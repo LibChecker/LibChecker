@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
@@ -15,6 +16,9 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
         val prefShowSystemApps = findPreference<SwitchPreferenceCompat>(Constants.PREF_SHOW_SYSTEM_APPS)
         prefShowSystemApps?.onPreferenceChangeListener = this
+
+        val prefAbout = findPreference<Preference>("about")
+        prefAbout?.summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
     }
 
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {

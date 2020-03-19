@@ -4,12 +4,12 @@
 
     <PreferenceCategory
         app:key="normalCategory"
-        app:title="Normal">
+        app:title="@string/pref_group_normal">
 
         <SwitchPreferenceCompat
             app:key="showSystemApps"
-            app:title="Show System Apps"
-            android:summary="Switch to control whether display system apps"
+            app:title="@string/show_system_apps"
+            android:summary="@string/show_system_apps_summary"
             android:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
@@ -17,7 +17,7 @@
 
     <PreferenceCategory
         app:key="othersCategory"
-        app:title="Others">
+        app:title="@string/pref_group_others">
 
         <Preference
             app:key="about"

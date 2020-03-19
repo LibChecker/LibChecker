@@ -4,7 +4,15 @@
     <string name="title_classify">Classify</string>
     <string name="title_settings">Settings</string>
 
+    <!--  About  -->
     <string name="settings_about">About</string>
     <string name="settings_about_summary">This is LibChecker!</string>
     <string name="about_info">This is an app that looks at the CPU architecture of apps in your device.</string>
+
+    <!--  Settings  -->
+    <string name="pref_group_normal">Normal</string>
+    <string name="pref_group_others">Others</string>
+
+    <string name="show_system_apps">Show System Apps</string>
+    <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
 </resources>
