@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.viewholder.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,14 +24,19 @@ class AppListViewModel : ViewModel() {
             val newItems = ArrayList<AppItem>()
 
             for (info in appList) {
-                if ((info.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM) {
-                    newItems.add(
-                        AppItem(
-                            info.loadIcon(context.packageManager),
-                            info.loadLabel(context.packageManager).toString(),
-                            getAbi(info.sourceDir)
-                        )
-                    )
+                if (((info.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM)
+                    || GlobalValues.isShowSystemApps) {
+
+                    val appItem = AppItem().apply {
+                        icon = info.loadIcon(context.packageManager)
+                        appName = info.loadLabel(context.packageManager).toString()
+                        packageName = info.packageName
+                        val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
+                        versionName = "${packageInfo.versionName}(${packageInfo.versionCode})"
+                        abi = getAbi(info.sourceDir)
+                    }
+
+                    newItems.add(appItem)
                 }
             }
 

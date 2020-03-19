@@ -5,4 +5,5 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="aboutHeader">#6200EE</color>
+    <color name="textNormal">#FF000000</color>
 </resources>

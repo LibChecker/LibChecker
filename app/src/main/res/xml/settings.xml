@@ -2,16 +2,35 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <Preference
-        app:key="about"
-        app:title="@string/settings_about"
-        app:summary="@string/settings_about_summary"
-        android:icon="@drawable/ic_logo">
+    <PreferenceCategory
+        app:key="normalCategory"
+        app:title="Normal">
 
-        <intent
-            android:targetPackage="com.absinthe.libchecker"
-            android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"/>
+        <SwitchPreferenceCompat
+            app:key="showSystemApps"
+            app:title="Show System Apps"
+            android:summary="Switch to control whether display system apps"
+            android:icon="@drawable/ic_android_outline"
+            app:defaultValue="false"/>
 
-    </Preference>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="othersCategory"
+        app:title="Others">
+
+        <Preference
+            app:key="about"
+            app:title="@string/settings_about"
+            app:summary="@string/settings_about_summary"
+            android:icon="@drawable/ic_logo">
+
+            <intent
+                android:targetPackage="com.absinthe.libchecker"
+                android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"/>
+
+        </Preference>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -22,25 +22,50 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_app_name"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Anywhere-"
-            android:textColor="@android:color/black"
-            android:textSize="16sp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_abi"
             app:layout_constraintStart_toEndOf="@id/iv_icon"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_app_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Anywhere-"
+                android:textColor="@android:color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_package_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="com.absinthe.anywhere_"
+                android:textColor="@android:color/black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tv_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1.8.0(1800)"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp" />
+
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/iv_abi_type"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_64bit"
+            app:layout_constraintBottom_toTopOf="@id/tv_abi"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,6 +75,7 @@
             android:layout_height="wrap_content"
             android:text="ARMv8"
             android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/iv_abi_type"
             app:layout_constraintStart_toStartOf="@id/iv_abi_type"
             app:layout_constraintTop_toBottomOf="@id/iv_abi_type" />
