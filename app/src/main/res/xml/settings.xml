@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Preference
+        app:key="about"
+        app:title="@string/settings_about"
+        app:summary="@string/settings_about_summary"
+        android:icon="@drawable/ic_logo">
+
+        <intent
+            android:targetPackage="com.absinthe.libchecker"
+            android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"/>
+
+    </Preference>
+
+</PreferenceScreen>

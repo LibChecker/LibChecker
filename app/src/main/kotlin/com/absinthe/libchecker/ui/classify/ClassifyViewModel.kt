@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 class ClassifyViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+        value = "Under construction"
     }
     val text: LiveData<String> = _text
 }

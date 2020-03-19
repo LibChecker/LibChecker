@@ -37,7 +37,11 @@ class AppListFragment : Fragment() {
             items.addAll(it)
             adapter.items = items
             adapter.notifyDataSetChanged()
+            binding.vfContainer.displayedChild = 1
         })
-        context?.let { viewModel.getItems(it) }
+        context?.let {
+            binding.vfContainer.displayedChild = 0
+            viewModel.getItems(it)
+        }
     }
 }
