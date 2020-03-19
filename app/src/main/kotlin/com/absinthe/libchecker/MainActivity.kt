@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
                 return when (position) {
                     0 -> AppListFragment()
                     1 -> ClassifyFragment()
-                    else -> SettingsFragment()
+                    2 -> SettingsFragment()
+                    else -> AppListFragment()
                 }
             }
         }
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        binding.viewpager.isUserInputEnabled = false
-        binding.viewpager.setPageTransformer(FadeOutPageTransformer())
+//        binding.viewpager.isUserInputEnabled = false
+//        binding.viewpager.setPageTransformer(FadeOutPageTransformer())
     }
 }

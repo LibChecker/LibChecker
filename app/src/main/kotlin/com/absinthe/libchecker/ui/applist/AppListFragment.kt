@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.applist
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +25,20 @@ class AppListFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(AppListViewModel::class.java)
         binding = FragmentAppListBinding.inflate(inflater, container, false)
         initView()
+        Log.d("Fragment", "OnCreateView")
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        Log.d("Fragment", "OnViewCreated")
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Fragment", "OnResume")
     }
 
     private fun initView() {
