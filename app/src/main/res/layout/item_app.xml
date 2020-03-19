@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Anywhere-"
-                android:textColor="@android:color/black"
+                android:textColor="@color/textNormal"
                 android:textSize="16sp" />
 
             <TextView
@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="com.absinthe.anywhere_"
-                android:textColor="@android:color/black"
+                android:textColor="@color/textNormal"
                 android:textSize="14sp" />
 
             <TextView
