@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@+id/navigation_app_list">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.absinthe.libchecker.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        android:id="@+id/navigation_app_list"
+        android:name="com.absinthe.libchecker.ui.applist.AppListFragment"
+        android:label="@string/title_app_list"
+        tools:layout="@layout/fragment_app_list" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.absinthe.libchecker.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_classify"
+        android:name="com.absinthe.libchecker.ui.classify.ClassifyFragment"
+        android:label="@string/title_classify"
+        tools:layout="@layout/fragment_classify" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.absinthe.libchecker.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_settings"
+        android:name="com.absinthe.libchecker.ui.settings.SettingsFragment"
+        android:label="@string/title_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
