@@ -4,6 +4,9 @@
     <string name="title_classify">Classify</string>
     <string name="title_settings">Settings</string>
 
+    <!--  App list  -->
+    <string name="menu_search">Search</string>
+
     <!--  About  -->
     <string name="settings_about">About</string>
     <string name="settings_about_summary">This is LibChecker!</string>

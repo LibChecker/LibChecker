@@ -9,7 +9,7 @@ import com.drakeet.about.*
 class AboutActivity : AbsAboutActivity() {
 
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
-        icon.setImageResource(R.mipmap.ic_launcher_round)
+        icon.setImageResource(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
     }

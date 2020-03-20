@@ -1,47 +1,39 @@
 package com.absinthe.libchecker.ui.applist
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
 import com.drakeet.multitype.MultiTypeAdapter
 
-class AppListFragment : Fragment() {
+class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
     private lateinit var viewModel: AppListViewModel
     private val adapter = MultiTypeAdapter()
     private val items = ArrayList<Any>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         viewModel = ViewModelProvider(this).get(AppListViewModel::class.java)
         binding = FragmentAppListBinding.inflate(inflater, container, false)
         initView()
-        Log.d("Fragment", "OnCreateView")
 
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Log.d("Fragment", "OnViewCreated")
-
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Log.d("Fragment", "OnResume")
-    }
-
     private fun initView() {
+        setHasOptionsMenu(true)
         adapter.register(AppItemViewBinder())
         binding.recyclerview.adapter = adapter
         binding.recyclerview.layoutManager = LinearLayoutManager(activity)
@@ -60,5 +52,34 @@ class AppListFragment : Fragment() {
             binding.vfContainer.displayedChild = 0
             viewModel.getItems(it)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.app_list_menu, menu)
+
+        val searchView = SearchView(context).apply {
+            setIconifiedByDefault(false)
+            setOnQueryTextListener(this@AppListFragment)
+            isQueryRefinementEnabled = true
+        }
+
+        menu.findItem(R.id.search).apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            actionView = searchView
+        }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String): Boolean {
+        val filter = items.filter {
+            (it as AppItem).appName.contains(newText) || it.packageName.contains(newText)
+        }
+        adapter.items = filter
+        adapter.notifyDataSetChanged()
+        return false
     }
 }

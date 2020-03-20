@@ -6,7 +6,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.listener.FadeOutPageTransformer
 import com.absinthe.libchecker.ui.applist.AppListFragment
 import com.absinthe.libchecker.ui.classify.ClassifyFragment
 import com.absinthe.libchecker.ui.settings.SettingsFragment
@@ -22,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setSupportActionBar(binding.toolbar)
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 3
@@ -54,8 +54,5 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-//        binding.viewpager.isUserInputEnabled = false
-//        binding.viewpager.setPageTransformer(FadeOutPageTransformer())
     }
 }
