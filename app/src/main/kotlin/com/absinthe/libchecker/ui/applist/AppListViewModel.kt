@@ -25,7 +25,8 @@ class AppListViewModel : ViewModel() {
 
             for (info in appList) {
                 if (((info.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM)
-                    || GlobalValues.isShowSystemApps) {
+                    || GlobalValues.isShowSystemApps
+                ) {
 
                     val appItem = AppItem().apply {
                         icon = info.loadIcon(context.packageManager)
@@ -33,7 +34,7 @@ class AppListViewModel : ViewModel() {
                         packageName = info.packageName
                         val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
                         versionName = "${packageInfo.versionName}(${packageInfo.versionCode})"
-                        abi = getAbi(info.sourceDir)
+                        abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                     }
 
                     newItems.add(appItem)
@@ -49,7 +50,7 @@ class AppListViewModel : ViewModel() {
         }
     }
 
-    private fun getAbi(path: String): Int {
+    private fun getAbi(path: String, nativePath: String): Int {
         val file = File(path)
         val zipFile = ZipFile(file)
         val entries = zipFile.entries()
@@ -67,6 +68,23 @@ class AppListViewModel : ViewModel() {
             abiList.contains("arm64-v8a") -> ARMV8
             abiList.contains("armeabi-v7a") -> ARMV7
             abiList.contains("armeabi") -> ARMV5
+            else -> getAbiByNativeDir(nativePath)
+        }
+    }
+
+    private fun getAbiByNativeDir(nativePath: String): Int {
+        val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
+        val abiList = ArrayList<String>()
+
+        val fileList = file.listFiles() ?: return NO_LIBS
+
+        for (abi in fileList) {
+            abiList.add(abi.name)
+        }
+
+        return when {
+            abiList.contains("arm64") -> ARMV8
+            abiList.contains("arm") -> ARMV7
             else -> NO_LIBS
         }
     }

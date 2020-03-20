@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.applist
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
@@ -35,6 +36,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun initView() {
         setHasOptionsMenu(true)
         adapter.register(AppItemViewBinder())
+        adapter
         binding.recyclerview.adapter = adapter
         binding.recyclerview.layoutManager = LinearLayoutManager(activity)
 
@@ -61,7 +63,12 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         val searchView = SearchView(context).apply {
             setIconifiedByDefault(false)
             setOnQueryTextListener(this@AppListFragment)
+            queryHint = getText(R.string.search_hint)
             isQueryRefinementEnabled = true
+
+            findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+                setBackgroundColor(Color.TRANSPARENT)
+            }
         }
 
         menu.findItem(R.id.search).apply {

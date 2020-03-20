@@ -26,7 +26,7 @@ class AppItemViewBinder : ItemViewBinder<AppItem, AppItemViewBinder.ViewHolder>(
                 ARMV8 -> ARMV8_STRING
                 ARMV7 -> ARMV7_STRING
                 ARMV5 -> ARMV5_STRING
-                else -> NO_LIBS_STRING
+                else -> holder.itemView.context.getText(R.string.no_libs)
             }
             abiType.setImageResource(when(item.abi) {
                 ARMV8 -> R.drawable.ic_64bit

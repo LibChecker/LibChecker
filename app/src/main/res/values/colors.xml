@@ -6,4 +6,5 @@
 
     <color name="aboutHeader">#6200EE</color>
     <color name="textNormal">#FF000000</color>
+    <color name="backgroundNormal">#FFFFFFFF</color>
 </resources>

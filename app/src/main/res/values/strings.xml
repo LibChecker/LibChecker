@@ -6,6 +6,8 @@
 
     <!--  App list  -->
     <string name="menu_search">Search</string>
+    <string name="search_hint">Search…</string>
+    <string name="no_libs">No native libs</string>
 
     <!--  About  -->
     <string name="settings_about">About</string>

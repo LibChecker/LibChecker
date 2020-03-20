@@ -11,4 +11,7 @@
     <string name="show_system_apps">显示系统应用</string>
     <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
     <string name="pref_group_others">其它</string>
+    <string name="search_hint">搜索…</string>
+    <string name="menu_search">搜索</string>
+    <string name="no_libs">无 native 库</string>
 </resources>
