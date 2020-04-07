@@ -12,21 +12,18 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
+import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.drakeet.multitype.MultiTypeAdapter
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
-    private lateinit var viewModel: AppListViewModel
+    private lateinit var viewModel: AppViewModel
     private val adapter = MultiTypeAdapter()
     private val items = ArrayList<Any>()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        viewModel = ViewModelProvider(this).get(AppListViewModel::class.java)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         binding = FragmentAppListBinding.inflate(inflater, container, false)
         initView()
 

@@ -28,5 +28,6 @@ class AboutActivity : AbsAboutActivity() {
         items.add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
         items.add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
         items.add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
+        items.add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
     }
 }

@@ -1,8 +1,9 @@
-package com.absinthe.libchecker.ui.applist
+package com.absinthe.libchecker.viewmodel
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -14,7 +15,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.zip.ZipFile
 
-class AppListViewModel : ViewModel() {
+class AppViewModel : ViewModel() {
     val items: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
 
     fun getItems(context: Context) {
@@ -25,15 +26,16 @@ class AppListViewModel : ViewModel() {
 
             for (info in appList) {
                 if (((info.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM)
-                    || GlobalValues.isShowSystemApps
-                ) {
+                    || GlobalValues.isShowSystemApps) {
 
                     val appItem = AppItem().apply {
                         icon = info.loadIcon(context.packageManager)
                         appName = info.loadLabel(context.packageManager).toString()
                         packageName = info.packageName
                         val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
-                        versionName = "${packageInfo.versionName}(${packageInfo.versionCode})"
+                        val versionCode =
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) { packageInfo.longVersionCode } else { packageInfo.versionCode }
+                        versionName = "${packageInfo.versionName}(${versionCode})"
                         abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                     }
 
