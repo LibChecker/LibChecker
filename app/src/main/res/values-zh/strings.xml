@@ -16,4 +16,6 @@
     <string name="no_libs">无 native 库</string>
     <string name="string_64_bit">64 位</string>
     <string name="string_32_bit">32 位</string>
+    <string name="chart_no_data_text">加载中</string>
+    <string name="title_classify_dialog">%s架构的 Apps</string>
 </resources>

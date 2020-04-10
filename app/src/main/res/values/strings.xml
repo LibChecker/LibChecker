@@ -11,6 +11,10 @@
     <string name="string_32_bit">32bit</string>
     <string name="no_libs">No native libs</string>
 
+    <!-- Classify   -->
+    <string name="chart_no_data_text">Loading</string>
+    <string name="title_classify_dialog">Apps with %s ABI</string>
+
     <!--  About  -->
     <string name="settings_about">About</string>
     <string name="settings_about_summary">This is LibChecker!</string>

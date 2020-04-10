@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.classify
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,26 +11,34 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
+import com.absinthe.libchecker.view.ClassifyDialogFragment
 import com.absinthe.libchecker.viewholder.ARMV5
 import com.absinthe.libchecker.viewholder.ARMV7
 import com.absinthe.libchecker.viewholder.ARMV8
 import com.absinthe.libchecker.viewholder.NO_LIBS
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 
 
-class ClassifyFragment : Fragment() {
+class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
 
     private lateinit var binding: FragmentClassifyBinding
     private lateinit var viewModel: AppViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         binding = FragmentClassifyBinding.inflate(inflater, container, false)
 
@@ -46,6 +55,7 @@ class ClassifyFragment : Fragment() {
                 verticalAlignment = Legend.LegendVerticalAlignment.TOP
                 horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
                 orientation = Legend.LegendOrientation.VERTICAL
+                textColor = resources.getColor(R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
                 yOffset = 0f
@@ -53,6 +63,10 @@ class ClassifyFragment : Fragment() {
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
+            setEntryLabelColor(Color.BLACK)
+            setNoDataText(getString(R.string.chart_no_data_text))
+            setNoDataTextColor(resources.getColor(R.color.textNormal))
+            setOnChartValueSelectedListener(this@ClassifyFragment)
         }
 
         viewModel.items.observe(viewLifecycleOwner, Observer {
@@ -113,7 +127,7 @@ class ClassifyFragment : Fragment() {
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(binding.chart))
                 setValueTextSize(11f)
-                setValueTextColor(Color.WHITE)
+                setValueTextColor(Color.BLACK)
             }
 
             binding.chart.apply {
@@ -122,5 +136,37 @@ class ClassifyFragment : Fragment() {
                 invalidate()
             }
         }
+    }
+
+    override fun onNothingSelected() {
+        Log.d("Classify Fragment", "Nothing selected")
+    }
+
+    override fun onValueSelected(e: Entry?, h: Highlight?) {
+        if (e == null) return
+        if (h == null) return
+
+        val dialogFragment = ClassifyDialogFragment()
+
+        when (h.x) {
+            0f -> {
+                viewModel.items.value?.filter { it.abi == ARMV8 }?.let { filter ->
+                    dialogFragment.item = filter
+                }
+            }
+            1f -> {
+                viewModel.items.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                    ?.let { filter ->
+                        dialogFragment.item = filter
+                    }
+            }
+            2f -> {
+                viewModel.items.value?.filter { it.abi == NO_LIBS }?.let { filter ->
+                    dialogFragment.item = filter
+                }
+            }
+        }
+
+        dialogFragment.show(requireActivity().supportFragmentManager, dialogFragment.tag)
     }
 }
