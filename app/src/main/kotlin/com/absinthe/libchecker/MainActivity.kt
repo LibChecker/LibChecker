@@ -9,6 +9,9 @@ import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.applist.AppListFragment
 import com.absinthe.libchecker.ui.classify.ClassifyFragment
 import com.absinthe.libchecker.ui.settings.SettingsFragment
+import com.microsoft.appcenter.AppCenter
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.crashes.Crashes
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +23,11 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        AppCenter.start(
+            application, "5f11b856-0a27-4438-a038-9e18e4797133",
+            Analytics::class.java, Crashes::class.java
+        )
 
         setSupportActionBar(binding.toolbar)
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
