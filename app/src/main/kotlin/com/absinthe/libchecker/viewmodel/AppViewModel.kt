@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.viewholder.*
 import com.blankj.utilcode.util.AppUtils
 import kotlinx.coroutines.Dispatchers
@@ -64,7 +65,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                 getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
             )
-
+            
             newItems.add(appItem)
             insert(item)
         }
@@ -79,23 +80,31 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun addItem() {
         allItems.value?.let { value ->
-            val newItems = ArrayList<AppItem>()
+            viewModelScope.launch(Dispatchers.IO) {
+                val newItems = ArrayList<AppItem>()
 
-            for (item in value) {
-                val appItem = AppItem().apply {
-                    icon = AppUtils.getAppIcon(item.packageName)
-                    appName = item.label
-                    packageName = item.packageName
-                    versionName = "${item.versionName}(${item.versionCode})"
-                    abi = item.abi.toInt()
+                for (item in value) {
+                    val appItem = AppItem().apply {
+                        icon = AppUtils.getAppIcon(item.packageName)
+                        appName = item.label
+                        packageName = item.packageName
+                        versionName = "${item.versionName}(${item.versionCode})"
+                        abi = item.abi.toInt()
+                    }
+
+                    GlobalValues.isShowSystemApps.value?.let {
+                        if (it || (!it && !item.isSystem)) {
+                            newItems.add(appItem)
+                        }
+                    }
                 }
 
-                newItems.add(appItem)
+                newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+
+                withContext(Dispatchers.Main) {
+                    items.value = newItems
+                }
             }
-
-            newItems.sortWith(compareBy({ it.abi }, { it.appName }))
-
-            items.value = newItems
         }
     }
 

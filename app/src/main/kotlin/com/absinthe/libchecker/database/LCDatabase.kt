@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [LCItem::class], version = 1, exportSchema = false)
+@Database(entities = [LCItem::class, NativeLibItem::class], version = 1, exportSchema = false)
 public abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -25,7 +25,7 @@ public abstract class LCDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     LCDatabase::class.java,
-                    "word_database"
+                    "lc_database"
                 ).build()
                 INSTANCE = instance
                 return instance

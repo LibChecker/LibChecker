@@ -14,4 +14,13 @@ interface LCDao {
 
     @Update
     suspend fun update(item: LCItem)
+
+    @Query("SELECT * from native_lib_table ORDER BY count DESC")
+    fun getLibItems(): LiveData<List<NativeLibItem>>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(item: NativeLibItem)
+
+    @Update
+    suspend fun update(item: NativeLibItem)
 }

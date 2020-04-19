@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
+import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.view.ClassifyDialogFragment
 import com.absinthe.libchecker.viewholder.ARMV5
 import com.absinthe.libchecker.viewholder.ARMV7
@@ -70,6 +71,10 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         }
 
         viewModel.items.observe(viewLifecycleOwner, Observer {
+            setData()
+        })
+
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
             setData()
         })
     }

@@ -83,18 +83,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         })
 
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                val filter = mItems.filter { f -> (f as AppItem).isSystem }
-                mAdapter.apply {
-                    items = filter
-                    notifyDataSetChanged()
-                }
-            } else {
-                mAdapter.apply {
-                    items = mItems
-                    notifyDataSetChanged()
-                }
-            }
+            viewModel.addItem()
         })
     }
 
