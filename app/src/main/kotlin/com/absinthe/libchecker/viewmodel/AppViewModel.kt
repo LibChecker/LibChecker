@@ -65,7 +65,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                 getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
             )
-            
+
             newItems.add(appItem)
             insert(item)
         }
