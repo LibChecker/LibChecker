@@ -9,6 +9,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
@@ -28,8 +29,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
     override fun onPreferenceChange(preference: Preference?, newValue: Any?): Boolean {
         if (preference?.key == Constants.PREF_SHOW_SYSTEM_APPS) {
-            GlobalValues.isShowSystemApps = newValue as Boolean
-            viewModel.getItems(requireContext())
+            GlobalValues.isShowSystemApps.value = newValue as Boolean
+            SPUtils.putBoolean(requireContext(), Constants.PREF_SHOW_SYSTEM_APPS, newValue)
             return true
         }
         return false

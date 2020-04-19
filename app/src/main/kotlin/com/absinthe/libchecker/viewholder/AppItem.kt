@@ -19,4 +19,5 @@ class AppItem {
     var packageName: String = ""
     var versionName: String = ""
     var abi: Int = NO_LIBS
+    var isSystem: Boolean = false
 }

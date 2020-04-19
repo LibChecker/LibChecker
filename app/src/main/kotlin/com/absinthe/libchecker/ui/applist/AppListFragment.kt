@@ -9,20 +9,27 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.drakeet.multitype.MultiTypeAdapter
+import jonathanfinerty.once.Once
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
     private lateinit var viewModel: AppViewModel
-    private val adapter = MultiTypeAdapter()
-    private val items = ArrayList<Any>()
+    private val mAdapter = MultiTypeAdapter()
+    private val mItems = ArrayList<Any>()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         binding = FragmentAppListBinding.inflate(inflater, container, false)
         initView()
@@ -32,25 +39,63 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun initView() {
         setHasOptionsMenu(true)
-        adapter.register(AppItemViewBinder())
-        adapter
-        binding.recyclerview.adapter = adapter
-        binding.recyclerview.layoutManager = LinearLayoutManager(activity)
+        mAdapter.register(AppItemViewBinder())
 
-        binding.vfContainer.setInAnimation(activity, R.anim.anim_fade_in)
-        binding.vfContainer.setOutAnimation(activity, R.anim.anim_fade_out)
+        binding.apply {
+            recyclerview.apply {
+                adapter = mAdapter
+                layoutManager = LinearLayoutManager(activity)
+            }
+            vfContainer.apply {
+                setInAnimation(activity, R.anim.anim_fade_in)
+                setOutAnimation(activity, R.anim.anim_fade_out)
+            }
+        }
+
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+            viewModel.initItems(requireContext())
+        } else {
+            viewModel.allItems.observe(viewLifecycleOwner, Observer {
+                if (it.isNullOrEmpty()) {
+                    binding.vfContainer.displayedChild = 0
+                    viewModel.initItems(requireContext())
+                } else {
+                    binding.vfContainer.displayedChild = 0
+                    viewModel.addItem()
+                }
+            })
+        }
 
         viewModel.items.observe(viewLifecycleOwner, Observer {
-            items.clear()
-            items.addAll(it)
-            adapter.items = items
-            adapter.notifyDataSetChanged()
+            mItems.apply {
+                clear()
+                addAll(it)
+            }
+            mAdapter.apply {
+                items = mItems
+                notifyDataSetChanged()
+            }
             binding.vfContainer.displayedChild = 1
+
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+                Once.markDone(OnceTag.FIRST_LAUNCH)
+            }
         })
-        context?.let {
-            binding.vfContainer.displayedChild = 0
-            viewModel.getItems(it)
-        }
+
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val filter = mItems.filter { f -> (f as AppItem).isSystem }
+                mAdapter.apply {
+                    items = filter
+                    notifyDataSetChanged()
+                }
+            } else {
+                mAdapter.apply {
+                    items = mItems
+                    notifyDataSetChanged()
+                }
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -79,11 +124,13 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        val filter = items.filter {
+        val filter = mItems.filter {
             (it as AppItem).appName.contains(newText) || it.packageName.contains(newText)
         }
-        adapter.items = filter
-        adapter.notifyDataSetChanged()
+        mAdapter.apply {
+            items = filter
+            notifyDataSetChanged()
+        }
         return false
     }
 }
