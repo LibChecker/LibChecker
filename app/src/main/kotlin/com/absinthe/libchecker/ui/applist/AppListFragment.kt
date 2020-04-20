@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.utils.GlobalValues
@@ -57,54 +56,43 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
 
-        val observer = Observer<List<LCItem>> {
-            if (!viewModel.isInit) {
-                binding.vfContainer.displayedChild = 0
-            }
-
-            if (it.isNullOrEmpty()) {
-                viewModel.initItems(requireContext())
-            } else {
-                viewModel.addItem(requireContext())
-            }
-        }
-
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-            viewModel.initItems(requireContext())
-        } else {
-            viewModel.allItems.observe(viewLifecycleOwner, observer)
-        }
-
-        viewModel.items.observe(viewLifecycleOwner, Observer {
-            updateItems(it)
-            mItems.apply {
-                clear()
-                addAll(it)
-            }
-            mTempItems.apply {
-                clear()
-                addAll(it)
-            }
-
-            binding.vfContainer.displayedChild = 1
-
+        viewModel.apply {
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-                Once.markDone(OnceTag.FIRST_LAUNCH)
-            }
-        })
-
-        GlobalValues.apply {
-            isShowSystemApps.observe(viewLifecycleOwner, Observer {
-                viewModel.addItem(requireContext())
-            })
-            isObservingDBItems.observe(viewLifecycleOwner, Observer {
-                if (Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-                    if (it) {
-                        viewModel.allItems.observe(viewLifecycleOwner, observer)
-                    } else {
-                        viewModel.allItems.removeObserver(observer)
+                initItems(requireContext())
+            } else {
+                allItems.observe(viewLifecycleOwner, Observer {
+                    if (!isInit) {
+                        binding.vfContainer.displayedChild = 0
                     }
+
+                    if (it.isNullOrEmpty()) {
+                        initItems(requireContext())
+                    } else {
+                        addItem(requireContext())
+                    }
+                })
+            }
+
+            items.observe(viewLifecycleOwner, Observer {
+                updateItems(it)
+                mItems.apply {
+                    clear()
+                    addAll(it)
                 }
+                mTempItems.apply {
+                    clear()
+                    addAll(it)
+                }
+
+                binding.vfContainer.displayedChild = 1
+
+                if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+                    Once.markDone(OnceTag.FIRST_LAUNCH)
+                }
+            })
+
+            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
+                addItem(requireContext())
             })
         }
     }

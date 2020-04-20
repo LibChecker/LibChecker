@@ -15,6 +15,10 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.update(item)
     }
 
+    suspend fun delete(item: LCItem) {
+        lcDao.delete(item)
+    }
+
     suspend fun deleteAll() {
         lcDao.deleteAll()
     }

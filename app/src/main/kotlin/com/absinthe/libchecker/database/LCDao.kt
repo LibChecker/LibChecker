@@ -15,6 +15,9 @@ interface LCDao {
     @Update
     suspend fun update(item: LCItem)
 
+    @Delete
+    suspend fun delete(item: LCItem)
+
     @Query("DELETE FROM item_table")
     fun deleteAll()
 

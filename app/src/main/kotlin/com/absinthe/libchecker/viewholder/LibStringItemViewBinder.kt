@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.viewholder
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +12,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.drakeet.multitype.ItemViewBinder
 
-class LibStringItemViewBinder  : ItemViewBinder<LibStringItem, LibStringItemViewBinder.ViewHolder>() {
+class LibStringItemViewBinder :
+    ItemViewBinder<LibStringItem, LibStringItemViewBinder.ViewHolder>() {
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
         val root: View = inflater.inflate(R.layout.item_lib_string, parent, false)
@@ -22,7 +25,7 @@ class LibStringItemViewBinder  : ItemViewBinder<LibStringItem, LibStringItemView
             name.text = item.name
             NativeLibMap.MAP[item.name]?.let {
                 libIcon.setImageResource(it)
-            }
+            } ?: libIcon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
         }
     }
 

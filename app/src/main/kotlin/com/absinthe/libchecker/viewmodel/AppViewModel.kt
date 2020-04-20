@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.*
 import com.blankj.utilcode.util.AppUtils
 import kotlinx.coroutines.Dispatchers
@@ -49,12 +49,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         for (info in appList) {
             try {
-                val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
-                val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    packageInfo.longVersionCode
-                } else {
-                    packageInfo.versionCode.toLong()
-                }
+                val packageInfo = PackageUtils.getPackageInfo(info)
+                val versionCode = PackageUtils.getVersionCode(packageInfo)
 
                 val appItem = AppItem().apply {
                     icon = info.loadIcon(context.packageManager)
@@ -131,12 +127,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+    private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.insert(item)
     }
 
-    fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+    private fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.update(item)
+    }
+
+    private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.delete(item)
     }
 
     private fun deleteAll() = viewModelScope.launch(Dispatchers.IO) {
@@ -144,11 +144,69 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChange(context: Context) {
-        viewModelScope.launch(Dispatchers.Main) {
-            GlobalValues.isObservingDBItems.value = false
+        val appList = context.packageManager
+            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val newItems = ArrayList<AppItem>()
+
+        for (info in appList) {
+            val packageInfo = PackageUtils.getPackageInfo(info)
+            val versionCode = PackageUtils.getVersionCode(packageInfo)
+
+            val appItem = AppItem().apply {
+                icon = info.loadIcon(context.packageManager)
+                appName = info.loadLabel(context.packageManager).toString()
+                packageName = info.packageName
+                versionName = "${packageInfo.versionName}(${versionCode})"
+                abi = getAbi(info.sourceDir, info.nativeLibraryDir)
+                isSystem =
+                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+            }
+
+            newItems.add(appItem)
         }
-        deleteAll()
-        initItems(context)
+
+        allItems.value?.let { value ->
+            for (dbItem in value) {
+                appList.find { it.packageName == dbItem.packageName }?.let {
+                    val packageInfo = PackageUtils.getPackageInfo(it)
+                    val versionCode = PackageUtils.getVersionCode(packageInfo)
+
+                    if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
+                        val item = LCItem(
+                            it.packageName,
+                            it.loadLabel(context.packageManager).toString(),
+                            packageInfo.versionName,
+                            versionCode,
+                            packageInfo.firstInstallTime,
+                            packageInfo.lastUpdateTime,
+                            (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                            getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
+                        )
+                        update(item)
+                    }
+
+                    appList.remove(it)
+                } ?: delete(dbItem)
+            }
+
+            for (info in appList) {
+                val packageInfo = PackageUtils.getPackageInfo(info)
+                val versionCode = PackageUtils.getVersionCode(packageInfo)
+
+                val lcItem = LCItem(
+                    info.packageName,
+                    info.loadLabel(context.packageManager).toString(),
+                    packageInfo.versionName,
+                    versionCode,
+                    packageInfo.firstInstallTime,
+                    packageInfo.lastUpdateTime,
+                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                    getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                )
+
+                insert(lcItem)
+            }
+        }
     }
 
     private fun getAbi(path: String, nativePath: String): Int {
