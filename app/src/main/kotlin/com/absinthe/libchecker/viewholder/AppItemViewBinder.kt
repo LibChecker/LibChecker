@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.NativeLibDialogFragment
 import com.drakeet.multitype.ItemViewBinder
 
 class AppItemViewBinder : ItemViewBinder<AppItem, AppItemViewBinder.ViewHolder>() {
@@ -22,18 +24,29 @@ class AppItemViewBinder : ItemViewBinder<AppItem, AppItemViewBinder.ViewHolder>(
             appName.text = item.appName
             packageName.text = item.packageName
             versionName.text = item.versionName
-            abi.text = when(item.abi) {
+            abi.text = when (item.abi) {
                 ARMV8 -> ARMV8_STRING
                 ARMV7 -> ARMV7_STRING
                 ARMV5 -> ARMV5_STRING
                 else -> holder.itemView.context.getText(R.string.no_libs)
             }
-            abiType.setImageResource(when(item.abi) {
-                ARMV8 -> R.drawable.ic_64bit
-                ARMV7 -> R.drawable.ic_32bit
-                ARMV5 -> R.drawable.ic_32bit
-                else -> 0
-            })
+            abiType.setImageResource(
+                when (item.abi) {
+                    ARMV8 -> R.drawable.ic_64bit
+                    ARMV7 -> R.drawable.ic_32bit
+                    ARMV5 -> R.drawable.ic_32bit
+                    else -> 0
+                }
+            )
+
+            itemView.setOnClickListener {
+                MainActivity.instance?.let { instance ->
+                    NativeLibDialogFragment(item.packageName).show(
+                        instance.supportFragmentManager,
+                        "NativeLibDialogFragment"
+                    )
+                }
+            }
         }
     }
 
