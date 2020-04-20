@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.viewholder
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.NativeLibDialogFragment
 import com.drakeet.multitype.ItemViewBinder
 
@@ -41,10 +43,15 @@ class AppItemViewBinder : ItemViewBinder<AppItem, AppItemViewBinder.ViewHolder>(
 
             itemView.setOnClickListener {
                 MainActivity.instance?.let { instance ->
-                    NativeLibDialogFragment(item.packageName).show(
-                        instance.supportFragmentManager,
-                        "NativeLibDialogFragment"
-                    )
+                    NativeLibDialogFragment().apply {
+                        arguments = Bundle().apply {
+                            putString(EXTRA_PKG_NAME, item.packageName)
+                        }
+                        show(
+                            instance.supportFragmentManager,
+                            "NativeLibDialogFragment"
+                        )
+                    }
                 }
             }
         }

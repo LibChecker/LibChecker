@@ -7,19 +7,36 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.viewholder.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
+
 class ClassifyDialogFragment : DialogFragment() {
 
-    lateinit var dialogView: ClassifyDialogView
-    var item: List<AppItem> = ArrayList()
+    var item: ArrayList<AppItem> = ArrayList()
+    private lateinit var dialogView: ClassifyDialogView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         dialogView = ClassifyDialogView(requireContext())
-        dialogView.adapter.items = item
+
+        if (savedInstanceState != null) {
+            savedInstanceState.getParcelableArrayList<AppItem>(
+                EXTRA_ITEM_LIST
+            )?.toList()?.let {
+                dialogView.adapter.items = it
+                item = it as ArrayList<AppItem>
+            }
+        } else {
+            dialogView.adapter.items = item
+        }
 
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(String.format(getString(R.string.title_classify_dialog), getTitle()))
             .setView(dialogView)
             .create()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelableArrayList(EXTRA_ITEM_LIST, item)
+        super.onSaveInstanceState(outState)
     }
 
     private fun getTitle(): String {

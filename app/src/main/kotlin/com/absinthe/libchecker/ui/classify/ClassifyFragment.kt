@@ -156,18 +156,18 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         when (h.x) {
             0f -> {
                 viewModel.items.value?.filter { it.abi == ARMV8 }?.let { filter ->
-                    dialogFragment.item = filter
+                    dialogFragment.item = ArrayList(filter)
                 }
             }
             1f -> {
                 viewModel.items.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
                     ?.let { filter ->
-                        dialogFragment.item = filter
+                        dialogFragment.item = ArrayList(filter)
                     }
             }
             2f -> {
                 viewModel.items.value?.filter { it.abi == NO_LIBS }?.let { filter ->
-                    dialogFragment.item = filter
+                    dialogFragment.item = ArrayList(filter)
                 }
             }
         }

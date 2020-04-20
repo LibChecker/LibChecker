@@ -2,26 +2,33 @@ package com.absinthe.libchecker.view
 
 import android.app.Dialog
 import android.os.Bundle
+import android.text.Html
 import androidx.fragment.app.DialogFragment
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.viewholder.LibStringItem
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
 
-class NativeLibDialogFragment constructor(private val packageName: String) : DialogFragment() {
+const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 
-    lateinit var dialogView: NativeLibView
+class NativeLibDialogFragment : DialogFragment() {
+
+    private lateinit var dialogView: NativeLibView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val packageName:String? = arguments?.getString(EXTRA_PKG_NAME)
+
         dialogView = NativeLibView(requireContext())
 
-        val info = Utils.getApp().packageManager.getApplicationInfo(packageName, 0)
+        val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
 
         dialogView.adapter.items = getAbiByNativeDir(info.nativeLibraryDir)
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Native libs in $packageName")
+            .setTitle(Html.fromHtml(String.format(getString(R.string.format_native_libs_title), AppUtils.getAppName(packageName))))
             .setView(dialogView)
             .create()
     }
