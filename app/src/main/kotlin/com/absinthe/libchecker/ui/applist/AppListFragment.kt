@@ -7,10 +7,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
@@ -18,12 +21,14 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.drakeet.multitype.MultiTypeAdapter
 import jonathanfinerty.once.Once
 
+
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
     private lateinit var viewModel: AppViewModel
     private val mAdapter = MultiTypeAdapter()
-    private val mItems = ArrayList<Any>()
+    private val mItems = ArrayList<AppItem>()
+    private val mTempItems = ArrayList<AppItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,29 +57,35 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
 
+        val observer = Observer<List<LCItem>> {
+            if (!viewModel.isInit) {
+                binding.vfContainer.displayedChild = 0
+            }
+
+            if (it.isNullOrEmpty()) {
+                viewModel.initItems(requireContext())
+            } else {
+                viewModel.addItem(requireContext())
+            }
+        }
+
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
             viewModel.initItems(requireContext())
         } else {
-            viewModel.allItems.observe(viewLifecycleOwner, Observer {
-                if (it.isNullOrEmpty()) {
-                    binding.vfContainer.displayedChild = 0
-                    viewModel.initItems(requireContext())
-                } else {
-                    binding.vfContainer.displayedChild = 0
-                    viewModel.addItem()
-                }
-            })
+            viewModel.allItems.observe(viewLifecycleOwner, observer)
         }
 
         viewModel.items.observe(viewLifecycleOwner, Observer {
+            updateItems(it)
             mItems.apply {
                 clear()
                 addAll(it)
             }
-            mAdapter.apply {
-                items = mItems
-                notifyDataSetChanged()
+            mTempItems.apply {
+                clear()
+                addAll(it)
             }
+
             binding.vfContainer.displayedChild = 1
 
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
@@ -82,9 +93,31 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         })
 
-        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
-            viewModel.addItem()
-        })
+        GlobalValues.apply {
+            isShowSystemApps.observe(viewLifecycleOwner, Observer {
+                viewModel.addItem(requireContext())
+            })
+            isObservingDBItems.observe(viewLifecycleOwner, Observer {
+                if (Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+                    if (it) {
+                        viewModel.allItems.observe(viewLifecycleOwner, observer)
+                    } else {
+                        viewModel.allItems.removeObserver(observer)
+                    }
+                }
+            })
+        }
+    }
+
+    private fun updateItems(newItems: List<AppItem>) {
+        if (mTempItems.isEmpty()) {
+            mAdapter.items = newItems
+            mAdapter.notifyDataSetChanged()
+        } else {
+            val diffResult = DiffUtil.calculateDiff(AppListDiffUtil(mTempItems, newItems), true)
+            diffResult.dispatchUpdatesTo(mAdapter)
+            mAdapter.items = mTempItems
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -114,11 +147,12 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         val filter = mItems.filter {
-            (it as AppItem).appName.contains(newText) || it.packageName.contains(newText)
+            it.appName.contains(newText) || it.packageName.contains(newText)
         }
-        mAdapter.apply {
-            items = filter
-            notifyDataSetChanged()
+        updateItems(filter)
+        mTempItems.apply {
+            clear()
+            addAll(filter)
         }
         return false
     }

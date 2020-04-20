@@ -15,6 +15,9 @@ interface LCDao {
     @Update
     suspend fun update(item: LCItem)
 
+    @Query("DELETE FROM item_table")
+    fun deleteAll()
+
     @Query("SELECT * from native_lib_table ORDER BY count DESC")
     fun getLibItems(): LiveData<List<NativeLibItem>>
 

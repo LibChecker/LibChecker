@@ -4,7 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -25,7 +28,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val items: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
     val allItems: LiveData<List<LCItem>>
+    var isInit = false
+
+    private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
+
 
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
@@ -34,51 +41,61 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d(tag, "initItems")
+
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val newItems = ArrayList<AppItem>()
 
         for (info in appList) {
-            val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
-            val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                packageInfo.longVersionCode
-            } else {
-                packageInfo.versionCode.toLong()
-            }
+            try {
+                val packageInfo = context.packageManager.getPackageInfo(info.packageName, 0)
+                val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    packageInfo.longVersionCode
+                } else {
+                    packageInfo.versionCode.toLong()
+                }
 
-            val appItem = AppItem().apply {
-                icon = info.loadIcon(context.packageManager)
-                appName = info.loadLabel(context.packageManager).toString()
-                packageName = info.packageName
-                versionName = "${packageInfo.versionName}(${versionCode})"
-                abi = getAbi(info.sourceDir, info.nativeLibraryDir)
-                isSystem =
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
-            }
-            val item = LCItem(
-                info.packageName,
-                info.loadLabel(context.packageManager).toString(),
-                packageInfo.versionName,
-                versionCode,
-                packageInfo.firstInstallTime,
-                packageInfo.lastUpdateTime,
-                (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
-            )
+                val appItem = AppItem().apply {
+                    icon = info.loadIcon(context.packageManager)
+                    appName = info.loadLabel(context.packageManager).toString()
+                    packageName = info.packageName
+                    versionName = "${packageInfo.versionName}(${versionCode})"
+                    abi = getAbi(info.sourceDir, info.nativeLibraryDir)
+                    isSystem =
+                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                }
+                val item = LCItem(
+                    info.packageName,
+                    info.loadLabel(context.packageManager).toString(),
+                    packageInfo.versionName,
+                    versionCode,
+                    packageInfo.firstInstallTime,
+                    packageInfo.lastUpdateTime,
+                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                    getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                )
 
-            newItems.add(appItem)
-            insert(item)
+                newItems.add(appItem)
+                insert(item)
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+                continue
+            }
         }
 
         //Sort
         newItems.sortWith(compareBy({ it.abi }, { it.appName }))
 
         withContext(Dispatchers.Main) {
+            GlobalValues.isObservingDBItems.value = true
             items.value = newItems
         }
     }
 
-    fun addItem() {
+    fun addItem(context: Context) {
+        Log.d(tag, "addItems")
+
         allItems.value?.let { value ->
             viewModelScope.launch(Dispatchers.IO) {
                 val newItems = ArrayList<AppItem>()
@@ -86,6 +103,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 for (item in value) {
                     val appItem = AppItem().apply {
                         icon = AppUtils.getAppIcon(item.packageName)
+                            ?: ColorDrawable(Color.TRANSPARENT)
                         appName = item.label
                         packageName = item.packageName
                         versionName = "${item.versionName}(${item.versionCode})"
@@ -104,6 +122,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     items.value = newItems
                 }
+
+                if (!isInit) {
+                    requestChange(context)
+                    isInit = true
+                }
             }
         }
     }
@@ -114,6 +137,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.update(item)
+    }
+
+    private fun deleteAll() = viewModelScope.launch(Dispatchers.IO) {
+        repository.deleteAll()
+    }
+
+    private fun requestChange(context: Context) {
+        viewModelScope.launch(Dispatchers.Main) {
+            GlobalValues.isObservingDBItems.value = false
+        }
+        deleteAll()
+        initItems(context)
     }
 
     private fun getAbi(path: String, nativePath: String): Int {
