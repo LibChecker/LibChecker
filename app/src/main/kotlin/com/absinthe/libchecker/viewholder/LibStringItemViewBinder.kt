@@ -23,8 +23,11 @@ class LibStringItemViewBinder :
             name.text = item.name
 
             NativeLibMap.MAP[item.name]?.let {
-                libIcon.setChipIconResource(it.iconRes)
-                libIcon.text = it.name
+                libIcon.apply {
+                    setChipIconResource(it.iconRes)
+                    text = it.name
+                    visibility = View.VISIBLE
+                }
             } ?: let {
                 libIcon.visibility = View.GONE
             }

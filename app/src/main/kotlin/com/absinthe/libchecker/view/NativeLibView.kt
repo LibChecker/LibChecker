@@ -10,7 +10,7 @@ import com.drakeet.multitype.MultiTypeAdapter
 
 class NativeLibView(context: Context) : LinearLayout(context) {
 
-    val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
+    private val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
 
     var adapter = MultiTypeAdapter()
 
@@ -24,6 +24,7 @@ class NativeLibView(context: Context) : LinearLayout(context) {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             layoutManager = LinearLayoutManager(context)
             adapter = this@NativeLibView.adapter
+            overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         }
 
         addView(rvList)
