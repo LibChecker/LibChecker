@@ -28,6 +28,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     private val mAdapter = MultiTypeAdapter()
     private val mItems = ArrayList<AppItem>()
     private val mTempItems = ArrayList<AppItem>()
+    private var mIsInit = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,8 +62,9 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 initItems(requireContext())
             } else {
                 allItems.observe(viewLifecycleOwner, Observer {
-                    if (!isInit) {
+                    if (!mIsInit) {
                         binding.vfContainer.displayedChild = 0
+                        mIsInit = true
                     }
 
                     if (it.isNullOrEmpty()) {

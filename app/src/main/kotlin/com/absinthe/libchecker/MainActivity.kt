@@ -25,10 +25,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        AppCenter.start(
-            application, "5f11b856-0a27-4438-a038-9e18e4797133",
-            Analytics::class.java, Crashes::class.java
-        )
+        if (!BuildConfig.DEBUG) {
+            AppCenter.start(
+                application, "5f11b856-0a27-4438-a038-9e18e4797133",
+                Analytics::class.java, Crashes::class.java
+            )
+        }
 
         setSupportActionBar(binding.toolbar)
 

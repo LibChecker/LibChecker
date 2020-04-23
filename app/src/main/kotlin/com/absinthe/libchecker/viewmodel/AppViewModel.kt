@@ -64,7 +64,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 val item = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
-                    packageInfo.versionName,
+                    packageInfo.versionName ?: "",
                     versionCode,
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,

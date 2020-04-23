@@ -3,10 +3,14 @@ package com.absinthe.libchecker.constant
 import com.absinthe.libchecker.R
 
 object NativeLibMap {
-    val MAP: HashMap<String, Int> = hashMapOf(
-        Pair("libflutter.so", R.drawable.lib_flutter),
-        Pair("libBugly.so", R.drawable.lib_bugly),
-        Pair("libtpnsSecurity.so", R.drawable.lib_xgpush),
-        Pair("libxguardian.so", R.drawable.lib_xgpush)
+    val MAP: HashMap<String, LibChip> = hashMapOf(
+        Pair("libflutter.so", LibChip(R.drawable.ic_flutter, "Flutter")),
+        Pair("libBugly.so", LibChip(R.drawable.ic_bugly, "Bugly")),
+        Pair("libtpnsSecurity.so", LibChip(R.drawable.ic_tencent, "Xinge")),
+        Pair("libxguardian.so", LibChip(R.drawable.ic_tencent, "Xinge")),
+        Pair("libijkplayer.so", LibChip(R.drawable.ic_bilibili, "IJKPlayer")),
+        Pair("libreactnativejni.so", LibChip(R.drawable.ic_react, "React Native"))
     )
+
+    data class LibChip(val iconRes: Int, val name: String)
 }
