@@ -217,6 +217,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         while (entries.hasMoreElements()) {
             val name = entries.nextElement().name
+
             if (name.contains("lib/")) {
                 abiList.add(name.split("/")[1])
             }

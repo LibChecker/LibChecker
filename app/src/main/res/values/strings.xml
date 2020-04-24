@@ -11,6 +11,7 @@
     <string name="string_32_bit">32bit</string>
     <string name="no_libs">No native libs</string>
     <string name="format_native_libs_title">Native libs in <b>%s</b></string>
+    <string name="empty_list">Empty list</string>
 
     <!-- Classify   -->
     <string name="chart_no_data_text">Loading</string>

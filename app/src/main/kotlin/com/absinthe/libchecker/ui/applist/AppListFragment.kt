@@ -50,6 +50,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             recyclerview.apply {
                 adapter = mAdapter
                 layoutManager = LinearLayoutManager(activity)
+                itemAnimator?.changeDuration = 0
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

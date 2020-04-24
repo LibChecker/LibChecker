@@ -2,7 +2,7 @@ package com.absinthe.libchecker.view
 
 import android.app.Dialog
 import android.os.Bundle
-import android.text.Html
+import android.text.SpannableStringBuilder
 import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.io.File
+import java.util.zip.ZipFile
 
 const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 
@@ -25,15 +26,15 @@ class NativeLibDialogFragment : DialogFragment() {
 
         val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
 
-        dialogView.adapter.items = getAbiByNativeDir(info.nativeLibraryDir)
-
+        dialogView.adapter.items = getAbiByNativeDir(info.sourceDir, info.nativeLibraryDir)
+        
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(Html.fromHtml(String.format(getString(R.string.format_native_libs_title), AppUtils.getAppName(packageName))))
+            .setTitle(SpannableStringBuilder(String.format(getString(R.string.format_native_libs_title), AppUtils.getAppName(packageName))))
             .setView(dialogView)
             .create()
     }
 
-    private fun getAbiByNativeDir(nativePath: String): List<LibStringItem> {
+    private fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
         val file = File(nativePath)
         val list = ArrayList<LibStringItem>()
 
@@ -43,7 +44,33 @@ class NativeLibDialogFragment : DialogFragment() {
             }
         }
 
-        list.sortByDescending { NativeLibMap.MAP.containsKey(it.name) }
+        if (list.isEmpty()) {
+            list.addAll(getSourceLibs(sourcePath))
+        }
+
+        if (list.isEmpty()) {
+            list.add(LibStringItem(getString(R.string.empty_list)))
+        } else {
+            list.sortByDescending { NativeLibMap.MAP.containsKey(it.name) }
+        }
         return list
+    }
+
+    private fun getSourceLibs(path: String): ArrayList<LibStringItem> {
+        val file = File(path)
+        val zipFile = ZipFile(file)
+        val entries = zipFile.entries()
+        val libList = ArrayList<LibStringItem>()
+
+        while (entries.hasMoreElements()) {
+            val name = entries.nextElement().name
+
+            if (name.contains("lib/")) {
+                libList.add(LibStringItem(name.split("/").last()))
+            }
+        }
+        zipFile.close()
+
+        return libList
     }
 }
