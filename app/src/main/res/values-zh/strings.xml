@@ -20,4 +20,9 @@
     <string name="title_classify_dialog">%s架构的 Apps</string>
     <string name="format_native_libs_title"><b>%s</b> 中的 Native 库</string>
     <string name="empty_list">空列表</string>
+    <string name="menu_sort">排序</string>
+    <string name="menu_sort_by_time_desc">按添加时间降序 (9–0)</string>
+    <string name="menu_sort_by_time_asc">按添加时间升序 (0–9)</string>
+    <string name="menu_sort_by_name_desc">按名字降序 (Z–A)</string>
+    <string name="menu_sort_by_name_asc">按名字升序 (A–Z)</string>
 </resources>

@@ -1,8 +1,11 @@
 package com.absinthe.libchecker.ui.applist
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -50,7 +53,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             recyclerview.apply {
                 adapter = mAdapter
                 layoutManager = LinearLayoutManager(activity)
-                itemAnimator?.changeDuration = 0
+                itemAnimator = null
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -146,5 +149,23 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             addAll(filter)
         }
         return false
+    }
+
+    @SuppressLint("RestrictedApi")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.sort -> {
+                val popup = PopupMenu(requireContext(), binding.root.findViewById(R.id.sort))
+                popup.menuInflater.inflate(R.menu.sort_menu, popup.menu)
+
+                if (popup.menu is MenuBuilder) {
+                    (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
+                }
+
+                popup.show()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }

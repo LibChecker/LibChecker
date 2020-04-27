@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/sort_by_time_desc"
+            android:title="@string/menu_sort_by_time_desc"
+            android:icon="@drawable/ic_sort" />
+        <item
+            android:id="@+id/sort_by_time_asc"
+            android:title="@string/menu_sort_by_time_asc"
+            android:icon="@drawable/ic_sort"/>
+        <item
+            android:id="@+id/sort_by_name_desc"
+            android:title="@string/menu_sort_by_name_desc"
+            android:icon="@drawable/ic_sort"/>
+        <item
+            android:id="@+id/sort_by_name_asc"
+            android:title="@string/menu_sort_by_name_asc"
+            android:icon="@drawable/ic_sort"/>
+
+    </group>
+
+</menu>
