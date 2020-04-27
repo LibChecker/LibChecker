@@ -181,7 +181,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     GlobalValues.sortMode.value = when (menuItem.itemId) {
                         R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
                         R.id.sort_by_name_desc -> Constants.SORT_MODE_NAME_DESC
-                        R.id.sort_by_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
                         else -> Constants.SORT_MODE_NAME_ASC
                     }
 
