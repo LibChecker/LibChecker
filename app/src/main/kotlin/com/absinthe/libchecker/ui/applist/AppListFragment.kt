@@ -7,15 +7,18 @@ import android.view.*
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
+import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
@@ -53,7 +56,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             recyclerview.apply {
                 adapter = mAdapter
                 layoutManager = LinearLayoutManager(activity)
-                itemAnimator = null
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -97,9 +100,19 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 }
             })
 
-            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
-                addItem(requireContext())
-            })
+            GlobalValues.apply {
+                isShowSystemApps.observe(viewLifecycleOwner, Observer {
+                    addItem(requireContext())
+                })
+                sortMode.observe(viewLifecycleOwner, Observer { mode ->
+                    when (mode) {
+                        Constants.SORT_MODE_UPDATE_TIME_DESC -> mTempItems.sortByDescending { it.updateTime }
+                        Constants.SORT_MODE_NAME_DESC -> mTempItems.sortByDescending { it.appName }
+                        Constants.SORT_MODE_NAME_ASC -> mTempItems.sortBy { it.appName }
+                    }
+                    updateItems(mTempItems)
+                })
+            }
         }
     }
 
@@ -155,11 +168,24 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.sort -> {
-                val popup = PopupMenu(requireContext(), binding.root.findViewById(R.id.sort))
+                val popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort))
                 popup.menuInflater.inflate(R.menu.sort_menu, popup.menu)
 
                 if (popup.menu is MenuBuilder) {
                     (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
+                }
+
+                popup.menu[GlobalValues.sortMode.value ?: Constants.SORT_MODE_NAME_ASC].isChecked =
+                    true
+                popup.setOnMenuItemClickListener { menuItem ->
+                    GlobalValues.sortMode.value = when (menuItem.itemId) {
+                        R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
+                        R.id.sort_by_name_desc -> Constants.SORT_MODE_NAME_DESC
+                        R.id.sort_by_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
+                        else -> Constants.SORT_MODE_NAME_ASC
+                    }
+
+                    true
                 }
 
                 popup.show()

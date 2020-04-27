@@ -14,8 +14,7 @@
     <string name="format_native_libs_title">Native libs in <b>%s</b></string>
     <string name="empty_list">Empty list</string>
 
-    <string name="menu_sort_by_time_desc">Descending by creating time(9–0)</string>
-    <string name="menu_sort_by_time_asc">Ascending by creating time(0–9)</string>
+    <string name="menu_sort_by_time_desc">Descending by update time</string>
     <string name="menu_sort_by_name_desc">Descending by name(Z–A)</string>
     <string name="menu_sort_by_name_asc">Ascending by name(A–Z)</string>
 

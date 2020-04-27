@@ -22,6 +22,7 @@ class AppItem() : Parcelable {
     var versionName: String = ""
     var abi: Int = NO_LIBS
     var isSystem: Boolean = false
+    var updateTime:Long = 0
 
     constructor(parcel: Parcel) : this() {
         appName = parcel.readString().toString()
@@ -29,6 +30,7 @@ class AppItem() : Parcelable {
         versionName = parcel.readString().toString()
         abi = parcel.readInt()
         isSystem = parcel.readByte() != 0.toByte()
+        updateTime = parcel.readLong()
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
@@ -37,6 +39,7 @@ class AppItem() : Parcelable {
         parcel.writeString(versionName)
         parcel.writeInt(abi)
         parcel.writeByte(if (isSystem) 1 else 0)
+        parcel.writeLong(updateTime)
     }
 
     override fun describeContents(): Int {

@@ -60,6 +60,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                     isSystem =
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                    updateTime = packageInfo.lastUpdateTime
                 }
                 val item = LCItem(
                     info.packageName,
@@ -104,6 +105,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageName = item.packageName
                         versionName = "${item.versionName}(${item.versionCode})"
                         abi = item.abi.toInt()
+                        isSystem = item.isSystem
+                        updateTime = item.lastUpdatedTime
                     }
 
                     GlobalValues.isShowSystemApps.value?.let {
@@ -160,6 +163,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                 isSystem =
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                updateTime = packageInfo.lastUpdateTime
             }
 
             newItems.add(appItem)
