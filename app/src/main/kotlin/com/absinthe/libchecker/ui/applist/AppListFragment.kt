@@ -20,6 +20,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewholder.AppItemViewBinder
 import com.absinthe.libchecker.viewmodel.AppViewModel
@@ -69,18 +70,26 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 initItems(requireContext())
             } else {
                 allItems.observe(viewLifecycleOwner, Observer {
-                    if (!mIsInit) {
-                        binding.vfContainer.displayedChild = 0
-                        mIsInit = true
-                    }
+                    if (!refreshLock.value!!) {
+                        if (!mIsInit) {
+                            binding.vfContainer.displayedChild = 0
+                            mIsInit = true
+                        }
 
-                    if (it.isNullOrEmpty()) {
-                        initItems(requireContext())
-                    } else {
-                        addItem(requireContext())
+                        if (it.isNullOrEmpty()) {
+                            initItems(requireContext())
+                        } else {
+                            addItem(requireContext())
+                        }
                     }
                 })
             }
+
+            refreshLock.observe(viewLifecycleOwner, Observer {
+                if (!it) {
+                    addItem(requireContext())
+                }
+            })
 
             items.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
@@ -178,11 +187,13 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 popup.menu[GlobalValues.sortMode.value ?: Constants.SORT_MODE_NAME_ASC].isChecked =
                     true
                 popup.setOnMenuItemClickListener { menuItem ->
-                    GlobalValues.sortMode.value = when (menuItem.itemId) {
+                    val mode = when (menuItem.itemId) {
                         R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
                         R.id.sort_by_name_desc -> Constants.SORT_MODE_NAME_DESC
                         else -> Constants.SORT_MODE_NAME_ASC
                     }
+                    GlobalValues.sortMode.value = mode
+                    SPUtils.putInt(requireContext(), Constants.PREF_SORT_MODE, mode)
 
                     true
                 }

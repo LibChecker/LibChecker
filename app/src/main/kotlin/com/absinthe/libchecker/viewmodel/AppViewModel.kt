@@ -29,6 +29,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val items: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
     val allItems: LiveData<List<LCItem>>
     var isInit = false
+    var refreshLock: MutableLiveData<Boolean> = MutableLiveData()
 
     private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
@@ -38,6 +39,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
         repository = LCRepository(lcDao)
         allItems = repository.allItems
+        refreshLock.value = false
     }
 
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
@@ -147,6 +149,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChange(context: Context) {
+        refreshLock.value = true
+
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val newItems = ArrayList<AppItem>()
@@ -210,6 +214,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                 insert(lcItem)
             }
+
+            refreshLock.value = false
         }
     }
 
