@@ -24,6 +24,7 @@ object NativeLibMap {
         Pair("libluajava.so", LibChip(R.drawable.ic_lib_lua, "AndroLua")),
         Pair("libRSSupport.so", LibChip(R.drawable.ic_android_outline, "RenderScript")),
         Pair("librsjni.so", LibChip(R.drawable.ic_android_outline, "RenderScript")),
+        Pair("librsjni_androidx.so", LibChip(R.drawable.ic_android_outline, "RenderScript")),
         Pair("libweexcore.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
         Pair("libWeexEagle.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
         Pair("libweexjst.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
@@ -38,8 +39,9 @@ object NativeLibMap {
         Pair("libmono.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libyoga.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
         Pair("libglog.so", LibChip(R.drawable.ic_lib_google, "glog")),
-        Pair("librealm-jni.so", LibChip(R.drawable.ic_lib_realm, "realm"))
-    )
+        Pair("librealm-jni.so", LibChip(R.drawable.ic_lib_realm, "realm")),
+        Pair("libcrashlytics.so", LibChip(R.drawable.ic_lib_firebase, "Crashlytics"))
+        )
 
     data class LibChip(val iconRes: Int, val name: String)
 }
