@@ -12,6 +12,6 @@ object GlobalValues {
     fun init(context: Context) {
         isShowSystemApps.value = SPUtils.getBoolean(context, Constants.PREF_SHOW_SYSTEM_APPS, false)
         isObservingDBItems.value = true
-        sortMode.value = SPUtils.getInt(context, Constants.PREF_SORT_MODE, Constants.SORT_MODE_NAME_ASC)
+        sortMode.value = SPUtils.getInt(context, Constants.PREF_SORT_MODE, Constants.SORT_MODE_DEFAULT)
     }
 }
