@@ -3,7 +3,6 @@ package com.absinthe.libchecker.view
 import android.app.Dialog
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.viewholder.LibStringItem
@@ -15,21 +14,35 @@ import java.util.zip.ZipFile
 
 const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 
-class NativeLibDialogFragment : DialogFragment() {
+class NativeLibDialogFragment : LCDialogFragment() {
 
     private lateinit var dialogView: NativeLibView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val packageName:String? = arguments?.getString(EXTRA_PKG_NAME)
+        val packageName: String? = arguments?.getString(EXTRA_PKG_NAME)
+
+        packageName ?: dismiss()
 
         dialogView = NativeLibView(requireContext())
 
         val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
 
-        dialogView.adapter.items = getAbiByNativeDir(info.sourceDir, info.nativeLibraryDir)
-        
+        dialogView.adapter.setNewInstance(
+            getAbiByNativeDir(
+                info.sourceDir,
+                info.nativeLibraryDir
+            ).toMutableList()
+        )
+
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(SpannableStringBuilder(String.format(getString(R.string.format_native_libs_title), AppUtils.getAppName(packageName))))
+            .setTitle(
+                SpannableStringBuilder(
+                    String.format(
+                        getString(R.string.format_native_libs_title),
+                        AppUtils.getAppName(packageName)
+                    )
+                )
+            )
             .setView(dialogView)
             .create()
     }

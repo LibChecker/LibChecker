@@ -11,20 +11,21 @@ import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.SimpleItemAnimator
+import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.view.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.NativeLibDialogFragment
 import com.absinthe.libchecker.viewholder.AppItem
-import com.absinthe.libchecker.viewholder.AppItemViewBinder
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.drakeet.multitype.MultiTypeAdapter
 import jonathanfinerty.once.Once
 
 
@@ -32,10 +33,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
     private lateinit var viewModel: AppViewModel
-    private val mAdapter = MultiTypeAdapter()
+    private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
-    private val mTempItems = ArrayList<AppItem>()
-    private var mIsInit = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +50,18 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun initView() {
         setHasOptionsMenu(true)
-        mAdapter.register(AppItemViewBinder())
+
+        mAdapter.setOnItemClickListener { adapter, _, position ->
+            NativeLibDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
+                }
+                MainActivity.instance?.apply {
+                    show(supportFragmentManager, tag)
+                }
+            }
+        }
+        mAdapter.setDiffCallback(AppListDiffUtil())
 
         binding.apply {
             recyclerview.apply {
@@ -71,10 +81,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             } else {
                 allItems.observe(viewLifecycleOwner, Observer {
                     if (!refreshLock.value!!) {
-                        if (!mIsInit) {
-                            binding.vfContainer.displayedChild = 0
-                            mIsInit = true
-                        }
+                        binding.vfContainer.displayedChild = 0
 
                         if (it.isNullOrEmpty()) {
                             initItems(requireContext())
@@ -97,10 +104,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     clear()
                     addAll(it)
                 }
-                mTempItems.apply {
-                    clear()
-                    addAll(it)
-                }
 
                 binding.vfContainer.displayedChild = 1
 
@@ -108,33 +111,33 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
                 }
             })
+        }
 
-            GlobalValues.apply {
-                isShowSystemApps.observe(viewLifecycleOwner, Observer {
-                    addItem(requireContext())
-                })
-                sortMode.observe(viewLifecycleOwner, Observer { mode ->
-                    val newItems = mTempItems
+        GlobalValues.apply {
+            isShowSystemApps.observe(viewLifecycleOwner, Observer {
+                viewModel.addItem(requireContext())
+            })
+            sortMode.observe(viewLifecycleOwner, Observer { mode ->
 
-                    when (mode) {
-                        Constants.SORT_MODE_DEFAULT -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
-                        Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
-                    }
-                    updateItems(newItems)
-                })
-            }
+                when (mode) {
+                    Constants.SORT_MODE_DEFAULT -> mItems.sortWith(
+                        compareBy(
+                            { it.abi },
+                            { it.appName })
+                    )
+                    Constants.SORT_MODE_UPDATE_TIME_DESC -> mItems.sortByDescending { it.updateTime }
+                }
+                updateItems(mItems)
+            })
         }
     }
 
     private fun updateItems(newItems: List<AppItem>) {
-        if (mTempItems.isEmpty()) {
-            mAdapter.items = newItems
+        if (mItems.isEmpty()) {
+            mAdapter.setNewInstance(newItems.toMutableList())
             mAdapter.notifyDataSetChanged()
         } else {
-            val diffResult = DiffUtil.calculateDiff(AppListDiffUtil(mTempItems, newItems), true)
-            mAdapter.items = mTempItems
-            diffResult.dispatchUpdatesTo(mAdapter)
-            mAdapter.notifyItemRangeChanged(0, mAdapter.itemCount)
+            mAdapter.setDiffNewData(newItems.toMutableList())
         }
     }
 
@@ -168,10 +171,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             it.appName.contains(newText) || it.packageName.contains(newText)
         }
         updateItems(filter)
-        mTempItems.apply {
-            clear()
-            addAll(filter)
-        }
         return false
     }
 

@@ -15,19 +15,27 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     override fun onItemsCreated(items: MutableList<Any>) {
-        items.add(Category("What's this"))
-        items.add(Card(getString(R.string.about_info)))
+        items.apply {
+            add(Category("What's this"))
+            add(Card(getString(R.string.about_info)))
 
-        items.add(Category("Developers"))
-        items.add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
+            add(Category("Developers"))
+            add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
 
-        items.add(Category("Open Source Licenses"))
-        items.add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
-        items.add(License("MultiType", "drakeet", License.APACHE_2, "https://github.com/drakeet/MultiType"))
-        items.add(License("about-page", "drakeet", License.APACHE_2, "https://github.com/drakeet/about-page"))
-        items.add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
-        items.add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
-        items.add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
-        items.add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
+            add(Category("Open Source Licenses"))
+            add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
+            add(License("MultiType", "drakeet", License.APACHE_2, "https://github.com/drakeet/MultiType"))
+            add(License("about-page", "drakeet", License.APACHE_2, "https://github.com/drakeet/about-page"))
+            add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
+            add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
+            add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
+            add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
+            add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
+            add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
+            add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
+            add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
+            add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
+            add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
+        }
     }
 }

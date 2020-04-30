@@ -29,12 +29,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val items: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
     val allItems: LiveData<List<LCItem>>
-    var isInit = false
     var refreshLock: MutableLiveData<Boolean> = MutableLiveData()
 
     private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
-
+    private var isInit = false
 
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
@@ -123,7 +122,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 when (GlobalValues.sortMode.value) {
-                    Constants.SORT_MODE_DEFAULT -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+                    Constants.SORT_MODE_DEFAULT -> newItems.sortWith(
+                        compareBy(
+                            { it.abi },
+                            { it.appName })
+                    )
                     Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
                 }
 
@@ -156,6 +159,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChange(context: Context) {
+        var isChanged = false
+
         viewModelScope.launch(Dispatchers.Main) {
             refreshLock.value = true
         }
@@ -200,10 +205,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
                         )
                         update(item)
+                        isChanged = true
                     }
 
                     appList.remove(it)
-                } ?: delete(dbItem)
+                } ?: run {
+                    delete(dbItem)
+                    isChanged = true
+                }
             }
 
             for (info in appList) {
@@ -222,10 +231,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 insert(lcItem)
+                isChanged = true
             }
 
-            viewModelScope.launch(Dispatchers.Main) {
-                refreshLock.value = false
+            if (isChanged) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    refreshLock.value = false
+                }
             }
         }
     }

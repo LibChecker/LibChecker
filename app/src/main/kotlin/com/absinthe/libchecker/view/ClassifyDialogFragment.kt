@@ -2,14 +2,13 @@ package com.absinthe.libchecker.view
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.viewholder.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
-class ClassifyDialogFragment : DialogFragment() {
+class ClassifyDialogFragment : LCDialogFragment() {
 
     var item: ArrayList<AppItem> = ArrayList()
     private lateinit var dialogView: ClassifyDialogView
@@ -21,11 +20,11 @@ class ClassifyDialogFragment : DialogFragment() {
             savedInstanceState.getParcelableArrayList<AppItem>(
                 EXTRA_ITEM_LIST
             )?.toList()?.let {
-                dialogView.adapter.items = it
+                dialogView.adapter.setNewInstance(it.toMutableList())
                 item = it as ArrayList<AppItem>
             }
         } else {
-            dialogView.adapter.items = item
+            dialogView.adapter.setNewInstance(item.toMutableList())
         }
 
         return MaterialAlertDialogBuilder(requireContext())
