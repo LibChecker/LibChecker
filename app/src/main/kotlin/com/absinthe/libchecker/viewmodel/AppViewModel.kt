@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.*
@@ -84,7 +85,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         //Sort
-        newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+        when (GlobalValues.sortMode.value) {
+            Constants.SORT_MODE_NAME_DESC -> newItems.sortedWith(compareByDescending<AppItem> { it.appName }.thenBy { it.abi })
+            Constants.SORT_MODE_NAME_ASC -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+            Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
+        }
 
         withContext(Dispatchers.Main) {
             GlobalValues.isObservingDBItems.value = true
@@ -118,7 +123,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-                newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+                when (GlobalValues.sortMode.value) {
+                    Constants.SORT_MODE_NAME_DESC -> newItems.sortedWith(compareByDescending<AppItem> { it.appName }.thenBy { it.abi })
+                    Constants.SORT_MODE_NAME_ASC -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+                    Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
+                }
 
                 withContext(Dispatchers.Main) {
                     items.value = newItems

@@ -114,12 +114,14 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     addItem(requireContext())
                 })
                 sortMode.observe(viewLifecycleOwner, Observer { mode ->
+                    val newItems = mTempItems
+
                     when (mode) {
-                        Constants.SORT_MODE_UPDATE_TIME_DESC -> mTempItems.sortByDescending { it.updateTime }
-                        Constants.SORT_MODE_NAME_DESC -> mTempItems.sortByDescending { it.appName }
-                        Constants.SORT_MODE_NAME_ASC -> mTempItems.sortBy { it.appName }
+                        Constants.SORT_MODE_NAME_DESC -> newItems.sortedWith(compareByDescending<AppItem> { it.appName }.thenBy { it.abi })
+                        Constants.SORT_MODE_NAME_ASC -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+                        Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
                     }
-                    updateItems(mTempItems)
+                    updateItems(newItems)
                 })
             }
         }
@@ -188,8 +190,9 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     true
                 popup.setOnMenuItemClickListener { menuItem ->
                     val mode = when (menuItem.itemId) {
-                        R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
+                        R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
                         R.id.sort_by_name_desc -> Constants.SORT_MODE_NAME_DESC
+                        R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
                         else -> Constants.SORT_MODE_NAME_ASC
                     }
                     GlobalValues.sortMode.value = mode

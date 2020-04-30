@@ -23,6 +23,7 @@ object NativeLibMap {
         Pair("libmmkv.so", LibChip(R.drawable.ic_lib_tencent, "MMKV")),
         Pair("libluajava.so", LibChip(R.drawable.ic_lib_lua, "AndroLua")),
         Pair("libRSSupport.so", LibChip(R.drawable.ic_android_outline, "RenderScript")),
+        Pair("librsjni.so", LibChip(R.drawable.ic_android_outline, "RenderScript")),
         Pair("libweexcore.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
         Pair("libWeexEagle.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
         Pair("libweexjst.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
