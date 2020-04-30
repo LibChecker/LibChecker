@@ -149,7 +149,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChange(context: Context) {
-        refreshLock.value = true
+        viewModelScope.launch(Dispatchers.Main) {
+            refreshLock.value = true
+        }
 
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
@@ -215,7 +217,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 insert(lcItem)
             }
 
-            refreshLock.value = false
+            viewModelScope.launch(Dispatchers.Main) {
+                refreshLock.value = false
+            }
         }
     }
 
