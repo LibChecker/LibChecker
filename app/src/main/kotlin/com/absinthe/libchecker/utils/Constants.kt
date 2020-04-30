@@ -5,7 +5,6 @@ object Constants {
     const val PREF_SORT_MODE = "sortMode"
 
     const val SORT_MODE_UPDATE_TIME_DESC = 0
-    const val SORT_MODE_NAME_DESC = 1
-    const val SORT_MODE_NAME_ASC = 2
+    const val SORT_MODE_DEFAULT = 1
 
 }

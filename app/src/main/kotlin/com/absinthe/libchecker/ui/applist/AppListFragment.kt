@@ -117,8 +117,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     val newItems = mTempItems
 
                     when (mode) {
-                        Constants.SORT_MODE_NAME_DESC -> newItems.sortedWith(compareByDescending<AppItem> { it.appName }.thenBy { it.abi })
-                        Constants.SORT_MODE_NAME_ASC -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
+                        Constants.SORT_MODE_DEFAULT -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
                         Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
                     }
                     updateItems(newItems)
@@ -133,8 +132,9 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             mAdapter.notifyDataSetChanged()
         } else {
             val diffResult = DiffUtil.calculateDiff(AppListDiffUtil(mTempItems, newItems), true)
-            diffResult.dispatchUpdatesTo(mAdapter)
             mAdapter.items = mTempItems
+            diffResult.dispatchUpdatesTo(mAdapter)
+            mAdapter.notifyItemRangeChanged(0, mAdapter.itemCount)
         }
     }
 
@@ -186,14 +186,13 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
                 }
 
-                popup.menu[GlobalValues.sortMode.value ?: Constants.SORT_MODE_NAME_ASC].isChecked =
+                popup.menu[GlobalValues.sortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked =
                     true
                 popup.setOnMenuItemClickListener { menuItem ->
                     val mode = when (menuItem.itemId) {
                         R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
-                        R.id.sort_by_name_desc -> Constants.SORT_MODE_NAME_DESC
-                        R.id.sort_by_name_asc -> Constants.SORT_MODE_NAME_ASC
-                        else -> Constants.SORT_MODE_NAME_ASC
+                        R.id.sort_default -> Constants.SORT_MODE_DEFAULT
+                        else -> Constants.SORT_MODE_DEFAULT
                     }
                     GlobalValues.sortMode.value = mode
                     SPUtils.putInt(requireContext(), Constants.PREF_SORT_MODE, mode)

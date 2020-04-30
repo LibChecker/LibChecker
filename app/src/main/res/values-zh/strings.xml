@@ -22,6 +22,5 @@
     <string name="empty_list">空列表</string>
     <string name="menu_sort">排序</string>
     <string name="menu_sort_by_time_desc">按更新时间降序</string>
-    <string name="menu_sort_by_name_desc">按名字降序 (Z–A)</string>
-    <string name="menu_sort_by_name_asc">按名字升序 (A–Z)</string>
+    <string name="menu_sort_default">默认顺序</string>
 </resources>

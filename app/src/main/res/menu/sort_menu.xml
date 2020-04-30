@@ -8,12 +8,8 @@
             android:title="@string/menu_sort_by_time_desc"
             android:icon="@drawable/ic_sort" />
         <item
-            android:id="@+id/sort_by_name_desc"
-            android:title="@string/menu_sort_by_name_desc"
-            android:icon="@drawable/ic_sort"/>
-        <item
-            android:id="@+id/sort_by_name_asc"
-            android:title="@string/menu_sort_by_name_asc"
+            android:id="@+id/sort_default"
+            android:title="@string/menu_sort_default"
             android:icon="@drawable/ic_sort"/>
 
     </group>

@@ -15,8 +15,7 @@
     <string name="empty_list">Empty list</string>
 
     <string name="menu_sort_by_time_desc">Descending by update time</string>
-    <string name="menu_sort_by_name_desc">Descending by name(Z–A)</string>
-    <string name="menu_sort_by_name_asc">Ascending by name(A–Z)</string>
+    <string name="menu_sort_default">Default order</string>
 
     <!-- Classify   -->
     <string name="chart_no_data_text">Loading</string>
