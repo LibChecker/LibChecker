@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
                         binding.navView.menu.getItem(position).isChecked = true
                     }
                 })
+
+                //禁止左右滑动
+                isUserInputEnabled = false
             }
 
             // 当ViewPager切换页面时，改变ViewPager的显示

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
 import com.absinthe.libchecker.utils.GlobalValues
@@ -151,27 +152,29 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         if (e == null) return
         if (h == null) return
 
-        val dialogFragment = ClassifyDialogFragment()
+        ClassifyDialogFragment().apply {
+            MainActivity.instance?.let {
+                show(it.supportFragmentManager, tag)
+            }
 
-        when (h.x) {
-            0f -> {
-                viewModel.items.value?.filter { it.abi == ARMV8 }?.let { filter ->
-                    dialogFragment.item = ArrayList(filter)
-                }
-            }
-            1f -> {
-                viewModel.items.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
-                    ?.let { filter ->
-                        dialogFragment.item = ArrayList(filter)
+            when (h.x) {
+                0f -> {
+                    viewModel.items.value?.filter { it.abi == ARMV8 }?.let { filter ->
+                        item = ArrayList(filter)
                     }
-            }
-            2f -> {
-                viewModel.items.value?.filter { it.abi == NO_LIBS }?.let { filter ->
-                    dialogFragment.item = ArrayList(filter)
+                }
+                1f -> {
+                    viewModel.items.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
+                }
+                2f -> {
+                    viewModel.items.value?.filter { it.abi == NO_LIBS }?.let { filter ->
+                        item = ArrayList(filter)
+                    }
                 }
             }
         }
-
-        dialogFragment.show(requireActivity().supportFragmentManager, dialogFragment.tag)
     }
 }

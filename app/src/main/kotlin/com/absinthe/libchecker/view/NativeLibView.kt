@@ -2,29 +2,53 @@ package com.absinthe.libchecker.view
 
 import android.content.Context
 import android.content.res.Resources
-import android.widget.LinearLayout
+import android.view.View
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 
-class NativeLibView(context: Context) : LinearLayout(context) {
+
+const val MODE_SOR_BY_SIZE = 0
+const val MODE_SOR_BY_LIB = 1
+
+class NativeLibView(context: Context) : ConstraintLayout(context) {
 
     private val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
 
     var adapter = LibStringAdapter()
+    var tvTitle: TextView
+    private var mode = MODE_SOR_BY_SIZE
 
     init {
-        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        setPadding(25.dp, 20.dp, 25.dp, 20.dp)
+        View.inflate(context, R.layout.layout_lib_dialog_title, this)
 
-        val rvList = RecyclerView(context).apply {
-            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-            layoutManager = LinearLayoutManager(context)
-            adapter = this@NativeLibView.adapter
-            overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        tvTitle = findViewById(R.id.tv_title)
+
+        val ibSort = findViewById<ImageButton>(R.id.ib_sort)
+        ibSort.setOnClickListener {
+            mode = if (mode == MODE_SOR_BY_SIZE) {
+                adapter.setList(adapter.data.sortedByDescending {
+                    NativeLibMap.MAP.containsKey(
+                        it.name
+                    )
+                })
+                MODE_SOR_BY_LIB
+            } else {
+                adapter.setList(adapter.data.sortedByDescending { it.size })
+                MODE_SOR_BY_SIZE
+            }
         }
 
-        addView(rvList)
+        val rvList = findViewById<RecyclerView>(R.id.rv_list)
+        rvList.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = this@NativeLibView.adapter
+        }
     }
 
 }

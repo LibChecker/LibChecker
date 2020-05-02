@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview
 
+import android.text.format.Formatter
 import android.view.View
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
@@ -12,6 +13,11 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
 
     override fun convert(holder: BaseViewHolder, item: LibStringItem) {
         holder.setText(R.id.tv_name, item.name)
+        if (item.size != 0L) {
+            holder.setText(R.id.tv_lib_size, sizeToString(item.size))
+        } else {
+            holder.setVisible(R.id.tv_lib_size, false)
+        }
 
         val libIcon = holder.getView<Chip>(R.id.chip)
         NativeLibMap.MAP[item.name]?.let {
@@ -25,4 +31,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         }
     }
 
+    private fun sizeToString(size: Long) : String {
+        return "(${Formatter.formatFileSize(context, size)})"
+    }
 }

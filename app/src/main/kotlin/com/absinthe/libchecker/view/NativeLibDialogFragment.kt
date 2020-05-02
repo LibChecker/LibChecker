@@ -4,11 +4,14 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.viewholder.LibStringItem
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -20,29 +23,36 @@ class NativeLibDialogFragment : LCDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val packageName: String? = arguments?.getString(EXTRA_PKG_NAME)
-
         packageName ?: dismiss()
 
-        dialogView = NativeLibView(requireContext())
+        dialogView = NativeLibView(requireContext()).apply {
+            tvTitle.text = SpannableStringBuilder(
+                String.format(
+                    getString(R.string.format_native_libs_title),
+                    AppUtils.getAppName(packageName)
+                )
+            )
+        }
 
         val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
 
-        dialogView.adapter.setNewInstance(
-            getAbiByNativeDir(
+        GlobalScope.launch(Dispatchers.IO) {
+            val list = getAbiByNativeDir(
                 info.sourceDir,
                 info.nativeLibraryDir
             ).toMutableList()
-        )
+
+            //Fix Dialog can't display all items
+            if (list.size > 10) {
+                list.add(LibStringItem("", 0))
+            }
+
+            withContext(Dispatchers.Main) {
+                dialogView.adapter.setNewInstance(list)
+            }
+        }
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(
-                SpannableStringBuilder(
-                    String.format(
-                        getString(R.string.format_native_libs_title),
-                        AppUtils.getAppName(packageName)
-                    )
-                )
-            )
             .setView(dialogView)
             .create()
     }
@@ -53,7 +63,7 @@ class NativeLibDialogFragment : LCDialogFragment() {
 
         file.listFiles()?.let {
             for (abi in it) {
-                list.add(LibStringItem(abi.name))
+                list.add(LibStringItem(abi.name, abi.length()))
             }
         }
 
@@ -62,9 +72,9 @@ class NativeLibDialogFragment : LCDialogFragment() {
         }
 
         if (list.isEmpty()) {
-            list.add(LibStringItem(getString(R.string.empty_list)))
+            list.add(LibStringItem(getString(R.string.empty_list), 0))
         } else {
-            list.sortByDescending { NativeLibMap.MAP.containsKey(it.name) }
+            list.sortByDescending { it.size }
         }
         return list
     }
@@ -79,7 +89,7 @@ class NativeLibDialogFragment : LCDialogFragment() {
             val name = entries.nextElement().name
 
             if (name.contains("lib/")) {
-                libList.add(LibStringItem(name.split("/").last()))
+                libList.add(LibStringItem(name.split("/").last(), entries.nextElement().size))
             }
         }
         zipFile.close()

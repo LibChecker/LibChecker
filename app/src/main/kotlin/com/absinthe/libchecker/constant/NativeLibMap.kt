@@ -14,6 +14,7 @@ object NativeLibMap {
         Pair("libijksdl.so", LibChip(R.drawable.ic_lib_bilibili, "IJKPlayer")),
         Pair("libijkffmpeg.so", LibChip(R.drawable.ic_lib_bilibili, "IJKPlayer")),
         Pair("libreactnativejni.so", LibChip(R.drawable.ic_lib_react, "React Native")),
+        Pair("libfb.so", LibChip(R.drawable.ic_lib_react, "React Native")),
         Pair("libjiagu.so", LibChip(R.drawable.ic_lib_360, "360 加固")),
         Pair("libc++_shared.so", LibChip(R.drawable.ic_lib_cpp, "C++ 共享库")),
         Pair("libwind.so", LibChip(R.drawable.ic_lib_weibo, "微博 SDK")),
@@ -40,7 +41,13 @@ object NativeLibMap {
         Pair("libyoga.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
         Pair("libglog.so", LibChip(R.drawable.ic_lib_google, "glog")),
         Pair("librealm-jni.so", LibChip(R.drawable.ic_lib_realm, "realm")),
-        Pair("libcrashlytics.so", LibChip(R.drawable.ic_lib_firebase, "Crashlytics"))
+        Pair("libcrashlytics.so", LibChip(R.drawable.ic_lib_firebase, "Crashlytics")),
+        Pair("libopencv_java3.so", LibChip(R.drawable.ic_lib_opencv, "OpenCV")),
+        Pair("libpl_droidsonroids_gif.so", LibChip(R.drawable.ic_lib_gif, "android-gif-drawable")),
+        Pair("libCtaApiLib.so", LibChip(R.drawable.ic_lib_jverification, "极光认证 SDK")),
+        Pair("libsqlcipher.so", LibChip(R.drawable.ic_lib_sql, "SQLCipher")),
+        Pair("libstlport_shared.so", LibChip(R.drawable.ic_lib_sql, "SQLCipher")),
+        Pair("libsgsecuritybody.so", LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全"))
         )
 
     data class LibChip(val iconRes: Int, val name: String)

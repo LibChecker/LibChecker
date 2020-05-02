@@ -11,8 +11,8 @@ android {
         applicationId "com.absinthe.libchecker"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 116
-        versionName "1.1.6"
+        versionCode 117
+        versionName "1.1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
