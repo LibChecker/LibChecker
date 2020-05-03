@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
@@ -69,7 +68,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             recyclerview.apply {
                 adapter = mAdapter
                 layoutManager = LinearLayoutManager(activity)
-                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -135,12 +133,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     private fun updateItems(newItems: List<AppItem>) {
-        if (mItems.isEmpty()) {
-            mAdapter.setNewInstance(newItems.toMutableList())
-            mAdapter.notifyDataSetChanged()
-        } else {
-            mAdapter.setDiffNewData(newItems.toMutableList())
-        }
+        mAdapter.setDiffNewData(newItems.toMutableList())
+        binding.recyclerview.smoothScrollToPosition(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -78,13 +78,13 @@ dependencies {
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
 
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.3'
     implementation 'com.drakeet.about:about:2.4.1'
     implementation 'com.drakeet.multitype:multitype:4.2.0'
     implementation 'com.airbnb.android:lottie:3.4.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
-    implementation 'com.blankj:utilcodex:1.28.2'
+    implementation 'com.blankj:utilcodex:1.28.3'
     implementation 'com.jonathanfinerty.once:once:1.3.0'
-    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.3'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
