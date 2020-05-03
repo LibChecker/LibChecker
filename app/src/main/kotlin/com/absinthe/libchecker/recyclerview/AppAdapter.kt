@@ -20,7 +20,7 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
                     ARMV5 -> ARMV5_STRING
                     NO_LIBS -> context.getText(R.string.no_libs)
                     ERROR -> "Can\'t read"
-                    else -> "Can\'t read"
+                    else -> "Unknown"
                 }
             )
             setImageResource(

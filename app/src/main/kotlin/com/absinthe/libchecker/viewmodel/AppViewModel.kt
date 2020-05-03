@@ -76,7 +76,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
                 )
 
-                newItems.add(appItem)
+                GlobalValues.isShowSystemApps.value?.let {
+                    if (it || (!it && !item.isSystem)) {
+                        newItems.add(appItem)
+                    }
+                }
+
                 insert(item)
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
@@ -168,25 +173,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
-        val newItems = ArrayList<AppItem>()
-
-        for (info in appList) {
-            val packageInfo = PackageUtils.getPackageInfo(info)
-            val versionCode = PackageUtils.getVersionCode(packageInfo)
-
-            val appItem = AppItem().apply {
-                icon = info.loadIcon(context.packageManager)
-                appName = info.loadLabel(context.packageManager).toString()
-                packageName = info.packageName
-                versionName = "${packageInfo.versionName ?: "null"}(${versionCode})"
-                abi = getAbi(info.sourceDir, info.nativeLibraryDir)
-                isSystem =
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
-                updateTime = packageInfo.lastUpdateTime
-            }
-
-            newItems.add(appItem)
-        }
 
         allItems.value?.let { value ->
             for (dbItem in value) {

@@ -51,17 +51,19 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun initView() {
         setHasOptionsMenu(true)
 
-        mAdapter.setOnItemClickListener { adapter, _, position ->
-            NativeLibDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
-                }
-                MainActivity.instance?.apply {
-                    show(supportFragmentManager, tag)
+        mAdapter.apply {
+            setOnItemClickListener { adapter, _, position ->
+                NativeLibDialogFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
+                    }
+                    MainActivity.instance?.apply {
+                        show(supportFragmentManager, tag)
+                    }
                 }
             }
+            setDiffCallback(AppListDiffUtil())
         }
-        mAdapter.setDiffCallback(AppListDiffUtil())
 
         binding.apply {
             recyclerview.apply {
