@@ -18,7 +18,9 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
                     ARMV8 -> ARMV8_STRING
                     ARMV7 -> ARMV7_STRING
                     ARMV5 -> ARMV5_STRING
-                    else -> context.getText(R.string.no_libs)
+                    NO_LIBS -> context.getText(R.string.no_libs)
+                    ERROR -> "Can\'t read"
+                    else -> "Can\'t read"
                 }
             )
             setImageResource(

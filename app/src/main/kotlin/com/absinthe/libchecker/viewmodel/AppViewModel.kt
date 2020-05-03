@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.system.ErrnoException
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -58,7 +59,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
-                    versionName = "${packageInfo.versionName}(${versionCode})"
+                    versionName = "${packageInfo.versionName ?: "null"}(${versionCode})"
                     abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                     isSystem =
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
@@ -177,7 +178,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 icon = info.loadIcon(context.packageManager)
                 appName = info.loadLabel(context.packageManager).toString()
                 packageName = info.packageName
-                versionName = "${packageInfo.versionName}(${versionCode})"
+                versionName = "${packageInfo.versionName ?: "null"}(${versionCode})"
                 abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                 isSystem =
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
@@ -197,7 +198,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         val item = LCItem(
                             it.packageName,
                             it.loadLabel(context.packageManager).toString(),
-                            packageInfo.versionName,
+                            packageInfo.versionName ?: "null",
                             versionCode,
                             packageInfo.firstInstallTime,
                             packageInfo.lastUpdateTime,
@@ -222,7 +223,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 val lcItem = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
-                    packageInfo.versionName,
+                    packageInfo.versionName ?: "null",
                     versionCode,
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,
@@ -243,19 +244,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getAbi(path: String, nativePath: String): Int {
-        val file = File(path)
-        val zipFile = ZipFile(file)
-        val entries = zipFile.entries()
         val abiList = ArrayList<String>()
 
-        while (entries.hasMoreElements()) {
-            val name = entries.nextElement().name
+        try {
+            val file = File(path)
+            val zipFile = ZipFile(file)
+            val entries = zipFile.entries()
 
-            if (name.contains("lib/")) {
-                abiList.add(name.split("/")[1])
+            while (entries.hasMoreElements()) {
+                val name = entries.nextElement().name
+
+                if (name.contains("lib/")) {
+                    abiList.add(name.split("/")[1])
+                }
             }
+            zipFile.close()
+        } catch (e: ErrnoException) {
+            e.printStackTrace()
+            return ERROR
         }
-        zipFile.close()
 
         return when {
             abiList.contains("arm64-v8a") -> ARMV8

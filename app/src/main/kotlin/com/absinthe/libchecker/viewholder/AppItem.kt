@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.os.Parcel
 import android.os.Parcelable
 
+const val ERROR = -1
 const val ARMV8 = 0
 const val ARMV7 = 1
 const val ARMV5 = 2

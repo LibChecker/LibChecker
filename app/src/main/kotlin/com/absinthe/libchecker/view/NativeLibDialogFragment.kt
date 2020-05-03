@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view
 
 import android.app.Dialog
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import com.absinthe.libchecker.R
@@ -34,17 +35,24 @@ class NativeLibDialogFragment : LCDialogFragment() {
             )
         }
 
-        val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
-
         GlobalScope.launch(Dispatchers.IO) {
-            val list = getAbiByNativeDir(
-                info.sourceDir,
-                info.nativeLibraryDir
-            ).toMutableList()
+            val list = mutableListOf<LibStringItem>()
 
-            //Fix Dialog can't display all items
-            if (list.size > 10) {
-                list.add(LibStringItem("", 0))
+            try {
+                val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
+
+                list.addAll(getAbiByNativeDir(
+                    info.sourceDir,
+                    info.nativeLibraryDir
+                ))
+
+                //Fix Dialog can't display all items
+                if (list.size > 10) {
+                    list.add(LibStringItem("", 0))
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+                list.add(LibStringItem("Not found", 0))
             }
 
             withContext(Dispatchers.Main) {
