@@ -34,6 +34,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var viewModel: AppViewModel
     private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
+    private var added = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -105,7 +106,10 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     addAll(it)
                 }
 
-                binding.vfContainer.displayedChild = 1
+                if (!added) {
+                    binding.vfContainer.displayedChild = 1
+                    added = true
+                }
 
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
@@ -134,7 +138,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun updateItems(newItems: List<AppItem>) {
         mAdapter.setDiffNewData(newItems.toMutableList())
-        binding.recyclerview.smoothScrollToPosition(0)
+        binding.recyclerview.scrollToPosition(0)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
