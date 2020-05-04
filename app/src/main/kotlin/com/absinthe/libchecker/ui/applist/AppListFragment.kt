@@ -26,6 +26,7 @@ import com.absinthe.libchecker.view.NativeLibDialogFragment
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.*
 
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -138,9 +139,16 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private fun updateItems(newItems: List<AppItem>) {
         mAdapter.setDiffNewData(newItems.toMutableList())
-        binding.recyclerview.scrollToPosition(0)
-    }
 
+        GlobalScope.launch(Dispatchers.IO) {
+            delay(1000)
+
+            withContext(Dispatchers.Main) {
+                binding.recyclerview.smoothScrollToPosition(0)
+            }
+        }
+    }
+    
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_list_menu, menu)
