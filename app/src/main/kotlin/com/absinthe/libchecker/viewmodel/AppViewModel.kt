@@ -28,9 +28,9 @@ import java.util.zip.ZipFile
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
-    val items: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
-    val allItems: LiveData<List<LCItem>>
-    var refreshLock: MutableLiveData<Boolean> = MutableLiveData()
+    val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
+    val dbItems: LiveData<List<LCItem>>
+    var isInit = false
 
     private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
@@ -38,8 +38,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
         repository = LCRepository(lcDao)
-        allItems = repository.allItems
-        refreshLock.value = false
+        dbItems = repository.allItems
     }
 
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
@@ -96,79 +95,57 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         withContext(Dispatchers.Main) {
             GlobalValues.isObservingDBItems.value = true
-            items.value = newItems
+            appItems.value = newItems
         }
     }
 
-    fun addItem(context: Context) {
+    fun addItem() = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "addItems")
 
-        allItems.value?.let { value ->
-            viewModelScope.launch(Dispatchers.IO) {
-                val newItems = ArrayList<AppItem>()
+        dbItems.value?.let { value ->
+            val newItems = ArrayList<AppItem>()
 
-                for (item in value) {
-                    val appItem = AppItem().apply {
-                        icon = AppUtils.getAppIcon(item.packageName)
-                            ?: ColorDrawable(Color.TRANSPARENT)
-                        appName = item.label
-                        packageName = item.packageName
-                        versionName = "${item.versionName}(${item.versionCode})"
-                        abi = item.abi.toInt()
-                        isSystem = item.isSystem
-                        updateTime = item.lastUpdatedTime
-                    }
+            for (item in value) {
+                val appItem = AppItem().apply {
+                    icon = AppUtils.getAppIcon(item.packageName)
+                        ?: ColorDrawable(Color.TRANSPARENT)
+                    appName = item.label
+                    packageName = item.packageName
+                    versionName = "${item.versionName}(${item.versionCode})"
+                    abi = item.abi.toInt()
+                    isSystem = item.isSystem
+                    updateTime = item.lastUpdatedTime
+                }
 
-                    GlobalValues.isShowSystemApps.value?.let {
-                        if (it || (!it && !item.isSystem)) {
-                            newItems.add(appItem)
-                        }
+                GlobalValues.isShowSystemApps.value?.let {
+                    if (it || (!it && !item.isSystem)) {
+                        newItems.add(appItem)
                     }
                 }
+            }
 
-                when (GlobalValues.sortMode.value) {
-                    Constants.SORT_MODE_DEFAULT -> newItems.sortWith(
-                        compareBy(
-                            { it.abi },
-                            { it.appName })
-                    )
-                    Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
-                }
+            when (GlobalValues.sortMode.value) {
+                Constants.SORT_MODE_DEFAULT -> newItems.sortWith(
+                    compareBy(
+                        { it.abi },
+                        { it.appName })
+                )
+                Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
+            }
 
-                withContext(Dispatchers.Main) {
-                    items.value = newItems
-                }
+            withContext(Dispatchers.Main) {
+                appItems.value = newItems
             }
         }
     }
 
-    private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(item)
-    }
-
-    private fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.update(item)
-    }
-
-    private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.delete(item)
-    }
-
-    private fun deleteAll() = viewModelScope.launch(Dispatchers.IO) {
-        repository.deleteAll()
-    }
-
-    fun requestChange(context: Context) {
-        var isChanged = false
-
-        viewModelScope.launch(Dispatchers.Main) {
-            refreshLock.value = true
-        }
+    fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d(tag, "requestChange")
 
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
 
-        allItems.value?.let { value ->
+        dbItems.value?.let { value ->
             for (dbItem in value) {
                 appList.find { it.packageName == dbItem.packageName }?.let {
                     val packageInfo = PackageUtils.getPackageInfo(it)
@@ -186,13 +163,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
                         )
                         update(item)
-                        isChanged = true
                     }
 
                     appList.remove(it)
                 } ?: run {
                     delete(dbItem)
-                    isChanged = true
                 }
             }
 
@@ -212,15 +187,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 insert(lcItem)
-                isChanged = true
-            }
-
-            if (isChanged) {
-                viewModelScope.launch(Dispatchers.Main) {
-                    refreshLock.value = false
-                }
             }
         }
+    }
+
+    private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(item)
+    }
+
+    private fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.update(item)
+    }
+
+    private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.delete(item)
     }
 
     private fun getAbi(path: String, nativePath: String): Int {

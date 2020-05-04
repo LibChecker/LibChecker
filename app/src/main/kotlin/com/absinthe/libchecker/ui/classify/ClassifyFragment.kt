@@ -71,7 +71,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
             setOnChartValueSelectedListener(this@ClassifyFragment)
         }
 
-        viewModel.items.observe(viewLifecycleOwner, Observer {
+        viewModel.appItems.observe(viewLifecycleOwner, Observer {
             setData()
         })
 
@@ -88,7 +88,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        viewModel.items.value?.let {
+        viewModel.appItems.value?.let {
             val list = mutableListOf(0, 0, 0)
 
             for (item in it) {
@@ -159,18 +159,18 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
 
             when (h.x) {
                 0f -> {
-                    viewModel.items.value?.filter { it.abi == ARMV8 }?.let { filter ->
+                    viewModel.appItems.value?.filter { it.abi == ARMV8 }?.let { filter ->
                         item = ArrayList(filter)
                     }
                 }
                 1f -> {
-                    viewModel.items.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                    viewModel.appItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 2f -> {
-                    viewModel.items.value?.filter { it.abi == NO_LIBS }?.let { filter ->
+                    viewModel.appItems.value?.filter { it.abi == NO_LIBS }?.let { filter ->
                         item = ArrayList(filter)
                     }
                 }

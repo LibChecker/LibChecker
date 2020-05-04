@@ -35,7 +35,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     private lateinit var viewModel: AppViewModel
     private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
-    private var added = false
+    private var changeCount = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,13 +49,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (added) {
-            viewModel.requestChange(requireContext())
-        }
-    }
-
     private fun initView() {
         setHasOptionsMenu(true)
 
@@ -63,7 +56,10 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             setOnItemClickListener { adapter, _, position ->
                 NativeLibDialogFragment().apply {
                     arguments = Bundle().apply {
-                        putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
+                        putString(
+                            EXTRA_PKG_NAME,
+                            (adapter.getItem(position) as AppItem).packageName
+                        )
                     }
                     MainActivity.instance?.apply {
                         show(supportFragmentManager, tag)
@@ -76,7 +72,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         binding.apply {
             recyclerview.apply {
                 adapter = mAdapter
-                layoutManager = LinearLayoutManager(activity)
+                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -88,36 +84,39 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems(requireContext())
             } else {
-                allItems.observe(viewLifecycleOwner, Observer {
-                    if (!refreshLock.value!! && !added) {
-                        binding.vfContainer.displayedChild = 0
-
-                        if (it.isNullOrEmpty()) {
-                            initItems(requireContext())
+                dbItems.observe(viewLifecycleOwner, Observer {
+                    if (it.isNullOrEmpty()) {
+                        initItems(requireContext())
+                    } else {
+                        if (!isInit) {
+                            addItem()
                         } else {
-                            addItem(requireContext())
+                            changeCount++
+
+                            GlobalScope.launch(Dispatchers.IO) {
+                                val count = changeCount
+                                delay(500)
+
+                                if (count == changeCount) {
+                                    addItem()
+                                }
+                            }
                         }
                     }
                 })
             }
 
-            refreshLock.observe(viewLifecycleOwner, Observer {
-                if (!it) {
-                    addItem(requireContext())
-                }
-            })
-
-            items.observe(viewLifecycleOwner, Observer {
+            appItems.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
                 mItems.apply {
                     clear()
                     addAll(it)
                 }
 
-                if (!added) {
+                if (!isInit) {
                     binding.vfContainer.displayedChild = 1
                     requestChange(requireContext())
-                    added = true
+                    isInit = true
                 }
 
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
@@ -128,7 +127,9 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, Observer {
-                viewModel.addItem(requireContext())
+                if (viewModel.isInit) {
+                    viewModel.addItem()
+                }
             })
             sortMode.observe(viewLifecycleOwner, Observer { mode ->
 
@@ -149,10 +150,14 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         mAdapter.setDiffNewData(newItems.toMutableList())
 
         GlobalScope.launch(Dispatchers.IO) {
-            delay(1000)
+            delay(300)
 
             withContext(Dispatchers.Main) {
-                binding.recyclerview.smoothScrollToPosition(0)
+                binding.recyclerview.apply {
+                    if (canScrollVertically(-1)) {
+                        smoothScrollToPosition(0)
+                    }
+                }
             }
         }
     }
