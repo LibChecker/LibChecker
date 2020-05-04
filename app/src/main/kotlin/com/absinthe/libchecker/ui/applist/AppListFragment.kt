@@ -49,6 +49,11 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         return binding.root
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.requestChange(requireContext())
+    }
+
     private fun initView() {
         setHasOptionsMenu(true)
 
@@ -82,7 +87,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 initItems(requireContext())
             } else {
                 allItems.observe(viewLifecycleOwner, Observer {
-                    if (!refreshLock.value!!) {
+                    if (!refreshLock.value!! && !added) {
                         binding.vfContainer.displayedChild = 0
 
                         if (it.isNullOrEmpty()) {
@@ -109,6 +114,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
                 if (!added) {
                     binding.vfContainer.displayedChild = 1
+                    requestChange(requireContext())
                     added = true
                 }
 
@@ -148,7 +154,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
     }
-    
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_list_menu, menu)

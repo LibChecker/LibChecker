@@ -34,7 +34,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
-    private var isInit = false
 
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
@@ -139,11 +138,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 withContext(Dispatchers.Main) {
                     items.value = newItems
                 }
-
-                if (!isInit) {
-                    requestChange(context)
-                    isInit = true
-                }
             }
         }
     }
@@ -164,7 +158,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         repository.deleteAll()
     }
 
-    private fun requestChange(context: Context) {
+    fun requestChange(context: Context) {
         var isChanged = false
 
         viewModelScope.launch(Dispatchers.Main) {
