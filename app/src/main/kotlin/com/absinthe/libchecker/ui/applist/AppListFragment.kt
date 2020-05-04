@@ -51,7 +51,9 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onResume() {
         super.onResume()
-        viewModel.requestChange(requireContext())
+        if (added) {
+            viewModel.requestChange(requireContext())
+        }
     }
 
     private fun initView() {
