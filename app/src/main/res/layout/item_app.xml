@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
     android:clickable="true"
     android:focusable="true"
+    android:transitionName="app_card_container"
     app:cardCornerRadius="3dp"
     app:cardElevation="1dp">
 
@@ -16,11 +18,14 @@
 
         <ImageView
             android:id="@+id/iv_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/app_icon_size"
+            android:layout_height="@dimen/app_icon_size"
+            android:contentDescription="App icon"
+            android:transitionName="app_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -37,25 +42,25 @@
                 android:id="@+id/tv_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Anywhere-"
                 android:textColor="@color/textNormal"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Anywhere-" />
 
             <TextView
                 android:id="@+id/tv_package_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="com.absinthe.anywhere_"
                 android:textColor="@color/textNormal"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:text="com.absinthe.anywhere_" />
 
             <TextView
                 android:id="@+id/tv_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1.8.0(1800)"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:text="1.8.0(1800)" />
 
 
         </LinearLayout>
@@ -64,20 +69,22 @@
             android:id="@+id/iv_abi_type"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:contentDescription="ABI icon"
             android:src="@drawable/ic_64bit"
             app:layout_constraintBottom_toTopOf="@id/tv_abi"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tv_abi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ARMv8"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_abi_type" />
+            app:layout_constraintTop_toBottomOf="@id/iv_abi_type"
+            tools:text="ARMv8" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

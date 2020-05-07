@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.ui.applist
 
 import android.annotation.SuppressLint
+import android.app.ActivityOptions
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.AppDetailActivity
 import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
@@ -65,6 +68,17 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                         show(supportFragmentManager, tag)
                     }
                 }
+            }
+            setOnItemLongClickListener { _, view, _ ->
+                val intent = Intent(requireActivity(), AppDetailActivity::class.java)
+
+                val options = ActivityOptions.makeSceneTransitionAnimation(
+                    requireActivity(),
+                    view,
+                    "app_card_container"
+                )
+                startActivity(intent, options.toBundle())
+                true
             }
             setDiffCallback(AppListDiffUtil())
         }

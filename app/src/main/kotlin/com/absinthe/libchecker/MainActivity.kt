@@ -1,6 +1,7 @@
 package com.absinthe.libchecker
 
 import android.os.Bundle
+import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +12,7 @@ import com.absinthe.libchecker.ui.applist.AppListFragment
 import com.absinthe.libchecker.ui.classify.ClassifyFragment
 import com.absinthe.libchecker.ui.settings.SettingsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
@@ -18,15 +20,18 @@ import com.microsoft.appcenter.crashes.Crashes
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var viewModel: AppViewModel
+    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        window.apply {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+            sharedElementsUseOverlay = false
+        }
+        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
 
+        super.onCreate(savedInstanceState)
         instance = this
-        viewModel = ViewModelProvider(this).get(AppViewModel::class.java)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         if (!BuildConfig.DEBUG) {

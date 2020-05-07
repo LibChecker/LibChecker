@@ -21,11 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".AppDetailActivity" />
         <activity
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
-
     </application>
 
 </manifest>
