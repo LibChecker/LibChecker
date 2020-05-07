@@ -4,46 +4,115 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AppDetailActivity">
+    android:background="@color/backgroundNormal"
+    tools:context=".ui.applist.AppDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="?attr/colorPrimary"
+            app:contentScrim="@color/backgroundNormal"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_content_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
+                android:background="@color/backgroundNormal"
                 android:paddingHorizontal="10dp"
                 android:paddingTop="?attr/actionBarSize"
+                android:paddingBottom="10dp"
                 app:layout_collapseMode="parallax">
 
                 <ImageView
                     android:id="@+id/iv_app_icon"
-                    android:layout_width="@dimen/app_icon_size"
-                    android:layout_height="@dimen/app_icon_size"
-                    android:transitionName="app_icon" />
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:contentDescription="App icon"
+                    android:transitionName="app_icon"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:background="@drawable/pic_splash"
+                    tools:ignore="HardcodedText" />
 
-            </LinearLayout>
+                <com.absinthe.anywhere_.view.AlwaysMarqueeTextView
+                    android:id="@+id/tv_app_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:ellipsize="marquee"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:singleLine="true"
+                    android:textColor="@color/textNormal"
+                    android:textSize="16sp"
+                    android:transitionName="app_name"
+                    app:layout_constraintEnd_toStartOf="@id/tv_target_api"
+                    app:layout_constraintStart_toEndOf="@id/iv_app_icon"
+                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+                    tools:text="Anywhere-" />
+
+                <TextView
+                    android:id="@+id/tv_package_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/textNormal"
+                    android:textSize="14sp"
+                    android:transitionName="package_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_app_name"
+                    app:layout_constraintTop_toBottomOf="@id/tv_app_name"
+                    tools:text="com.absinthe.anywhere_" />
+
+                <TextView
+                    android:id="@+id/tv_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="12sp"
+                    android:transitionName="version_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_package_name"
+                    app:layout_constraintTop_toBottomOf="@id/tv_package_name"
+                    tools:text="1.8.0(1800)" />
+
+                <TextView
+                    android:id="@+id/tv_target_api"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+                    tools:text="API 29" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+                app:layout_collapseMode="pin"
+                app:titleTextColor="@color/textNormal" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:descendantFocusability="beforeDescendants"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

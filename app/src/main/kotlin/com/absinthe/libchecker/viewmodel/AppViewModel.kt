@@ -57,7 +57,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
-                    versionName = "${packageInfo.versionName ?: "null"}(${versionCode})"
+                    versionName = PackageUtils.getVersionString(info.packageName)
                     abi = getAbi(info.sourceDir, info.nativeLibraryDir)
                     isSystem =
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
@@ -111,7 +111,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         ?: ColorDrawable(Color.TRANSPARENT)
                     appName = item.label
                     packageName = item.packageName
-                    versionName = "${item.versionName}(${item.versionCode})"
+                    versionName = PackageUtils.getVersionString(item.packageName)
                     abi = item.abi.toInt()
                     isSystem = item.isSystem
                     updateTime = item.lastUpdatedTime

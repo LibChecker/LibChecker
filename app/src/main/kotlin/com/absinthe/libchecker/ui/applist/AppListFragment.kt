@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.absinthe.libchecker.AppDetailActivity
 import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
@@ -30,7 +29,6 @@ import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
-
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -69,8 +67,12 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     }
                 }
             }
-            setOnItemLongClickListener { _, view, _ ->
-                val intent = Intent(requireActivity(), AppDetailActivity::class.java)
+            setOnItemLongClickListener { _, view, position ->
+                val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
+                    putExtras(Bundle().apply {
+                        putString(EXTRA_PKG_NAME, mAdapter.getItem(position).packageName)
+                    })
+                }
 
                 val options = ActivityOptions.makeSceneTransitionAnimation(
                     requireActivity(),

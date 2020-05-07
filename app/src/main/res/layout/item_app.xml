@@ -42,26 +42,31 @@
                 android:id="@+id/tv_app_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
                 android:textColor="@color/textNormal"
                 android:textSize="16sp"
+                android:transitionName="app_name"
                 tools:text="Anywhere-" />
 
             <TextView
                 android:id="@+id/tv_package_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif"
                 android:textColor="@color/textNormal"
                 android:textSize="14sp"
+                android:transitionName="package_name"
                 tools:text="com.absinthe.anywhere_" />
 
             <TextView
                 android:id="@+id/tv_version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
+                android:transitionName="version_name"
                 tools:text="1.8.0(1800)" />
-
 
         </LinearLayout>
 
