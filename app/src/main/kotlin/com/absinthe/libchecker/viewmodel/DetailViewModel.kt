@@ -48,9 +48,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             val list = ArrayList<LibStringItem>()
 
             try {
-                val packageInfo = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
+                val packageInfo =
+                    context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
                 for (service in packageInfo.services) {
-                    list.add(LibStringItem(service.name, 0))
+                    list.add(LibStringItem(service.name.removePrefix(packageName), 0))
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
