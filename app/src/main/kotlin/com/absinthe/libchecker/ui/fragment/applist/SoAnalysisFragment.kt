@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
@@ -14,8 +15,8 @@ import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
-const val MODE_SOR_BY_SIZE = 0
-const val MODE_SOR_BY_LIB = 1
+const val MODE_SORT_BY_SIZE = 0
+const val MODE_SORT_BY_LIB = 1
 
 class SoAnalysisFragment : Fragment() {
 
@@ -25,7 +26,6 @@ class SoAnalysisFragment : Fragment() {
     private val adapter = LibStringAdapter().apply {
         mode = MODE_NATIVE
     }
-    private var mode = MODE_SOR_BY_SIZE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,16 +42,16 @@ class SoAnalysisFragment : Fragment() {
         binding.apply {
             list.adapter = this@SoAnalysisFragment.adapter
             ibSort.setOnClickListener {
-                mode = if (mode == MODE_SOR_BY_SIZE) {
+                GlobalValues.sortMode = if (GlobalValues.sortMode == MODE_SORT_BY_SIZE) {
                     adapter.setList(adapter.data.sortedByDescending {
                         NativeLibMap.MAP.containsKey(
                             it.name
                         )
                     })
-                    MODE_SOR_BY_LIB
+                    MODE_SORT_BY_LIB
                 } else {
                     adapter.setList(adapter.data.sortedByDescending { it.size })
-                    MODE_SOR_BY_SIZE
+                    MODE_SORT_BY_SIZE
                 }
             }
         }
@@ -68,10 +68,10 @@ class SoAnalysisFragment : Fragment() {
         fun newInstance(packageName: String): SoAnalysisFragment {
             return SoAnalysisFragment()
                 .apply {
-                arguments = Bundle().apply {
-                    putString(EXTRA_PKG_NAME, packageName)
+                    arguments = Bundle().apply {
+                        putString(EXTRA_PKG_NAME, packageName)
+                    }
                 }
-            }
         }
     }
 }
