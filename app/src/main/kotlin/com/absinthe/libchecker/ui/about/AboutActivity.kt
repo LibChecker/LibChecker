@@ -33,8 +33,6 @@ class AboutActivity : AbsAboutActivity() {
             add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
             add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
             add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
-            add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
-            add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
             add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
         }
     }

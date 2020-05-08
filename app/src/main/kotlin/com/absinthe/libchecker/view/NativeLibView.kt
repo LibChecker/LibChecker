@@ -12,7 +12,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 
-
 const val MODE_SOR_BY_SIZE = 0
 const val MODE_SOR_BY_LIB = 1
 

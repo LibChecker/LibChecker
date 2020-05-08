@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.settings
+package com.absinthe.libchecker.ui.fragment
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
@@ -15,7 +16,8 @@
         android:textColor="@color/textNormal"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/chip"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="libnative.so" />
 
     <TextView
         android:id="@+id/tv_lib_size"
@@ -24,7 +26,8 @@
         android:fontFamily="sans-serif-condensed"
         android:textSize="12sp"
         app:layout_constraintStart_toStartOf="@id/tv_name"
-        app:layout_constraintTop_toBottomOf="@id/tv_name" />
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        tools:text="100kb" />
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chip"
@@ -35,6 +38,7 @@
         app:chipMinTouchTargetSize="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Native Lib" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

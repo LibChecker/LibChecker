@@ -32,4 +32,9 @@
 
     <string name="show_system_apps">Show System Apps</string>
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
+
+    <!--  Detail  -->
+    <string name="tab_so_analysis">so File Analysis</string>
+    <string name="tab_manifest_analysis">Manifest File Analysis</string>
+
 </resources>

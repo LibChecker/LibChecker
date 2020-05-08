@@ -13,6 +13,10 @@ object PackageUtils {
         return Utils.getApp().packageManager.getPackageInfo(info.packageName, 0)
     }
 
+    fun getPackageInfo(packageName: String): PackageInfo {
+        return Utils.getApp().packageManager.getPackageInfo(packageName, 0)
+    }
+
     fun getVersionCode(packageInfo: PackageInfo): Long {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             packageInfo.longVersionCode

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.applist
+package com.absinthe.libchecker.ui.fragment.applist
 
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
@@ -13,13 +13,13 @@ import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
+import com.absinthe.libchecker.ui.main.AppDetailActivity
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
@@ -33,7 +33,7 @@ import kotlinx.coroutines.*
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
-    private lateinit var viewModel: AppViewModel
+    private val viewModel by lazy { ViewModelProvider(requireActivity()).get(AppViewModel::class.java) }
     private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
     private var changeCount = 0
@@ -43,7 +43,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
         binding = FragmentAppListBinding.inflate(inflater, container, false)
         initView()
 
@@ -86,10 +85,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         }
 
         binding.apply {
-            recyclerview.apply {
-                adapter = mAdapter
-                layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-            }
+            recyclerview.adapter = mAdapter
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)

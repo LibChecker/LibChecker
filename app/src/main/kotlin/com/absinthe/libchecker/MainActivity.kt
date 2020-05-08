@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.ui.applist.AppListFragment
-import com.absinthe.libchecker.ui.classify.ClassifyFragment
-import com.absinthe.libchecker.ui.settings.SettingsFragment
+import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
+import com.absinthe.libchecker.ui.fragment.ClassifyFragment
+import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.AppCenter

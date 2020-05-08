@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/backgroundNormal"
-    tools:context=".ui.applist.AppDetailActivity">
+    tools:context=".ui.main.AppDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
@@ -25,9 +25,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/backgroundNormal"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="@dimen/normal_padding"
                 android:paddingTop="?attr/actionBarSize"
-                android:paddingBottom="10dp"
+                android:paddingBottom="@dimen/normal_padding"
                 app:layout_collapseMode="parallax">
 
                 <ImageView
@@ -45,7 +45,7 @@
                     android:id="@+id/tv_app_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginHorizontal="@dimen/normal_padding"
                     android:ellipsize="marquee"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
@@ -59,7 +59,7 @@
                     app:layout_constraintEnd_toStartOf="@id/tv_target_api"
                     app:layout_constraintStart_toEndOf="@id/iv_app_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
-                    tools:text="Anywhere-" />
+                    tools:text="LibChecker" />
 
                 <TextView
                     android:id="@+id/tv_package_name"
@@ -71,7 +71,7 @@
                     android:transitionName="package_name"
                     app:layout_constraintStart_toStartOf="@id/tv_app_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_app_name"
-                    tools:text="com.absinthe.anywhere_" />
+                    tools:text="com.absinthe.libchecker" />
 
                 <TextView
                     android:id="@+id/tv_version"
@@ -83,7 +83,7 @@
                     android:transitionName="version_name"
                     app:layout_constraintStart_toStartOf="@id/tv_package_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_package_name"
-                    tools:text="1.8.0(1800)" />
+                    tools:text="1.2.0(120)" />
 
                 <TextView
                     android:id="@+id/tv_target_api"
@@ -109,10 +109,35 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:descendantFocusability="beforeDescendants"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+        android:orientation="vertical"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_so_analysis" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_manifest_analysis" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

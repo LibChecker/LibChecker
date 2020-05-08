@@ -23,4 +23,6 @@
     <string name="menu_sort">排序</string>
     <string name="menu_sort_by_time_desc">按更新时间降序</string>
     <string name="menu_sort_default">默认顺序</string>
+    <string name="tab_so_analysis">so 文件分析</string>
+    <string name="tab_manifest_analysis">Manifest 文件分析</string>
 </resources>
