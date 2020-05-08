@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.ui.fragment.applist.ManifestAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
@@ -84,7 +84,7 @@ class AppDetailActivity : AppCompatActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> SoAnalysisFragment.newInstance(pkgName)
-                    1 -> ManifestAnalysisFragment.newInstance(pkgName)
+                    1 -> ComponentsAnalysisFragment.newInstance(pkgName)
                     else -> SoAnalysisFragment.newInstance(pkgName)
                 }
             }
@@ -94,7 +94,7 @@ class AppDetailActivity : AppCompatActivity() {
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
                 when (position) {
                     0 -> tab.text = getText(R.string.tab_so_analysis)
-                    1 -> tab.text = getText(R.string.tab_manifest_analysis)
+                    1 -> tab.text = getText(R.string.tab_components_analysis)
                     else -> tab.text = getText(R.string.tab_so_analysis)
                 }
             })

@@ -17,29 +17,50 @@ import java.util.zip.ZipFile
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     val libItems: MutableLiveData<ArrayList<LibStringItem>> = MutableLiveData()
+    val componentsItems: MutableLiveData<ArrayList<LibStringItem>> = MutableLiveData()
 
-    fun initData(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-        val list = ArrayList<LibStringItem>()
+    fun initSoAnalysisData(context: Context, packageName: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = ArrayList<LibStringItem>()
 
-        try {
-            val info = context.packageManager.getApplicationInfo(packageName, 0)
+            try {
+                val info = context.packageManager.getApplicationInfo(packageName, 0)
 
-            list.addAll(
-                getAbiByNativeDir(
-                    context,
-                    info.sourceDir,
-                    info.nativeLibraryDir
+                list.addAll(
+                    getAbiByNativeDir(
+                        context,
+                        info.sourceDir,
+                        info.nativeLibraryDir
+                    )
                 )
-            )
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-            list.add(LibStringItem("Not found", 0))
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+                list.add(LibStringItem("Not found", 0))
+            }
+
+            withContext(Dispatchers.Main) {
+                libItems.value = list
+            }
         }
 
-        withContext(Dispatchers.Main) {
-            libItems.value = list
+    fun initComponentsData(context: Context, packageName: String) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val list = ArrayList<LibStringItem>()
+
+            try {
+                val packageInfo = context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
+                for (service in packageInfo.services) {
+                    list.add(LibStringItem(service.name, 0))
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+                list.add(LibStringItem("Not found", 0))
+            }
+
+            withContext(Dispatchers.Main) {
+                componentsItems.value = list
+            }
         }
-    }
 
     private fun getAbiByNativeDir(
         context: Context,

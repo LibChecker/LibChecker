@@ -8,28 +8,26 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.constant.NativeLibMap
-import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
+import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
-const val MODE_SOR_BY_SIZE = 0
-const val MODE_SOR_BY_LIB = 1
+class ComponentsAnalysisFragment : Fragment() {
 
-class SoAnalysisFragment : Fragment() {
-
-    private lateinit var binding: FragmentSoAnalysisBinding
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
-    private val adapter = LibStringAdapter()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
+    private val adapter = LibStringAdapter()
     private var mode = MODE_SOR_BY_SIZE
+
+    private lateinit var binding: FragmentManifestAnalysisBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSoAnalysisBinding.inflate(inflater, container, false)
+        binding = FragmentManifestAnalysisBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -37,7 +35,7 @@ class SoAnalysisFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            list.adapter = this@SoAnalysisFragment.adapter
+            list.adapter = this@ComponentsAnalysisFragment.adapter
             ibSort.setOnClickListener {
                 mode = if (mode == MODE_SOR_BY_SIZE) {
                     adapter.setList(adapter.data.sortedByDescending {
@@ -54,21 +52,21 @@ class SoAnalysisFragment : Fragment() {
         }
 
         viewModel.apply {
-            libItems.observe(viewLifecycleOwner, Observer {
+            componentsItems.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
             })
-            initSoAnalysisData(requireContext(), packageName)
+            initComponentsData(requireContext(), packageName)
         }
     }
 
     companion object {
-        fun newInstance(packageName: String): SoAnalysisFragment {
-            return SoAnalysisFragment()
+        fun newInstance(packageName: String): ComponentsAnalysisFragment {
+            return ComponentsAnalysisFragment()
                 .apply {
-                arguments = Bundle().apply {
-                    putString(EXTRA_PKG_NAME, packageName)
+                    arguments = Bundle().apply {
+                        putString(EXTRA_PKG_NAME, packageName)
+                    }
                 }
-            }
         }
     }
 }

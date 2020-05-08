@@ -35,6 +35,6 @@
 
     <!--  Detail  -->
     <string name="tab_so_analysis">so File Analysis</string>
-    <string name="tab_manifest_analysis">Manifest File Analysis</string>
+    <string name="tab_components_analysis">Components Analysis</string>
 
 </resources>
