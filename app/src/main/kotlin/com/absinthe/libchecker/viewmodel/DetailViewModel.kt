@@ -53,7 +53,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 for (service in packageInfo.services) {
                     list.add(LibStringItem(service.name.removePrefix(packageName), 0))
                 }
-            } catch (e: PackageManager.NameNotFoundException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
                 list.add(LibStringItem("Not found", 0))
             }
