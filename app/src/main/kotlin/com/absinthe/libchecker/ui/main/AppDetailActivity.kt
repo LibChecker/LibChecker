@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
@@ -18,16 +18,24 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 
-class AppDetailActivity : AppCompatActivity() {
+class AppDetailActivity : BaseActivity() {
 
-    private val binding by lazy { ActivityAppDetailBinding.inflate(layoutInflater) }
+    private lateinit var binding: ActivityAppDetailBinding
     private var pkgName = ""
+
+    override fun setViewBinding() {
+        binding = ActivityAppDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+
+    override fun setRoot() {
+        root = binding.root
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initTransition()
 
         super.onCreate(savedInstanceState)
-        setContentView(binding.root)
         initView()
 
         intent.extras?.let {

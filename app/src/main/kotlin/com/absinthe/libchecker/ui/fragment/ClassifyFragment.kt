@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
 import com.absinthe.libchecker.utils.GlobalValues
@@ -153,9 +152,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         if (h == null) return
 
         ClassifyDialogFragment().apply {
-            MainActivity.instance?.let {
-                show(it.supportFragmentManager, tag)
-            }
+            show(this@ClassifyFragment.requireActivity().supportFragmentManager, tag)
 
             when (h.x) {
                 0f -> {

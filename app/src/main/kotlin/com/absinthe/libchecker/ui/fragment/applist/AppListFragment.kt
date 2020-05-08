@@ -13,7 +13,6 @@ import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.absinthe.libchecker.MainActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
@@ -24,7 +23,6 @@ import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
-import com.absinthe.libchecker.view.NativeLibDialogFragment
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once
@@ -53,20 +51,20 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         setHasOptionsMenu(true)
 
         mAdapter.apply {
-            setOnItemClickListener { adapter, _, position ->
-                NativeLibDialogFragment().apply {
-                    arguments = Bundle().apply {
-                        putString(
-                            EXTRA_PKG_NAME,
-                            (adapter.getItem(position) as AppItem).packageName
-                        )
-                    }
-                    MainActivity.instance?.apply {
-                        show(supportFragmentManager, tag)
-                    }
-                }
-            }
-            setOnItemLongClickListener { _, view, position ->
+//            setOnItemClickListener { adapter, _, position ->
+//                NativeLibDialogFragment().apply {
+//                    arguments = Bundle().apply {
+//                        putString(
+//                            EXTRA_PKG_NAME,
+//                            (adapter.getItem(position) as AppItem).packageName
+//                        )
+//                    }
+//                    MainActivity.instance?.apply {
+//                        show(supportFragmentManager, tag)
+//                    }
+//                }
+//            }
+            setOnItemClickListener { _, view, position ->
                 val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {
                         putString(EXTRA_PKG_NAME, mAdapter.getItem(position).packageName)
@@ -79,7 +77,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     "app_card_container"
                 )
                 startActivity(intent, options.toBundle())
-                true
             }
             setDiffCallback(AppListDiffUtil())
         }

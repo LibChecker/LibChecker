@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
@@ -16,14 +17,13 @@ import com.absinthe.libchecker.viewmodel.DetailViewModel
 
 class ComponentsAnalysisFragment : Fragment() {
 
+    private lateinit var binding: FragmentManifestAnalysisBinding
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
     private val adapter = LibStringAdapter().apply {
         mode = MODE_SERVICE
     }
     private var mode = MODE_SOR_BY_SIZE
-
-    private lateinit var binding: FragmentManifestAnalysisBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +38,10 @@ class ComponentsAnalysisFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
-            list.adapter = this@ComponentsAnalysisFragment.adapter
+            list.apply {
+                adapter = this@ComponentsAnalysisFragment.adapter
+                addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+            }
             ibSort.setOnClickListener {
                 mode = if (mode == MODE_SOR_BY_SIZE) {
                     adapter.setList(adapter.data.sortedByDescending {
@@ -48,7 +51,7 @@ class ComponentsAnalysisFragment : Fragment() {
                     })
                     MODE_SOR_BY_LIB
                 } else {
-                    adapter.setList(adapter.data.sortedByDescending { it.size })
+                    adapter.setList(adapter.data.sortedByDescending { it.name })
                     MODE_SOR_BY_SIZE
                 }
             }

@@ -1,27 +1,37 @@
-package com.absinthe.libchecker
+package com.absinthe.libchecker.ui.main
 
 import android.os.Bundle
 import android.view.Window
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
+import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
 
+class MainActivity : BaseActivity() {
 
-class MainActivity : AppCompatActivity() {
-
-    private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
+    private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
+
+    override fun setViewBinding() {
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+
+    override fun setRoot() {
+        root = binding.root
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         window.apply {
@@ -31,8 +41,6 @@ class MainActivity : AppCompatActivity() {
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
 
         super.onCreate(savedInstanceState)
-        instance = this
-        setContentView(binding.root)
 
         if (!BuildConfig.DEBUG) {
             AppCenter.start(
@@ -89,14 +97,5 @@ class MainActivity : AppCompatActivity() {
         if (viewModel.isInit) {
             viewModel.requestChange(this)
         }
-    }
-
-    override fun onDestroy() {
-        instance = null
-        super.onDestroy()
-    }
-
-    companion object {
-        var instance: MainActivity? = null
     }
 }

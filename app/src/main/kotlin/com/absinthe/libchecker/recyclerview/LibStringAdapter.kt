@@ -28,7 +28,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
 
         val libIcon = holder.getView<Chip>(R.id.chip)
 
-        val map = when(mode) {
+        val map = when (mode) {
             MODE_NATIVE -> NativeLibMap.MAP
             MODE_SERVICE -> ServiceLibMap.MAP
             else -> NativeLibMap.MAP
@@ -45,7 +45,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         }
     }
 
-    private fun sizeToString(size: Long) : String {
+    private fun sizeToString(size: Long): String {
         return "(${Formatter.formatFileSize(context, size)})"
     }
 }
