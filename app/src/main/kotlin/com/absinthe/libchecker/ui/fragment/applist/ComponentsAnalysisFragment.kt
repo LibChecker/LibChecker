@@ -23,7 +23,7 @@ class ComponentsAnalysisFragment : Fragment() {
     private val adapter = LibStringAdapter().apply {
         mode = MODE_SERVICE
     }
-    private var mode = MODE_SOR_BY_SIZE
+    private var mode = MODE_SORT_BY_SIZE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -43,16 +43,16 @@ class ComponentsAnalysisFragment : Fragment() {
                 addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
             }
             ibSort.setOnClickListener {
-                mode = if (mode == MODE_SOR_BY_SIZE) {
+                mode = if (mode == MODE_SORT_BY_SIZE) {
                     adapter.setList(adapter.data.sortedByDescending {
                         ServiceLibMap.MAP.containsKey(
                             it.name
                         )
                     })
-                    MODE_SOR_BY_LIB
+                    MODE_SORT_BY_LIB
                 } else {
                     adapter.setList(adapter.data.sortedByDescending { it.name })
-                    MODE_SOR_BY_SIZE
+                    MODE_SORT_BY_SIZE
                 }
             }
         }
