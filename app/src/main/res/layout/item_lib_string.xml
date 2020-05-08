@@ -14,6 +14,7 @@
         android:fontFamily="sans-serif-medium"
         android:textColor="@color/textNormal"
         android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_lib_size"
         app:layout_constraintEnd_toStartOf="@id/chip"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -25,6 +26,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed"
         android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/tv_name"
         app:layout_constraintTop_toBottomOf="@id/tv_name"
         tools:text="100kb" />
