@@ -21,8 +21,9 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         holder.setText(R.id.tv_name, item.name)
         if (item.size != 0L) {
             holder.setText(R.id.tv_lib_size, sizeToString(item.size))
+            holder.setGone(R.id.tv_lib_size, false)
         } else {
-            holder.setText(R.id.tv_lib_size, "")
+            holder.setGone(R.id.tv_lib_size, true)
         }
 
         val libIcon = holder.getView<Chip>(R.id.chip)
