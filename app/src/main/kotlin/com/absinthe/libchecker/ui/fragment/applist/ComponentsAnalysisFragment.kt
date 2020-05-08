@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.absinthe.libchecker.constant.NativeLibMap
+import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE
@@ -42,7 +42,7 @@ class ComponentsAnalysisFragment : Fragment() {
             ibSort.setOnClickListener {
                 mode = if (mode == MODE_SOR_BY_SIZE) {
                     adapter.setList(adapter.data.sortedByDescending {
-                        NativeLibMap.MAP.containsKey(
+                        ServiceLibMap.MAP.containsKey(
                             it.name
                         )
                     })

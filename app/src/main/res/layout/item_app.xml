@@ -25,6 +25,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            tools:background="@drawable/pic_splash"
             tools:ignore="HardcodedText" />
 
         <LinearLayout
@@ -46,7 +47,7 @@
                 android:textColor="@color/textNormal"
                 android:textSize="16sp"
                 android:transitionName="app_name"
-                tools:text="Anywhere-" />
+                tools:text="LibChecker" />
 
             <TextView
                 android:id="@+id/tv_package_name"
@@ -56,7 +57,7 @@
                 android:textColor="@color/textNormal"
                 android:textSize="14sp"
                 android:transitionName="package_name"
-                tools:text="com.absinthe.anywhere_" />
+                tools:text="com.absinthe.libchecker" />
 
             <TextView
                 android:id="@+id/tv_version"
@@ -66,7 +67,7 @@
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 android:transitionName="version_name"
-                tools:text="1.8.0(1800)" />
+                tools:text="1.2.0(120)" />
 
         </LinearLayout>
 

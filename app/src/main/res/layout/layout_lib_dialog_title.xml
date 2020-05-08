@@ -17,7 +17,8 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/ib_sort"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Native libs in LibChecker" />
 
     <ImageButton
         android:id="@+id/ib_sort"
