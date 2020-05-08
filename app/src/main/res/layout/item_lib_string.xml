@@ -10,13 +10,14 @@
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:maxLines="1"
         android:textColor="@color/textNormal"
         android:textSize="14sp"
         app:layout_constraintEnd_toStartOf="@id/chip"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="libnative.so" />
 
     <TextView
