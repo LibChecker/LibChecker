@@ -49,6 +49,4 @@ object NativeLibMap {
         Pair("libstlport_shared.so", LibChip(R.drawable.ic_lib_sql, "SQLCipher")),
         Pair("libsgsecuritybody.so", LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全"))
         )
-
-    data class LibChip(val iconRes: Int, val name: String)
 }

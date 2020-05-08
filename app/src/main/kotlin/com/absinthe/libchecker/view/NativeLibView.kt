@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 
 const val MODE_SOR_BY_SIZE = 0
 const val MODE_SOR_BY_LIB = 1
@@ -19,7 +20,9 @@ class NativeLibView(context: Context) : ConstraintLayout(context) {
 
     private val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
 
-    var adapter = LibStringAdapter()
+    var adapter = LibStringAdapter().apply {
+        mode = MODE_NATIVE
+    }
     var tvTitle: TextView
     private var mode = MODE_SOR_BY_SIZE
 

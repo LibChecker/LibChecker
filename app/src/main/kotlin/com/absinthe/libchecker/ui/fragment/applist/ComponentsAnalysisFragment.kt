@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.MODE_SERVICE
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
@@ -17,7 +18,9 @@ class ComponentsAnalysisFragment : Fragment() {
 
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val adapter = LibStringAdapter()
+    private val adapter = LibStringAdapter().apply {
+        mode = MODE_SERVICE
+    }
     private var mode = MODE_SOR_BY_SIZE
 
     private lateinit var binding: FragmentManifestAnalysisBinding
