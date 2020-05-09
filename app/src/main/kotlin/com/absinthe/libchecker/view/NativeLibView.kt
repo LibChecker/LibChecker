@@ -13,7 +13,9 @@ import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.SPUtils
 
 class NativeLibView(context: Context) : ConstraintLayout(context) {
 
@@ -40,6 +42,7 @@ class NativeLibView(context: Context) : ConstraintLayout(context) {
                 adapter.setList(adapter.data.sortedByDescending { it.size })
                 MODE_SORT_BY_SIZE
             }
+            SPUtils.putInt(context, Constants.PREF_LIB_SORT_MODE, GlobalValues.libSortMode.value?: MODE_SORT_BY_SIZE)
         }
 
         val rvList = findViewById<RecyclerView>(R.id.rv_list)

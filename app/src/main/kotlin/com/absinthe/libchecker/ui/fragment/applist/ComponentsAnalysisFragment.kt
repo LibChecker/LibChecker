@@ -12,6 +12,9 @@ import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE
+import com.absinthe.libchecker.utils.Constants
+import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
@@ -23,7 +26,6 @@ class ComponentsAnalysisFragment : Fragment() {
     private val adapter = LibStringAdapter().apply {
         mode = MODE_SERVICE
     }
-    private var mode = MODE_SORT_BY_SIZE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,20 +42,31 @@ class ComponentsAnalysisFragment : Fragment() {
         binding.apply {
             list.apply {
                 adapter = this@ComponentsAnalysisFragment.adapter
-                addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+                addItemDecoration(
+                    DividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
+                    )
+                )
             }
             ibSort.setOnClickListener {
-                mode = if (mode == MODE_SORT_BY_SIZE) {
-                    adapter.setList(adapter.data.sortedByDescending {
-                        ServiceLibMap.MAP.containsKey(
-                            it.name
-                        )
-                    })
-                    MODE_SORT_BY_LIB
-                } else {
-                    adapter.setList(adapter.data.sortedByDescending { it.name })
-                    MODE_SORT_BY_SIZE
-                }
+                GlobalValues.libSortMode.value =
+                    if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+                        adapter.setList(adapter.data.sortedByDescending {
+                            ServiceLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        })
+                        MODE_SORT_BY_LIB
+                    } else {
+                        adapter.setList(adapter.data.sortedByDescending { it.name })
+                        MODE_SORT_BY_SIZE
+                    }
+                SPUtils.putInt(
+                    requireContext(),
+                    Constants.PREF_LIB_SORT_MODE,
+                    GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
+                )
             }
         }
 

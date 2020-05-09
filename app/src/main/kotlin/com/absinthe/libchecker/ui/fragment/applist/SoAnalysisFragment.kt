@@ -11,7 +11,9 @@ import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
+import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
@@ -53,6 +55,7 @@ class SoAnalysisFragment : Fragment() {
                     adapter.setList(adapter.data.sortedByDescending { it.size })
                     MODE_SORT_BY_SIZE
                 }
+                SPUtils.putInt(requireContext(), Constants.PREF_LIB_SORT_MODE, GlobalValues.libSortMode.value?: MODE_SORT_BY_SIZE)
             }
         }
 
