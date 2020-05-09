@@ -88,7 +88,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         //Sort
-        when (GlobalValues.sortMode.value) {
+        when (GlobalValues.appSortMode.value) {
             Constants.SORT_MODE_DEFAULT -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
             Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
         }
@@ -124,7 +124,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            when (GlobalValues.sortMode.value) {
+            when (GlobalValues.appSortMode.value) {
                 Constants.SORT_MODE_DEFAULT -> newItems.sortWith(
                     compareBy(
                         { it.abi },
