@@ -13,6 +13,7 @@ import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.GlobalValues
 
 class NativeLibView(context: Context) : ConstraintLayout(context) {
 
@@ -28,7 +29,7 @@ class NativeLibView(context: Context) : ConstraintLayout(context) {
 
         val ibSort = findViewById<ImageButton>(R.id.ib_sort)
         ibSort.setOnClickListener {
-            GlobalValues.sortMode = if (GlobalValues.sortMode == MODE_SORT_BY_SIZE) {
+            GlobalValues.libSortMode.value = if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 adapter.setList(adapter.data.sortedByDescending {
                     NativeLibMap.MAP.containsKey(
                         it.name
