@@ -5,19 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/ib_sort"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/normal_padding"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Sort"
-        android:src="@drawable/ic_lib_sort"
-        android:tooltipText="@string/menu_sort"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="HardcodedText"
-        tools:targetApi="o" />
+    <androidx.cardview.widget.CardView
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:translationZ="3dp"
+        app:cardElevation="3dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/ib_sort"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Sort"
+                android:scaleType="center"
+                android:src="@drawable/ic_lib_sort"
+                android:tooltipText="@string/menu_sort"
+                tools:ignore="HardcodedText"
+                tools:targetApi="o" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
@@ -25,9 +40,10 @@
         android:layout_height="0dp"
         android:descendantFocusability="beforeDescendants"
         android:overScrollMode="never"
-        android:padding="@dimen/normal_padding"
+        android:paddingHorizontal="@dimen/normal_padding"
+        android:paddingTop="@dimen/normal_padding"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ib_sort" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

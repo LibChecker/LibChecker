@@ -7,6 +7,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.NativeLibMap
+import com.absinthe.libchecker.constant.ServiceLibMap
+import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.viewholder.LibStringItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -58,6 +61,14 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 list.add(LibStringItem("Not found", 0))
             }
 
+            if (GlobalValues.sortMode == MODE_SORT_BY_SIZE) {
+                list.sortByDescending { it.size }
+            } else {
+                list.sortByDescending { ServiceLibMap.MAP.containsKey(
+                    it.name
+                ) }
+            }
+
             withContext(Dispatchers.Main) {
                 componentsItems.value = list
             }
@@ -84,7 +95,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         if (list.isEmpty()) {
             list.add(LibStringItem(context.getString(R.string.empty_list), 0))
         } else {
-            list.sortByDescending { it.size }
+            if (GlobalValues.sortMode == MODE_SORT_BY_SIZE) {
+                list.sortByDescending { it.size }
+            } else {
+                list.sortByDescending { NativeLibMap.MAP.containsKey(
+                    it.name
+                ) }
+            }
         }
         return list
     }

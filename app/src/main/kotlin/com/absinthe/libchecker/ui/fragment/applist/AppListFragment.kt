@@ -140,7 +140,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     viewModel.addItem()
                 }
             })
-            sortMode.observe(viewLifecycleOwner, Observer { mode ->
+            appSortMode.observe(viewLifecycleOwner, Observer { mode ->
 
                 when (mode) {
                     Constants.SORT_MODE_DEFAULT -> mItems.sortWith(
@@ -215,7 +215,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
                 }
 
-                popup.menu[GlobalValues.sortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked =
+                popup.menu[GlobalValues.appSortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked =
                     true
                 popup.setOnMenuItemClickListener { menuItem ->
                     val mode = when (menuItem.itemId) {
@@ -223,8 +223,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                         R.id.sort_default -> Constants.SORT_MODE_DEFAULT
                         else -> Constants.SORT_MODE_DEFAULT
                     }
-                    GlobalValues.sortMode.value = mode
-                    SPUtils.putInt(requireContext(), Constants.PREF_SORT_MODE, mode)
+                    GlobalValues.appSortMode.value = mode
+                    SPUtils.putInt(requireContext(), Constants.PREF_APP_SORT_MODE, mode)
 
                     true
                 }
