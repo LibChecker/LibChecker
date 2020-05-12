@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.system.ErrnoException
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -44,8 +45,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "initItems")
 
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageUtils.getInstalledApplications(context)
+        } else {
+            context.packageManager
+                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        }
         val newItems = ArrayList<AppItem>()
 
         for (info in appList) {
@@ -142,8 +147,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "requestChange")
 
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageUtils.getInstalledApplications(context)
+        } else {
+            context.packageManager
+                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        }
 
         dbItems.value?.let { value ->
             for (dbItem in value) {

@@ -1,10 +1,13 @@
 package com.absinthe.libchecker.utils
 
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.Utils
+import java.util.stream.Collectors
 
 
 object PackageUtils {
@@ -44,4 +47,15 @@ object PackageUtils {
             "API ?"
         }
     }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    fun getInstalledApplications(context: Context): MutableList<ApplicationInfo> {
+        return CacheFunctionUtil.get().staticCache(CacheFunctionUtil.Supplier {
+            context.packageManager.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+                .stream()
+                .map { applicationInfo: ApplicationInfo -> applicationInfo }
+                .collect(Collectors.toList())
+        })
+    }
+
 }
