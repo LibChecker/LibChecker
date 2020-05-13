@@ -35,11 +35,11 @@ object NativeLibMap {
         Pair("libWTF.so", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
         Pair("libtencentloc.so", LibChip(R.drawable.ic_lib_tencent_map, "腾讯地图 SDK")),
         Pair("libyuv.so", LibChip(R.drawable.ic_lib_google, "libYUV")),
+        Pair("libglog.so", LibChip(R.drawable.ic_lib_google, "glog")),
         Pair("libunity.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libmain.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libmono.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libyoga.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
-        Pair("libglog.so", LibChip(R.drawable.ic_lib_google, "glog")),
         Pair("librealm-jni.so", LibChip(R.drawable.ic_lib_realm, "realm")),
         Pair("libcrashlytics.so", LibChip(R.drawable.ic_lib_firebase, "Crashlytics")),
         Pair("libopencv_java3.so", LibChip(R.drawable.ic_lib_opencv, "OpenCV")),
@@ -47,6 +47,10 @@ object NativeLibMap {
         Pair("libCtaApiLib.so", LibChip(R.drawable.ic_lib_jverification, "极光认证 SDK")),
         Pair("libsqlcipher.so", LibChip(R.drawable.ic_lib_sql, "SQLCipher")),
         Pair("libstlport_shared.so", LibChip(R.drawable.ic_lib_sql, "SQLCipher")),
-        Pair("libsgsecuritybody.so", LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全"))
+        Pair("libsgsecuritybody.so", LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")),
+        Pair("libimagepipeline.so", LibChip(R.drawable.ic_lib_facebook, "Fresco")),
+        Pair("libstatic-webp.so", LibChip(R.drawable.ic_lib_facebook, "Fresco")),
+        Pair("libentryexpro.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
+        Pair("libsdk_patcher_jni.so", LibChip(R.drawable.ic_lib_xiaomi, "小米更新 SDK"))
         )
 }

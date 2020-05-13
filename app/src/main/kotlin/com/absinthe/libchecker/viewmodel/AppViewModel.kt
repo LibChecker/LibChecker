@@ -25,6 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileNotFoundException
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
@@ -148,51 +150,61 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         dbItems.value?.let { value ->
             for (dbItem in value) {
-                appList.find { it.packageName == dbItem.packageName }?.let {
-                    val packageInfo = PackageUtils.getPackageInfo(it)
-                    val versionCode = PackageUtils.getVersionCode(packageInfo)
+                try {
+                    appList.find { it.packageName == dbItem.packageName }?.let {
+                        val packageInfo = PackageUtils.getPackageInfo(it)
+                        val versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                    if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
-                        val item = LCItem(
-                            it.packageName,
-                            it.loadLabel(context.packageManager).toString(),
-                            packageInfo.versionName ?: "null",
-                            versionCode,
-                            packageInfo.firstInstallTime,
-                            packageInfo.lastUpdateTime,
-                            (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                            getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
-                        )
-                        update(item)
+                        if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
+                            val item = LCItem(
+                                it.packageName,
+                                it.loadLabel(context.packageManager).toString(),
+                                packageInfo.versionName ?: "null",
+                                versionCode,
+                                packageInfo.firstInstallTime,
+                                packageInfo.lastUpdateTime,
+                                (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                                getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
+                            )
+                            update(item)
+                        }
+
+                        appList.remove(it)
+                    } ?: run {
+                        delete(dbItem)
                     }
-
-                    appList.remove(it)
-                } ?: run {
-                    delete(dbItem)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    e.printStackTrace()
+                    continue
                 }
             }
 
             for (info in appList) {
-                val packageInfo = PackageUtils.getPackageInfo(info)
-                val versionCode = PackageUtils.getVersionCode(packageInfo)
+                try {
+                    val packageInfo = PackageUtils.getPackageInfo(info)
+                    val versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                val lcItem = LCItem(
-                    info.packageName,
-                    info.loadLabel(context.packageManager).toString(),
-                    packageInfo.versionName ?: "null",
-                    versionCode,
-                    packageInfo.firstInstallTime,
-                    packageInfo.lastUpdateTime,
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                    getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
-                )
+                    val lcItem = LCItem(
+                        info.packageName,
+                        info.loadLabel(context.packageManager).toString(),
+                        packageInfo.versionName ?: "null",
+                        versionCode,
+                        packageInfo.firstInstallTime,
+                        packageInfo.lastUpdateTime,
+                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                        getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                    )
 
-                insert(lcItem)
+                    insert(lcItem)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    e.printStackTrace()
+                    continue
+                }
             }
         }
     }
 
-    fun collectPopularLibraries(context: Context) {
+    fun collectPopularLibraries(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val map = HashMap<String, Int>()
@@ -249,6 +261,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
             zipFile.close()
         } catch (e: ErrnoException) {
+            e.printStackTrace()
+            return ERROR
+        } catch (e: ZipException) {
+            e.printStackTrace()
+            return ERROR
+        } catch (e: FileNotFoundException) {
             e.printStackTrace()
             return ERROR
         }

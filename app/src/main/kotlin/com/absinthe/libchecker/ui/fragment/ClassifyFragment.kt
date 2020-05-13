@@ -60,7 +60,6 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
                 xEntrySpace = 7f
                 yEntrySpace = 0f
                 yOffset = 0f
-                setDrawInside(false)
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
@@ -68,6 +67,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
             setNoDataText(getString(R.string.chart_no_data_text))
             setNoDataTextColor(resources.getColor(R.color.textNormal))
             setOnChartValueSelectedListener(this@ClassifyFragment)
+            setHoleColor(Color.TRANSPARENT)
         }
 
         viewModel.appItems.observe(viewLifecycleOwner, Observer {

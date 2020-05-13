@@ -12,10 +12,12 @@ import java.util.zip.ZipFile
 
 object PackageUtils {
 
+    @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(info: ApplicationInfo): PackageInfo {
         return Utils.getApp().packageManager.getPackageInfo(info.packageName, 0)
     }
 
+    @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String): PackageInfo {
         return Utils.getApp().packageManager.getPackageInfo(packageName, 0)
     }
