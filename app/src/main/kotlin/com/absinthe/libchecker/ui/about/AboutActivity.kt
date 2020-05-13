@@ -34,7 +34,6 @@ class AboutActivity : AbsAboutActivity() {
             add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
             add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
             add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
-            add(License("CacheFunctionUtil", "heruoxin", License.MIT, "https://github.com/heruoxin/CacheFunctionUtil"))
         }
     }
 }

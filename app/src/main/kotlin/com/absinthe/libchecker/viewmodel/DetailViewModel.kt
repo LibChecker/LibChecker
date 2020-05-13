@@ -11,12 +11,11 @@ import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.LibStringItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.zip.ZipFile
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -80,18 +79,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         sourcePath: String,
         nativePath: String
     ): List<LibStringItem> {
-        val file = File(nativePath)
-        val list = ArrayList<LibStringItem>()
-
-        file.listFiles()?.let {
-            for (abi in it) {
-                list.add(LibStringItem(abi.name, abi.length()))
-            }
-        }
-
-        if (list.isEmpty()) {
-            list.addAll(getSourceLibs(sourcePath))
-        }
+        val list = PackageUtils.getAbiByNativeDir(sourcePath, nativePath).toMutableList()
 
         if (list.isEmpty()) {
             list.add(LibStringItem(context.getString(R.string.empty_list), 0))
@@ -105,23 +93,5 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
         return list
-    }
-
-    private fun getSourceLibs(path: String): ArrayList<LibStringItem> {
-        val file = File(path)
-        val zipFile = ZipFile(file)
-        val entries = zipFile.entries()
-        val libList = ArrayList<LibStringItem>()
-
-        while (entries.hasMoreElements()) {
-            val name = entries.nextElement().name
-
-            if (name.contains("lib/")) {
-                libList.add(LibStringItem(name.split("/").last(), entries.nextElement().size))
-            }
-        }
-        zipFile.close()
-
-        return libList
     }
 }

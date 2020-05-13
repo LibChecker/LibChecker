@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.utils
 
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.annotation.RequiresApi
+import com.absinthe.libchecker.viewholder.LibStringItem
 import com.blankj.utilcode.util.Utils
-import java.util.stream.Collectors
+import java.io.File
+import java.util.zip.ZipFile
 
 
 object PackageUtils {
@@ -48,14 +48,38 @@ object PackageUtils {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    fun getInstalledApplications(context: Context): MutableList<ApplicationInfo> {
-        return CacheFunctionUtil.get().staticCache(CacheFunctionUtil.Supplier {
-            context.packageManager.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
-                .stream()
-                .map { applicationInfo: ApplicationInfo -> applicationInfo }
-                .collect(Collectors.toList())
-        })
+    fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
+        val file = File(nativePath)
+        val list = ArrayList<LibStringItem>()
+
+        file.listFiles()?.let {
+            for (abi in it) {
+                list.add(LibStringItem(abi.name, abi.length()))
+            }
+        }
+
+        if (list.isEmpty()) {
+            list.addAll(getSourceLibs(sourcePath))
+        }
+
+        return list
     }
 
+    fun getSourceLibs(path: String): ArrayList<LibStringItem> {
+        val file = File(path)
+        val zipFile = ZipFile(file)
+        val entries = zipFile.entries()
+        val libList = ArrayList<LibStringItem>()
+
+        while (entries.hasMoreElements()) {
+            val name = entries.nextElement().name
+
+            if (name.contains("lib/")) {
+                libList.add(LibStringItem(name.split("/").last(), entries.nextElement().size))
+            }
+        }
+        zipFile.close()
+
+        return libList
+    }
 }

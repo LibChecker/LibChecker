@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.os.Build
 import android.system.ErrnoException
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -21,6 +20,7 @@ import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.*
 import com.blankj.utilcode.util.AppUtils
+import com.microsoft.appcenter.analytics.Analytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,12 +45,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "initItems")
 
-        val appList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageUtils.getInstalledApplications(context)
-        } else {
-            context.packageManager
-                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
-        }
+        val appList = context.packageManager
+            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val newItems = ArrayList<AppItem>()
 
         for (info in appList) {
@@ -147,12 +143,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "requestChange")
 
-        val appList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageUtils.getInstalledApplications(context)
-        } else {
-            context.packageManager
-                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
-        }
+        val appList = context.packageManager
+            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
 
         dbItems.value?.let { value ->
             for (dbItem in value) {
@@ -196,6 +188,34 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 insert(lcItem)
+            }
+        }
+    }
+
+    fun collectPopularLibraries(context: Context) {
+        val appList = context.packageManager
+            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val map = HashMap<String, Int>()
+
+        for (item in appList) {
+            val libList = PackageUtils.getAbiByNativeDir(
+                item.sourceDir,
+                item.nativeLibraryDir
+            )
+
+            for (lib in libList) {
+                val count = map[lib.name] ?: 0
+                map[lib.name] = count + 1
+            }
+        }
+
+        for (entry in map) {
+            if (entry.value > 3) {
+                val properties: MutableMap<String, String> = java.util.HashMap()
+                properties["Library name"] = entry.key
+                properties["Library count"] = entry.value.toString()
+
+                Analytics.trackEvent("Library", properties)
             }
         }
     }
@@ -246,10 +266,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val abiList = ArrayList<String>()
 
         val fileList = file.listFiles() ?: return NO_LIBS
-
-        for (abi in fileList) {
-            abiList.add(abi.name)
-        }
+        fileList.iterator().forEach { abiList.add(it.name) }
 
         return when {
             abiList.contains("arm64") -> ARMV8

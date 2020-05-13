@@ -9,6 +9,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
@@ -18,6 +19,7 @@ import com.google.android.material.transition.MaterialContainerTransformSharedEl
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import jonathanfinerty.once.Once
 
 class MainActivity : BaseActivity() {
 
@@ -89,6 +91,11 @@ class MainActivity : BaseActivity() {
                 }
                 true
             }
+        }
+
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
+            viewModel.collectPopularLibraries(this)
+            Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }
     }
 
