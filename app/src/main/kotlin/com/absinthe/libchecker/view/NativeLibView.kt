@@ -14,7 +14,7 @@ import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.Constants
-import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 
 class NativeLibView(context: Context) : ConstraintLayout(context) {

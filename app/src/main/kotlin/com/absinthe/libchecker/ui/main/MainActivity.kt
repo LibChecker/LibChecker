@@ -1,5 +1,9 @@
 package com.absinthe.libchecker.ui.main
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Window
 import androidx.fragment.app.Fragment
@@ -10,13 +14,13 @@ import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
@@ -27,6 +31,11 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
+    private val pbc = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            viewModel.requestChange(context)
+        }
+    }
 
     override fun setViewBinding() {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -55,6 +64,7 @@ class MainActivity : BaseActivity() {
 
         initView()
         requestConfiguration()
+        registerPackageBroadcast()
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
             viewModel.collectPopularLibraries(this)
@@ -62,11 +72,9 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (viewModel.isInit) {
-            viewModel.requestChange(this)
-        }
+    override fun onDestroy() {
+        unregisterPackageBroadcast()
+        super.onDestroy()
     }
 
     private fun initView() {
@@ -115,8 +123,22 @@ class MainActivity : BaseActivity() {
 
     private fun requestConfiguration() {
         viewModel.configuration.observe(this, Observer {
-            ToastUtils.showLong(it.toString())
+            GlobalValues.config = it
         })
         viewModel.requestConfiguration()
+    }
+
+    private fun registerPackageBroadcast() {
+        val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+        }
+
+        registerReceiver(pbc, intentFilter)
+    }
+
+    private fun unregisterPackageBroadcast() {
+        unregisterReceiver(pbc)
     }
 }

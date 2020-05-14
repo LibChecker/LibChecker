@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.utils.Constants
-import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel

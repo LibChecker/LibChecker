@@ -7,10 +7,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.LibStringItem
 import kotlinx.coroutines.Dispatchers

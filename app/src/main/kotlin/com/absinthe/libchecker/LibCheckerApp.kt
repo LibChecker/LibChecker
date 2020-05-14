@@ -1,7 +1,7 @@
 package com.absinthe.libchecker
 
 import android.app.Application
-import com.absinthe.libchecker.utils.GlobalValues
+import com.absinthe.libchecker.constant.GlobalValues
 import jonathanfinerty.once.Once
 
 class LibCheckerApp : Application() {
