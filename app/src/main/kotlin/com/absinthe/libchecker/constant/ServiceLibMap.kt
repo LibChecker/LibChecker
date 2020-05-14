@@ -16,7 +16,7 @@ object ServiceLibMap {
         Pair("com.tencent.tinker.lib.service.DefaultTinkerResultService", LibChip(R.drawable.ic_lib_tencent, "Tinker")),
         Pair("com.google.firebase.messaging.FirebaseMessagingService", LibChip(R.drawable.ic_lib_firebase, "FCM")),
         Pair("com.huawei.hms.support.api.push.service.HmsMsgService", LibChip(R.drawable.ic_lib_huawei, "Huawei Push")),
-        Pair("com.qq.e.comm.DownloadService", LibChip(R.drawable.ic_lib_tencent, "腾讯广告 SDK")),
+        Pair("com.qq.e.comm.DownloadService", LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")),
         Pair("com.vivo.push.sdk.service.CommandClientService", LibChip(R.drawable.ic_lib_vivo, "vivo Push")),
         Pair("com.heytap.mcssdk.PushService", LibChip(R.drawable.ic_lib_oppo, "OPPO Push")),
         Pair("com.heytap.mcssdk.AppPushService", LibChip(R.drawable.ic_lib_oppo, "OPPO Push")),
