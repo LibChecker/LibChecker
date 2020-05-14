@@ -12,6 +12,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.api.Configuration
+import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
@@ -24,6 +27,11 @@ import com.microsoft.appcenter.analytics.Analytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.zip.ZipException
@@ -31,8 +39,9 @@ import java.util.zip.ZipFile
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
-    val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
     val dbItems: LiveData<List<LCItem>>
+    val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
+    val configuration: MutableLiveData<Configuration> = MutableLiveData()
     var isInit = false
 
     private val tag = AppViewModel::class.java.simpleName
@@ -230,6 +239,28 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 Analytics.trackEvent("Library", properties)
             }
         }
+    }
+
+    fun requestConfiguration() = viewModelScope.launch(Dispatchers.IO) {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(ApiManager.ROOT_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val request = retrofit.create(ConfigurationRequest::class.java)
+        val config = request.requestConfiguration()
+        config.enqueue(object : Callback<Configuration> {
+            override fun onFailure(call: Call<Configuration>, t: Throwable) {
+
+            }
+
+            override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
+                viewModelScope.launch(Dispatchers.Main) {
+                    response.body()?.let {
+                        configuration.value = it
+                    }
+                }
+            }
+        })
     }
 
     private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {

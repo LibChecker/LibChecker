@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.main
 import android.os.Bundle
 import android.view.Window
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -15,6 +16,7 @@ import com.absinthe.libchecker.ui.fragment.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
@@ -51,6 +53,23 @@ class MainActivity : BaseActivity() {
             )
         }
 
+        initView()
+        requestConfiguration()
+
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
+            viewModel.collectPopularLibraries(this)
+            Once.markDone(OnceTag.HAS_COLLECT_LIB)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (viewModel.isInit) {
+            viewModel.requestChange(this)
+        }
+    }
+
+    private fun initView() {
         setSupportActionBar(binding.toolbar)
 
         binding.apply {
@@ -92,17 +111,12 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
-
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
-            viewModel.collectPopularLibraries(this)
-            Once.markDone(OnceTag.HAS_COLLECT_LIB)
-        }
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (viewModel.isInit) {
-            viewModel.requestChange(this)
-        }
+    private fun requestConfiguration() {
+        viewModel.configuration.observe(this, Observer {
+            ToastUtils.showLong(it.toString())
+        })
+        viewModel.requestConfiguration()
     }
 }
