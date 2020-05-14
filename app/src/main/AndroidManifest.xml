@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.absinthe.libchecker">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    
     <application
         android:name=".LibCheckerApp"
         android:allowBackup="true"

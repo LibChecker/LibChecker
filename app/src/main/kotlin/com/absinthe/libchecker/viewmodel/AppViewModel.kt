@@ -23,6 +23,7 @@ import com.absinthe.libchecker.utils.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.*
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.microsoft.appcenter.analytics.Analytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -250,14 +251,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val config = request.requestConfiguration()
         config.enqueue(object : Callback<Configuration> {
             override fun onFailure(call: Call<Configuration>, t: Throwable) {
-
+                viewModelScope.launch(Dispatchers.Main) {
+                    ToastUtils.showLong("failed")
+                }
             }
 
             override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
                         configuration.value = it
-                    }
+                    } ?: ToastUtils.showLong("empty")
                 }
             }
         })
