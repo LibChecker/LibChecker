@@ -69,6 +69,7 @@ object NativeLibMap {
         Pair("libwebpimage.so", LibChip(R.drawable.ic_lib_facebook, "Fresco")),
         Pair("libwebp.so", LibChip(R.drawable.ic_lib_facebook, "Fresco")),
         Pair("libentryexpro.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
+        Pair("libuptsmaddon.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
         Pair("libsdk_patcher_jni.so", LibChip(R.drawable.ic_lib_xiaomi, "小米更新 SDK")),
         Pair("libmibraindec.so", LibChip(R.drawable.ic_lib_xiaoai, "小爱 SDK")),
         Pair("libmibrainjni.so", LibChip(R.drawable.ic_lib_xiaoai, "小爱 SDK")),
