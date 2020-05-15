@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.api
+package com.absinthe.libchecker.api.bean
 
 const val CONFIGURATION_VERSION = 1
 

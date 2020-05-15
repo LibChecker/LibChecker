@@ -1,14 +1,13 @@
 package com.absinthe.libchecker.view
 
 import android.content.Context
-import android.view.View
+import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.absinthe.libchecker.R
+import com.absinthe.libchecker.databinding.LayoutDialogLibDetailBinding
 
-class LibDetailView(context: Context) : ConstraintLayout(context) {
+class LibDetailView constructor(context: Context) : ConstraintLayout(context) {
 
-    init {
-        View.inflate(context, R.layout.layout_dialog_lib_detail, this)
-    }
+    val binding: LayoutDialogLibDetailBinding = LayoutDialogLibDetailBinding
+        .inflate(LayoutInflater.from(context), this, true)
 
 }

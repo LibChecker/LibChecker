@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.api.request
 
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.Configuration
+import com.absinthe.libchecker.api.bean.Configuration
 import retrofit2.Call
 import retrofit2.http.GET
 

@@ -2,7 +2,7 @@ package com.absinthe.libchecker.constant
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import com.absinthe.libchecker.api.Configuration
+import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.SPUtils

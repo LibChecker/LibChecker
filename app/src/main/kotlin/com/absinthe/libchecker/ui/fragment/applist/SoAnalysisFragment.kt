@@ -51,18 +51,23 @@ class SoAnalysisFragment : Fragment() {
         binding.apply {
             list.adapter = this@SoAnalysisFragment.adapter
             ibSort.setOnClickListener {
-                GlobalValues.libSortMode.value = if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                    adapter.setList(adapter.data.sortedByDescending {
-                        NativeLibMap.MAP.containsKey(
-                            it.name
-                        )
-                    })
-                    MODE_SORT_BY_LIB
-                } else {
-                    adapter.setList(adapter.data.sortedByDescending { it.size })
-                    MODE_SORT_BY_SIZE
-                }
-                SPUtils.putInt(requireContext(), Constants.PREF_LIB_SORT_MODE, GlobalValues.libSortMode.value?: MODE_SORT_BY_SIZE)
+                GlobalValues.libSortMode.value =
+                    if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+                        adapter.setList(adapter.data.sortedByDescending {
+                            NativeLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        })
+                        MODE_SORT_BY_LIB
+                    } else {
+                        adapter.setList(adapter.data.sortedByDescending { it.size })
+                        MODE_SORT_BY_SIZE
+                    }
+                SPUtils.putInt(
+                    requireContext(),
+                    Constants.PREF_LIB_SORT_MODE,
+                    GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
+                )
             }
         }
 
@@ -70,7 +75,6 @@ class SoAnalysisFragment : Fragment() {
             libItems.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
             })
-            initSoAnalysisData(requireContext(), packageName)
         }
 
         adapter.setOnItemClickListener { _, _, _ ->
@@ -82,6 +86,11 @@ class SoAnalysisFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.initSoAnalysisData(requireContext(), packageName)
     }
 
     companion object {

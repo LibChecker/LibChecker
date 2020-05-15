@@ -13,7 +13,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.Configuration
+import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem

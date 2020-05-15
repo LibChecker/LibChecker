@@ -3,145 +3,173 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/normal_padding">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/ll_title"
+    <ViewFlipper
+        android:id="@+id/vf_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="UseCompoundDrawables">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/iv_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/lib_detail_icon_size"
-            android:contentDescription="Library's icon"
-            android:src="@drawable/ic_lib_xiaomi"
-            tools:ignore="HardcodedText" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
 
-        <TextView
-            android:id="@+id/tv_lib_name"
-            android:layout_width="0dp"
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="lib_detail_progress_bar.json"
+                app:lottie_loop="true" />
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/normal_padding"
-            android:layout_weight="1"
-            android:fontFamily="sans-serif-condensed-medium"
-            android:textAppearance="?attr/textAppearanceHeadline5"
-            tools:text="libizuko.so" />
+            android:padding="@dimen/normal_padding">
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseCompoundDrawables">
 
-    <LinearLayout
-        android:id="@+id/ll_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/normal_padding"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ll_title"
-        tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:id="@+id/iv_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/lib_detail_icon_size"
+                    android:contentDescription="Library's icon"
+                    android:src="@drawable/ic_lib_xiaomi"
+                    tools:ignore="HardcodedText" />
 
-        <ImageView
-            android:id="@+id/iv_label_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/normal_icon_size"
-            android:contentDescription="Label's icon"
-            android:src="@drawable/ic_label"
-            tools:ignore="HardcodedText" />
+                <TextView
+                    android:id="@+id/tv_lib_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/normal_padding"
+                    android:layout_weight="1"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:textAppearance="?attr/textAppearanceHeadline5"
+                    tools:text="libizuko.so" />
 
-        <TextView
-            android:id="@+id/tv_label_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceSubtitle2"
-            tools:text="Izuko" />
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/ll_title"
+                tools:ignore="UseCompoundDrawables">
 
-    <LinearLayout
-        android:id="@+id/ll_contributor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/normal_padding"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ll_label"
-        tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:id="@+id/iv_label_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/normal_icon_size"
+                    android:contentDescription="Label's icon"
+                    android:src="@drawable/ic_label"
+                    tools:ignore="HardcodedText" />
 
-        <ImageView
-            android:id="@+id/iv_contributor_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/normal_icon_size"
-            android:contentDescription="Contributor's icon"
-            android:src="@drawable/ic_github"
-            tools:ignore="HardcodedText" />
+                <TextView
+                    android:id="@+id/tv_label_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceSubtitle2"
+                    tools:text="Izuko" />
 
-        <TextView
-            android:id="@+id/tv_contributor_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceSubtitle2"
-            tools:text="Absinthe" />
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_contributor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/ll_label"
+                tools:ignore="UseCompoundDrawables">
 
-    <LinearLayout
-        android:id="@+id/ll_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/normal_padding"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ll_contributor"
-        tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:id="@+id/iv_contributor_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/normal_icon_size"
+                    android:contentDescription="Contributor's icon"
+                    android:src="@drawable/ic_github"
+                    tools:ignore="HardcodedText" />
 
-        <ImageView
-            android:id="@+id/iv_description_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/normal_icon_size"
-            android:contentDescription="Description's icon"
-            android:src="@drawable/ic_content"
-            tools:ignore="HardcodedText" />
+                <TextView
+                    android:id="@+id/tv_contributor_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceSubtitle2"
+                    tools:text="Absinthe" />
 
-        <TextView
-            android:id="@+id/tv_description_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@android:color/secondary_text_dark"
-            tools:text="An app which can look at the CPU architecture of apps in your device." />
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/ll_contributor"
+                tools:ignore="UseCompoundDrawables">
 
-    <LinearLayout
-        android:id="@+id/ll_relative_url"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/normal_padding"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/ll_description"
-        tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:id="@+id/iv_description_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/normal_icon_size"
+                    android:contentDescription="Description's icon"
+                    android:src="@drawable/ic_content"
+                    tools:ignore="HardcodedText" />
 
-        <ImageView
-            android:id="@+id/iv_relative_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/normal_icon_size"
-            android:contentDescription="Relative URL's icon"
-            android:src="@drawable/ic_url"
-            tools:ignore="HardcodedText" />
+                <TextView
+                    android:id="@+id/tv_description_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="@android:color/secondary_text_dark"
+                    tools:text="An app which can look at the CPU architecture of apps in your device." />
 
-        <TextView
-            android:id="@+id/tv_relative_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@android:color/secondary_text_dark"
-            tools:text="https://github.com/zhaobozhen/LibChecker" />
+            </LinearLayout>
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/ll_relative_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/ll_description"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/iv_relative_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/normal_icon_size"
+                    android:contentDescription="Relative URL's icon"
+                    android:src="@drawable/ic_url"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_relative_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textColor="@android:color/secondary_text_dark"
+                    tools:text="https://github.com/zhaobozhen/LibChecker" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
