@@ -31,7 +31,12 @@ class MainActivity : BaseActivity() {
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
     private val pbc = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            viewModel.requestChange(context)
+            if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
+                intent.action == Intent.ACTION_PACKAGE_REMOVED ||
+                intent.action == Intent.ACTION_PACKAGE_REPLACED
+            ) {
+                viewModel.requestChange(context)
+            }
         }
     }
 
@@ -124,6 +129,7 @@ class MainActivity : BaseActivity() {
             addAction(Intent.ACTION_PACKAGE_ADDED)
             addAction(Intent.ACTION_PACKAGE_REPLACED)
             addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
         }
 
         registerReceiver(pbc, intentFilter)
