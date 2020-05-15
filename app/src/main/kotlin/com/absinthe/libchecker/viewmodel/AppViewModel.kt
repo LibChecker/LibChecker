@@ -243,7 +243,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun requestConfiguration() = viewModelScope.launch(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl(ApiManager.ROOT_URL)
+            .baseUrl(ApiManager.GITEE_ROOT_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val request = retrofit.create(ConfigurationRequest::class.java)
