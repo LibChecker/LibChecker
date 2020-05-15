@@ -79,7 +79,7 @@ class SoAnalysisFragment : Fragment() {
         }
 
         adapter.setOnItemClickListener { _, _, position ->
-            if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
+            if (GlobalValues.config.enableLibDetail || true) {
                 LibDetailDialogFragment.newInstance(adapter.getItem(position).name).apply {
                     ActivityStackManager.topActivity?.apply {
                         show(supportFragmentManager, tag)
