@@ -74,10 +74,10 @@ object PackageUtils {
         val libList = ArrayList<LibStringItem>()
 
         while (entries.hasMoreElements()) {
-            val name = entries.nextElement().name
+            val next = entries.nextElement()
 
-            if (name.contains("lib/")) {
-                libList.add(LibStringItem(name.split("/").last(), entries.nextElement().size))
+            if (next.name.contains("lib/")) {
+                libList.add(LibStringItem(next.name.split("/").last(), next.size))
             }
         }
         zipFile.close()
