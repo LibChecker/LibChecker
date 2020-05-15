@@ -36,5 +36,7 @@
     <!--  Detail  -->
     <string name="tab_so_analysis">so File Analysis</string>
     <string name="tab_components_analysis">Components Analysis</string>
+    <string name="not_found">Not found</string>
+    <string name="create_an_issue">Assist us to supplement the information</string>
 
 </resources>

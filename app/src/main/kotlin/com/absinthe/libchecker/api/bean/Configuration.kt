@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.api.bean
 
-const val CONFIGURATION_VERSION = 1
+const val CONFIGURATION_VERSION = 2
 
 data class Configuration(
     val enableLibDetail: Boolean,
-    val showIcon: Boolean,
     val showLibName: Boolean,
     val showLibDescription: Boolean,
     val showContributor: Boolean,

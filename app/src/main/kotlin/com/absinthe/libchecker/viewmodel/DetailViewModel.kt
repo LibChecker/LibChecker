@@ -93,6 +93,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             .build()
         val request = retrofit.create(NativeLibDetailRequest::class.java)
         val detail = request.requestNativeLibDetail("native-libs/${libName}.json")
+        Log.d("DetailViewModel", "requestNativeLibDetail")
         detail.enqueue(object : Callback<NativeLibDetailBean> {
             override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
                 Log.e("DetailViewModel", t.message ?: "")

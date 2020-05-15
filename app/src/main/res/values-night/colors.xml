@@ -3,4 +3,5 @@
     <color name="aboutHeader">#FF121212</color>
     <color name="textNormal">#FFFFFFFF</color>
     <color name="backgroundNormal">#FF121212</color>
+    <color name="textSecondary">#80BEBEBE</color>
 </resources>

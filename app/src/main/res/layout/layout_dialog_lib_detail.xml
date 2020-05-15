@@ -3,60 +3,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="@dimen/normal_padding">
+
+    <LinearLayout
+        android:id="@+id/ll_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/lib_detail_icon_size"
+            android:layout_height="@dimen/lib_detail_icon_size"
+            android:contentDescription="Library's icon"
+            tools:ignore="HardcodedText"
+            tools:src="@drawable/ic_lib_xiaomi" />
+
+        <TextView
+            android:id="@+id/tv_lib_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/normal_padding"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:textAppearance="?attr/textAppearanceHeadline5"
+            android:textSize="20sp"
+            tools:text="libizuko.so" />
+
+    </LinearLayout>
 
     <ViewFlipper
         android:id="@+id/vf_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginTop="@dimen/normal_padding"
+        app:layout_constraintTop_toBottomOf="@id/ll_title">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <com.airbnb.lottie.LottieAnimationView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                app:lottie_autoPlay="true"
-                app:lottie_fileName="lib_detail_progress_bar.json"
-                app:lottie_loop="true" />
-
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/normal_padding">
-
-            <LinearLayout
-                android:id="@+id/ll_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:id="@+id/iv_icon"
-                    android:layout_width="@dimen/lib_detail_icon_size"
-                    android:layout_height="@dimen/lib_detail_icon_size"
-                    android:contentDescription="Library's icon"
-                    android:src="@drawable/ic_lib_xiaomi"
-                    tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tv_lib_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/normal_padding"
-                    android:layout_weight="1"
-                    android:fontFamily="sans-serif-condensed-medium"
-                    android:textAppearance="?attr/textAppearanceHeadline5"
-                    tools:text="libizuko.so" />
-
-            </LinearLayout>
+            android:orientation="vertical">
 
             <LinearLayout
                 android:id="@+id/ll_label"
@@ -64,7 +53,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/normal_padding"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/ll_title"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -91,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/normal_padding"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/ll_label"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -118,7 +105,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/normal_padding"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/ll_contributor"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -135,7 +121,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="@android:color/secondary_text_dark"
+                    android:textColor="@color/textSecondary"
                     tools:text="An app which can look at the CPU architecture of apps in your device." />
 
             </LinearLayout>
@@ -146,7 +132,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/normal_padding"
                 android:orientation="horizontal"
-                app:layout_constraintTop_toBottomOf="@id/ll_description"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
@@ -163,12 +148,60 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textAppearance="?attr/textAppearanceBody2"
-                    android:textColor="@android:color/secondary_text_dark"
+                    android:textColor="@color/textSecondary"
                     tools:text="https://github.com/zhaobozhen/LibChecker" />
 
             </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="lib_detail_progress_bar.json"
+                app:lottie_loop="true" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:contentDescription="Not found"
+                android:src="@drawable/ic_failed"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_found"
+                android:textAppearance="?attr/textAppearanceBody2" />
+
+            <TextView
+                android:id="@+id/tv_create_issue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:drawableStart="@drawable/ic_github"
+                android:drawablePadding="5dp"
+                android:gravity="center_vertical"
+                android:text="@string/create_an_issue"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textColorLink="@color/textNormal" />
+
+        </LinearLayout>
 
     </ViewFlipper>
 

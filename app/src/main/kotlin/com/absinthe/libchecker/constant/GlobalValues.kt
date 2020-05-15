@@ -16,7 +16,6 @@ object GlobalValues {
 
     var config = Configuration(
         enableLibDetail = false,
-        showIcon = true,
         showLibName = true,
         showLibDescription = true,
         showContributor = true,
