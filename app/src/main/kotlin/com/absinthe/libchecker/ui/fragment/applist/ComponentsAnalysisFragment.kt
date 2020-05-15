@@ -74,8 +74,12 @@ class ComponentsAnalysisFragment : Fragment() {
             componentsItems.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
             })
-            initComponentsData(requireContext(), packageName)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.initComponentsData(requireContext(), packageName)
     }
 
     companion object {

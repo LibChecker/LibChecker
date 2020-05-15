@@ -15,8 +15,12 @@ object ServiceLibMap {
         Pair("com.tencent.tinker.lib.service.TinkerPatchService\$InnerService", LibChip(R.drawable.ic_lib_tencent, "Tinker")),
         Pair("com.tencent.tinker.lib.service.DefaultTinkerResultService", LibChip(R.drawable.ic_lib_tencent, "Tinker")),
         Pair("com.google.firebase.messaging.FirebaseMessagingService", LibChip(R.drawable.ic_lib_firebase, "FCM")),
+        Pair("com.google.firebase.components.ComponentDiscoveryService", LibChip(R.drawable.ic_lib_firebase, "Firebase")),
+        Pair("com.google.firebase.iid.FirebaseInstanceIdService", LibChip(R.drawable.ic_lib_firebase, "Firebase")),
         Pair("com.huawei.hms.support.api.push.service.HmsMsgService", LibChip(R.drawable.ic_lib_huawei, "Huawei Push")),
+        Pair("com.huawei.updatesdk.service.deamon.download.DownloadService", LibChip(R.drawable.ic_lib_huawei, "HMS SDK")),
         Pair("com.qq.e.comm.DownloadService", LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")),
+        Pair("com.qq.e.downloader.DownloadService", LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")),
         Pair("com.vivo.push.sdk.service.CommandClientService", LibChip(R.drawable.ic_lib_vivo, "vivo Push")),
         Pair("com.heytap.mcssdk.PushService", LibChip(R.drawable.ic_lib_oppo, "OPPO Push")),
         Pair("com.heytap.mcssdk.AppPushService", LibChip(R.drawable.ic_lib_oppo, "OPPO Push")),
@@ -25,9 +29,13 @@ object ServiceLibMap {
         Pair("com.taobao.accs.data.MsgDistributeService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
         Pair("org.android.agoo.accs.AgooService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
         Pair("com.taobao.accs.internal.AccsJobService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
-        Pair("com.tencent.android.tpush.service.XGPushServiceV3", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
+        Pair("com.tencent.android.tpush.service.XGDaemonService", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
         Pair("com.tencent.android.tpush.service.XGPushService", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
+        Pair("com.tencent.android.tpush.service.XGPushServiceV3", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
+        Pair("com.tencent.android.tpush.service.XGPushServiceV4", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
         Pair("com.tencent.android.tpush.rpc.XGRemoteService", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
+        Pair("com.tencent.matrix.resource.CanaryWorkerService", LibChip(R.drawable.ic_lib_tencent, "Matrix")),
+        Pair("com.tencent.matrix.resource.CanaryResultService", LibChip(R.drawable.ic_lib_tencent, "Matrix")),
         Pair("com.umeng.update.net.DownloadingService", LibChip(R.drawable.ic_lib_umeng, "友盟推送")),
         Pair("com.umeng.message.UmengService", LibChip(R.drawable.ic_lib_umeng, "友盟推送")),
         Pair("com.umeng.message.XiaomiIntentService", LibChip(R.drawable.ic_lib_umeng, "友盟推送")),
@@ -50,6 +58,9 @@ object ServiceLibMap {
         Pair("com.ss.android.socialbase.appdownloader.DownloadHandlerService", LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")),
         Pair("com.ss.android.socialbase.impls.DownloadHandlerService", LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")),
         Pair("com.tencent.qalsdk.service.QalService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
-        Pair("com.tencent.qalsdk.service.QalAssistService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信"))
+        Pair("com.tencent.qalsdk.service.QalAssistService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
+        Pair("com.google.android.gms.auth.api.signin.RevocationBoundService", LibChip(R.drawable.ic_lib_google, "Google Sign-In")),
+        Pair("com.didi.virtualapk.delegate.LocalService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK")),
+        Pair("com.didi.virtualapk.delegate.RemoteService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK"))
         )
 }
