@@ -81,5 +81,3 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
-android-key.jks
-signing.gradle
