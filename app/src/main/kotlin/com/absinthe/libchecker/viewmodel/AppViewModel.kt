@@ -41,7 +41,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
     val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
-    val configuration: MutableLiveData<Configuration> = MutableLiveData()
     var isInit = false
 
     private val tag = AppViewModel::class.java.simpleName
@@ -250,13 +249,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val config = request.requestConfiguration()
         config.enqueue(object : Callback<Configuration> {
             override fun onFailure(call: Call<Configuration>, t: Throwable) {
-
+                Log.e(tag, t.message ?: "")
             }
 
             override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
-                        configuration.value = it
+                        GlobalValues.config = it
                     }
                 }
             }

@@ -7,14 +7,12 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.Window
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.ClassifyFragment
@@ -63,8 +61,8 @@ class MainActivity : BaseActivity() {
         }
 
         initView()
-        requestConfiguration()
         registerPackageBroadcast()
+        viewModel.requestConfiguration()
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
             viewModel.collectPopularLibraries(this)
@@ -119,13 +117,6 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
-    }
-
-    private fun requestConfiguration() {
-        viewModel.configuration.observe(this, Observer {
-            GlobalValues.config = it
-        })
-        viewModel.requestConfiguration()
     }
 
     private fun registerPackageBroadcast() {
