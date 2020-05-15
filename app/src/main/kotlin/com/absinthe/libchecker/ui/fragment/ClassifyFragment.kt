@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.view.ClassifyDialogFragment
+import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
 import com.absinthe.libchecker.viewholder.ARMV5
 import com.absinthe.libchecker.viewholder.ARMV7
 import com.absinthe.libchecker.viewholder.ARMV8

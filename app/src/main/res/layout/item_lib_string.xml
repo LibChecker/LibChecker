@@ -36,7 +36,7 @@
         style="@style/Widget.MaterialComponents.Chip.Action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="@dimen/normal_padding"
         app:chipMinHeight="28dp"
         app:chipMinTouchTargetSize="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -22,7 +22,7 @@ import com.absinthe.libchecker.ui.main.AppDetailActivity
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewholder.AppItem
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once

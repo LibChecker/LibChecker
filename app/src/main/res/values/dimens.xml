@@ -3,5 +3,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="app_icon_size">40dp</dimen>
+    <dimen name="lib_detail_icon_size">50dp</dimen>
     <dimen name="normal_padding">15dp</dimen>
+    <dimen name="normal_icon_size">24dp</dimen>
 </resources>

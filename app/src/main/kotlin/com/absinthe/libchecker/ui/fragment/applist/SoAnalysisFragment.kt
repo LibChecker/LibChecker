@@ -12,9 +12,11 @@ import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
+import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
 const val MODE_SORT_BY_SIZE = 0
@@ -36,6 +38,11 @@ class SoAnalysisFragment : Fragment() {
     ): View? {
         binding = FragmentSoAnalysisBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -64,6 +71,16 @@ class SoAnalysisFragment : Fragment() {
                 adapter.setList(it)
             })
             initSoAnalysisData(requireContext(), packageName)
+        }
+
+        adapter.setOnItemClickListener { _, _, _ ->
+            if (GlobalValues.config.enableLibDetail) {
+                LibDetailDialogFragment().apply {
+                    ActivityStackManager.topActivity?.apply {
+                        show(supportFragmentManager, tag)
+                    }
+                }
+            }
         }
     }
 

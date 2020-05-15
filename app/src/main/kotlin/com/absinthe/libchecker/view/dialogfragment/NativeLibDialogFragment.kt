@@ -1,10 +1,12 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.LCDialogFragment
+import com.absinthe.libchecker.view.NativeLibView
 import com.absinthe.libchecker.viewholder.LibStringItem
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
@@ -26,7 +28,8 @@ class NativeLibDialogFragment : LCDialogFragment() {
         val packageName: String? = arguments?.getString(EXTRA_PKG_NAME)
         packageName ?: dismiss()
 
-        dialogView = NativeLibView(requireContext()).apply {
+        dialogView = NativeLibView(requireContext())
+            .apply {
             tvTitle.text = SpannableStringBuilder(
                 String.format(
                     getString(R.string.format_native_libs_title),

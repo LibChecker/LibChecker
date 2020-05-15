@@ -79,6 +79,7 @@ object NativeLibMap {
         Pair("libvad.dnn.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
         Pair("libbdSpilWakeup.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
         Pair("libbdEASRAndroid.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
-        Pair("libImgRecognition.so", LibChip(R.drawable.ic_lib_baidu, "DuMix"))
+        Pair("libImgRecognition.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
+        Pair("libindoor.so", LibChip(R.drawable.ic_lib_baidu, "百度 LBS"))
         )
 }

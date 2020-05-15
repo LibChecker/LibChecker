@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.recyclerview.AppAdapter
+import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.NativeLibDialogFragment
 import com.absinthe.libchecker.viewholder.AppItem
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
@@ -17,7 +19,8 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
         adapter.setOnItemClickListener { adapter, _, position ->
-            NativeLibDialogFragment().apply {
+            NativeLibDialogFragment()
+                .apply {
                 arguments = Bundle().apply {
                     putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
                 }

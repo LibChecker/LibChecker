@@ -1,8 +1,10 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
 import android.os.Bundle
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.ClassifyDialogView
+import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.viewholder.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -14,7 +16,8 @@ class ClassifyDialogFragment : LCDialogFragment() {
     private lateinit var dialogView: ClassifyDialogView
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogView = ClassifyDialogView(requireContext())
+        dialogView =
+            ClassifyDialogView(requireContext())
 
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<AppItem>(

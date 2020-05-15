@@ -15,7 +15,7 @@ import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE
 import com.absinthe.libchecker.utils.Constants
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
 class ComponentsAnalysisFragment : Fragment() {

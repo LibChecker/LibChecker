@@ -25,7 +25,7 @@ class NativeLibView(context: Context) : ConstraintLayout(context) {
     var tvTitle: TextView
 
     init {
-        View.inflate(context, R.layout.layout_lib_dialog_title, this)
+        View.inflate(context, R.layout.layout_dialog_lib_list, this)
 
         tvTitle = findViewById(R.id.tv_title)
 
