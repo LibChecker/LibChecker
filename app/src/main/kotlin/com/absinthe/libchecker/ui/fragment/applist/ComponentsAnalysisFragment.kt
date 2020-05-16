@@ -13,7 +13,7 @@ import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE
-import com.absinthe.libchecker.utils.Constants
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel

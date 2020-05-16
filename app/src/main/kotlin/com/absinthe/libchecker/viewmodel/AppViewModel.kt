@@ -18,7 +18,7 @@ import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
-import com.absinthe.libchecker.utils.Constants
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewholder.*
@@ -256,7 +256,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
                         GlobalValues.config = it
-                    }
+                    } ?: Log.e(tag, response.message())
                 }
             }
         })

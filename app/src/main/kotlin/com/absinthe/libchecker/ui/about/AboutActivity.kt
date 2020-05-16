@@ -1,12 +1,28 @@
 package com.absinthe.libchecker.ui.about
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.os.Bundle
+import android.os.PersistableBundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.utils.UiUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.drakeet.about.*
+import com.google.android.material.appbar.AppBarLayout
 
 class AboutActivity : AbsAboutActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onCreate(savedInstanceState, persistentState)
+        initView()
+    }
 
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
         icon.setImageResource(R.drawable.pic_splash)
@@ -35,5 +51,33 @@ class AboutActivity : AbsAboutActivity() {
             add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
             add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
         }
+    }
+
+    private fun initView() {
+        UiUtils.setDarkMode(this)
+        UiUtils.setSystemBarTransparent(this)
+
+        val appbar = findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout)
+        appbar.fitsSystemWindows = true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.about_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == R.id.toolbar_rate) {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    data = URLManager.MARKET_PAGE.toUri()
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                })
+            } catch (e: ActivityNotFoundException) {
+                e.printStackTrace()
+                ToastUtils.showLong("Not exist any app market")
+            }
+        }
+        return super.onOptionsItemSelected(menuItem)
     }
 }

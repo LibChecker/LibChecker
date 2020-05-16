@@ -27,4 +27,5 @@
     <string name="tab_components_analysis">组件分析</string>
     <string name="not_found">未找到</string>
     <string name="create_an_issue">协助我们来补充信息</string>
+    <string name="toolbar_rate">评分</string>
 </resources>

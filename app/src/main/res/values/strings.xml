@@ -25,6 +25,7 @@
     <string name="settings_about">About</string>
     <string name="settings_about_summary">This is LibChecker!</string>
     <string name="about_info">This is an app which can look at the CPU architecture of apps in your device.</string>
+    <string name="toolbar_rate">Rate</string>
 
     <!--  Settings  -->
     <string name="pref_group_normal">Normal</string>

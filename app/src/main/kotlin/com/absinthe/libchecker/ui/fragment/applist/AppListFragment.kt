@@ -19,7 +19,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.ui.main.AppDetailActivity
-import com.absinthe.libchecker.utils.Constants
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME

@@ -14,7 +14,7 @@ import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.utils.Constants
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -79,7 +79,7 @@ class SoAnalysisFragment : Fragment() {
         }
 
         adapter.setOnItemClickListener { _, _, position ->
-            if (GlobalValues.config.enableLibDetail || true) {
+            if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
                 LibDetailDialogFragment.newInstance(adapter.getItem(position).name).apply {
                     ActivityStackManager.topActivity?.apply {
                         show(supportFragmentManager, tag)
