@@ -13,10 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:usesCleartextTraffic="true"
-        tools:ignore="AllowBackup"
-        tools:targetApi="m">
-
+        tools:ignore="AllowBackup">
         <activity
             android:name=".ui.main.MainActivity"
             android:label="@string/app_name"
@@ -28,6 +25,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.AppDetailActivity" />
+        <activity android:name=".LibReferenceActivity"
+            android:label="@string/tab_lib_reference_statistics">
+        </activity>
         <activity
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"

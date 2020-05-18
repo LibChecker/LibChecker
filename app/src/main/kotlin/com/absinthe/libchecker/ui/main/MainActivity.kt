@@ -15,7 +15,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.ui.fragment.ClassifyFragment
+import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel

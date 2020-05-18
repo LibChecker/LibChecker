@@ -7,7 +7,7 @@ import android.text.SpannableStringBuilder
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.NativeLibView
-import com.absinthe.libchecker.viewholder.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItem
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.viewholder.AppItem
+import com.absinthe.libchecker.bean.AppItem
 
 class AppListDiffUtil : DiffUtil.ItemCallback<AppItem>() {
 

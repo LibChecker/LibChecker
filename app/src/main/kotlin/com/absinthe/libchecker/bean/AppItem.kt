@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.viewholder
+package com.absinthe.libchecker.bean
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

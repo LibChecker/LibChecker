@@ -8,4 +8,5 @@
     <color name="textNormal">#FF000000</color>
     <color name="backgroundNormal">#FFFFFFFF</color>
     <color name="textSecondary">#80464646</color>
+    <color name="backgroundGray">#FFDFDFDF</color>
 </resources>

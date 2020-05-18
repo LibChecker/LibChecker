@@ -5,7 +5,7 @@ import android.os.Bundle
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.ClassifyDialogView
 import com.absinthe.libchecker.view.LCDialogFragment
-import com.absinthe.libchecker.viewholder.*
+import com.absinthe.libchecker.bean.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"

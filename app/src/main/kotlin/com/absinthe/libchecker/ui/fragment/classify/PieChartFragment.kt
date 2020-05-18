@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment
+package com.absinthe.libchecker.ui.fragment.classify
 
 import android.graphics.Color
 import android.os.Bundle
@@ -6,17 +6,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.databinding.FragmentClassifyBinding
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
-import com.absinthe.libchecker.viewholder.ARMV5
-import com.absinthe.libchecker.viewholder.ARMV7
-import com.absinthe.libchecker.viewholder.ARMV8
-import com.absinthe.libchecker.viewholder.NO_LIBS
+import com.absinthe.libchecker.bean.ARMV5
+import com.absinthe.libchecker.bean.ARMV7
+import com.absinthe.libchecker.bean.ARMV8
+import com.absinthe.libchecker.bean.NO_LIBS
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
@@ -30,18 +31,17 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 
 
-class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
+class PieChartFragment : Fragment(), OnChartValueSelectedListener {
 
-    private lateinit var binding: FragmentClassifyBinding
-    private lateinit var viewModel: AppViewModel
+    private lateinit var binding: FragmentPieChartBinding
+    private val viewModel by activityViewModels<AppViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
-        binding = FragmentClassifyBinding.inflate(inflater, container, false)
+        binding = FragmentPieChartBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -56,7 +56,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
                 verticalAlignment = Legend.LegendVerticalAlignment.TOP
                 horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
                 orientation = Legend.LegendOrientation.VERTICAL
-                textColor = resources.getColor(R.color.textNormal)
+                textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
                 yOffset = 0f
@@ -65,8 +65,8 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
             setExtraOffsets(5f, 10f, 5f, 5f)
             setEntryLabelColor(Color.BLACK)
             setNoDataText(getString(R.string.chart_no_data_text))
-            setNoDataTextColor(resources.getColor(R.color.textNormal))
-            setOnChartValueSelectedListener(this@ClassifyFragment)
+            setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
+            setOnChartValueSelectedListener(this@PieChartFragment)
             setHoleColor(Color.TRANSPARENT)
         }
 
@@ -152,7 +152,7 @@ class ClassifyFragment : Fragment(), OnChartValueSelectedListener {
         if (h == null) return
 
         ClassifyDialogFragment().apply {
-            show(this@ClassifyFragment.requireActivity().supportFragmentManager, tag)
+            show(this@PieChartFragment.requireActivity().supportFragmentManager, tag)
 
             when (h.x) {
                 0f -> {

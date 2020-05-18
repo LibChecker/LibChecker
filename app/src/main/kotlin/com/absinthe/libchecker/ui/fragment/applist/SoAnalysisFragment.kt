@@ -7,14 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -78,14 +77,21 @@ class SoAnalysisFragment : Fragment() {
             })
         }
 
-        adapter.setOnItemClickListener { _, _, position ->
-            if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
+        fun openLibDetailDialog(position: Int) {
+            if (GlobalValues.config.enableLibDetail) {
                 LibDetailDialogFragment.newInstance(adapter.getItem(position).name).apply {
                     ActivityStackManager.topActivity?.apply {
                         show(supportFragmentManager, tag)
                     }
                 }
             }
+        }
+
+        adapter.setOnItemClickListener { _, _, position ->
+            openLibDetailDialog(position)
+        }
+        adapter.setOnItemChildClickListener { _, _, position ->
+            openLibDetailDialog(position)
         }
     }
 

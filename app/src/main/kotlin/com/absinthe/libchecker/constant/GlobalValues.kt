@@ -15,11 +15,14 @@ object GlobalValues {
 
     var config = Configuration(
         enableLibDetail = false,
-        showLibName = true,
-        showLibDescription = true,
-        showContributor = true,
-        showRelativeUrl = true
+        showLibName = false,
+        showTeamName = false,
+        showLibDescription = false,
+        showContributor = false,
+        showRelativeUrl = false
     )
+
+    var repo = Constants.REPO_GITHUB
 
     fun init(context: Context) {
         isShowSystemApps.value =
@@ -41,5 +44,10 @@ object GlobalValues {
                 Constants.PREF_LIB_SORT_MODE,
                 MODE_SORT_BY_SIZE
             )
+        repo = SPUtils.getString(
+            context,
+            Constants.PREF_RULES_REPO,
+            Constants.REPO_GITHUB
+        ) ?: Constants.REPO_GITHUB
     }
 }

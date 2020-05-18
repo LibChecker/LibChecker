@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_repo">
+        <item>Github</item>
+        <item>Gitee</item>
+    </string-array>
+
+    <string-array name="list_repo_value">
+        <item>github</item>
+        <item>gitee</item>
+    </string-array>
+</resources>

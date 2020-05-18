@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.viewholder
+package com.absinthe.libchecker.bean
 
 import com.absinthe.libchecker.constant.LibChip
 

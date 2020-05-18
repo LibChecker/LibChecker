@@ -104,7 +104,7 @@ dependencies {
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.5.0")
     implementation("com.squareup.retrofit2:retrofit:2.8.1")
-    implementation ("com.squareup.retrofit2:converter-gson:2.8.1")
+    implementation("com.squareup.retrofit2:converter-gson:2.8.1")
     implementation("com.squareup.okio:okio:2.5.0")
 
     testImplementation 'junit:junit:4.13'

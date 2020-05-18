@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview
 
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.viewholder.*
+import com.absinthe.libchecker.bean.*
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 

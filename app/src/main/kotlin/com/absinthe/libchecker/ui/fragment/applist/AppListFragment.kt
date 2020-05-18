@@ -11,19 +11,19 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.ui.main.AppDetailActivity
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
-import com.absinthe.libchecker.viewholder.AppItem
+import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
@@ -31,7 +31,7 @@ import kotlinx.coroutines.*
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
-    private val viewModel by lazy { ViewModelProvider(requireActivity()).get(AppViewModel::class.java) }
+    private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
     private var changeCount = 0

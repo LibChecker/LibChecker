@@ -5,7 +5,7 @@ import android.view.View
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.constant.ServiceLibMap
-import com.absinthe.libchecker.viewholder.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItem
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.chip.Chip
@@ -16,6 +16,10 @@ const val MODE_SERVICE = 1
 class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
     var mode = MODE_NATIVE
+
+    init {
+        addChildClickViewIds(R.id.chip)
+    }
 
     override fun convert(holder: BaseViewHolder, item: LibStringItem) {
         holder.setText(R.id.tv_name, item.name)

@@ -28,4 +28,8 @@
     <string name="not_found">未找到</string>
     <string name="create_an_issue">协助我们来补充信息</string>
     <string name="toolbar_rate">评分</string>
+    <string name="rules_repo_title">规则仓库</string>
+    <string name="tab_lib_reference_statistics">库引用统计</string>
+    <string name="tab_pie_chart">饼状图</string>
+    <string name="not_marked_lib">未标记的库</string>
 </resources>

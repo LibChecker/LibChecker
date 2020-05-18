@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.NativeLibDialogFragment
-import com.absinthe.libchecker.viewholder.AppItem
+import com.absinthe.libchecker.bean.AppItem
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
 

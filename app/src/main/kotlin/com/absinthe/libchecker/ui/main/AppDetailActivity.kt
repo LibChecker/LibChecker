@@ -39,8 +39,7 @@ class AppDetailActivity : BaseActivity() {
         initView()
 
         intent.extras?.let {
-            val bundle = it
-            bundle.getString(EXTRA_PKG_NAME)?.let { packageName ->
+            it.getString(EXTRA_PKG_NAME)?.let { packageName ->
                 pkgName = packageName
                 supportActionBar?.apply {
                     title = AppUtils.getAppName(packageName)

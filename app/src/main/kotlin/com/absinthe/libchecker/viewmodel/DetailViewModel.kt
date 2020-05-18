@@ -16,7 +16,7 @@ import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.constant.ServiceLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.viewholder.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,12 +88,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     fun requestNativeLibDetail(libName: String) = viewModelScope.launch(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl(ApiManager.ROOT_URL)
+            .baseUrl(ApiManager.root)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val request = retrofit.create(NativeLibDetailRequest::class.java)
         val detail = request.requestNativeLibDetail("native-libs/${libName}.json")
-        Log.d("DetailViewModel", "requestNativeLibDetail")
+        Log.d("DetailViewModel", "requestNativeLibDetail: root = ${ApiManager.root}")
         detail.enqueue(object : Callback<NativeLibDetailBean> {
             override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
                 Log.e("DetailViewModel", t.message ?: "")

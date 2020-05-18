@@ -4,7 +4,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import com.absinthe.libchecker.viewholder.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItem
 import com.blankj.utilcode.util.Utils
 import java.io.File
 import java.util.zip.ZipFile

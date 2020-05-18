@@ -8,6 +8,7 @@ import android.view.View
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NativeLibMap
 import com.absinthe.libchecker.view.LCDialogFragment
@@ -41,7 +42,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()
                 text = Html.fromHtml(
-                    "<a href='https://github.com/zhaobozhen/LibChecker-Rules/issues/new'> ${resources.getText(
+                    "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${resources.getText(
                         R.string.create_an_issue
                     )} </a>"
                 )
@@ -66,6 +67,12 @@ class LibDetailDialogFragment : LCDialogFragment() {
                             tvLabelName.text = it.label
                         } else {
                             llLabel.visibility = View.GONE
+                        }
+
+                        if (showTeamName) {
+                            tvTeamName.text = it.team
+                        } else {
+                            llTeam.visibility = View.GONE
                         }
 
                         if (showContributor) {

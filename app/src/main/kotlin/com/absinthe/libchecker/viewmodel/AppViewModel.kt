@@ -15,13 +15,13 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
+import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.viewholder.*
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +41,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
     val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
+    val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     var isInit = false
 
     private val tag = AppViewModel::class.java.simpleName
@@ -255,11 +256,59 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
+                        Log.d(tag, "Configuration response: ${response.body()}")
                         GlobalValues.config = it
                     } ?: Log.e(tag, response.message())
                 }
             }
         })
+    }
+
+    fun computeLibReference(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        val appList = context.packageManager
+            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val map = HashMap<String, Int>()
+        val list = mutableListOf<LibReference>()
+
+        for (item in appList) {
+            val libList = PackageUtils.getAbiByNativeDir(
+                item.sourceDir,
+                item.nativeLibraryDir
+            )
+
+            for (lib in libList) {
+                val count = map[lib.name] ?: 0
+                map[lib.name] = count + 1
+            }
+
+            try {
+                val packageInfo =
+                    context.packageManager.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
+
+                packageInfo.services?.let {
+                    for (service in it) {
+                        val count = map[service.name] ?: 0
+                        map[service.name] = count + 1
+                    }
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+            }
+        }
+
+        for (entry in map) {
+            if (entry.value > 1) {
+                list.add(
+                    LibReference(entry.key, entry.value)
+                )
+            }
+        }
+
+        list.sortByDescending { it.referredCount }
+
+        withContext(Dispatchers.Main) {
+            libReference.value = list
+        }
     }
 
     private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {

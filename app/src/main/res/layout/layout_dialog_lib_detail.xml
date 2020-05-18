@@ -18,9 +18,10 @@
             android:id="@+id/iv_icon"
             android:layout_width="@dimen/lib_detail_icon_size"
             android:layout_height="@dimen/lib_detail_icon_size"
+            android:background="@drawable/bg_gray_circle"
             android:contentDescription="Library's icon"
-            tools:ignore="HardcodedText"
-            tools:src="@drawable/ic_lib_xiaomi" />
+            android:src="@drawable/ic_question"
+            tools:ignore="HardcodedText" />
 
         <TextView
             android:id="@+id/tv_lib_name"
@@ -70,6 +71,32 @@
                     android:layout_weight="1"
                     android:textAppearance="?attr/textAppearanceSubtitle2"
                     tools:text="Izuko" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_team"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:orientation="horizontal"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/iv_team_icon"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/normal_icon_size"
+                    android:contentDescription="Label's icon"
+                    android:src="@drawable/ic_team"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_team_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="?attr/textAppearanceSubtitle2"
+                    tools:text="Absinthe" />
 
             </LinearLayout>
 

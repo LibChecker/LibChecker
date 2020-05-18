@@ -9,9 +9,18 @@
         <SwitchPreferenceCompat
             app:key="showSystemApps"
             app:title="@string/show_system_apps"
-            android:summary="@string/show_system_apps_summary"
-            android:icon="@drawable/ic_android_outline"
+            app:summary="@string/show_system_apps_summary"
+            app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
+
+        <DropDownPreference
+            app:key="rulesRepository"
+            app:title="@string/rules_repo_title"
+            app:icon="@drawable/ic_repository"
+            app:useSimpleSummaryProvider="true"
+            app:defaultValue="github"
+            app:entries="@array/list_repo"
+            app:entryValues="@array/list_repo_value"/>
 
     </PreferenceCategory>
 

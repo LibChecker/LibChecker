@@ -20,6 +20,9 @@
     <!-- Classify   -->
     <string name="chart_no_data_text">Loading</string>
     <string name="title_classify_dialog">Apps with %s ABI</string>
+    <string name="tab_pie_chart">Pie chart</string>
+    <string name="tab_lib_reference_statistics">Lib reference</string>
+    <string name="not_marked_lib">Not marked library</string>
 
     <!--  About  -->
     <string name="settings_about">About</string>
@@ -32,6 +35,7 @@
     <string name="pref_group_others">Others</string>
 
     <string name="show_system_apps">Show System Apps</string>
+    <string name="rules_repo_title">Rules Repo</string>
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
 
     <!--  Detail  -->
