@@ -11,18 +11,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
+import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
-import com.microsoft.appcenter.AppCenter
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.crashes.Crashes
 import jonathanfinerty.once.Once
 
 class MainActivity : BaseActivity() {
@@ -57,13 +53,6 @@ class MainActivity : BaseActivity() {
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
 
         super.onCreate(savedInstanceState)
-
-        if (!BuildConfig.DEBUG) {
-            AppCenter.start(
-                application, "5f11b856-0a27-4438-a038-9e18e4797133",
-                Analytics::class.java, Crashes::class.java
-            )
-        }
 
         initView()
         registerPackageBroadcast()

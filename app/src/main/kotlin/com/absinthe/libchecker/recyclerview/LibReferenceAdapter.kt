@@ -20,6 +20,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(R.lay
                 holder.setText(R.id.tv_label_name, it.name)
             }
         } ?: let {
+            holder.setImageResource(R.id.iv_icon, R.drawable.ic_question)
             holder.setText(R.id.tv_label_name, R.string.not_marked_lib)
         }
         holder.setText(R.id.tv_count, item.referredCount.toString())
