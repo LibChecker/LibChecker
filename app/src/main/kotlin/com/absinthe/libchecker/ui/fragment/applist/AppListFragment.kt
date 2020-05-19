@@ -24,6 +24,7 @@ import com.absinthe.libchecker.ui.main.AppDetailActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
@@ -115,7 +116,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                 })
             }
 
-            appItems.observe(viewLifecycleOwner, Observer {
+            AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
                 mItems.apply {
                     clear()
@@ -215,7 +216,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
                 }
 
-                popup.menu[GlobalValues.appSortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked =
+                popup.menu[GlobalValues.appSortMode.value
+                    ?: Constants.SORT_MODE_DEFAULT].isChecked =
                     true
                 popup.setOnMenuItemClickListener { menuItem ->
                     val mode = when (menuItem.itemId) {

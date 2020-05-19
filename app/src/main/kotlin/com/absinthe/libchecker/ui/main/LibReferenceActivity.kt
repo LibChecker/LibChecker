@@ -1,17 +1,16 @@
-package com.absinthe.libchecker
+package com.absinthe.libchecker.ui.main
 
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
-import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.viewmodel.AppViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,12 +24,6 @@ const val EXTRA_TYPE = "TYPE"
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
-
-    private val viewModel by lazy {
-        ViewModelProvider(ActivityStackManager.getActivity(MainActivity::class.java)!!).get(
-            AppViewModel::class.java
-        )
-    }
     private val adapter = AppAdapter()
 
     override fun setViewBinding() {
@@ -47,8 +40,12 @@ class LibReferenceActivity : BaseActivity() {
 
         binding.rvList.adapter = this.adapter
         binding.vfContainer.apply {
-            setInAnimation(this@LibReferenceActivity, R.anim.anim_fade_in)
-            setOutAnimation(this@LibReferenceActivity, R.anim.anim_fade_out)
+            setInAnimation(this@LibReferenceActivity,
+                R.anim.anim_fade_in
+            )
+            setOutAnimation(this@LibReferenceActivity,
+                R.anim.anim_fade_out
+            )
         }
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -59,7 +56,7 @@ class LibReferenceActivity : BaseActivity() {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val list = mutableListOf<AppItem>()
 
-                        viewModel.appItems.value?.let { items ->
+                        AppItemRepository.allItems.value?.let { items ->
 
                             if (type == TYPE_NATIVE) {
                                 for (item in items) {

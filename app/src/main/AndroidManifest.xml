@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.main.AppDetailActivity" />
-        <activity android:name=".LibReferenceActivity"
+        <activity android:name=".ui.main.LibReferenceActivity"
             android:label="@string/tab_lib_reference_statistics">
         </activity>
         <activity

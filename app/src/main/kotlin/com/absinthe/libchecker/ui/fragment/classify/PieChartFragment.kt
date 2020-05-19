@@ -8,17 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.databinding.FragmentPieChartBinding
-import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
 import com.absinthe.libchecker.bean.ARMV5
 import com.absinthe.libchecker.bean.ARMV7
 import com.absinthe.libchecker.bean.ARMV8
 import com.absinthe.libchecker.bean.NO_LIBS
-import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -34,7 +33,6 @@ import com.github.mikephil.charting.utils.MPPointF
 class PieChartFragment : Fragment(), OnChartValueSelectedListener {
 
     private lateinit var binding: FragmentPieChartBinding
-    private val viewModel by activityViewModels<AppViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +68,7 @@ class PieChartFragment : Fragment(), OnChartValueSelectedListener {
             setHoleColor(Color.TRANSPARENT)
         }
 
-        viewModel.appItems.observe(viewLifecycleOwner, Observer {
+        AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
             setData()
         })
 
@@ -87,7 +85,7 @@ class PieChartFragment : Fragment(), OnChartValueSelectedListener {
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        viewModel.appItems.value?.let {
+        AppItemRepository.allItems.value?.let {
             val list = mutableListOf(0, 0, 0)
 
             for (item in it) {
@@ -156,18 +154,18 @@ class PieChartFragment : Fragment(), OnChartValueSelectedListener {
 
             when (h.x) {
                 0f -> {
-                    viewModel.appItems.value?.filter { it.abi == ARMV8 }?.let { filter ->
+                    AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }?.let { filter ->
                         item = ArrayList(filter)
                     }
                 }
                 1f -> {
-                    viewModel.appItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                    AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 2f -> {
-                    viewModel.appItems.value?.filter { it.abi == NO_LIBS }?.let { filter ->
+                    AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }?.let { filter ->
                         item = ArrayList(filter)
                     }
                 }

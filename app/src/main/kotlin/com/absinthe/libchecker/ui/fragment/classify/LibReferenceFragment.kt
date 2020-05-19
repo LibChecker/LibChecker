@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import com.absinthe.libchecker.*
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.LibReferenceAdapter
+import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
 class LibReferenceFragment : Fragment() {

@@ -16,6 +16,8 @@ object ServiceLibMap {
         Pair("com.tencent.tinker.lib.service.DefaultTinkerResultService", LibChip(R.drawable.ic_lib_tencent, "Tinker")),
         Pair("com.google.firebase.messaging.FirebaseMessagingService", LibChip(R.drawable.ic_lib_firebase, "FCM")),
         Pair("com.google.firebase.components.ComponentDiscoveryService", LibChip(R.drawable.ic_lib_firebase, "Firebase")),
+        Pair("com.google.android.gms.measurement.AppMeasurementJobService", LibChip(R.drawable.ic_lib_firebase, "Firebase Analytics")),
+        Pair("com.google.android.gms.measurement.AppMeasurementService", LibChip(R.drawable.ic_lib_firebase, "Firebase Analytics")),
         Pair("com.google.firebase.iid.FirebaseInstanceIdService", LibChip(R.drawable.ic_lib_firebase, "Firebase")),
         Pair("com.huawei.hms.support.api.push.service.HmsMsgService", LibChip(R.drawable.ic_lib_huawei, "Huawei Push")),
         Pair("com.huawei.updatesdk.service.deamon.download.DownloadService", LibChip(R.drawable.ic_lib_huawei, "HMS SDK")),
@@ -60,7 +62,10 @@ object ServiceLibMap {
         Pair("com.tencent.qalsdk.service.QalService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
         Pair("com.tencent.qalsdk.service.QalAssistService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
         Pair("com.google.android.gms.auth.api.signin.RevocationBoundService", LibChip(R.drawable.ic_lib_google, "Google Sign-In")),
+        Pair("com.google.android.gms.analytics.AnalyticsService", LibChip(R.drawable.ic_lib_google_analytics, "Google Analytics")),
+        Pair("com.google.android.gms.analytics.AnalyticsJobService", LibChip(R.drawable.ic_lib_google_analytics, "Google Analytics")),
         Pair("com.didi.virtualapk.delegate.LocalService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK")),
-        Pair("com.didi.virtualapk.delegate.RemoteService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK"))
+        Pair("com.didi.virtualapk.delegate.RemoteService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK")),
+        Pair("org.hapjs.features.channel.ChannelService", LibChip(R.drawable.ic_lib_hapjs, "快应用"))
         )
 }

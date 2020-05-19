@@ -16,6 +16,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
@@ -40,7 +41,6 @@ import java.util.zip.ZipFile
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
-    val appItems: MutableLiveData<ArrayList<AppItem>> = MutableLiveData()
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     var isInit = false
 
@@ -107,7 +107,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         withContext(Dispatchers.Main) {
             GlobalValues.isObservingDBItems.value = true
-            appItems.value = newItems
+            AppItemRepository.allItems.value = newItems
         }
     }
 
@@ -146,7 +146,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             withContext(Dispatchers.Main) {
-                appItems.value = newItems
+                AppItemRepository.allItems.value = newItems
             }
         }
     }
@@ -271,6 +271,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val list = mutableListOf<LibReference>()
 
         for (item in appList) {
+
+            if (!GlobalValues.isShowSystemApps.value!! && ((item.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM)) {
+                continue
+            }
+
             val libList = PackageUtils.getAbiByNativeDir(
                 item.sourceDir,
                 item.nativeLibraryDir
@@ -283,7 +288,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
             try {
                 val packageInfo =
-                    context.packageManager.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
+                    context.packageManager.getPackageInfo(
+                        item.packageName,
+                        PackageManager.GET_SERVICES
+                    )
 
                 packageInfo.services?.let {
                     for (service in it) {

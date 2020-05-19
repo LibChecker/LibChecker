@@ -14,6 +14,7 @@ object NativeLibMap {
         Pair("libflexbox.so", LibChip(R.drawable.ic_lib_tencent, "Hippy")),
         Pair("libmmkv.so", LibChip(R.drawable.ic_lib_tencent, "MMKV")),
         Pair("libBeacon.so", LibChip(R.drawable.ic_lib_tencent, "腾讯流量联盟")),
+        Pair("libmarsxlog.so", LibChip(R.drawable.ic_lib_tencent, "Mars")),
         Pair("libliteavsdk.so", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云直播 SDK")),
         Pair("libsaturn.so", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云直播 SDK")),
         Pair("libijkplayer.so", LibChip(R.drawable.ic_lib_bilibili, "IJKPlayer")),
@@ -22,6 +23,7 @@ object NativeLibMap {
         Pair("libreactnativejni.so", LibChip(R.drawable.ic_lib_react, "React Native")),
         Pair("libfb.so", LibChip(R.drawable.ic_lib_react, "React Native")),
         Pair("libjsc.so", LibChip(R.drawable.ic_lib_react, "React Native")),
+        Pair("libfolly_json.so", LibChip(R.drawable.ic_lib_react, "React Native")),
         Pair("libjiagu.so", LibChip(R.drawable.ic_lib_360, "360 加固")),
         Pair("libc++_shared.so", LibChip(R.drawable.ic_lib_cpp, "C++ 共享库")),
         Pair("libstlport_shared.so", LibChip(R.drawable.ic_lib_cpp, "C++ STL")),
@@ -70,6 +72,7 @@ object NativeLibMap {
         Pair("libwebp.so", LibChip(R.drawable.ic_lib_facebook, "Fresco")),
         Pair("libentryexpro.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
         Pair("libuptsmaddon.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
+        Pair("libuptsmaddonmi.so", LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")),
         Pair("libsdk_patcher_jni.so", LibChip(R.drawable.ic_lib_xiaomi, "小米更新 SDK")),
         Pair("libmibraindec.so", LibChip(R.drawable.ic_lib_xiaoai, "小爱 SDK")),
         Pair("libmibrainjni.so", LibChip(R.drawable.ic_lib_xiaoai, "小爱 SDK")),
@@ -81,6 +84,7 @@ object NativeLibMap {
         Pair("libbdSpilWakeup.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
         Pair("libbdEASRAndroid.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
         Pair("libImgRecognition.so", LibChip(R.drawable.ic_lib_baidu, "DuMix")),
-        Pair("libindoor.so", LibChip(R.drawable.ic_lib_baidu, "百度 LBS"))
-        )
+        Pair("libindoor.so", LibChip(R.drawable.ic_lib_baidu, "百度 LBS")),
+        Pair("libarcore_sdk_c.so", LibChip(R.drawable.ic_question, "ViroCore"))
+    )
 }
