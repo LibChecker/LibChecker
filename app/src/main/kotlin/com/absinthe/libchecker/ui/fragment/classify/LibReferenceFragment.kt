@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.*
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.LibReferenceAdapter
 import com.absinthe.libchecker.ui.main.*
@@ -39,6 +40,11 @@ class LibReferenceFragment : Fragment() {
                 adapter.setNewInstance(it.toMutableList())
                 binding.vfContainer.displayedChild = 1
             })
+            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
+                binding.vfContainer.displayedChild = 0
+                viewModel.computeLibReference(requireContext())
+            })
+            
             viewModel.computeLibReference(requireContext())
             isInit = true
         }

@@ -53,6 +53,8 @@ object NativeLibMap {
         Pair("libmain.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libmono.so", LibChip(R.drawable.ic_lib_unity, "Unity")),
         Pair("libyoga.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
+        Pair("libyouga.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
+        Pair("liblib_fb_fbjni.so", LibChip(R.drawable.ic_lib_facebook, "Yoga")),
         Pair("librealm-jni.so", LibChip(R.drawable.ic_lib_realm, "realm")),
         Pair("libcrashlytics.so", LibChip(R.drawable.ic_lib_firebase, "Crashlytics")),
         Pair("libopencv_java3.so", LibChip(R.drawable.ic_lib_opencv, "OpenCV")),

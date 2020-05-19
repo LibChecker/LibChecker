@@ -243,7 +243,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun requestConfiguration() = viewModelScope.launch(Dispatchers.IO) {
         val retrofit = Retrofit.Builder()
-            .baseUrl(ApiManager.GITEE_ROOT_URL)
+            .baseUrl(ApiManager.root)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         val request = retrofit.create(ConfigurationRequest::class.java)
@@ -256,7 +256,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
-                        Log.d(tag, "Configuration response: ${response.body()}")
+                        Log.d(tag, "Configuration response: ${response.raw()}")
                         GlobalValues.config = it
                     } ?: Log.e(tag, response.message())
                 }

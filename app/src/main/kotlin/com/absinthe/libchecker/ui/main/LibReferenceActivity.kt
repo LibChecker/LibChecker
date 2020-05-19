@@ -40,63 +40,28 @@ class LibReferenceActivity : BaseActivity() {
 
         binding.rvList.adapter = this.adapter
         binding.vfContainer.apply {
-            setInAnimation(this@LibReferenceActivity,
+            setInAnimation(
+                this@LibReferenceActivity,
                 R.anim.anim_fade_in
             )
-            setOutAnimation(this@LibReferenceActivity,
+            setOutAnimation(
+                this@LibReferenceActivity,
                 R.anim.anim_fade_out
             )
         }
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        intent.extras?.let {
-            it.getString(EXTRA_NAME)?.let { name ->
-                    it.getInt(EXTRA_TYPE).let { type ->
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val list = mutableListOf<AppItem>()
+        val name = intent.extras?.getString(EXTRA_NAME)
+        val type = intent.extras?.getInt(EXTRA_TYPE)
 
-                        AppItemRepository.allItems.value?.let { items ->
-
-                            if (type == TYPE_NATIVE) {
-                                for (item in items) {
-                                    val packageInfo = PackageUtils.getPackageInfo(item.packageName)
-
-                                    val natives = PackageUtils.getAbiByNativeDir(
-                                        packageInfo.applicationInfo.sourceDir,
-                                        packageInfo.applicationInfo.nativeLibraryDir
-                                    )
-
-                                    for (native in natives) {
-                                        if (native.name == name) {
-                                            list.add(item)
-                                            break
-                                        }
-                                    }
-                                }
-                            } else if (type == TYPE_SERVICE) {
-                                for (item in items) {
-                                    val packageInfo = packageManager.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
-                                    packageInfo.services?.let { services ->
-                                        for (service in services) {
-                                            if (service.name == name) {
-                                                list.add(item)
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        withContext(Dispatchers.Main) {
-                            adapter.setNewInstance(list)
-                            binding.vfContainer.displayedChild = 1
-                        }
-                    }
-
-                }
-            } ?: finish()
-        } ?: finish()
+        if (name == null || type == null) {
+            finish()
+        } else {
+            lifecycleScope.launch(Dispatchers.IO) {
+                setData(name, type)
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -104,5 +69,52 @@ class LibReferenceActivity : BaseActivity() {
             onBackPressed()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private suspend fun setData(name: String, type: Int) {
+
+        withContext(Dispatchers.Main) {
+            binding.vfContainer.displayedChild = 0
+        }
+
+        val list = mutableListOf<AppItem>()
+
+        AppItemRepository.allItems.value?.let { items ->
+
+            if (type == TYPE_NATIVE) {
+                for (item in items) {
+                    val packageInfo = PackageUtils.getPackageInfo(item.packageName)
+
+                    val natives = PackageUtils.getAbiByNativeDir(
+                        packageInfo.applicationInfo.sourceDir,
+                        packageInfo.applicationInfo.nativeLibraryDir
+                    )
+
+                    for (native in natives) {
+                        if (native.name == name) {
+                            list.add(item)
+                            break
+                        }
+                    }
+                }
+            } else if (type == TYPE_SERVICE) {
+                for (item in items) {
+                    val packageInfo =
+                        packageManager.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
+                    packageInfo.services?.let { services ->
+                        for (service in services) {
+                            if (service.name == name) {
+                                list.add(item)
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        withContext(Dispatchers.Main) {
+            adapter.setNewInstance(list)
+            binding.vfContainer.displayedChild = 1
+        }
     }
 }
