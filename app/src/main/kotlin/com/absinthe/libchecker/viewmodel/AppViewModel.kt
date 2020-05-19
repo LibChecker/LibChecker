@@ -256,7 +256,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
                 viewModelScope.launch(Dispatchers.Main) {
                     response.body()?.let {
-                        Log.d(tag, "Configuration response: ${response.raw()}")
+                        Log.d(tag, "Configuration response: ${response.body()}")
                         GlobalValues.config = it
                     } ?: Log.e(tag, response.message())
                 }

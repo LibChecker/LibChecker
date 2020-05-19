@@ -82,6 +82,35 @@ object PackageUtils {
         }
         zipFile.close()
 
+        if (libList.isEmpty()) {
+            libList.addAll(getSplitLibs(path))
+        }
+
+        return libList
+    }
+
+    fun getSplitLibs(path: String): ArrayList<LibStringItem> {
+        val libList = ArrayList<LibStringItem>()
+
+        File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
+            for (file in it) {
+                if (file.name.contains("split_config.arm")) {
+                    val zipFile = ZipFile(file)
+                    val entries = zipFile.entries()
+
+                    while (entries.hasMoreElements()) {
+                        val next = entries.nextElement()
+                        if (next.name.contains("lib/") && !next.isDirectory) {
+                            libList.add(LibStringItem(next.name.split("/").last(), next.size))
+                        }
+                    }
+                    zipFile.close()
+
+                    break
+                }
+            }
+        }
+
         return libList
     }
 }

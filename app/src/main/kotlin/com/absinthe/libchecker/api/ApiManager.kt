@@ -6,9 +6,9 @@ import com.absinthe.libchecker.constant.GlobalValues
 
 object ApiManager {
 
-    const val GITHUB_ROOT_URL =
+    private const val GITHUB_ROOT_URL =
         "https://raw.githubusercontent.com/zhaobozhen/LibChecker-Rules/master/"
-    const val GITEE_ROOT_URL =
+    private const val GITEE_ROOT_URL =
         "https://gitee.com/zhaobozhen/LibChecker-Rules/raw/master/"
 
     const val CONFIGURATION_URL = "configuration/configuration_v$CONFIGURATION_VERSION.json"
