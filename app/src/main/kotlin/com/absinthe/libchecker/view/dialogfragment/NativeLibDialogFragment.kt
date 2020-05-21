@@ -5,11 +5,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.provider.ContextProvider
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.NativeLibView
-import com.absinthe.libchecker.bean.LibStringItem
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.Utils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -42,7 +42,7 @@ class NativeLibDialogFragment : LCDialogFragment() {
             val list = mutableListOf<LibStringItem>()
 
             try {
-                val info = Utils.getApp().packageManager.getApplicationInfo(packageName!!, 0)
+                val info = ContextProvider.getGlobalContext().packageManager.getApplicationInfo(packageName!!, 0)
 
                 list.addAll(getAbiByNativeDir(
                     info.sourceDir,

@@ -10,8 +10,8 @@ import android.provider.Settings
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.absinthe.libchecker.provider.ContextProvider
 import com.blankj.utilcode.util.ConvertUtils
-import com.blankj.utilcode.util.Utils
 
 object UiUtils {
 
@@ -70,7 +70,7 @@ object UiUtils {
 
     fun getNavBarHeight(): Int {
         //Full screen adaption
-        if (Settings.Global.getInt(Utils.getApp().contentResolver, "force_fsg_nav_bar", 0) != 0) {
+        if (Settings.Global.getInt(ContextProvider.getGlobalContext().contentResolver, "force_fsg_nav_bar", 0) != 0) {
             return ConvertUtils.dp2px(20f)
         }
 
