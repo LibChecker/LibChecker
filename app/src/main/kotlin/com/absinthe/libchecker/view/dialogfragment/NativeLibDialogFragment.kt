@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import androidx.core.view.isGone
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.provider.ContextProvider
@@ -60,6 +61,7 @@ class NativeLibDialogFragment : LCDialogFragment() {
 
             withContext(Dispatchers.Main) {
                 dialogView.adapter.setNewInstance(list)
+                dialogView.ibSort.isGone = list.size == 1
             }
         }
 

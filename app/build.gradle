@@ -73,7 +73,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation "androidx.preference:preference:1.1.1"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation "androidx.fragment:fragment:${fragment_version}"
     implementation "androidx.fragment:fragment-ktx:${fragment_version}"
