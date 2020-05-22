@@ -98,36 +98,42 @@ class LibReferenceActivity : BaseActivity() {
         val list = mutableListOf<AppItem>()
 
         AppItemRepository.allItems.value?.let { items ->
+            try {
+                if (type == TYPE_NATIVE) {
+                    for (item in items) {
+                        val packageInfo = PackageUtils.getPackageInfo(item.packageName)
 
-            if (type == TYPE_NATIVE) {
-                for (item in items) {
-                    val packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                        val natives = PackageUtils.getAbiByNativeDir(
+                            packageInfo.applicationInfo.sourceDir,
+                            packageInfo.applicationInfo.nativeLibraryDir
+                        )
 
-                    val natives = PackageUtils.getAbiByNativeDir(
-                        packageInfo.applicationInfo.sourceDir,
-                        packageInfo.applicationInfo.nativeLibraryDir
-                    )
-
-                    for (native in natives) {
-                        if (native.name == name) {
-                            list.add(item)
-                            break
-                        }
-                    }
-                }
-            } else if (type == TYPE_SERVICE) {
-                for (item in items) {
-                    val packageInfo =
-                        packageManager.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
-                    packageInfo.services?.let { services ->
-                        for (service in services) {
-                            if (service.name == name) {
+                        for (native in natives) {
+                            if (native.name == name) {
                                 list.add(item)
                                 break
                             }
                         }
                     }
+                } else if (type == TYPE_SERVICE) {
+                    for (item in items) {
+                        val packageInfo =
+                            packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_SERVICES
+                            )
+                        packageInfo.services?.let { services ->
+                            for (service in services) {
+                                if (service.name == name) {
+                                    list.add(item)
+                                    break
+                                }
+                            }
+                        }
+                    }
                 }
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
             }
         }
         withContext(Dispatchers.Main) {

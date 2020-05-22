@@ -93,16 +93,20 @@ object PackageUtils {
         return libList
     }
 
-    fun isSplitsApk(packageName: String) : Boolean {
-        val path = getPackageInfo(packageName).applicationInfo.sourceDir
-
-        File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-            for (file in it) {
-                if (file.name.startsWith("split_config.")) {
-                    return true
+    fun isSplitsApk(packageName: String): Boolean {
+        try {
+            val path = getPackageInfo(packageName).applicationInfo.sourceDir
+            File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
+                for (file in it) {
+                    if (file.name.startsWith("split_config.")) {
+                        return true
+                    }
                 }
             }
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
         }
+
         return false
     }
 
