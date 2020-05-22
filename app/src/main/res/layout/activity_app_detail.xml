@@ -104,12 +104,12 @@
                     android:layout_marginTop="@dimen/normal_padding"
                     android:text="@string/splits_spk"
                     android:visibility="gone"
+                    app:chipIcon="@drawable/ic_split"
                     app:chipMinHeight="28dp"
                     app:chipMinTouchTargetSize="0dp"
                     app:chipStartPadding="10dp"
                     app:layout_constraintStart_toStartOf="@id/iv_app_icon"
-                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon"
-                    tools:chipIcon="@drawable/ic_split" />
+                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

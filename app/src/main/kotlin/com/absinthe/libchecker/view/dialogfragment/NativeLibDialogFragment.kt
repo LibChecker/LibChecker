@@ -7,7 +7,7 @@ import android.text.SpannableStringBuilder
 import androidx.core.view.isGone
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.provider.ContextProvider
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.NativeLibView
 import com.blankj.utilcode.util.AppUtils
@@ -16,8 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.util.zip.ZipFile
 
 const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 
@@ -43,12 +41,16 @@ class NativeLibDialogFragment : LCDialogFragment() {
             val list = mutableListOf<LibStringItem>()
 
             try {
-                val info = ContextProvider.getGlobalContext().packageManager.getApplicationInfo(packageName!!, 0)
+                val info = requireContext().packageManager.getApplicationInfo(packageName!!, 0)
 
-                list.addAll(getAbiByNativeDir(
+                list.addAll(PackageUtils.getAbiByNativeDir(
                     info.sourceDir,
                     info.nativeLibraryDir
                 ))
+
+                if (list.isEmpty()) {
+                    list.add(LibStringItem(getString(R.string.empty_list), 0))
+                }
 
                 //Fix Dialog can't display all items
                 if (list.size > 10) {
@@ -68,45 +70,5 @@ class NativeLibDialogFragment : LCDialogFragment() {
         return MaterialAlertDialogBuilder(requireContext())
             .setView(dialogView)
             .create()
-    }
-
-    private fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
-        val file = File(nativePath)
-        val list = ArrayList<LibStringItem>()
-
-        file.listFiles()?.let {
-            for (abi in it) {
-                list.add(LibStringItem(abi.name, abi.length()))
-            }
-        }
-
-        if (list.isEmpty()) {
-            list.addAll(getSourceLibs(sourcePath))
-        }
-
-        if (list.isEmpty()) {
-            list.add(LibStringItem(getString(R.string.empty_list), 0))
-        } else {
-            list.sortByDescending { it.size }
-        }
-        return list
-    }
-
-    private fun getSourceLibs(path: String): ArrayList<LibStringItem> {
-        val file = File(path)
-        val zipFile = ZipFile(file)
-        val entries = zipFile.entries()
-        val libList = ArrayList<LibStringItem>()
-
-        while (entries.hasMoreElements()) {
-            val name = entries.nextElement().name
-
-            if (name.contains("lib/")) {
-                libList.add(LibStringItem(name.split("/").last(), entries.nextElement().size))
-            }
-        }
-        zipFile.close()
-
-        return libList
     }
 }
