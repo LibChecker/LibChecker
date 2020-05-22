@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
@@ -44,11 +45,14 @@ class AppDetailActivity : BaseActivity() {
                 supportActionBar?.apply {
                     title = AppUtils.getAppName(packageName)
                 }
-                binding.ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
-                binding.tvAppName.text = AppUtils.getAppName(packageName)
-                binding.tvPackageName.text = packageName
-                binding.tvVersion.text = PackageUtils.getVersionString(packageName)
-                binding.tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
+                binding.apply {
+                    ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
+                    tvAppName.text = AppUtils.getAppName(packageName)
+                    tvPackageName.text = packageName
+                    tvVersion.text = PackageUtils.getVersionString(packageName)
+                    tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
+                    chipSplit.isGone = !PackageUtils.isSplitsApk(packageName)
+                }
             } ?: finish()
         } ?: finish()
     }

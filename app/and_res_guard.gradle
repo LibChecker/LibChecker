@@ -14,26 +14,14 @@ andResGuard {
     mergeDuplicatedRes = true
     whiteList = [
             // your icon
-            "R.mipmap.ic_launcher",
-            // for fabric
-            "R.string.com.crashlytics.*",
-            // for google-services
-            "R.string.google_app_id",
-            "R.string.gcm_defaultSenderId",
-            "R.string.default_web_client_id",
-            "R.string.ga_trackingId",
-            "R.string.firebase_database_url",
-            "R.string.google_api_key",
-            "R.string.google_crash_reporting_api_key",
-            //for firebase
-            "R.string.project_id"
+            "R.mipmap.ic_launcher"
     ]
     compressFilePattern = [
             "*.png",
             "*.jpg",
             "*.jpeg",
             "*.gif",
-            "*.webp",
+            "*.webp"
     ]
     sevenzip {
         artifact = 'com.tencent.mm:SevenZip:1.2.17'
@@ -44,7 +32,7 @@ andResGuard {
      * Optional: if finalApkBackupPath is null, AndResGuard will overwrite final apk
      * to the path which assemble[Task] write to
      **/
-    // finalApkBackupPath = "${project.rootDir}/final.apk"
+    finalApkBackupPath = "${project.rootDir}/app/release/app-release.apk"
 
     /**
      * Optional: Specifies the name of the message digest algorithm to user when digesting the entries of JAR file

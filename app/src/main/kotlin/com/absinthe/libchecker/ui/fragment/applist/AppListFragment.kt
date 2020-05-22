@@ -52,19 +52,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         setHasOptionsMenu(true)
 
         mAdapter.apply {
-//            setOnItemClickListener { adapter, _, position ->
-//                NativeLibDialogFragment().apply {
-//                    arguments = Bundle().apply {
-//                        putString(
-//                            EXTRA_PKG_NAME,
-//                            (adapter.getItem(position) as AppItem).packageName
-//                        )
-//                    }
-//                    MainActivity.instance?.apply {
-//                        show(supportFragmentManager, tag)
-//                    }
-//                }
-//            }
             setOnItemClickListener { _, view, position ->
                 val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {

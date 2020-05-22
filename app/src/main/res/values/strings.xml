@@ -43,5 +43,6 @@
     <string name="tab_components_analysis">Components Analysis</string>
     <string name="not_found">Not found</string>
     <string name="create_an_issue">Assist us to supplement the information</string>
+    <string name="splits_spk" translatable="false">Splits APK</string>
 
 </resources>

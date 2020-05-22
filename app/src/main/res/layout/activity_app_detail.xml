@@ -96,6 +96,21 @@
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="API 29" />
 
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_split"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/normal_padding"
+                    android:text="@string/splits_spk"
+                    android:visibility="gone"
+                    app:chipMinHeight="28dp"
+                    app:chipMinTouchTargetSize="0dp"
+                    app:chipStartPadding="10dp"
+                    app:layout_constraintStart_toStartOf="@id/iv_app_icon"
+                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon"
+                    tools:chipIcon="@drawable/ic_split" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar

@@ -54,9 +54,11 @@ object PackageUtils {
         val file = File(nativePath)
         val list = ArrayList<LibStringItem>()
 
-        file.listFiles()?.let {
-            for (abi in it) {
-                list.add(LibStringItem(abi.name, abi.length()))
+        file.listFiles()?.let { fileList ->
+            for (abi in fileList) {
+                if (!list.any { it.name == abi.name }) {
+                    list.add(LibStringItem(abi.name, abi.length()))
+                }
             }
         }
 
@@ -77,7 +79,9 @@ object PackageUtils {
             val next = entries.nextElement()
 
             if (next.name.contains("lib/")) {
-                libList.add(LibStringItem(next.name.split("/").last(), next.size))
+                if (!libList.any { it.name == next.name }) {
+                    libList.add(LibStringItem(next.name.split("/").last(), next.size))
+                }
             }
         }
         zipFile.close()
@@ -89,12 +93,25 @@ object PackageUtils {
         return libList
     }
 
+    fun isSplitsApk(packageName: String) : Boolean {
+        val path = getPackageInfo(packageName).applicationInfo.sourceDir
+
+        File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
+            for (file in it) {
+                if (file.name.startsWith("split_config.")) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     fun getSplitLibs(path: String): ArrayList<LibStringItem> {
         val libList = ArrayList<LibStringItem>()
 
         File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
             for (file in it) {
-                if (file.name.contains("split_config.arm")) {
+                if (file.name.startsWith("split_config.arm")) {
                     val zipFile = ZipFile(file)
                     val entries = zipFile.entries()
 
