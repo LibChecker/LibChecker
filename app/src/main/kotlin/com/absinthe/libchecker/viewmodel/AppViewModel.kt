@@ -272,7 +272,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         for (item in appList) {
 
-            if (!GlobalValues.isShowSystemApps.value!! && ((item.flags and ApplicationInfo.FLAG_SYSTEM) != ApplicationInfo.FLAG_SYSTEM)) {
+            if (!GlobalValues.isShowSystemApps.value!! && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
                 continue
             }
 
@@ -305,7 +305,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         for (entry in map) {
-            if (entry.value > 1) {
+            if (entry.value > 1 && entry.key.isNotBlank()) {
                 list.add(
                     LibReference(entry.key, entry.value)
                 )
