@@ -9,6 +9,7 @@ import com.absinthe.libchecker.utils.SPUtils
 object GlobalValues {
 
     var isShowSystemApps: MutableLiveData<Boolean> = MutableLiveData()
+    var isShowEntryAnimation: MutableLiveData<Boolean> = MutableLiveData()
     var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData()
     var appSortMode: MutableLiveData<Int> = MutableLiveData()
     var libSortMode: MutableLiveData<Int> = MutableLiveData()
@@ -30,6 +31,12 @@ object GlobalValues {
                 context,
                 Constants.PREF_SHOW_SYSTEM_APPS,
                 false
+            )
+        isShowEntryAnimation.value =
+            SPUtils.getBoolean(
+                context,
+                Constants.PREF_ENTRY_ANIMATION,
+                true
             )
         isObservingDBItems.value = true
         appSortMode.value =

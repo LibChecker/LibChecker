@@ -67,7 +67,12 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     view,
                     "app_card_container"
                 )
-                startActivity(intent, options.toBundle())
+
+                if (GlobalValues.isShowEntryAnimation.value!!) {
+                    startActivity(intent, options.toBundle())
+                } else {
+                    startActivity(intent)
+                }
             }
             setDiffCallback(AppListDiffUtil())
         }

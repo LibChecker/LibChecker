@@ -20,6 +20,9 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         findPreference<SwitchPreferenceCompat>(Constants.PREF_SHOW_SYSTEM_APPS)?.apply {
             onPreferenceChangeListener = this@SettingsFragment
         }
+        findPreference<SwitchPreferenceCompat>(Constants.PREF_ENTRY_ANIMATION)?.apply {
+            onPreferenceChangeListener = this@SettingsFragment
+        }
         findPreference<DropDownPreference>(Constants.PREF_RULES_REPO)?.apply {
             onPreferenceChangeListener = this@SettingsFragment
         }
@@ -35,13 +38,20 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        if (preference.key == Constants.PREF_SHOW_SYSTEM_APPS) {
-            GlobalValues.isShowSystemApps.value = newValue as Boolean
-            return true
-        } else if (preference.key == Constants.PREF_RULES_REPO) {
-            GlobalValues.repo = newValue as String
-            return true
+        return when (preference.key) {
+            Constants.PREF_SHOW_SYSTEM_APPS -> {
+                GlobalValues.isShowSystemApps.value = newValue as Boolean
+                true
+            }
+            Constants.PREF_RULES_REPO -> {
+                GlobalValues.repo = newValue as String
+                true
+            }
+            Constants.PREF_ENTRY_ANIMATION -> {
+                GlobalValues.isShowEntryAnimation.value = newValue as Boolean
+                true
+            }
+            else -> false
         }
-        return false
     }
 }

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant
 
 object Constants {
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
+    const val PREF_ENTRY_ANIMATION = "entryAnimation"
     const val PREF_ABOUT = "about"
     const val PREF_APP_SORT_MODE = "appSortMode"
     const val PREF_LIB_SORT_MODE = "libSortMode"
