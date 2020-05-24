@@ -6,4 +6,11 @@
     <dimen name="lib_detail_icon_size">50dp</dimen>
     <dimen name="normal_padding">15dp</dimen>
     <dimen name="normal_icon_size">24dp</dimen>
+
+    <dimen name="app_bar_elevation">4dp</dimen>
+
+    <integer name="rd_material_dialog_enter_alpha_anim_duration">150</integer>
+    <integer name="rd_material_dialog_enter_scale_anim_duration">225</integer>
+    <integer name="rd_material_dialog_exit_alpha_anim_duration">150</integer>
+    <integer name="rd_material_dialog_exit_scale_anim_duration">150</integer>
 </resources>

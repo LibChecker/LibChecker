@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -21,13 +23,14 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.ui.main.AppDetailActivity
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
-import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
+import rikka.material.widget.BorderView
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -70,7 +73,14 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         }
 
         binding.apply {
-            recyclerview.adapter = mAdapter
+            recyclerview.apply {
+                adapter = mAdapter
+                borderVisibilityChangedListener =
+                    BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                    }
+                setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+            }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
@@ -163,7 +173,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_list_menu, menu)
 
-        val searchView = SearchView(context).apply {
+        val searchView = SearchView(requireContext()).apply {
             setIconifiedByDefault(false)
             setOnQueryTextListener(this@AppListFragment)
             queryHint = getText(R.string.search_hint)

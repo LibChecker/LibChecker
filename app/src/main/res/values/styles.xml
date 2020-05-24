@@ -1,15 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@android:color/white</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowSplashscreenContent" tools:targetApi="o">@drawable/splash_drawable</item>
-    </style>
+    <style name="AppTheme" parent="Theme.Light"/>
 
     <style name="AppTheme.About" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -18,6 +10,24 @@
 
         <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
         <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
+    </style>
+
+    <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
+        <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/rd_dialog_exit</item>
+    </style>
+
+    <style name="ThemeOverlay.Material.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+        <item name="android:windowAnimationStyle">@style/Animation.Material.Dialog</item>
+        <item name="android:windowElevation">@dimen/rd_material_dialog_default_elevation</item>
+        <item name="android:backgroundDimAmount">@dimen/rd_material_dialog_default_dim_amount</item>
+    </style>
+
+    <style name="Widget.AppBar" parent="">
+        <item name="android:theme">?actionBarTheme</item>
+        <item name="android:background">?android:colorBackground</item>
+        <item name="android:stateListAnimator">@animator/raise_animator</item>
+        <item name="android:elevation">0dp</item>
     </style>
 
 </resources>

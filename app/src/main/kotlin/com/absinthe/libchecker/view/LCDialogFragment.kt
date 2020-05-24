@@ -3,6 +3,7 @@ package com.absinthe.libchecker.view
 import android.content.DialogInterface
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.DialogStack
 
 open class LCDialogFragment : DialogFragment() {
@@ -11,6 +12,8 @@ open class LCDialogFragment : DialogFragment() {
     private var mListener: OnDismissListener? = null
 
     override fun show(manager: FragmentManager, tag: String?) {
+        dialog?.window?.setWindowAnimations(R.style.Animation_Material_Dialog)
+
         super.show(manager, tag)
         DialogStack.push(this)
     }

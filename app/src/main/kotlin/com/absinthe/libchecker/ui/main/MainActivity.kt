@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
@@ -25,7 +27,7 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
-    private val pbc = object : BroadcastReceiver() {
+    private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
@@ -51,11 +53,16 @@ class MainActivity : BaseActivity() {
             sharedElementsUseOverlay = false
         }
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
-
         super.onCreate(savedInstanceState)
 
         initView()
-        registerPackageBroadcast()
+        LocalBroadcastManager.getInstance(this).registerReceiver(requestPackageReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
+        })
+
         viewModel.requestConfiguration()
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
@@ -65,12 +72,13 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        unregisterPackageBroadcast()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestPackageReceiver)
         super.onDestroy()
     }
 
     private fun initView() {
-        setSupportActionBar(binding.toolbar)
+        setAppBar(binding.appbar, binding.toolbar)
+        (binding.root as ViewGroup).bringChildToFront(binding.appbar)
 
         binding.apply {
             viewpager.apply {
@@ -111,20 +119,5 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
-    }
-
-    private fun registerPackageBroadcast() {
-        val intentFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_PACKAGE_ADDED)
-            addAction(Intent.ACTION_PACKAGE_REPLACED)
-            addAction(Intent.ACTION_PACKAGE_REMOVED)
-            addDataScheme("package")
-        }
-
-        registerReceiver(pbc, intentFilter)
-    }
-
-    private fun unregisterPackageBroadcast() {
-        unregisterReceiver(pbc)
     }
 }

@@ -24,6 +24,10 @@ class AppDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityAppDetailBinding
     private var pkgName = ""
 
+    init {
+        isPaddingToolbar = true
+    }
+
     override fun setViewBinding() {
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)

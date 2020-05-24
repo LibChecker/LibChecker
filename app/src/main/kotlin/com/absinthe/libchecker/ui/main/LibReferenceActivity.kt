@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -14,9 +15,11 @@ import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.blankj.utilcode.util.BarUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import rikka.material.widget.BorderView
 
 const val TYPE_NATIVE = 0
 const val TYPE_SERVICE = 1
@@ -41,7 +44,16 @@ class LibReferenceActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.rvList.adapter = this.adapter
+        setAppBar(binding.appbar, binding.toolbar)
+        (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+
+        binding.rvList.apply {
+            adapter = this@LibReferenceActivity.adapter
+            borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                appBar?.setRaised(!top)
+            }
+            setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+        }
         binding.vfContainer.apply {
             setInAnimation(
                 this@LibReferenceActivity,

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentClassifyBinding
+import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.tabs.TabLayoutMediator
 
 
@@ -26,6 +27,7 @@ class ClassifyFragment : Fragment() {
     }
 
     private fun initView() {
+        binding.root.setPadding(0, binding.root.paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 2

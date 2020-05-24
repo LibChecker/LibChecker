@@ -9,7 +9,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:backgroundTint="@color/backgroundNormal"
+        android:backgroundTint="?android:colorBackground"
         android:translationZ="3dp"
         app:cardElevation="3dp"
         app:layout_constraintTop_toTopOf="parent">

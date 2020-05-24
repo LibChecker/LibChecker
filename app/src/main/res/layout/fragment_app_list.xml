@@ -25,10 +25,17 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <rikka.material.widget.BorderRecyclerView
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="?actionBarSize"
+            android:scrollbarStyle="insideOverlay"
+            android:scrollbars="vertical"
+            app:borderBottomStyle="never"
+            app:borderTopDrawable="@null"
+            app:borderTopStyle="whenTop"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </ViewFlipper>

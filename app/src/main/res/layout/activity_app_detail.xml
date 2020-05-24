@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/backgroundNormal"
+    android:background="?android:colorBackground"
     tools:context=".ui.main.AppDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -16,7 +16,6 @@
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:contentScrim="@color/backgroundNormal"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -24,7 +23,7 @@
                 android:id="@+id/header_content_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/backgroundNormal"
+                android:background="?android:colorBackground"
                 android:paddingHorizontal="@dimen/normal_padding"
                 android:paddingTop="?attr/actionBarSize"
                 android:paddingBottom="@dimen/normal_padding"
@@ -41,7 +40,7 @@
                     tools:background="@drawable/pic_splash"
                     tools:ignore="HardcodedText" />
 
-                <com.absinthe.anywhere_.view.AlwaysMarqueeTextView
+                <com.absinthe.libchecker.view.AlwaysMarqueeTextView
                     android:id="@+id/tv_app_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -133,7 +132,8 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

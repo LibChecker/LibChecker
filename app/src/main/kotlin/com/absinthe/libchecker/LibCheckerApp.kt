@@ -1,11 +1,13 @@
 package com.absinthe.libchecker
 
 import android.app.Application
+import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.constant.GlobalValues
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
 import jonathanfinerty.once.Once
+import rikka.material.app.DayNightDelegate
 
 class LibCheckerApp : Application() {
 
@@ -19,6 +21,8 @@ class LibCheckerApp : Application() {
             )
         }
 
+        DayNightDelegate.setApplicationContext(this)
+        DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         GlobalValues.init(this)
         Once.initialise(this)
     }

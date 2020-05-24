@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.fragment
 
 import android.os.Bundle
+import android.view.View
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -9,6 +10,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.blankj.utilcode.util.BarUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
 
@@ -25,6 +27,11 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
             summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        listView.setPadding(0, listView.paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {

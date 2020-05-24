@@ -44,12 +44,18 @@ class AboutActivity : AbsAboutActivity() {
             add(License("about-page", "drakeet", License.APACHE_2, "https://github.com/drakeet/about-page"))
             add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
             add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
+            add(License("gson", "Google", License.APACHE_2, "https://github.com/google/gson"))
+            add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
             add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
             add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
-            add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
             add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
             add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
             add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
+            add(License("OkHttp", "Square", License.APACHE_2, "https://github.com/square/okhttp"))
+            add(License("Retrofit", "Square", License.APACHE_2, "https://github.com/square/retrofit"))
+            add(License("contour", "Square", License.APACHE_2, "https://github.com/cashapp/contour"))
+            add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
+            add(License("libraries", "RikkaApps", License.APACHE_2, "https://github.com/RikkaApps/libraries"))
         }
     }
 

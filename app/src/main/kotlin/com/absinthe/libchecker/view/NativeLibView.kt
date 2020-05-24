@@ -31,8 +31,8 @@ class NativeLibView(context: Context) : ContourLayout(context) {
         setTextSize(TypedValue.COMPLEX_UNIT_DIP, 17f)
         setTypeface(null, Typeface.BOLD)
         applyLayout(
-            x = leftTo { parent.left() + 25.dip },
-            y = topTo { parent.top() + 20.dip }
+            x = leftTo { parent.left() + 25.xdip }.rightTo { ibSort.left() - 25.xdip },
+            y = topTo { parent.top() + 20.ydip }
         )
     }
 
