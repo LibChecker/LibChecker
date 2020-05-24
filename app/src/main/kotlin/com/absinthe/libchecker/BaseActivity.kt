@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.absinthe.libchecker.ui.app.AppActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
+import com.absinthe.libchecker.utils.UiUtils.setDarkMode
 import com.absinthe.libchecker.utils.UiUtils.setSystemBarTransparent
 import com.blankj.utilcode.util.BarUtils
 import java.lang.ref.WeakReference
@@ -23,6 +24,7 @@ abstract class BaseActivity : AppActivity() {
         super.onCreate(savedInstanceState)
         setViewBinding()
 
+        setDarkMode(this)
         setSystemBarTransparent(this)
         setRoot()
 

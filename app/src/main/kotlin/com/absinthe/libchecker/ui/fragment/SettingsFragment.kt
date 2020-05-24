@@ -10,6 +10,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
@@ -34,7 +35,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        listView.setPadding(0, listView.paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+        listView.setPadding(0, UiUtils.getActionBarSize(requireActivity()) + BarUtils.getStatusBarHeight(), 0, 0)
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {

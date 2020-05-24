@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
@@ -7,11 +8,13 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.provider.Settings
+import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.absinthe.libchecker.provider.ContextProvider
 import com.blankj.utilcode.util.ConvertUtils
+
 
 object UiUtils {
 
@@ -70,7 +73,12 @@ object UiUtils {
 
     fun getNavBarHeight(): Int {
         //Full screen adaption
-        if (Settings.Global.getInt(ContextProvider.getGlobalContext().contentResolver, "force_fsg_nav_bar", 0) != 0) {
+        if (Settings.Global.getInt(
+                ContextProvider.getGlobalContext().contentResolver,
+                "force_fsg_nav_bar",
+                0
+            ) != 0
+        ) {
             return ConvertUtils.dp2px(20f)
         }
 
@@ -79,6 +87,19 @@ object UiUtils {
 
         return if (resourceId != 0) {
             res.getDimensionPixelSize(resourceId)
+        } else {
+            0
+        }
+    }
+
+    fun getActionBarSize(activity: Activity): Int {
+        val tv = TypedValue()
+
+        return if (activity.theme.resolveAttribute(R.attr.actionBarSize, tv, true)) {
+            TypedValue.complexToDimensionPixelSize(
+                tv.data,
+                activity.resources.displayMetrics
+            )
         } else {
             0
         }
