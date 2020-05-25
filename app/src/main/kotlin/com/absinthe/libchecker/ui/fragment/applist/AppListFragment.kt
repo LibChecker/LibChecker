@@ -93,6 +93,15 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
         }
 
         viewModel.apply {
+            AppItemRepository.allItems.value?.let { list ->
+                updateItems(list)
+                mItems.apply {
+                    clear()
+                    addAll(list)
+                }
+                binding.vfContainer.displayedChild = 1
+            }
+
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems(requireContext())
             } else {

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.view.Window
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -14,8 +15,10 @@ import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.BarUtils
+import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,6 +45,11 @@ class LibReferenceActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.apply {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+            sharedElementsUseOverlay = false
+        }
+        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
         setAppBar(binding.appbar, binding.toolbar)
@@ -52,7 +60,7 @@ class LibReferenceActivity : BaseActivity() {
             borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                 appBar?.setRaised(!top)
             }
-            setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+            setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, UiUtils.getNavBarHeight())
         }
         binding.vfContainer.apply {
             setInAnimation(
