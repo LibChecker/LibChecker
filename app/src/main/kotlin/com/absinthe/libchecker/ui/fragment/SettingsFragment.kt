@@ -30,11 +30,11 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             onPreferenceChangeListener = this@SettingsFragment
         }
         findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
-            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+            onPreferenceClickListener = this@SettingsFragment
         }
 
         findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
-            onPreferenceClickListener = this@SettingsFragment
+            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
         }
     }
 
