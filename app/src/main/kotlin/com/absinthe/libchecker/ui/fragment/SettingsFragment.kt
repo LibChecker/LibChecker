@@ -11,9 +11,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.blankj.utilcode.util.BarUtils
 
-class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
+class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener,
+    Preference.OnPreferenceClickListener {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -27,15 +29,23 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         findPreference<DropDownPreference>(Constants.PREF_RULES_REPO)?.apply {
             onPreferenceChangeListener = this@SettingsFragment
         }
+        findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
+            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+        }
 
         findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
-            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+            onPreferenceClickListener = this@SettingsFragment
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        listView.setPadding(0, UiUtils.getActionBarSize(requireActivity()) + BarUtils.getStatusBarHeight(), 0, 0)
+        listView.setPadding(
+            0,
+            UiUtils.getActionBarSize(requireActivity()) + BarUtils.getStatusBarHeight(),
+            0,
+            0
+        )
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
@@ -50,6 +60,16 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             }
             Constants.PREF_ENTRY_ANIMATION -> {
                 GlobalValues.isShowEntryAnimation.value = newValue as Boolean
+                true
+            }
+            else -> false
+        }
+    }
+
+    override fun onPreferenceClick(preference: Preference): Boolean {
+        return when (preference.key) {
+            Constants.PREF_LIB_REF_THRESHOLD -> {
+                LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 true
             }
             else -> false

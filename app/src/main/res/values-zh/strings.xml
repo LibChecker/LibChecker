@@ -34,4 +34,6 @@
     <string name="not_marked_lib">未标记的库</string>
     <string name="entry_animation_summary">在打开和关闭详情页面时播放动画</string>
     <string name="entry_animation">入场动画</string>
+    <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
+    <string name="lib_ref_threshold">库引用阈值</string>
 </resources>

@@ -13,6 +13,7 @@ object GlobalValues {
     var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData()
     var appSortMode: MutableLiveData<Int> = MutableLiveData()
     var libSortMode: MutableLiveData<Int> = MutableLiveData()
+    var libReferenceThreshold: MutableLiveData<Int> = MutableLiveData()
 
     var config = Configuration(
         enableLibDetail = false,
@@ -51,6 +52,11 @@ object GlobalValues {
                 Constants.PREF_LIB_SORT_MODE,
                 MODE_SORT_BY_SIZE
             )
+        libReferenceThreshold.value = SPUtils.getInt(
+            context,
+            Constants.PREF_LIB_REF_THRESHOLD,
+            2
+        )
         repo = SPUtils.getString(
             context,
             Constants.PREF_RULES_REPO,

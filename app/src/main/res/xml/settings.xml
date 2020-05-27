@@ -29,6 +29,12 @@
             app:entries="@array/list_repo"
             app:entryValues="@array/list_repo_value"/>
 
+        <Preference
+            app:key="libRefThreshold"
+            app:title="@string/lib_ref_threshold"
+            app:summary="@string/lib_ref_threshold_summary"
+            app:icon="@drawable/ic_threshold"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

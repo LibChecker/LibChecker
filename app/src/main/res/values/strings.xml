@@ -37,9 +37,11 @@
     <string name="show_system_apps">Show System Apps</string>
     <string name="entry_animation">Entry Animation</string>
     <string name="rules_repo_title">Rules Repo</string>
+    <string name="lib_ref_threshold">Library Reference Threshold</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
+    <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
 
     <!--  Detail  -->
     <string name="tab_so_analysis">so File Analysis</string>

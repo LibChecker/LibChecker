@@ -55,7 +55,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
-        registerPackageBroadcast()
 
         viewModel.requestConfiguration()
 
@@ -63,6 +62,11 @@ class MainActivity : BaseActivity() {
             viewModel.collectPopularLibraries(this)
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerPackageBroadcast()
     }
 
     override fun onDestroy() {

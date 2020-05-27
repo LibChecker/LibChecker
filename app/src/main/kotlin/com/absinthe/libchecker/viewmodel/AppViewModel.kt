@@ -317,7 +317,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         for (entry in map) {
-            if (entry.value > 1 && entry.key.isNotBlank()) {
+            if (entry.value >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
                 list.add(
                     LibReference(entry.key, entry.value)
                 )
