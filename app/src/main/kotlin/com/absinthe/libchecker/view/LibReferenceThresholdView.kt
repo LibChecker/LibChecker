@@ -9,13 +9,16 @@ class LibReferenceThresholdView(context: Context) : ContourLayout(context) {
 
     val slider: Slider = Slider(context).apply {
         valueFrom = 1f
-        valueTo = 50f
+        valueTo = 20f
         stepSize = 1f
         value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
         applyLayout(
-            x = centerHorizontallyTo { parent.width() },
+            x = matchParentX(),
             y = topTo { parent.top() }
         )
     }
 
+    init {
+        contourHeightOf { slider.height() + 10.ydip }
+    }
 }

@@ -44,6 +44,10 @@ class LibReferenceFragment : Fragment() {
                 binding.vfContainer.displayedChild = 0
                 viewModel.computeLibReference(requireContext())
             })
+            GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, Observer {
+                binding.vfContainer.displayedChild = 0
+                viewModel.computeLibReference(requireContext()) //Todo Use List#filter() to optimize
+            })
             
             viewModel.computeLibReference(requireContext())
             isInit = true
