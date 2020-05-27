@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view
 
 import android.content.Context
+import com.absinthe.libchecker.constant.GlobalValues
 import com.google.android.material.slider.Slider
 import com.squareup.contour.ContourLayout
 
@@ -10,6 +11,7 @@ class LibReferenceThresholdView(context: Context) : ContourLayout(context) {
         valueFrom = 1f
         valueTo = 50f
         stepSize = 1f
+        value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
         applyLayout(
             x = centerHorizontallyTo { parent.width() },
             y = topTo { parent.top() }
