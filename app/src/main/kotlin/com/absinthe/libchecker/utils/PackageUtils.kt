@@ -7,6 +7,7 @@ import android.os.Build
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.provider.ContextProvider
 import java.io.File
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 
 
@@ -70,27 +71,36 @@ object PackageUtils {
     }
 
     fun getSourceLibs(path: String): ArrayList<LibStringItem> {
-        val file = File(path)
-        val zipFile = ZipFile(file)
-        val entries = zipFile.entries()
         val libList = ArrayList<LibStringItem>()
 
-        while (entries.hasMoreElements()) {
-            val next = entries.nextElement()
+        try {
+            val file = File(path)
+            val zipFile = ZipFile(file)
+            val entries = zipFile.entries()
+            var splitName = ""
 
-            if (next.name.contains("lib/")) {
-                if (!libList.any { it.name == next.name }) {
-                    libList.add(LibStringItem(next.name.split("/").last(), next.size))
+            while (entries.hasMoreElements()) {
+                val next = entries.nextElement()
+
+                if (next.name.contains("lib/")) {
+                    splitName = next.name.split("/").last()
+
+                    if (!libList.any { it.name == splitName }) {
+                        libList.add(LibStringItem(splitName, next.size))
+                    }
                 }
             }
-        }
-        zipFile.close()
+            zipFile.close()
 
-        if (libList.isEmpty()) {
-            libList.addAll(getSplitLibs(path))
-        }
+            if (libList.isEmpty()) {
+                libList.addAll(getSplitLibs(path))
+            }
 
-        return libList
+            return libList
+        } catch (e: ZipException) {
+            e.printStackTrace()
+            return libList
+        }
     }
 
     fun isSplitsApk(packageName: String): Boolean {

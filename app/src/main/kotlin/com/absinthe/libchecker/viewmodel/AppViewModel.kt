@@ -287,7 +287,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             try {
-                val packageInfo =
+                var packageInfo =
                     context.packageManager.getPackageInfo(
                         item.packageName,
                         PackageManager.GET_SERVICES
@@ -299,7 +299,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         map[service.name] = count + 1
                     }
                 }
-            } catch (e: PackageManager.NameNotFoundException) {
+
+                packageInfo =
+                    context.packageManager.getPackageInfo(
+                        item.packageName,
+                        PackageManager.GET_ACTIVITIES
+                    )
+                packageInfo.activities?.let {
+                    for (activity in it) {
+                        val count = map[activity.name] ?: 0
+                        map[activity.name] = count + 1
+                    }
+                }
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }

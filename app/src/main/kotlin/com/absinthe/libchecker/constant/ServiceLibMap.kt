@@ -31,6 +31,8 @@ object ServiceLibMap {
         Pair("com.taobao.accs.data.MsgDistributeService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
         Pair("org.android.agoo.accs.AgooService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
         Pair("com.taobao.accs.internal.AccsJobService", LibChip(R.drawable.ic_lib_taobao, "淘宝 Push")),
+        Pair("com.alibaba.android.bindingx.plugin.weex.WXBindingXModuleService", LibChip(R.drawable.ic_lib_alibaba, "Weex")),
+        Pair("mtopsdk.xstate.XStateService", LibChip(R.drawable.ic_lib_alibaba, "Mtop SDK")),
         Pair("com.tencent.android.tpush.service.XGDaemonService", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
         Pair("com.tencent.android.tpush.service.XGPushService", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
         Pair("com.tencent.android.tpush.service.XGPushServiceV3", LibChip(R.drawable.ic_lib_tencent, "信鸽推送")),
@@ -62,10 +64,15 @@ object ServiceLibMap {
         Pair("com.tencent.qalsdk.service.QalService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
         Pair("com.tencent.qalsdk.service.QalAssistService", LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯云通信")),
         Pair("com.google.android.gms.auth.api.signin.RevocationBoundService", LibChip(R.drawable.ic_lib_google, "Google Sign-In")),
+        Pair("com.google.android.gms.cast.framework.ReconnectionService", LibChip(R.drawable.ic_lib_google, "Google Cast")),
+        Pair("com.google.android.gms.cast.framework.media.MediaNotificationService", LibChip(R.drawable.ic_lib_google, "Google Cast")),
         Pair("com.google.android.gms.analytics.AnalyticsService", LibChip(R.drawable.ic_lib_google_analytics, "Google Analytics")),
         Pair("com.google.android.gms.analytics.AnalyticsJobService", LibChip(R.drawable.ic_lib_google_analytics, "Google Analytics")),
         Pair("com.didi.virtualapk.delegate.LocalService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK")),
         Pair("com.didi.virtualapk.delegate.RemoteService", LibChip(R.drawable.ic_lib_didi, "VirtualAPK")),
-        Pair("org.hapjs.features.channel.ChannelService", LibChip(R.drawable.ic_lib_hapjs, "快应用"))
-        )
+        Pair("org.hapjs.features.channel.ChannelService", LibChip(R.drawable.ic_lib_hapjs, "快应用")),
+        Pair("com.liulishuo.filedownloader.services.FileDownloadService\$SeparateProcessService", LibChip(R.drawable.ic_question, "FileDownloader")),
+        Pair("com.liulishuo.filedownloader.services.FileDownloadService\$SharedMainProcessService", LibChip(R.drawable.ic_question, "FileDownloader"))
+
+    )
 }

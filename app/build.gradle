@@ -80,7 +80,6 @@ dependencies {
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
     implementation "androidx.fragment:fragment:${fragment_version}"
     implementation "androidx.fragment:fragment-ktx:${fragment_version}"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0"
     implementation 'com.google.android.material:material:1.2.0-alpha06'
 
     // Lifecycle

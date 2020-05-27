@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
@@ -56,12 +55,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
-        LocalBroadcastManager.getInstance(this).registerReceiver(requestPackageReceiver, IntentFilter().apply {
-            addAction(Intent.ACTION_PACKAGE_ADDED)
-            addAction(Intent.ACTION_PACKAGE_REPLACED)
-            addAction(Intent.ACTION_PACKAGE_REMOVED)
-            addDataScheme("package")
-        })
+        registerPackageBroadcast()
 
         viewModel.requestConfiguration()
 
@@ -72,7 +66,7 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestPackageReceiver)
+        unregisterPackageBroadcast()
         super.onDestroy()
     }
 
@@ -119,5 +113,20 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
+    }
+
+    private fun registerPackageBroadcast() {
+        val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
+        }
+
+        registerReceiver(requestPackageReceiver, intentFilter)
+    }
+
+    private fun unregisterPackageBroadcast() {
+        unregisterReceiver(requestPackageReceiver)
     }
 }
