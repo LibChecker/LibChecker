@@ -16,7 +16,7 @@ object GlobalValues {
 
     private var sPreferences: SharedPreferences? = null
 
-    private fun getPreferences(): SharedPreferences {
+    fun getPreferences(): SharedPreferences {
         return sPreferences!!
     }
 
