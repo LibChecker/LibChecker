@@ -61,9 +61,10 @@ class LibReferenceActivity : BaseActivity() {
 
         binding.rvList.apply {
             adapter = this@LibReferenceActivity.adapter
-            borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                appBar?.setRaised(!top)
-            }
+            borderVisibilityChangedListener =
+                BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                    appBar?.setRaised(!top)
+                }
             setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, UiUtils.getNavBarHeight())
         }
         binding.vfContainer.apply {
@@ -149,6 +150,54 @@ class LibReferenceActivity : BaseActivity() {
                         packageInfo.services?.let { services ->
                             for (service in services) {
                                 if (service.name == name) {
+                                    list.add(item)
+                                    break
+                                }
+                            }
+                        }
+                    }
+                } else if (type == TYPE_ACTIVITY) {
+                    for (item in items) {
+                        val packageInfo =
+                            packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
+                        packageInfo.activities?.let { activities ->
+                            for (activity in activities) {
+                                if (activity.name == name) {
+                                    list.add(item)
+                                    break
+                                }
+                            }
+                        }
+                    }
+                } else if (type == TYPE_BROADCAST_RECEIVER) {
+                    for (item in items) {
+                        val packageInfo =
+                            packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
+                        packageInfo.receivers?.let { receivers ->
+                            for (receiver in receivers) {
+                                if (receiver.name == name) {
+                                    list.add(item)
+                                    break
+                                }
+                            }
+                        }
+                    }
+                } else if (type == TYPE_CONTENT_PROVIDER) {
+                    for (item in items) {
+                        val packageInfo =
+                            packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
+                        packageInfo.providers?.let { providers ->
+                            for (provider in providers) {
+                                if (provider.name == name) {
                                     list.add(item)
                                     break
                                 }
