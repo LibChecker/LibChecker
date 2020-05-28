@@ -87,7 +87,7 @@ class LibReferenceFragment : Fragment() {
             startActivity(Intent(requireContext(), LibReferenceActivity::class.java).apply {
                 val item = this@LibReferenceFragment.adapter.data[position]
                 putExtra(EXTRA_NAME, item.libName)
-                putExtra(EXTRA_TYPE, category)
+                putExtra(EXTRA_TYPE, item.type)
             })
         }
     }
