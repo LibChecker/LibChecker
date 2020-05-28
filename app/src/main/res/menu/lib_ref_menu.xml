@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ref_category_all"
+        android:title="@string/ref_category_all"
+        android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_native"
+        android:title="@string/ref_category_native"
+        android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_service"
+        android:title="@string/ref_category_service"
+        android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_activity"
+        android:title="@string/ref_category_activity"
+        android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_br"
+        android:title="@string/ref_category_br"
+        android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_cp"
+        android:title="@string/ref_category_cp"
+        android:icon="@drawable/ic_sort" />
+
+</menu>

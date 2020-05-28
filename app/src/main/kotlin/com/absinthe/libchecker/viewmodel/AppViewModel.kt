@@ -3,6 +3,7 @@ package com.absinthe.libchecker.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -22,6 +23,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -59,13 +61,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val newItems = ArrayList<AppItem>()
+        var packageInfo: PackageInfo
+        var versionCode: Long
+        var appItem: AppItem
+        var lcItem: LCItem
 
         for (info in appList) {
             try {
-                val packageInfo = PackageUtils.getPackageInfo(info)
-                val versionCode = PackageUtils.getVersionCode(packageInfo)
+                packageInfo = PackageUtils.getPackageInfo(info)
+                versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                val appItem = AppItem().apply {
+                appItem = AppItem().apply {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
@@ -75,7 +81,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                     updateTime = packageInfo.lastUpdateTime
                 }
-                val item = LCItem(
+                lcItem = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
                     packageInfo.versionName ?: "",
@@ -87,12 +93,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 GlobalValues.isShowSystemApps.value?.let {
-                    if (it || (!it && !item.isSystem)) {
+                    if (it || (!it && !lcItem.isSystem)) {
                         newItems.add(appItem)
                     }
                 }
 
-                insert(item)
+                insert(lcItem)
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
                 continue
@@ -116,9 +122,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         dbItems.value?.let { value ->
             val newItems = ArrayList<AppItem>()
+            var appItem: AppItem
 
             for (item in value) {
-                val appItem = AppItem().apply {
+                appItem = AppItem().apply {
                     icon = AppUtils.getAppIcon(item.packageName)
                         ?: ColorDrawable(Color.TRANSPARENT)
                     appName = item.label
@@ -158,14 +165,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
 
         dbItems.value?.let { value ->
+            var packageInfo: PackageInfo
+            var versionCode: Long
+            var lcItem: LCItem
+
             for (dbItem in value) {
                 try {
                     appList.find { it.packageName == dbItem.packageName }?.let {
-                        val packageInfo = PackageUtils.getPackageInfo(it)
-                        val versionCode = PackageUtils.getVersionCode(packageInfo)
+                        packageInfo = PackageUtils.getPackageInfo(it)
+                        versionCode = PackageUtils.getVersionCode(packageInfo)
 
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
-                            val item = LCItem(
+                            lcItem = LCItem(
                                 it.packageName,
                                 it.loadLabel(context.packageManager).toString(),
                                 packageInfo.versionName ?: "null",
@@ -175,7 +186,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                                 getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
                             )
-                            update(item)
+                            update(lcItem)
                         }
 
                         appList.remove(it)
@@ -190,10 +201,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
             for (info in appList) {
                 try {
-                    val packageInfo = PackageUtils.getPackageInfo(info)
-                    val versionCode = PackageUtils.getVersionCode(packageInfo)
+                    packageInfo = PackageUtils.getPackageInfo(info)
+                    versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                    val lcItem = LCItem(
+                    lcItem = LCItem(
                         info.packageName,
                         info.loadLabel(context.packageManager).toString(),
                         packageInfo.versionName ?: "null",
@@ -217,15 +228,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val map = HashMap<String, Int>()
+        var libList: List<LibStringItem>
+        var count: Int
 
         for (item in appList) {
-            val libList = PackageUtils.getAbiByNativeDir(
+            libList = PackageUtils.getAbiByNativeDir(
                 item.sourceDir,
                 item.nativeLibraryDir
             )
 
             for (lib in libList) {
-                val count = map[lib.name] ?: 0
+                count = map[lib.name] ?: 0
                 map[lib.name] = count + 1
             }
         }
@@ -264,70 +277,218 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         })
     }
 
-    fun computeLibReference(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeLibReference(context: Context, flag: Int) = viewModelScope.launch(Dispatchers.IO) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val map = HashMap<String, Int>()
-        val list = mutableListOf<LibReference>()
+        val refList = mutableListOf<LibReference>()
+        val showSystem = GlobalValues.isShowSystemApps.value!!
 
-        for (item in appList) {
+        var libList: List<LibStringItem>
+        var refCount: Int
+        var packageInfo: PackageInfo
 
-            if (!GlobalValues.isShowSystemApps.value!! && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                continue
-            }
+        when (flag) {
+            TYPE_ALL -> {
+                for (item in appList) {
 
-            val libList = PackageUtils.getAbiByNativeDir(
-                item.sourceDir,
-                item.nativeLibraryDir
-            )
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
 
-            for (lib in libList) {
-                val count = map[lib.name] ?: 0
-                map[lib.name] = count + 1
-            }
-
-            try {
-                var packageInfo =
-                    context.packageManager.getPackageInfo(
-                        item.packageName,
-                        PackageManager.GET_SERVICES
+                    libList = PackageUtils.getAbiByNativeDir(
+                        item.sourceDir,
+                        item.nativeLibraryDir
                     )
 
-                packageInfo.services?.let {
-                    for (service in it) {
-                        val count = map[service.name] ?: 0
-                        map[service.name] = count + 1
+                    for (lib in libList) {
+                        refCount = map[lib.name] ?: 0
+                        map[lib.name] = refCount + 1
                     }
-                }
 
-                packageInfo =
-                    context.packageManager.getPackageInfo(
-                        item.packageName,
-                        PackageManager.GET_ACTIVITIES
-                    )
-                packageInfo.activities?.let {
-                    for (activity in it) {
-                        val count = map[activity.name] ?: 0
-                        map[activity.name] = count + 1
+                    try {
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_SERVICES
+                            )
+
+                        packageInfo.services?.let {
+                            for (service in it) {
+                                refCount = map[service.name] ?: 0
+                                map[service.name] = refCount + 1
+                            }
+                        }
+
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
+                        packageInfo.activities?.let {
+                            for (activity in it) {
+                                refCount = map[activity.name] ?: 0
+                                map[activity.name] = refCount + 1
+                            }
+                        }
+
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
+                        packageInfo.receivers?.let {
+                            for (receiver in it) {
+                                refCount = map[receiver.name] ?: 0
+                                map[receiver.name] = refCount + 1
+                            }
+                        }
+
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
+                        packageInfo.providers?.let {
+                            for (provider in it) {
+                                refCount = map[provider.name] ?: 0
+                                map[provider.name] = refCount + 1
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            }
+            TYPE_NATIVE -> {
+                for (item in appList) {
+
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
+
+                    libList = PackageUtils.getAbiByNativeDir(
+                        item.sourceDir,
+                        item.nativeLibraryDir
+                    )
+
+                    for (lib in libList) {
+                        refCount = map[lib.name] ?: 0
+                        map[lib.name] = refCount + 1
+                    }
+                }
+            }
+            TYPE_SERVICE -> {
+                for (item in appList) {
+
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
+
+                    try {
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_SERVICES
+                            )
+
+                        packageInfo.services?.let {
+                            for (service in it) {
+                                refCount = map[service.name] ?: 0
+                                map[service.name] = refCount + 1
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            TYPE_ACTIVITY -> {
+                for (item in appList) {
+
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
+
+                    try {
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
+                        packageInfo.activities?.let {
+                            for (activity in it) {
+                                refCount = map[activity.name] ?: 0
+                                map[activity.name] = refCount + 1
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            TYPE_BROADCAST_RECEIVER -> {
+                for (item in appList) {
+
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
+
+                    try {
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
+                        packageInfo.receivers?.let {
+                            for (receiver in it) {
+                                refCount = map[receiver.name] ?: 0
+                                map[receiver.name] = refCount + 1
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            TYPE_CONTENT_PROVIDER -> {
+                for (item in appList) {
+
+                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                        continue
+                    }
+
+                    try {
+                        packageInfo =
+                            context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
+                        packageInfo.providers?.let {
+                            for (provider in it) {
+                                refCount = map[provider.name] ?: 0
+                                map[provider.name] = refCount + 1
+                            }
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
             }
         }
 
         for (entry in map) {
             if (entry.value >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
-                list.add(
+                refList.add(
                     LibReference(entry.key, entry.value)
                 )
             }
         }
 
-        list.sortByDescending { it.referredCount }
+        refList.sortByDescending { it.referredCount }
 
         withContext(Dispatchers.Main) {
-            libReference.value = list
+            libReference.value = refList
         }
     }
 

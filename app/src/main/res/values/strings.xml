@@ -24,6 +24,13 @@
     <string name="tab_lib_reference_statistics">Lib reference</string>
     <string name="not_marked_lib">Not marked library</string>
 
+    <string name="ref_category_all">All</string>
+    <string name="ref_category_native">Native Libraries</string>
+    <string name="ref_category_service">Services</string>
+    <string name="ref_category_activity">Activities</string>
+    <string name="ref_category_br">Broadcast Receivers</string>
+    <string name="ref_category_cp">Content Providers</string>
+
     <!--  About  -->
     <string name="settings_about">About</string>
     <string name="settings_about_summary">This is LibChecker!</string>

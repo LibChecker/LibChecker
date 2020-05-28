@@ -7,8 +7,11 @@ import android.os.Build
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.provider.ContextProvider
 import java.io.File
+import java.util.*
+import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
+import kotlin.collections.ArrayList
 
 
 object PackageUtils {
@@ -77,10 +80,12 @@ object PackageUtils {
             val file = File(path)
             val zipFile = ZipFile(file)
             val entries = zipFile.entries()
-            var splitName = ""
+
+            var splitName: String
+            var next: ZipEntry
 
             while (entries.hasMoreElements()) {
-                val next = entries.nextElement()
+                next = entries.nextElement()
 
                 if (next.name.contains("lib/")) {
                     splitName = next.name.split("/").last()
@@ -124,13 +129,18 @@ object PackageUtils {
         val libList = ArrayList<LibStringItem>()
 
         File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
+            val zipFile: ZipFile
+            val entries: Enumeration<out ZipEntry>
+            var next: ZipEntry
+
             for (file in it) {
                 if (file.name.startsWith("split_config.arm")) {
-                    val zipFile = ZipFile(file)
-                    val entries = zipFile.entries()
+                    zipFile = ZipFile(file)
+                    entries = zipFile.entries()
 
                     while (entries.hasMoreElements()) {
-                        val next = entries.nextElement()
+                        next = entries.nextElement()
+
                         if (next.name.contains("lib/") && !next.isDirectory) {
                             libList.add(LibStringItem(next.name.split("/").last(), next.size))
                         }

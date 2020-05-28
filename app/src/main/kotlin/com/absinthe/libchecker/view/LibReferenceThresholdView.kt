@@ -9,7 +9,7 @@ class LibReferenceThresholdView(context: Context) : ContourLayout(context) {
 
     val slider: Slider = Slider(context).apply {
         valueFrom = 1f
-        valueTo = 20f
+        valueTo = 50f
         stepSize = 1f
         value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
         applyLayout(

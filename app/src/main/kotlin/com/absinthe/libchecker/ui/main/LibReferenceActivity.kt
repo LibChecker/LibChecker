@@ -24,8 +24,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
-const val TYPE_NATIVE = 0
-const val TYPE_SERVICE = 1
+const val TYPE_ALL = 0
+const val TYPE_NATIVE = 1
+const val TYPE_SERVICE = 2
+const val TYPE_ACTIVITY = 3
+const val TYPE_BROADCAST_RECEIVER = 4
+const val TYPE_CONTENT_PROVIDER = 5
 
 const val EXTRA_NAME = "NAME"
 const val EXTRA_TYPE = "TYPE"
