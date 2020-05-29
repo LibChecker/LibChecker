@@ -3,8 +3,8 @@ package com.absinthe.libchecker.recyclerview
 import android.text.format.Formatter
 import android.view.View
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.NativeLibMap
-import com.absinthe.libchecker.constant.ServiceLibMap
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.bean.LibStringItem
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

@@ -14,6 +14,7 @@ import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
@@ -81,6 +82,10 @@ class LibReferenceActivity : BaseActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         adapter.setOnItemClickListener { _, view, position ->
+            if (AntiShakeUtils.isInvalidClick(view)) {
+                return@setOnItemClickListener
+            }
+
             val intent = Intent(this, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
                     putString(EXTRA_PKG_NAME, adapter.getItem(position).packageName)

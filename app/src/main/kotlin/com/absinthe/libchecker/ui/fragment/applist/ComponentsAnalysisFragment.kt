@@ -9,7 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.ServiceLibMap
+import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE

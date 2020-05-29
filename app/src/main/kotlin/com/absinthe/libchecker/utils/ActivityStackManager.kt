@@ -150,6 +150,7 @@ object ActivityStackManager {
                 listIterator.remove()
             }
         } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

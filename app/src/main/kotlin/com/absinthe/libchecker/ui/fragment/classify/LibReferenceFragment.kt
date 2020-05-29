@@ -52,6 +52,16 @@ class LibReferenceFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        setHasOptionsMenu(true)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        setHasOptionsMenu(false)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.lib_ref_menu, menu)
@@ -76,8 +86,6 @@ class LibReferenceFragment : Fragment() {
     }
 
     private fun initView() {
-        setHasOptionsMenu(true)
-
         binding.rvList.adapter = this.adapter
         binding.vfContainer.apply {
             setInAnimation(activity, R.anim.anim_fade_in)

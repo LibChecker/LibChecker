@@ -24,6 +24,7 @@ import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.recyclerview.AppListDiffUtil
 import com.absinthe.libchecker.ui.main.AppDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.AppViewModel
@@ -56,6 +57,10 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
         mAdapter.apply {
             setOnItemClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemClickListener
+                }
+
                 val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {
                         putString(EXTRA_PKG_NAME, mAdapter.getItem(position).packageName)
@@ -184,7 +189,6 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.app_list_menu, menu)
 
         val searchView = SearchView(requireContext()).apply {
@@ -202,6 +206,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
         }
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

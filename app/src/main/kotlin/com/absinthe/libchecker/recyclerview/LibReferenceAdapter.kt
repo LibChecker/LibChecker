@@ -2,8 +2,8 @@ package com.absinthe.libchecker.recyclerview
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
-import com.absinthe.libchecker.constant.NativeLibMap
-import com.absinthe.libchecker.constant.ServiceLibMap
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.ui.main.TYPE_NATIVE
 import com.absinthe.libchecker.ui.main.TYPE_SERVICE
 import com.chad.library.adapter.base.BaseQuickAdapter

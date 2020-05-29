@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,9 +19,11 @@ import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
+import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
+
 
 class MainActivity : BaseActivity() {
 
@@ -35,6 +38,10 @@ class MainActivity : BaseActivity() {
                 viewModel.requestChange(context)
             }
         }
+    }
+
+    fun getToolbar(): Toolbar {
+        return binding.toolbar
     }
 
     override fun setViewBinding() {
@@ -74,6 +81,11 @@ class MainActivity : BaseActivity() {
         super.onDestroy()
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        ActivityStackManager.appExit()
+    }
+
     private fun initView() {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
@@ -99,7 +111,6 @@ class MainActivity : BaseActivity() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
                         binding.navView.menu.getItem(position).isChecked = true
-                        invalidateOptionsMenu()
                     }
                 })
 

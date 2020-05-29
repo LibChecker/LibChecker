@@ -25,9 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.main.AppDetailActivity" />
-        <activity android:name=".ui.main.LibReferenceActivity"
-            android:label="@string/tab_lib_reference_statistics">
+        <activity
+            android:name=".ui.main.AppDetailActivity"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
+            android:name=".ui.main.LibReferenceActivity"
+            android:label="@string/tab_lib_reference_statistics"
+            android:launchMode="singleTask">
         </activity>
         <activity
             android:name=".ui.about.AboutActivity"

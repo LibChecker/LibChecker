@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
