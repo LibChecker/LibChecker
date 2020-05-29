@@ -99,8 +99,7 @@ class AppDetailActivity : BaseActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> SoAnalysisFragment.newInstance(pkgName)
-                    1 -> ComponentsAnalysisFragment.newInstance(pkgName)
-                    else -> SoAnalysisFragment.newInstance(pkgName)
+                    else -> ComponentsAnalysisFragment.newInstance(pkgName)
                 }
             }
         }
@@ -109,8 +108,7 @@ class AppDetailActivity : BaseActivity() {
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
                 when (position) {
                     0 -> tab.text = getText(R.string.tab_so_analysis)
-                    1 -> tab.text = getText(R.string.tab_components_analysis)
-                    else -> tab.text = getText(R.string.tab_so_analysis)
+                    else -> tab.text = getText(R.string.tab_components_analysis)
                 }
             })
         mediator.attach()

@@ -89,8 +89,7 @@ class MainActivity : BaseActivity() {
                         return when (position) {
                             0 -> AppListFragment()
                             1 -> ClassifyFragment()
-                            2 -> SettingsFragment()
-                            else -> AppListFragment()
+                            else -> SettingsFragment()
                         }
                     }
                 }
@@ -100,6 +99,7 @@ class MainActivity : BaseActivity() {
                     override fun onPageSelected(position: Int) {
                         super.onPageSelected(position)
                         binding.navView.menu.getItem(position).isChecked = true
+                        invalidateOptionsMenu()
                     }
                 })
 

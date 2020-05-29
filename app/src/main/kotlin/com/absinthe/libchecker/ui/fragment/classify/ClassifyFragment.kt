@@ -35,8 +35,7 @@ class ClassifyFragment : Fragment() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> PieChartFragment()
-                    1 -> LibReferenceFragment()
+                    0 -> LibReferenceFragment()
                     else -> PieChartFragment()
                 }
             }
@@ -45,8 +44,7 @@ class ClassifyFragment : Fragment() {
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
                 when (position) {
-                    0 -> tab.text = getText(R.string.tab_pie_chart)
-                    1 -> tab.text = getText(R.string.tab_lib_reference_statistics)
+                    0 -> tab.text = getText(R.string.tab_lib_reference_statistics)
                     else -> tab.text = getText(R.string.tab_pie_chart)
                 }
             })
