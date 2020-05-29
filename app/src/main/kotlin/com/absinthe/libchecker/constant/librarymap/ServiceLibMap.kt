@@ -104,7 +104,7 @@ object ServiceLibMap {
         Pair("com.huawei.updatesdk.service.deamon.download.DownloadService",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "HMS SDK"
+                "HMS Update"
             )
         ),
         Pair("com.qq.e.comm.DownloadService",

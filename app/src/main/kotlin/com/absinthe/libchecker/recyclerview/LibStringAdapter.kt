@@ -12,6 +12,9 @@ import com.google.android.material.chip.Chip
 
 const val MODE_NATIVE = 0
 const val MODE_SERVICE = 1
+const val MODE_ACTIVITY = 2
+const val MODE_RECEIVER = 3
+const val MODE_PROVIDER = 4
 
 class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
