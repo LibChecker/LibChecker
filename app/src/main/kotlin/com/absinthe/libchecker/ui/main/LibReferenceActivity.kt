@@ -18,7 +18,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.BarUtils
-import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

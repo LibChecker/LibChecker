@@ -16,8 +16,8 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.transition.MaterialContainerTransform
-import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
+import com.google.android.material.transition.platform.MaterialContainerTransform
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 
 class AppDetailActivity : BaseActivity() {
 

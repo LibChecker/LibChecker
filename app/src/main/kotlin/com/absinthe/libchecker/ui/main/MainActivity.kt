@@ -19,7 +19,7 @@ import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.google.android.material.transition.MaterialContainerTransformSharedElementCallback
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
 
 class MainActivity : BaseActivity() {
