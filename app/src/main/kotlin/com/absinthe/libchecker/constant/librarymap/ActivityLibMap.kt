@@ -7,7 +7,7 @@ object ActivityLibMap {
     val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.google.android.gms.common.api.GoogleApiActivity",
-            LibChip(R.drawable.ic_lib_play_store, "Play Store Service")
+            LibChip(R.drawable.ic_lib_play_store, "Google Play Service")
         ),
         Pair(
             "com.google.android.gms.auth.api.signin.internal.SignInHubActivity",

@@ -3,9 +3,8 @@ package com.absinthe.libchecker.recyclerview
 import android.text.format.Formatter
 import android.view.View
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.librarymap.*
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.chip.Chip
@@ -38,6 +37,9 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         val map = when (mode) {
             MODE_NATIVE -> NativeLibMap.MAP
             MODE_SERVICE -> ServiceLibMap.MAP
+            MODE_ACTIVITY -> ActivityLibMap.MAP
+            MODE_RECEIVER -> ReceiverLibMap.MAP
+            MODE_PROVIDER -> ProviderLibMap.MAP
             else -> NativeLibMap.MAP
         }
 

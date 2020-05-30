@@ -17,6 +17,10 @@ import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.ui.main.TYPE_ACTIVITY
+import com.absinthe.libchecker.ui.main.TYPE_BROADCAST_RECEIVER
+import com.absinthe.libchecker.ui.main.TYPE_CONTENT_PROVIDER
+import com.absinthe.libchecker.ui.main.TYPE_SERVICE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,16 +60,42 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(context: Context, packageName: String) =
+    fun initComponentsData(context: Context, packageName: String, flag: Int) =
         viewModelScope.launch(Dispatchers.IO) {
             val list = ArrayList<LibStringItem>()
 
             try {
-                val packageInfo =
-                    context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
-                for (service in packageInfo.services) {
-                    list.add(LibStringItem(service.name.removePrefix(packageName), 0))
+                when(flag) {
+                    TYPE_SERVICE->{
+                        val packageInfo =
+                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
+                        for (service in packageInfo.services) {
+                            list.add(LibStringItem(service.name.removePrefix(packageName), 0))
+                        }
+                    }
+                    TYPE_ACTIVITY->{
+                        val packageInfo =
+                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+                        for (activity in packageInfo.activities) {
+                            list.add(LibStringItem(activity.name.removePrefix(packageName), 0))
+                        }
+                    }
+                    TYPE_BROADCAST_RECEIVER->{
+                        val packageInfo =
+                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_RECEIVERS)
+                        for (receiver in packageInfo.receivers) {
+                            list.add(LibStringItem(receiver.name, 0))
+                        }
+                    }
+                    TYPE_CONTENT_PROVIDER->{
+                        val packageInfo =
+                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_PROVIDERS)
+                        for (provider in packageInfo.providers) {
+                            list.add(LibStringItem(provider.name, 0))
+                        }
+                    }
                 }
+
             } catch (e: Exception) {
                 e.printStackTrace()
                 list.add(LibStringItem("Not found", 0))

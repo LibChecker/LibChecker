@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,6 +15,7 @@ import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.MODE_SERVICE
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.ui.main.TYPE_SERVICE
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -68,6 +70,21 @@ class ComponentsAnalysisFragment : Fragment() {
                     GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
                 )
             }
+            spinner.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    adapter.mode = position + 1
+                    viewModel.initComponentsData(requireContext(), packageName, position + 1)
+                }
+            }
         }
 
         viewModel.apply {
@@ -79,7 +96,7 @@ class ComponentsAnalysisFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.initComponentsData(requireContext(), packageName)
+        viewModel.initComponentsData(requireContext(), packageName, TYPE_SERVICE)
     }
 
     companion object {

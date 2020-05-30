@@ -16,6 +16,26 @@ object ProviderLibMap {
         Pair(
             "com.huawei.hms.support.api.push.PushProvider",
             LibChip(R.drawable.ic_lib_huawei, "Huawei Push")
+        ),
+        Pair(
+            "androidx.core.content.FileProvider",
+            LibChip(R.drawable.ic_android_outline, "File Provider")
+        ),
+        Pair(
+            "android.support.v4.content.FileProvider",
+            LibChip(R.drawable.ic_android_outline, "File Provider")
+        ),
+        Pair(
+            "androidx.lifecycle.ProcessLifecycleOwnerInitializer",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Lifecycle")
+        ),
+        Pair(
+            "android.arch.lifecycle.ProcessLifecycleOwnerInitializer",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Lifecycle")
+        ),
+        Pair(
+            "androidx.work.impl.WorkManagerInitializer",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Work")
         )
     )
 }

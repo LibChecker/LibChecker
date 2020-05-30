@@ -1,97 +1,127 @@
-#---------------------------------基本指令区----------------------------------
--obfuscationdictionary dictionary.txt       # 混淆字典
+# This is a configuration file for ProGuard.
+# http://proguard.sourceforge.net/index.html#manual/usage.html
+#
+# Starting with version 2.2 of the Android plugin for Gradle, this file is distributed together with
+# the plugin and unpacked at build-time. The files in $ANDROID_HOME are no longer maintained and
+# will be ignored by new version of the Android plugin for Gradle.
+
+#-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose
+
+# Optimization is turned off by default. Dex does not like code run
+# through the ProGuard optimize and preverify steps (and performs some
+# of these optimizations on its own).
+# -dontoptimize
+-optimizationpasses 5
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable,!class/unboxing/enum
+-obfuscationdictionary dictionary.txt
 -classobfuscationdictionary dictionary.txt
 -packageobfuscationdictionary dictionary.txt
--optimizationpasses 5       # 指定代码的压缩级别
--dontusemixedcaseclassnames     # 是否使用大小写混合
--dontskipnonpubliclibraryclasses        # 指定不去忽略非公共的库类
--dontskipnonpubliclibraryclassmembers       # 指定不去忽略包可见的库类的成员
--dontpreverify      # 混淆时是否做预校验
--verbose        # 混淆时是否记录日志
--optimizations !code/simplification/cast,!field/*,!class/merging/*      # 混淆时所采用的算法
--keepattributes *Annotation*,InnerClasses
--keepattributes Signature
--keepattributes SourceFile,LineNumberTable
-#----------------------------------------------------------------------------
--ignorewarnings     # 是否忽略检测，（是）
-#---------------------------------默认保留区---------------------------------
+-repackageclasses com.absinthe.anywhere_
 
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.app.backup.BackupAgentHelper
--keep public class * extends android.preference.Preference
--keep public class * extends android.view.View
--keep public class * extends java.lang.Exception
+-dontpreverify
+
+# Preserve some attributes that may be required for reflection.
+-keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+
+-keep class * extends androidx.fragment.app.Fragment{}
+-keep public class com.google.vending.licensing.ILicensingService
 -keep public class com.android.vending.licensing.ILicensingService
--keep class android.support.** {*;}
-#-ignorewarnings -keep class * { public private *; }
+-keep public class com.google.android.vending.licensing.ILicensingService
+-dontnote com.android.vending.licensing.ILicensingService
+-dontnote com.google.vending.licensing.ILicensingService
+-dontnote com.google.android.vending.licensing.ILicensingService
 
--keep public class * extends android.app.Fragment
-
+# For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
 -keepclasseswithmembernames class * {
     native <methods>;
 }
--keepclassmembers class * extends android.app.Activity{
-    public void *(android.view.View);
+
+# Keep setters in Views so that animations can still work.
+-keepclassmembers public class * extends android.view.View {
+    void set*(***);
+    *** get*();
 }
+
+# We want to keep methods in Activity that could be used in the XML attribute onClick.
+# -keepclassmembers class * extends android.app.Activity {
+#     public void *(android.view.View);
+# }
+
+# For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
--keep public class * extends android.view.View{
-    *** get*();
-    void set*(***);
-    public <init>(android.content.Context);
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
+
+-keepclassmembers class * implements android.os.Parcelable {
+    public static final ** CREATOR;
 }
--keepclasseswithmembers class * {
-    public <init>(android.content.Context, android.util.AttributeSet);
-    public <init>(android.content.Context, android.util.AttributeSet, int);
-}
--keep class * implements android.os.Parcelable {
-  public static final android.os.Parcelable$Creator *;
-}
--keepclassmembers class * implements java.io.Serializable {
-    static final long serialVersionUID;
-    private static final java.io.ObjectStreamField[] serialPersistentFields;
-    private void writeObject(java.io.ObjectOutputStream);
-    private void readObject(java.io.ObjectInputStream);
-    java.lang.Object writeReplace();
-    java.lang.Object readResolve();
-}
-#表示不混淆R文件中的所有静态字段
--keep class **.R$* {
+
+-keepclassmembers class **.R$* {
     public static <fields>;
 }
+
+# Preserve annotated Javascript interface methods.
 -keepclassmembers class * {
-    void *(**On*Event);
-}
-#----------------------------------------------------------------------------
-
-#---------------------------------Webview------------------------------------
--keepclassmembers class fqcn.of.javascript.interface.for.Webview {
-   public *;
-}
--keepclassmembers class * extends android.webkit.WebViewClient {
-    public void *(android.webkit.WebView, java.lang.String, android.graphics.Bitmap);
-    public boolean *(android.webkit.WebView, java.lang.String);
-}
--keepclassmembers class * extends android.webkit.WebViewClient {
-    public void *(android.webkit.WebView, jav.lang.String);
+    @android.webkit.JavascriptInterface <methods>;
 }
 
-#Firebase
--dontwarn com.google.firebase.**
--keep class com.google.firebase.** { *; }
--dontwarn com.google.android.gms.**
--keep class com.google.android.gms.** { *; }
--keep class com.crashlytics.** { *; }
--keep class io.fabric.sdk.** { *; }
--dontwarn com.crashlytics.**
+# The support libraries contains references to newer platform versions.
+# Don't warn about those in case this app is linking against an older
+# platform version. We know about them, and they are safe.
+-dontnote android.support.**
+-dontwarn android.support.**
+
+-dontwarn javax.annotation.**
+
+# Understand the @Keep support annotation.
+-keep class android.support.annotation.Keep
+-keep class androidx.annotation.Keep
+
+-keep @android.support.annotation.Keep class * {*;}
+-keep @androidx.annotation.Keep class * {*;}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @android.support.annotation.Keep <init>(...);
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <methods>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <fields>;
+}
+
+-keepclasseswithmembers class * {
+    @androidx.annotation.Keep <init>(...);
+}
+
+-assumenosideeffects class kotlin.jvm.internal.Intrinsics {
+    static void checkParameterIsNotNull(java.lang.Object, java.lang.String);
+    static void checkExpressionValueIsNotNull(java.lang.Object, java.lang.String);
+    static void checkNotNullExpressionValue(java.lang.Object, java.lang.String);
+    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
+    static void checkReturnedValueIsNotNull(java.lang.Object, java.lang.String);
+    static void checkFieldIsNotNull(java.lang.Object, java.lang.String, java.lang.String);
+    static void checkFieldIsNotNull(java.lang.Object, java.lang.String);
+    static void checkNotNull(java.lang.Object, java.lang.String);
+    static void checkNotNullParameter(java.lang.Object, java.lang.String);
+}
+
+-dontwarn org.xmlpull.v1.XmlPullParser
+-dontwarn org.xmlpull.v1.XmlSerializer
+-keep class org.xmlpull.v1.* {*;}
 
 #Glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
@@ -100,4 +130,12 @@
    public *;
 }
 
--dontwarn org.jetbrains.annotations.**
+# Keep all native methods, their classes and any classes in their descriptors
+-keepclasseswithmembers,includedescriptorclasses class com.tencent.mmkv.** {
+    native <methods>;
+    long nativeHandle;
+    private static *** onMMKVCRCCheckFail(***);
+    private static *** onMMKVFileLengthError(***);
+    private static *** mmkvLogImp(...);
+    private static *** onContentChangedByOuterProcess(***);
+}
