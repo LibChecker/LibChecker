@@ -9,15 +9,9 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.chip.Chip
 
-const val MODE_NATIVE = 0
-const val MODE_SERVICE = 1
-const val MODE_ACTIVITY = 2
-const val MODE_RECEIVER = 3
-const val MODE_PROVIDER = 4
-
 class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
-    var mode = MODE_NATIVE
+    var mode = Mode.NATIVE
 
     init {
         addChildClickViewIds(R.id.chip)
@@ -35,12 +29,11 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         val libIcon = holder.getView<Chip>(R.id.chip)
 
         val map = when (mode) {
-            MODE_NATIVE -> NativeLibMap.MAP
-            MODE_SERVICE -> ServiceLibMap.MAP
-            MODE_ACTIVITY -> ActivityLibMap.MAP
-            MODE_RECEIVER -> ReceiverLibMap.MAP
-            MODE_PROVIDER -> ProviderLibMap.MAP
-            else -> NativeLibMap.MAP
+            Mode.NATIVE -> NativeLibMap.MAP
+            Mode.SERVICE -> ServiceLibMap.MAP
+            Mode.ACTIVITY -> ActivityLibMap.MAP
+            Mode.RECEIVER -> ReceiverLibMap.MAP
+            Mode.PROVIDER -> ProviderLibMap.MAP
         }
 
         map[item.name]?.let {
@@ -56,5 +49,13 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
 
     private fun sizeToString(size: Long): String {
         return "(${Formatter.formatFileSize(context, size)})"
+    }
+
+    enum class Mode {
+        NATIVE,
+        SERVICE,
+        ACTIVITY,
+        RECEIVER,
+        PROVIDER
     }
 }

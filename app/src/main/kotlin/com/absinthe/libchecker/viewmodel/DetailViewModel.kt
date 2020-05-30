@@ -12,15 +12,11 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.ui.main.TYPE_ACTIVITY
-import com.absinthe.libchecker.ui.main.TYPE_BROADCAST_RECEIVER
-import com.absinthe.libchecker.ui.main.TYPE_CONTENT_PROVIDER
-import com.absinthe.libchecker.ui.main.TYPE_SERVICE
+import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.ui.main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,39 +56,53 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(context: Context, packageName: String, flag: Int) =
+    fun initComponentsData(context: Context, packageName: String, flag: LibReferenceActivity.Type) =
         viewModelScope.launch(Dispatchers.IO) {
             val list = ArrayList<LibStringItem>()
 
             try {
-                when(flag) {
-                    TYPE_SERVICE->{
+                when (flag) {
+                    LibReferenceActivity.Type.TYPE_SERVICE -> {
                         val packageInfo =
-                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES)
+                            context.packageManager.getPackageInfo(
+                                packageName,
+                                PackageManager.GET_SERVICES
+                            )
                         for (service in packageInfo.services) {
                             list.add(LibStringItem(service.name.removePrefix(packageName), 0))
                         }
                     }
-                    TYPE_ACTIVITY->{
+                    LibReferenceActivity.Type.TYPE_ACTIVITY -> {
                         val packageInfo =
-                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+                            context.packageManager.getPackageInfo(
+                                packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
                         for (activity in packageInfo.activities) {
                             list.add(LibStringItem(activity.name.removePrefix(packageName), 0))
                         }
                     }
-                    TYPE_BROADCAST_RECEIVER->{
+                    LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
                         val packageInfo =
-                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_RECEIVERS)
+                            context.packageManager.getPackageInfo(
+                                packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
                         for (receiver in packageInfo.receivers) {
                             list.add(LibStringItem(receiver.name, 0))
                         }
                     }
-                    TYPE_CONTENT_PROVIDER->{
+                    LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
                         val packageInfo =
-                            context.packageManager.getPackageInfo(packageName, PackageManager.GET_PROVIDERS)
+                            context.packageManager.getPackageInfo(
+                                packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
                         for (provider in packageInfo.providers) {
                             list.add(LibStringItem(provider.name, 0))
                         }
+                    }
+                    else -> {
                     }
                 }
 
@@ -105,9 +115,30 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 list.sortByDescending { it.size }
             } else {
                 list.sortByDescending {
-                    ServiceLibMap.MAP.containsKey(
-                        it.name
-                    )
+                    when (flag) {
+                        LibReferenceActivity.Type.TYPE_SERVICE -> {
+                            ServiceLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        }
+                        LibReferenceActivity.Type.TYPE_ACTIVITY -> {
+                            ActivityLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        }
+                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
+                            ReceiverLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        }
+                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
+                            ProviderLibMap.MAP.containsKey(
+                                it.name
+                            )
+                        }
+                        else -> false
+                    }
+
                 }
             }
 

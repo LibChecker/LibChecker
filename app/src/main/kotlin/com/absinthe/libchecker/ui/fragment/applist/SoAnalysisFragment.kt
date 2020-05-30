@@ -12,7 +12,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
-import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
@@ -28,7 +27,7 @@ class SoAnalysisFragment : Fragment() {
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
     private val adapter = LibStringAdapter().apply {
-        mode = MODE_NATIVE
+        mode = LibStringAdapter.Mode.NATIVE
     }
 
     override fun onCreateView(

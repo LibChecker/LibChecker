@@ -25,13 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
-const val TYPE_ALL = 0
-const val TYPE_NATIVE = 1
-const val TYPE_SERVICE = 2
-const val TYPE_ACTIVITY = 3
-const val TYPE_BROADCAST_RECEIVER = 4
-const val TYPE_CONTENT_PROVIDER = 5
-
 const val EXTRA_NAME = "NAME"
 const val EXTRA_TYPE = "TYPE"
 
@@ -107,7 +100,13 @@ class LibReferenceActivity : BaseActivity() {
             finish()
         } else {
             lifecycleScope.launch(Dispatchers.IO) {
-                setData(name, type)
+                val enumType = when (type) {
+                    0 -> Type.TYPE_SERVICE
+                    1 -> Type.TYPE_ACTIVITY
+                    2 -> Type.TYPE_BROADCAST_RECEIVER
+                    else -> Type.TYPE_CONTENT_PROVIDER
+                }
+                setData(name, enumType)
             }
         }
     }
@@ -119,7 +118,7 @@ class LibReferenceActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    private suspend fun setData(name: String, type: Int) {
+    private suspend fun setData(name: String, type: Type) {
 
         withContext(Dispatchers.Main) {
             binding.vfContainer.displayedChild = 0
@@ -129,7 +128,7 @@ class LibReferenceActivity : BaseActivity() {
 
         AppItemRepository.allItems.value?.let { items ->
             try {
-                if (type == TYPE_NATIVE) {
+                if (type == Type.TYPE_NATIVE) {
                     for (item in items) {
                         val packageInfo = PackageUtils.getPackageInfo(item.packageName)
 
@@ -145,7 +144,7 @@ class LibReferenceActivity : BaseActivity() {
                             }
                         }
                     }
-                } else if (type == TYPE_SERVICE) {
+                } else if (type == Type.TYPE_SERVICE) {
                     for (item in items) {
                         val packageInfo =
                             packageManager.getPackageInfo(
@@ -161,7 +160,7 @@ class LibReferenceActivity : BaseActivity() {
                             }
                         }
                     }
-                } else if (type == TYPE_ACTIVITY) {
+                } else if (type == Type.TYPE_ACTIVITY) {
                     for (item in items) {
                         val packageInfo =
                             packageManager.getPackageInfo(
@@ -177,7 +176,7 @@ class LibReferenceActivity : BaseActivity() {
                             }
                         }
                     }
-                } else if (type == TYPE_BROADCAST_RECEIVER) {
+                } else if (type == Type.TYPE_BROADCAST_RECEIVER) {
                     for (item in items) {
                         val packageInfo =
                             packageManager.getPackageInfo(
@@ -193,7 +192,7 @@ class LibReferenceActivity : BaseActivity() {
                             }
                         }
                     }
-                } else if (type == TYPE_CONTENT_PROVIDER) {
+                } else if (type == Type.TYPE_CONTENT_PROVIDER) {
                     for (item in items) {
                         val packageInfo =
                             packageManager.getPackageInfo(
@@ -218,5 +217,14 @@ class LibReferenceActivity : BaseActivity() {
             adapter.setNewInstance(list)
             binding.vfContainer.displayedChild = 1
         }
+    }
+
+    enum class Type {
+        TYPE_ALL,
+        TYPE_NATIVE,
+        TYPE_SERVICE,
+        TYPE_ACTIVITY,
+        TYPE_BROADCAST_RECEIVER,
+        TYPE_CONTENT_PROVIDER,
     }
 }

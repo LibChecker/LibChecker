@@ -20,7 +20,7 @@ class LibReferenceFragment : Fragment() {
 
     private lateinit var binding: FragmentLibReferenceBinding
     private var isInit = false
-    private var category = TYPE_NATIVE
+    private var category = LibReferenceActivity.Type.TYPE_NATIVE
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -69,12 +69,12 @@ class LibReferenceFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.ref_category_all -> category = TYPE_ALL
-            R.id.ref_category_native -> category = TYPE_NATIVE
-            R.id.ref_category_service -> category = TYPE_SERVICE
-            R.id.ref_category_activity -> category = TYPE_ACTIVITY
-            R.id.ref_category_br -> category = TYPE_BROADCAST_RECEIVER
-            R.id.ref_category_cp -> category = TYPE_CONTENT_PROVIDER
+            R.id.ref_category_all -> category = LibReferenceActivity.Type.TYPE_ALL
+            R.id.ref_category_native -> category = LibReferenceActivity.Type.TYPE_NATIVE
+            R.id.ref_category_service -> category = LibReferenceActivity.Type.TYPE_SERVICE
+            R.id.ref_category_activity -> category = LibReferenceActivity.Type.TYPE_ACTIVITY
+            R.id.ref_category_br -> category = LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+            R.id.ref_category_cp -> category = LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
         }
         computeRef()
         return super.onOptionsItemSelected(item)

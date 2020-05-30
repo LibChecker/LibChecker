@@ -13,9 +13,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
-import com.absinthe.libchecker.recyclerview.MODE_SERVICE
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.ui.main.TYPE_SERVICE
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -26,7 +25,7 @@ class ComponentsAnalysisFragment : Fragment() {
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
     private val adapter = LibStringAdapter().apply {
-        mode = MODE_SERVICE
+        mode = LibStringAdapter.Mode.SERVICE
     }
 
     override fun onCreateView(
@@ -70,7 +69,7 @@ class ComponentsAnalysisFragment : Fragment() {
                     GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
                 )
             }
-            spinner.onItemSelectedListener = object :AdapterView.OnItemSelectedListener{
+            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(parent: AdapterView<*>?) {
 
                 }
@@ -81,8 +80,19 @@ class ComponentsAnalysisFragment : Fragment() {
                     position: Int,
                     id: Long
                 ) {
-                    adapter.mode = position + 1
-                    viewModel.initComponentsData(requireContext(), packageName, position + 1)
+                    adapter.mode = when (position) {
+                        0 -> LibStringAdapter.Mode.SERVICE
+                        1 -> LibStringAdapter.Mode.ACTIVITY
+                        2 -> LibStringAdapter.Mode.RECEIVER
+                        else -> LibStringAdapter.Mode.PROVIDER
+                    }
+                    val type = when (position) {
+                        0 -> LibReferenceActivity.Type.TYPE_SERVICE
+                        1 -> LibReferenceActivity.Type.TYPE_ACTIVITY
+                        2 -> LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                        else -> LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                    }
+                    viewModel.initComponentsData(requireContext(), packageName, type)
                 }
             }
         }
@@ -96,7 +106,11 @@ class ComponentsAnalysisFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.initComponentsData(requireContext(), packageName, TYPE_SERVICE)
+        viewModel.initComponentsData(
+            requireContext(),
+            packageName,
+            LibReferenceActivity.Type.TYPE_SERVICE
+        )
     }
 
     companion object {

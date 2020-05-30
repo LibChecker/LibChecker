@@ -279,10 +279,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     data class RefCountType(
         val count: Int,
-        val type: Int
+        val type: LibReferenceActivity.Type
     )
 
-    fun computeLibReference(context: Context, flag: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeLibReference(context: Context, flag: LibReferenceActivity.Type) = viewModelScope.launch(Dispatchers.IO) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val map = HashMap<String, RefCountType>()
@@ -294,7 +294,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var count: Int
 
         when (flag) {
-            TYPE_ALL -> {
+            LibReferenceActivity.Type.TYPE_ALL -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -308,7 +308,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                     for (lib in libList) {
                         count = map[lib.name]?.count ?: 0
-                        map[lib.name] = RefCountType(count + 1, TYPE_NATIVE)
+                        map[lib.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
                     }
 
                     try {
@@ -321,7 +321,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.services?.let {
                             for (service in it) {
                                 count = map[service.name]?.count ?: 0
-                                map[service.name] = RefCountType(count + 1, TYPE_SERVICE)
+                                map[service.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_SERVICE)
                             }
                         }
 
@@ -333,7 +333,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.activities?.let {
                             for (activity in it) {
                                 count = map[activity.name]?.count ?: 0
-                                map[activity.name] = RefCountType(count + 1, TYPE_ACTIVITY)
+                                map[activity.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_ACTIVITY)
                             }
                         }
 
@@ -345,7 +345,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.receivers?.let {
                             for (receiver in it) {
                                 count = map[receiver.name]?.count ?: 0
-                                map[receiver.name] = RefCountType(count + 1, TYPE_BROADCAST_RECEIVER)
+                                map[receiver.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
                             }
                         }
 
@@ -357,7 +357,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.providers?.let {
                             for (provider in it) {
                                 count = map[provider.name]?.count ?: 0
-                                map[provider.name] = RefCountType(count + 1, TYPE_CONTENT_PROVIDER)
+                                map[provider.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
                             }
                         }
                     } catch (e: Exception) {
@@ -365,7 +365,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
-            TYPE_NATIVE -> {
+            LibReferenceActivity.Type.TYPE_NATIVE -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -379,11 +379,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                     for (lib in libList) {
                         count = map[lib.name]?.count ?: 0
-                        map[lib.name] = RefCountType(count + 1, TYPE_NATIVE)
+                        map[lib.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
                     }
                 }
             }
-            TYPE_SERVICE -> {
+            LibReferenceActivity.Type.TYPE_SERVICE -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -400,7 +400,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.services?.let {
                             for (service in it) {
                                 count = map[service.name]?.count ?: 0
-                                map[service.name] = RefCountType(count + 1, TYPE_SERVICE)
+                                map[service.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_SERVICE)
                             }
                         }
                     } catch (e: Exception) {
@@ -408,7 +408,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
-            TYPE_ACTIVITY -> {
+            LibReferenceActivity.Type.TYPE_ACTIVITY -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -424,7 +424,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.activities?.let {
                             for (activity in it) {
                                 count = map[activity.name]?.count ?: 0
-                                map[activity.name] = RefCountType(count + 1, TYPE_ACTIVITY)
+                                map[activity.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_ACTIVITY)
                             }
                         }
                     } catch (e: Exception) {
@@ -432,7 +432,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
-            TYPE_BROADCAST_RECEIVER -> {
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -448,7 +448,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.receivers?.let {
                             for (receiver in it) {
                                 count = map[receiver.name]?.count ?: 0
-                                map[receiver.name] = RefCountType(count + 1, TYPE_BROADCAST_RECEIVER)
+                                map[receiver.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
                             }
                         }
                     } catch (e: Exception) {
@@ -456,7 +456,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
-            TYPE_CONTENT_PROVIDER -> {
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
                 for (item in appList) {
 
                     if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -472,7 +472,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.providers?.let {
                             for (provider in it) {
                                 count = map[provider.name]?.count ?: 0
-                                map[provider.name] = RefCountType(count + 1, TYPE_CONTENT_PROVIDER)
+                                map[provider.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
                             }
                         }
                     } catch (e: Exception) {

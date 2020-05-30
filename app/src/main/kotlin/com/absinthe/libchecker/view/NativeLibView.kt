@@ -15,7 +15,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
-import com.absinthe.libchecker.recyclerview.MODE_NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.SPUtils
@@ -24,7 +23,7 @@ import com.squareup.contour.ContourLayout
 class NativeLibView(context: Context) : ContourLayout(context) {
 
     val adapter = LibStringAdapter().apply {
-        mode = MODE_NATIVE
+        mode = LibStringAdapter.Mode.NATIVE
     }
     val tvTitle: TextView = TextView(context).apply {
         setTextColor(ContextCompat.getColor(context, R.color.textNormal))
