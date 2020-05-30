@@ -10,13 +10,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
+const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
 
 const val VF_CHILD_DETAIL = 0
 const val VF_CHILD_LOADING = 1
@@ -26,6 +28,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
 
     private lateinit var dialogView: LibDetailView
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
+    private val type by lazy { arguments?.getSerializable(EXTRA_LIB_TYPE) as LibStringAdapter.Mode }
 
     private fun List<String>.toContributorsString(): String {
         return this.joinToString(separator = ", ")
@@ -37,7 +40,16 @@ class LibDetailDialogFragment : LCDialogFragment() {
         dialogView.binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
-            ivIcon.setImageResource(NativeLibMap.MAP[libName]?.iconRes ?: R.drawable.ic_logo)
+
+            val map = when (type) {
+                LibStringAdapter.Mode.NATIVE -> NativeLibMap.MAP
+                LibStringAdapter.Mode.SERVICE -> ServiceLibMap.MAP
+                LibStringAdapter.Mode.ACTIVITY -> ActivityLibMap.MAP
+                LibStringAdapter.Mode.RECEIVER -> ReceiverLibMap.MAP
+                else -> ProviderLibMap.MAP
+            }
+
+            ivIcon.setImageResource(map[libName]?.iconRes ?: R.drawable.ic_logo)
             tvCreateIssue.apply {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()
@@ -105,15 +117,16 @@ class LibDetailDialogFragment : LCDialogFragment() {
                 dialogView.binding.vfContainer.displayedChild = VF_CHILD_FAILED
             }
         })
-        viewModel.requestNativeLibDetail(libName)
+        viewModel.requestLibDetail(libName, type)
     }
 
     companion object {
-        fun newInstance(libName: String): LibDetailDialogFragment {
+        fun newInstance(libName: String, mode: LibStringAdapter.Mode): LibDetailDialogFragment {
             return LibDetailDialogFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_LIB_NAME, libName)
+                        putSerializable(EXTRA_LIB_TYPE, mode)
                     }
                 }
         }

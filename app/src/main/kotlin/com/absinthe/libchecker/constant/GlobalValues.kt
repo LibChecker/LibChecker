@@ -26,6 +26,7 @@ object GlobalValues {
 
     var config = Configuration(
         enableLibDetail = false,
+        enableComponentsDetail = false,
         showLibName = false,
         showTeamName = false,
         showLibDescription = false,

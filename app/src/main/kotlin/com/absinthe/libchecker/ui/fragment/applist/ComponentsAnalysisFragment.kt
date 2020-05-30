@@ -15,8 +15,10 @@ import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
 class ComponentsAnalysisFragment : Fragment() {
@@ -101,6 +103,23 @@ class ComponentsAnalysisFragment : Fragment() {
             componentsItems.observe(viewLifecycleOwner, Observer {
                 adapter.setList(it)
             })
+        }
+
+        fun openLibDetailDialog(position: Int) {
+            if (GlobalValues.config.enableComponentsDetail) {
+                LibDetailDialogFragment.newInstance(adapter.getItem(position).name, adapter.mode).apply {
+                    ActivityStackManager.topActivity?.apply {
+                        show(supportFragmentManager, tag)
+                    }
+                }
+            }
+        }
+
+        adapter.setOnItemClickListener { _, _, position ->
+            openLibDetailDialog(position)
+        }
+        adapter.setOnItemChildClickListener { _, _, position ->
+            openLibDetailDialog(position)
         }
     }
 

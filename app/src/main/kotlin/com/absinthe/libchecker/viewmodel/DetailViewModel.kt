@@ -11,12 +11,13 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
-import com.absinthe.libchecker.ui.main.*
+import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -147,28 +148,37 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun requestNativeLibDetail(libName: String) = viewModelScope.launch(Dispatchers.IO) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(ApiManager.root)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val request = retrofit.create(NativeLibDetailRequest::class.java)
-        val detail = request.requestNativeLibDetail("native-libs/${libName}.json")
-        Log.d("DetailViewModel", "requestNativeLibDetail: root = ${ApiManager.root}")
-        detail.enqueue(object : Callback<NativeLibDetailBean> {
-            override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
-                Log.e("DetailViewModel", t.message ?: "")
-                detailBean.value = null
+    fun requestLibDetail(libName: String, type: LibStringAdapter.Mode) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(ApiManager.root)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+            val request = retrofit.create(NativeLibDetailRequest::class.java)
+
+            val categoryDir = when (type) {
+                LibStringAdapter.Mode.NATIVE -> "native-libs"
+                LibStringAdapter.Mode.SERVICE -> "services-libs"
+                LibStringAdapter.Mode.ACTIVITY -> "activities-libs"
+                LibStringAdapter.Mode.RECEIVER -> "receivers-libs"
+                else -> "providers-libs"
             }
 
-            override fun onResponse(
-                call: Call<NativeLibDetailBean>,
-                response: Response<NativeLibDetailBean>
-            ) {
-                detailBean.value = response.body()
-            }
-        })
-    }
+            val detail = request.requestNativeLibDetail("${categoryDir}/${libName}.json")
+            detail.enqueue(object : Callback<NativeLibDetailBean> {
+                override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
+                    Log.e("DetailViewModel", t.message ?: "")
+                    detailBean.value = null
+                }
+
+                override fun onResponse(
+                    call: Call<NativeLibDetailBean>,
+                    response: Response<NativeLibDetailBean>
+                ) {
+                    detailBean.value = response.body()
+                }
+            })
+        }
 
     private fun getAbiByNativeDir(
         context: Context,

@@ -1,3 +1,5 @@
 package com.absinthe.libchecker.bean
 
-data class LibStringItem(val name: String, val size: Long)
+import java.io.Serializable
+
+data class LibStringItem(val name: String, val size: Long) : Serializable

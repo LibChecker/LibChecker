@@ -78,7 +78,7 @@ class SoAnalysisFragment : Fragment() {
 
         fun openLibDetailDialog(position: Int) {
             if (GlobalValues.config.enableLibDetail) {
-                LibDetailDialogFragment.newInstance(adapter.getItem(position).name).apply {
+                LibDetailDialogFragment.newInstance(adapter.getItem(position).name, adapter.mode).apply {
                     ActivityStackManager.topActivity?.apply {
                         show(supportFragmentManager, tag)
                     }
