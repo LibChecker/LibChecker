@@ -58,6 +58,10 @@ object ActivityLibMap {
             LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
         ),
         Pair(
+            "com.alipay.sdk.app.AlipayResultActivity",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
             "com.sina.weibo.sdk.share.WbShareTransActivity",
             LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
         ),
@@ -66,8 +70,16 @@ object ActivityLibMap {
             LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
         ),
         Pair(
+            "com.sina.weibo.sdk.share.WbShareResultActivity",
+            LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
+        ),
+        Pair(
             "com.sina.weibo.sdk.web.WeiboSdkWebActivity",
             LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
+        ),
+        Pair(
+            "com.vivo.push.sdk.LinkProxyClientActivity",
+            LibChip(R.drawable.ic_lib_vivo, "vivo Push")
         )
     )
 }

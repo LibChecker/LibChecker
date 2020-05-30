@@ -94,19 +94,13 @@ class LibReferenceActivity : BaseActivity() {
         }
 
         val name = intent.extras?.getString(EXTRA_NAME)
-        val type = intent.extras?.getInt(EXTRA_TYPE)
+        val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
 
-        if (name == null || type == null) {
+        if (name == null) {
             finish()
         } else {
             lifecycleScope.launch(Dispatchers.IO) {
-                val enumType = when (type) {
-                    0 -> Type.TYPE_SERVICE
-                    1 -> Type.TYPE_ACTIVITY
-                    2 -> Type.TYPE_BROADCAST_RECEIVER
-                    else -> Type.TYPE_CONTENT_PROVIDER
-                }
-                setData(name, enumType)
+                setData(name, type)
             }
         }
     }
