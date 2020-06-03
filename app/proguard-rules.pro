@@ -18,7 +18,7 @@
 -obfuscationdictionary dictionary.txt
 -classobfuscationdictionary dictionary.txt
 -packageobfuscationdictionary dictionary.txt
--repackageclasses com.absinthe.anywhere_
+-repackageclasses com.absinthe.libchecker
 
 -dontpreverify
 
@@ -128,14 +128,4 @@
 -keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
    **[] $VALUES;
    public *;
-}
-
-# Keep all native methods, their classes and any classes in their descriptors
--keepclasseswithmembers,includedescriptorclasses class com.tencent.mmkv.** {
-    native <methods>;
-    long nativeHandle;
-    private static *** onMMKVCRCCheckFail(***);
-    private static *** onMMKVFileLengthError(***);
-    private static *** mmkvLogImp(...);
-    private static *** onContentChangedByOuterProcess(***);
 }

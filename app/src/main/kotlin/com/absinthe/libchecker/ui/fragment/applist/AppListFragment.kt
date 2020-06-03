@@ -242,7 +242,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                         else -> Constants.SORT_MODE_DEFAULT
                     }
                     GlobalValues.appSortMode.value = mode
-                    SPUtils.putInt(requireContext(), Constants.PREF_APP_SORT_MODE, mode)
+                    SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
 
                     true
                 }

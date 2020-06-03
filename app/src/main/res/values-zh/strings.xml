@@ -42,4 +42,5 @@
     <string name="ref_category_br">广播接收器</string>
     <string name="ref_category_cp">内容提供器</string>
     <string name="ref_category_native">原生库</string>
+    <string name="detail_label">查看 App 详情</string>
 </resources>

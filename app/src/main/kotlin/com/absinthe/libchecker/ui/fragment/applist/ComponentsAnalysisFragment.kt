@@ -65,9 +65,7 @@ class ComponentsAnalysisFragment : Fragment() {
                         adapter.setList(adapter.data.sortedByDescending { it.name })
                         MODE_SORT_BY_SIZE
                     }
-                SPUtils.putInt(
-                    requireContext(),
-                    Constants.PREF_LIB_SORT_MODE,
+                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE,
                     GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
                 )
             }

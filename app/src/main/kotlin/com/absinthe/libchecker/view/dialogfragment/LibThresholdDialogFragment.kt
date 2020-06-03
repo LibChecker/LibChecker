@@ -20,7 +20,7 @@ class LibThresholdDialogFragment : LCDialogFragment() {
             .setTitle(R.string.lib_ref_threshold)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 GlobalValues.libReferenceThreshold.value = dialogView.slider.value.toInt()
-                SPUtils.putInt(requireContext(), Constants.PREF_LIB_REF_THRESHOLD, dialogView.slider.value.toInt())
+                SPUtils.putInt(Constants.PREF_LIB_REF_THRESHOLD, dialogView.slider.value.toInt())
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()

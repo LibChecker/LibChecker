@@ -1,111 +1,59 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
+import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.provider.ContextProvider
+
+const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object SPUtils {
-    private val sPName: String
-        get() = "${BuildConfig.APPLICATION_ID}_preferences"
 
-    fun putString(
-        context: Context,
-        key: String?,
-        value: String?
-    ) {
-        val editor =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-                .edit()
-        editor.putString(key, value)
-        editor.apply()
+    private val sp by lazy {
+        ContextProvider.getGlobalContext().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     }
 
-    fun getString(context: Context, key: String?): String? {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-        return sp.getString(key, "")
+    fun putString(key: String, value: String) {
+        sp.edit { putString(key, value) }
     }
 
-    fun getString(
-        context: Context,
-        key: String?,
-        defaultValue: String?
-    ): String? {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-        return sp.getString(key, defaultValue)
+    fun getString(key: String): String {
+        return sp.getString(key, "") ?: ""
     }
 
-    fun putBoolean(
-        context: Context,
-        key: String?,
-        value: Boolean
-    ) {
-        val editor =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-                .edit()
-        editor.putBoolean(key, value)
-        editor.apply()
+    fun getString(key: String, defaultValue: String): String {
+        return sp.getString(key, defaultValue) ?: ""
     }
 
-    fun getBoolean(
-        context: Context,
-        key: String?,
-        defaultValue: Boolean
-    ): Boolean {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-        return if (defaultValue) {
-            sp.getBoolean(key, true)
-        } else {
-            sp.getBoolean(key, false)
-        }
+    fun putBoolean(key: String, value: Boolean) {
+        sp.edit { putBoolean(key, value) }
     }
 
-    fun putInt(context: Context, key: String?, value: Int) {
-        val editor =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-                .edit()
-        editor.putInt(key, value)
-        editor.apply()
+    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
+        return sp.getBoolean(key, defaultValue)
     }
 
-    fun getInt(context: Context, key: String?): Int {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
+    fun putInt(key: String, value: Int) {
+        sp.edit { putInt(key, value) }
+    }
+
+    fun getInt(key: String): Int {
         return sp.getInt(key, 0)
     }
 
-    fun getInt(context: Context, key: String?, defaultValue: Int): Int {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
+    fun getInt(key: String, defaultValue: Int): Int {
         return sp.getInt(key, defaultValue)
     }
 
-    fun putLong(
-        context: Context,
-        key: String?,
-        value: Long
-    ) {
-        val editor =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
-                .edit()
-        editor.putLong(key, value)
-        editor.apply()
+    fun putLong(key: String, value: Long) {
+        sp.edit { putLong(key, value) }
     }
 
-    fun getLong(context: Context, key: String?): Long {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
+    fun getLong(key: String): Long {
         return sp.getLong(key, 0)
     }
 
-    fun getLong(
-        context: Context,
-        key: String?,
-        defaultValue: Long
-    ): Long {
-        val sp =
-            context.getSharedPreferences(sPName, Context.MODE_PRIVATE)
+    fun getLong(key: String, defaultValue: Long): Long {
         return sp.getLong(key, defaultValue)
     }
 }

@@ -51,6 +51,7 @@
     <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
 
     <!--  Detail  -->
+    <string name="detail_label">View App Details</string>
     <string name="tab_so_analysis">so File Analysis</string>
     <string name="tab_components_analysis">Components Analysis</string>
     <string name="not_found">Not found</string>
