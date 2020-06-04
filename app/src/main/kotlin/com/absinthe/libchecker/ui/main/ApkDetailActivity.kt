@@ -1,33 +1,65 @@
 package com.absinthe.libchecker.ui.main
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.absinthe.libchecker.R
+import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
 import com.absinthe.libchecker.ktx.logd
-import java.io.File
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
+import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import java.util.zip.ZipInputStream
 
-class ApkDetailActivity : AppCompatActivity() {
+class ApkDetailActivity : BaseActivity() {
+
+    private lateinit var binding: ActivityApkDetailBinding
+    private val adapter = LibStringAdapter().apply {
+        mode = LibStringAdapter.Mode.NATIVE
+    }
+
+    override fun setViewBinding() {
+        binding = ActivityApkDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+    }
+
+    override fun setRoot() {
+        root = binding.root
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_apk_detail)
 
-        intent.data?.scheme?.let {
-            if (it == "content") {
-                intent.data?.let {uri->
+        binding.rvList.apply {
+            adapter = this@ApkDetailActivity.adapter
+        }
+
+        intent.data?.scheme?.let { scheme ->
+            if (scheme == "content") {
+                intent.data?.let { uri ->
                     logd(uri.toString())
-                    val zipFile = ZipFile(File(uri.toString()))
-                    val entries = zipFile.entries()
 
-                    var next: ZipEntry
+                    val libList = ArrayList<LibStringItem>()
+                    val inputStream = contentResolver.openInputStream(uri)
+                    val zipInputStream = ZipInputStream(inputStream)
 
-                    while (entries.hasMoreElements()) {
-                        next = entries.nextElement()
+                    try {
+                        var entry = zipInputStream.nextEntry
+                        var splitName: String
 
-                        logd(next.name)
+                        while (entry != null) {
+                            if (entry.name.contains("lib/")) {
+                                splitName = entry.name.split("/").last()
+
+                                if (!libList.any { it.name == splitName }) {
+                                    logd(splitName)
+                                    libList.add(LibStringItem(splitName, entry.size))
+                                }
+                            }
+                            entry = zipInputStream.nextEntry
+                        }
+                    } catch (e: Exception) {
+                    } finally {
+                        zipInputStream.close()
+                        adapter.setNewInstance(libList)
                     }
-                    zipFile.close()
                 }
             }
         }

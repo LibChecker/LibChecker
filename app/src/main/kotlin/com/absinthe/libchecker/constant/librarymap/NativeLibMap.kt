@@ -143,12 +143,6 @@ object NativeLibMap {
                 "React Native"
             )
         ),
-        Pair("libfb.so",
-            LibChip(
-                R.drawable.ic_lib_react,
-                "React Native"
-            )
-        ),
         Pair("libjsc.so",
             LibChip(
                 R.drawable.ic_lib_react,
@@ -189,6 +183,12 @@ object NativeLibMap {
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
+            )
+        ),
+        Pair("libfb.so",
+            LibChip(
+                R.drawable.ic_lib_facebook,
+                "Facebook SDK"
             )
         ),
         Pair("libjiagu.so",
@@ -302,7 +302,7 @@ object NativeLibMap {
         Pair("libgcanvas.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
-                "Weex GCanvas"
+                "GCanvas"
             )
         ),
         Pair("libWTF.so",

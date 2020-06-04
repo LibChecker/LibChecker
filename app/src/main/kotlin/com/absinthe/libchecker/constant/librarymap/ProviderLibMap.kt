@@ -42,6 +42,26 @@ object ProviderLibMap {
         ),
         Pair("com.crashlytics.android.CrashlyticsInitProvider",
             LibChip(R.drawable.ic_lib_firebase, "Crashlytics")
+        ),
+        Pair(
+            "com.google.android.gms.ads.MobileAdsInitProvider",
+            LibChip(R.drawable.ic_lib_google, "Google Mobile Ads")
+        ),
+        Pair(
+            "com.tencent.bugly.beta.utils.BuglyFileProvider",
+            LibChip(R.drawable.ic_lib_bugly, "Bugly")
+        ),
+        Pair(
+            "com.tencent.mid.api.MidProvider",
+            LibChip(R.drawable.ic_lib_tencent, "腾讯移动分析")
+        ),
+        Pair(
+            "com.facebook.internal.FacebookInitProvider",
+            LibChip(R.drawable.ic_lib_facebook, "Facebook SDK")
+        ),
+        Pair(
+            "com.facebook.FacebookContentProvider",
+            LibChip(R.drawable.ic_lib_facebook, "Facebook SDK")
         )
     )
 }

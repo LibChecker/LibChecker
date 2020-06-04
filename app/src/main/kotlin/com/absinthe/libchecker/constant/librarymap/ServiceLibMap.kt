@@ -37,8 +37,8 @@ object ServiceLibMap {
         ),
         Pair("com.tencent.bugly.beta.tinker.TinkerResultService",
             LibChip(
-                R.drawable.ic_lib_tencent,
-                "Tinker"
+                R.drawable.ic_lib_bugly,
+                "Bugly"
             )
         ),
         Pair("com.tencent.tinker.lib.service.TinkerPatchForeService",
@@ -77,6 +77,12 @@ object ServiceLibMap {
                 "Firebase"
             )
         ),
+        Pair("com.google.firebase.iid.FirebaseInstanceIdService",
+            LibChip(
+                R.drawable.ic_lib_firebase,
+                "Firebase"
+            )
+        ),
         Pair("com.google.android.gms.measurement.AppMeasurementJobService",
             LibChip(
                 R.drawable.ic_lib_firebase,
@@ -87,12 +93,6 @@ object ServiceLibMap {
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Firebase Analytics"
-            )
-        ),
-        Pair("com.google.firebase.iid.FirebaseInstanceIdService",
-            LibChip(
-                R.drawable.ic_lib_firebase,
-                "Firebase"
             )
         ),
         Pair("com.huawei.hms.support.api.push.service.HmsMsgService",
@@ -140,31 +140,31 @@ object ServiceLibMap {
         Pair("com.taobao.accs.ChannelService",
             LibChip(
                 R.drawable.ic_lib_taobao,
-                "淘宝 Push"
+                "淘宝推送"
             )
         ),
         Pair("com.taobao.accs.ChannelService\$KernelService",
             LibChip(
                 R.drawable.ic_lib_taobao,
-                "淘宝 Push"
+                "淘宝推送"
             )
         ),
         Pair("com.taobao.accs.data.MsgDistributeService",
             LibChip(
                 R.drawable.ic_lib_taobao,
-                "淘宝 Push"
+                "淘宝推送"
             )
         ),
         Pair("org.android.agoo.accs.AgooService",
             LibChip(
                 R.drawable.ic_lib_taobao,
-                "淘宝 Push"
+                "淘宝推送"
             )
         ),
         Pair("com.taobao.accs.internal.AccsJobService",
             LibChip(
                 R.drawable.ic_lib_taobao,
-                "淘宝 Push"
+                "淘宝推送"
             )
         ),
         Pair("com.alibaba.android.bindingx.plugin.weex.WXBindingXModuleService",
