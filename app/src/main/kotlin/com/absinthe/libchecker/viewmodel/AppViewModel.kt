@@ -222,6 +222,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+        GlobalValues.shouldRequestChange = false
     }
 
     fun collectPopularLibraries(context: Context) = viewModelScope.launch(Dispatchers.IO) {

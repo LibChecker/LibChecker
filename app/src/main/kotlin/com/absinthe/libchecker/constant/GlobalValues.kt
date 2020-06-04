@@ -36,6 +36,8 @@ object GlobalValues {
 
     var repo = Constants.REPO_GITHUB
 
+    var shouldRequestChange = false
+
     fun init(context: Context) {
         if (sPreferences == null) {
             sPreferences = context

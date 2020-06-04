@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.main
 
+import android.content.ActivityNotFoundException
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -15,6 +16,8 @@ import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.IntentUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -112,5 +115,13 @@ class AppDetailActivity : BaseActivity() {
                 }
             })
         mediator.attach()
+
+        binding.ivAppIcon.setOnClickListener {
+            try {
+                startActivity(IntentUtils.getLaunchAppIntent(pkgName))
+            } catch (e: ActivityNotFoundException) {
+                ToastUtils.showShort("Can\'t open this app")
+            }
+        }
     }
 }

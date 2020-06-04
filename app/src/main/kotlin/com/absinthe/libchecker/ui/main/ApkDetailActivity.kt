@@ -1,7 +1,8 @@
-package com.absinthe.libchecker
+package com.absinthe.libchecker.ui.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ktx.logd
 import java.io.File
 import java.util.zip.ZipEntry

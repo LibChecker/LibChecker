@@ -27,7 +27,8 @@
         <activity
             android:name=".ui.main.AppDetailActivity"
             android:launchMode="singleTask" />
-        <activity android:name=".ApkDetailActivity"
+        <activity
+            android:name=".ui.main.ApkDetailActivity"
             android:label="@string/detail_label">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -51,6 +52,18 @@
             android:name=".provider.ContextProvider"
             android:authorities="${applicationId}.contextprovider"
             android:exported="false" />
+
+        <receiver
+            android:name=".receiver.PackageReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

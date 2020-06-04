@@ -1,25 +1,20 @@
 package com.absinthe.libchecker.ui.main
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
-import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
@@ -29,20 +24,6 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
-    private val requestPackageReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
-                intent.action == Intent.ACTION_PACKAGE_REMOVED ||
-                intent.action == Intent.ACTION_PACKAGE_REPLACED
-            ) {
-                viewModel.requestChange(context)
-            }
-        }
-    }
-
-    fun getToolbar(): Toolbar {
-        return binding.toolbar
-    }
 
     override fun setViewBinding() {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -71,19 +52,11 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        registerPackageBroadcast()
-    }
-
-    override fun onDestroy() {
-        unregisterPackageBroadcast()
-        super.onDestroy()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        ActivityStackManager.appExit()
+    override fun onResume() {
+        super.onResume()
+        if (GlobalValues.shouldRequestChange) {
+            viewModel.requestChange(this)
+        }
     }
 
     private fun initView() {
@@ -128,20 +101,5 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
-    }
-
-    private fun registerPackageBroadcast() {
-        val intentFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_PACKAGE_ADDED)
-            addAction(Intent.ACTION_PACKAGE_REPLACED)
-            addAction(Intent.ACTION_PACKAGE_REMOVED)
-            addDataScheme("package")
-        }
-
-        registerReceiver(requestPackageReceiver, intentFilter)
-    }
-
-    private fun unregisterPackageBroadcast() {
-        unregisterReceiver(requestPackageReceiver)
     }
 }
