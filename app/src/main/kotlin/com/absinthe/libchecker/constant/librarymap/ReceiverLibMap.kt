@@ -83,6 +83,18 @@ object ReceiverLibMap {
                 "Huawei Push"
             )
         ),
+        Pair("com.huawei.hms.support.api.push.PushReceiver",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "Huawei Push"
+            )
+        ),
+        Pair("com.huawei.hms.support.api.push.PushMsgReceiver",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "Huawei Push"
+            )
+        ),
         Pair("com.facebook.CurrentAccessTokenExpirationBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_facebook,

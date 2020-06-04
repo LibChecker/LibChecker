@@ -10,6 +10,10 @@ object ActivityLibMap {
             LibChip(R.drawable.ic_lib_play_store, "Google Play Service")
         ),
         Pair(
+            "com.android.billingclient.api.ProxyBillingActivity",
+            LibChip(R.drawable.ic_lib_play_store, "Google Play Billing")
+        ),
+        Pair(
             "com.google.android.gms.auth.api.signin.internal.SignInHubActivity",
             LibChip(R.drawable.ic_lib_google, "Google Sign-In")
         ),
