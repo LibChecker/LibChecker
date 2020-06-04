@@ -30,15 +30,25 @@
                 app:layout_collapseMode="parallax">
 
                 <ImageView
-                    android:id="@+id/iv_app_icon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:id="@+id/iv_abi"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
                     android:contentDescription="App icon"
                     android:transitionName="app_icon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:background="@drawable/pic_splash"
+                    tools:background="@drawable/ic_64bit"
                     tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/tv_abi_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceCaption"
+                    app:layout_constraintEnd_toEndOf="@id/iv_abi"
+                    app:layout_constraintStart_toStartOf="@id/iv_abi"
+                    app:layout_constraintTop_toBottomOf="@id/iv_abi"
+                    tools:text="ARMV8" />
 
                 <com.absinthe.libchecker.view.AlwaysMarqueeTextView
                     android:id="@+id/tv_app_name"
@@ -56,8 +66,8 @@
                     android:textSize="16sp"
                     android:transitionName="app_name"
                     app:layout_constraintEnd_toStartOf="@id/tv_target_api"
-                    app:layout_constraintStart_toEndOf="@id/iv_app_icon"
-                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+                    app:layout_constraintStart_toEndOf="@id/iv_abi"
+                    app:layout_constraintTop_toTopOf="@id/iv_abi"
                     tools:text="LibChecker" />
 
                 <TextView
@@ -94,7 +104,7 @@
                     android:textColor="@android:color/darker_gray"
                     android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+                    app:layout_constraintTop_toTopOf="@id/iv_abi"
                     tools:text="API 29" />
 
                 <com.google.android.material.chip.Chip
@@ -109,8 +119,8 @@
                     app:chipMinHeight="28dp"
                     app:chipMinTouchTargetSize="0dp"
                     app:chipStartPadding="10dp"
-                    app:layout_constraintStart_toStartOf="@id/iv_app_icon"
-                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon" />
+                    app:layout_constraintStart_toStartOf="@id/iv_abi"
+                    app:layout_constraintTop_toBottomOf="@id/iv_abi" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -135,6 +145,8 @@
             android:id="@+id/rv_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:padding="@dimen/normal_padding"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </LinearLayout>

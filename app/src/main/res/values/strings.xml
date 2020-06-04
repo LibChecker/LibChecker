@@ -58,4 +58,7 @@
     <string name="create_an_issue">Assist us to supplement the information</string>
     <string name="splits_spk" translatable="false">Splits APK</string>
 
+    <!--  Toast  -->
+    <string name="toast_copied_to_clipboard">Copied to clipboard</string>
+
 </resources>

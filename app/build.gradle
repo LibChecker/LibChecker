@@ -21,8 +21,8 @@ android {
         applicationId "com.absinthe.libchecker"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 135
-        versionName "1.3.5"
+        versionCode 136
+        versionName "1.3.6"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -107,6 +107,7 @@ dependencies {
     implementation 'com.blankj:utilcodex:1.28.5'
     implementation 'com.jonathanfinerty.once:once:1.3.0'
     implementation 'app.cash.contour:contour:0.1.7'
+    implementation 'net.dongliu:apk-parser:2.6.7'
 
     implementation "rikka.appcompat:appcompat:1.2.0-rc01"
     implementation "rikka.core:core:1.2.1"

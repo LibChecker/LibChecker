@@ -43,4 +43,5 @@
     <string name="ref_category_cp">内容提供器</string>
     <string name="ref_category_native">原生库</string>
     <string name="detail_label">查看 App 详情</string>
+    <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
 </resources>

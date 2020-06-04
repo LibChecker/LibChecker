@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
@@ -20,6 +21,8 @@ import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.blankj.utilcode.util.ToastUtils
+import rikka.core.util.ClipboardUtils
 
 class ComponentsAnalysisFragment : Fragment() {
 
@@ -113,11 +116,18 @@ class ComponentsAnalysisFragment : Fragment() {
             }
         }
 
-        adapter.setOnItemClickListener { _, _, position ->
-            openLibDetailDialog(position)
-        }
-        adapter.setOnItemChildClickListener { _, _, position ->
-            openLibDetailDialog(position)
+        adapter.apply {
+            setOnItemClickListener { _, _, position ->
+                openLibDetailDialog(position)
+            }
+            setOnItemLongClickListener { _, _, position ->
+                ClipboardUtils.put(requireContext(), getItem(position).name)
+                ToastUtils.showShort(R.string.toast_copied_to_clipboard)
+                true
+            }
+            setOnItemChildClickListener { _, _, position ->
+                openLibDetailDialog(position)
+            }
         }
     }
 

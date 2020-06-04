@@ -283,220 +283,247 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val type: LibReferenceActivity.Type
     )
 
-    fun computeLibReference(context: Context, flag: LibReferenceActivity.Type) = viewModelScope.launch(Dispatchers.IO) {
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
-        val map = HashMap<String, RefCountType>()
-        val refList = mutableListOf<LibReference>()
-        val showSystem = GlobalValues.isShowSystemApps.value!!
+    fun computeLibReference(context: Context, flag: LibReferenceActivity.Type) =
+        viewModelScope.launch(Dispatchers.IO) {
+            val appList = context.packageManager
+                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+            val map = HashMap<String, RefCountType>()
+            val refList = mutableListOf<LibReference>()
+            val showSystem = GlobalValues.isShowSystemApps.value!!
 
-        var libList: List<LibStringItem>
-        var packageInfo: PackageInfo
-        var count: Int
+            var libList: List<LibStringItem>
+            var packageInfo: PackageInfo
+            var count: Int
 
-        when (flag) {
-            LibReferenceActivity.Type.TYPE_ALL -> {
-                for (item in appList) {
+            when (flag) {
+                LibReferenceActivity.Type.TYPE_ALL -> {
+                    for (item in appList) {
 
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        libList = PackageUtils.getAbiByNativeDir(
+                            item.sourceDir,
+                            item.nativeLibraryDir
+                        )
+
+                        for (lib in libList) {
+                            count = map[lib.name]?.count ?: 0
+                            map[lib.name] =
+                                RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
+                        }
+
+                        try {
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_SERVICES
+                                )
+
+                            packageInfo.services?.let {
+                                for (service in it) {
+                                    count = map[service.name]?.count ?: 0
+                                    map[service.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_SERVICE
+                                    )
+                                }
+                            }
+
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_ACTIVITIES
+                                )
+                            packageInfo.activities?.let {
+                                for (activity in it) {
+                                    count = map[activity.name]?.count ?: 0
+                                    map[activity.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_ACTIVITY
+                                    )
+                                }
+                            }
+
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_RECEIVERS
+                                )
+                            packageInfo.receivers?.let {
+                                for (receiver in it) {
+                                    count = map[receiver.name]?.count ?: 0
+                                    map[receiver.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                                    )
+                                }
+                            }
+
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_PROVIDERS
+                                )
+                            packageInfo.providers?.let {
+                                for (provider in it) {
+                                    count = map[provider.name]?.count ?: 0
+                                    map[provider.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
+                }
+                LibReferenceActivity.Type.TYPE_NATIVE -> {
+                    for (item in appList) {
 
-                    libList = PackageUtils.getAbiByNativeDir(
-                        item.sourceDir,
-                        item.nativeLibraryDir
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        libList = PackageUtils.getAbiByNativeDir(
+                            item.sourceDir,
+                            item.nativeLibraryDir
+                        )
+
+                        for (lib in libList) {
+                            count = map[lib.name]?.count ?: 0
+                            map[lib.name] =
+                                RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
+                        }
+                    }
+                }
+                LibReferenceActivity.Type.TYPE_SERVICE -> {
+                    for (item in appList) {
+
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        try {
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_SERVICES
+                                )
+
+                            packageInfo.services?.let {
+                                for (service in it) {
+                                    count = map[service.name]?.count ?: 0
+                                    map[service.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_SERVICE
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                LibReferenceActivity.Type.TYPE_ACTIVITY -> {
+                    for (item in appList) {
+
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        try {
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_ACTIVITIES
+                                )
+                            packageInfo.activities?.let {
+                                for (activity in it) {
+                                    count = map[activity.name]?.count ?: 0
+                                    map[activity.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_ACTIVITY
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
+                    for (item in appList) {
+
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        try {
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_RECEIVERS
+                                )
+                            packageInfo.receivers?.let {
+                                for (receiver in it) {
+                                    count = map[receiver.name]?.count ?: 0
+                                    map[receiver.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
+                    for (item in appList) {
+
+                        if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+                            continue
+                        }
+
+                        try {
+                            packageInfo =
+                                context.packageManager.getPackageInfo(
+                                    item.packageName,
+                                    PackageManager.GET_PROVIDERS
+                                )
+                            packageInfo.providers?.let {
+                                for (provider in it) {
+                                    count = map[provider.name]?.count ?: 0
+                                    map[provider.name] = RefCountType(
+                                        count + 1,
+                                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                                    )
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+
+            for (entry in map) {
+                if (entry.value.count >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
+                    refList.add(
+                        LibReference(entry.key, entry.value.count, entry.value.type)
                     )
-
-                    for (lib in libList) {
-                        count = map[lib.name]?.count ?: 0
-                        map[lib.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
-                    }
-
-                    try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_SERVICES
-                            )
-
-                        packageInfo.services?.let {
-                            for (service in it) {
-                                count = map[service.name]?.count ?: 0
-                                map[service.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_SERVICE)
-                            }
-                        }
-
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_ACTIVITIES
-                            )
-                        packageInfo.activities?.let {
-                            for (activity in it) {
-                                count = map[activity.name]?.count ?: 0
-                                map[activity.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_ACTIVITY)
-                            }
-                        }
-
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_RECEIVERS
-                            )
-                        packageInfo.receivers?.let {
-                            for (receiver in it) {
-                                count = map[receiver.name]?.count ?: 0
-                                map[receiver.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
-                            }
-                        }
-
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_PROVIDERS
-                            )
-                        packageInfo.providers?.let {
-                            for (provider in it) {
-                                count = map[provider.name]?.count ?: 0
-                                map[provider.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
                 }
             }
-            LibReferenceActivity.Type.TYPE_NATIVE -> {
-                for (item in appList) {
 
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
-                    }
+            refList.sortByDescending { it.referredCount }
 
-                    libList = PackageUtils.getAbiByNativeDir(
-                        item.sourceDir,
-                        item.nativeLibraryDir
-                    )
-
-                    for (lib in libList) {
-                        count = map[lib.name]?.count ?: 0
-                        map[lib.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_NATIVE)
-                    }
-                }
-            }
-            LibReferenceActivity.Type.TYPE_SERVICE -> {
-                for (item in appList) {
-
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
-                    }
-
-                    try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_SERVICES
-                            )
-
-                        packageInfo.services?.let {
-                            for (service in it) {
-                                count = map[service.name]?.count ?: 0
-                                map[service.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_SERVICE)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            LibReferenceActivity.Type.TYPE_ACTIVITY -> {
-                for (item in appList) {
-
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
-                    }
-
-                    try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_ACTIVITIES
-                            )
-                        packageInfo.activities?.let {
-                            for (activity in it) {
-                                count = map[activity.name]?.count ?: 0
-                                map[activity.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_ACTIVITY)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
-                for (item in appList) {
-
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
-                    }
-
-                    try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_RECEIVERS
-                            )
-                        packageInfo.receivers?.let {
-                            for (receiver in it) {
-                                count = map[receiver.name]?.count ?: 0
-                                map[receiver.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
-                for (item in appList) {
-
-                    if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-                        continue
-                    }
-
-                    try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_PROVIDERS
-                            )
-                        packageInfo.providers?.let {
-                            for (provider in it) {
-                                count = map[provider.name]?.count ?: 0
-                                map[provider.name] = RefCountType(count + 1, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
+            withContext(Dispatchers.Main) {
+                libReference.value = refList
             }
         }
-
-        for (entry in map) {
-            if (entry.value.count >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
-                refList.add(
-                    LibReference(entry.key, entry.value.count, entry.value.type)
-                )
-            }
-        }
-
-        refList.sortByDescending { it.referredCount }
-
-        withContext(Dispatchers.Main) {
-            libReference.value = refList
-        }
-    }
 
     private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.insert(item)
@@ -511,7 +538,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun getAbi(path: String, nativePath: String): Int {
-        val abiList = ArrayList<String>()
+        var abi = NO_LIBS
 
         try {
             val file = File(path)
@@ -522,10 +549,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 val name = entries.nextElement().name
 
                 if (name.contains("lib/")) {
-                    abiList.add(name.split("/")[1])
+                    if (name.contains("arm64-v8a")) {
+                        abi = ARMV8
+                    } else if (name.contains("armeabi-v7a")) {
+                        if (abi != ARMV8) {
+                            abi = ARMV7
+                        }
+                    } else if (name.contains("armeabi")) {
+                        if (abi != ARMV8 && abi != ARMV7) {
+                            abi = ARMV5
+                        }
+                    }
                 }
             }
             zipFile.close()
+            return if (abi == NO_LIBS) {
+                getAbiByNativeDir(nativePath)
+            } else {
+                abi
+            }
         } catch (e: ErrnoException) {
             e.printStackTrace()
             return ERROR
@@ -535,13 +577,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
             return ERROR
-        }
-
-        return when {
-            abiList.contains("arm64-v8a") -> ARMV8
-            abiList.contains("armeabi-v7a") -> ARMV7
-            abiList.contains("armeabi") -> ARMV5
-            else -> getAbiByNativeDir(nativePath)
         }
     }
 

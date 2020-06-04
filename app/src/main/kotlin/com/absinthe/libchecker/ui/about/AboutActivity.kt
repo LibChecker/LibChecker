@@ -56,6 +56,7 @@ class AboutActivity : AbsAboutActivity() {
             add(License("contour", "Square", License.APACHE_2, "https://github.com/cashapp/contour"))
             add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
             add(License("libraries", "RikkaApps", License.APACHE_2, "https://github.com/RikkaApps/libraries"))
+            add(License("apk-parser", "hsiafan", "BSD-2-Clause", "https://github.com/hsiafan/apk-parser"))
         }
     }
 
