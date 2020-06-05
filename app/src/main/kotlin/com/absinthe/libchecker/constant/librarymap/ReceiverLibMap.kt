@@ -112,6 +112,12 @@ object ReceiverLibMap {
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
-        )
+        ),
+        Pair("com.ss.android.downloadlib.core.download.DownloadReceiver",
+            LibChip(
+                R.drawable.ic_lib_toutiao, 
+                "头条广告 SDK"
+            )
+        ),
     )
 }

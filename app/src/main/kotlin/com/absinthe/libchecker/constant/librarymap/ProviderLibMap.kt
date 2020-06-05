@@ -62,6 +62,10 @@ object ProviderLibMap {
         Pair(
             "com.facebook.FacebookContentProvider",
             LibChip(R.drawable.ic_lib_facebook, "Facebook SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.multipro.TTMultiProvider",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         )
     )
 }

@@ -616,6 +616,42 @@ object NativeLibMap {
                 R.drawable.ic_question,
                 "LAME"
             )
+        ),
+        Pair("libmonosgen-2.0.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair("libmonodroid.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair("libmonodroid_bundle_app.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair("libmono-btls-shared.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair("libaot-mscorlib.dll.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair("libxamarin-app.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
         )
     )
 }

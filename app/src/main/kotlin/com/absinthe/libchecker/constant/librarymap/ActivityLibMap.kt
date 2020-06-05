@@ -38,6 +38,11 @@ object ActivityLibMap {
         Pair("com.qq.e.ads.ADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
+        Pair("com.qq.e.ads.RewardvideoPortraitADActivity",
+            LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
+        ),Pair("com.qq.e.ads.RewardvideoLandscapeADActivity",
+            LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
+        ),
         Pair(
             "com.tencent.bugly.beta.ui.BetaActivity",
             LibChip(R.drawable.ic_lib_bugly, "Bugly")
@@ -148,6 +153,42 @@ object ActivityLibMap {
         Pair(
             "com.zhihu.matisse.ui.MatisseActivity",
             LibChip(R.drawable.ic_lib_zhihu, "Matisse")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTLandingPageActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTVideoLandingPageActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTRewardVideoActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTFullScreenVideoActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTDelegateActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.activity.TTDelegateActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.ss.android.socialbase.appdownloader.view.DownloadSizeLimitActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.ss.android.socialbase.appdownloader.view.DownloadTaskDeleteActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.ss.android.downloadlib.activity.InteractionMiddleActivity",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         )
     )
 }

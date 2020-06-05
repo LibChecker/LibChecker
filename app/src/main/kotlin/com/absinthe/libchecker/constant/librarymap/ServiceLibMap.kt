@@ -335,6 +335,24 @@ object ServiceLibMap {
                 "头条广告 SDK"
             )
         ),
+        Pair("com.ss.android.socialbase.downloader.downloader.SqlDownloadCacheService",
+            LibChip(
+                R.drawable.ic_lib_toutiao,
+                "头条广告 SDK"
+            )
+        ),
+        Pair("com.ss.android.socialbase.downloader.impls.RetryJobSchedulerService",
+            LibChip(
+                R.drawable.ic_lib_toutiao,
+                "头条广告 SDK"
+            )
+        ),
+        Pair("com.ss.android.socialbase.downloader.impls.DownloadHandleService",
+            LibChip(
+                R.drawable.ic_lib_toutiao,
+                "头条广告 SDK"
+            )
+        ),
         Pair("com.ss.android.socialbase.appdownloader.DownloadHandlerService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
