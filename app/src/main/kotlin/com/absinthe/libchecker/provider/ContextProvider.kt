@@ -20,7 +20,7 @@ class ContextProvider : ContentProvider() {
     override fun onCreate(): Boolean {
         mContext = context!!
         mApplication = context!!.applicationContext as Application
-        return false
+        return true
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? = null
