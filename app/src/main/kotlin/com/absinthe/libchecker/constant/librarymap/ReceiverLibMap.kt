@@ -118,6 +118,6 @@ object ReceiverLibMap {
                 R.drawable.ic_lib_toutiao, 
                 "头条广告 SDK"
             )
-        ),
+        )
     )
 }
