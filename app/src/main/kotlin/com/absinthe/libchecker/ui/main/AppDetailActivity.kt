@@ -14,7 +14,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.IntentUtils
 import com.blankj.utilcode.util.ToastUtils

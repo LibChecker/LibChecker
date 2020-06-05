@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.absinthe.libchecker.constant.GlobalValues
+import com.blankj.utilcode.util.ToastUtils
 
 class PackageReceiver :BroadcastReceiver(){
 
@@ -13,6 +14,7 @@ class PackageReceiver :BroadcastReceiver(){
             intent.action == Intent.ACTION_PACKAGE_REPLACED
         ) {
             GlobalValues.shouldRequestChange = true
+            ToastUtils.showShort("BR Received")
         }
     }
 

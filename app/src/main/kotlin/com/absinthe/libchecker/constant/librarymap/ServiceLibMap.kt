@@ -3,435 +3,507 @@ package com.absinthe.libchecker.constant.librarymap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
-object ServiceLibMap {
+object ServiceLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
-        Pair("com.xiaomi.push.service.XMPushService",
+        Pair(
+            "com.xiaomi.push.service.XMPushService",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "MiPush"
             )
         ),
-        Pair("com.xiaomi.push.service.XMJobService",
+        Pair(
+            "com.xiaomi.push.service.XMJobService",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "MiPush"
             )
         ),
-        Pair("com.xiaomi.mipush.sdk.PushMessageHandler",
+        Pair(
+            "com.xiaomi.mipush.sdk.PushMessageHandler",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "MiPush"
             )
         ),
-        Pair("com.xiaomi.mipush.sdk.MessageHandleService",
+        Pair(
+            "com.xiaomi.mipush.sdk.MessageHandleService",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "MiPush"
             )
         ),
-        Pair("com.amap.api.location.APSService",
+        Pair(
+            "com.amap.api.location.APSService",
             LibChip(
                 R.drawable.ic_lib_amap,
                 "高德地图 SDK"
             )
         ),
-        Pair("com.tencent.bugly.beta.tinker.TinkerResultService",
+        Pair(
+            "com.tencent.bugly.beta.tinker.TinkerResultService",
             LibChip(
                 R.drawable.ic_lib_bugly,
                 "Bugly"
             )
         ),
-        Pair("com.tencent.tinker.lib.service.TinkerPatchForeService",
+        Pair(
+            "com.tencent.tinker.lib.service.TinkerPatchForeService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Tinker"
             )
         ),
-        Pair("com.tencent.tinker.lib.service.TinkerPatchService",
+        Pair(
+            "com.tencent.tinker.lib.service.TinkerPatchService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Tinker"
             )
         ),
-        Pair("com.tencent.tinker.lib.service.TinkerPatchService\$InnerService",
+        Pair(
+            "com.tencent.tinker.lib.service.TinkerPatchService\$InnerService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Tinker"
             )
         ),
-        Pair("com.tencent.tinker.lib.service.DefaultTinkerResultService",
+        Pair(
+            "com.tencent.tinker.lib.service.DefaultTinkerResultService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Tinker"
             )
         ),
-        Pair("com.google.firebase.messaging.FirebaseMessagingService",
+        Pair(
+            "com.google.firebase.messaging.FirebaseMessagingService",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "FCM"
             )
         ),
-        Pair("com.google.firebase.components.ComponentDiscoveryService",
+        Pair(
+            "com.google.firebase.components.ComponentDiscoveryService",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Firebase"
             )
         ),
-        Pair("com.google.firebase.iid.FirebaseInstanceIdService",
+        Pair(
+            "com.google.firebase.iid.FirebaseInstanceIdService",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Firebase"
             )
         ),
-        Pair("com.google.android.gms.measurement.AppMeasurementJobService",
+        Pair(
+            "com.google.android.gms.measurement.AppMeasurementJobService",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Firebase Analytics"
             )
         ),
-        Pair("com.google.android.gms.measurement.AppMeasurementService",
+        Pair(
+            "com.google.android.gms.measurement.AppMeasurementService",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Firebase Analytics"
             )
         ),
-        Pair("com.huawei.hms.support.api.push.service.HmsMsgService",
+        Pair(
+            "com.huawei.hms.support.api.push.service.HmsMsgService",
             LibChip(
                 R.drawable.ic_lib_huawei,
                 "Huawei Push"
             )
         ),
-        Pair("com.huawei.updatesdk.service.deamon.download.DownloadService",
+        Pair(
+            "com.huawei.updatesdk.service.deamon.download.DownloadService",
             LibChip(
                 R.drawable.ic_lib_huawei,
                 "HMS Update"
             )
         ),
-        Pair("com.qq.e.comm.DownloadService",
+        Pair(
+            "com.qq.e.comm.DownloadService",
             LibChip(
                 R.drawable.ic_lib_tencent_ad,
                 "腾讯广告 SDK"
             )
         ),
-        Pair("com.qq.e.downloader.DownloadService",
+        Pair(
+            "com.qq.e.downloader.DownloadService",
             LibChip(
                 R.drawable.ic_lib_tencent_ad,
                 "腾讯广告 SDK"
             )
         ),
-        Pair("com.vivo.push.sdk.service.CommandClientService",
+        Pair(
+            "com.vivo.push.sdk.service.CommandClientService",
             LibChip(
                 R.drawable.ic_lib_vivo,
                 "vivo Push"
             )
         ),
-        Pair("com.heytap.mcssdk.PushService",
+        Pair(
+            "com.heytap.mcssdk.PushService",
             LibChip(
                 R.drawable.ic_lib_oppo,
                 "OPPO Push"
             )
         ),
-        Pair("com.heytap.mcssdk.AppPushService",
+        Pair(
+            "com.heytap.mcssdk.AppPushService",
             LibChip(
                 R.drawable.ic_lib_oppo,
                 "OPPO Push"
             )
         ),
-        Pair("com.taobao.accs.ChannelService",
+        Pair(
+            "com.taobao.accs.ChannelService",
             LibChip(
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
         ),
-        Pair("com.taobao.accs.ChannelService\$KernelService",
+        Pair(
+            "com.taobao.accs.ChannelService\$KernelService",
             LibChip(
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
         ),
-        Pair("com.taobao.accs.data.MsgDistributeService",
+        Pair(
+            "com.taobao.accs.data.MsgDistributeService",
             LibChip(
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
         ),
-        Pair("org.android.agoo.accs.AgooService",
+        Pair(
+            "org.android.agoo.accs.AgooService",
             LibChip(
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
         ),
-        Pair("com.taobao.accs.internal.AccsJobService",
+        Pair(
+            "com.taobao.accs.internal.AccsJobService",
             LibChip(
                 R.drawable.ic_lib_taobao,
                 "淘宝推送"
             )
         ),
-        Pair("com.alibaba.android.bindingx.plugin.weex.WXBindingXModuleService",
+        Pair(
+            "com.alibaba.android.bindingx.plugin.weex.WXBindingXModuleService",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("mtopsdk.xstate.XStateService",
+        Pair(
+            "mtopsdk.xstate.XStateService",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Mtop SDK"
             )
         ),
-        Pair("com.tencent.android.tpush.service.XGDaemonService",
+        Pair(
+            "com.tencent.android.tpush.service.XGDaemonService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("com.tencent.android.tpush.service.XGPushService",
+        Pair(
+            "com.tencent.android.tpush.service.XGPushService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("com.tencent.android.tpush.service.XGPushServiceV3",
+        Pair(
+            "com.tencent.android.tpush.service.XGPushServiceV3",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("com.tencent.android.tpush.service.XGPushServiceV4",
+        Pair(
+            "com.tencent.android.tpush.service.XGPushServiceV4",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("com.tencent.android.tpush.rpc.XGRemoteService",
+        Pair(
+            "com.tencent.android.tpush.rpc.XGRemoteService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("com.tencent.matrix.resource.CanaryWorkerService",
+        Pair(
+            "com.tencent.matrix.resource.CanaryWorkerService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Matrix"
             )
         ),
-        Pair("com.tencent.matrix.resource.CanaryResultService",
+        Pair(
+            "com.tencent.matrix.resource.CanaryResultService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Matrix"
             )
         ),
-        Pair("com.umeng.update.net.DownloadingService",
+        Pair(
+            "com.umeng.update.net.DownloadingService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.UmengService",
+        Pair(
+            "com.umeng.message.UmengService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.XiaomiIntentService",
+        Pair(
+            "com.umeng.message.XiaomiIntentService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.UmengDownloadResourceService",
+        Pair(
+            "com.umeng.message.UmengDownloadResourceService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.UmengIntentService",
+        Pair(
+            "com.umeng.message.UmengIntentService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.UmengMessageIntentReceiverService",
+        Pair(
+            "com.umeng.message.UmengMessageIntentReceiverService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.umeng.message.UmengMessageCallbackHandlerService",
+        Pair(
+            "com.umeng.message.UmengMessageCallbackHandlerService",
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
             )
         ),
-        Pair("com.meizu.cloud.pushsdk.NotificationService",
+        Pair(
+            "com.meizu.cloud.pushsdk.NotificationService",
             LibChip(
                 R.drawable.ic_lib_meizu,
                 "Meizu Push"
             )
         ),
-        Pair("androidx.work.impl.background.systemjob.SystemJobService",
+        Pair(
+            "androidx.work.impl.background.systemjob.SystemJobService",
             LibChip(
                 R.drawable.ic_lib_jetpack,
                 "Jetpack Work"
             )
         ),
-        Pair("androidx.work.impl.foreground.SystemForegroundService",
+        Pair(
+            "androidx.work.impl.foreground.SystemForegroundService",
             LibChip(
                 R.drawable.ic_lib_jetpack,
                 "Jetpack Work"
             )
         ),
-        Pair("androidx.room.MultiInstanceInvalidationService",
+        Pair(
+            "androidx.room.MultiInstanceInvalidationService",
             LibChip(
                 R.drawable.ic_lib_jetpack,
                 "Jetpack Room"
             )
         ),
-        Pair("cn.jpush.android.service.PushService",
+        Pair(
+            "cn.jpush.android.service.PushService",
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
             )
         ),
-        Pair("cn.jpush.android.service.DownloadService",
+        Pair(
+            "cn.jpush.android.service.DownloadService",
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
             )
         ),
-        Pair("cn.jpush.android.service.DaemonService",
+        Pair(
+            "cn.jpush.android.service.DaemonService",
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
             )
         ),
-        Pair("com.huawei.agconnect.core.ServiceDiscovery",
+        Pair(
+            "com.huawei.agconnect.core.ServiceDiscovery",
             LibChip(
                 R.drawable.ic_lib_huawei,
                 "AppGallery Connect"
             )
         ),
-        Pair("com.bytedance.sdk.openadsdk.multipro.aidl.BinderPoolService",
+        Pair(
+            "com.bytedance.sdk.openadsdk.multipro.aidl.BinderPoolService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.notification.DownloadNotificationService",
+        Pair(
+            "com.ss.android.socialbase.downloader.notification.DownloadNotificationService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.downloader.DownloadService",
+        Pair(
+            "com.ss.android.socialbase.downloader.downloader.DownloadService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.downloader.IndependentProcessDownloadService",
+        Pair(
+            "com.ss.android.socialbase.downloader.downloader.IndependentProcessDownloadService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.downloader.SqlDownloadCacheService",
+        Pair(
+            "com.ss.android.socialbase.downloader.downloader.SqlDownloadCacheService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.impls.RetryJobSchedulerService",
+        Pair(
+            "com.ss.android.socialbase.downloader.impls.RetryJobSchedulerService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.downloader.impls.DownloadHandleService",
+        Pair(
+            "com.ss.android.socialbase.downloader.impls.DownloadHandleService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.appdownloader.DownloadHandlerService",
+        Pair(
+            "com.ss.android.socialbase.appdownloader.DownloadHandlerService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.ss.android.socialbase.impls.DownloadHandlerService",
+        Pair(
+            "com.ss.android.socialbase.impls.DownloadHandlerService",
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
             )
         ),
-        Pair("com.tencent.qalsdk.service.QalService",
+        Pair(
+            "com.tencent.qalsdk.service.QalService",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信"
             )
         ),
-        Pair("com.tencent.qalsdk.service.QalAssistService",
+        Pair(
+            "com.tencent.qalsdk.service.QalAssistService",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信"
             )
         ),
-        Pair("com.google.android.gms.auth.api.signin.RevocationBoundService",
+        Pair(
+            "com.google.android.gms.auth.api.signin.RevocationBoundService",
             LibChip(
                 R.drawable.ic_lib_google,
                 "Google Sign-In"
             )
         ),
-        Pair("com.google.android.gms.cast.framework.ReconnectionService",
+        Pair(
+            "com.google.android.gms.cast.framework.ReconnectionService",
             LibChip(
                 R.drawable.ic_lib_google,
                 "Google Cast"
             )
         ),
-        Pair("com.google.android.gms.cast.framework.media.MediaNotificationService",
+        Pair(
+            "com.google.android.gms.cast.framework.media.MediaNotificationService",
             LibChip(
                 R.drawable.ic_lib_google,
                 "Google Cast"
             )
         ),
-        Pair("com.google.android.gms.analytics.AnalyticsService",
+        Pair(
+            "com.google.android.gms.analytics.AnalyticsService",
             LibChip(
                 R.drawable.ic_lib_google_analytics,
                 "Google Analytics"
             )
         ),
-        Pair("com.google.android.gms.analytics.AnalyticsJobService",
+        Pair(
+            "com.google.android.gms.analytics.AnalyticsJobService",
             LibChip(
                 R.drawable.ic_lib_google_analytics,
                 "Google Analytics"
             )
         ),
-        Pair("com.didi.virtualapk.delegate.LocalService",
+        Pair(
+            "com.didi.virtualapk.delegate.LocalService",
             LibChip(
                 R.drawable.ic_lib_didi,
                 "VirtualAPK"
             )
         ),
-        Pair("com.didi.virtualapk.delegate.RemoteService",
+        Pair(
+            "com.didi.virtualapk.delegate.RemoteService",
             LibChip(
                 R.drawable.ic_lib_didi,
                 "VirtualAPK"
             )
         ),
-        Pair("org.hapjs.features.channel.ChannelService",
+        Pair(
+            "org.hapjs.features.channel.ChannelService",
             LibChip(
                 R.drawable.ic_lib_hapjs,
                 "快应用"
             )
         ),
-        Pair("com.liulishuo.filedownloader.services.FileDownloadService\$SeparateProcessService",
+        Pair(
+            "com.liulishuo.filedownloader.services.FileDownloadService\$SeparateProcessService",
             LibChip(
                 R.drawable.ic_question,
                 "FileDownloader"
             )
         ),
-        Pair("com.liulishuo.filedownloader.services.FileDownloadService\$SharedMainProcessService",
+        Pair(
+            "com.liulishuo.filedownloader.services.FileDownloadService\$SharedMainProcessService",
             LibChip(
                 R.drawable.ic_question,
                 "FileDownloader"
@@ -439,4 +511,8 @@ object ServiceLibMap {
         )
 
     )
+
+    override fun getMap(): HashMap<String, LibChip> {
+        return MAP
+    }
 }

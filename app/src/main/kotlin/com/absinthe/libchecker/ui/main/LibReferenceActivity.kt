@@ -17,7 +17,7 @@ import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
@@ -126,7 +126,7 @@ class LibReferenceActivity : BaseActivity() {
                     for (item in items) {
                         val packageInfo = PackageUtils.getPackageInfo(item.packageName)
 
-                        val natives = PackageUtils.getAbiByNativeDir(
+                        val natives = PackageUtils.getNativeDirLibs(
                             packageInfo.applicationInfo.sourceDir,
                             packageInfo.applicationInfo.nativeLibraryDir
                         )

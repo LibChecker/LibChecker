@@ -26,8 +26,7 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
             setImageResource(
                 R.id.iv_abi_type, when (item.abi) {
                     ARMV8 -> R.drawable.ic_64bit
-                    ARMV7 -> R.drawable.ic_32bit
-                    ARMV5 -> R.drawable.ic_32bit
+                    ARMV7, ARMV5 -> R.drawable.ic_32bit
                     else -> 0
                 }
             )

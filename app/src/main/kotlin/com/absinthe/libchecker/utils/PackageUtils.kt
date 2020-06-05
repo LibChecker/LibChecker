@@ -46,15 +46,13 @@ object PackageUtils {
 
     fun getTargetApiString(packageName: String): String {
         return try {
-            val packageInfo: PackageInfo =
-                ContextProvider.getGlobalContext().packageManager.getPackageInfo(packageName, 0)
-            "API ${packageInfo.applicationInfo.targetSdkVersion}"
+            "API ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "API ?"
         }
     }
 
-    fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
+    fun getNativeDirLibs(sourcePath: String, nativePath: String): List<LibStringItem> {
         val file = File(nativePath)
         val list = ArrayList<LibStringItem>()
 

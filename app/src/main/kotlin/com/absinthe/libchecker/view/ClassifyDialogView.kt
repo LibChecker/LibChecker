@@ -12,7 +12,8 @@ import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.ui.main.AppDetailActivity
-import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+
+const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
 

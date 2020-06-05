@@ -26,7 +26,7 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : LCDialogFragment() {
 
-    private lateinit var dialogView: LibDetailView
+    private val dialogView by lazy { LibDetailView(requireContext()) }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getSerializable(EXTRA_LIB_TYPE) as LibStringAdapter.Mode }
 
@@ -35,8 +35,6 @@ class LibDetailDialogFragment : LCDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogView =
-            LibDetailView(requireContext())
         dialogView.binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName

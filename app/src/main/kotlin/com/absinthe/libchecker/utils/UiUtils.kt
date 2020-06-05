@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.utils
 
-import android.R
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
@@ -12,9 +11,9 @@ import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.provider.ContextProvider
 import com.blankj.utilcode.util.ConvertUtils
-
 
 object UiUtils {
 

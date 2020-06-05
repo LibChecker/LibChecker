@@ -3,7 +3,7 @@ package com.absinthe.libchecker.constant.librarymap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
-object ProviderLibMap {
+object ProviderLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.huawei.hms.update.provider.UpdateProvider",
@@ -37,10 +37,12 @@ object ProviderLibMap {
             "androidx.work.impl.WorkManagerInitializer",
             LibChip(R.drawable.ic_lib_jetpack, "Jetpack Work")
         ),
-        Pair("com.google.firebase.provider.FirebaseInitProvider",
+        Pair(
+            "com.google.firebase.provider.FirebaseInitProvider",
             LibChip(R.drawable.ic_lib_firebase, "Firebase")
         ),
-        Pair("com.crashlytics.android.CrashlyticsInitProvider",
+        Pair(
+            "com.crashlytics.android.CrashlyticsInitProvider",
             LibChip(R.drawable.ic_lib_firebase, "Crashlytics")
         ),
         Pair(
@@ -68,4 +70,8 @@ object ProviderLibMap {
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         )
     )
+
+    override fun getMap(): HashMap<String, LibChip> {
+        return MAP
+    }
 }

@@ -14,46 +14,23 @@ class LibReferenceAdapter :
         holder.setText(R.id.tv_lib_name, item.libName)
 
         var found = false
-        when (item.type) {
-            LibReferenceActivity.Type.TYPE_NATIVE -> {
-                NativeLibMap.MAP[item.libName]?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
-                    holder.setText(R.id.tv_label_name, it.name)
-                    found = true
-                }
+        val map: BaseMap? = when (item.type) {
+            LibReferenceActivity.Type.TYPE_NATIVE -> NativeLibMap
+            LibReferenceActivity.Type.TYPE_SERVICE -> ServiceLibMap
+            LibReferenceActivity.Type.TYPE_ACTIVITY -> ActivityLibMap
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> ReceiverLibMap
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> ProviderLibMap
+            else -> null
+        }
+        map?.apply {
+            getMap()[item.libName]?.let {
+                holder.setImageResource(R.id.iv_icon, it.iconRes)
+                holder.setText(R.id.tv_label_name, it.name)
+                found = true
             }
-            LibReferenceActivity.Type.TYPE_SERVICE -> {
-                ServiceLibMap.MAP[item.libName]?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
-                    holder.setText(R.id.tv_label_name, it.name)
-                    found = true
-                }
-            }
-            LibReferenceActivity.Type.TYPE_ACTIVITY -> {
-                ActivityLibMap.MAP[item.libName]?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
-                    holder.setText(R.id.tv_label_name, it.name)
-                    found = true
-                }
-            }
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
-                ReceiverLibMap.MAP[item.libName]?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
-                    holder.setText(R.id.tv_label_name, it.name)
-                    found = true
-                }
-            }
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
-                ProviderLibMap.MAP[item.libName]?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
-                    holder.setText(R.id.tv_label_name, it.name)
-                    found = true
-                }
-            }
-            else -> {
-                holder.setImageResource(R.id.iv_icon, R.drawable.ic_question)
-                holder.setText(R.id.tv_label_name, R.string.not_marked_lib)
-            }
+        } ?: apply {
+            holder.setImageResource(R.id.iv_icon, R.drawable.ic_question)
+            holder.setText(R.id.tv_label_name, R.string.not_marked_lib)
         }
 
         if (!found) {

@@ -3,7 +3,7 @@ package com.absinthe.libchecker.constant.librarymap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
-object ActivityLibMap {
+object ActivityLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.google.android.gms.common.api.GoogleApiActivity",
@@ -29,18 +29,23 @@ object ActivityLibMap {
             "com.tencent.connect.common.AssistActivity",
             LibChip(R.drawable.ic_lib_tencent, "腾讯开放平台")
         ),
-        Pair("com.qq.e.ads.LandscapeADActivity",
+        Pair(
+            "com.qq.e.ads.LandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
-        Pair("com.qq.e.ads.PortraitADActivity",
+        Pair(
+            "com.qq.e.ads.PortraitADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
-        Pair("com.qq.e.ads.ADActivity",
+        Pair(
+            "com.qq.e.ads.ADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
-        Pair("com.qq.e.ads.RewardvideoPortraitADActivity",
+        Pair(
+            "com.qq.e.ads.RewardvideoPortraitADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
-        ),Pair("com.qq.e.ads.RewardvideoLandscapeADActivity",
+        ), Pair(
+            "com.qq.e.ads.RewardvideoLandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
         Pair(
@@ -95,7 +100,8 @@ object ActivityLibMap {
             "com.alipay.sdk.app.AlipayResultActivity",
             LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
         ),
-        Pair("com.alibaba.wireless.security.open.middletier.fc.ui.ContainerActivity",
+        Pair(
+            "com.alibaba.wireless.security.open.middletier.fc.ui.ContainerActivity",
             LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")
         ),
         Pair(
@@ -191,4 +197,8 @@ object ActivityLibMap {
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         )
     )
+
+    override fun getMap(): HashMap<String, LibChip> {
+        return MAP
+    }
 }

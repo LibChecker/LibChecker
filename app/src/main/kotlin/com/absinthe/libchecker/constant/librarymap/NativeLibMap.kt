@@ -3,655 +3,767 @@ package com.absinthe.libchecker.constant.librarymap
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
-object NativeLibMap {
+object NativeLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
-        Pair("libflutter.so",
+        Pair(
+            "libflutter.so",
             LibChip(
                 R.drawable.ic_lib_flutter,
                 "Flutter"
             )
         ),
-        Pair("libapp.so",
+        Pair(
+            "libapp.so",
             LibChip(
                 R.drawable.ic_lib_flutter,
                 "Flutter"
             )
         ),
-        Pair("libBugly.so",
+        Pair(
+            "libBugly.so",
             LibChip(
                 R.drawable.ic_lib_bugly,
                 "Bugly"
             )
         ),
-        Pair("libBugly-rqd.so",
+        Pair(
+            "libBugly-rqd.so",
             LibChip(
                 R.drawable.ic_lib_bugly,
                 "Bugly"
             )
         ),
-        Pair("libtpnsSecurity.so",
+        Pair(
+            "libtpnsSecurity.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("libxguardian.so",
+        Pair(
+            "libxguardian.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "信鸽推送"
             )
         ),
-        Pair("libhippybridge.so",
+        Pair(
+            "libhippybridge.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Hippy"
             )
         ),
-        Pair("libflexbox.so",
+        Pair(
+            "libflexbox.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Hippy"
             )
         ),
-        Pair("libmmkv.so",
+        Pair(
+            "libmmkv.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "MMKV"
             )
         ),
-        Pair("libBeacon.so",
+        Pair(
+            "libBeacon.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "腾讯流量联盟"
             )
         ),
-        Pair("libmarsxlog.so",
+        Pair(
+            "libmarsxlog.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Mars"
             )
         ),
-        Pair("libwcdb.so",
+        Pair(
+            "libwcdb.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "WCDB"
             )
         ),
-        Pair("libwtecdh.so",
+        Pair(
+            "libwtecdh.so",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "米大师"
             )
         ),
-        Pair("libliteavsdk.so",
+        Pair(
+            "libliteavsdk.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云直播 SDK"
             )
         ),
-        Pair("libsaturn.so",
+        Pair(
+            "libsaturn.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云直播 SDK"
             )
         ),
-        Pair("libqalmsfboot.so",
+        Pair(
+            "libqalmsfboot.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信 SDK"
             )
         ),
-        Pair("libqalcodecwrapper.so",
+        Pair(
+            "libqalcodecwrapper.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信 SDK"
             )
         ),
-        Pair("libwtcrypto.so",
+        Pair(
+            "libwtcrypto.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信 SDK"
             )
         ),
-        Pair("libijkplayer.so",
+        Pair(
+            "libijkplayer.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,
                 "IJKPlayer"
             )
         ),
-        Pair("libijksdl.so",
+        Pair(
+            "libijksdl.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,
                 "IJKPlayer"
             )
         ),
-        Pair("libijkffmpeg.so",
+        Pair(
+            "libijkffmpeg.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,
                 "IJKPlayer"
             )
         ),
-        Pair("libndkbitmap.so",
+        Pair(
+            "libndkbitmap.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,
                 "烈焰弹幕使"
             )
         ),
-        Pair("libreactnativejni.so",
+        Pair(
+            "libreactnativejni.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libjsc.so",
+        Pair(
+            "libjsc.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libfolly_json.so",
+        Pair(
+            "libfolly_json.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libjsinspector.so",
+        Pair(
+            "libjsinspector.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libjsinspector.so",
+        Pair(
+            "libjsinspector.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libjscexecutor.so",
+        Pair(
+            "libjscexecutor.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libJavaScriptCore.so",
+        Pair(
+            "libJavaScriptCore.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libglog_init.so",
+        Pair(
+            "libglog_init.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
             )
         ),
-        Pair("libfb.so",
+        Pair(
+            "libfb.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Facebook SDK"
             )
         ),
-        Pair("libjiagu.so",
+        Pair(
+            "libjiagu.so",
             LibChip(
                 R.drawable.ic_lib_360,
                 "360 加固"
             )
         ),
-        Pair("libc++_shared.so",
+        Pair(
+            "libc++_shared.so",
             LibChip(
                 R.drawable.ic_lib_cpp,
                 "C++ 共享库"
             )
         ),
-        Pair("libstlport_shared.so",
+        Pair(
+            "libstlport_shared.so",
             LibChip(
                 R.drawable.ic_lib_cpp,
                 "C++ STL"
             )
         ),
-        Pair("libwind.so",
+        Pair(
+            "libwind.so",
             LibChip(
                 R.drawable.ic_lib_weibo,
                 "微博 SDK"
             )
         ),
-        Pair("libutility.so",
+        Pair(
+            "libutility.so",
             LibChip(
                 R.drawable.ic_lib_weibo,
                 "微博 SDK"
             )
         ),
-        Pair("libweibosdkcore.so",
+        Pair(
+            "libweibosdkcore.so",
             LibChip(
                 R.drawable.ic_lib_weibo,
                 "微博 SDK"
             )
         ),
-        Pair("libmsc.so",
+        Pair(
+            "libmsc.so",
             LibChip(
                 R.drawable.ic_lib_xunfei,
                 "讯飞 SDK"
             )
         ),
-        Pair("libluajava.so",
+        Pair(
+            "libluajava.so",
             LibChip(
                 R.drawable.ic_lib_lua,
                 "AndroLua"
             )
         ),
-        Pair("libRSSupport.so",
+        Pair(
+            "libRSSupport.so",
             LibChip(
                 R.drawable.ic_android_outline,
                 "RenderScript"
             )
         ),
-        Pair("librsjni.so",
+        Pair(
+            "librsjni.so",
             LibChip(
                 R.drawable.ic_android_outline,
                 "RenderScript"
             )
         ),
-        Pair("librsjni_androidx.so",
+        Pair(
+            "librsjni_androidx.so",
             LibChip(
                 R.drawable.ic_android_outline,
                 "RenderScript"
             )
         ),
-        Pair("libframesequence.so",
+        Pair(
+            "libframesequence.so",
             LibChip(
                 R.drawable.ic_android_outline,
                 "FrameSequence"
             )
         ),
-        Pair("libweexcore.so",
+        Pair(
+            "libweexcore.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libWeexEagle.so",
+        Pair(
+            "libWeexEagle.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libweexjst.so",
+        Pair(
+            "libweexjst.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libweexjss.so",
+        Pair(
+            "libweexjss.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libweexjsb.so",
+        Pair(
+            "libweexjsb.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libweexjssr.so",
+        Pair(
+            "libweexjssr.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libgcanvas.so",
+        Pair(
+            "libgcanvas.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "GCanvas"
             )
         ),
-        Pair("libWTF.so",
+        Pair(
+            "libWTF.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
             )
         ),
-        Pair("libandfix.so",
+        Pair(
+            "libandfix.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "AndFix"
             )
         ),
-        Pair("libcrashsdk.so",
+        Pair(
+            "libcrashsdk.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "岳鹰 SDK"
             )
         ),
-        Pair("libtencentloc.so",
+        Pair(
+            "libtencentloc.so",
             LibChip(
                 R.drawable.ic_lib_tencent_map,
                 "腾讯地图 SDK"
             )
         ),
-        Pair("libtxmapengine.so",
+        Pair(
+            "libtxmapengine.so",
             LibChip(
                 R.drawable.ic_lib_tencent_map,
                 "腾讯地图 SDK"
             )
         ),
-        Pair("libyuv.so",
+        Pair(
+            "libyuv.so",
             LibChip(
                 R.drawable.ic_lib_google,
                 "libYUV"
             )
         ),
-        Pair("libYUV.so",
+        Pair(
+            "libYUV.so",
             LibChip(
                 R.drawable.ic_lib_google,
                 "libYUV"
             )
         ),
-        Pair("libglog.so",
+        Pair(
+            "libglog.so",
             LibChip(
                 R.drawable.ic_lib_google,
                 "glog"
             )
         ),
-        Pair("libarcore_sdk_jni.so",
+        Pair(
+            "libarcore_sdk_jni.so",
             LibChip(
                 R.drawable.ic_lib_google_arcore,
                 "ARCore"
             )
         ),
-        Pair("libunity.so",
+        Pair(
+            "libunity.so",
             LibChip(
                 R.drawable.ic_lib_unity,
                 "Unity"
             )
         ),
-        Pair("libmain.so",
+        Pair(
+            "libmain.so",
             LibChip(
                 R.drawable.ic_lib_unity,
                 "Unity"
             )
         ),
-        Pair("libmono.so",
+        Pair(
+            "libmono.so",
             LibChip(
                 R.drawable.ic_lib_unity,
                 "Unity"
             )
         ),
-        Pair("libyoga.so",
+        Pair(
+            "libyoga.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Yoga"
             )
         ),
-        Pair("libyouga.so",
+        Pair(
+            "libyouga.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Yoga"
             )
         ),
-        Pair("liblib_fb_fbjni.so",
+        Pair(
+            "liblib_fb_fbjni.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Yoga"
             )
         ),
-        Pair("librealm-jni.so",
+        Pair(
+            "librealm-jni.so",
             LibChip(
                 R.drawable.ic_lib_realm,
                 "realm"
             )
         ),
-        Pair("libcrashlytics.so",
+        Pair(
+            "libcrashlytics.so",
             LibChip(
                 R.drawable.ic_lib_firebase,
                 "Crashlytics"
             )
         ),
-        Pair("libopencv_java3.so",
+        Pair(
+            "libopencv_java3.so",
             LibChip(
                 R.drawable.ic_lib_opencv,
                 "OpenCV"
             )
         ),
-        Pair("libpl_droidsonroids_gif.so",
+        Pair(
+            "libpl_droidsonroids_gif.so",
             LibChip(
                 R.drawable.ic_lib_gif,
                 "android-gif-drawable"
             )
         ),
-        Pair("libCtaApiLib.so",
+        Pair(
+            "libCtaApiLib.so",
             LibChip(
                 R.drawable.ic_lib_jverification,
                 "极光认证 SDK"
             )
         ),
-        Pair("libsqlcipher.so",
+        Pair(
+            "libsqlcipher.so",
             LibChip(
                 R.drawable.ic_lib_sql,
                 "SQLCipher"
             )
         ),
-        Pair("libstlport_shared.so",
+        Pair(
+            "libstlport_shared.so",
             LibChip(
                 R.drawable.ic_lib_sql,
                 "SQLCipher"
             )
         ),
-        Pair("libsgsecuritybody.so",
+        Pair(
+            "libsgsecuritybody.so",
             LibChip(
                 R.drawable.ic_lib_ali_security,
                 "阿里聚安全"
             )
         ),
-        Pair("libsgavmp.so",
+        Pair(
+            "libsgavmp.so",
             LibChip(
                 R.drawable.ic_lib_ali_security,
                 "阿里聚安全"
             )
         ),
-        Pair("libsgmain.so",
+        Pair(
+            "libsgmain.so",
             LibChip(
                 R.drawable.ic_lib_ali_security,
                 "阿里聚安全"
             )
         ),
-        Pair("libimagepipeline.so",
+        Pair(
+            "libimagepipeline.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libstatic-webp.so",
+        Pair(
+            "libstatic-webp.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libbitmaps.so",
+        Pair(
+            "libbitmaps.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libgifimage.so",
+        Pair(
+            "libgifimage.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libmemchunk.so",
+        Pair(
+            "libmemchunk.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libwebpimage.so",
+        Pair(
+            "libwebpimage.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libnative-filters.so",
+        Pair(
+            "libnative-filters.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libnative-imagetranscoder.so",
+        Pair(
+            "libnative-imagetranscoder.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libwebp.so",
+        Pair(
+            "libwebp.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
                 "Fresco"
             )
         ),
-        Pair("libentryexpro.so",
+        Pair(
+            "libentryexpro.so",
             LibChip(
                 R.drawable.ic_lib_unionpay,
                 "银联 SDK"
             )
         ),
-        Pair("libuptsmaddon.so",
+        Pair(
+            "libuptsmaddon.so",
             LibChip(
                 R.drawable.ic_lib_unionpay,
                 "银联 SDK"
             )
         ),
-        Pair("libuptsmaddonmi.so",
+        Pair(
+            "libuptsmaddonmi.so",
             LibChip(
                 R.drawable.ic_lib_unionpay,
                 "银联 SDK"
             )
         ),
-        Pair("libuptsmservice.so",
+        Pair(
+            "libuptsmservice.so",
             LibChip(
                 R.drawable.ic_lib_unionpay,
                 "银联 SDK"
             )
         ),
-        Pair("libsdk_patcher_jni.so",
+        Pair(
+            "libsdk_patcher_jni.so",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "小米更新 SDK"
             )
         ),
-        Pair("libmibraindec.so",
+        Pair(
+            "libmibraindec.so",
             LibChip(
                 R.drawable.ic_lib_xiaoai,
                 "小爱 SDK"
             )
         ),
-        Pair("libmibrainjni.so",
+        Pair(
+            "libmibrainjni.so",
             LibChip(
                 R.drawable.ic_lib_xiaoai,
                 "小爱 SDK"
             )
         ),
-        Pair("libmibrainsdk.so",
+        Pair(
+            "libmibrainsdk.so",
             LibChip(
                 R.drawable.ic_lib_xiaoai,
                 "小爱 SDK"
             )
         ),
-        Pair("libmibrainvad2.so",
+        Pair(
+            "libmibrainvad2.so",
             LibChip(
                 R.drawable.ic_lib_xiaoai,
                 "小爱 SDK"
             )
         ),
-        Pair("libapssdk.so",
+        Pair(
+            "libapssdk.so",
             LibChip(
                 R.drawable.ic_lib_amap,
                 "高德 SDK"
             )
         ),
-        Pair("libBaiduSpeechSDK.so",
+        Pair(
+            "libBaiduSpeechSDK.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "DuMix"
             )
         ),
-        Pair("libvad.dnn.so",
+        Pair(
+            "libvad.dnn.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "DuMix"
             )
         ),
-        Pair("libbdSpilWakeup.so",
+        Pair(
+            "libbdSpilWakeup.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "DuMix"
             )
         ),
-        Pair("libbdEASRAndroid.so",
+        Pair(
+            "libbdEASRAndroid.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "DuMix"
             )
         ),
-        Pair("libImgRecognition.so",
+        Pair(
+            "libImgRecognition.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "DuMix"
             )
         ),
-        Pair("libindoor.so",
+        Pair(
+            "libindoor.so",
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "百度 LBS"
             )
         ),
-        Pair("libarcore_sdk_c.so",
+        Pair(
+            "libarcore_sdk_c.so",
             LibChip(
                 R.drawable.ic_question,
                 "ViroCore"
             )
         ),
-        Pair("libmp3lame.so",
+        Pair(
+            "libmp3lame.so",
             LibChip(
                 R.drawable.ic_question,
                 "LAME"
             )
         ),
-        Pair("libmonosgen-2.0.so",
+        Pair(
+            "libmonosgen-2.0.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         ),
-        Pair("libmonodroid.so",
+        Pair(
+            "libmonodroid.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         ),
-        Pair("libmonodroid_bundle_app.so",
+        Pair(
+            "libmonodroid_bundle_app.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         ),
-        Pair("libmono-btls-shared.so",
+        Pair(
+            "libmono-btls-shared.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         ),
-        Pair("libaot-mscorlib.dll.so",
+        Pair(
+            "libaot-mscorlib.dll.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         ),
-        Pair("libxamarin-app.so",
+        Pair(
+            "libxamarin-app.so",
             LibChip(
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
         )
     )
+
+    override fun getMap(): HashMap<String, LibChip> {
+        return MAP
+    }
 }

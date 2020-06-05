@@ -233,7 +233,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var count: Int
 
         for (item in appList) {
-            libList = PackageUtils.getAbiByNativeDir(
+            libList = PackageUtils.getNativeDirLibs(
                 item.sourceDir,
                 item.nativeLibraryDir
             )
@@ -303,7 +303,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             continue
                         }
 
-                        libList = PackageUtils.getAbiByNativeDir(
+                        libList = PackageUtils.getNativeDirLibs(
                             item.sourceDir,
                             item.nativeLibraryDir
                         )
@@ -387,7 +387,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             continue
                         }
 
-                        libList = PackageUtils.getAbiByNativeDir(
+                        libList = PackageUtils.getNativeDirLibs(
                             item.sourceDir,
                             item.nativeLibraryDir
                         )

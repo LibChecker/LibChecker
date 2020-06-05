@@ -185,7 +185,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         sourcePath: String,
         nativePath: String
     ): List<LibStringItem> {
-        val list = PackageUtils.getAbiByNativeDir(sourcePath, nativePath).toMutableList()
+        val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
 
         if (list.isEmpty()) {
             list.add(LibStringItem(context.getString(R.string.empty_list), 0))

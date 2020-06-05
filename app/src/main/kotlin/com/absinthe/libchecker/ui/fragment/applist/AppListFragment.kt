@@ -26,7 +26,7 @@ import com.absinthe.libchecker.ui.main.AppDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.view.dialogfragment.EXTRA_PKG_NAME
+import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once

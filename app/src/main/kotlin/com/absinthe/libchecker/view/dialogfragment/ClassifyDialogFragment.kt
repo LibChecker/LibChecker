@@ -13,12 +13,9 @@ const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 class ClassifyDialogFragment : LCDialogFragment() {
 
     var item: ArrayList<AppItem> = ArrayList()
-    private lateinit var dialogView: ClassifyDialogView
+    private val dialogView by lazy { ClassifyDialogView(requireContext()) }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogView =
-            ClassifyDialogView(requireContext())
-
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<AppItem>(
                 EXTRA_ITEM_LIST
