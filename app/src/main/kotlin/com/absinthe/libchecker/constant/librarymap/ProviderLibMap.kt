@@ -14,6 +14,10 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_huawei, "HMS Update")
         ),
         Pair(
+            "com.huawei.agconnect.core.provider.AGConnectInitializeProvider",
+            LibChip(R.drawable.ic_lib_huawei, "AppGallery Connect")
+        ),
+        Pair(
             "com.huawei.hms.support.api.push.PushProvider",
             LibChip(R.drawable.ic_lib_huawei, "Huawei Push")
         ),
@@ -88,6 +92,14 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "com.igexin.download.DownloadProvider",
             LibChip(R.drawable.ic_question, "个推")
+        ),
+        Pair(
+            "com.squareup.picasso.PicassoProvider",
+            LibChip(R.drawable.ic_question, "Picasso")
+        ),
+        Pair(
+            "com.blankj.utilcode.util.UtilsFileProvider",
+            LibChip(R.drawable.ic_question, "AndroidUtilCode")
         )
     )
 

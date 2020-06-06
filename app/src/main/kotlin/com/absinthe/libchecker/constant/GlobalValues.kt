@@ -34,7 +34,7 @@ object GlobalValues {
         showRelativeUrl = false
     )
 
-    var repo = Constants.REPO_GITHUB
+    var repo = Constants.REPO_GITEE
 
     var shouldRequestChange = false
 
@@ -57,7 +57,7 @@ object GlobalValues {
         libReferenceThreshold.value =
             getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
-        repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITHUB)
-            ?: Constants.REPO_GITHUB
+        repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
+            ?: Constants.REPO_GITEE
     }
 }

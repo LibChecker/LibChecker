@@ -529,6 +529,13 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "个推"
             )
+        ),
+        Pair(
+            "com.blankj.utilcode.util.MessengerUtils\$ServerService",
+            LibChip(
+                R.drawable.ic_question,
+                "AndroidUtilCode"
+            )
         )
     )
 

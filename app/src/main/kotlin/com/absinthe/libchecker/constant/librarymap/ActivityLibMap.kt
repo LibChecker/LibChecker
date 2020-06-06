@@ -102,6 +102,10 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
         ),
         Pair(
+            "com.ali.auth.third.ui.LoginWebViewActivity",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
             "com.ali.auth.third.ui.webview.BaseWebViewActivity",
             LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
         ),
@@ -224,6 +228,14 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.igexin.sdk.GActivity",
             LibChip(R.drawable.ic_question, "个推")
+        ),
+        Pair(
+            "com.xiaomi.account.openauth.AuthorizeActivity",
+            LibChip(R.drawable.ic_lib_xiaomi, "小米账号开放平台")
+        ),
+        Pair(
+            "com.blankj.utilcode.util.UtilsTransActivity",
+            LibChip(R.drawable.ic_question, "AndroidUtilCode")
         )
     )
 

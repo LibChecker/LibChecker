@@ -777,6 +777,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libdexjni.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
             "libDexHelper.so",
             LibChip(
                 R.drawable.ic_question,
@@ -812,10 +819,45 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libnms.so",
+            LibChip(
+                R.drawable.ic_lib_toutiao,
+                "头条广告 SDK"
+            )
+        ),
+        Pair(
+            "libtobEmbedEncrypt.so",
+            LibChip(
+                R.drawable.ic_lib_toutiao,
+                "头条广告 SDK"
+            )
+        ),
+        Pair(
+            "libgetuiext3.so",
+            LibChip(
+                R.drawable.ic_question,
+                "个推"
+            )
+        ),
+        Pair(
             "libepic.so",
             LibChip(
                 R.drawable.ic_question,
                 "Epic"
+            )
+        ),
+        Pair(
+            "libxcrash.so",
+            LibChip(
+                R.drawable.ic_lib_iqiyi,
+                "xCrash"
+            )
+        ),
+        Pair(
+            "libxcrash_dumper.so",
+            LibChip(
+                R.drawable.ic_lib_iqiyi,
+                "xCrash"
             )
         )
     )
