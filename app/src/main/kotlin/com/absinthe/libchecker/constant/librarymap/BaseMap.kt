@@ -7,6 +7,14 @@ abstract class BaseMap {
     abstract fun findRegex(name: String): LibChip?
 
     fun contains(name: String): Boolean {
-        return getMap().containsKey(name) || NativeLibMap.findRegex(name) != null
+        return getMap().containsKey(name) || findRegex(name) != null
+    }
+
+    fun getChip(name: String): LibChip? {
+        getMap()[name]?.let {
+            return it
+        } ?: let {
+            return findRegex(name)
+        }
     }
 }

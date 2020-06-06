@@ -28,15 +28,15 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
 
         val libIcon = holder.getView<Chip>(R.id.chip)
 
-        val map = when (mode) {
-            Mode.NATIVE -> NativeLibMap.MAP
-            Mode.SERVICE -> ServiceLibMap.MAP
-            Mode.ACTIVITY -> ActivityLibMap.MAP
-            Mode.RECEIVER -> ReceiverLibMap.MAP
-            Mode.PROVIDER -> ProviderLibMap.MAP
+        val map: BaseMap = when (mode) {
+            Mode.NATIVE -> NativeLibMap
+            Mode.SERVICE -> ServiceLibMap
+            Mode.ACTIVITY -> ActivityLibMap
+            Mode.RECEIVER -> ReceiverLibMap
+            Mode.PROVIDER -> ProviderLibMap
         }
 
-        map[item.name]?.let {
+        map.getChip(item.name)?.let {
             libIcon.apply {
                 setChipIconResource(it.iconRes)
                 text = it.name

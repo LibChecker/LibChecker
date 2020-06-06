@@ -771,6 +771,7 @@ object NativeLibMap : BaseMap() {
     override fun findRegex(name: String): LibChip? {
         return when {
             Pattern.matches("libAMapSDK_MAP_v[0-9]_[0-9]_[0-9]\\.so", name) -> LibChip(R.drawable.ic_lib_amap, "高德地图 SDK")
+            Pattern.matches("libaot-Xamarin\\.Android\\.(.*)\\.dll\\.so", name) -> LibChip(R.drawable.ic_lib_xamarin, "Xamarin")
             else -> null
         }
     }
