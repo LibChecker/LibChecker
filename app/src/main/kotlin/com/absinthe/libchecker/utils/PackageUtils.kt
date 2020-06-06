@@ -1,11 +1,13 @@
 package com.absinthe.libchecker.utils
 
 import android.content.pm.ApplicationInfo
+import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.provider.ContextProvider
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import java.io.File
 import java.util.*
 import java.util.zip.ZipEntry
@@ -17,13 +19,16 @@ import kotlin.collections.ArrayList
 object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
-    fun getPackageInfo(info: ApplicationInfo): PackageInfo {
-        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(info.packageName, 0)
+    fun getPackageInfo(info: ApplicationInfo, flag: Int = 0): PackageInfo {
+        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(
+            info.packageName,
+            flag
+        )
     }
 
     @Throws(PackageManager.NameNotFoundException::class)
-    fun getPackageInfo(packageName: String): PackageInfo {
-        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(packageName, 0)
+    fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
+        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(packageName, flag)
     }
 
     fun getVersionCode(packageInfo: PackageInfo): Long {
@@ -151,5 +156,28 @@ object PackageUtils {
         }
 
         return libList
+    }
+
+    fun getComponentList(
+        packageName: String,
+        type: LibReferenceActivity.Type
+    ): Array<out ComponentInfo>? {
+        val flag = when (type) {
+            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
+            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
+            else -> 0
+        }
+
+        val packageInfo = getPackageInfo(packageName, flag)
+
+        return when (flag) {
+            PackageManager.GET_SERVICES -> packageInfo.services
+            PackageManager.GET_ACTIVITIES -> packageInfo.activities
+            PackageManager.GET_RECEIVERS -> packageInfo.receivers
+            PackageManager.GET_PROVIDERS -> packageInfo.providers
+            else -> null
+        }
     }
 }

@@ -50,6 +50,27 @@ class LibReferenceActivity : BaseActivity() {
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
+        val name = intent.extras?.getString(EXTRA_NAME)
+        val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
+
+        if (name == null) {
+            finish()
+        } else {
+            initView()
+            lifecycleScope.launch(Dispatchers.IO) {
+                setData(name, type)
+            }
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun initView() {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
 
@@ -92,24 +113,6 @@ class LibReferenceActivity : BaseActivity() {
             )
             startActivity(intent, options.toBundle())
         }
-
-        val name = intent.extras?.getString(EXTRA_NAME)
-        val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
-
-        if (name == null) {
-            finish()
-        } else {
-            lifecycleScope.launch(Dispatchers.IO) {
-                setData(name, type)
-            }
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressed()
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private suspend fun setData(name: String, type: Type) {
@@ -138,64 +141,11 @@ class LibReferenceActivity : BaseActivity() {
                             }
                         }
                     }
-                } else if (type == Type.TYPE_SERVICE) {
+                } else {
                     for (item in items) {
-                        val packageInfo =
-                            packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_SERVICES
-                            )
-                        packageInfo.services?.let { services ->
-                            for (service in services) {
-                                if (service.name == name) {
-                                    list.add(item)
-                                    break
-                                }
-                            }
-                        }
-                    }
-                } else if (type == Type.TYPE_ACTIVITY) {
-                    for (item in items) {
-                        val packageInfo =
-                            packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_ACTIVITIES
-                            )
-                        packageInfo.activities?.let { activities ->
-                            for (activity in activities) {
-                                if (activity.name == name) {
-                                    list.add(item)
-                                    break
-                                }
-                            }
-                        }
-                    }
-                } else if (type == Type.TYPE_BROADCAST_RECEIVER) {
-                    for (item in items) {
-                        val packageInfo =
-                            packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_RECEIVERS
-                            )
-                        packageInfo.receivers?.let { receivers ->
-                            for (receiver in receivers) {
-                                if (receiver.name == name) {
-                                    list.add(item)
-                                    break
-                                }
-                            }
-                        }
-                    }
-                } else if (type == Type.TYPE_CONTENT_PROVIDER) {
-                    for (item in items) {
-                        val packageInfo =
-                            packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_PROVIDERS
-                            )
-                        packageInfo.providers?.let { providers ->
-                            for (provider in providers) {
-                                if (provider.name == name) {
+                        PackageUtils.getComponentList(item.packageName, type)?.let { components ->
+                            for (component in components) {
+                                if (component.name == name) {
                                     list.add(item)
                                     break
                                 }
