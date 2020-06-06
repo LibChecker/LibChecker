@@ -1,5 +1,9 @@
 package com.absinthe.libchecker.ui.main
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
@@ -16,6 +20,7 @@ import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
 
@@ -24,6 +29,17 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
+    private val requestPackageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
+                intent.action == Intent.ACTION_PACKAGE_REMOVED ||
+                intent.action == Intent.ACTION_PACKAGE_REPLACED
+            ) {
+                GlobalValues.shouldRequestChange = true
+                ToastUtils.showShort("BR Received")
+            }
+        }
+    }
 
     override fun setViewBinding() {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,6 +60,7 @@ class MainActivity : BaseActivity() {
 
         initView()
 
+        registerPackageBroadcast()
         viewModel.requestConfiguration()
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
@@ -57,6 +74,16 @@ class MainActivity : BaseActivity() {
         if (GlobalValues.shouldRequestChange) {
             viewModel.requestChange(this)
         }
+    }
+
+    override fun onDestroy() {
+        unregisterPackageBroadcast()
+        super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
     }
 
     private fun initView() {
@@ -101,5 +128,20 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
+    }
+
+    private fun registerPackageBroadcast() {
+        val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_ADDED)
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
+        }
+
+        registerReceiver(requestPackageReceiver, intentFilter)
+    }
+
+    private fun unregisterPackageBroadcast() {
+        unregisterReceiver(requestPackageReceiver)
     }
 }
