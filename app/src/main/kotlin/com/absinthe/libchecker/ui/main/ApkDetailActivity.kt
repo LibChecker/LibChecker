@@ -183,9 +183,7 @@ class ApkDetailActivity : BaseActivity() {
                 libList.add(LibStringItem(getString(R.string.empty_list), 0))
             } else {
                 libList.sortByDescending {
-                    NativeLibMap.MAP.containsKey(
-                        it.name
-                    )
+                    NativeLibMap.contains(it.name)
                 }
             }
 

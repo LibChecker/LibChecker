@@ -27,6 +27,12 @@ class LibReferenceAdapter :
                 holder.setImageResource(R.id.iv_icon, it.iconRes)
                 holder.setText(R.id.tv_label_name, it.name)
                 found = true
+            }?:let {
+                findRegex(item.libName)?.let {
+                    holder.setImageResource(R.id.iv_icon, it.iconRes)
+                    holder.setText(R.id.tv_label_name, it.name)
+                    found = true
+                }
             }
         } ?: apply {
             holder.setImageResource(R.id.iv_icon, R.drawable.ic_question)

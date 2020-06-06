@@ -60,9 +60,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     fun initComponentsData(context: Context, packageName: String, flag: LibReferenceActivity.Type) =
         viewModelScope.launch(Dispatchers.IO) {
             val list = ArrayList<LibStringItem>()
+            var map: BaseMap? = null
 
             try {
-                when (flag) {
+                map = when (flag) {
                     LibReferenceActivity.Type.TYPE_SERVICE -> {
                         val packageInfo =
                             context.packageManager.getPackageInfo(
@@ -72,6 +73,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         for (service in packageInfo.services) {
                             list.add(LibStringItem(service.name.removePrefix(packageName), 0))
                         }
+                        ServiceLibMap
                     }
                     LibReferenceActivity.Type.TYPE_ACTIVITY -> {
                         val packageInfo =
@@ -82,6 +84,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         for (activity in packageInfo.activities) {
                             list.add(LibStringItem(activity.name.removePrefix(packageName), 0))
                         }
+                        ActivityLibMap
                     }
                     LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
                         val packageInfo =
@@ -92,6 +95,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         for (receiver in packageInfo.receivers) {
                             list.add(LibStringItem(receiver.name, 0))
                         }
+                        ReceiverLibMap
                     }
                     LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
                         val packageInfo =
@@ -102,11 +106,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         for (provider in packageInfo.providers) {
                             list.add(LibStringItem(provider.name, 0))
                         }
+                        ProviderLibMap
                     }
                     else -> {
+                        null
                     }
                 }
-
             } catch (e: Exception) {
                 e.printStackTrace()
                 list.add(LibStringItem("Not found", 0))
@@ -116,30 +121,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 list.sortByDescending { it.size }
             } else {
                 list.sortByDescending {
-                    when (flag) {
-                        LibReferenceActivity.Type.TYPE_SERVICE -> {
-                            ServiceLibMap.MAP.containsKey(
-                                it.name
-                            )
-                        }
-                        LibReferenceActivity.Type.TYPE_ACTIVITY -> {
-                            ActivityLibMap.MAP.containsKey(
-                                it.name
-                            )
-                        }
-                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
-                            ReceiverLibMap.MAP.containsKey(
-                                it.name
-                            )
-                        }
-                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
-                            ProviderLibMap.MAP.containsKey(
-                                it.name
-                            )
-                        }
-                        else -> false
-                    }
-
+                    map?.contains(it.name) ?: false
                 }
             }
 
@@ -194,9 +176,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 list.sortByDescending { it.size }
             } else {
                 list.sortByDescending {
-                    NativeLibMap.MAP.containsKey(
-                        it.name
-                    )
+                    NativeLibMap.contains(it.name)
                 }
             }
         }

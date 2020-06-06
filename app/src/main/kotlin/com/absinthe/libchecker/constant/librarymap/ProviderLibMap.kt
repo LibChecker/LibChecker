@@ -74,4 +74,8 @@ object ProviderLibMap : BaseMap() {
     override fun getMap(): HashMap<String, LibChip> {
         return MAP
     }
+
+    override fun findRegex(name: String): LibChip? {
+        return null
+    }
 }

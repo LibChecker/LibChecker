@@ -59,9 +59,7 @@ class ComponentsAnalysisFragment : Fragment() {
                 GlobalValues.libSortMode.value =
                     if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                         adapter.setList(adapter.data.sortedByDescending {
-                            ServiceLibMap.MAP.containsKey(
-                                it.name
-                            )
+                            ServiceLibMap.contains(it.name)
                         })
                         MODE_SORT_BY_LIB
                     } else {

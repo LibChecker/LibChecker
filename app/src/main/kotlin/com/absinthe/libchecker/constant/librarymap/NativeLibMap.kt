@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
+import java.util.regex.Pattern
 
 object NativeLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
@@ -765,5 +766,12 @@ object NativeLibMap : BaseMap() {
 
     override fun getMap(): HashMap<String, LibChip> {
         return MAP
+    }
+
+    override fun findRegex(name: String): LibChip? {
+        return when {
+            Pattern.matches("libAMapSDK_MAP_v[0-9]_[0-9]_[0-9]\\.so]", name) -> LibChip(R.drawable.ic_lib_amap, "高德地图 SDK")
+            else -> null
+        }
     }
 }

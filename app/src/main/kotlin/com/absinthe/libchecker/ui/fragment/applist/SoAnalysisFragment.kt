@@ -56,9 +56,7 @@ class SoAnalysisFragment : Fragment() {
                 GlobalValues.libSortMode.value =
                     if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                         adapter.setList(adapter.data.sortedByDescending {
-                            NativeLibMap.MAP.containsKey(
-                                it.name
-                            )
+                            NativeLibMap.contains(it.name)
                         })
                         MODE_SORT_BY_LIB
                     } else {
