@@ -55,6 +55,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver",
+            LibChip(
+                R.drawable.ic_lib_firebase,
+                "Firebase"
+            )
+        ),
+        Pair(
             "com.google.android.gms.measurement.AppMeasurementReceiver",
             LibChip(
                 R.drawable.ic_lib_firebase,
@@ -125,6 +132,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.taobao.accs.ServiceReceiver",
+            LibChip(
+                R.drawable.ic_lib_taobao,
+                "淘宝推送"
+            )
+        ),
+        Pair(
             "com.taobao.agoo.AgooCommondReceiver",
             LibChip(
                 R.drawable.ic_lib_taobao,
@@ -136,6 +150,41 @@ object ReceiverLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_toutiao,
                 "头条广告 SDK"
+            )
+        ),
+        Pair(
+            "com.igexin.sdk.PushReceiver",
+            LibChip(
+                R.drawable.ic_question,
+                "个推"
+            )
+        ),
+        Pair(
+            "cn.jpush.android.service.AlarmReceiver",
+            LibChip(
+                R.drawable.ic_lib_jpush,
+                "极光推送"
+            )
+        ),
+        Pair(
+            "cn.jpush.android.service.PushReceiver",
+            LibChip(
+                R.drawable.ic_lib_jpush,
+                "极光推送"
+            )
+        ),
+        Pair(
+            "com.tencent.android.tpush.XGPushReceiver",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "信鸽推送"
+            )
+        ),
+        Pair(
+            "com.umeng.message.NotificationProxyBroadcastReceiver",
+            LibChip(
+                R.drawable.ic_lib_umeng,
+                "友盟推送"
             )
         )
     )

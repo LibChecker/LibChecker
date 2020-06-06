@@ -532,6 +532,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libsgsgmiddletier.so",
+            LibChip(
+                R.drawable.ic_lib_ali_security,
+                "阿里聚安全"
+            )
+        ),
+        Pair(
             "libimagepipeline.so",
             LibChip(
                 R.drawable.ic_lib_facebook,
@@ -761,6 +768,55 @@ object NativeLibMap : BaseMap() {
                 R.drawable.ic_lib_xamarin,
                 "Xamarin"
             )
+        ),
+        Pair(
+            "libbmob.so",
+            LibChip(
+                R.drawable.ic_question,
+                "Bmob 后端云"
+            )
+        ),
+        Pair(
+            "libDexHelper.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
+            "libDexHelper-x86.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
+            "libSecShell.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
+            "libSecShell-x86.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
+            "libsecexe.so",
+            LibChip(
+                R.drawable.ic_question,
+                "梆梆安全"
+            )
+        ),
+        Pair(
+            "libepic.so",
+            LibChip(
+                R.drawable.ic_question,
+                "Epic"
+            )
         )
     )
 
@@ -770,8 +826,12 @@ object NativeLibMap : BaseMap() {
 
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("libAMapSDK_MAP_v[0-9]_[0-9]_[0-9]\\.so", name) -> LibChip(R.drawable.ic_lib_amap, "高德地图 SDK")
+            Pattern.matches("libAMapSDK_MAP_v(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_amap, "高德地图 SDK")
             Pattern.matches("libaot-Xamarin\\.Android\\.(.*)\\.dll\\.so", name) -> LibChip(R.drawable.ic_lib_xamarin, "Xamarin")
+            Pattern.matches("libcronet\\.(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_chromium, "Cronet")
+            Pattern.matches("libsgavmpso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")
+            Pattern.matches("libsgmainso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")
+            Pattern.matches("libsgsecuritybodyso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")
             else -> null
         }
     }

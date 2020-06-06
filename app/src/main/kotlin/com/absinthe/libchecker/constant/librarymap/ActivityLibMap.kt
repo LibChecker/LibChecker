@@ -102,6 +102,14 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
         ),
         Pair(
+            "com.ali.auth.third.ui.webview.BaseWebViewActivity",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
+            "com.ali.auth.third.ui.LoginActivity",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
             "com.alibaba.wireless.security.open.middletier.fc.ui.ContainerActivity",
             LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全")
         ),
@@ -196,6 +204,26 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.ss.android.downloadlib.activity.InteractionMiddleActivity",
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "cn.jpush.android.service.JNotifyActivity",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "cn.jpush.android.ui.PushActivity",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "cn.jpush.android.ui.PopWinActivity",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "com.igexin.sdk.PushActivity",
+            LibChip(R.drawable.ic_question, "个推")
+        ),
+        Pair(
+            "com.igexin.sdk.GActivity",
+            LibChip(R.drawable.ic_question, "个推")
         )
     )
 

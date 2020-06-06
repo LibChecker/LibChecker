@@ -97,6 +97,20 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery",
+            LibChip(
+                R.drawable.ic_lib_firebase,
+                "Firebase"
+            )
+        ),
+        Pair(
+            "com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService",
+            LibChip(
+                R.drawable.ic_lib_firebase,
+                "Firebase"
+            )
+        ),
+        Pair(
             "com.google.android.gms.measurement.AppMeasurementJobService",
             LibChip(
                 R.drawable.ic_lib_firebase,
@@ -508,8 +522,14 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "FileDownloader"
             )
+        ),
+        Pair(
+            "com.igexin.sdk.PushService",
+            LibChip(
+                R.drawable.ic_question,
+                "个推"
+            )
         )
-
     )
 
     override fun getMap(): HashMap<String, LibChip> {

@@ -68,6 +68,26 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "com.bytedance.sdk.openadsdk.multipro.TTMultiProvider",
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "cn.jpush.android.service.DataProvider",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "cn.jpush.android.service.Downloadrovider",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "com.tencent.android.tpush.XGPushProvider",
+            LibChip(R.drawable.ic_lib_tencent, "信鸽推送")
+        ),
+        Pair(
+            "com.tencent.android.tpush.SettingsContentProvider",
+            LibChip(R.drawable.ic_lib_tencent, "信鸽推送")
+        ),
+        Pair(
+            "com.igexin.download.DownloadProvider",
+            LibChip(R.drawable.ic_question, "个推")
         )
     )
 
