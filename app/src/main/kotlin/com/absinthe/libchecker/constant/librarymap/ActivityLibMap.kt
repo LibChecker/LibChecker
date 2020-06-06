@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
+import java.util.regex.Pattern
 
 object ActivityLibMap : BaseMap() {
     val MAP: HashMap<String, LibChip> = hashMapOf(
@@ -203,6 +204,9 @@ object ActivityLibMap : BaseMap() {
     }
 
     override fun findRegex(name: String): LibChip? {
-        return null
+        return when {
+            Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker")
+            else -> null
+        }
     }
 }
