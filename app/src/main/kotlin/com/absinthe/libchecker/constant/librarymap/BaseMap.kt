@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.recyclerview.LibStringAdapter
 
 abstract class BaseMap {
     abstract fun getMap(): HashMap<String, LibChip>
@@ -15,6 +16,18 @@ abstract class BaseMap {
             return it
         } ?: let {
             return findRegex(name)
+        }
+    }
+
+    companion object {
+        fun getMap(mode: LibStringAdapter.Mode): BaseMap {
+            return when (mode) {
+                LibStringAdapter.Mode.NATIVE -> NativeLibMap
+                LibStringAdapter.Mode.SERVICE -> ServiceLibMap
+                LibStringAdapter.Mode.ACTIVITY -> ActivityLibMap
+                LibStringAdapter.Mode.RECEIVER -> ReceiverLibMap
+                else -> ProviderLibMap
+            }
         }
     }
 }

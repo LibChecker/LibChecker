@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -15,6 +16,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.main.ApkDetailActivity
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
+import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener,
@@ -65,6 +67,8 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             }
             Constants.PREF_RULES_REPO -> {
                 GlobalValues.repo = newValue as String
+                val viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
+                viewModel.requestConfiguration()
                 true
             }
             Constants.PREF_ENTRY_ANIMATION -> {

@@ -130,7 +130,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun requestLibDetail(libName: String, type: LibStringAdapter.Mode) =
+    fun requestLibDetail(libName: String, type: LibStringAdapter.Mode, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
             val retrofit = Retrofit.Builder()
                 .baseUrl(ApiManager.root)
@@ -143,7 +143,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 LibStringAdapter.Mode.SERVICE -> "services-libs"
                 LibStringAdapter.Mode.ACTIVITY -> "activities-libs"
                 LibStringAdapter.Mode.RECEIVER -> "receivers-libs"
-                else -> "providers-libs"
+                LibStringAdapter.Mode.PROVIDER -> "providers-libs"
+            }
+            if (isRegex) {
+                categoryDir.plus("/regex")
             }
 
             val detail = request.requestNativeLibDetail("${categoryDir}/${libName}.json")

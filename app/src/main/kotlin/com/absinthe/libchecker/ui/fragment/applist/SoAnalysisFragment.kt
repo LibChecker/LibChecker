@@ -78,7 +78,9 @@ class SoAnalysisFragment : Fragment() {
 
         fun openLibDetailDialog(position: Int) {
             if (GlobalValues.config.enableLibDetail) {
-                LibDetailDialogFragment.newInstance(adapter.getItem(position).name, adapter.mode)
+                val name = adapter.getItem(position).name
+                val regexName = NativeLibMap.findRegex(name)?.regexName
+                LibDetailDialogFragment.newInstance(name, adapter.mode, regexName)
                     .apply {
                         ActivityStackManager.topActivity?.apply {
                             show(supportFragmentManager, tag)

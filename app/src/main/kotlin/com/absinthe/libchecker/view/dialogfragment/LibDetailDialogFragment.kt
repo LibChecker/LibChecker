@@ -4,13 +4,13 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.view.View
+import androidx.core.view.isGone
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.LibDetailView
@@ -19,6 +19,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
+const val EXTRA_REGEX_NAME = "EXTRA_REGEX_NAME"
 
 const val VF_CHILD_DETAIL = 0
 const val VF_CHILD_LOADING = 1
@@ -29,6 +30,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
     private val dialogView by lazy { LibDetailView(requireContext()) }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getSerializable(EXTRA_LIB_TYPE) as LibStringAdapter.Mode }
+    private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
 
     private fun List<String>.toContributorsString(): String {
         return this.joinToString(separator = ", ")
@@ -38,16 +40,9 @@ class LibDetailDialogFragment : LCDialogFragment() {
         dialogView.binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
-
-            val map = when (type) {
-                LibStringAdapter.Mode.NATIVE -> NativeLibMap.MAP
-                LibStringAdapter.Mode.SERVICE -> ServiceLibMap.MAP
-                LibStringAdapter.Mode.ACTIVITY -> ActivityLibMap.MAP
-                LibStringAdapter.Mode.RECEIVER -> ReceiverLibMap.MAP
-                else -> ProviderLibMap.MAP
-            }
-
-            ivIcon.setImageResource(map[libName]?.iconRes ?: R.drawable.ic_logo)
+            ivIcon.setImageResource(
+                BaseMap.getMap(type).getMap()[libName]?.iconRes ?: R.drawable.ic_logo
+            )
             tvCreateIssue.apply {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()
@@ -72,40 +67,21 @@ class LibDetailDialogFragment : LCDialogFragment() {
             if (it != null) {
                 dialogView.binding.apply {
                     GlobalValues.config.apply {
+                        llLabel.isGone = !showLibName
+                        llTeam.isGone = !showTeamName
+                        llContributor.isGone = !showContributor
+                        llDescription.isGone = !showLibDescription
+                        llRelativeUrl.isGone = !showRelativeUrl
 
-                        if (showLibName) {
-                            tvLabelName.text = it.label
-                        } else {
-                            llLabel.visibility = View.GONE
-                        }
-
-                        if (showTeamName) {
-                            tvTeamName.text = it.team
-                        } else {
-                            llTeam.visibility = View.GONE
-                        }
-
-                        if (showContributor) {
-                            tvContributorName.text = it.contributors.toContributorsString()
-                        } else {
-                            llContributor.visibility = View.GONE
-                        }
-
-                        if (showLibDescription) {
-                            tvDescriptionName.text = it.description
-                        } else {
-                            llDescription.visibility = View.GONE
-                        }
-
-                        if (showRelativeUrl) {
-                            tvRelativeName.apply {
-                                isClickable = true
-                                movementMethod = LinkMovementMethod.getInstance()
-                                text =
-                                    Html.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>")
-                            }
-                        } else {
-                            llRelativeUrl.visibility = View.GONE
+                        tvLabelName.text = it.label
+                        tvTeamName.text = it.team
+                        tvContributorName.text = it.contributors.toContributorsString()
+                        tvDescriptionName.text = it.description
+                        tvRelativeName.apply {
+                            isClickable = true
+                            movementMethod = LinkMovementMethod.getInstance()
+                            text =
+                                Html.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>")
                         }
                     }
 
@@ -115,16 +91,25 @@ class LibDetailDialogFragment : LCDialogFragment() {
                 dialogView.binding.vfContainer.displayedChild = VF_CHILD_FAILED
             }
         })
-        viewModel.requestLibDetail(libName, type)
+        regexName?.let {
+            viewModel.requestLibDetail(regexName!!, type, true)
+        } ?: let {
+            viewModel.requestLibDetail(libName, type)
+        }
     }
 
     companion object {
-        fun newInstance(libName: String, mode: LibStringAdapter.Mode): LibDetailDialogFragment {
+        fun newInstance(
+            libName: String,
+            mode: LibStringAdapter.Mode,
+            regexName: String? = null
+        ): LibDetailDialogFragment {
             return LibDetailDialogFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_LIB_NAME, libName)
                         putSerializable(EXTRA_LIB_TYPE, mode)
+                        putString(EXTRA_REGEX_NAME, regexName)
                     }
                 }
         }

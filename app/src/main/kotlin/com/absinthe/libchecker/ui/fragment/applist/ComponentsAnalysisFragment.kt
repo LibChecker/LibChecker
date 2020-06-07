@@ -15,6 +15,7 @@ import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
@@ -107,7 +108,9 @@ class ComponentsAnalysisFragment : Fragment() {
 
         fun openLibDetailDialog(position: Int) {
             if (GlobalValues.config.enableComponentsDetail) {
-                LibDetailDialogFragment.newInstance(adapter.getItem(position).name, adapter.mode)
+                val name = adapter.getItem(position).name
+                val regexName = BaseMap.getMap(adapter.mode).findRegex(name)?.regexName
+                LibDetailDialogFragment.newInstance(name, adapter.mode, regexName)
                     .apply {
                         ActivityStackManager.topActivity?.apply {
                             show(supportFragmentManager, tag)

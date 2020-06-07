@@ -8,6 +8,7 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
@@ -81,10 +82,9 @@ class ApkDetailActivity : BaseActivity() {
 
             fun openLibDetailDialog(position: Int) {
                 if (GlobalValues.config.enableLibDetail) {
-                    LibDetailDialogFragment.newInstance(
-                        adapter.getItem(position).name,
-                        adapter.mode
-                    ).apply {
+                    val name = adapter.getItem(position).name
+                    val regexName = BaseMap.getMap(adapter.mode).findRegex(name)?.regexName
+                    LibDetailDialogFragment.newInstance(name, adapter.mode, regexName).apply {
                         ActivityStackManager.topActivity?.apply {
                             show(supportFragmentManager, tag)
                         }
