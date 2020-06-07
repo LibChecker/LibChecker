@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.main
 
 import android.app.ActivityOptions
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -153,7 +152,7 @@ class LibReferenceActivity : BaseActivity() {
                         }
                     }
                 }
-            } catch (e: PackageManager.NameNotFoundException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }

@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.recyclerview
 
+import android.content.res.ColorStateList
 import android.text.format.Formatter
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
@@ -44,7 +46,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
                 visibility = View.VISIBLE
 
                 if (GlobalValues.isColorfulIcon.value!!) {
-                    setChipIconTintResource(R.color.textNormal)
+                    libIcon.chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
                 }
             }
         } ?: let {

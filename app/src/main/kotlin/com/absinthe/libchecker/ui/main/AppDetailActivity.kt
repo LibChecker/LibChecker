@@ -121,6 +121,8 @@ class AppDetailActivity : BaseActivity() {
                 startActivity(IntentUtils.getLaunchAppIntent(pkgName))
             } catch (e: ActivityNotFoundException) {
                 ToastUtils.showShort("Can\'t open this app")
+            } catch (e: NullPointerException) {
+                ToastUtils.showShort("Package name is null")
             }
         }
     }

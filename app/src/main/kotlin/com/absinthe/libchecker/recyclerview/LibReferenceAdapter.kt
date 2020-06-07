@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview
 
 import android.content.res.ColorStateList
+import android.graphics.PorterDuff
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
@@ -32,8 +33,7 @@ class LibReferenceAdapter :
                 icon.setImageResource(it.iconRes)
 
                 if (GlobalValues.isColorfulIcon.value!!) {
-                    icon.imageTintList =
-                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                    icon.setColorFilter(ContextCompat.getColor(context, R.color.textNormal), PorterDuff.Mode.SRC_IN)
                 }
 
                 holder.setText(R.id.tv_label_name, it.name)

@@ -11,7 +11,6 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import java.io.File
 import java.util.*
 import java.util.zip.ZipEntry
-import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import kotlin.collections.ArrayList
 
@@ -105,7 +104,7 @@ object PackageUtils {
             }
 
             return libList
-        } catch (e: ZipException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return libList
         }
