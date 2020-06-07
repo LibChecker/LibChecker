@@ -44,4 +44,8 @@
     <string name="ref_category_native">原生库</string>
     <string name="detail_label">查看 App 详情</string>
     <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
+    <string name="apk_analytics">APK 分析</string>
+    <string name="colorful_icon">多彩图标</string>
+    <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
+    <string name="colorful_icon_summary">部分标记库会呈现为彩色Logo</string>
 </resources>

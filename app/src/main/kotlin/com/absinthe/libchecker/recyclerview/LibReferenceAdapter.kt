@@ -1,7 +1,11 @@
 package com.absinthe.libchecker.recyclerview
 
+import android.content.res.ColorStateList
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -24,12 +28,26 @@ class LibReferenceAdapter :
         }
         map?.apply {
             getMap()[item.libName]?.let {
-                holder.setImageResource(R.id.iv_icon, it.iconRes)
+                val icon = holder.getView<ImageView>(R.id.iv_icon)
+                icon.setImageResource(it.iconRes)
+
+                if (GlobalValues.isColorfulIcon.value!!) {
+                    icon.imageTintList =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                }
+
                 holder.setText(R.id.tv_label_name, it.name)
                 found = true
-            }?:let {
+            } ?: let {
                 findRegex(item.libName)?.let {
-                    holder.setImageResource(R.id.iv_icon, it.iconRes)
+                    val icon = holder.getView<ImageView>(R.id.iv_icon)
+                    icon.setImageResource(it.iconRes)
+
+                    if (GlobalValues.isColorfulIcon.value!!) {
+                        icon.imageTintList =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                    }
+
                     holder.setText(R.id.tv_label_name, it.name)
                     found = true
                 }

@@ -19,6 +19,8 @@ object GlobalValues {
 
     var isShowSystemApps: MutableLiveData<Boolean> = MutableLiveData()
     var isShowEntryAnimation: MutableLiveData<Boolean> = MutableLiveData()
+    var isColorfulIcon: MutableLiveData<Boolean> = MutableLiveData()
+
     var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData()
     var appSortMode: MutableLiveData<Int> = MutableLiveData()
     var libSortMode: MutableLiveData<Int> = MutableLiveData()
@@ -50,6 +52,8 @@ object GlobalValues {
             getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false)
         isShowEntryAnimation.value =
             getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true)
+        isColorfulIcon.value =
+            getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true)
         appSortMode.value =
             getPreferences().getInt(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
         libSortMode.value =
