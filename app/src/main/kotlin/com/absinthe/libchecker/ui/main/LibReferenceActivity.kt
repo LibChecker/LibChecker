@@ -11,6 +11,7 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.AppAdapter
 import com.absinthe.libchecker.utils.AntiShakeUtils
@@ -110,7 +111,12 @@ class LibReferenceActivity : BaseActivity() {
                 view,
                 "app_card_container"
             )
-            startActivity(intent, options.toBundle())
+
+            if (GlobalValues.isShowEntryAnimation.value!!) {
+                startActivity(intent, options.toBundle())
+            } else {
+                startActivity(intent)
+            }
         }
     }
 

@@ -1,19 +1,26 @@
 package com.absinthe.libchecker.ui.fragment.classify
 
+import android.app.ActivityOptions
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import com.absinthe.libchecker.*
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.LibReferenceAdapter
-import com.absinthe.libchecker.ui.main.*
+import com.absinthe.libchecker.recyclerview.RefListDiffUtil
+import com.absinthe.libchecker.ui.main.EXTRA_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_TYPE
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
-class LibReferenceFragment : Fragment() {
+class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val adapter = LibReferenceAdapter()
@@ -63,8 +70,24 @@ class LibReferenceFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.lib_ref_menu, menu)
+
+        val searchView = SearchView(requireContext()).apply {
+            setIconifiedByDefault(false)
+            setOnQueryTextListener(this@LibReferenceFragment)
+            queryHint = getText(R.string.search_hint)
+            isQueryRefinementEnabled = true
+
+            findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+                setBackgroundColor(Color.TRANSPARENT)
+            }
+        }
+
+        menu.findItem(R.id.search).apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+            actionView = searchView
+        }
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -91,12 +114,41 @@ class LibReferenceFragment : Fragment() {
             setInAnimation(activity, R.anim.anim_fade_in)
             setOutAnimation(activity, R.anim.anim_fade_out)
         }
-        adapter.setOnItemClickListener { _, _, position ->
-            startActivity(Intent(requireContext(), LibReferenceActivity::class.java).apply {
+
+        adapter.setDiffCallback(RefListDiffUtil())
+        adapter.setOnItemClickListener { _, view, position ->
+            if (AntiShakeUtils.isInvalidClick(view)) {
+                return@setOnItemClickListener
+            }
+
+            val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
                 val item = this@LibReferenceFragment.adapter.data[position]
                 putExtra(EXTRA_NAME, item.libName)
                 putExtra(EXTRA_TYPE, item.type)
-            })
+            }
+            val options = ActivityOptions.makeSceneTransitionAnimation(
+                requireActivity(),
+                view,
+                "app_card_container"
+            )
+
+            if (GlobalValues.isShowEntryAnimation.value!!) {
+                startActivity(intent, options.toBundle())
+            } else {
+                startActivity(intent)
+            }
         }
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String): Boolean {
+        val filter = viewModel.libReference.value!!.filter {
+            it.libName.contains(newText)
+        }
+        adapter.setDiffNewData(filter.toMutableList())
+        return false
     }
 }

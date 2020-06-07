@@ -45,7 +45,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
                 text = it.name
                 visibility = View.VISIBLE
 
-                if (GlobalValues.isColorfulIcon.value!!) {
+                if (!GlobalValues.isColorfulIcon.value!!) {
                     libIcon.chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
                 }
             }

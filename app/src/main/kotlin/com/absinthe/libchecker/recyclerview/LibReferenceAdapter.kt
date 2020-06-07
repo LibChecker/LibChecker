@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview
 
-import android.content.res.ColorStateList
 import android.graphics.PorterDuff
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
@@ -32,7 +31,7 @@ class LibReferenceAdapter :
                 val icon = holder.getView<ImageView>(R.id.iv_icon)
                 icon.setImageResource(it.iconRes)
 
-                if (GlobalValues.isColorfulIcon.value!!) {
+                if (!GlobalValues.isColorfulIcon.value!!) {
                     icon.setColorFilter(ContextCompat.getColor(context, R.color.textNormal), PorterDuff.Mode.SRC_IN)
                 }
 
@@ -43,9 +42,8 @@ class LibReferenceAdapter :
                     val icon = holder.getView<ImageView>(R.id.iv_icon)
                     icon.setImageResource(it.iconRes)
 
-                    if (GlobalValues.isColorfulIcon.value!!) {
-                        icon.imageTintList =
-                            ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                    if (!GlobalValues.isColorfulIcon.value!!) {
+                        icon.setColorFilter(ContextCompat.getColor(context, R.color.textNormal), PorterDuff.Mode.SRC_IN)
                     }
 
                     holder.setText(R.id.tv_label_name, it.name)
