@@ -245,7 +245,7 @@ object ActivityLibMap : BaseMap() {
 
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker")
+            Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker", "regex_tinker")
             else -> null
         }
     }

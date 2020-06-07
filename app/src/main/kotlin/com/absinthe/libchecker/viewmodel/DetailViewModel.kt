@@ -14,6 +14,7 @@ import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -138,7 +139,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 .build()
             val request = retrofit.create(NativeLibDetailRequest::class.java)
 
-            val categoryDir = when (type) {
+            var categoryDir = when (type) {
                 LibStringAdapter.Mode.NATIVE -> "native-libs"
                 LibStringAdapter.Mode.SERVICE -> "services-libs"
                 LibStringAdapter.Mode.ACTIVITY -> "activities-libs"
@@ -146,9 +147,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 LibStringAdapter.Mode.PROVIDER -> "providers-libs"
             }
             if (isRegex) {
-                categoryDir.plus("/regex")
+                categoryDir += "/regex"
             }
 
+            logd("${categoryDir}/${libName}.json")
             val detail = request.requestNativeLibDetail("${categoryDir}/${libName}.json")
             detail.enqueue(object : Callback<NativeLibDetailBean> {
                 override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {

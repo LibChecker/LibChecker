@@ -874,6 +874,7 @@ object NativeLibMap : BaseMap() {
             Pattern.matches("libsgavmpso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全", "regex_ali_security")
             Pattern.matches("libsgmainso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全", "regex_ali_security")
             Pattern.matches("libsgsecuritybodyso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全", "regex_ali_security")
+            Pattern.matches("libsgsgmiddletierso-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全", "regex_ali_security")
             else -> null
         }
     }
