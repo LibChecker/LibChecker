@@ -20,10 +20,11 @@ import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
-import com.absinthe.libchecker.ui.main.*
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -512,8 +513,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
             for (entry in map) {
                 if (entry.value.count >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
+
+                    val libMap: BaseMap? = when (entry.value.type) {
+                        LibReferenceActivity.Type.TYPE_NATIVE -> NativeLibMap
+                        LibReferenceActivity.Type.TYPE_SERVICE -> ServiceLibMap
+                        LibReferenceActivity.Type.TYPE_ACTIVITY -> ActivityLibMap
+                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> ReceiverLibMap
+                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> ProviderLibMap
+                        else -> null
+                    }
+                    val chip = libMap?.getChip(entry.key)
+
                     refList.add(
-                        LibReference(entry.key, entry.value.count, entry.value.type)
+                        LibReference(entry.key, chip, entry.value.count, entry.value.type)
                     )
                 }
             }

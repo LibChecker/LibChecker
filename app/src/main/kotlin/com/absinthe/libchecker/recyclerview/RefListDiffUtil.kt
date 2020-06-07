@@ -12,6 +12,7 @@ class RefListDiffUtil : DiffUtil.ItemCallback<LibReference>() {
     override fun areContentsTheSame(oldItem: LibReference, newItem: LibReference): Boolean {
         return oldItem.libName == newItem.libName
                 && oldItem.referredCount == newItem.referredCount
+                && oldItem.chip == newItem.chip
                 && oldItem.type == newItem.type
     }
 }

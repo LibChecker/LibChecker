@@ -36,6 +36,7 @@ class MainActivity : BaseActivity() {
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
                 GlobalValues.shouldRequestChange = true
+                viewModel.requestChange(this@MainActivity)
                 ToastUtils.showShort("BR Received")
             }
         }

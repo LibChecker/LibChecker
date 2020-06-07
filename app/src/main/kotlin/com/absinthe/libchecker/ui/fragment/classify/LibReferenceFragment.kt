@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.classify
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -99,7 +98,10 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
             R.id.ref_category_br -> category = LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
             R.id.ref_category_cp -> category = LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
         }
-        computeRef()
+
+        if (item.itemId != R.id.search) {
+            computeRef()
+        }
         return super.onOptionsItemSelected(item)
     }
 
@@ -126,17 +128,7 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
                 putExtra(EXTRA_NAME, item.libName)
                 putExtra(EXTRA_TYPE, item.type)
             }
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                requireActivity(),
-                view,
-                "app_card_container"
-            )
-
-            if (GlobalValues.isShowEntryAnimation.value!!) {
-                startActivity(intent, options.toBundle())
-            } else {
-                startActivity(intent)
-            }
+            startActivity(intent)
         }
     }
 
@@ -146,7 +138,7 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         val filter = viewModel.libReference.value!!.filter {
-            it.libName.contains(newText)
+            it.libName.contains(newText) || it.chip?.name?.contains(newText) ?: false
         }
         adapter.setDiffNewData(filter.toMutableList())
         return false
