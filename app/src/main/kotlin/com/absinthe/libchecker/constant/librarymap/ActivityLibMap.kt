@@ -236,6 +236,10 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.blankj.utilcode.util.UtilsTransActivity",
             LibChip(R.drawable.ic_question, "AndroidUtilCode")
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.keeplive.PushExtActivity",
+            LibChip(R.drawable.ic_lib_aliyun, "阿里移动推送")
         )
     )
 

@@ -30,21 +30,21 @@ object ReceiverLibMap : BaseMap() {
             "androidx.work.impl.utils.ForceStopRunnable\$BroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_jetpack,
-                "Jetpack Work"
+                "Jetpack Work Manager"
             )
         ),
         Pair(
             "androidx.work.impl.background.systemalarm.RescheduleReceiver",
             LibChip(
                 R.drawable.ic_lib_jetpack,
-                "Jetpack Work"
+                "Jetpack Work Manager"
             )
         ),
         Pair(
             "androidx.work.impl.diagnostics.DiagnosticsReceiver",
             LibChip(
                 R.drawable.ic_lib_jetpack,
-                "Jetpack Work"
+                "Jetpack Work Manager"
             )
         ),
         Pair(
@@ -127,22 +127,29 @@ object ReceiverLibMap : BaseMap() {
         Pair(
             "com.taobao.accs.EventReceiver",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "com.taobao.accs.ServiceReceiver",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "com.taobao.agoo.AgooCommondReceiver",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.SystemEventReceiver",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(

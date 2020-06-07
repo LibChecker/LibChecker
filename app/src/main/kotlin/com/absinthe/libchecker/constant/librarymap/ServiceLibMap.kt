@@ -135,7 +135,14 @@ object ServiceLibMap : BaseMap() {
             "com.huawei.updatesdk.service.deamon.download.DownloadService",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "HMS Update"
+                "Huawei Push"
+            )
+        ),
+        Pair(
+            "com.huawei.agconnect.core.ServiceDiscovery",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "AppGallery Connect"
             )
         ),
         Pair(
@@ -174,38 +181,73 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.alibaba.sdk.android.push.MsgService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.channel.CheckService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
             "com.taobao.accs.ChannelService",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "com.taobao.accs.ChannelService\$KernelService",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "com.taobao.accs.data.MsgDistributeService",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "org.android.agoo.accs.AgooService",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.AliyunPushIntentService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.channel.TaobaoRecvService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
             "com.taobao.accs.internal.AccsJobService",
             LibChip(
-                R.drawable.ic_lib_taobao,
-                "淘宝推送"
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.alibaba.sdk.android.push.channel.KeepChannelService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
             )
         ),
         Pair(
@@ -331,14 +373,14 @@ object ServiceLibMap : BaseMap() {
             "androidx.work.impl.background.systemjob.SystemJobService",
             LibChip(
                 R.drawable.ic_lib_jetpack,
-                "Jetpack Work"
+                "Jetpack Work Manager"
             )
         ),
         Pair(
             "androidx.work.impl.foreground.SystemForegroundService",
             LibChip(
                 R.drawable.ic_lib_jetpack,
-                "Jetpack Work"
+                "Jetpack Work Manager"
             )
         ),
         Pair(
@@ -367,13 +409,6 @@ object ServiceLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
-            )
-        ),
-        Pair(
-            "com.huawei.agconnect.core.ServiceDiscovery",
-            LibChip(
-                R.drawable.ic_lib_huawei,
-                "AppGallery Connect"
             )
         ),
         Pair(

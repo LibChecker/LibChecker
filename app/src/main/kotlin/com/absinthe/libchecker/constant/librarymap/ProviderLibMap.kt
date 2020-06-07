@@ -39,7 +39,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "androidx.work.impl.WorkManagerInitializer",
-            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Work")
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Work Manager")
         ),
         Pair(
             "com.google.firebase.provider.FirebaseInitProvider",

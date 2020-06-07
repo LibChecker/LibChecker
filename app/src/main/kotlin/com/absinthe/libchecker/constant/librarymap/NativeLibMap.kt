@@ -133,6 +133,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libImSDK.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯云通信 SDK"
+            )
+        ),
+        Pair(
             "libijkplayer.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,

@@ -137,10 +137,12 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        val filter = viewModel.libReference.value!!.filter {
-            it.libName.contains(newText) || it.chip?.name?.contains(newText) ?: false
+        viewModel.libReference.value?.let { list ->
+            val filter = list.filter {
+                it.libName.contains(newText) || it.chip?.name?.contains(newText) ?: false
+            }
+            adapter.setDiffNewData(filter.toMutableList())
         }
-        adapter.setDiffNewData(filter.toMutableList())
         return false
     }
 }

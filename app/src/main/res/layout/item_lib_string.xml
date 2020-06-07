@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
+    android:minHeight="40dp"
     android:paddingBottom="5dp">
 
     <TextView
@@ -40,11 +41,11 @@
         app:chipMinHeight="28dp"
         app:chipMinTouchTargetSize="0dp"
         app:chipStartPadding="10dp"
-        tools:chipIcon="@drawable/ic_lib_xiaomi"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tv_name"
         app:layout_constraintTop_toTopOf="parent"
+        tools:chipIcon="@drawable/ic_lib_google"
         tools:text="Native Lib" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
