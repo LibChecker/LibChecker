@@ -5,7 +5,7 @@ import com.absinthe.libchecker.constant.LibChip
 import java.util.regex.Pattern
 
 object ActivityLibMap : BaseMap() {
-    val MAP: HashMap<String, LibChip> = hashMapOf(
+    private val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.google.android.gms.common.api.GoogleApiActivity",
             LibChip(R.drawable.ic_lib_play_store, "Google Play Service")
@@ -20,7 +20,7 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.google.android.gms.ads.AdActivity",
-            LibChip(R.drawable.ic_lib_google, "Google Mobile Ads")
+            LibChip(R.drawable.ic_lib_google, "Google AdMob")
         ),
         Pair(
             "com.tencent.tauth.AuthActivity",
@@ -45,7 +45,8 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.qq.e.ads.RewardvideoPortraitADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
-        ), Pair(
+        ), 
+        Pair(
             "com.qq.e.ads.RewardvideoLandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
@@ -54,16 +55,16 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_bugly, "Bugly")
         ),
         Pair(
-            "com.huawei.hms.activity.BridgeActivity",
-            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
-        ),
-        Pair(
             "com.huawei.updatesdk.service.otaupdate.AppUpdateActivity",
             LibChip(R.drawable.ic_lib_huawei, "HMS Update")
         ),
         Pair(
             "com.huawei.updatesdk.support.pm.PackageInstallerActivity",
             LibChip(R.drawable.ic_lib_huawei, "HMS Update")
+        ),
+        Pair(
+            "com.huawei.hms.activity.BridgeActivity",
+            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
         ),
         Pair(
             "com.huawei.android.hms.agent.common.HMSAgentActivity",

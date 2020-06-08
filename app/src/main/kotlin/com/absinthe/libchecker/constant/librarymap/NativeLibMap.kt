@@ -5,7 +5,7 @@ import com.absinthe.libchecker.constant.LibChip
 import java.util.regex.Pattern
 
 object NativeLibMap : BaseMap() {
-    val MAP: HashMap<String, LibChip> = hashMapOf(
+    private val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "libflutter.so",
             LibChip(

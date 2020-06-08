@@ -28,3 +28,14 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+def gitCommitId = 'git rev-parse --short HEAD'.execute([], project.rootDir).text.trim()
+def gitCommitCount = Integer.parseInt('git rev-list --count HEAD'.execute([], project.rootDir).text.trim())
+def baseVersionName = '1.4.1'
+
+ext {
+    minSdkVersion = 21
+    targetSdkVersion = 29
+    versionCode = gitCommitCount
+    versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
+}

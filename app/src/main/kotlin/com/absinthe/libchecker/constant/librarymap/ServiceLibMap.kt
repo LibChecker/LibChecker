@@ -4,7 +4,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
 object ServiceLibMap : BaseMap() {
-    val MAP: HashMap<String, LibChip> = hashMapOf(
+    private val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.xiaomi.push.service.XMPushService",
             LibChip(

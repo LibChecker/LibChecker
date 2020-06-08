@@ -4,7 +4,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
 object ProviderLibMap : BaseMap() {
-    val MAP: HashMap<String, LibChip> = hashMapOf(
+    private val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.huawei.hms.update.provider.UpdateProvider",
             LibChip(R.drawable.ic_lib_huawei, "HMS Update")
@@ -51,7 +51,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.google.android.gms.ads.MobileAdsInitProvider",
-            LibChip(R.drawable.ic_lib_google, "Google Mobile Ads")
+            LibChip(R.drawable.ic_lib_google, "Google AdMob")
         ),
         Pair(
             "com.tencent.bugly.beta.utils.BuglyFileProvider",

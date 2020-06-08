@@ -4,16 +4,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
 
 object ReceiverLibMap : BaseMap() {
-    val MAP: HashMap<String, LibChip> = hashMapOf(
+    private val MAP: HashMap<String, LibChip> = hashMapOf(
         Pair(
             "com.xiaomi.push.service.receivers.PingReceiver",
-            LibChip(
-                R.drawable.ic_lib_xiaomi,
-                "MiPush"
-            )
-        ),
-        Pair(
-            "org.android.agoo.xiaomi.MiPushBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_xiaomi,
                 "MiPush"
@@ -147,6 +140,13 @@ object ReceiverLibMap : BaseMap() {
         ),
         Pair(
             "com.alibaba.sdk.android.push.SystemEventReceiver",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "org.android.agoo.xiaomi.MiPushBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_aliyun,
                 "阿里移动推送"
