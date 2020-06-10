@@ -48,11 +48,6 @@
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
 
-        <provider
-            android:name=".provider.ContextProvider"
-            android:authorities="${applicationId}.contextprovider"
-            android:exported="false" />
-
     </application>
 
 </manifest>

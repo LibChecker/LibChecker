@@ -241,6 +241,10 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.alibaba.sdk.android.push.keeplive.PushExtActivity",
             LibChip(R.drawable.ic_lib_aliyun, "阿里移动推送")
+        ),
+        Pair(
+            "cmb.pb.ui.PBKeyboardActivity",
+            LibChip(R.drawable.ic_lib_cmb, "招商银行 SDK")
         )
     )
 

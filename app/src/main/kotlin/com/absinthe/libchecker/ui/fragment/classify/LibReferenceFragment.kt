@@ -50,7 +50,7 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
                 computeRef()
             })
             GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, Observer {
-                computeRef() //Todo Use List#filter() to optimize
+                viewModel.refreshRef()
             })
 
             computeRef()

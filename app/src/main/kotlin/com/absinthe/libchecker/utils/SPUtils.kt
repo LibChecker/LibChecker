@@ -3,14 +3,14 @@ package com.absinthe.libchecker.utils
 import android.content.Context
 import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.provider.ContextProvider
+import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object SPUtils {
 
     private val sp by lazy {
-        ContextProvider.getGlobalContext().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
+        Utils.getApp().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     }
 
     fun putString(key: String, value: String) {

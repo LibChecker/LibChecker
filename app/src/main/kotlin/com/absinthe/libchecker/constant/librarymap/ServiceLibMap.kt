@@ -571,6 +571,20 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "AndroidUtilCode"
             )
+        ),
+        Pair(
+            "com.baidu.location.f",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度地图 SDK"
+            )
+        ),
+        Pair(
+            "cmb.pb.cmbsafe.CmbService",
+            LibChip(
+                R.drawable.ic_lib_cmb,
+                "招商银行 SDK"
+            )
         )
     )
 

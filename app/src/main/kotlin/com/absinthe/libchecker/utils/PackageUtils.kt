@@ -6,8 +6,8 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.provider.ContextProvider
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.blankj.utilcode.util.Utils
 import java.io.File
 import java.util.*
 import java.util.zip.ZipEntry
@@ -19,7 +19,7 @@ object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(info: ApplicationInfo, flag: Int = 0): PackageInfo {
-        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(
+        return Utils.getApp().packageManager.getPackageInfo(
             info.packageName,
             flag
         )
@@ -27,7 +27,7 @@ object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
-        return ContextProvider.getGlobalContext().packageManager.getPackageInfo(packageName, flag)
+        return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
     }
 
     fun getVersionCode(packageInfo: PackageInfo): Long {
@@ -41,7 +41,7 @@ object PackageUtils {
     fun getVersionString(packageName: String): String {
         return try {
             val packageInfo: PackageInfo =
-                ContextProvider.getGlobalContext().packageManager.getPackageInfo(packageName, 0)
+                Utils.getApp().packageManager.getPackageInfo(packageName, 0)
             "${packageInfo.versionName ?: "null"}(${getVersionCode(packageInfo)})"
         } catch (e: PackageManager.NameNotFoundException) {
             ""

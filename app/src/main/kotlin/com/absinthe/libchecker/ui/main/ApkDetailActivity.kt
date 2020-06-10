@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import net.dongliu.apk.parser.ApkFile
 import rikka.core.util.ClipboardUtils
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipInputStream
@@ -108,23 +109,23 @@ class ApkDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initData(uri: Uri) = lifecycleScope.launch(Dispatchers.IO) {
-        val libList = ArrayList<LibStringItem>()
-        val inputStream = contentResolver.openInputStream(uri)
-        val zipInputStream = ZipInputStream(inputStream)
-        tempFile = File(externalCacheDir, "temp.apk")
-
-        FileIOUtils.writeFileFromIS(tempFile, inputStream)
-
-        val apkFile = ApkFile(tempFile)
-        withContext(Dispatchers.Main) {
-            binding.tvAppName.text = apkFile.apkMeta.label
-            binding.tvPackageName.text = apkFile.apkMeta.packageName
-            binding.tvVersion.text =
-                "${apkFile.apkMeta.versionName} (${apkFile.apkMeta.versionCode})"
-            binding.tvTargetApi.text = "API ${apkFile.apkMeta.targetSdkVersion}"
-        }
-
         try {
+            val libList = ArrayList<LibStringItem>()
+            val inputStream = contentResolver.openInputStream(uri)
+            val zipInputStream = ZipInputStream(inputStream)
+            tempFile = File(externalCacheDir, "temp.apk")
+
+            FileIOUtils.writeFileFromIS(tempFile, inputStream)
+
+            val apkFile = ApkFile(tempFile)
+            withContext(Dispatchers.Main) {
+                binding.tvAppName.text = apkFile.apkMeta.label
+                binding.tvPackageName.text = apkFile.apkMeta.packageName
+                binding.tvVersion.text =
+                    "${apkFile.apkMeta.versionName} (${apkFile.apkMeta.versionCode})"
+                binding.tvTargetApi.text = "API ${apkFile.apkMeta.targetSdkVersion}"
+            }
+
             val zipFile = ZipFile(tempFile)
             val entries = zipFile.entries()
             var splitName: String
@@ -176,8 +177,6 @@ class ApkDetailActivity : BaseActivity() {
             }
 
             zipFile.close()
-        } catch (e: Exception) {
-        } finally {
             zipInputStream.close()
             if (libList.isEmpty()) {
                 libList.add(LibStringItem(getString(R.string.empty_list), 0))
@@ -190,6 +189,10 @@ class ApkDetailActivity : BaseActivity() {
             withContext(Dispatchers.Main) {
                 adapter.setNewInstance(libList)
             }
+        } catch (e: FileNotFoundException) {
+            binding.tvAppName.text = "File manager not provide a content provider"
+        } catch (e: Exception) {
+            binding.tvAppName.text = "ERROR"
         }
     }
 }
