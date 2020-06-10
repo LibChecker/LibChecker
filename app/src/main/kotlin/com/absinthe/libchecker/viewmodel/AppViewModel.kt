@@ -538,7 +538,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     fun refreshRef() {
-        libReference.value = libReference.value!!.filter { it.referredCount >= GlobalValues.libReferenceThreshold.value!! }
+        libReference.value?.let { ref ->
+            libReference.value =
+                ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.value!! }
+        }
     }
 
     private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
