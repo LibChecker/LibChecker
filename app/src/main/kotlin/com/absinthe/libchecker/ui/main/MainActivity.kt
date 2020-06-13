@@ -19,6 +19,7 @@ import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
+import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
@@ -93,13 +94,14 @@ class MainActivity : BaseActivity() {
             viewpager.apply {
                 adapter = object : FragmentStateAdapter(this@MainActivity) {
                     override fun getItemCount(): Int {
-                        return 3
+                        return 4
                     }
 
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
                             0 -> AppListFragment()
                             1 -> ClassifyFragment()
+                            2 -> SnapshotFragment()
                             else -> SettingsFragment()
                         }
                     }
@@ -122,7 +124,8 @@ class MainActivity : BaseActivity() {
                 when (it.itemId) {
                     R.id.navigation_app_list -> binding.viewpager.setCurrentItem(0, true)
                     R.id.navigation_classify -> binding.viewpager.setCurrentItem(1, true)
-                    R.id.navigation_settings -> binding.viewpager.setCurrentItem(2, true)
+                    R.id.navigation_snapshot -> binding.viewpager.setCurrentItem(2, true)
+                    R.id.navigation_settings -> binding.viewpager.setCurrentItem(3, true)
                 }
                 true
             }

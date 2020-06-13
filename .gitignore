@@ -81,3 +81,8 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+app/.classpath
+app/.project
+.project
+.settings/org.eclipse.buildship.core.prefs
+app/.settings/org.eclipse.buildship.core.prefs

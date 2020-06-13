@@ -38,6 +38,10 @@ class AboutActivity : AbsAboutActivity() {
             add(Category("Developers"))
             add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
 
+            add(Card(
+                ""
+            ))
+
             add(Category("Open Source Licenses"))
             add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
             add(License("MultiType", "drakeet", License.APACHE_2, "https://github.com/drakeet/MultiType"))

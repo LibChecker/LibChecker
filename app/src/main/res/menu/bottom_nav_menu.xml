@@ -12,6 +12,11 @@
         android:title="@string/title_classify" />
 
     <item
+        android:id="@+id/navigation_snapshot"
+        android:icon="@drawable/ic_snapshot"
+        android:title="@string/title_snapshot" />
+
+    <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/ic_settings"
         android:title="@string/title_settings" />

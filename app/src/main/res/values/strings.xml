@@ -2,6 +2,7 @@
     <string name="app_name">LibChecker</string>
     <string name="title_app_list">Apps List</string>
     <string name="title_classify">Classify</string>
+    <string name="title_snapshot">Snapshot</string>
     <string name="title_settings">Settings</string>
 
     <!--  App list  -->
