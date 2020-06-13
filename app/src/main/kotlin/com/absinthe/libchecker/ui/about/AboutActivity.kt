@@ -4,12 +4,12 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
+import androidx.core.text.HtmlCompat
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
@@ -39,14 +39,15 @@ class AboutActivity : AbsAboutActivity() {
             add(Category("Developers"))
             add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
 
+            add(Category("Acknowledgement"))
             add(Card(
-                Html.fromHtml(
+                HtmlCompat.fromHtml(
                     getString(R.string.resource_declaration) + "<br>" +
-                            "<a href=\"https://www.iconfont.cn/\">Iconfont</a><br>"+
+                            "<a href=\"https://www.iconfont.cn/\">https://www.iconfont.cn/</a><br>"+
                             "<a href=\"https://lottiefiles.com/22122-fanimation\">https://lottiefiles.com/22122-fanimation</a><br>" +
                             "<a href=\"https://lottiefiles.com/21836-blast-off\">https://lottiefiles.com/21836-blast-off</a><br>"+
-                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a><br>"
-                )
+                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a>"
+                , HtmlCompat.FROM_HTML_MODE_LEGACY)
             ))
 
             add(Category("Open Source Licenses"))

@@ -21,12 +21,15 @@ interface LCDao {
     @Query("DELETE FROM item_table")
     fun deleteAll()
 
-    @Query("SELECT * from native_lib_table ORDER BY count DESC")
-    fun getLibItems(): LiveData<List<NativeLibItem>>
+    @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
+    fun getSnapshots(): LiveData<List<SnapshotItem>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(item: NativeLibItem)
+    suspend fun insert(item: SnapshotItem)
 
     @Update
-    suspend fun update(item: NativeLibItem)
+    suspend fun update(item: SnapshotItem)
+
+    @Delete
+    suspend fun delete(item: SnapshotItem)
 }
