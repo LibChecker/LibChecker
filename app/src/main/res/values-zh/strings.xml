@@ -48,4 +48,6 @@
     <string name="colorful_icon">多彩图标</string>
     <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
     <string name="colorful_icon_summary">部分标记库会呈现为彩色Logo</string>
+    <string name="resource_declaration">应用中的部分素材来自于</string>
+    <string name="title_snapshot">快照</string>
 </resources>

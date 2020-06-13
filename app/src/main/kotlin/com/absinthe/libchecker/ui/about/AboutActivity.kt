@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.text.Html
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -39,7 +40,13 @@ class AboutActivity : AbsAboutActivity() {
             add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
 
             add(Card(
-                ""
+                Html.fromHtml(
+                    getString(R.string.resource_declaration) + "<br>" +
+                            "<a href=\"https://www.iconfont.cn/\">Iconfont</a><br>"+
+                            "<a href=\"https://lottiefiles.com/22122-fanimation\">https://lottiefiles.com/22122-fanimation</a><br>" +
+                            "<a href=\"https://lottiefiles.com/21836-blast-off\">https://lottiefiles.com/21836-blast-off</a><br>"+
+                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a><br>"
+                )
             ))
 
             add(Category("Open Source Licenses"))
