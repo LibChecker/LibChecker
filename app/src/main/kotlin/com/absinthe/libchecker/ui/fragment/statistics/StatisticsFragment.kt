@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment.classify
+package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,21 +7,20 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.databinding.FragmentClassifyBinding
+import com.absinthe.libchecker.databinding.FragmentStatisticsBinding
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.tabs.TabLayoutMediator
 
+class StatisticsFragment : Fragment() {
 
-class ClassifyFragment : Fragment() {
-
-    private lateinit var binding: FragmentClassifyBinding
+    private lateinit var binding: FragmentStatisticsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentClassifyBinding.inflate(inflater, container, false)
+        binding = FragmentStatisticsBinding.inflate(inflater, container, false)
         initView()
         return binding.root
     }

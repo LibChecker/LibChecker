@@ -18,7 +18,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
-import com.absinthe.libchecker.ui.fragment.classify.ClassifyFragment
+import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -100,7 +100,7 @@ class MainActivity : BaseActivity() {
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
                             0 -> AppListFragment()
-                            1 -> ClassifyFragment()
+                            1 -> StatisticsFragment()
                             2 -> SnapshotFragment()
                             else -> SettingsFragment()
                         }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LibChecker</string>
     <string name="title_app_list">应用列表</string>
-    <string name="title_classify">分类</string>
+    <string name="title_statistics">统计</string>
     <string name="title_settings">设置</string>
 
     <string name="settings_about">关于</string>
@@ -17,7 +17,7 @@
     <string name="string_64_bit">64 位</string>
     <string name="string_32_bit">32 位</string>
     <string name="chart_no_data_text">加载中</string>
-    <string name="title_classify_dialog">%s架构的 Apps</string>
+    <string name="title_statistics_dialog">%s架构的 Apps</string>
     <string name="format_native_libs_title"><b>%s</b> 中的 Native 库</string>
     <string name="empty_list">空列表</string>
     <string name="menu_sort">排序</string>
@@ -50,4 +50,5 @@
     <string name="colorful_icon_summary">部分标记库会呈现为彩色Logo</string>
     <string name="resource_declaration">应用中的部分素材来自于</string>
     <string name="title_snapshot">快照</string>
+    <string name="snapshot_btn_save_current">保存当前快照</string>
 </resources>

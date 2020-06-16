@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LibChecker</string>
     <string name="title_app_list">Apps List</string>
-    <string name="title_classify">Classify</string>
+    <string name="title_statistics">Statistics</string>
     <string name="title_snapshot">Snapshot</string>
     <string name="title_settings">Settings</string>
 
@@ -18,9 +18,9 @@
     <string name="menu_sort_by_time_desc">Descending by update time</string>
     <string name="menu_sort_default">Default order</string>
 
-    <!-- Classify   -->
+    <!-- Statistics   -->
     <string name="chart_no_data_text">Loading</string>
-    <string name="title_classify_dialog">Apps with %s ABI</string>
+    <string name="title_statistics_dialog">Apps with %s ABI</string>
     <string name="tab_pie_chart">Pie chart</string>
     <string name="tab_lib_reference_statistics">Lib reference</string>
     <string name="not_marked_lib">Not marked library</string>
@@ -67,4 +67,6 @@
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
 
+    <!--  Snapshot  -->
+    <string name="snapshot_btn_save_current">Save current snapshot</string>
 </resources>

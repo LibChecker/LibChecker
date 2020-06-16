@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.classify.ClassifyFragment">
+    tools:context=".ui.fragment.statistics.StatisticsFragment">
 
     <com.github.mikephil.charting.charts.PieChart
         android:id="@+id/chart"

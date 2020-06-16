@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment.classify
+package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
