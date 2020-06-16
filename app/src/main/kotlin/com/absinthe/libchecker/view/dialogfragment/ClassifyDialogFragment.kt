@@ -28,7 +28,7 @@ class ClassifyDialogFragment : LCDialogFragment() {
         }
 
         return MaterialAlertDialogBuilder(requireContext())
-            .setTitle(String.format(getString(R.string.title_classify_dialog), getTitle()))
+            .setTitle(String.format(getString(R.string.title_statistics_dialog), getTitle()))
             .setView(dialogView)
             .create()
     }
