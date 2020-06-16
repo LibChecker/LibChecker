@@ -7,12 +7,16 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.LCDialogFragment
-import com.absinthe.libchecker.view.LibReferenceThresholdView
+import com.absinthe.libchecker.view.settings.LibReferenceThresholdView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class LibThresholdDialogFragment : LCDialogFragment() {
 
-    private val dialogView by lazy { LibReferenceThresholdView(requireContext()) }
+    private val dialogView by lazy {
+        LibReferenceThresholdView(
+            requireContext()
+        )
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return MaterialAlertDialogBuilder(requireContext())

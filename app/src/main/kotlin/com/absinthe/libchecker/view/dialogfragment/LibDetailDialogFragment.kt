@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -13,7 +14,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.view.LCDialogFragment
-import com.absinthe.libchecker.view.LibDetailView
+import com.absinthe.libchecker.view.detail.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
@@ -27,7 +28,11 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : LCDialogFragment() {
 
-    private val dialogView by lazy { LibDetailView(requireContext()) }
+    private val dialogView by lazy {
+        LibDetailView(
+            requireContext()
+        )
+    }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getSerializable(EXTRA_LIB_TYPE) as LibStringAdapter.Mode }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
@@ -46,10 +51,11 @@ class LibDetailDialogFragment : LCDialogFragment() {
             tvCreateIssue.apply {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()
-                text = Html.fromHtml(
+                text = HtmlCompat.fromHtml(
                     "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${resources.getText(
                         R.string.create_an_issue
                     )} </a>"
+                    , HtmlCompat.FROM_HTML_MODE_LEGACY
                 )
             }
         }

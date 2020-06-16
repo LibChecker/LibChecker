@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.detail
 
 import android.content.Context
 import android.view.LayoutInflater

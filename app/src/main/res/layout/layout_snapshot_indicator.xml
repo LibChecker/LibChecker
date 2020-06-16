@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:ignore="UseCompoundDrawables">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        tools:text="@string/snapshot_indicator_added" />
+
+    <ImageView
+        android:id="@+id/indicator"
+        android:layout_width="20dp"
+        android:layout_height="5dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/normal_padding"
+        android:importantForAccessibility="no"
+        android:src="@color/material_green_A400" />
+
+</LinearLayout>

@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.blankj.utilcode.util.BarUtils
+import com.blankj.utilcode.util.ConvertUtils
 
 class SnapshotFragment : Fragment() {
 
@@ -27,11 +25,15 @@ class SnapshotFragment : Fragment() {
     }
 
     private fun initView() {
-        lifecycleScope.launch {
-            delay(3000)
-            withContext(Dispatchers.Main) {
-                binding.extendedFab.shrink()
-            }
+        binding.root.setPadding(binding.root.paddingStart, binding.root.paddingTop + BarUtils.getStatusBarHeight(), binding.root.paddingEnd, 0)
+        binding.extendedFab.apply {
+            (layoutParams as CoordinatorLayout.LayoutParams)
+                .setMargins(
+                    0,
+                    0,
+                    ConvertUtils.dp2px(16f),
+                    ConvertUtils.dp2px(16f) + paddingBottom
+                )
         }
     }
 

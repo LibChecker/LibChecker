@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.settings
 
 import android.content.Context
 import com.absinthe.libchecker.constant.GlobalValues

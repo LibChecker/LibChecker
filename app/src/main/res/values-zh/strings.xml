@@ -51,4 +51,5 @@
     <string name="resource_declaration">应用中的部分素材来自于</string>
     <string name="title_snapshot">快照</string>
     <string name="snapshot_btn_save_current">保存当前快照</string>
+    <string name="snapshot_current_timestamp">当前快照时间戳</string>
 </resources>

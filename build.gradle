@@ -35,7 +35,7 @@ def baseVersionName = '1.4.1'
 
 ext {
     minSdkVersion = 21
-    targetSdkVersion = 29
+    targetSdkVersion = 30
     versionCode = gitCommitCount
     versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
 }
