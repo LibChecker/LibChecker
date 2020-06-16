@@ -9,7 +9,7 @@
     <item
         android:id="@+id/navigation_classify"
         android:icon="@drawable/ic_classify"
-        android:title="@string/title_classify" />
+        android:title="@string/title_statistics" />
 
     <item
         android:id="@+id/navigation_snapshot"
