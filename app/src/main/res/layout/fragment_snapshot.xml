@@ -12,7 +12,6 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingHorizontal="@dimen/normal_padding"
-        android:paddingTop="?actionBarSize"
         android:scrollbarStyle="insideOverlay"
         android:scrollbars="vertical"
         app:borderBottomStyle="never"

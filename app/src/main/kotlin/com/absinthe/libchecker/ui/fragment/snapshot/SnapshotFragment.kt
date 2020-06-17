@@ -12,6 +12,7 @@ import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.recyclerview.SnapshotAdapter
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
 import rikka.material.widget.BorderView
 import java.text.SimpleDateFormat
@@ -36,6 +37,14 @@ class SnapshotFragment : Fragment() {
     }
 
     private fun initView() {
+        binding.root.apply {
+            setPadding(
+                paddingStart,
+                paddingTop + BarUtils.getStatusBarHeight(),
+                paddingEnd,
+                paddingBottom
+            )
+        }
         binding.apply {
             extendedFab.apply {
                 (layoutParams as CoordinatorLayout.LayoutParams)
@@ -69,7 +78,7 @@ class SnapshotFragment : Fragment() {
                 "None"
             }
         })
-        viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+        viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             adapter.setNewInstance(it.toMutableList())
         })
     }
