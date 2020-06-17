@@ -23,11 +23,19 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.insert(item)
     }
 
+    suspend fun insertSnapshots(items: List<SnapshotItem>) {
+        lcDao.insertSnapshots(items)
+    }
+
     suspend fun update(item: SnapshotItem) {
         lcDao.update(item)
     }
 
     suspend fun delete(item: SnapshotItem) {
         lcDao.delete(item)
+    }
+
+    suspend fun deleteAllSnapshots() {
+        lcDao.deleteAllSnapshots()
     }
 }

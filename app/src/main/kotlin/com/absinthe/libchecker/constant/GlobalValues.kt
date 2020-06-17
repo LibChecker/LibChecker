@@ -2,29 +2,49 @@ package com.absinthe.libchecker.constant
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
 
-    private var sPreferences: SharedPreferences? = null
+    private val preferences: SharedPreferences = Utils.getApp()
+        .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
 
     private fun getPreferences(): SharedPreferences {
-        return sPreferences!!
+        return preferences
     }
 
-    var isShowSystemApps: MutableLiveData<Boolean> = MutableLiveData()
-    var isShowEntryAnimation: MutableLiveData<Boolean> = MutableLiveData()
-    var isColorfulIcon: MutableLiveData<Boolean> = MutableLiveData()
+    var isShowSystemApps: MutableLiveData<Boolean> =
+        MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
+    var isShowEntryAnimation: MutableLiveData<Boolean> =
+        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true))
+    var isColorfulIcon: MutableLiveData<Boolean> =
+        MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
 
-    var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData()
-    var appSortMode: MutableLiveData<Int> = MutableLiveData()
-    var libSortMode: MutableLiveData<Int> = MutableLiveData()
-    var libReferenceThreshold: MutableLiveData<Int> = MutableLiveData()
+    var appSortMode: MutableLiveData<Int> = MutableLiveData(
+        getPreferences().getInt(
+            Constants.PREF_APP_SORT_MODE,
+            Constants.SORT_MODE_DEFAULT
+        )
+    )
+    var libSortMode: MutableLiveData<Int> =
+        MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
+    var libReferenceThreshold: MutableLiveData<Int> =
+        MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
+
+    var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData(true)
+    var snapshotTimestamp: Long = 0
+        get() = getPreferences().getLong(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
+        set(value) {
+            field = value
+            getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
+        }
 
     var config = Configuration(
         enableLibDetail = false,
@@ -36,32 +56,8 @@ object GlobalValues {
         showRelativeUrl = false
     )
 
-    var repo = Constants.REPO_GITEE
+    var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
+        ?: Constants.REPO_GITEE
 
     var shouldRequestChange = false
-
-    fun init(context: Context) {
-        if (sPreferences == null) {
-            sPreferences = context
-                .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
-        }
-
-        isObservingDBItems.value = true
-
-        isShowSystemApps.value =
-            getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false)
-        isShowEntryAnimation.value =
-            getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true)
-        isColorfulIcon.value =
-            getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true)
-        appSortMode.value =
-            getPreferences().getInt(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
-        libSortMode.value =
-            getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
-        libReferenceThreshold.value =
-            getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2)
-
-        repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
-            ?: Constants.REPO_GITEE
-    }
 }

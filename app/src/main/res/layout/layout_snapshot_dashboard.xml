@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:backgroundTint="?android:colorBackground"
+    android:minHeight="100dp"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="0dp"
+    app:rippleColor="@null"
+    app:strokeColor="@color/cardBorder"
+    app:strokeWidth="1dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/normal_padding">
+
+        <TextView
+            android:id="@+id/tv_snapshot_timestamp_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/snapshot_current_timestamp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_snapshot_timestamp_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-light"
+            app:layout_constraintStart_toStartOf="@id/tv_snapshot_timestamp_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_snapshot_timestamp_title"
+            tools:text="2020-06-17-00:39:45" />
+
+        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+            android:id="@+id/indicator_added"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicator="@color/material_green_300"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:text="@string/snapshot_indicator_added" />
+
+        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+            android:id="@+id/indicator_removed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicator="@color/material_red_300"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/indicator_added"
+            app:text="@string/snapshot_indicator_removed" />
+
+        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+            android:id="@+id/indicator_changed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:indicator="@color/material_yellow_300"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/indicator_removed"
+            app:text="@string/snapshot_indicator_changed" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -52,4 +52,7 @@
     <string name="title_snapshot">快照</string>
     <string name="snapshot_btn_save_current">保存当前快照</string>
     <string name="snapshot_current_timestamp">当前快照时间戳</string>
+    <string name="snapshot_indicator_added">增加</string>
+    <string name="snapshot_indicator_removed">移除</string>
+    <string name="snapshot_indicator_changed">变更</string>
 </resources>

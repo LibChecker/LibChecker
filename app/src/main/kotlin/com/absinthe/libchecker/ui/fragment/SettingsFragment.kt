@@ -4,7 +4,7 @@ import android.content.ComponentName
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import androidx.preference.DropDownPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -21,6 +21,8 @@ import com.blankj.utilcode.util.BarUtils
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener,
     Preference.OnPreferenceClickListener {
+
+    private val viewModel by activityViewModels<AppViewModel>()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -67,7 +69,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
             }
             Constants.PREF_RULES_REPO -> {
                 GlobalValues.repo = newValue as String
-                val viewModel = ViewModelProvider(requireActivity()).get(AppViewModel::class.java)
                 viewModel.requestConfiguration()
                 true
             }

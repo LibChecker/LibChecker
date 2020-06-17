@@ -14,7 +14,6 @@ import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
-import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.recyclerview.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -150,8 +149,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            logd("${categoryDir}/${libName}.json")
-            val detail = request.requestNativeLibDetail("${categoryDir}/${libName}.json")
+            val detail = request.requestNativeLibDetail(categoryDir, libName)
             detail.enqueue(object : Callback<NativeLibDetailBean> {
                 override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
                     Log.e("DetailViewModel", t.message ?: "")
