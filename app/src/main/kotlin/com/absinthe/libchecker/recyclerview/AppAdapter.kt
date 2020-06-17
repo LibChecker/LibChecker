@@ -27,7 +27,7 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
                 R.id.iv_abi_type, when (item.abi) {
                     ARMV8 -> R.drawable.ic_64bit
                     ARMV7, ARMV5 -> R.drawable.ic_32bit
-                    else -> 0
+                    else -> R.drawable.ic_no_libs
                 }
             )
         }

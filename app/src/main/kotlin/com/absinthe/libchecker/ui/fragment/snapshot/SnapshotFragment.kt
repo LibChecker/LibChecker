@@ -78,6 +78,10 @@ class SnapshotFragment : Fragment() {
                 "None"
             }
         })
+        viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
+            viewModel.computeDiff()
+        })
         viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             adapter.setNewInstance(it.toMutableList())
         })

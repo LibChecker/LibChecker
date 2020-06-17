@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/normal_padding"
     android:clickable="true"
     android:focusable="true"
     android:transitionName="app_card_container"
@@ -34,7 +35,7 @@
             android:layout_marginEnd="10dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/layout_abi_badge"
+            app:layout_constraintEnd_toStartOf="@id/ll_abi_badge"
             app:layout_constraintStart_toEndOf="@id/iv_icon"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -70,37 +71,76 @@
 
         </LinearLayout>
 
-        <include
-            android:id="@+id/layout_abi_badge"
-            layout="@layout/layout_abi_badge"
+        <LinearLayout
+            android:id="@+id/ll_abi_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/normal_padding"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_arrow"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/ll_color_indicator"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_arrow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="→"
-            android:textColor="@color/textNormal"
-            android:textSize="30sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/layout_abi_badge_new"
-            app:layout_constraintEnd_toStartOf="@id/layout_abi_badge_new"
-            app:layout_constraintTop_toTopOf="@id/layout_abi_badge_new"
-            tools:ignore="HardcodedText" />
+            <include
+                android:id="@+id/layout_abi_badge"
+                layout="@layout/layout_abi_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
-        <include
-            android:id="@+id/layout_abi_badge_new"
-            layout="@layout/layout_abi_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
+            <TextView
+                android:id="@+id/tv_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="3dp"
+                android:text="→"
+                android:textColor="@color/textNormal"
+                android:textSize="20sp"
+                android:visibility="gone"
+                tools:ignore="HardcodedText" />
+
+            <include
+                android:id="@+id/layout_abi_badge_new"
+                layout="@layout/layout_abi_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_color_indicator"
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/indicator_added"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/material_green_300"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/indicator_removed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/material_red_300"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/indicator_changed"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@color/material_yellow_300"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

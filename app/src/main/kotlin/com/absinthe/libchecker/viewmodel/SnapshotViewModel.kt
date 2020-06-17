@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.bean.ARMV7
 import com.absinthe.libchecker.bean.ARMV8
 import com.absinthe.libchecker.bean.NO_LIBS
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -35,7 +36,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         deleteAllSnapshots()
         val dbList = mutableListOf<SnapshotItem>()
-        val diffList = mutableListOf<SnapshotDiffItem>()
 
         dbList.add(
             SnapshotItem(
@@ -49,6 +49,18 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 "", "", "", "", ""
             )
         )
+
+        insertSnapshots(dbList)
+        withContext(Dispatchers.Main) {
+            val ts = System.currentTimeMillis()
+            GlobalValues.snapshotTimestamp = ts
+            timestamp.value = ts
+        }
+    }
+
+    fun computeDiff() = viewModelScope.launch(Dispatchers.IO) {
+        val diffList = mutableListOf<SnapshotDiffItem>()
+
         diffList.add(
             SnapshotDiffItem(
                 BuildConfig.APPLICATION_ID,
@@ -60,29 +72,27 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 SnapshotDiffItem.DiffNode(""),
                 SnapshotDiffItem.DiffNode(""),
                 SnapshotDiffItem.DiffNode(""),
-                SnapshotDiffItem.DiffNode("")
+                SnapshotDiffItem.DiffNode(""),
+                added = true
             )
         )
         diffList.add(
             SnapshotDiffItem(
-                BuildConfig.APPLICATION_ID,
-                SnapshotDiffItem.DiffNode("LibChecker"),
-                SnapshotDiffItem.DiffNode(BuildConfig.VERSION_NAME),
-                SnapshotDiffItem.DiffNode(BuildConfig.VERSION_CODE.toLong(), 12345678),
-                SnapshotDiffItem.DiffNode(NO_LIBS.toShort(), ARMV8.toShort()),
+                "com.absinthe.anywhere_",
+                SnapshotDiffItem.DiffNode("Anywhere-"),
+                SnapshotDiffItem.DiffNode("2.0.0-beta5", "2.0.0-beta6"),
+                SnapshotDiffItem.DiffNode(20006, 20007),
+                SnapshotDiffItem.DiffNode(ARMV7.toShort(), ARMV8.toShort()),
                 SnapshotDiffItem.DiffNode(""),
                 SnapshotDiffItem.DiffNode(""),
                 SnapshotDiffItem.DiffNode(""),
                 SnapshotDiffItem.DiffNode(""),
-                SnapshotDiffItem.DiffNode("")
+                SnapshotDiffItem.DiffNode(""),
+                true, removed = true
             )
         )
 
-        insertSnapshots(dbList)
         withContext(Dispatchers.Main) {
-            val ts = System.currentTimeMillis()
-            GlobalValues.snapshotTimestamp = ts
-            timestamp.value = ts
             snapshotDiffItems.value = diffList
         }
     }

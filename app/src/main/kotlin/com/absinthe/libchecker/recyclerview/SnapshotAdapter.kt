@@ -20,7 +20,15 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
         )
 
-//        if ()
+        if (item.added) {
+            holder.getView<TextView>(R.id.indicator_added).isVisible = true
+        }
+        if (item.removed) {
+            holder.getView<TextView>(R.id.indicator_removed).isVisible = true
+        }
+        if (item.changed) {
+            holder.getView<TextView>(R.id.indicator_changed).isVisible = true
+        }
 
         if (item.labelDiff.new != null) {
             holder.setText(R.id.tv_app_name, item.labelDiff.old + ARROW + item.labelDiff.new)
@@ -55,7 +63,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             R.id.iv_abi_type, when (item.abiDiff.old.toInt()) {
                 ARMV8 -> R.drawable.ic_64bit
                 ARMV7, ARMV5 -> R.drawable.ic_32bit
-                else -> 0
+                else -> R.drawable.ic_no_libs
             }
         )
         if (item.abiDiff.new != null) {
@@ -76,7 +84,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 when (item.abiDiff.new.toInt()) {
                     ARMV8 -> R.drawable.ic_64bit
                     ARMV7, ARMV5 -> R.drawable.ic_32bit
-                    else -> 0
+                    else -> R.drawable.ic_no_libs
                 }
             )
         }

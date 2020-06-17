@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/normal_padding"
     android:backgroundTint="?android:colorBackground"
     android:minHeight="100dp"
     app:cardCornerRadius="5dp"
@@ -35,6 +34,25 @@
             app:layout_constraintStart_toStartOf="@id/tv_snapshot_timestamp_title"
             app:layout_constraintTop_toBottomOf="@id/tv_snapshot_timestamp_title"
             tools:text="2020-06-17-00:39:45" />
+
+        <TextView
+            android:id="@+id/tv_snapshot_apps_count_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:fontFamily="sans-serif-black"
+            android:text="@string/snapshot_apps_count"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_snapshot_timestamp_text" />
+
+        <TextView
+            android:id="@+id/tv_snapshot_apps_count_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-light"
+            app:layout_constraintStart_toStartOf="@id/tv_snapshot_timestamp_title"
+            app:layout_constraintTop_toBottomOf="@id/tv_snapshot_apps_count_title"
+            tools:text="117" />
 
         <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
             android:id="@+id/indicator_added"

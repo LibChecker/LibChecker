@@ -10,7 +10,10 @@ data class SnapshotDiffItem(
     val servicesDiff: DiffNode<String>,
     val activitiesDiff: DiffNode<String>,
     val receiversDiff: DiffNode<String>,
-    val providersDiff: DiffNode<String>
+    val providersDiff: DiffNode<String>,
+    val added: Boolean = false,
+    val removed: Boolean = false,
+    val changed: Boolean = false
 ) {
     data class DiffNode<T>(val old: T, val new: T? = null)
 }

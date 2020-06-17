@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/iv_abi_type"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:contentDescription="ABI icon"
         android:src="@drawable/ic_64bit"
         tools:ignore="HardcodedText" />
@@ -18,7 +18,7 @@
         android:id="@+id/tv_abi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
+        android:textSize="11sp"
         tools:text="ARMv8" />
 
 </LinearLayout>
