@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.recyclerview.SnapshotAdapter
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -23,7 +22,6 @@ class SnapshotFragment : Fragment() {
 
     private val viewModel by viewModels<SnapshotViewModel>()
     private lateinit var binding: FragmentSnapshotBinding
-    private lateinit var dashboardBinding: LayoutSnapshotDashboardBinding
     private val adapter = SnapshotAdapter()
 
     override fun onCreateView(
@@ -32,7 +30,6 @@ class SnapshotFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSnapshotBinding.inflate(inflater, container, false)
-        dashboardBinding = LayoutSnapshotDashboardBinding.inflate(inflater, binding.root, false)
         initView()
         return binding.root
     }
@@ -75,19 +72,18 @@ class SnapshotFragment : Fragment() {
         }
 
         adapter.apply {
-            addHeaderView(dashboardBinding.root)
             setEmptyView(R.layout.layout_snapshot_empty_view)
         }
 
         viewModel.timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            dashboardBinding.tvSnapshotTimestampText.text = if (it != 0L) {
+            binding.dashboardLayout.tvSnapshotTimestampText.text = if (it != 0L) {
                 getFormatDateString(it)
             } else {
                 "None"
             }
         })
         viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
+            binding.dashboardLayout.tvSnapshotAppsCountText.text = it.size.toString()
             viewModel.computeDiff(requireContext())
         })
         viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {

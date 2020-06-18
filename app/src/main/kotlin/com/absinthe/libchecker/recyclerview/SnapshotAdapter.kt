@@ -10,7 +10,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-const val ARROW = " → "
+const val ARROW = "→"
 
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.layout.item_snapshot) {
 
@@ -30,14 +30,14 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             holder.getView<TextView>(R.id.indicator_changed).isVisible = true
         }
 
-        if (item.labelDiff.new != null) {
-            holder.setText(R.id.tv_app_name, item.labelDiff.old + ARROW + item.labelDiff.new)
+        if (item.labelDiff.old != item.labelDiff.new) {
+            holder.setText(R.id.tv_app_name, "${item.labelDiff.old} $ARROW ${item.labelDiff.new}")
         } else {
             holder.setText(R.id.tv_app_name, item.labelDiff.old)
         }
         holder.setText(R.id.tv_package_name, item.packageName)
 
-        if (item.versionNameDiff.new != null || item.versionCodeDiff.new != null) {
+        if (item.versionNameDiff.old != item.versionNameDiff.new || item.versionCodeDiff.old != item.versionCodeDiff.new) {
             holder.setText(
                 R.id.tv_version,
                 "${item.versionNameDiff.old} (${item.versionCodeDiff.old}) $ARROW ${item.versionNameDiff.new ?: item.versionNameDiff.old} (${item.versionCodeDiff.new ?: item.versionCodeDiff.old})"
@@ -47,6 +47,11 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 R.id.tv_version,
                 "${item.versionNameDiff.old} (${item.versionCodeDiff.old})"
             )
+        }
+        if (item.targetApiDiff.old != item.targetApiDiff.new) {
+            holder.setText(R.id.tv_target_api, "API ${item.targetApiDiff.old} $ARROW API ${item.targetApiDiff.new}")
+        } else {
+            holder.setText(R.id.tv_target_api, item.targetApiDiff.old.toString())
         }
 
         holder.setText(
@@ -66,7 +71,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 else -> R.drawable.ic_no_libs
             }
         )
-        if (item.abiDiff.new != null) {
+        if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
             holder.getView<TextView>(R.id.tv_arrow).isVisible = true
 
             val abiBadgeNewLayout = holder.getView<LinearLayout>(R.id.layout_abi_badge_new)

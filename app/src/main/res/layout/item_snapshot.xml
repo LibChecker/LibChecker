@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/normal_padding"
+    android:layout_marginHorizontal="@dimen/normal_padding"
+    android:layout_marginVertical="5dp"
     android:clickable="true"
     android:focusable="true"
     android:transitionName="app_card_container"
@@ -69,6 +70,17 @@
                 android:transitionName="version_name"
                 tools:ignore="SmallSp"
                 tools:text="1.2.0(120)" />
+
+            <TextView
+                android:id="@+id/tv_target_api"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="11sp"
+                android:transitionName="target_api"
+                tools:ignore="SmallSp"
+                tools:text="API 30" />
 
         </LinearLayout>
 
