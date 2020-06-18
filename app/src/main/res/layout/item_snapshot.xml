@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
                 android:textColor="@color/textNormal"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:transitionName="app_name"
                 tools:text="LibChecker" />
 
@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:textColor="@color/textNormal"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:transitionName="package_name"
                 tools:text="com.absinthe.libchecker" />
 
@@ -65,8 +65,9 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
                 android:textColor="@android:color/darker_gray"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:transitionName="version_name"
+                tools:ignore="SmallSp"
                 tools:text="1.2.0(120)" />
 
         </LinearLayout>

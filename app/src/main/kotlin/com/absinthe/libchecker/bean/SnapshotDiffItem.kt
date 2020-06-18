@@ -6,6 +6,7 @@ data class SnapshotDiffItem(
     val versionNameDiff: DiffNode<String>,
     val versionCodeDiff: DiffNode<Long>,
     val abiDiff: DiffNode<Short>,
+    val targetApiDiff: DiffNode<Short>,
     val nativeLibsDiff: DiffNode<String>,
     val servicesDiff: DiffNode<String>,
     val activitiesDiff: DiffNode<String>,
@@ -13,7 +14,9 @@ data class SnapshotDiffItem(
     val providersDiff: DiffNode<String>,
     val added: Boolean = false,
     val removed: Boolean = false,
-    val changed: Boolean = false
+    val changed: Boolean = false,
+    val newInstalled: Boolean = false,
+    val deleted: Boolean = false
 ) {
     data class DiffNode<T>(val old: T, val new: T? = null)
 }

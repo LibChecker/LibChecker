@@ -40,7 +40,7 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("DROP TABLE IF EXISTS native_lib_table")
                 database.execSQL(
-                    "CREATE TABLE snapshot_table (packageName TEXT NOT NULL, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, PRIMARY KEY(packageName))"
+                    "CREATE TABLE snapshot_table (packageName TEXT NOT NULL, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, PRIMARY KEY(packageName))"
                 )
             }
         }

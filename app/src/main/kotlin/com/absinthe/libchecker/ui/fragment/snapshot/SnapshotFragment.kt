@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.recyclerview.SnapshotAdapter
@@ -55,7 +56,9 @@ class SnapshotFragment : Fragment() {
                         ConvertUtils.dp2px(16f) + paddingBottom
                     )
                 setOnClickListener {
-                    viewModel.computeSnapshots()
+                    viewModel.computeSnapshots(requireContext())
+                    isClickable = false
+                    text = getString(R.string.snapshot_btn_saving)
                 }
             }
             rvList.apply {
@@ -80,7 +83,11 @@ class SnapshotFragment : Fragment() {
         })
         viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
-            viewModel.computeDiff()
+            binding.extendedFab.apply {
+                text = getString(R.string.snapshot_btn_save_current)
+                isClickable = true
+            }
+            viewModel.computeDiff(requireContext())
         })
         viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             adapter.setNewInstance(it.toMutableList())

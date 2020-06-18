@@ -14,6 +14,7 @@ data class SnapshotItem(
     @ColumnInfo(name = "lastUpdatedTime") val lastUpdatedTime: Long,
     @ColumnInfo(name = "isSystem") val isSystem: Boolean,
     @ColumnInfo(name = "abi") val abi: Short,
+    @ColumnInfo(name = "targetApi") val targetApi: Short,
     @ColumnInfo(name = "nativeLibs") val nativeLibs: String,
     @ColumnInfo(name = "services") val services: String,
     @ColumnInfo(name = "activities") val activities: String,

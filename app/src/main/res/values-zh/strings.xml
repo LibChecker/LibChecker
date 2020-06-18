@@ -55,5 +55,6 @@
     <string name="snapshot_indicator_added">增加</string>
     <string name="snapshot_indicator_removed">移除</string>
     <string name="snapshot_indicator_changed">变更</string>
-    <string name="snapshot_apps_count">应用程序数量</string>
+    <string name="snapshot_apps_count">快照应用程序数量</string>
+    <string name="snapshot_btn_saving">正在保存快照</string>
 </resources>

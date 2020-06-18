@@ -7,7 +7,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.system.ErrnoException
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -16,7 +15,9 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
-import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -36,10 +37,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.File
-import java.io.FileNotFoundException
-import java.util.zip.ZipException
-import java.util.zip.ZipFile
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -77,7 +74,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
                     versionName = PackageUtils.getVersionString(info.packageName)
-                    abi = getAbi(info.sourceDir, info.nativeLibraryDir)
+                    abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
                     isSystem =
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                     updateTime = packageInfo.lastUpdateTime
@@ -90,7 +87,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                    getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                    PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
                 )
 
                 GlobalValues.isShowSystemApps.value?.let {
@@ -185,7 +182,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 packageInfo.firstInstallTime,
                                 packageInfo.lastUpdateTime,
                                 (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
+                                PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
                             )
                             update(lcItem)
                         }
@@ -213,7 +210,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.firstInstallTime,
                         packageInfo.lastUpdateTime,
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                        getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
                     )
 
                     insert(lcItem)
@@ -554,62 +551,5 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.delete(item)
-    }
-
-    private fun getAbi(path: String, nativePath: String): Int {
-        var abi = NO_LIBS
-
-        try {
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-
-            while (entries.hasMoreElements()) {
-                val name = entries.nextElement().name
-
-                if (name.contains("lib/")) {
-                    if (name.contains("arm64-v8a")) {
-                        abi = ARMV8
-                    } else if (name.contains("armeabi-v7a")) {
-                        if (abi != ARMV8) {
-                            abi = ARMV7
-                        }
-                    } else if (name.contains("armeabi")) {
-                        if (abi != ARMV8 && abi != ARMV7) {
-                            abi = ARMV5
-                        }
-                    }
-                }
-            }
-            zipFile.close()
-            return if (abi == NO_LIBS) {
-                getAbiByNativeDir(nativePath)
-            } else {
-                abi
-            }
-        } catch (e: ErrnoException) {
-            e.printStackTrace()
-            return ERROR
-        } catch (e: ZipException) {
-            e.printStackTrace()
-            return ERROR
-        } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return ERROR
-        }
-    }
-
-    private fun getAbiByNativeDir(nativePath: String): Int {
-        val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
-        val abiList = ArrayList<String>()
-
-        val fileList = file.listFiles() ?: return NO_LIBS
-        fileList.iterator().forEach { abiList.add(it.name) }
-
-        return when {
-            abiList.contains("arm64") -> ARMV8
-            abiList.contains("arm") -> ARMV7
-            else -> NO_LIBS
-        }
     }
 }

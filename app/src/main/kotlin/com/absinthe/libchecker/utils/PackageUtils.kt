@@ -5,12 +5,15 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import com.absinthe.libchecker.bean.LibStringItem
+import android.system.ErrnoException
+import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
 import java.io.File
+import java.io.FileNotFoundException
 import java.util.*
 import java.util.zip.ZipEntry
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import kotlin.collections.ArrayList
 
@@ -160,7 +163,7 @@ object PackageUtils {
     fun getComponentList(
         packageName: String,
         type: LibReferenceActivity.Type
-    ): Array<out ComponentInfo>? {
+    ): List<String> {
         val flag = when (type) {
             LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
             LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
@@ -171,12 +174,77 @@ object PackageUtils {
 
         val packageInfo = getPackageInfo(packageName, flag)
 
-        return when (flag) {
+        val list = when (flag) {
             PackageManager.GET_SERVICES -> packageInfo.services
             PackageManager.GET_ACTIVITIES -> packageInfo.activities
             PackageManager.GET_RECEIVERS -> packageInfo.receivers
             PackageManager.GET_PROVIDERS -> packageInfo.providers
             else -> null
+        }
+
+        val finalList = mutableListOf<String>()
+        list?.let {
+            for (component in it) {
+                finalList.add(component.name)
+            }
+        }
+        return finalList
+    }
+
+    fun getAbi(path: String, nativePath: String): Int {
+        var abi = NO_LIBS
+
+        try {
+            val file = File(path)
+            val zipFile = ZipFile(file)
+            val entries = zipFile.entries()
+
+            while (entries.hasMoreElements()) {
+                val name = entries.nextElement().name
+
+                if (name.contains("lib/")) {
+                    if (name.contains("arm64-v8a")) {
+                        abi = ARMV8
+                    } else if (name.contains("armeabi-v7a")) {
+                        if (abi != ARMV8) {
+                            abi = ARMV7
+                        }
+                    } else if (name.contains("armeabi")) {
+                        if (abi != ARMV8 && abi != ARMV7) {
+                            abi = ARMV5
+                        }
+                    }
+                }
+            }
+            zipFile.close()
+            return if (abi == NO_LIBS) {
+                getAbiByNativeDir(nativePath)
+            } else {
+                abi
+            }
+        } catch (e: ErrnoException) {
+            e.printStackTrace()
+            return ERROR
+        } catch (e: ZipException) {
+            e.printStackTrace()
+            return ERROR
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return ERROR
+        }
+    }
+
+    private fun getAbiByNativeDir(nativePath: String): Int {
+        val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
+        val abiList = ArrayList<String>()
+
+        val fileList = file.listFiles() ?: return NO_LIBS
+        fileList.iterator().forEach { abiList.add(it.name) }
+
+        return when {
+            abiList.contains("arm64") -> ARMV8
+            abiList.contains("arm") -> ARMV7
+            else -> NO_LIBS
         }
     }
 }
