@@ -56,22 +56,27 @@ class SnapshotFragment : Fragment() {
                         ConvertUtils.dp2px(16f) + paddingBottom
                     )
                 setOnClickListener {
+                    vfContainer.displayedChild = 0
+                    hide()
                     viewModel.computeSnapshots(requireContext())
-                    isClickable = false
-                    text = getString(R.string.snapshot_btn_saving)
                 }
             }
-            rvList.apply {
+            recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
             }
+            vfContainer.apply {
+                setInAnimation(activity, R.anim.anim_fade_in)
+                setOutAnimation(activity, R.anim.anim_fade_out)
+            }
         }
 
         adapter.apply {
             addHeaderView(dashboardBinding.root)
+            setEmptyView(R.layout.layout_snapshot_empty_view)
         }
 
         viewModel.timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
@@ -83,14 +88,12 @@ class SnapshotFragment : Fragment() {
         })
         viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
-            binding.extendedFab.apply {
-                text = getString(R.string.snapshot_btn_save_current)
-                isClickable = true
-            }
             viewModel.computeDiff(requireContext())
         })
         viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
             adapter.setNewInstance(it.toMutableList())
+            binding.vfContainer.displayedChild = 1
+            binding.extendedFab.show()
         })
     }
 

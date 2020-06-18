@@ -45,43 +45,47 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val gson = Gson()
 
         for (info in appList) {
-            packageInfo = PackageUtils.getPackageInfo(info)
+            try {
+                packageInfo = PackageUtils.getPackageInfo(info)
 
-            dbList.add(
-                SnapshotItem(
-                    packageInfo.packageName,//Package name
-                    info.loadLabel(context.packageManager).toString(),//App name
-                    packageInfo.versionName,//Version name
-                    PackageUtils.getVersionCode(packageInfo),//Version code
-                    packageInfo.firstInstallTime,//Install time
-                    packageInfo.lastUpdateTime,// Update time
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
-                    PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),//Abi type
-                    info.targetSdkVersion.toShort(),//Target API
-                    gson.toJson(
-                        PackageUtils.getNativeDirLibs(
-                            info.sourceDir,
-                            info.nativeLibraryDir
-                        )
-                    ),//Native libs
-                    gson.toJson(PackageUtils.getComponentList(
-                        packageInfo.packageName,
-                        LibReferenceActivity.Type.TYPE_SERVICE
-                    )),
-                    gson.toJson(PackageUtils.getComponentList(
-                        packageInfo.packageName,
-                        LibReferenceActivity.Type.TYPE_ACTIVITY
-                    )),
-                    gson.toJson(PackageUtils.getComponentList(
-                        packageInfo.packageName,
-                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
-                    )),
-                    gson.toJson(PackageUtils.getComponentList(
-                        packageInfo.packageName,
-                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
-                    ))
+                dbList.add(
+                    SnapshotItem(
+                        packageInfo.packageName,//Package name
+                        info.loadLabel(context.packageManager).toString(),//App name
+                        packageInfo.versionName,//Version name
+                        PackageUtils.getVersionCode(packageInfo),//Version code
+                        packageInfo.firstInstallTime,//Install time
+                        packageInfo.lastUpdateTime,// Update time
+                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
+                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),//Abi type
+                        info.targetSdkVersion.toShort(),//Target API
+                        gson.toJson(
+                            PackageUtils.getNativeDirLibs(
+                                info.sourceDir,
+                                info.nativeLibraryDir
+                            )
+                        ),//Native libs
+                        gson.toJson(PackageUtils.getComponentList(
+                            packageInfo.packageName,
+                            LibReferenceActivity.Type.TYPE_SERVICE
+                        )),
+                        gson.toJson(PackageUtils.getComponentList(
+                            packageInfo.packageName,
+                            LibReferenceActivity.Type.TYPE_ACTIVITY
+                        )),
+                        gson.toJson(PackageUtils.getComponentList(
+                            packageInfo.packageName,
+                            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                        )),
+                        gson.toJson(PackageUtils.getComponentList(
+                            packageInfo.packageName,
+                            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                        ))
+                    )
                 )
-            )
+            } catch (e: Exception) {
+                continue
+            }
         }
 
         insertSnapshots(dbList)
@@ -93,6 +97,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun computeDiff(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        if (snapshotItems.value != null && snapshotItems.value!!.isEmpty()) return@launch
+
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
         val appList = packageManager

@@ -148,13 +148,8 @@ class LibReferenceActivity : BaseActivity() {
                     }
                 } else {
                     for (item in items) {
-                        PackageUtils.getComponentList(item.packageName, type)?.let { components ->
-                            for (component in components) {
-                                if (component.name == name) {
-                                    list.add(item)
-                                    break
-                                }
-                            }
+                        if (PackageUtils.getComponentList(item.packageName, type).contains(name)) {
+                            list.add(item)
                         }
                     }
                 }

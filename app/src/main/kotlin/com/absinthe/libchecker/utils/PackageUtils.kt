@@ -174,7 +174,7 @@ object PackageUtils {
 
         val packageInfo = getPackageInfo(packageName, flag)
 
-        val list = when (flag) {
+        val list: Array<out ComponentInfo>? = when (flag) {
             PackageManager.GET_SERVICES -> packageInfo.services
             PackageManager.GET_ACTIVITIES -> packageInfo.activities
             PackageManager.GET_RECEIVERS -> packageInfo.receivers
