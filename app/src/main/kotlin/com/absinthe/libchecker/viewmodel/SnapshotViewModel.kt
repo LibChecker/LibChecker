@@ -119,6 +119,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             diffList.add(
                                 SnapshotDiffItem(
                                     packageInfo.packageName,
+                                    packageInfo.lastUpdateTime,
                                     SnapshotDiffItem.DiffNode(dbItem.label, it.loadLabel(packageManager).toString()),
                                     SnapshotDiffItem.DiffNode(dbItem.versionName, packageInfo.versionName),
                                     SnapshotDiffItem.DiffNode(dbItem.versionCode, versionCode),
@@ -152,6 +153,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         diffList.add(
                             SnapshotDiffItem(
                                 dbItem.packageName,
+                                dbItem.lastUpdatedTime,
                                 SnapshotDiffItem.DiffNode(dbItem.label),
                                 SnapshotDiffItem.DiffNode(dbItem.versionName),
                                 SnapshotDiffItem.DiffNode(dbItem.versionCode),
@@ -180,6 +182,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     diffList.add(
                         SnapshotDiffItem(
                             packageInfo.packageName,
+                            packageInfo.lastUpdateTime,
                             SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
                             SnapshotDiffItem.DiffNode(packageInfo.versionName),
                             SnapshotDiffItem.DiffNode(versionCode),

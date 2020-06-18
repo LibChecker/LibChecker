@@ -1,18 +1,24 @@
 package com.absinthe.libchecker.recyclerview
 
+import android.content.res.ColorStateList
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 const val ARROW = "→"
 
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.layout.item_snapshot) {
+
+    private val gson = Gson()
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
         holder.setImageDrawable(
@@ -20,13 +26,22 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
         )
 
-        if (item.added) {
+        if (item.deleted) {
+            holder.itemView.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_red_300))
+        } else if (item.newInstalled) {
+            holder.itemView.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_green_300))
+        }
+
+        val compareNode = compareNativeAndComponentDiff(item)
+        if (compareNode.added) {
             holder.getView<TextView>(R.id.indicator_added).isVisible = true
         }
-        if (item.removed) {
+        if (compareNode.removed) {
             holder.getView<TextView>(R.id.indicator_removed).isVisible = true
         }
-        if (item.changed) {
+        if (compareNode.changed) {
             holder.getView<TextView>(R.id.indicator_changed).isVisible = true
         }
 
@@ -49,9 +64,12 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             )
         }
         if (item.targetApiDiff.old != item.targetApiDiff.new) {
-            holder.setText(R.id.tv_target_api, "API ${item.targetApiDiff.old} $ARROW API ${item.targetApiDiff.new}")
+            holder.setText(
+                R.id.tv_target_api,
+                "API ${item.targetApiDiff.old} $ARROW API ${item.targetApiDiff.new}"
+            )
         } else {
-            holder.setText(R.id.tv_target_api, item.targetApiDiff.old.toString())
+            holder.setText(R.id.tv_target_api, "API ${item.targetApiDiff.old}")
         }
 
         holder.setText(
@@ -94,4 +112,134 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             )
         }
     }
+
+    private fun compareNativeAndComponentDiff(item: SnapshotDiffItem): CompareDiffNode {
+        val nativeCompareNode = compareNativeDiff(
+            gson.fromJson(
+                item.nativeLibsDiff.old,
+                object : TypeToken<List<LibStringItem>>() {}.type
+            ),
+            gson.fromJson(
+                item.nativeLibsDiff.new,
+                object : TypeToken<List<LibStringItem>>() {}.type
+            )
+        )
+        val servicesCompareNode = compareComponentsDiff(
+            gson.fromJson(
+                item.servicesDiff.old,
+                object : TypeToken<List<String>>() {}.type
+            ),
+            gson.fromJson(
+                item.servicesDiff.new,
+                object : TypeToken<List<String>>() {}.type
+            )
+        )
+        val activitiesCompareNode = compareComponentsDiff(
+            gson.fromJson(
+                item.activitiesDiff.old,
+                object : TypeToken<List<String>>() {}.type
+            ),
+            gson.fromJson(
+                item.activitiesDiff.new,
+                object : TypeToken<List<String>>() {}.type
+            )
+        )
+        val receiversCompareNode = compareComponentsDiff(
+            gson.fromJson(
+                item.receiversDiff.old,
+                object : TypeToken<List<String>>() {}.type
+            ),
+            gson.fromJson(
+                item.receiversDiff.new,
+                object : TypeToken<List<String>>() {}.type
+            )
+        )
+        val providersCompareNode = compareComponentsDiff(
+            gson.fromJson(
+                item.providersDiff.old,
+                object : TypeToken<List<String>>() {}.type
+            ),
+            gson.fromJson(
+                item.providersDiff.new,
+                object : TypeToken<List<String>>() {}.type
+            )
+        )
+
+        val totalNode = CompareDiffNode()
+        totalNode.added =
+            nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added
+        totalNode.removed =
+            nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed
+        totalNode.changed =
+            nativeCompareNode.changed or servicesCompareNode.changed or activitiesCompareNode.changed or receiversCompareNode.changed or providersCompareNode.changed
+
+        return totalNode
+    }
+
+    private fun compareNativeDiff(
+        oldList: List<LibStringItem>,
+        newList: List<LibStringItem>
+    ): CompareDiffNode {
+        val tempOldList = oldList.toMutableList()
+        val tempNewList = newList.toMutableList()
+        val sameList = mutableListOf<LibStringItem>()
+        val node = CompareDiffNode()
+
+        for (item in tempNewList) {
+            oldList.find { it.name == item.name }?.let {
+                if (it.size != item.size) {
+                    node.changed = true
+                }
+                sameList.add(item)
+            }
+        }
+
+        for (item in sameList) {
+            tempOldList.remove(item)
+            tempNewList.remove(item)
+        }
+
+        if (tempOldList.isNotEmpty()) {
+            node.removed = true
+        }
+        if (tempNewList.isNotEmpty()) {
+            node.added = true
+        }
+        return node
+    }
+
+    private fun compareComponentsDiff(
+        oldList: List<String>,
+        newList: List<String>
+    ): CompareDiffNode {
+        val tempOldList = oldList.toMutableList()
+        val tempNewList = newList.toMutableList()
+        val sameList = mutableListOf<String>()
+        val node = CompareDiffNode()
+
+        for (item in tempNewList) {
+            oldList.find { it == item }?.let {
+                sameList.add(item)
+            }
+        }
+
+        for (item in sameList) {
+            tempOldList.remove(item)
+            tempNewList.remove(item)
+        }
+
+        if (tempOldList.isNotEmpty()) {
+            node.removed = true
+        }
+        if (tempNewList.isNotEmpty()) {
+            node.added = true
+        }
+        return node
+    }
+
+    data class CompareDiffNode(
+        var added: Boolean = false,
+        var removed: Boolean = false,
+        var changed: Boolean = false
+    )
 }

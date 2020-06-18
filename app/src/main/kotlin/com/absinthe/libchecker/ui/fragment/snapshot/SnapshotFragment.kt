@@ -7,14 +7,13 @@ import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.SnapshotAdapter
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
-import rikka.material.widget.BorderView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -60,10 +59,12 @@ class SnapshotFragment : Fragment() {
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
-                borderVisibilityChangedListener =
-                    BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        if (dy > 0 || dy < 0 && binding.extendedFab.isShown)
+                            binding.extendedFab.shrink()
                     }
+                })
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -86,8 +87,8 @@ class SnapshotFragment : Fragment() {
             binding.dashboardLayout.tvSnapshotAppsCountText.text = it.size.toString()
             viewModel.computeDiff(requireContext())
         })
-        viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            adapter.setNewInstance(it.toMutableList())
+        viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer { list ->
+            adapter.setNewInstance(list.sortedByDescending { it.updateTime }.toMutableList())
             binding.vfContainer.displayedChild = 1
             binding.extendedFab.show()
         })

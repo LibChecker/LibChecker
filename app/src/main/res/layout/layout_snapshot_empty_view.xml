@@ -14,7 +14,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No changes"
+        android:text="@string/snapshot_empty_list_title"
         android:textAppearance="?attr/textAppearanceHeadline4" />
 
 </LinearLayout>

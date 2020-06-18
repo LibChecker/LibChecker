@@ -2,6 +2,7 @@ package com.absinthe.libchecker.bean
 
 data class SnapshotDiffItem(
     val packageName: String,
+    val updateTime: Long,
     val labelDiff: DiffNode<String>,
     val versionNameDiff: DiffNode<String>,
     val versionCodeDiff: DiffNode<Long>,
