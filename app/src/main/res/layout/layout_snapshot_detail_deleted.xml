@@ -8,15 +8,16 @@
     tools:ignore="UseCompoundDrawables">
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_natural_food" />
+        android:src="@drawable/ic_no" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/snapshot_empty_list_title"
-        android:textAppearance="?attr/textAppearanceHeadline5" />
+        android:layout_marginTop="@dimen/normal_padding"
+        android:text="@string/snapshot_detail_deleted_title"
+        android:textAppearance="?attr/textAppearanceHeadline6" />
 
 </LinearLayout>

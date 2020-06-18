@@ -58,4 +58,6 @@
     <string name="snapshot_apps_count">快照应用程序数量</string>
     <string name="snapshot_btn_saving">正在保存快照</string>
     <string name="snapshot_empty_list_title">没有变更</string>
+    <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
+    <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
 </resources>

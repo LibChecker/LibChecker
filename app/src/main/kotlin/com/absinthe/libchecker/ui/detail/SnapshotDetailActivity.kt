@@ -8,6 +8,7 @@ import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.recyclerview.ARROW
@@ -77,6 +78,7 @@ class SnapshotDetailActivity : BaseActivity() {
             setDisplayShowHomeEnabled(true)
             title = entity!!.labelDiff.new ?: entity!!.labelDiff.old
         }
+
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
@@ -91,14 +93,18 @@ class SnapshotDetailActivity : BaseActivity() {
 
             tvPackageName.text = entity!!.packageName
 
-            if ((entity!!.versionNameDiff.old != entity!!.versionNameDiff.new || entity!!.versionCodeDiff.old != entity!!.versionCodeDiff.new)) {
-                tvVersion.text = "${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old}) $ARROW ${entity!!.versionNameDiff.new ?: entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.new ?: entity!!.versionCodeDiff.old})"
+            val isNewOrDeleted = entity!!.deleted || entity!!.newInstalled
+
+            if ((entity!!.versionNameDiff.old != entity!!.versionNameDiff.new || entity!!.versionCodeDiff.old != entity!!.versionCodeDiff.new) && !isNewOrDeleted) {
+                tvVersion.text =
+                    "${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old}) $ARROW ${entity!!.versionNameDiff.new ?: entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.new ?: entity!!.versionCodeDiff.old})"
             } else {
-                tvVersion.text ="${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old})"
+                tvVersion.text = "${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old})"
             }
 
-            if (entity!!.targetApiDiff.old != entity!!.targetApiDiff.new) {
-                tvTargetApi.text = "API ${entity!!.targetApiDiff.old} $ARROW API ${entity!!.targetApiDiff.new}"
+            if (entity!!.targetApiDiff.old != entity!!.targetApiDiff.new && !isNewOrDeleted) {
+                tvTargetApi.text =
+                    "API ${entity!!.targetApiDiff.old} $ARROW API ${entity!!.targetApiDiff.new}"
             } else {
                 tvTargetApi.text = "API ${entity!!.targetApiDiff.old}"
             }
@@ -106,6 +112,13 @@ class SnapshotDetailActivity : BaseActivity() {
         viewModel.snapshotDetailItems.observe(this, Observer {
             adapter.setNewInstance(it.toMutableList())
         })
+        adapter.setEmptyView(
+            when {
+                entity!!.newInstalled -> R.layout.layout_snapshot_detail_new_install
+                entity!!.deleted -> R.layout.layout_snapshot_detail_deleted
+                else -> R.layout.layout_snapshot_empty_view
+            }
+        )
     }
 
     private fun initData() {
