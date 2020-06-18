@@ -26,10 +26,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.main.AppDetailActivity"
+            android:name=".ui.detail.AppDetailActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.main.ApkDetailActivity"
+            android:name=".ui.detail.ApkDetailActivity"
             android:label="@string/detail_label">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -40,6 +40,7 @@
                 <data android:mimeType="application/vnd.android.package-archive" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.detail.SnapshotDetailActivity" />
         <activity
             android:name=".ui.main.LibReferenceActivity"
             android:label="@string/tab_lib_reference_statistics"
@@ -48,7 +49,6 @@
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
-
     </application>
 
 </manifest>

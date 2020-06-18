@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.SnapshotAdapter
+import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
+import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
@@ -78,6 +83,25 @@ class SnapshotFragment : Fragment() {
 
         adapter.apply {
             setEmptyView(R.layout.layout_snapshot_empty_view)
+            setOnItemClickListener { _, view, position ->
+                val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
+                    putExtras(Bundle().apply {
+                        putSerializable(EXTRA_ENTITY, getItem(position))
+                    })
+                }
+
+                val options = ActivityOptions.makeSceneTransitionAnimation(
+                    requireActivity(),
+                    view,
+                    "app_card_container"
+                )
+
+                if (GlobalValues.isShowEntryAnimation.value!!) {
+                    startActivity(intent, options.toBundle())
+                } else {
+                    startActivity(intent)
+                }
+            }
         }
 
         viewModel.timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {

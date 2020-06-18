@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.recyclerview
 
 import android.content.res.ColorStateList
-import android.text.format.Formatter
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.chip.Chip
@@ -23,7 +23,7 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
     override fun convert(holder: BaseViewHolder, item: LibStringItem) {
         holder.setText(R.id.tv_name, item.name)
         if (item.size != 0L) {
-            holder.setText(R.id.tv_lib_size, sizeToString(item.size))
+            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.size))
             holder.setGone(R.id.tv_lib_size, false)
         } else {
             holder.setGone(R.id.tv_lib_size, true)
@@ -52,10 +52,6 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
         } ?: let {
             libIcon.visibility = View.GONE
         }
-    }
-
-    private fun sizeToString(size: Long): String {
-        return "(${Formatter.formatFileSize(context, size)})"
     }
 
     enum class Mode {

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.main
+package com.absinthe.libchecker.ui.detail
 
 import android.content.ActivityNotFoundException
 import android.os.Bundle
@@ -25,7 +25,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 class AppDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
-    private var pkgName = ""
+    private val pkgName by lazy { intent.getStringExtra(EXTRA_PKG_NAME) }
 
     init {
         isPaddingToolbar = true
@@ -46,21 +46,18 @@ class AppDetailActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         initView()
 
-        intent.extras?.let {
-            it.getString(EXTRA_PKG_NAME)?.let { packageName ->
-                pkgName = packageName
-                supportActionBar?.apply {
-                    title = AppUtils.getAppName(packageName)
-                }
-                binding.apply {
-                    ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
-                    tvAppName.text = AppUtils.getAppName(packageName)
-                    tvPackageName.text = packageName
-                    tvVersion.text = PackageUtils.getVersionString(packageName)
-                    tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
-                    chipSplit.isGone = !PackageUtils.isSplitsApk(packageName)
-                }
-            } ?: finish()
+        pkgName?.let { packageName ->
+            supportActionBar?.apply {
+                title = AppUtils.getAppName(packageName)
+            }
+            binding.apply {
+                ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
+                tvAppName.text = AppUtils.getAppName(packageName)
+                tvPackageName.text = packageName
+                tvVersion.text = PackageUtils.getVersionString(packageName)
+                tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
+                chipSplit.isGone = !PackageUtils.isSplitsApk(packageName)
+            }
         } ?: finish()
     }
 
@@ -101,8 +98,8 @@ class AppDetailActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> SoAnalysisFragment.newInstance(pkgName)
-                    else -> ComponentsAnalysisFragment.newInstance(pkgName)
+                    0 -> SoAnalysisFragment.newInstance(pkgName!!)
+                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!)
                 }
             }
         }

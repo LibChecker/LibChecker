@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.bean
 
+import java.io.Serializable
+
 data class SnapshotDiffItem(
     val packageName: String,
     val updateTime: Long,
@@ -18,6 +20,6 @@ data class SnapshotDiffItem(
     val changed: Boolean = false,
     val newInstalled: Boolean = false,
     val deleted: Boolean = false
-) {
-    data class DiffNode<T>(val old: T, val new: T? = null)
+) : Serializable {
+    data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 }

@@ -27,21 +27,30 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
             )
         } catch (e: Exception) {
+            holder.setImageDrawable(R.id.iv_icon, null)
         }
 
         var isNewOrDeleted = false
-        if (item.deleted) {
-            holder.itemView.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_red_300))
-            holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
-            holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
-            isNewOrDeleted = true
-        } else if (item.newInstalled) {
-            holder.itemView.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_green_300))
-            holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
-            holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
-            isNewOrDeleted = true
+        when {
+            item.deleted -> {
+                holder.itemView.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_red_300))
+                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
+                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+                isNewOrDeleted = true
+            }
+            item.newInstalled -> {
+                holder.itemView.backgroundTintList =
+                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_green_300))
+                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
+                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+                isNewOrDeleted = true
+            }
+            else -> {
+                holder.itemView.backgroundTintList = null
+                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, android.R.color.darker_gray))
+                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, android.R.color.darker_gray))
+            }
         }
 
         if (!isNewOrDeleted) {

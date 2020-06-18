@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.system.ErrnoException
+import android.text.format.Formatter
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
@@ -246,5 +247,9 @@ object PackageUtils {
             abiList.contains("arm") -> ARMV7
             else -> NO_LIBS
         }
+    }
+
+    fun sizeToString(size: Long): String {
+        return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
     }
 }

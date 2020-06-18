@@ -78,10 +78,11 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:${fragment_version}"
 
     // Lifecycle
-    def lifecycleVersion = '2.2.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
-    kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+    def lifecycle_version = "2.3.0-alpha04"
+    implementation "androidx.lifecycle:lifecycle-livedata:${lifecycle_version}"
+    implementation "androidx.lifecycle:lifecycle-common-java8:${lifecycle_version}"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:${lifecycle_version}"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}"
 
     // Room components
     def roomVersion = '2.2.5'

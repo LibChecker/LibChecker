@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.main
+package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -190,9 +190,13 @@ class ApkDetailActivity : BaseActivity() {
                 adapter.setNewInstance(libList)
             }
         } catch (e: FileNotFoundException) {
-            binding.tvAppName.text = "File manager not provide a content provider"
+            withContext(Dispatchers.Main) {
+                binding.tvAppName.text = "File manager not provide a content provider"
+            }
         } catch (e: Exception) {
-            binding.tvAppName.text = "ERROR"
+            withContext(Dispatchers.Main) {
+                binding.tvAppName.text = "ERROR"
+            }
         }
     }
 }

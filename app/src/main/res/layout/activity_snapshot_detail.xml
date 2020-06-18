@@ -40,7 +40,7 @@
                     tools:background="@drawable/pic_splash"
                     tools:ignore="HardcodedText" />
 
-                <com.absinthe.libchecker.view.AlwaysMarqueeTextView
+                <TextView
                     android:id="@+id/tv_app_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -87,8 +87,9 @@
                     android:fontFamily="sans-serif-condensed-medium"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="13sp"
+                    android:transitionName="target_api"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+                    app:layout_constraintTop_toTopOf="@id/tv_app_name"
                     tools:text="API 29" />
 
                 <com.google.android.material.chip.Chip
@@ -125,29 +126,13 @@
         android:orientation="vertical"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground">
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_so_analysis" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/tab_components_analysis" />
-
-        </com.google.android.material.tabs.TabLayout>
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:padding="@dimen/normal_padding"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </LinearLayout>
 
