@@ -44,6 +44,10 @@ class SnapshotDetailActivity : BaseActivity() {
         initTransition()
         super.onCreate(savedInstanceState)
         initView()
+    }
+
+    override fun onStart() {
+        super.onStart()
         initData()
     }
 

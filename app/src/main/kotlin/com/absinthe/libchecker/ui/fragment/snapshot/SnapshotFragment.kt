@@ -78,6 +78,7 @@ class SnapshotFragment : Fragment() {
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
+                displayedChild = 1
             }
         }
 
