@@ -21,38 +21,50 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
     private val gson = Gson()
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
-        holder.setImageDrawable(
-            R.id.iv_icon,
-            PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
-        )
+        try {
+            holder.setImageDrawable(
+                R.id.iv_icon,
+                PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
+            )
+        } catch (e: Exception) {
+        }
 
+        var isNewOrDeleted = false
         if (item.deleted) {
             holder.itemView.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_red_300))
+            holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
+            holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+            isNewOrDeleted = true
         } else if (item.newInstalled) {
             holder.itemView.backgroundTintList =
                 ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_green_300))
+            holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
+            holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+            isNewOrDeleted = true
         }
 
-        val compareNode = compareNativeAndComponentDiff(item)
-        if (compareNode.added) {
-            holder.getView<TextView>(R.id.indicator_added).isVisible = true
-        }
-        if (compareNode.removed) {
-            holder.getView<TextView>(R.id.indicator_removed).isVisible = true
-        }
-        if (compareNode.changed) {
-            holder.getView<TextView>(R.id.indicator_changed).isVisible = true
+        if (!isNewOrDeleted) {
+            val compareNode = compareNativeAndComponentDiff(item)
+            if (compareNode.added) {
+                holder.getView<TextView>(R.id.indicator_added).isVisible = true
+            }
+            if (compareNode.removed) {
+                holder.getView<TextView>(R.id.indicator_removed).isVisible = true
+            }
+            if (compareNode.changed) {
+                holder.getView<TextView>(R.id.indicator_changed).isVisible = true
+            }
         }
 
-        if (item.labelDiff.old != item.labelDiff.new) {
+        if (item.labelDiff.old != item.labelDiff.new && !isNewOrDeleted) {
             holder.setText(R.id.tv_app_name, "${item.labelDiff.old} $ARROW ${item.labelDiff.new}")
         } else {
             holder.setText(R.id.tv_app_name, item.labelDiff.old)
         }
         holder.setText(R.id.tv_package_name, item.packageName)
 
-        if (item.versionNameDiff.old != item.versionNameDiff.new || item.versionCodeDiff.old != item.versionCodeDiff.new) {
+        if ((item.versionNameDiff.old != item.versionNameDiff.new || item.versionCodeDiff.old != item.versionCodeDiff.new) && !isNewOrDeleted) {
             holder.setText(
                 R.id.tv_version,
                 "${item.versionNameDiff.old} (${item.versionCodeDiff.old}) $ARROW ${item.versionNameDiff.new ?: item.versionNameDiff.old} (${item.versionCodeDiff.new ?: item.versionCodeDiff.old})"
@@ -63,7 +75,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 "${item.versionNameDiff.old} (${item.versionCodeDiff.old})"
             )
         }
-        if (item.targetApiDiff.old != item.targetApiDiff.new) {
+        if (item.targetApiDiff.old != item.targetApiDiff.new && !isNewOrDeleted) {
             holder.setText(
                 R.id.tv_target_api,
                 "API ${item.targetApiDiff.old} $ARROW API ${item.targetApiDiff.new}"
@@ -178,8 +190,12 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
 
     private fun compareNativeDiff(
         oldList: List<LibStringItem>,
-        newList: List<LibStringItem>
+        newList: List<LibStringItem>?
     ): CompareDiffNode {
+        if (newList == null) {
+            return CompareDiffNode(removed = true)
+        }
+
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<LibStringItem>()
@@ -210,8 +226,12 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
 
     private fun compareComponentsDiff(
         oldList: List<String>,
-        newList: List<String>
+        newList: List<String>?
     ): CompareDiffNode {
+        if (newList == null) {
+            return CompareDiffNode(removed = true)
+        }
+
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<String>()

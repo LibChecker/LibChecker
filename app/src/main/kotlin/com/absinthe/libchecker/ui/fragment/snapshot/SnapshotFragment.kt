@@ -61,8 +61,12 @@ class SnapshotFragment : Fragment() {
                 adapter = this@SnapshotFragment.adapter
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        if (dy > 0 || dy < 0 && binding.extendedFab.isShown)
-                            binding.extendedFab.shrink()
+                        //dy less than zero means swiping up
+                        if (dy > 0 && binding.extendedFab.isShown) {
+                            binding.extendedFab.hide()
+                        } else if (dy < 0 && !binding.extendedFab.isShown) {
+                            binding.extendedFab.show()
+                        }
                     }
                 })
             }

@@ -14,6 +14,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.UiUtils
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
@@ -32,12 +33,20 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     override fun onItemsCreated(items: MutableList<Any>) {
+
+        val hasInstallCoolApk = AppUtils.isAppInstalled("com.coolapk.market")
+
         items.apply {
             add(Category("What's this"))
             add(Card(getString(R.string.about_info)))
 
             add(Category("Developers"))
-            add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", "https://www.coolapk.com/u/482045"))
+            val developerUrl = if (hasInstallCoolApk) {
+                URLManager.COOLAPK_PAGE
+            } else {
+                URLManager.GITHUB_PAGE
+            }
+            add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", developerUrl))
 
             add(Category("Acknowledgement"))
             add(Card(
