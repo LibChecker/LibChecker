@@ -18,7 +18,6 @@ import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import java.util.regex.Pattern
 
 class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -43,10 +42,21 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
         super.onStart()
 
         if (!isInit) {
-            viewModel.libReference.observe(viewLifecycleOwner, Observer {
-                adapter.setNewInstance(it.toMutableList())
-                binding.vfContainer.displayedChild = 1
-            })
+            viewModel.apply {
+                libReference.observe(viewLifecycleOwner, Observer {
+                    adapter.setNewInstance(it.toMutableList())
+                    binding.vfContainer.displayedChild = 1
+                })
+                clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
+                    if (it) {
+                        binding.rvList.apply {
+                            if (canScrollVertically(-1)) {
+                                smoothScrollToPosition(0)
+                            }
+                        }
+                    }
+                })
+            }
             GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
                 computeRef()
             })
@@ -140,9 +150,7 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(newText: String): Boolean {
         viewModel.libReference.value?.let { list ->
             val filter = list.filter {
-                Pattern.compile(Pattern.quote(it.libName), Pattern.CASE_INSENSITIVE)
-                    .matcher(newText).find() ||
-                        it.chip?.name?.contains(newText) ?: false
+                it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(newText, ignoreCase = true) ?: false
             }
             adapter.setDiffNewData(filter.toMutableList())
         }

@@ -32,7 +32,6 @@ import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 import rikka.material.widget.BorderView
-import java.util.regex.Pattern
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -150,6 +149,16 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
                 }
             })
+            clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
+                if (it) {
+                    binding.recyclerview.apply {
+                        if (canScrollVertically(-1)) {
+                            smoothScrollToPosition(0)
+
+                        }
+                    }
+                }
+            })
         }
 
         GlobalValues.apply {
@@ -216,8 +225,7 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         val filter = mItems.filter {
-            Pattern.compile(Pattern.quote(it.appName), Pattern.CASE_INSENSITIVE).matcher(newText).find() ||
-            Pattern.compile(Pattern.quote(it.packageName), Pattern.CASE_INSENSITIVE).matcher(newText).find()
+            it.appName.contains(newText, ignoreCase = true) || it.packageName.contains(newText, ignoreCase = true)
         }
         updateItems(filter)
         return false

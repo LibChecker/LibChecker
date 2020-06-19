@@ -7,8 +7,9 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
@@ -18,17 +19,21 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
-import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
+import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val viewModel by lazy { ViewModelProvider(this).get(AppViewModel::class.java) }
+    private var clickBottomItemFlag = false
+    private val viewModel by viewModels<AppViewModel>()
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
@@ -122,8 +127,36 @@ class MainActivity : BaseActivity() {
             // 当ViewPager切换页面时，改变ViewPager的显示
             navView.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
-                    R.id.navigation_app_list -> binding.viewpager.setCurrentItem(0, true)
-                    R.id.navigation_classify -> binding.viewpager.setCurrentItem(1, true)
+                    R.id.navigation_app_list -> {
+                        if (binding.viewpager.currentItem != 0) {
+                            binding.viewpager.setCurrentItem(0, true)
+                        } else {
+                            if (!clickBottomItemFlag) {
+                                clickBottomItemFlag = true
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    delay(200)
+                                    clickBottomItemFlag = false
+                                }
+                            } else {
+                                viewModel.clickBottomItemFlag.value = true
+                            }
+                        }
+                    }
+                    R.id.navigation_classify -> {
+                        if (binding.viewpager.currentItem != 0) {
+                            binding.viewpager.setCurrentItem(1, true)
+                        } else {
+                            if (!clickBottomItemFlag) {
+                                clickBottomItemFlag = true
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    delay(200)
+                                    clickBottomItemFlag = false
+                                }
+                            } else {
+                                viewModel.clickBottomItemFlag.value = true
+                            }
+                        }
+                    }
                     R.id.navigation_snapshot -> binding.viewpager.setCurrentItem(2, true)
                     R.id.navigation_settings -> binding.viewpager.setCurrentItem(3, true)
                 }
