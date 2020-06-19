@@ -143,7 +143,7 @@ class MainActivity : BaseActivity() {
                         }
                     }
                     R.id.navigation_classify -> {
-                        if (binding.viewpager.currentItem != 0) {
+                        if (binding.viewpager.currentItem != 1) {
                             binding.viewpager.setCurrentItem(1, true)
                         } else {
                             if (!clickBottomItemFlag) {
