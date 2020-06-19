@@ -18,6 +18,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import java.util.regex.Pattern
 
 class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -139,7 +140,9 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onQueryTextChange(newText: String): Boolean {
         viewModel.libReference.value?.let { list ->
             val filter = list.filter {
-                it.libName.contains(newText) || it.chip?.name?.contains(newText) ?: false
+                Pattern.compile(Pattern.quote(it.libName), Pattern.CASE_INSENSITIVE)
+                    .matcher(newText).find() ||
+                        it.chip?.name?.contains(newText) ?: false
             }
             adapter.setDiffNewData(filter.toMutableList())
         }

@@ -32,6 +32,7 @@ import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 import rikka.material.widget.BorderView
+import java.util.regex.Pattern
 
 class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
@@ -215,7 +216,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         val filter = mItems.filter {
-            it.appName.contains(newText) || it.packageName.contains(newText)
+            Pattern.compile(Pattern.quote(it.appName), Pattern.CASE_INSENSITIVE).matcher(newText).find() ||
+            Pattern.compile(Pattern.quote(it.packageName), Pattern.CASE_INSENSITIVE).matcher(newText).find()
         }
         updateItems(filter)
         return false

@@ -220,8 +220,8 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         }
 
         for (item in sameList) {
-            tempOldList.remove(item)
-            tempNewList.remove(item)
+            tempOldList.remove(tempOldList.find { it.name == item.name })
+            tempNewList.remove(tempNewList.find { it.name == item.name })
         }
 
         if (tempOldList.isNotEmpty()) {
