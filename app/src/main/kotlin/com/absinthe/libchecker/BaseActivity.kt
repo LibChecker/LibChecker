@@ -17,16 +17,14 @@ abstract class BaseActivity : AppActivity() {
     protected var isPaddingToolbar = false
     private lateinit var reference: WeakReference<BaseActivity>
 
-    protected abstract fun setViewBinding()
-    protected abstract fun setRoot()
+    protected abstract fun setViewBinding(): View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setViewBinding()
+        setViewBindingImpl(setViewBinding())
 
         setDarkMode(this)
         setSystemBarTransparent(this)
-        setRoot()
 
         if (isPaddingToolbar) {
             root?.setPadding(0, BarUtils.getStatusBarHeight(), 0, 0)
@@ -39,5 +37,10 @@ abstract class BaseActivity : AppActivity() {
     override fun onDestroy() {
         ActivityStackManager.removeActivity(reference)
         super.onDestroy()
+    }
+
+    private fun setViewBindingImpl(root: View) {
+        this.root = root
+        setContentView(root)
     }
 }

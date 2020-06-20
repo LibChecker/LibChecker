@@ -11,8 +11,8 @@ import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
-import com.absinthe.libchecker.recyclerview.LibReferenceAdapter
-import com.absinthe.libchecker.recyclerview.RefListDiffUtil
+import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
+import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -22,7 +22,8 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
-    private val adapter = LibReferenceAdapter()
+    private val adapter =
+        LibReferenceAdapter()
 
     private lateinit var binding: FragmentLibReferenceBinding
     private var isInit = false
@@ -44,7 +45,7 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
         if (!isInit) {
             viewModel.apply {
                 libReference.observe(viewLifecycleOwner, Observer {
-                    adapter.setNewInstance(it.toMutableList())
+                    adapter.setList(it)
                     binding.vfContainer.displayedChild = 1
                 })
                 clickBottomItemFlag.observe(viewLifecycleOwner, Observer {

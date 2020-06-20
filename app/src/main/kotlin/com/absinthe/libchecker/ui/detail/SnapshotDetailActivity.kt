@@ -11,8 +11,8 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.recyclerview.ARROW
-import com.absinthe.libchecker.recyclerview.SnapshotDetailAdapter
+import com.absinthe.libchecker.recyclerview.adapter.ARROW
+import com.absinthe.libchecker.recyclerview.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.transition.platform.MaterialContainerTransform
@@ -23,7 +23,8 @@ const val EXTRA_ENTITY = "EXTRA_ENTITY"
 class SnapshotDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySnapshotDetailBinding
-    private val adapter = SnapshotDetailAdapter()
+    private val adapter =
+        SnapshotDetailAdapter()
     private val entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
     private val viewModel by viewModels<SnapshotViewModel>()
 
@@ -31,13 +32,9 @@ class SnapshotDetailActivity : BaseActivity() {
         isPaddingToolbar = true
     }
 
-    override fun setViewBinding() {
+    override fun setViewBinding(): View {
         binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    override fun setRoot() {
-        root = binding.root
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,9 +48,13 @@ class SnapshotDetailActivity : BaseActivity() {
         initData()
     }
 
+    override fun onBackPressed() {
+        supportFinishAfterTransition()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            supportFinishAfterTransition()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -114,7 +115,7 @@ class SnapshotDetailActivity : BaseActivity() {
             }
         }
         viewModel.snapshotDetailItems.observe(this, Observer {
-            adapter.setNewInstance(it.toMutableList())
+            adapter.setList(it)
         })
         adapter.setEmptyView(
             when {
@@ -127,7 +128,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
     private fun initData() {
         if (entity == null) {
-            finish()
+            supportFinishAfterTransition()
         } else {
             viewModel.computeDiffDetail(entity!!)
         }

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview
+package com.absinthe.libchecker.recyclerview.adapter
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*

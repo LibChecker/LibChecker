@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.detail
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -11,7 +12,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.blankj.utilcode.util.FileIOUtils
@@ -32,21 +33,18 @@ class ApkDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityApkDetailBinding
 
     private var tempFile: File? = null
-    private val adapter = LibStringAdapter().apply {
-        mode = LibStringAdapter.Mode.NATIVE
-    }
+    private val adapter = LibStringAdapter()
+        .apply {
+            mode = LibStringAdapter.Mode.NATIVE
+        }
 
     init {
         isPaddingToolbar = true
     }
 
-    override fun setViewBinding() {
+    override fun setViewBinding(): View {
         binding = ActivityApkDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    override fun setRoot() {
-        root = binding.root
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -187,7 +185,7 @@ class ApkDetailActivity : BaseActivity() {
             }
 
             withContext(Dispatchers.Main) {
-                adapter.setNewInstance(libList)
+                adapter.setList(libList)
             }
         } catch (e: FileNotFoundException) {
             withContext(Dispatchers.Main) {

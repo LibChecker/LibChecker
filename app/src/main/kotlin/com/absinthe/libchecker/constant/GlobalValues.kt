@@ -46,15 +46,7 @@ object GlobalValues {
             getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
         }
 
-    var config = Configuration(
-        enableLibDetail = false,
-        enableComponentsDetail = false,
-        showLibName = false,
-        showTeamName = false,
-        showLibDescription = false,
-        showContributor = false,
-        showRelativeUrl = false
-    )
+    var config = Configuration()
 
     var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
         ?: Constants.REPO_GITEE

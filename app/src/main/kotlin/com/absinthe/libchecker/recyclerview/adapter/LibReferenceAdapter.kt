@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview
+package com.absinthe.libchecker.recyclerview.adapter
 
 import android.graphics.PorterDuff
 import android.widget.ImageView

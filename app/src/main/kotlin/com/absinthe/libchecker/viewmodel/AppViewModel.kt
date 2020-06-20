@@ -18,7 +18,7 @@ import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
@@ -74,7 +74,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
-                    versionName = PackageUtils.getVersionString(info.packageName)
+                    versionName = PackageUtils.getVersionString(packageInfo)
                     abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
                     isSystem =
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
@@ -129,7 +129,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         ?: ColorDrawable(Color.TRANSPARENT)
                     appName = item.label
                     packageName = item.packageName
-                    versionName = PackageUtils.getVersionString(item.packageName)
+                    versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
                     abi = item.abi.toInt()
                     isSystem = item.isSystem
                     updateTime = item.lastUpdatedTime

@@ -13,7 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -30,7 +30,8 @@ class ComponentsAnalysisFragment : Fragment() {
     private lateinit var binding: FragmentManifestAnalysisBinding
     private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val adapter = LibStringAdapter().apply {
+    private val adapter = LibStringAdapter()
+        .apply {
         mode = LibStringAdapter.Mode.SERVICE
     }
 

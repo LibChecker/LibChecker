@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.recyclerview.SnapshotAdapter
+import com.absinthe.libchecker.recyclerview.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -26,7 +26,8 @@ class SnapshotFragment : Fragment() {
 
     private val viewModel by viewModels<SnapshotViewModel>()
     private lateinit var binding: FragmentSnapshotBinding
-    private val adapter = SnapshotAdapter()
+    private val adapter =
+        SnapshotAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -117,7 +118,7 @@ class SnapshotFragment : Fragment() {
             viewModel.computeDiff(requireContext())
         })
         viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer { list ->
-            adapter.setNewInstance(list.sortedByDescending { it.updateTime }.toMutableList())
+            adapter.setList(list.sortedByDescending { it.updateTime })
             binding.vfContainer.displayedChild = 1
             binding.extendedFab.show()
         })

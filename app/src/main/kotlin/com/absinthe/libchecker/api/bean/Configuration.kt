@@ -6,11 +6,11 @@ const val CONFIGURATION_VERSION = 4
 
 @Keep
 data class Configuration(
-    val enableLibDetail: Boolean,
-    val enableComponentsDetail: Boolean,
-    val showLibName: Boolean,
-    val showTeamName: Boolean,
-    val showLibDescription: Boolean,
-    val showContributor: Boolean,
-    val showRelativeUrl: Boolean
+    val enableLibDetail: Boolean = false,
+    val enableComponentsDetail: Boolean = false,
+    val showLibName: Boolean = false,
+    val showTeamName: Boolean = false,
+    val showLibDescription: Boolean = false,
+    val showContributor: Boolean = false,
+    val showRelativeUrl: Boolean = false
 )

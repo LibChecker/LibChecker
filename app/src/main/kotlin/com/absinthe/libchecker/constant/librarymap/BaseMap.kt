@@ -1,9 +1,10 @@
 package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.constant.LibChip
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 
 abstract class BaseMap {
+
     abstract fun getMap(): HashMap<String, LibChip>
     abstract fun findRegex(name: String): LibChip?
 

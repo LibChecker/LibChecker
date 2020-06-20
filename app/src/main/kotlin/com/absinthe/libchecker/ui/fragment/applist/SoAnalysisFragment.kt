@@ -5,14 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
@@ -27,9 +27,10 @@ const val MODE_SORT_BY_LIB = 1
 class SoAnalysisFragment : Fragment() {
 
     private lateinit var binding: FragmentSoAnalysisBinding
-    private val viewModel by lazy { ViewModelProvider(requireActivity()).get(DetailViewModel::class.java) }
+    private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val adapter = LibStringAdapter().apply {
+    private val adapter = LibStringAdapter()
+        .apply {
         mode = LibStringAdapter.Mode.NATIVE
     }
 

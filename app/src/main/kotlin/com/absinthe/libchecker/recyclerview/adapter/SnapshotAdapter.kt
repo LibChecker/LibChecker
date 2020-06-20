@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview
+package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.res.ColorStateList
 import android.widget.ImageView
@@ -190,7 +190,8 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             )
         )
 
-        val totalNode = CompareDiffNode()
+        val totalNode =
+            CompareDiffNode()
         totalNode.added =
             nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added
         totalNode.removed =
@@ -206,13 +207,16 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         newList: List<LibStringItem>?
     ): CompareDiffNode {
         if (newList == null) {
-            return CompareDiffNode(removed = true)
+            return CompareDiffNode(
+                removed = true
+            )
         }
 
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<LibStringItem>()
-        val node = CompareDiffNode()
+        val node =
+            CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it.name == item.name }?.let {
@@ -242,13 +246,16 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         newList: List<String>?
     ): CompareDiffNode {
         if (newList == null) {
-            return CompareDiffNode(removed = true)
+            return CompareDiffNode(
+                removed = true
+            )
         }
 
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<String>()
-        val node = CompareDiffNode()
+        val node =
+            CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it == item }?.let {

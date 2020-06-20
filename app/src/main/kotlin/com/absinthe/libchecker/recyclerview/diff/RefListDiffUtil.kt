@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview
+package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
 import com.absinthe.libchecker.bean.LibReference

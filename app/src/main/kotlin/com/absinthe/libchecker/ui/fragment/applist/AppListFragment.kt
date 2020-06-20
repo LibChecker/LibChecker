@@ -15,13 +15,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.recyclerview.AppAdapter
-import com.absinthe.libchecker.recyclerview.AppListDiffUtil
+import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
+import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
@@ -37,7 +37,8 @@ class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: FragmentAppListBinding
     private val viewModel by activityViewModels<AppViewModel>()
-    private val mAdapter = AppAdapter()
+    private val mAdapter =
+        AppAdapter()
     private val mItems = ArrayList<AppItem>()
     private var changeCount = 0
 

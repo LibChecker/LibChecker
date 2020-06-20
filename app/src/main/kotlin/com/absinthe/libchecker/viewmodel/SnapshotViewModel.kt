@@ -15,7 +15,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.SnapshotItem
-import com.absinthe.libchecker.recyclerview.ARROW
+import com.absinthe.libchecker.recyclerview.adapter.ARROW
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
@@ -37,7 +37,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
         repository = LCRepository(lcDao)
-        snapshotItems = lcDao.getSnapshots()
+        snapshotItems = repository.allSnapshotItems
     }
 
     fun insertSnapshots(items: List<SnapshotItem>) = viewModelScope.launch(Dispatchers.IO) {

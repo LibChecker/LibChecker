@@ -7,6 +7,7 @@ import android.view.View
 import android.view.Window
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -21,6 +22,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AppDetailActivity : BaseActivity() {
 
@@ -31,13 +35,9 @@ class AppDetailActivity : BaseActivity() {
         isPaddingToolbar = true
     }
 
-    override fun setViewBinding() {
+    override fun setViewBinding(): View {
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    override fun setRoot() {
-        root = binding.root
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,22 +51,40 @@ class AppDetailActivity : BaseActivity() {
                 title = AppUtils.getAppName(packageName)
             }
             binding.apply {
+                val packageInfo = PackageUtils.getPackageInfo(packageName)
                 ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
                 tvAppName.text = AppUtils.getAppName(packageName)
                 tvPackageName.text = packageName
-                tvVersion.text = PackageUtils.getVersionString(packageName)
-                tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
-                chipSplitApk.isVisible = PackageUtils.isSplitsApk(packageName)
-                chipKotlinUsed.isVisible = PackageUtils.isKotlinUsed(packageName)
+                tvVersion.text = PackageUtils.getVersionString(packageInfo)
+                tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val isSplitApk = PackageUtils.isSplitsApk(packageInfo)
+                    val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+
+                    withContext(Dispatchers.Main) {
+                        chipSplitApk.isVisible = isSplitApk
+                        chipKotlinUsed.isVisible = isKotlinUsed
+                    }
+                }
             }
-        } ?: finish()
+        } ?: supportFinishAfterTransition()
+    }
+
+    override fun onStart() {
+        super.onStart()
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            supportFinishAfterTransition()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onBackPressed() {
+        supportFinishAfterTransition()
     }
 
     private fun initTransition() {

@@ -14,7 +14,7 @@ import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils

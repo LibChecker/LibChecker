@@ -14,7 +14,7 @@ import com.absinthe.libchecker.bean.ARMV5
 import com.absinthe.libchecker.bean.ARMV7
 import com.absinthe.libchecker.bean.ARMV8
 import com.absinthe.libchecker.bean.NO_LIBS
-import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment

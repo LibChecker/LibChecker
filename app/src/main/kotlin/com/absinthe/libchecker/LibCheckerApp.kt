@@ -2,6 +2,7 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.absinthe.libchecker.constant.Constants
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
@@ -15,7 +16,7 @@ class LibCheckerApp : Application() {
 
         if (!BuildConfig.DEBUG) {
             AppCenter.start(
-                this, "5f11b856-0a27-4438-a038-9e18e4797133",
+                this, Constants.APP_CENTER_SECRET,
                 Analytics::class.java, Crashes::class.java
             )
         }

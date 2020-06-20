@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.recyclerview.AppAdapter
+import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 
 const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"

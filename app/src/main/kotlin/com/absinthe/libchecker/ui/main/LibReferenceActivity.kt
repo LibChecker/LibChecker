@@ -4,16 +4,17 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.constant.AppItemRepository
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.recyclerview.AppAdapter
+import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -32,15 +33,12 @@ const val EXTRA_TYPE = "TYPE"
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
-    private val adapter = AppAdapter()
+    private val adapter =
+        AppAdapter()
 
-    override fun setViewBinding() {
+    override fun setViewBinding(): View {
         binding = ActivityLibReferenceBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-    }
-
-    override fun setRoot() {
-        root = binding.root
+        return binding.root
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +53,7 @@ class LibReferenceActivity : BaseActivity() {
         val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
 
         if (name == null) {
-            finish()
+            supportFinishAfterTransition()
         } else {
             initView()
             lifecycleScope.launch(Dispatchers.IO) {
@@ -64,9 +62,13 @@ class LibReferenceActivity : BaseActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        supportFinishAfterTransition()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            supportFinishAfterTransition()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -159,7 +161,7 @@ class LibReferenceActivity : BaseActivity() {
             }
         }
         withContext(Dispatchers.Main) {
-            adapter.setNewInstance(list)
+            adapter.setList(list)
             binding.vfContainer.displayedChild = 1
         }
     }

@@ -20,11 +20,11 @@ class ClassifyDialogFragment : LCDialogFragment() {
             savedInstanceState.getParcelableArrayList<AppItem>(
                 EXTRA_ITEM_LIST
             )?.toList()?.let {
-                dialogView.adapter.setNewInstance(it.toMutableList())
+                dialogView.adapter.setList(it)
                 item = it as ArrayList<AppItem>
             }
         } else {
-            dialogView.adapter.setNewInstance(item.toMutableList())
+            dialogView.adapter.setList(item)
         }
 
         return MaterialAlertDialogBuilder(requireContext())

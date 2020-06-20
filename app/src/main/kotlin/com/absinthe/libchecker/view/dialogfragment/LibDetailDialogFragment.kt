@@ -12,7 +12,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.recyclerview.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.detail.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel

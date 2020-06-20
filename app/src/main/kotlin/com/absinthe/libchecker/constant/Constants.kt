@@ -1,6 +1,9 @@
 package com.absinthe.libchecker.constant
 
 object Constants {
+
+    const val APP_CENTER_SECRET = "5f11b856-0a27-4438-a038-9e18e4797133"
+
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
     const val PREF_ENTRY_ANIMATION = "entryAnimation"
     const val PREF_APK_ANALYTICS = "apkAnalytics"

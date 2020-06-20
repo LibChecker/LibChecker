@@ -10,6 +10,7 @@ import android.text.format.Formatter
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
+import net.dongliu.apk.parser.ApkFile
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.*
@@ -17,7 +18,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import kotlin.collections.ArrayList
-
 
 object PackageUtils {
 
@@ -42,19 +42,17 @@ object PackageUtils {
         }
     }
 
-    fun getVersionString(packageName: String): String {
+    fun getVersionString(packageInfo: PackageInfo): String {
         return try {
-            val packageInfo: PackageInfo =
-                Utils.getApp().packageManager.getPackageInfo(packageName, 0)
             "${packageInfo.versionName ?: "null"}(${getVersionCode(packageInfo)})"
         } catch (e: PackageManager.NameNotFoundException) {
             ""
         }
     }
 
-    fun getTargetApiString(packageName: String): String {
+    fun getTargetApiString(packageInfo: PackageInfo): String {
         return try {
-            "API ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
+            "API ${packageInfo.applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "API ?"
         }
@@ -114,9 +112,9 @@ object PackageUtils {
         }
     }
 
-    fun isSplitsApk(packageName: String): Boolean {
+    fun isSplitsApk(packageInfo: PackageInfo): Boolean {
         try {
-            val path = getPackageInfo(packageName).applicationInfo.sourceDir
+            val path = packageInfo.applicationInfo.sourceDir
             File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
                 for (file in it) {
                     if (file.name.startsWith("split_config.")) {
@@ -131,9 +129,9 @@ object PackageUtils {
         return false
     }
 
-    fun isKotlinUsed(packageName: String): Boolean {
+    fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
         try {
-            val path = getPackageInfo(packageName).applicationInfo.sourceDir
+            val path = packageInfo.applicationInfo.sourceDir
             val file = File(path)
             val zipFile = ZipFile(file)
             val entries = zipFile.entries()
@@ -142,18 +140,35 @@ object PackageUtils {
             while (entries.hasMoreElements()) {
                 next = entries.nextElement()
 
-                if (next.name.startsWith("kotlin/")) {
-                    return true
-                } else if (next.name.startsWith("META-INF/services/kotlin")) {
-                    return true
+                when {
+                    next.name.startsWith("kotlin/") -> {
+                        return true
+                    }
+                    next.name.startsWith("META-INF/services/kotlin") -> {
+                        return true
+                    }
                 }
             }
             zipFile.close()
+            return isKotlinUsedInClassDex(file)
         } catch (e: PackageManager.NameNotFoundException) {
             return false
         }
+    }
 
-        return false
+    fun isKotlinUsedInClassDex(file: File): Boolean {
+        try {
+            val apkFile = ApkFile(file)
+
+            for (dexClass in apkFile.dexClasses) {
+                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString().startsWith("Lkotlinx/")) {
+                    return true
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            return false
+        }
     }
 
     fun getSplitLibs(path: String): ArrayList<LibStringItem> {
