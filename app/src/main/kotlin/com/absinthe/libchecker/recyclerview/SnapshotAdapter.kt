@@ -64,6 +64,10 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             if (compareNode.changed) {
                 holder.getView<TextView>(R.id.indicator_changed).isVisible = true
             }
+        } else {
+            holder.getView<TextView>(R.id.indicator_added).isVisible = false
+            holder.getView<TextView>(R.id.indicator_removed).isVisible = false
+            holder.getView<TextView>(R.id.indicator_changed).isVisible = false
         }
 
         if (item.labelDiff.old != item.labelDiff.new && !isNewOrDeleted) {

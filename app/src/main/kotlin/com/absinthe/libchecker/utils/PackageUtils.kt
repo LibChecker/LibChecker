@@ -131,6 +131,31 @@ object PackageUtils {
         return false
     }
 
+    fun isKotlinUsed(packageName: String): Boolean {
+        try {
+            val path = getPackageInfo(packageName).applicationInfo.sourceDir
+            val file = File(path)
+            val zipFile = ZipFile(file)
+            val entries = zipFile.entries()
+            var next: ZipEntry
+
+            while (entries.hasMoreElements()) {
+                next = entries.nextElement()
+
+                if (next.name.startsWith("kotlin/")) {
+                    return true
+                } else if (next.name.startsWith("META-INF/services/kotlin")) {
+                    return true
+                }
+            }
+            zipFile.close()
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
+        }
+
+        return false
+    }
+
     fun getSplitLibs(path: String): ArrayList<LibStringItem> {
         val libList = ArrayList<LibStringItem>()
 

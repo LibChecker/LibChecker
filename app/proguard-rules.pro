@@ -15,9 +15,6 @@
 # -dontoptimize
 -optimizationpasses 5
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable,!class/unboxing/enum
--obfuscationdictionary dictionary.txt
--classobfuscationdictionary dictionary.txt
--packageobfuscationdictionary dictionary.txt
 -repackageclasses com.absinthe.libchecker
 
 -dontpreverify

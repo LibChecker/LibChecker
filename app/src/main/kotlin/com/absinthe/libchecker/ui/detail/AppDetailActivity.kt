@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
-import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
@@ -56,7 +56,8 @@ class AppDetailActivity : BaseActivity() {
                 tvPackageName.text = packageName
                 tvVersion.text = PackageUtils.getVersionString(packageName)
                 tvTargetApi.text = PackageUtils.getTargetApiString(packageName)
-                chipSplit.isGone = !PackageUtils.isSplitsApk(packageName)
+                chipSplitApk.isVisible = PackageUtils.isSplitsApk(packageName)
+                chipKotlinUsed.isVisible = PackageUtils.isKotlinUsed(packageName)
             }
         } ?: finish()
     }
