@@ -78,8 +78,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     packageName = info.packageName
                     versionName = PackageUtils.getVersionString(packageInfo)
                     abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                    isSystem =
-                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                    isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                     updateTime = packageInfo.lastUpdateTime
                 }
                 lcItem = LCItem(
@@ -102,7 +101,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 insert(lcItem)
-            } catch (e: PackageManager.NameNotFoundException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
                 continue
             }

@@ -113,8 +113,8 @@ class AppDetailActivity : BaseActivity() {
                     val lcItem = repository.getItem(packageName)
                     val chipGroupBinding =
                         LayoutChipGroupBinding.inflate(layoutInflater).apply {
-                            chipSplitApk.isVisible = lcItem.isSplitApk
-                            chipKotlinUsed.isVisible = lcItem.isKotlinUsed
+                            chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
+                            chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
                         }
                     chipGroupBinding.root.id = View.generateViewId()
 

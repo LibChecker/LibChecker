@@ -10,7 +10,7 @@ interface LCDao {
     fun getItems(): LiveData<List<LCItem>>
 
     @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
-    fun getItem(packageName: String): LCItem
+    fun getItem(packageName: String): LCItem?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: LCItem)

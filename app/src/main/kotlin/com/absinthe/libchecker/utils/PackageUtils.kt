@@ -5,17 +5,14 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.system.ErrnoException
 import android.text.format.Formatter
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
 import java.io.File
-import java.io.FileNotFoundException
 import java.util.*
 import java.util.zip.ZipEntry
-import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import kotlin.collections.ArrayList
 
@@ -263,13 +260,7 @@ object PackageUtils {
             } else {
                 abi
             }
-        } catch (e: ErrnoException) {
-            e.printStackTrace()
-            return ERROR
-        } catch (e: ZipException) {
-            e.printStackTrace()
-            return ERROR
-        } catch (e: FileNotFoundException) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return ERROR
         }
