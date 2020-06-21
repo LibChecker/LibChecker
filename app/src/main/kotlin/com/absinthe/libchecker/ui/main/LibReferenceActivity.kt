@@ -53,7 +53,7 @@ class LibReferenceActivity : BaseActivity() {
         val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
 
         if (name == null) {
-            supportFinishAfterTransition()
+            finish()
         } else {
             initView()
             lifecycleScope.launch(Dispatchers.IO) {
@@ -62,13 +62,9 @@ class LibReferenceActivity : BaseActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        supportFinishAfterTransition()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            supportFinishAfterTransition()
+            onBackPressed()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -95,7 +91,6 @@ class LibReferenceActivity : BaseActivity() {
                 R.anim.anim_fade_out
             )
         }
-        setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         adapter.setOnItemClickListener { _, view, position ->

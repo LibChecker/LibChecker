@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -43,36 +44,8 @@ class AppDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initTransition()
-
         super.onCreate(savedInstanceState)
         initView()
-
-        pkgName?.let { packageName ->
-            supportActionBar?.apply {
-                title = AppUtils.getAppName(packageName)
-            }
-            binding.apply {
-                val packageInfo = PackageUtils.getPackageInfo(packageName)
-                ivAppIcon.setImageDrawable(AppUtils.getAppIcon(packageName))
-                tvAppName.text = AppUtils.getAppName(packageName)
-                tvPackageName.text = packageName
-                tvVersion.text = PackageUtils.getVersionString(packageInfo)
-                tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
-
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val isSplitApk = PackageUtils.isSplitsApk(packageInfo)
-                    val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
-
-                    if (isSplitApk || isKotlinUsed) {
-                        withContext(Dispatchers.Main) {
-                            val chipGroupBinding = LayoutChipGroupBinding.inflate(layoutInflater, binding.chipGroupContainer)
-                            chipGroupBinding.chipSplitApk.isVisible = isSplitApk
-                            chipGroupBinding.chipKotlinUsed.isVisible = isKotlinUsed
-                        }
-                    }
-                }
-            }
-        } ?: supportFinishAfterTransition()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -95,7 +68,7 @@ class AppDetailActivity : BaseActivity() {
             }
             sharedElementReturnTransition = MaterialContainerTransform().apply {
                 addTarget(android.R.id.content)
-                duration = 300L
+                duration = 250L
             }
         }
         findViewById<View>(android.R.id.content).transitionName = "app_card_container"
@@ -108,6 +81,59 @@ class AppDetailActivity : BaseActivity() {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
+
+        pkgName?.let { packageName ->
+            supportActionBar?.apply {
+                title = AppUtils.getAppName(packageName)
+            }
+            binding.apply {
+                val packageInfo = PackageUtils.getPackageInfo(packageName)
+                ivAppIcon.apply {
+                    setImageDrawable(AppUtils.getAppIcon(packageName))
+                    setOnClickListener {
+                        try {
+                            startActivity(IntentUtils.getLaunchAppIntent(pkgName))
+                        } catch (e: ActivityNotFoundException) {
+                            ToastUtils.showShort("Can\'t open this app")
+                        } catch (e: NullPointerException) {
+                            ToastUtils.showShort("Package name is null")
+                        }
+                    }
+                }
+                tvAppName.text = AppUtils.getAppName(packageName)
+                tvPackageName.text = packageName
+                tvVersion.text = PackageUtils.getVersionString(packageInfo)
+                tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val isSplitApk = PackageUtils.isSplitsApk(packageInfo)
+                    val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+
+                    if (isSplitApk || isKotlinUsed) {
+                        withContext(Dispatchers.Main) {
+                            val chipGroupBinding =
+                                LayoutChipGroupBinding.inflate(layoutInflater).apply {
+                                    chipSplitApk.isVisible = isSplitApk
+                                    chipKotlinUsed.isVisible = isKotlinUsed
+                                }
+                            chipGroupBinding.root.id = View.generateViewId()
+                            binding.headerContentLayout.addView(chipGroupBinding.root)
+                            ConstraintSet().apply {
+                                clone(binding.headerContentLayout)
+                                connect(
+                                    chipGroupBinding.root.id,
+                                    ConstraintSet.TOP,
+                                    binding.ivAppIcon.id,
+                                    ConstraintSet.BOTTOM,
+                                    resources.getDimension(R.dimen.normal_padding).toInt()
+                                )
+                                applyTo(binding.headerContentLayout)
+                            }
+                        }
+                    }
+                }
+            }
+        } ?: supportFinishAfterTransition()
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
@@ -130,15 +156,5 @@ class AppDetailActivity : BaseActivity() {
                 }
             })
         mediator.attach()
-
-        binding.ivAppIcon.setOnClickListener {
-            try {
-                startActivity(IntentUtils.getLaunchAppIntent(pkgName))
-            } catch (e: ActivityNotFoundException) {
-                ToastUtils.showShort("Can\'t open this app")
-            } catch (e: NullPointerException) {
-                ToastUtils.showShort("Package name is null")
-            }
-        }
     }
 }

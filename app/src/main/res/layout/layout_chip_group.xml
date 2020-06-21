@@ -1,34 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge>
-    <com.google.android.material.chip.ChipGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
+<com.google.android.material.chip.ChipGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:chipSpacing="@dimen/normal_padding">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_split_apk"
+        style="@style/Widget.MaterialComponents.Chip.Action"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        app:chipSpacing="@dimen/normal_padding">
+        android:text="@string/splits_spk"
+        app:chipIcon="@drawable/ic_split"
+        app:chipMinHeight="28dp"
+        app:chipMinTouchTargetSize="0dp"
+        app:chipStartPadding="10dp" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_split_apk"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/splits_spk"
-            app:chipIcon="@drawable/ic_split"
-            app:chipMinHeight="28dp"
-            app:chipMinTouchTargetSize="0dp"
-            app:chipStartPadding="10dp" />
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_kotlin_used"
+        style="@style/Widget.MaterialComponents.Chip.Action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/kotlin_used"
+        app:chipIcon="@drawable/ic_kotlin_logo"
+        app:chipMinHeight="28dp"
+        app:chipMinTouchTargetSize="0dp"
+        app:chipStartPadding="10dp" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_kotlin_used"
-            style="@style/Widget.MaterialComponents.Chip.Action"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/kotlin_used"
-            app:chipIcon="@drawable/ic_kotlin_logo"
-            app:chipMinHeight="28dp"
-            app:chipMinTouchTargetSize="0dp"
-            app:chipStartPadding="10dp" />
-
-    </com.google.android.material.chip.ChipGroup>
-</merge>
+</com.google.android.material.chip.ChipGroup>

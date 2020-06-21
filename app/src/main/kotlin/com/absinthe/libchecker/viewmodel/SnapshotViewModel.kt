@@ -224,7 +224,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             )
                         )
                     }
-                } catch (e: PackageManager.NameNotFoundException) {
+                } catch (e: Exception) {
                     e.printStackTrace()
                     continue
                 }

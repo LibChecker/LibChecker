@@ -68,7 +68,7 @@ class SnapshotDetailActivity : BaseActivity() {
             }
             sharedElementReturnTransition = MaterialContainerTransform().apply {
                 addTarget(android.R.id.content)
-                duration = 300L
+                duration = 250L
             }
         }
         findViewById<View>(android.R.id.content).transitionName = "app_card_container"
