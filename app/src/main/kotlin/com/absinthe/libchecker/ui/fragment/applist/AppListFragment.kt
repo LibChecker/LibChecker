@@ -13,6 +13,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -88,6 +89,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
+            tvFirstTip.isVisible = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
         }
 
         viewModel.apply {
@@ -100,8 +102,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 binding.vfContainer.displayedChild = 1
             }
 
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.ADD_SPLIT_AND_KOTLIN_COLUMN)) {
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
                 Once.clearDone(OnceTag.FIRST_LAUNCH)
+                binding.tvFirstTip.isVisible = true
             }
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems(requireContext())
@@ -143,7 +146,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
-                    Once.markDone(OnceTag.ADD_SPLIT_AND_KOTLIN_COLUMN)
+                    Once.markDone(OnceTag.DB_MIGRATE_2_3)
                 }
             })
             clickBottomItemFlag.observe(viewLifecycleOwner, Observer {

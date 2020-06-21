@@ -14,6 +14,7 @@
     <string name="no_libs">No native libs</string>
     <string name="format_native_libs_title">Native libs in <b>%s</b></string>
     <string name="empty_list">Empty list</string>
+    <string name="applist_first_tip">The first load will take some time</string>
 
     <string name="menu_sort_by_time_desc">Descending by update time</string>
     <string name="menu_sort_default">Default order</string>

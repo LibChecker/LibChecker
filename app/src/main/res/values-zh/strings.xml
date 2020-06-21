@@ -60,4 +60,5 @@
     <string name="snapshot_empty_list_title">没有变更</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
+    <string name="applist_first_tip">第一次加载需要一些时间</string>
 </resources>
