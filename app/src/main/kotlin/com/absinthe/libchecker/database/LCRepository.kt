@@ -19,6 +19,14 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.delete(item)
     }
 
+    fun deleteAllItems() {
+        lcDao.deleteAllItems()
+    }
+
+    fun getItem(packageName: String): LCItem {
+        return lcDao.getItem(packageName)
+    }
+
     suspend fun insert(item: SnapshotItem) {
         lcDao.insert(item)
     }

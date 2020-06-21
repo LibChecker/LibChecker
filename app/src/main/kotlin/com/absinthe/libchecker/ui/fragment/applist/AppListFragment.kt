@@ -100,6 +100,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 binding.vfContainer.displayedChild = 1
             }
 
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.ADD_SPLIT_AND_KOTLIN_COLUMN)) {
+                Once.clearDone(OnceTag.FIRST_LAUNCH)
+            }
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems(requireContext())
             } else {
@@ -140,6 +143,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
+                    Once.markDone(OnceTag.ADD_SPLIT_AND_KOTLIN_COLUMN)
                 }
             })
             clickBottomItemFlag.observe(viewLifecycleOwner, Observer {

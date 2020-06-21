@@ -13,5 +13,7 @@ data class LCItem(
     @ColumnInfo(name = "installedTime") val installedTime: Long,
     @ColumnInfo(name = "lastUpdatedTime") val lastUpdatedTime: Long,
     @ColumnInfo(name = "isSystem") val isSystem: Boolean,
-    @ColumnInfo(name = "abi") val abi: Short
+    @ColumnInfo(name = "abi") val abi: Short,
+    @ColumnInfo(name = "isSplitApk") val isSplitApk: Boolean,
+    @ColumnInfo(name = "isKotlinUsed") val isKotlinUsed: Boolean
 )

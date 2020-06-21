@@ -12,6 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.database.LCDatabase
+import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
@@ -106,29 +108,28 @@ class AppDetailActivity : BaseActivity() {
                 tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val isSplitApk = PackageUtils.isSplitsApk(packageInfo)
-                    val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+                    val lcDao = LCDatabase.getDatabase(application).lcDao()
+                    val repository = LCRepository(lcDao)
+                    val lcItem = repository.getItem(packageName)
+                    val chipGroupBinding =
+                        LayoutChipGroupBinding.inflate(layoutInflater).apply {
+                            chipSplitApk.isVisible = lcItem.isSplitApk
+                            chipKotlinUsed.isVisible = lcItem.isKotlinUsed
+                        }
+                    chipGroupBinding.root.id = View.generateViewId()
 
-                    if (isSplitApk || isKotlinUsed) {
-                        withContext(Dispatchers.Main) {
-                            val chipGroupBinding =
-                                LayoutChipGroupBinding.inflate(layoutInflater).apply {
-                                    chipSplitApk.isVisible = isSplitApk
-                                    chipKotlinUsed.isVisible = isKotlinUsed
-                                }
-                            chipGroupBinding.root.id = View.generateViewId()
-                            binding.headerContentLayout.addView(chipGroupBinding.root)
-                            ConstraintSet().apply {
-                                clone(binding.headerContentLayout)
-                                connect(
-                                    chipGroupBinding.root.id,
-                                    ConstraintSet.TOP,
-                                    binding.ivAppIcon.id,
-                                    ConstraintSet.BOTTOM,
-                                    resources.getDimension(R.dimen.normal_padding).toInt()
-                                )
-                                applyTo(binding.headerContentLayout)
-                            }
+                    withContext(Dispatchers.Main) {
+                        binding.headerContentLayout.addView(chipGroupBinding.root)
+                        ConstraintSet().apply {
+                            clone(binding.headerContentLayout)
+                            connect(
+                                chipGroupBinding.root.id,
+                                ConstraintSet.TOP,
+                                binding.ivAppIcon.id,
+                                ConstraintSet.BOTTOM,
+                                resources.getDimension(R.dimen.normal_padding).toInt()
+                            )
+                            applyTo(binding.headerContentLayout)
                         }
                     }
                 }

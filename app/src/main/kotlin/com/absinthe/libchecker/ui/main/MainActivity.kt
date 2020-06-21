@@ -84,7 +84,8 @@ class MainActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        supportFinishAfterTransition()
+        super.onBackPressed()
+        finish()
     }
 
     private fun initView() {

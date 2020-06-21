@@ -9,6 +9,9 @@ interface LCDao {
     @Query("SELECT * from item_table ORDER BY label ASC")
     fun getItems(): LiveData<List<LCItem>>
 
+    @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
+    fun getItem(packageName: String): LCItem
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: LCItem)
 
@@ -17,6 +20,9 @@ interface LCDao {
 
     @Delete
     suspend fun delete(item: LCItem)
+
+    @Query("DELETE FROM item_table")
+    fun deleteAllItems()
 
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
     fun getSnapshots(): LiveData<List<SnapshotItem>>

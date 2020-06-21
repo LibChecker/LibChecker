@@ -18,10 +18,10 @@ import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
@@ -57,6 +57,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         Log.d(tag, "initItems")
 
+        repository.deleteAllItems()
+
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         val newItems = ArrayList<AppItem>()
@@ -88,7 +90,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                    PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                    PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                    PackageUtils.isSplitsApk(packageInfo),
+                    PackageUtils.isKotlinUsed(packageInfo)
                 )
 
                 GlobalValues.isShowSystemApps.value?.let {
@@ -183,7 +187,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 packageInfo.firstInstallTime,
                                 packageInfo.lastUpdateTime,
                                 (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()
+                                PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort(),
+                                PackageUtils.isSplitsApk(packageInfo),
+                                PackageUtils.isKotlinUsed(packageInfo)
                             )
                             update(lcItem)
                         }
@@ -211,7 +217,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.firstInstallTime,
                         packageInfo.lastUpdateTime,
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()
+                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                        PackageUtils.isSplitsApk(packageInfo),
+                        PackageUtils.isKotlinUsed(packageInfo)
                     )
 
                     insert(lcItem)
