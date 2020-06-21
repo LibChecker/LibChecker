@@ -2,10 +2,11 @@ package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
-import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -13,30 +14,44 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
-class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
+class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val adapter =
         LibReferenceAdapter()
 
-    private lateinit var binding: FragmentLibReferenceBinding
     private var isInit = false
     private var category = LibReferenceActivity.Type.TYPE_NATIVE
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentLibReferenceBinding.inflate(inflater, container, false)
-        initView()
-        return binding.root
+    override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
+
+    override fun init() {
+        binding.rvList.adapter = this.adapter
+        binding.vfContainer.apply {
+            setInAnimation(activity, R.anim.anim_fade_in)
+            setOutAnimation(activity, R.anim.anim_fade_out)
+        }
+
+        adapter.setDiffCallback(RefListDiffUtil())
+        adapter.setOnItemClickListener { _, view, position ->
+            if (AntiShakeUtils.isInvalidClick(view)) {
+                return@setOnItemClickListener
+            }
+
+            val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
+                val item = this@LibReferenceFragment.adapter.data[position]
+                putExtra(EXTRA_NAME, item.libName)
+                putExtra(EXTRA_TYPE, item.type)
+            }
+            startActivity(intent)
+        }
     }
 
     override fun onStart() {
@@ -120,28 +135,6 @@ class LibReferenceFragment : Fragment(), SearchView.OnQueryTextListener {
     private fun computeRef() {
         binding.vfContainer.displayedChild = 0
         viewModel.computeLibReference(requireContext(), category)
-    }
-
-    private fun initView() {
-        binding.rvList.adapter = this.adapter
-        binding.vfContainer.apply {
-            setInAnimation(activity, R.anim.anim_fade_in)
-            setOutAnimation(activity, R.anim.anim_fade_out)
-        }
-
-        adapter.setDiffCallback(RefListDiffUtil())
-        adapter.setOnItemClickListener { _, view, position ->
-            if (AntiShakeUtils.isInvalidClick(view)) {
-                return@setOnItemClickListener
-            }
-
-            val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
-                val item = this@LibReferenceFragment.adapter.data[position]
-                putExtra(EXTRA_NAME, item.libName)
-                putExtra(EXTRA_TYPE, item.type)
-            }
-            startActivity(intent)
-        }
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

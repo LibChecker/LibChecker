@@ -1,22 +1,19 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.graphics.Color
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ARMV5
 import com.absinthe.libchecker.bean.ARMV7
 import com.absinthe.libchecker.bean.ARMV8
 import com.absinthe.libchecker.bean.NO_LIBS
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
@@ -29,24 +26,11 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 
+class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart), OnChartValueSelectedListener {
 
-class PieChartFragment : Fragment(), OnChartValueSelectedListener {
+    override fun initBinding(view: View): FragmentPieChartBinding = FragmentPieChartBinding.bind(view)
 
-    private lateinit var binding: FragmentPieChartBinding
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentPieChartBinding.inflate(inflater, container, false)
-
-        return binding.root
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
+    override fun init() {
         binding.chart.apply {
             dragDecelerationFrictionCoef = 0.95f
             description = null

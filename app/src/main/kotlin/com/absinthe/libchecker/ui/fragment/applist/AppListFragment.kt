@@ -5,24 +5,27 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
@@ -33,27 +36,16 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 import rikka.material.widget.BorderView
 
-class AppListFragment : Fragment(), SearchView.OnQueryTextListener {
+class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
-    private lateinit var binding: FragmentAppListBinding
     private val viewModel by activityViewModels<AppViewModel>()
-    private val mAdapter =
-        AppAdapter()
+    private val mAdapter = AppAdapter()
     private val mItems = ArrayList<AppItem>()
     private var changeCount = 0
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentAppListBinding.inflate(inflater, container, false)
-        initView()
+    override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
-        return binding.root
-    }
-
-    private fun initView() {
+    override fun init() {
         setHasOptionsMenu(true)
 
         mAdapter.apply {

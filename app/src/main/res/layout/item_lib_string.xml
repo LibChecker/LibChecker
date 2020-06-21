@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:clipToPadding="false"
     android:minHeight="40dp"
-    android:paddingBottom="5dp">
+    android:paddingVertical="3dp">
 
     <TextView
         android:id="@+id/tv_name"

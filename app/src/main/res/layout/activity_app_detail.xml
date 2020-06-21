@@ -15,14 +15,14 @@
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_content_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="?android:colorBackground"
                 android:paddingHorizontal="@dimen/normal_padding"
                 android:paddingTop="?attr/actionBarSize"
@@ -91,40 +91,14 @@
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="API 29" />
 
-                <com.google.android.material.chip.ChipGroup
+                <LinearLayout
+                    android:id="@+id/chip_group_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/normal_padding"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
-                    app:chipSpacing="@dimen/normal_padding"
-                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon">
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_split_apk"
-                        style="@style/Widget.MaterialComponents.Chip.Action"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/splits_spk"
-                        android:visibility="gone"
-                        app:chipIcon="@drawable/ic_split"
-                        app:chipMinHeight="28dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStartPadding="10dp" />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_kotlin_used"
-                        style="@style/Widget.MaterialComponents.Chip.Action"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/kotlin_used"
-                        android:visibility="gone"
-                        app:chipIcon="@drawable/ic_kotlin_logo"
-                        app:chipMinHeight="28dp"
-                        app:chipMinTouchTargetSize="0dp"
-                        app:chipStartPadding="10dp" />
-
-                </com.google.android.material.chip.ChipGroup>
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/iv_app_icon" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

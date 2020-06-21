@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -13,6 +10,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
@@ -24,33 +22,19 @@ import rikka.core.util.ClipboardUtils
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
 
-class SoAnalysisFragment : Fragment() {
+class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.fragment_so_analysis) {
 
-    private lateinit var binding: FragmentSoAnalysisBinding
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
     private val adapter = LibStringAdapter()
         .apply {
-        mode = LibStringAdapter.Mode.NATIVE
-    }
+            mode = LibStringAdapter.Mode.NATIVE
+        }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentSoAnalysisBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun initBinding(view: View): FragmentSoAnalysisBinding =
+        FragmentSoAnalysisBinding.bind(view)
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        retainInstance = true
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun init() {
         binding.apply {
             list.adapter = this@SoAnalysisFragment.adapter
             ibSort.setOnClickListener {
@@ -105,8 +89,8 @@ class SoAnalysisFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel.initSoAnalysisData(requireContext(), packageName)
     }
 

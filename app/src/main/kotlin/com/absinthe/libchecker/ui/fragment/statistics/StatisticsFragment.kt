@@ -1,31 +1,20 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentStatisticsBinding
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.tabs.TabLayoutMediator
 
-class StatisticsFragment : Fragment() {
+class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.fragment_statistics) {
 
-    private lateinit var binding: FragmentStatisticsBinding
+    override fun initBinding(view: View): FragmentStatisticsBinding =
+        FragmentStatisticsBinding.bind(view)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentStatisticsBinding.inflate(inflater, container, false)
-        initView()
-        return binding.root
-    }
-
-    private fun initView() {
+    override fun init() {
         binding.root.setPadding(0, binding.root.paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {

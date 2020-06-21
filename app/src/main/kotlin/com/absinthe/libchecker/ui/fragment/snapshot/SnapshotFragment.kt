@@ -3,11 +3,8 @@ package com.absinthe.libchecker.ui.fragment.snapshot
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
@@ -16,30 +13,21 @@ import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
+import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SnapshotFragment : Fragment() {
+class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by viewModels<SnapshotViewModel>()
-    private lateinit var binding: FragmentSnapshotBinding
-    private val adapter =
-        SnapshotAdapter()
+    private val adapter = SnapshotAdapter()
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentSnapshotBinding.inflate(inflater, container, false)
-        initView()
-        return binding.root
-    }
+    override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
-    private fun initView() {
+    override fun init() {
         binding.root.apply {
             setPadding(
                 paddingStart,

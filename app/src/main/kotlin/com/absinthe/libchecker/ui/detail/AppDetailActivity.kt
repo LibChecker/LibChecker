@@ -12,6 +12,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
@@ -62,18 +63,16 @@ class AppDetailActivity : BaseActivity() {
                     val isSplitApk = PackageUtils.isSplitsApk(packageInfo)
                     val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
 
-                    withContext(Dispatchers.Main) {
-                        chipSplitApk.isVisible = isSplitApk
-                        chipKotlinUsed.isVisible = isKotlinUsed
+                    if (isSplitApk || isKotlinUsed) {
+                        withContext(Dispatchers.Main) {
+                            val chipGroupBinding = LayoutChipGroupBinding.inflate(layoutInflater, binding.chipGroupContainer)
+                            chipGroupBinding.chipSplitApk.isVisible = isSplitApk
+                            chipGroupBinding.chipKotlinUsed.isVisible = isKotlinUsed
+                        }
                     }
                 }
             }
         } ?: supportFinishAfterTransition()
-    }
-
-    override fun onStart() {
-        super.onStart()
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -14,8 +14,7 @@ import com.google.android.material.chip.Chip
 
 class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
-    var mode =
-        Mode.NATIVE
+    var mode = Mode.NATIVE
 
     init {
         addChildClickViewIds(R.id.chip)
