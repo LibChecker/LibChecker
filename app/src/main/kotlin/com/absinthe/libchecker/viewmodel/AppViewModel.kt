@@ -127,21 +127,25 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var appItem: AppItem
 
             for (item in value) {
-                appItem = AppItem().apply {
-                    icon = AppUtils.getAppIcon(item.packageName)
-                        ?: ColorDrawable(Color.TRANSPARENT)
-                    appName = item.label
-                    packageName = item.packageName
-                    versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
-                    abi = item.abi.toInt()
-                    isSystem = item.isSystem
-                    updateTime = item.lastUpdatedTime
-                }
-
-                GlobalValues.isShowSystemApps.value?.let {
-                    if (it || (!it && !item.isSystem)) {
-                        newItems.add(appItem)
+                try {
+                    appItem = AppItem().apply {
+                        icon = AppUtils.getAppIcon(item.packageName)
+                            ?: ColorDrawable(Color.TRANSPARENT)
+                        appName = item.label
+                        packageName = item.packageName
+                        versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
+                        abi = item.abi.toInt()
+                        isSystem = item.isSystem
+                        updateTime = item.lastUpdatedTime
                     }
+
+                    GlobalValues.isShowSystemApps.value?.let {
+                        if (it || (!it && !item.isSystem)) {
+                            newItems.add(appItem)
+                        }
+                    }
+                } catch (e: Exception) {
+                    continue
                 }
             }
 

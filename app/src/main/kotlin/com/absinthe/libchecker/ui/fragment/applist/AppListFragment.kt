@@ -16,6 +16,7 @@ import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.Constants
@@ -34,7 +35,10 @@ import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
 class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
@@ -118,7 +122,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         } else {
                             changeCount++
 
-                            GlobalScope.launch(Dispatchers.IO) {
+                            lifecycleScope.launch(Dispatchers.IO) {
                                 val count = changeCount
                                 delay(500)
 
@@ -185,7 +189,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     private fun updateItems(newItems: List<AppItem>) {
         mAdapter.setDiffNewData(newItems.toMutableList())
 
-        GlobalScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             delay(300)
 
             withContext(Dispatchers.Main) {
