@@ -24,8 +24,7 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
-    private val adapter =
-        LibReferenceAdapter()
+    private val adapter = LibReferenceAdapter()
 
     private var isInit = false
     private var category = LibReferenceActivity.Type.TYPE_NATIVE

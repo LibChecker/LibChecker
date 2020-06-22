@@ -201,8 +201,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     } ?: run {
                         delete(dbItem)
                     }
-                } catch (e: PackageManager.NameNotFoundException) {
-                    e.printStackTrace()
+                } catch (e: Exception) {
                     continue
                 }
             }
