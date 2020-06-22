@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:colorBackground"
     tools:context=".ui.detail.AppDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@null">
+        android:background="@null"
+        android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -25,7 +26,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
-                android:background="?android:colorBackground"
                 android:paddingHorizontal="@dimen/normal_padding"
                 android:paddingTop="?attr/actionBarSize"
                 android:paddingBottom="@dimen/normal_padding"

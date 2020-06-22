@@ -13,6 +13,7 @@ import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -36,7 +37,10 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
 
     override fun init() {
         binding.apply {
-            list.adapter = this@SoAnalysisFragment.adapter
+            list.apply {
+                adapter = this@SoAnalysisFragment.adapter
+                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
+            }
             ibSort.setOnClickListener {
                 GlobalValues.libSortMode.value =
                     if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {

@@ -17,6 +17,7 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -46,6 +47,7 @@ class ComponentsAnalysisFragment :
                         DividerItemDecoration.VERTICAL
                     )
                 )
+                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
             ibSort.setOnClickListener {
                 GlobalValues.libSortMode.value =

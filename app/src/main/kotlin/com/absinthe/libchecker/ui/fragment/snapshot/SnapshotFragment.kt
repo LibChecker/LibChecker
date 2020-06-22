@@ -14,6 +14,7 @@ import com.absinthe.libchecker.recyclerview.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
@@ -28,15 +29,15 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
     override fun init() {
-        binding.root.apply {
-            setPadding(
-                paddingStart,
-                paddingTop + BarUtils.getStatusBarHeight(),
-                paddingEnd,
-                paddingBottom
-            )
-        }
         binding.apply {
+            root.apply {
+                setPadding(
+                    paddingStart,
+                    paddingTop + BarUtils.getStatusBarHeight(),
+                    paddingEnd,
+                    paddingBottom
+                )
+            }
             extendedFab.apply {
                 (layoutParams as CoordinatorLayout.LayoutParams)
                     .setMargins(
@@ -63,6 +64,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         }
                     }
                 })
+                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

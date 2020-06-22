@@ -89,49 +89,53 @@ class AppDetailActivity : BaseActivity() {
                 title = AppUtils.getAppName(packageName)
             }
             binding.apply {
-                val packageInfo = PackageUtils.getPackageInfo(packageName)
-                ivAppIcon.apply {
-                    setImageDrawable(AppUtils.getAppIcon(packageName))
-                    setOnClickListener {
-                        try {
-                            startActivity(IntentUtils.getLaunchAppIntent(pkgName))
-                        } catch (e: ActivityNotFoundException) {
-                            ToastUtils.showShort("Can\'t open this app")
-                        } catch (e: NullPointerException) {
-                            ToastUtils.showShort("Package name is null")
+                try {
+                    val packageInfo = PackageUtils.getPackageInfo(packageName)
+                    ivAppIcon.apply {
+                        setImageDrawable(AppUtils.getAppIcon(packageName))
+                        setOnClickListener {
+                            try {
+                                startActivity(IntentUtils.getLaunchAppIntent(pkgName))
+                            } catch (e: ActivityNotFoundException) {
+                                ToastUtils.showShort("Can\'t open this app")
+                            } catch (e: NullPointerException) {
+                                ToastUtils.showShort("Package name is null")
+                            }
                         }
                     }
-                }
-                tvAppName.text = AppUtils.getAppName(packageName)
-                tvPackageName.text = packageName
-                tvVersion.text = PackageUtils.getVersionString(packageInfo)
-                tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
+                    tvAppName.text = AppUtils.getAppName(packageName)
+                    tvPackageName.text = packageName
+                    tvVersion.text = PackageUtils.getVersionString(packageInfo)
+                    tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
-                lifecycleScope.launch(Dispatchers.IO) {
-                    val lcDao = LCDatabase.getDatabase(application).lcDao()
-                    val repository = LCRepository(lcDao)
-                    val lcItem = repository.getItem(packageName)
-                    val chipGroupBinding =
-                        LayoutChipGroupBinding.inflate(layoutInflater).apply {
-                            chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
-                            chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
-                        }
-                    chipGroupBinding.root.id = View.generateViewId()
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val lcDao = LCDatabase.getDatabase(application).lcDao()
+                        val repository = LCRepository(lcDao)
+                        val lcItem = repository.getItem(packageName)
+                        val chipGroupBinding =
+                            LayoutChipGroupBinding.inflate(layoutInflater).apply {
+                                chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
+                                chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
+                            }
+                        chipGroupBinding.root.id = View.generateViewId()
 
-                    withContext(Dispatchers.Main) {
-                        binding.headerContentLayout.addView(chipGroupBinding.root)
-                        ConstraintSet().apply {
-                            clone(binding.headerContentLayout)
-                            connect(
-                                chipGroupBinding.root.id,
-                                ConstraintSet.TOP,
-                                binding.ivAppIcon.id,
-                                ConstraintSet.BOTTOM,
-                                resources.getDimension(R.dimen.normal_padding).toInt()
-                            )
-                            applyTo(binding.headerContentLayout)
+                        withContext(Dispatchers.Main) {
+                            binding.headerContentLayout.addView(chipGroupBinding.root)
+                            ConstraintSet().apply {
+                                clone(binding.headerContentLayout)
+                                connect(
+                                    chipGroupBinding.root.id,
+                                    ConstraintSet.TOP,
+                                    binding.ivAppIcon.id,
+                                    ConstraintSet.BOTTOM,
+                                    resources.getDimension(R.dimen.normal_padding).toInt()
+                                )
+                                applyTo(binding.headerContentLayout)
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    supportFinishAfterTransition()
                 }
             }
         } ?: supportFinishAfterTransition()

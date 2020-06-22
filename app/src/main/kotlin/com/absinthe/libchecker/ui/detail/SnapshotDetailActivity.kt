@@ -13,6 +13,7 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.SnapshotDetailAdapter
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.transition.platform.MaterialContainerTransform
@@ -23,8 +24,7 @@ const val EXTRA_ENTITY = "EXTRA_ENTITY"
 class SnapshotDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySnapshotDetailBinding
-    private val adapter =
-        SnapshotDetailAdapter()
+    private val adapter = SnapshotDetailAdapter()
     private val entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
     private val viewModel by viewModels<SnapshotViewModel>()
 
@@ -87,6 +87,7 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
+                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
             ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity!!.packageName))
 
