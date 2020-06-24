@@ -56,6 +56,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 adapter = this@SnapshotFragment.adapter
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
                         //dy less than zero means swiping up
                         if (dy > 0 && binding.extendedFab.isShown) {
                             binding.extendedFab.hide()
