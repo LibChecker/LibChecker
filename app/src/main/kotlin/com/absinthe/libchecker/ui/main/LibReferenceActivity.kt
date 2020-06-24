@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.main
 
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -69,7 +70,13 @@ class LibReferenceActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    }
+
     private fun initView() {
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
 

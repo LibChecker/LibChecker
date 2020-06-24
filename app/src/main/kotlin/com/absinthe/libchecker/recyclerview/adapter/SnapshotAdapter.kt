@@ -55,19 +55,9 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
 
         if (!isNewOrDeleted) {
             val compareNode = compareNativeAndComponentDiff(item)
-            if (compareNode.added) {
-                holder.getView<TextView>(R.id.indicator_added).isVisible = true
-            }
-            if (compareNode.removed) {
-                holder.getView<TextView>(R.id.indicator_removed).isVisible = true
-            }
-            if (compareNode.changed) {
-                holder.getView<TextView>(R.id.indicator_changed).isVisible = true
-            }
-        } else {
-            holder.getView<TextView>(R.id.indicator_added).isVisible = false
-            holder.getView<TextView>(R.id.indicator_removed).isVisible = false
-            holder.getView<TextView>(R.id.indicator_changed).isVisible = false
+            holder.getView<TextView>(R.id.indicator_added).isVisible = compareNode.added and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_removed).isVisible = compareNode.removed and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_changed).isVisible = compareNode.changed and !isNewOrDeleted
         }
 
         if (item.labelDiff.old != item.labelDiff.new && !isNewOrDeleted) {
@@ -215,8 +205,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<LibStringItem>()
-        val node =
-            CompareDiffNode()
+        val node = CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it.name == item.name }?.let {

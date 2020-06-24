@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.ActivityNotFoundException
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -61,6 +62,11 @@ class AppDetailActivity : BaseActivity() {
         supportFinishAfterTransition()
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    }
+
     private fun initTransition() {
         window.apply {
             requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
@@ -78,6 +84,7 @@ class AppDetailActivity : BaseActivity() {
     }
 
     private fun initView() {
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)

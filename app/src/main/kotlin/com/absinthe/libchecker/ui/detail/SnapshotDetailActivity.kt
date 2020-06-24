@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -25,8 +26,9 @@ class SnapshotDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySnapshotDetailBinding
     private val adapter = SnapshotDetailAdapter()
-    private val entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
     private val viewModel by viewModels<SnapshotViewModel>()
+    private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
+    private lateinit var entity:SnapshotDiffItem
 
     init {
         isPaddingToolbar = true
@@ -40,12 +42,19 @@ class SnapshotDetailActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         initTransition()
         super.onCreate(savedInstanceState)
+
+        if (_entity != null) {
+            entity = _entity!!
+        } else {
+            supportFinishAfterTransition()
+        }
+
         initView()
     }
 
     override fun onStart() {
         super.onStart()
-        initData()
+        viewModel.computeDiffDetail(entity)
     }
 
     override fun onBackPressed() {
@@ -57,6 +66,11 @@ class SnapshotDetailActivity : BaseActivity() {
             supportFinishAfterTransition()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
 
     private fun initTransition() {
@@ -77,11 +91,12 @@ class SnapshotDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initView() {
+        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = entity!!.labelDiff.new ?: entity!!.labelDiff.old
+            title = entity.labelDiff.new ?: entity.labelDiff.old
         }
 
         binding.apply {
@@ -89,30 +104,30 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
-            ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity!!.packageName))
+            ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity.packageName))
 
-            if (entity!!.labelDiff.new != null && entity!!.labelDiff.new != entity!!.labelDiff.old) {
-                tvAppName.text = "${entity!!.labelDiff.old} $ARROW ${entity!!.labelDiff.new}"
+            if (entity.labelDiff.new != null && entity.labelDiff.new != entity.labelDiff.old) {
+                tvAppName.text = "${entity.labelDiff.old} $ARROW ${entity.labelDiff.new}"
             } else {
-                tvAppName.text = entity!!.labelDiff.old
+                tvAppName.text = entity.labelDiff.old
             }
 
-            tvPackageName.text = entity!!.packageName
+            tvPackageName.text = entity.packageName
 
-            val isNewOrDeleted = entity!!.deleted || entity!!.newInstalled
+            val isNewOrDeleted = entity.deleted || entity.newInstalled
 
-            if ((entity!!.versionNameDiff.old != entity!!.versionNameDiff.new || entity!!.versionCodeDiff.old != entity!!.versionCodeDiff.new) && !isNewOrDeleted) {
+            if ((entity.versionNameDiff.old != entity.versionNameDiff.new || entity.versionCodeDiff.old != entity.versionCodeDiff.new) && !isNewOrDeleted) {
                 tvVersion.text =
-                    "${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old}) $ARROW ${entity!!.versionNameDiff.new ?: entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.new ?: entity!!.versionCodeDiff.old})"
+                    "${entity.versionNameDiff.old} (${entity.versionCodeDiff.old}) $ARROW ${entity.versionNameDiff.new ?: entity.versionNameDiff.old} (${entity.versionCodeDiff.new ?: entity.versionCodeDiff.old})"
             } else {
-                tvVersion.text = "${entity!!.versionNameDiff.old} (${entity!!.versionCodeDiff.old})"
+                tvVersion.text = "${entity.versionNameDiff.old} (${entity.versionCodeDiff.old})"
             }
 
-            if (entity!!.targetApiDiff.old != entity!!.targetApiDiff.new && !isNewOrDeleted) {
+            if (entity.targetApiDiff.old != entity.targetApiDiff.new && !isNewOrDeleted) {
                 tvTargetApi.text =
-                    "API ${entity!!.targetApiDiff.old} $ARROW API ${entity!!.targetApiDiff.new}"
+                    "API ${entity.targetApiDiff.old} $ARROW API ${entity.targetApiDiff.new}"
             } else {
-                tvTargetApi.text = "API ${entity!!.targetApiDiff.old}"
+                tvTargetApi.text = "API ${entity.targetApiDiff.old}"
             }
         }
         viewModel.snapshotDetailItems.observe(this, Observer {
@@ -120,18 +135,10 @@ class SnapshotDetailActivity : BaseActivity() {
         })
         adapter.setEmptyView(
             when {
-                entity!!.newInstalled -> R.layout.layout_snapshot_detail_new_install
-                entity!!.deleted -> R.layout.layout_snapshot_detail_deleted
+                entity.newInstalled -> R.layout.layout_snapshot_detail_new_install
+                entity.deleted -> R.layout.layout_snapshot_detail_deleted
                 else -> R.layout.layout_snapshot_empty_view
             }
         )
-    }
-
-    private fun initData() {
-        if (entity == null) {
-            supportFinishAfterTransition()
-        } else {
-            viewModel.computeDiffDetail(entity!!)
-        }
     }
 }
