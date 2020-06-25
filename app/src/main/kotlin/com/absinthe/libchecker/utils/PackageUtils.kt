@@ -148,7 +148,7 @@ object PackageUtils {
             }
             zipFile.close()
             return isKotlinUsedInClassDex(file)
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
             return false
         }
     }
@@ -172,25 +172,28 @@ object PackageUtils {
         val libList = ArrayList<LibStringItem>()
 
         File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-            val zipFile: ZipFile
-            val entries: Enumeration<out ZipEntry>
+            var zipFile: ZipFile
+            var entries: Enumeration<out ZipEntry>
             var next: ZipEntry
 
             for (file in it) {
                 if (file.name.startsWith("split_config.arm")) {
-                    zipFile = ZipFile(file)
-                    entries = zipFile.entries()
+                    try {
+                        zipFile = ZipFile(file)
+                        entries = zipFile.entries()
 
-                    while (entries.hasMoreElements()) {
-                        next = entries.nextElement()
+                        while (entries.hasMoreElements()) {
+                            next = entries.nextElement()
 
-                        if (next.name.contains("lib/") && !next.isDirectory) {
-                            libList.add(LibStringItem(next.name.split("/").last(), next.size))
+                            if (next.name.contains("lib/") && !next.isDirectory) {
+                                libList.add(LibStringItem(next.name.split("/").last(), next.size))
+                            }
                         }
+                        zipFile.close()
+                        break
+                    } catch (e: Exception) {
+                        continue
                     }
-                    zipFile.close()
-
-                    break
                 }
             }
         }

@@ -78,7 +78,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     packageName = info.packageName
                     versionName = PackageUtils.getVersionString(packageInfo)
                     abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                    isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                    isSystem =
+                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                     updateTime = packageInfo.lastUpdateTime
                 }
                 lcItem = LCItem(
@@ -133,7 +134,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             ?: ColorDrawable(Color.TRANSPARENT)
                         appName = item.label
                         packageName = item.packageName
-                        versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
+                        versionName =
+                            PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
                         abi = item.abi.toInt()
                         isSystem = item.isSystem
                         updateTime = item.lastUpdatedTime
@@ -271,6 +273,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             .build()
         val request = retrofit.create(ConfigurationRequest::class.java)
         val config = request.requestConfiguration()
+
         config.enqueue(object : Callback<Configuration> {
             override fun onFailure(call: Call<Configuration>, t: Throwable) {
                 Log.e(tag, t.message ?: "")
@@ -298,7 +301,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
             val map = HashMap<String, RefCountType>()
             val refList = mutableListOf<LibReference>()
-            val showSystem = GlobalValues.isShowSystemApps.value!!
+            val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
             var libList: List<LibStringItem>
             var packageInfo: PackageInfo

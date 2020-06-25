@@ -34,8 +34,7 @@ const val EXTRA_TYPE = "TYPE"
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
-    private val adapter =
-        AppAdapter()
+    private val adapter = AppAdapter()
 
     override fun setViewBinding(): View {
         binding = ActivityLibReferenceBinding.inflate(layoutInflater)
@@ -54,7 +53,7 @@ class LibReferenceActivity : BaseActivity() {
         val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
 
         if (name == null) {
-            finish()
+            supportFinishAfterTransition()
         } else {
             initView()
             lifecycleScope.launch(Dispatchers.IO) {
@@ -65,18 +64,24 @@ class LibReferenceActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            supportFinishAfterTransition()
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.root.apply {
+            fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+            setPadding(paddingStart, 0, paddingEnd, paddingBottom)
+        }
     }
 
     private fun initView() {
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.root.apply {
+            fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+            setPadding(paddingStart, 0, paddingEnd, paddingBottom)
+        }
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
 

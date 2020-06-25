@@ -17,6 +17,7 @@ import com.absinthe.libchecker.recyclerview.adapter.SnapshotDetailAdapter
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 
@@ -70,7 +71,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        setRootPadding()
     }
 
     private fun initTransition() {
@@ -91,7 +92,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initView() {
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -140,5 +141,13 @@ class SnapshotDetailActivity : BaseActivity() {
                 else -> R.layout.layout_snapshot_empty_view
             }
         )
+    }
+
+    private fun setRootPadding() {
+        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.root.apply {
+            fitsSystemWindows = isLandScape
+            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+        }
     }
 }

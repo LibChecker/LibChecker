@@ -22,6 +22,7 @@ import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.IntentUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -64,7 +65,7 @@ class AppDetailActivity : BaseActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        setRootPadding()
     }
 
     private fun initTransition() {
@@ -84,7 +85,7 @@ class AppDetailActivity : BaseActivity() {
     }
 
     private fun initView() {
-        binding.root.fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
@@ -168,5 +169,13 @@ class AppDetailActivity : BaseActivity() {
                 }
             })
         mediator.attach()
+    }
+
+    private fun setRootPadding() {
+        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.root.apply {
+            fitsSystemWindows = isLandScape
+            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+        }
     }
 }

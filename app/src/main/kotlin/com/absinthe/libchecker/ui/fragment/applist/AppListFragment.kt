@@ -158,7 +158,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     binding.recyclerview.apply {
                         if (canScrollVertically(-1)) {
                             smoothScrollToPosition(0)
-
                         }
                     }
                 }
@@ -172,7 +171,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 }
             })
             appSortMode.observe(viewLifecycleOwner, Observer { mode ->
-
                 when (mode) {
                     Constants.SORT_MODE_DEFAULT -> mItems.sortWith(
                         compareBy(
