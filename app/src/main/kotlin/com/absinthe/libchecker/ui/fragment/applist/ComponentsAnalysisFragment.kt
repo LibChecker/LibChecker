@@ -125,10 +125,6 @@ class ComponentsAnalysisFragment :
                 openLibDetailDialog(position)
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
         viewModel.initComponentsData(
             requireContext(),
             packageName,

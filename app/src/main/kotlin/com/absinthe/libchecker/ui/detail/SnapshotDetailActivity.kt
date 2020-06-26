@@ -51,10 +51,6 @@ class SnapshotDetailActivity : BaseActivity() {
         }
 
         initView()
-    }
-
-    override fun onStart() {
-        super.onStart()
         viewModel.computeDiffDetail(entity)
     }
 

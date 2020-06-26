@@ -91,10 +91,6 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
                 openLibDetailDialog(position)
             }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         viewModel.initSoAnalysisData(requireContext(), packageName)
     }
 
