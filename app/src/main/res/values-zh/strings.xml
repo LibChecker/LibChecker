@@ -6,7 +6,7 @@
 
     <string name="settings_about">关于</string>
     <string name="settings_about_summary">这里是 LibChecker!</string>
-    <string name="about_info">这是一款查看设备中 App 使用的 lib 架构的 App。</string>
+    <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
     <string name="pref_group_normal">常规</string>
     <string name="show_system_apps">显示系统应用</string>
     <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
@@ -61,4 +61,5 @@
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
     <string name="applist_first_tip">第一次加载需要一些时间</string>
+    <string name="loading">加载中…</string>
 </resources>

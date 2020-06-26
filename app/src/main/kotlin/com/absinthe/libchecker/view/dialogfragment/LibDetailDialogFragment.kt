@@ -2,7 +2,6 @@ package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
 import android.os.Bundle
-import android.text.Html
 import android.text.method.LinkMovementMethod
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
@@ -86,8 +85,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
                         tvRelativeName.apply {
                             isClickable = true
                             movementMethod = LinkMovementMethod.getInstance()
-                            text =
-                                Html.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>")
+                            text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
                         }
                     }
 
@@ -98,7 +96,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
             }
         })
         regexName?.let {
-            viewModel.requestLibDetail(regexName!!, type, true)
+            viewModel.requestLibDetail(it, type, true)
         } ?: let {
             viewModel.requestLibDetail(libName, type)
         }

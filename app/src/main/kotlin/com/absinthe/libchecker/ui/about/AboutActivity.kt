@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -47,6 +48,7 @@ class AboutActivity : AbsAboutActivity() {
                 URLManager.GITHUB_PAGE
             }
             add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", developerUrl))
+            add(Contributor(R.drawable.ic_github, "Source Code", URLManager.GITHUB_REPO_PAGE, URLManager.GITHUB_REPO_PAGE))
 
             add(Category("Acknowledgement"))
             add(Card(
@@ -85,8 +87,8 @@ class AboutActivity : AbsAboutActivity() {
         UiUtils.setDarkMode(this)
         UiUtils.setSystemBarTransparent(this)
 
-        val appbar = findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout)
-        appbar.fitsSystemWindows = true
+        findViewById<View>(android.R.id.content).fitsSystemWindows = false
+        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

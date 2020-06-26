@@ -18,6 +18,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.ktx.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -29,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity() {
 
@@ -41,8 +43,12 @@ class MainActivity : BaseActivity() {
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
-                GlobalValues.shouldRequestChange = true
-                viewModel.requestChange(this@MainActivity)
+                try {
+                    GlobalValues.shouldRequestChange = true
+                    viewModel.requestChange(this@MainActivity)
+                } catch (e: VerifyError) {
+                    e.printStackTrace()
+                }
             }
         }
     }
@@ -126,7 +132,7 @@ class MainActivity : BaseActivity() {
                 when (it.itemId) {
                     R.id.navigation_app_list -> {
                         if (binding.viewpager.currentItem != 0) {
-                            binding.viewpager.setCurrentItem(0, true)
+                            binding.viewpager.setCurrentItem(0, PAGE_TRANSFORM_DURATION)
                         } else {
                             if (!clickBottomItemFlag) {
                                 clickBottomItemFlag = true
@@ -141,7 +147,7 @@ class MainActivity : BaseActivity() {
                     }
                     R.id.navigation_classify -> {
                         if (binding.viewpager.currentItem != 1) {
-                            binding.viewpager.setCurrentItem(1, true)
+                            binding.viewpager.setCurrentItem(1, PAGE_TRANSFORM_DURATION)
                         } else {
                             if (!clickBottomItemFlag) {
                                 clickBottomItemFlag = true
@@ -154,8 +160,8 @@ class MainActivity : BaseActivity() {
                             }
                         }
                     }
-                    R.id.navigation_snapshot -> binding.viewpager.setCurrentItem(2, true)
-                    R.id.navigation_settings -> binding.viewpager.setCurrentItem(3, true)
+                    R.id.navigation_snapshot -> binding.viewpager.setCurrentItem(2, PAGE_TRANSFORM_DURATION)
+                    R.id.navigation_settings -> binding.viewpager.setCurrentItem(3, PAGE_TRANSFORM_DURATION)
                 }
                 true
             }

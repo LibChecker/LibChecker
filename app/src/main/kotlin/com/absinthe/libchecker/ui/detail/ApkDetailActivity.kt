@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -65,6 +68,7 @@ class ApkDetailActivity : BaseActivity() {
         super.onDestroy()
     }
 
+    @SuppressLint("ResourceType")
     private fun initView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -77,7 +81,13 @@ class ApkDetailActivity : BaseActivity() {
         }
 
         adapter.apply {
-            setEmptyView(R.layout.layout_loading)
+            val tvLoading = TextView(this@ApkDetailActivity).apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                textSize = 20f
+                text = getString(R.string.loading)
+                setTypeface(typeface, Typeface.BOLD)
+            }
+            setEmptyView(tvLoading)
 
             fun openLibDetailDialog(position: Int) {
                 if (GlobalValues.config.enableLibDetail) {
