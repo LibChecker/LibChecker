@@ -7,3 +7,4 @@ This app is used to view the third-party libraries used by applications in your 
 
 ## Download
 [![CoolApk](/source/coolapk-badge.png)](https://www.coolapk.com/apk/com.absinthe.libchecker)
+[![Google Play](/source/google-play-badge.png)](https://play.google.com/store/apps/details?id=com.absinthe.libchecker)
