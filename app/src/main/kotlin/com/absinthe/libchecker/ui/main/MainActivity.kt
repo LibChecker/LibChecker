@@ -71,7 +71,7 @@ class MainActivity : BaseActivity() {
         registerPackageBroadcast()
         viewModel.requestConfiguration()
 
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HAS_COLLECT_LIB)) {
+        if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             viewModel.collectPopularLibraries(this)
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }

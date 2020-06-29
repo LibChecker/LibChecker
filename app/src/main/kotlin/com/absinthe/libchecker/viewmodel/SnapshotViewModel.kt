@@ -65,7 +65,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     SnapshotItem(
                         packageInfo.packageName,//Package name
                         info.loadLabel(context.packageManager).toString(),//App name
-                        packageInfo.versionName,//Version name
+                        packageInfo.versionName ?: "null",//Version name
                         PackageUtils.getVersionCode(packageInfo),//Version code
                         packageInfo.firstInstallTime,//Install time
                         packageInfo.lastUpdateTime,// Update time

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -87,7 +86,6 @@ class AboutActivity : AbsAboutActivity() {
         UiUtils.setDarkMode(this)
         UiUtils.setSystemBarTransparent(this)
 
-        findViewById<View>(android.R.id.content).fitsSystemWindows = false
         findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 

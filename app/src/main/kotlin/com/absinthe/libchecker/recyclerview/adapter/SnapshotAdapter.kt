@@ -5,6 +5,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
@@ -34,30 +35,65 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         when {
             item.deleted -> {
                 holder.itemView.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_red_300))
-                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
-                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+                    ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.material_red_300
+                        )
+                    )
+                holder.setTextColor(
+                    R.id.tv_version,
+                    ContextCompat.getColor(context, R.color.textNormal)
+                )
+                holder.setTextColor(
+                    R.id.tv_target_api,
+                    ContextCompat.getColor(context, R.color.textNormal)
+                )
                 isNewOrDeleted = true
             }
             item.newInstalled -> {
                 holder.itemView.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_green_300))
-                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, R.color.textNormal))
-                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, R.color.textNormal))
+                    ColorStateList.valueOf(
+                        ContextCompat.getColor(
+                            context,
+                            R.color.material_green_300
+                        )
+                    )
+                holder.setTextColor(
+                    R.id.tv_version,
+                    ContextCompat.getColor(context, R.color.textNormal)
+                )
+                holder.setTextColor(
+                    R.id.tv_target_api,
+                    ContextCompat.getColor(context, R.color.textNormal)
+                )
                 isNewOrDeleted = true
             }
             else -> {
                 holder.itemView.backgroundTintList = null
-                holder.setTextColor(R.id.tv_version, ContextCompat.getColor(context, android.R.color.darker_gray))
-                holder.setTextColor(R.id.tv_target_api, ContextCompat.getColor(context, android.R.color.darker_gray))
+                holder.setTextColor(
+                    R.id.tv_version,
+                    ContextCompat.getColor(context, android.R.color.darker_gray)
+                )
+                holder.setTextColor(
+                    R.id.tv_target_api,
+                    ContextCompat.getColor(context, android.R.color.darker_gray)
+                )
             }
         }
 
-        if (!isNewOrDeleted) {
+        if (isNewOrDeleted) {
+            holder.getView<TextView>(R.id.indicator_added).isGone = true
+            holder.getView<TextView>(R.id.indicator_removed).isGone = true
+            holder.getView<TextView>(R.id.indicator_changed).isGone = true
+        } else {
             val compareNode = compareNativeAndComponentDiff(item)
-            holder.getView<TextView>(R.id.indicator_added).isVisible = compareNode.added and !isNewOrDeleted
-            holder.getView<TextView>(R.id.indicator_removed).isVisible = compareNode.removed and !isNewOrDeleted
-            holder.getView<TextView>(R.id.indicator_changed).isVisible = compareNode.changed and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_added).isVisible =
+                compareNode.added and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_removed).isVisible =
+                compareNode.removed and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_changed).isVisible =
+                compareNode.changed and !isNewOrDeleted
         }
 
         if (item.labelDiff.old != item.labelDiff.new && !isNewOrDeleted) {
@@ -125,6 +161,9 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                     else -> R.drawable.ic_no_libs
                 }
             )
+        } else {
+            holder.getView<TextView>(R.id.tv_arrow).isGone = true
+            holder.getView<LinearLayout>(R.id.layout_abi_badge_new).isGone = true
         }
     }
 

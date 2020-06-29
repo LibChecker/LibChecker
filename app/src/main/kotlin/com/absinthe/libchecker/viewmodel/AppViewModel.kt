@@ -256,12 +256,50 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         for (entry in map) {
-            if (entry.value > 3) {
+            if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
                 val properties: MutableMap<String, String> = java.util.HashMap()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
 
-                Analytics.trackEvent("Library", properties)
+                Analytics.trackEvent("Native Library", properties)
+            }
+        }
+
+        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_SERVICE, "Service")
+        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_ACTIVITY, "Activity")
+        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, "Receiver")
+        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, "Provider")
+    }
+
+    private fun collectComponentPopularLibraries(
+        appList: List<ApplicationInfo>,
+        type: LibReferenceActivity.Type,
+        label: String
+    ) {
+        val map = HashMap<String, Int>()
+        var compLibList: List<String>
+        var count: Int
+
+        for (item in appList) {
+            compLibList = PackageUtils.getComponentList(
+                item.packageName,
+                type
+            )
+
+            for (lib in compLibList) {
+                count = map[lib] ?: 0
+                map[lib] = count + 1
+            }
+        }
+
+        val libMap = BaseMap.getMap(type)
+        for (entry in map) {
+            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key)) {
+                val properties: MutableMap<String, String> = java.util.HashMap()
+                properties["Library name"] = entry.key
+                properties["Library count"] = entry.value.toString()
+
+                Analytics.trackEvent("$label Library", properties)
             }
         }
     }
