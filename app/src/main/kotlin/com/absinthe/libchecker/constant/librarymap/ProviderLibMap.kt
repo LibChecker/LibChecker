@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
+import java.util.regex.Pattern
 
 object ProviderLibMap : BaseMap() {
     private val MAP: HashMap<String, LibChip> = hashMapOf(
@@ -100,6 +101,38 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "com.blankj.utilcode.util.UtilsFileProvider",
             LibChip(R.drawable.ic_question, "AndroidUtilCode")
+        ),
+        Pair(
+            "com.bytedance.sdk.openadsdk.TTFileProvider",
+            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+        ),
+        Pair(
+            "com.liulishuo.okdownload.OkDownloadProvider",
+            LibChip(R.drawable.ic_question, "OkDownload")
+        ),
+        Pair(
+            "com.netease.nimlib.ipc.NIMContentProvider",
+            LibChip(R.drawable.ic_lib_netease, "网易云通信 SDK")
+        ),
+        Pair(
+            "com.sensorsdata.analytics.android.sdk.data.SensorsDataContentProvider",
+            LibChip(R.drawable.ic_lib_sensors, "神策分析 SDK")
+        ),
+        Pair(
+            "com.sensorsdata.analytics.android.sdk.SensorsDataContentProvider",
+            LibChip(R.drawable.ic_lib_sensors, "神策分析 SDK")
+        ),
+        Pair(
+            "com.umeng.message.provider.MessageProvider",
+            LibChip(R.drawable.ic_lib_umeng, "友盟推送")
+        ),
+        Pair(
+            "cn.jpush.android.service.DownloadProvider",
+            LibChip(R.drawable.ic_lib_jpush, "极光推送")
+        ),
+        Pair(
+            "cn.bmob.v3.util.BmobContentProvider",
+            LibChip(R.drawable.ic_question, "Bmob 后端云")
         )
     )
 
@@ -108,6 +141,10 @@ object ProviderLibMap : BaseMap() {
     }
 
     override fun findRegex(name: String): LibChip? {
-        return null
+        return when {
+            Pattern.matches("com.qihoo360.replugin.component.process.ProcessPitProvider(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            Pattern.matches("com.qihoo360.replugin.component.provider.PluginPitProvider(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            else -> null
+        }
     }
 }

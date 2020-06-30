@@ -41,6 +41,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "androidx.media.session.MediaButtonReceiver",
+            LibChip(
+                R.drawable.ic_lib_jetpack,
+                "Jetpack Media"
+            )
+        ),
+        Pair(
             "com.google.firebase.iid.FirebaseInstanceIdReceiver",
             LibChip(
                 R.drawable.ic_lib_firebase,
@@ -192,6 +199,27 @@ object ReceiverLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_umeng,
                 "友盟推送"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.service.NimReceiver",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.service.ResponseReceiver",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
+        ),
+        Pair(
+            "com.microsoft.appcenter.distribute.DownloadManagerReceiver",
+            LibChip(
+                R.drawable.ic_lib_microsoft,
+                "App Center"
             )
         )
     )

@@ -245,6 +245,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libgnustl_shared.so",
+            LibChip(
+                R.drawable.ic_lib_cpp,
+                "C++ 共享库"
+            )
+        ),
+        Pair(
             "libstlport_shared.so",
             LibChip(
                 R.drawable.ic_lib_cpp,
@@ -865,6 +872,13 @@ object NativeLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_iqiyi,
                 "xCrash"
+            )
+        ),
+        Pair(
+            "libJni_wgs2gcj.so",
+            LibChip(
+                R.drawable.ic_question,
+                "wgs2gcj"
             )
         )
     )

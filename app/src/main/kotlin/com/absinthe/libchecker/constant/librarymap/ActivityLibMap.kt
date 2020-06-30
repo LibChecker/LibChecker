@@ -31,6 +31,14 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_tencent, "腾讯开放平台")
         ),
         Pair(
+            "com.tencent.smtt.sdk.VideoActivity",
+            LibChip(R.drawable.ic_lib_tencent, "TBS")
+        ),
+        Pair(
+            "com.tencent.captchasdk.TCaptchaPopupActivity",
+            LibChip(R.drawable.ic_lib_tencent, "防水墙")
+        ),
+        Pair(
             "com.qq.e.ads.LandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
@@ -175,42 +183,6 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_zhihu, "Matisse")
         ),
         Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTLandingPageActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTVideoLandingPageActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTRewardVideoActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTFullScreenVideoActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTDelegateActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.activity.TTDelegateActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.ss.android.socialbase.appdownloader.view.DownloadSizeLimitActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.ss.android.socialbase.appdownloader.view.DownloadTaskDeleteActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
-            "com.ss.android.downloadlib.activity.InteractionMiddleActivity",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
-        ),
-        Pair(
             "cn.jpush.android.service.JNotifyActivity",
             LibChip(R.drawable.ic_lib_jpush, "极光推送")
         ),
@@ -239,12 +211,48 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_question, "AndroidUtilCode")
         ),
         Pair(
+            "com.blankj.utilcode.util.UtilsTransActivity4MainProcess",
+            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+        ),
+        Pair(
             "com.alibaba.sdk.android.push.keeplive.PushExtActivity",
             LibChip(R.drawable.ic_lib_aliyun, "阿里移动推送")
         ),
         Pair(
             "cmb.pb.ui.PBKeyboardActivity",
             LibChip(R.drawable.ic_lib_cmb, "招商银行 SDK")
+        ),
+        Pair(
+            "org.hapjs.features.channel.transparentactivity.TransparentActivity",
+            LibChip(R.drawable.ic_lib_hapjs, "快应用")
+        ),
+        Pair(
+            "com.unionpay.uppay.PayActivity",
+            LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")
+        ),
+        Pair(
+            "com.unionpay.UPPayWapActivity",
+            LibChip(R.drawable.ic_lib_unionpay, "银联 SDK")
+        ),
+        Pair(
+            "net.openid.appauth.RedirectUriReceiverActivity",
+            LibChip(R.drawable.ic_lib_appauth, "AppAuth")
+        ),
+        Pair(
+            "net.openid.appauth.AuthorizationManagementActivity",
+            LibChip(R.drawable.ic_lib_appauth, "AppAuth")
+        ),
+        Pair(
+            "com.pingplusplus.android.PaymentActivity",
+            LibChip(R.drawable.ic_question, "Ping++")
+        ),
+        Pair(
+            "com.unity3d.player.UnityPlayerActivity",
+            LibChip(R.drawable.ic_lib_unity, "Unity")
+        ),
+        Pair(
+            "com.soundcloud.android.crop.CropImageActivity",
+            LibChip(R.drawable.ic_question, "android-crop")
         )
     )
 
@@ -255,6 +263,9 @@ object ActivityLibMap : BaseMap() {
     override fun findRegex(name: String): LibChip? {
         return when {
             Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker", "regex_tinker")
+            Pattern.matches("com.bytedance.sdk.openadsdk.activity.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            Pattern.matches("com.ss.android.socialbase.appdownloader.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            Pattern.matches("com.ss.android.downloadlib.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
             else -> null
         }
     }

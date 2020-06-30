@@ -13,7 +13,8 @@ import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -30,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     val libItems: MutableLiveData<ArrayList<LibStringItem>> = MutableLiveData()
-    val componentsItems: MutableLiveData<ArrayList<LibStringItem>> = MutableLiveData()
+    val componentsItems: MutableLiveData<List<String>> = MutableLiveData()
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
 
     fun initSoAnalysisData(context: Context, packageName: String) =
@@ -57,73 +58,26 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(context: Context, packageName: String, flag: LibReferenceActivity.Type) =
+    fun initComponentsData(packageName: String, type: LibReferenceActivity.Type) =
         viewModelScope.launch(Dispatchers.IO) {
-            val list = ArrayList<LibStringItem>()
-            var map: BaseMap? = null
+            val map = BaseMap.getMap(type)
+            val list: MutableList<String> = mutableListOf()
 
             try {
-                map = when (flag) {
-                    LibReferenceActivity.Type.TYPE_SERVICE -> {
-                        val packageInfo =
-                            context.packageManager.getPackageInfo(
-                                packageName,
-                                PackageManager.GET_SERVICES
-                            )
-                        for (service in packageInfo.services) {
-                            list.add(LibStringItem(service.name.removePrefix(packageName), 0))
-                        }
-                        ServiceLibMap
-                    }
-                    LibReferenceActivity.Type.TYPE_ACTIVITY -> {
-                        val packageInfo =
-                            context.packageManager.getPackageInfo(
-                                packageName,
-                                PackageManager.GET_ACTIVITIES
-                            )
-                        for (activity in packageInfo.activities) {
-                            list.add(LibStringItem(activity.name.removePrefix(packageName), 0))
-                        }
-                        ActivityLibMap
-                    }
-                    LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> {
-                        val packageInfo =
-                            context.packageManager.getPackageInfo(
-                                packageName,
-                                PackageManager.GET_RECEIVERS
-                            )
-                        for (receiver in packageInfo.receivers) {
-                            list.add(LibStringItem(receiver.name, 0))
-                        }
-                        ReceiverLibMap
-                    }
-                    LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> {
-                        val packageInfo =
-                            context.packageManager.getPackageInfo(
-                                packageName,
-                                PackageManager.GET_PROVIDERS
-                            )
-                        for (provider in packageInfo.providers) {
-                            list.add(LibStringItem(provider.name, 0))
-                        }
-                        ProviderLibMap
-                    }
-                    else -> {
-                        null
-                    }
-                }
+                list.addAll(PackageUtils.getComponentList(packageName, type))
             } catch (e: Exception) {
-                e.printStackTrace()
-                list.add(LibStringItem("Not found", 0))
+                list.add("Not found")
             }
 
-            if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                list.sortByDescending { it.size }
-            } else {
-                list.sortByDescending {
-                    map?.contains(it.name) ?: false
+            if (list.isEmpty()) {
+                try {
+                    list.addAll(PackageUtils.getFreezeComponentList(packageName, type))
+                } catch (e: Exception) {
+                    list.add("Not found")
                 }
             }
+
+            list.sortByDescending { map.contains(it) }
 
             withContext(Dispatchers.Main) {
                 componentsItems.value = list

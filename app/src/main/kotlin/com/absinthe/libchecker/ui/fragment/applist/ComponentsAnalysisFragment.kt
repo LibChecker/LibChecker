@@ -7,6 +7,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -47,7 +48,12 @@ class ComponentsAnalysisFragment :
                         DividerItemDecoration.VERTICAL
                     )
                 )
-                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
+                setPadding(
+                    paddingStart,
+                    paddingTop,
+                    paddingEnd,
+                    paddingBottom + UiUtils.getNavBarHeight()
+                )
             }
             ibSort.setOnClickListener {
                 GlobalValues.libSortMode.value =
@@ -88,14 +94,18 @@ class ComponentsAnalysisFragment :
                         2 -> LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
                         else -> LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
                     }
-                    viewModel.initComponentsData(requireContext(), packageName, type)
+                    viewModel.initComponentsData(packageName, type)
                 }
             }
         }
 
         viewModel.apply {
             componentsItems.observe(viewLifecycleOwner, Observer {
-                adapter.setList(it)
+                val list = mutableListOf<LibStringItem>()
+                for (item in it) {
+                    list.add(LibStringItem(item, 0))
+                }
+                adapter.setList(list)
             })
         }
 
@@ -125,11 +135,7 @@ class ComponentsAnalysisFragment :
                 openLibDetailDialog(position)
             }
         }
-        viewModel.initComponentsData(
-            requireContext(),
-            packageName,
-            LibReferenceActivity.Type.TYPE_SERVICE
-        )
+        viewModel.initComponentsData(packageName, LibReferenceActivity.Type.TYPE_SERVICE)
     }
 
     companion object {

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
@@ -29,6 +30,11 @@ object PackageUtils {
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
         return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
+    }
+
+    @Throws(PackageManager.NameNotFoundException::class)
+    fun getPackageArchiveInfo(sourcePath: String, flag: Int = 0): PackageInfo? {
+        return Utils.getApp().packageManager.getPackageArchiveInfo(sourcePath, flag)
     }
 
     fun getVersionCode(packageInfo: PackageInfo): Long {
@@ -220,6 +226,46 @@ object PackageUtils {
             PackageManager.GET_ACTIVITIES -> packageInfo.activities
             PackageManager.GET_RECEIVERS -> packageInfo.receivers
             PackageManager.GET_PROVIDERS -> packageInfo.providers
+            else -> null
+        }
+
+        val finalList = mutableListOf<String>()
+        list?.let {
+            for (component in it) {
+                finalList.add(component.name)
+            }
+        }
+        return finalList
+    }
+
+    fun getFreezeComponentList(
+        packageName: String,
+        type: LibReferenceActivity.Type
+    ): List<String> {
+        val flag = when (type) {
+            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
+            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
+            else -> 0
+        }
+
+        val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_DISABLED_COMPONENTS
+        } else {
+            PackageManager.GET_DISABLED_COMPONENTS
+        }
+
+        val packageInfo = getPackageInfo(packageName, flag)
+        logd(packageInfo.applicationInfo.sourceDir)
+        val archivePackageInfo = getPackageArchiveInfo(packageInfo.applicationInfo.sourceDir, flag or pmFlag)
+            ?: return listOf("Not found")
+
+        val list: Array<out ComponentInfo>? = when (flag) {
+            PackageManager.GET_SERVICES -> archivePackageInfo.services
+            PackageManager.GET_ACTIVITIES -> archivePackageInfo.activities
+            PackageManager.GET_RECEIVERS -> archivePackageInfo.receivers
+            PackageManager.GET_PROVIDERS -> archivePackageInfo.providers
             else -> null
         }
 

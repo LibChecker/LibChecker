@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
+import java.util.regex.Pattern
 
 object ServiceLibMap : BaseMap() {
     private val MAP: HashMap<String, LibChip> = hashMapOf(
@@ -63,6 +64,13 @@ object ServiceLibMap : BaseMap() {
         ),
         Pair(
             "com.tencent.tinker.lib.service.TinkerPatchService\$InnerService",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "Tinker"
+            )
+        ),
+        Pair(
+            "com.tencent.tinker.lib.service.TinkerPatchService\$IntentServiceRunner\$InnerService",
             LibChip(
                 R.drawable.ic_lib_tencent,
                 "Tinker"
@@ -314,6 +322,13 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.tencent.smtt.export.external.DexClassLoaderProviderService",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "TBS"
+            )
+        ),
+        Pair(
             "com.umeng.update.net.DownloadingService",
             LibChip(
                 R.drawable.ic_lib_umeng,
@@ -409,69 +424,6 @@ object ServiceLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
-            )
-        ),
-        Pair(
-            "com.bytedance.sdk.openadsdk.multipro.aidl.BinderPoolService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.notification.DownloadNotificationService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.downloader.DownloadService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.downloader.IndependentProcessDownloadService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.downloader.SqlDownloadCacheService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.impls.RetryJobSchedulerService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.downloader.impls.DownloadHandleService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.appdownloader.DownloadHandlerService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
-            )
-        ),
-        Pair(
-            "com.ss.android.socialbase.impls.DownloadHandlerService",
-            LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
             )
         ),
         Pair(
@@ -585,6 +537,41 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_lib_cmb,
                 "招商银行 SDK"
             )
+        ),
+        Pair(
+            "com.alipay.android.app.MspService",
+            LibChip(
+                R.drawable.ic_lib_alipay,
+                "支付宝 SDK"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.service.NimService",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.service.NimService\$Aux",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.job.NIMJobService",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
+        ),
+        Pair(
+            "com.netease.nimlib.service.ResponseService",
+            LibChip(
+                R.drawable.ic_lib_netease,
+                "网易云通信 SDK"
+            )
         )
     )
 
@@ -593,6 +580,11 @@ object ServiceLibMap : BaseMap() {
     }
 
     override fun findRegex(name: String): LibChip? {
-        return null
+        return when {
+            Pattern.matches("com.qihoo360.replugin.component.service.server.PluginPitService(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            Pattern.matches("com.ss.android.socialbase.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            Pattern.matches("com.bytedance.sdk.openadsdk.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            else -> null
+        }
     }
 }
