@@ -89,7 +89,8 @@
                     android:fontFamily="sans-serif-condensed-medium"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="13sp"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/layout_abi"
+                    app:layout_constraintStart_toStartOf="@id/layout_abi"
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="API 29" />
 
@@ -98,7 +99,7 @@
                     layout="@layout/layout_abi_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="@id/tv_target_api"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_target_api" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

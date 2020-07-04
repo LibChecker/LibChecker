@@ -112,7 +112,8 @@ class ApkDetailActivity : BaseActivity() {
 
                     val abi = PackageUtils.getAbi(
                         it.applicationInfo.sourceDir,
-                        it.applicationInfo.nativeLibraryDir
+                        it.applicationInfo.nativeLibraryDir,
+                        isApk = true
                     )
 
                     layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
