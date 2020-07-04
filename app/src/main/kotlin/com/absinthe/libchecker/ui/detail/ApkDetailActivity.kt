@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
-import android.content.ActivityNotFoundException
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -22,8 +21,6 @@ import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
-import com.blankj.utilcode.util.IntentUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
 
@@ -107,15 +104,6 @@ class ApkDetailActivity : BaseActivity() {
                 try {
                     ivAppIcon.apply {
                         setImageDrawable(it.applicationInfo.loadIcon(packageManager))
-                        setOnClickListener {
-                            try {
-                                startActivity(IntentUtils.getLaunchAppIntent(packageInfo.packageName))
-                            } catch (e: ActivityNotFoundException) {
-                                ToastUtils.showShort("Can\'t open this app")
-                            } catch (e: NullPointerException) {
-                                ToastUtils.showShort("Package name is null")
-                            }
-                        }
                     }
                     tvAppName.text = it.applicationInfo.loadLabel(packageManager)
                     tvPackageName.text = packageInfo.packageName

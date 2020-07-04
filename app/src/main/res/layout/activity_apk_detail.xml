@@ -64,7 +64,7 @@
                     android:textColor="@color/textNormal"
                     android:textSize="14sp"
                     android:transitionName="package_name"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toEndOf="@id/tv_app_name"
                     app:layout_constraintStart_toStartOf="@id/tv_app_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_app_name"
                     tools:text="com.absinthe.libchecker" />
@@ -77,8 +77,8 @@
                     android:textColor="@android:color/darker_gray"
                     android:textSize="12sp"
                     android:transitionName="version_name"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@id/tv_package_name"
+                    app:layout_constraintEnd_toEndOf="@id/tv_app_name"
+                    app:layout_constraintStart_toStartOf="@id/tv_app_name"
                     app:layout_constraintTop_toBottomOf="@id/tv_package_name"
                     tools:text="1.2.0(120)" />
 
