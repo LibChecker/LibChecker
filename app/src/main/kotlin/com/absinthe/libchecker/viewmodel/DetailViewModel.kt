@@ -30,7 +30,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    val libItems: MutableLiveData<ArrayList<LibStringItem>> = MutableLiveData()
+    val libItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
     val componentsItems: MutableLiveData<List<String>> = MutableLiveData()
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
 

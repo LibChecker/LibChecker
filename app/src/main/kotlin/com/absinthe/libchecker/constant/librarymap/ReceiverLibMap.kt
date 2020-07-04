@@ -118,6 +118,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.huawei.android.pushagent.PushEventReceiver",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "Huawei Push"
+            )
+        ),
+        Pair(
             "com.facebook.CurrentAccessTokenExpirationBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_facebook,
@@ -220,6 +227,13 @@ object ReceiverLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_microsoft,
                 "App Center"
+            )
+        ),
+        Pair(
+            "com.taobao.weex.WXGlobalEventReceiver",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "Weex"
             )
         )
     )

@@ -10,14 +10,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
+import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.recyclerview.adapter.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
+import rikka.material.widget.BorderView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,15 +32,8 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
     override fun init() {
+        val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
         binding.apply {
-            root.apply {
-                setPadding(
-                    paddingStart,
-                    paddingTop + BarUtils.getStatusBarHeight(),
-                    paddingEnd,
-                    paddingBottom
-                )
-            }
             extendedFab.apply {
                 (layoutParams as CoordinatorLayout.LayoutParams)
                     .setMargins(
@@ -54,6 +50,11 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
+                borderVisibilityChangedListener =
+                    BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                    }
+                setPadding(paddingStart, paddingTop + BarUtils.getStatusBarHeight(), paddingEnd, paddingBottom)
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -65,7 +66,12 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         }
                     }
                 })
-                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
+                setPadding(
+                    paddingStart,
+                    paddingTop,
+                    paddingEnd,
+                    paddingBottom + UiUtils.getNavBarHeight()
+                )
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -76,6 +82,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
         adapter.apply {
             setEmptyView(R.layout.layout_snapshot_empty_view)
+            setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
                 val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {
@@ -98,21 +105,23 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
 
         viewModel.timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            binding.dashboardLayout.tvSnapshotTimestampText.text = if (it != 0L) {
+            dashboardBinding.tvSnapshotTimestampText.text = if (it != 0L) {
                 getFormatDateString(it)
             } else {
                 "None"
             }
         })
         viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            binding.dashboardLayout.tvSnapshotAppsCountText.text = it.size.toString()
+            dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
             viewModel.computeDiff(requireContext())
         })
-        viewModel.snapshotDiffItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer { list ->
-            adapter.setList(list.sortedByDescending { it.updateTime })
-            binding.vfContainer.displayedChild = 1
-            binding.extendedFab.show()
-        })
+        viewModel.snapshotDiffItems.observe(
+            viewLifecycleOwner,
+            androidx.lifecycle.Observer { list ->
+                adapter.setList(list.sortedByDescending { it.updateTime })
+                binding.vfContainer.displayedChild = 1
+                binding.extendedFab.show()
+            })
     }
 
     private fun getFormatDateString(timestamp: Long): String {

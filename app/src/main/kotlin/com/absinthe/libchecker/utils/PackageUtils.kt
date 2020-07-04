@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
@@ -257,7 +256,6 @@ object PackageUtils {
         }
 
         val packageInfo = getPackageInfo(packageName, flag)
-        logd(packageInfo.applicationInfo.sourceDir)
         val archivePackageInfo = getPackageArchiveInfo(packageInfo.applicationInfo.sourceDir, flag or pmFlag)
             ?: return listOf("Not found")
 

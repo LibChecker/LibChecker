@@ -10,6 +10,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
@@ -44,12 +45,12 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
             ibSort.setOnClickListener {
                 GlobalValues.libSortMode.value =
                     if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                        adapter.setList(adapter.data.sortedByDescending {
+                        adapter.setDiffNewData(adapter.data.sortedByDescending {
                             NativeLibMap.contains(it.name)
-                        })
+                        }.toMutableList())
                         MODE_SORT_BY_LIB
                     } else {
-                        adapter.setList(adapter.data.sortedByDescending { it.size })
+                        adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }.toMutableList())
                         MODE_SORT_BY_SIZE
                     }
                 SPUtils.putInt(
@@ -61,7 +62,7 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
 
         viewModel.apply {
             libItems.observe(viewLifecycleOwner, Observer {
-                adapter.setList(it)
+                adapter.setDiffNewData(it.toMutableList())
             })
         }
 
@@ -90,6 +91,7 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
             setOnItemChildClickListener { _, _, position ->
                 openLibDetailDialog(position)
             }
+            setDiffCallback(LibStringDiffUtil())
         }
         viewModel.initSoAnalysisData(requireContext(), packageName)
     }

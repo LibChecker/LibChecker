@@ -25,10 +25,19 @@ import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
+import com.google.android.material.button.MaterialButtonToggleGroup
 
-class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart), OnChartValueSelectedListener {
+private const val TYPE_ABI = 0
+private const val TYPE_KOTLIN = 1
 
-    override fun initBinding(view: View): FragmentPieChartBinding = FragmentPieChartBinding.bind(view)
+class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
+    OnChartValueSelectedListener,
+    MaterialButtonToggleGroup.OnButtonCheckedListener {
+
+    private var pieType = TYPE_ABI
+
+    override fun initBinding(view: View): FragmentPieChartBinding =
+        FragmentPieChartBinding.bind(view)
 
     override fun init() {
         binding.chart.apply {
@@ -53,15 +62,15 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         }
 
         AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
-            setData()
+            setAbiData()
         })
 
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
-            setData()
+            setAbiData()
         })
     }
 
-    private fun setData() {
+    private fun setAbiData() {
         val parties = listOf(
             resources.getString(R.string.string_64_bit),
             resources.getString(R.string.string_32_bit),
@@ -125,6 +134,67 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         }
     }
 
+    private fun setKotlinData() {
+        val parties = listOf(
+            resources.getString(R.string.string_kotlin_used),
+            resources.getString(R.string.string_kotlin_unused)
+        )
+        val entries: ArrayList<PieEntry> = ArrayList()
+
+        AppItemRepository.allItems.value?.let {
+            val list = mutableListOf(0, 0)
+
+            for (item in it) {
+                if (item.isKotlinUsed) {
+                    list[0]++
+                } else {
+                    list[1]++
+                }
+            }
+
+            // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+            // the chart.
+            for (i in parties.indices) {
+                entries.add(
+                    PieEntry(
+                        list[i].toFloat(),
+                        parties[i % parties.size],
+                        resources.getDrawable(R.drawable.ic_kotlin_logo, null)
+                    )
+                )
+            }
+            val dataSet = PieDataSet(entries, "").apply {
+                setDrawIcons(false)
+                sliceSpace = 3f
+                iconsOffset = MPPointF(0f, 40f)
+                selectionShift = 5f
+            }
+
+            // add a lot of colors
+            val colors: ArrayList<Int> = ArrayList()
+            for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
+            for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
+            for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
+            for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
+            for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
+            colors.add(ColorTemplate.getHoloBlue())
+
+            dataSet.colors = colors
+            //dataSet.setSelectionShift(0f);
+            val data = PieData(dataSet).apply {
+                setValueFormatter(PercentFormatter(binding.chart))
+                setValueTextSize(11f)
+                setValueTextColor(Color.BLACK)
+            }
+
+            binding.chart.apply {
+                this.data = data
+                highlightValues(null)
+                invalidate()
+            }
+        }
+    }
+
     override fun onNothingSelected() {
         Log.d("Classify Fragment", "Nothing selected")
     }
@@ -134,25 +204,69 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         if (h == null) return
 
         ClassifyDialogFragment().apply {
+            if (pieType == TYPE_ABI) {
+                when (h.x) {
+                    0f -> {
+                        dialogTitle = String.format(
+                            getString(R.string.title_statistics_dialog),
+                            getString(R.string.string_64_bit)
+                        )
+                        AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    1f -> {
+                        dialogTitle = String.format(
+                            getString(R.string.title_statistics_dialog),
+                            getString(R.string.string_32_bit)
+                        )
+                        AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    2f -> {
+                        dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
+                        AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                }
+            } else if (pieType == TYPE_KOTLIN) {
+                when (h.x) {
+                    0f -> {
+                        dialogTitle = getString(R.string.string_kotlin_used)
+                        AppItemRepository.allItems.value?.filter { it.isKotlinUsed }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    1f -> {
+                        dialogTitle = getString(R.string.string_kotlin_unused)
+                        AppItemRepository.allItems.value?.filter { !it.isKotlinUsed }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                }
+            }
             show(this@PieChartFragment.requireActivity().supportFragmentManager, tag)
+        }
+    }
 
-            when (h.x) {
-                0f -> {
-                    AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }?.let { filter ->
-                        item = ArrayList(filter)
-                    }
-                }
-                1f -> {
-                    AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
-                }
-                2f -> {
-                    AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }?.let { filter ->
-                        item = ArrayList(filter)
-                    }
-                }
+    override fun onButtonChecked(
+        group: MaterialButtonToggleGroup?,
+        checkedId: Int,
+        isChecked: Boolean
+    ) {
+        when (checkedId) {
+            R.id.btn_abi -> if (isChecked) {
+                setAbiData()
+            }
+            R.id.btn_kotlin -> if (isChecked) {
+                setKotlinData()
             }
         }
     }

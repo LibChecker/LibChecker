@@ -23,6 +23,7 @@ class AppItem() : Parcelable {
     var versionName: String = ""
     var abi: Int = NO_LIBS
     var isSystem: Boolean = false
+    var isKotlinUsed: Boolean = false
     var updateTime:Long = 0
 
     constructor(parcel: Parcel) : this() {
@@ -31,6 +32,7 @@ class AppItem() : Parcelable {
         versionName = parcel.readString().toString()
         abi = parcel.readInt()
         isSystem = parcel.readByte() != 0.toByte()
+        isKotlinUsed = parcel.readByte() != 0.toByte()
         updateTime = parcel.readLong()
     }
 
@@ -40,6 +42,7 @@ class AppItem() : Parcelable {
         parcel.writeString(versionName)
         parcel.writeInt(abi)
         parcel.writeByte(if (isSystem) 1 else 0)
+        parcel.writeByte(if (isKotlinUsed) 1 else 0)
         parcel.writeLong(updateTime)
     }
 

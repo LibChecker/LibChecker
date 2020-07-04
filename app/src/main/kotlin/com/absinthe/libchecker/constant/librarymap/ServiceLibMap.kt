@@ -189,6 +189,13 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.coloros.mcssdk.PushService",
+            LibChip(
+                R.drawable.ic_lib_oppo,
+                "OPPO Push"
+            )
+        ),
+        Pair(
             "com.alibaba.sdk.android.push.MsgService",
             LibChip(
                 R.drawable.ic_lib_aliyun,
@@ -253,6 +260,13 @@ object ServiceLibMap : BaseMap() {
         ),
         Pair(
             "com.alibaba.sdk.android.push.channel.KeepChannelService",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "阿里移动推送"
+            )
+        ),
+        Pair(
+            "com.taobao.agoo.TaobaoMessageIntentReceiverService",
             LibChip(
                 R.drawable.ic_lib_aliyun,
                 "阿里移动推送"

@@ -23,6 +23,7 @@
     <!-- Statistics   -->
     <string name="chart_no_data_text">Loading</string>
     <string name="title_statistics_dialog">Apps with %s ABI</string>
+    <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
     <string name="tab_pie_chart">Pie chart</string>
     <string name="tab_lib_reference_statistics">Lib reference</string>
     <string name="not_marked_lib">Not marked library</string>
@@ -33,6 +34,9 @@
     <string name="ref_category_activity">Activities</string>
     <string name="ref_category_br">Broadcast Receivers</string>
     <string name="ref_category_cp">Content Providers</string>
+
+    <string name="string_kotlin_used">Kotlin Used</string>
+    <string name="string_kotlin_unused">Kotlin Unused</string>
 
     <!--  About  -->
     <string name="settings_about">About</string>

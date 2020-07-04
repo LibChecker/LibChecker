@@ -62,4 +62,7 @@
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
     <string name="applist_first_tip">第一次加载需要一些时间</string>
     <string name="loading">加载中…</string>
+    <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
+    <string name="string_kotlin_used">使用了 Kotlin</string>
+    <string name="string_kotlin_unused">未使用 Kotlin</string>
 </resources>
