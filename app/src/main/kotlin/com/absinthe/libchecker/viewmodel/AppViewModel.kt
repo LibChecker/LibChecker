@@ -64,6 +64,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
         var versionCode: Long
+        var abiType: Int
+        var isSystemType: Boolean
+        var isKotlinType: Boolean
+
         var appItem: AppItem
         var lcItem: LCItem
 
@@ -71,16 +75,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 packageInfo = PackageUtils.getPackageInfo(info)
                 versionCode = PackageUtils.getVersionCode(packageInfo)
+                abiType = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                isSystemType = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
                 appItem = AppItem().apply {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
                     packageName = info.packageName
                     versionName = PackageUtils.getVersionString(packageInfo)
-                    abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                    isSystem =
-                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                    abi = abiType
+                    isSystem = isSystemType
                     updateTime = packageInfo.lastUpdateTime
+                    isKotlinUsed = isKotlinType
                 }
                 lcItem = LCItem(
                     info.packageName,
@@ -89,10 +96,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     versionCode,
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                    PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                    isSystemType,
+                    abiType.toShort(),
                     PackageUtils.isSplitsApk(packageInfo),
-                    PackageUtils.isKotlinUsed(packageInfo)
+                    isKotlinType
                 )
 
                 GlobalValues.isShowSystemApps.value?.let {
@@ -139,6 +146,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         abi = item.abi.toInt()
                         isSystem = item.isSystem
                         updateTime = item.lastUpdatedTime
+                        isKotlinUsed = item.isKotlinUsed
                     }
 
                     GlobalValues.isShowSystemApps.value?.let {

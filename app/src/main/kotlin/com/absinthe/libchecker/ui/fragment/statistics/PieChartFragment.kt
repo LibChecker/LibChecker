@@ -6,10 +6,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.ARMV5
-import com.absinthe.libchecker.bean.ARMV7
-import com.absinthe.libchecker.bean.ARMV8
-import com.absinthe.libchecker.bean.NO_LIBS
+import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
@@ -61,6 +58,11 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             setHoleColor(Color.TRANSPARENT)
         }
 
+        binding.buttonsGroup.apply {
+            addOnButtonCheckedListener(this@PieChartFragment)
+            check(R.id.btn_abi)
+        }
+
         AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
             setAbiData()
         })
@@ -84,9 +86,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             for (item in it) {
                 when (item.abi) {
                     ARMV8 -> list[0]++
-                    ARMV7 -> list[1]++
-                    ARMV5 -> list[1]++
-                    NO_LIBS -> list[2]++
+                    ARMV5, ARMV7 -> list[1]++
                     else -> list[2]++
                 }
             }
@@ -114,9 +114,6 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
             for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
             for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
-            for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
-            for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
-            colors.add(ColorTemplate.getHoloBlue())
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
@@ -172,12 +169,8 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             // add a lot of colors
             val colors: ArrayList<Int> = ArrayList()
-            for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
-            for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
-            for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
             for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
             for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
-            colors.add(ColorTemplate.getHoloBlue())
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
@@ -203,57 +196,61 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         if (e == null) return
         if (h == null) return
 
-        ClassifyDialogFragment().apply {
-            if (pieType == TYPE_ABI) {
-                when (h.x) {
-                    0f -> {
-                        dialogTitle = String.format(
-                            getString(R.string.title_statistics_dialog),
-                            getString(R.string.string_64_bit)
-                        )
-                        AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }
-                            ?.let { filter ->
-                                item = ArrayList(filter)
-                            }
-                    }
-                    1f -> {
-                        dialogTitle = String.format(
-                            getString(R.string.title_statistics_dialog),
-                            getString(R.string.string_32_bit)
-                        )
-                        AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
-                            ?.let { filter ->
-                                item = ArrayList(filter)
-                            }
-                    }
-                    2f -> {
-                        dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
-                        AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }
-                            ?.let { filter ->
-                                item = ArrayList(filter)
-                            }
-                    }
+        var dialogTitle = ""
+        var item: List<AppItem> = listOf()
+
+        if (pieType == TYPE_ABI) {
+            when (h.x) {
+                0f -> {
+                    dialogTitle = String.format(
+                        getString(R.string.title_statistics_dialog),
+                        getString(R.string.string_64_bit)
+                    )
+                    AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
                 }
-            } else if (pieType == TYPE_KOTLIN) {
-                when (h.x) {
-                    0f -> {
-                        dialogTitle = getString(R.string.string_kotlin_used)
-                        AppItemRepository.allItems.value?.filter { it.isKotlinUsed }
-                            ?.let { filter ->
-                                item = ArrayList(filter)
-                            }
-                    }
-                    1f -> {
-                        dialogTitle = getString(R.string.string_kotlin_unused)
-                        AppItemRepository.allItems.value?.filter { !it.isKotlinUsed }
-                            ?.let { filter ->
-                                item = ArrayList(filter)
-                            }
-                    }
+                1f -> {
+                    dialogTitle = String.format(
+                        getString(R.string.title_statistics_dialog),
+                        getString(R.string.string_32_bit)
+                    )
+                    AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
+                }
+                2f -> {
+                    dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
+                    AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
                 }
             }
-            show(this@PieChartFragment.requireActivity().supportFragmentManager, tag)
+        } else if (pieType == TYPE_KOTLIN) {
+            when (h.x) {
+                0f -> {
+                    dialogTitle = getString(R.string.string_kotlin_used)
+                    AppItemRepository.allItems.value?.filter { it.isKotlinUsed }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
+                }
+                1f -> {
+                    dialogTitle = getString(R.string.string_kotlin_unused)
+                    AppItemRepository.allItems.value?.filter { !it.isKotlinUsed }
+                        ?.let { filter ->
+                            item = ArrayList(filter)
+                        }
+                }
+            }
         }
+
+        val dialog = ClassifyDialogFragment.newInstance(dialogTitle)
+        dialog.show(requireActivity().supportFragmentManager, tag)
+        dialog.item = ArrayList(item)
     }
 
     override fun onButtonChecked(
@@ -263,9 +260,11 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     ) {
         when (checkedId) {
             R.id.btn_abi -> if (isChecked) {
+                pieType = TYPE_ABI
                 setAbiData()
             }
             R.id.btn_kotlin -> if (isChecked) {
+                pieType = TYPE_KOTLIN
                 setKotlinData()
             }
         }
