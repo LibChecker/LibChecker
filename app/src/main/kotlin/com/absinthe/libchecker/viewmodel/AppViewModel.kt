@@ -227,8 +227,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     )
 
                     insert(lcItem)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    e.printStackTrace()
+                } catch (e: Exception) {
                     continue
                 }
             }
@@ -281,14 +280,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var count: Int
 
         for (item in appList) {
-            compLibList = PackageUtils.getComponentList(
-                item.packageName,
-                type
-            )
+            try {
+                compLibList = PackageUtils.getComponentList(
+                    item.packageName,
+                    type
+                )
 
-            for (lib in compLibList) {
-                count = map[lib] ?: 0
-                map[lib] = count + 1
+                for (lib in compLibList) {
+                    count = map[lib] ?: 0
+                    map[lib] = count + 1
+                }
+            } catch (e: Exception) {
+                continue
             }
         }
 

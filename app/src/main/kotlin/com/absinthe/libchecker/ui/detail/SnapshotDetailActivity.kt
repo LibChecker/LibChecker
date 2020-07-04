@@ -26,10 +26,11 @@ const val EXTRA_ENTITY = "EXTRA_ENTITY"
 class SnapshotDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySnapshotDetailBinding
+    private lateinit var entity: SnapshotDiffItem
+
     private val adapter = SnapshotDetailAdapter()
     private val viewModel by viewModels<SnapshotViewModel>()
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
-    private lateinit var entity:SnapshotDiffItem
 
     init {
         isPaddingToolbar = true
@@ -46,12 +47,11 @@ class SnapshotDetailActivity : BaseActivity() {
 
         if (_entity != null) {
             entity = _entity!!
+            initView()
+            viewModel.computeDiffDetail(entity)
         } else {
             supportFinishAfterTransition()
         }
-
-        initView()
-        viewModel.computeDiffDetail(entity)
     }
 
     override fun onBackPressed() {
