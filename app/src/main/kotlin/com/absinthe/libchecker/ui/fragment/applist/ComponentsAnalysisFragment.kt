@@ -95,7 +95,7 @@ class ComponentsAnalysisFragment :
                         2 -> LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
                         else -> LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
                     }
-                    viewModel.initComponentsData(packageName, type)
+                    viewModel.initComponentsData(requireContext(), packageName, type)
                 }
             }
         }
@@ -137,7 +137,7 @@ class ComponentsAnalysisFragment :
             }
             setDiffCallback(LibStringDiffUtil())
         }
-        viewModel.initComponentsData(packageName, LibReferenceActivity.Type.TYPE_SERVICE)
+        viewModel.initComponentsData(requireContext(), packageName, LibReferenceActivity.Type.TYPE_SERVICE)
     }
 
     companion object {

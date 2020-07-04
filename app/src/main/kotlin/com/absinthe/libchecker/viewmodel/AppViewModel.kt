@@ -12,9 +12,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.Configuration
-import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
@@ -32,11 +29,6 @@ import com.microsoft.appcenter.analytics.Analytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -310,30 +302,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 Analytics.trackEvent("$label Library", properties)
             }
         }
-    }
-
-    fun requestConfiguration() = viewModelScope.launch(Dispatchers.IO) {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(ApiManager.root)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val request = retrofit.create(ConfigurationRequest::class.java)
-        val config = request.requestConfiguration()
-
-        config.enqueue(object : Callback<Configuration> {
-            override fun onFailure(call: Call<Configuration>, t: Throwable) {
-                Log.e(tag, t.message ?: "")
-            }
-
-            override fun onResponse(call: Call<Configuration>, response: Response<Configuration>) {
-                viewModelScope.launch(Dispatchers.Main) {
-                    response.body()?.let {
-                        Log.d(tag, "Configuration response: ${response.body()}")
-                        GlobalValues.config = it
-                    } ?: Log.e(tag, response.message())
-                }
-            }
-        })
     }
 
     data class RefCountType(

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -14,15 +15,7 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, item.versionName)
             setText(
-                R.id.tv_abi, when (item.abi) {
-                    ARMV8 -> ARMV8_STRING
-                    ARMV7 -> ARMV7_STRING
-                    ARMV5 -> ARMV5_STRING
-                    NO_LIBS -> context.getText(R.string.no_libs)
-                    ERROR -> "Can\'t read"
-                    else -> "Unknown"
-                }
-            )
+                R.id.tv_abi, PackageUtils.getAbiString(item.abi))
             setImageResource(
                 R.id.iv_abi_type, when (item.abi) {
                     ARMV8 -> R.drawable.ic_64bit

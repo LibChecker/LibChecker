@@ -1,45 +1,36 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
-import android.graphics.Typeface
+import android.content.ActivityNotFoundException
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.TextView
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.bean.ARMV5
+import com.absinthe.libchecker.bean.ARMV7
+import com.absinthe.libchecker.bean.ARMV8
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
-import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
+import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
+import com.absinthe.libchecker.utils.PackageUtils
+import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
+import com.blankj.utilcode.util.IntentUtils
 import com.blankj.utilcode.util.ToastUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import net.dongliu.apk.parser.ApkFile
-import rikka.core.util.ClipboardUtils
+import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
-import java.io.FileNotFoundException
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
 
 class ApkDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityApkDetailBinding
-
     private var tempFile: File? = null
-    private val adapter = LibStringAdapter()
-        .apply {
-            mode = LibStringAdapter.Mode.NATIVE
-        }
 
     init {
         isPaddingToolbar = true
@@ -52,158 +43,131 @@ class ApkDetailActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initView()
 
         intent.data?.scheme?.let { scheme ->
             if (scheme == "content") {
-                intent.data?.let { uri ->
-                    initData(uri)
+                intent.data?.let {
+                    initView(it)
                 }
             }
         }
     }
 
-    override fun onDestroy() {
-        tempFile?.delete()
-        super.onDestroy()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
-    @SuppressLint("ResourceType")
-    private fun initView() {
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        setRootPadding()
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun initView(uri: Uri) {
+        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
         }
 
-        binding.rvList.apply {
-            adapter = this@ApkDetailActivity.adapter
-        }
+        initData(uri)
+    }
 
-        adapter.apply {
-            val tvLoading = TextView(this@ApkDetailActivity).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                textSize = 20f
-                text = getString(R.string.loading)
-                setTypeface(typeface, Typeface.BOLD)
-            }
-            setEmptyView(tvLoading)
-
-            fun openLibDetailDialog(position: Int) {
-                if (GlobalValues.config.enableLibDetail) {
-                    val name = adapter.getItem(position).name
-                    val regexName = BaseMap.getMap(adapter.mode).findRegex(name)?.regexName
-                    LibDetailDialogFragment.newInstance(name, adapter.mode, regexName).apply {
-                        ActivityStackManager.topActivity?.apply {
-                            show(supportFragmentManager, tag)
-                        }
-                    }
-                }
-            }
-
-            setOnItemClickListener { _, _, position ->
-                openLibDetailDialog(position)
-            }
-            setOnItemLongClickListener { _, _, position ->
-                ClipboardUtils.put(this@ApkDetailActivity, getItem(position).name)
-                ToastUtils.showShort(R.string.toast_copied_to_clipboard)
-                true
-            }
-            setOnItemChildClickListener { _, _, position ->
-                openLibDetailDialog(position)
-            }
+    private fun setRootPadding() {
+        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        binding.root.apply {
+            fitsSystemWindows = isLandScape
+            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
         }
     }
 
     @SuppressLint("SetTextI18n")
-    private fun initData(uri: Uri) = lifecycleScope.launch(Dispatchers.IO) {
-        try {
-            val libList = ArrayList<LibStringItem>()
-            val inputStream = contentResolver.openInputStream(uri)
-            val zipInputStream = ZipInputStream(inputStream)
-            tempFile = File(externalCacheDir, "temp.apk")
+    private fun initData(uri: Uri) {
+        val libList = ArrayList<LibStringItem>()
+        val inputStream = contentResolver.openInputStream(uri)
+        tempFile = File(externalCacheDir, "temp.apk")
 
-            FileIOUtils.writeFileFromIS(tempFile, inputStream)
+        FileIOUtils.writeFileFromIS(tempFile, inputStream)
 
-            val apkFile = ApkFile(tempFile)
-            withContext(Dispatchers.Main) {
-                binding.tvAppName.text = apkFile.apkMeta.label
-                binding.tvPackageName.text = apkFile.apkMeta.packageName
-                binding.tvVersion.text =
-                    "${apkFile.apkMeta.versionName} (${apkFile.apkMeta.versionCode})"
-                binding.tvTargetApi.text = "API ${apkFile.apkMeta.targetSdkVersion}"
+        val path = tempFile!!.path
+        val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
+        packageInfo?.let {
+            //Refer to https://juejin.im/post/5cb41f7b6fb9a0688b574228
+            it.applicationInfo.sourceDir = path
+            it.applicationInfo.publicSourceDir = path
+
+            supportActionBar?.apply {
+                title = it.applicationInfo.loadLabel(packageManager)
             }
-
-            val zipFile = ZipFile(tempFile)
-            val entries = zipFile.entries()
-            var splitName: String
-            var next: ZipEntry
-            var abi = NO_LIBS
-
-            while (entries.hasMoreElements()) {
-                next = entries.nextElement()
-
-                if (next.name.contains("lib/")) {
-                    splitName = next.name.split("/").last()
-
-                    if (!libList.any { it.name == splitName }) {
-                        libList.add(LibStringItem(splitName, next.size))
-                    }
-
-                    if (next.name.contains("arm64-v8a")) {
-                        abi = ARMV8
-                    } else if (next.name.contains("armeabi-v7a")) {
-                        if (abi != ARMV8) {
-                            abi = ARMV7
-                        }
-                    } else if (next.name.contains("armeabi")) {
-                        if (abi != ARMV8 && abi != ARMV7) {
-                            abi = ARMV5
+            binding.apply {
+                try {
+                    ivAppIcon.apply {
+                        setImageDrawable(it.applicationInfo.loadIcon(packageManager))
+                        setOnClickListener {
+                            try {
+                                startActivity(IntentUtils.getLaunchAppIntent(packageInfo.packageName))
+                            } catch (e: ActivityNotFoundException) {
+                                ToastUtils.showShort("Can\'t open this app")
+                            } catch (e: NullPointerException) {
+                                ToastUtils.showShort("Package name is null")
+                            }
                         }
                     }
+                    tvAppName.text = it.applicationInfo.loadLabel(packageManager)
+                    tvPackageName.text = packageInfo.packageName
+                    tvVersion.text = "${it.versionName}(${it.versionCode})"
+                    tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
+
+                    val abi = PackageUtils.getAbi(
+                        it.applicationInfo.sourceDir,
+                        it.applicationInfo.nativeLibraryDir
+                    )
+
+                    layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
+                    layoutAbi.ivAbiType.setImageResource(
+                        when (abi) {
+                            ARMV8 -> R.drawable.ic_64bit
+                            ARMV7, ARMV5 -> R.drawable.ic_32bit
+                            else -> R.drawable.ic_no_libs
+                        }
+                    )
+                } catch (e: Exception) {
+                    supportFinishAfterTransition()
                 }
             }
+        } ?: finish()
 
-            withContext(Dispatchers.Main) {
-                when (abi) {
-                    ARMV8 -> {
-                        binding.ivAbi.setImageResource(R.drawable.ic_64bit)
-                        binding.tvAbiLabel.text = ARMV8_STRING
-                    }
-                    ARMV7 -> {
-                        binding.ivAbi.setImageResource(R.drawable.ic_32bit)
-                        binding.tvAbiLabel.text = ARMV7_STRING
-                    }
-                    ARMV5 -> {
-                        binding.ivAbi.setImageResource(R.drawable.ic_32bit)
-                        binding.tvAbiLabel.text = ARMV5_STRING
-                    }
-                    else -> {
-                        binding.tvAbiLabel.text = getString(R.string.no_libs)
-                    }
+        binding.viewpager.adapter = object : FragmentStateAdapter(this@ApkDetailActivity) {
+            override fun getItemCount(): Int {
+                return 2
+            }
+
+            override fun createFragment(position: Int): Fragment {
+                return when (position) {
+                    0 -> SoAnalysisFragment.newInstance(tempFile!!.path)
+                    else -> ComponentsAnalysisFragment.newInstance(tempFile!!.path)
                 }
             }
+        }
 
-            zipFile.close()
-            zipInputStream.close()
-            if (libList.isEmpty()) {
-                libList.add(LibStringItem(getString(R.string.empty_list), 0))
-            } else {
-                libList.sortByDescending {
-                    NativeLibMap.contains(it.name)
+        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
+            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
+                when (position) {
+                    0 -> tab.text = getText(R.string.tab_so_analysis)
+                    else -> tab.text = getText(R.string.tab_components_analysis)
                 }
-            }
+            })
+        mediator.attach()
 
-            withContext(Dispatchers.Main) {
-                adapter.setList(libList)
-            }
-        } catch (e: FileNotFoundException) {
-            withContext(Dispatchers.Main) {
-                binding.tvAppName.text = "File manager not provide a content provider"
-            }
-        } catch (e: Exception) {
-            withContext(Dispatchers.Main) {
-                binding.tvAppName.text = "ERROR"
+        if (libList.isEmpty()) {
+            libList.add(LibStringItem(getString(R.string.empty_list), 0))
+        } else {
+            libList.sortByDescending {
+                NativeLibMap.contains(it.name)
             }
         }
     }

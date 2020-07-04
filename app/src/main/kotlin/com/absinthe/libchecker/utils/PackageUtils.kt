@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.format.Formatter
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.blankj.utilcode.util.Utils
@@ -218,7 +219,20 @@ object PackageUtils {
             else -> 0
         }
 
-        val packageInfo = getPackageInfo(packageName, flag)
+        return getComponentList(getPackageInfo(packageName, flag), type)
+    }
+
+    fun getComponentList(
+        packageInfo: PackageInfo,
+        type: LibReferenceActivity.Type
+    ): List<String> {
+        val flag = when (type) {
+            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
+            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
+            else -> 0
+        }
 
         val list: Array<out ComponentInfo>? = when (flag) {
             PackageManager.GET_SERVICES -> packageInfo.services
@@ -310,6 +324,17 @@ object PackageUtils {
         } catch (e: Exception) {
             e.printStackTrace()
             return ERROR
+        }
+    }
+
+    fun getAbiString(abi: Int): String {
+        return when (abi) {
+            ARMV8 -> ARMV8_STRING
+            ARMV7 -> ARMV7_STRING
+            ARMV5 -> ARMV5_STRING
+            NO_LIBS -> Utils.getApp().getString(R.string.no_libs)
+            ERROR -> "Can\'t read"
+            else -> "Unknown"
         }
     }
 

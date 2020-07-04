@@ -3,6 +3,7 @@ package com.absinthe.libchecker.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -39,15 +40,27 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             val list = ArrayList<LibStringItem>()
 
             try {
-                val info = context.packageManager.getApplicationInfo(packageName, 0)
+                val info = if (packageName.endsWith("/temp.apk")) {
+                    context.packageManager.getPackageArchiveInfo(
+                        packageName,
+                        0
+                    )?.applicationInfo?.apply {
+                        sourceDir = packageName
+                        publicSourceDir = packageName
+                    }
+                } else {
+                    context.packageManager.getApplicationInfo(packageName, 0)
+                }
 
-                list.addAll(
-                    getAbiByNativeDir(
-                        context,
-                        info.sourceDir,
-                        info.nativeLibraryDir
+                info?.let {
+                    list.addAll(
+                        getAbiByNativeDir(
+                            context,
+                            info.sourceDir,
+                            info.nativeLibraryDir ?: ""
+                        )
                     )
-                )
+                }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
                 list.add(LibStringItem("Not found", 0))
@@ -58,13 +71,36 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(packageName: String, type: LibReferenceActivity.Type) =
+    fun initComponentsData(context: Context, packageName: String, type: LibReferenceActivity.Type) =
         viewModelScope.launch(Dispatchers.IO) {
             val map = BaseMap.getMap(type)
             val list: MutableList<String> = mutableListOf()
 
+            val flag = when (type) {
+                LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
+                LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
+                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
+                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
+                else -> 0
+            }
+
+            val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                PackageManager.MATCH_DISABLED_COMPONENTS
+            } else {
+                PackageManager.GET_DISABLED_COMPONENTS
+            }
+
             try {
-                list.addAll(PackageUtils.getComponentList(packageName, type))
+                if (packageName.endsWith("/temp.apk")) {
+                    context.packageManager.getPackageArchiveInfo(packageName, flag or pmFlag)?.apply {
+                        applicationInfo.sourceDir = packageName
+                        applicationInfo.publicSourceDir = packageName
+                    }?.let {
+                        list.addAll(PackageUtils.getComponentList(it, type))
+                    }
+                } else {
+                    list.addAll(PackageUtils.getComponentList(packageName, type))
+                }
             } catch (e: Exception) {
                 list.add("Not found")
             }

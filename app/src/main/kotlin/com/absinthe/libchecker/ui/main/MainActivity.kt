@@ -67,9 +67,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
-
         registerPackageBroadcast()
-        viewModel.requestConfiguration()
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             viewModel.collectPopularLibraries(this)

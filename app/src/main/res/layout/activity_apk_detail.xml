@@ -10,44 +10,37 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@null">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_content_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?android:colorBackground"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
                 android:paddingHorizontal="@dimen/normal_padding"
                 android:paddingTop="?attr/actionBarSize"
                 android:paddingBottom="@dimen/normal_padding"
                 app:layout_collapseMode="parallax">
 
                 <ImageView
-                    android:id="@+id/iv_abi"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:id="@+id/iv_app_icon"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:contentDescription="App icon"
                     android:transitionName="app_icon"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:background="@drawable/ic_64bit"
+                    tools:background="@drawable/pic_splash"
                     tools:ignore="HardcodedText" />
-
-                <TextView
-                    android:id="@+id/tv_abi_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?attr/textAppearanceCaption"
-                    app:layout_constraintStart_toStartOf="@id/iv_abi"
-                    app:layout_constraintTop_toBottomOf="@id/iv_abi"
-                    tools:text="ARMV8" />
 
                 <com.absinthe.libchecker.view.AlwaysMarqueeTextView
                     android:id="@+id/tv_app_name"
@@ -59,8 +52,8 @@
                     android:textSize="16sp"
                     android:transitionName="app_name"
                     app:layout_constraintEnd_toStartOf="@id/tv_target_api"
-                    app:layout_constraintStart_toEndOf="@id/iv_abi"
-                    app:layout_constraintTop_toTopOf="@id/iv_abi"
+                    app:layout_constraintStart_toEndOf="@id/iv_app_icon"
+                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="LibChecker" />
 
                 <TextView
@@ -97,23 +90,16 @@
                     android:textColor="@android:color/darker_gray"
                     android:textSize="13sp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/iv_abi"
+                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="API 29" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_split"
-                    style="@style/Widget.MaterialComponents.Chip.Action"
+                <include
+                    android:id="@+id/layout_abi"
+                    layout="@layout/layout_abi_badge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/normal_padding"
-                    android:text="@string/splits_spk"
-                    android:visibility="gone"
-                    app:chipIcon="@drawable/ic_split"
-                    app:chipMinHeight="28dp"
-                    app:chipMinTouchTargetSize="0dp"
-                    app:chipStartPadding="10dp"
-                    app:layout_constraintStart_toStartOf="@id/iv_abi"
-                    app:layout_constraintTop_toBottomOf="@id/iv_abi" />
+                    app:layout_constraintEnd_toEndOf="@id/tv_target_api"
+                    app:layout_constraintTop_toBottomOf="@id/tv_target_api" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -134,13 +120,29 @@
         android:orientation="vertical"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_list"
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:overScrollMode="never"
-            android:padding="@dimen/normal_padding"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_so_analysis" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_components_analysis" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
