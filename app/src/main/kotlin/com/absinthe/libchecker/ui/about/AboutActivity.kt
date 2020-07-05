@@ -103,7 +103,7 @@ class AboutActivity : AbsAboutActivity() {
                 })
             } catch (e: ActivityNotFoundException) {
                 e.printStackTrace()
-                ToastUtils.showLong("Not exist any app market")
+                ToastUtils.showLong("There's not existing any app market")
             }
         }
         return super.onOptionsItemSelected(menuItem)

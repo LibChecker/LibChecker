@@ -35,6 +35,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    var refreshLock = false
     var isInit = false
 
     private val tag = AppViewModel::class.java.simpleName
@@ -163,6 +164,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             withContext(Dispatchers.Main) {
                 AppItemRepository.allItems.value = newItems
             }
+
+            refreshLock = false
         }
     }
 

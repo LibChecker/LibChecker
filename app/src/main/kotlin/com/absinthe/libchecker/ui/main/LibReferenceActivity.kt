@@ -8,24 +8,20 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import androidx.lifecycle.lifecycleScope
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
+import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
 const val EXTRA_NAME = "NAME"
@@ -35,6 +31,7 @@ class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
     private val adapter = AppAdapter()
+    private val viewModel by viewModels<LibReferenceViewModel>()
 
     override fun setViewBinding(): View {
         binding = ActivityLibReferenceBinding.inflate(layoutInflater)
@@ -56,9 +53,8 @@ class LibReferenceActivity : BaseActivity() {
             supportFinishAfterTransition()
         } else {
             initView()
-            lifecycleScope.launch(Dispatchers.IO) {
-                setData(name, type)
-            }
+            binding.vfContainer.displayedChild = 0
+            viewModel.setData(name, type)
         }
     }
 
@@ -72,38 +68,53 @@ class LibReferenceActivity : BaseActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.root.apply {
-            fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+            fitsSystemWindows =
+                resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             setPadding(paddingStart, 0, paddingEnd, paddingBottom)
         }
     }
 
     private fun initView() {
-        binding.root.apply {
-            fitsSystemWindows = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-            setPadding(paddingStart, 0, paddingEnd, paddingBottom)
-        }
-        setAppBar(binding.appbar, binding.toolbar)
-        (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+        binding.apply {
+            root.apply {
+                fitsSystemWindows =
+                    resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+                setPadding(paddingStart, 0, paddingEnd, paddingBottom)
+            }
 
-        binding.rvList.apply {
-            adapter = this@LibReferenceActivity.adapter
-            borderVisibilityChangedListener =
-                BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                    appBar?.setRaised(!top)
-                }
-            setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, UiUtils.getNavBarHeight())
+            setAppBar(appbar, toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            (root as ViewGroup).bringChildToFront(appbar)
+
+            rvList.apply {
+                adapter = this@LibReferenceActivity.adapter
+                borderVisibilityChangedListener =
+                    BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                        appBar?.setRaised(!top)
+                    }
+                setPadding(
+                    0,
+                    paddingTop + BarUtils.getStatusBarHeight(),
+                    0,
+                    UiUtils.getNavBarHeight()
+                )
+            }
+            vfContainer.apply {
+                setInAnimation(
+                    this@LibReferenceActivity,
+                    R.anim.anim_fade_in
+                )
+                setOutAnimation(
+                    this@LibReferenceActivity,
+                    R.anim.anim_fade_out
+                )
+            }
         }
-        binding.vfContainer.apply {
-            setInAnimation(
-                this@LibReferenceActivity,
-                R.anim.anim_fade_in
-            )
-            setOutAnimation(
-                this@LibReferenceActivity,
-                R.anim.anim_fade_out
-            )
-        }
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        viewModel.libRefList.observe(this, Observer {
+            adapter.setList(it)
+            binding.vfContainer.displayedChild = 1
+        })
 
         adapter.setOnItemClickListener { _, view, position ->
             if (AntiShakeUtils.isInvalidClick(view)) {
@@ -127,49 +138,6 @@ class LibReferenceActivity : BaseActivity() {
             } else {
                 startActivity(intent)
             }
-        }
-    }
-
-    private suspend fun setData(name: String, type: Type) {
-
-        withContext(Dispatchers.Main) {
-            binding.vfContainer.displayedChild = 0
-        }
-
-        val list = mutableListOf<AppItem>()
-
-        AppItemRepository.allItems.value?.let { items ->
-            try {
-                if (type == Type.TYPE_NATIVE) {
-                    for (item in items) {
-                        val packageInfo = PackageUtils.getPackageInfo(item.packageName)
-
-                        val natives = PackageUtils.getNativeDirLibs(
-                            packageInfo.applicationInfo.sourceDir,
-                            packageInfo.applicationInfo.nativeLibraryDir
-                        )
-
-                        for (native in natives) {
-                            if (native.name == name) {
-                                list.add(item)
-                                break
-                            }
-                        }
-                    }
-                } else {
-                    for (item in items) {
-                        if (PackageUtils.getComponentList(item.packageName, type).contains(name)) {
-                            list.add(item)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        withContext(Dispatchers.Main) {
-            adapter.setList(list)
-            binding.vfContainer.displayedChild = 1
         }
     }
 

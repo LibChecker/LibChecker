@@ -20,6 +20,13 @@ object GlobalValues {
         return preferences
     }
 
+    var config = Configuration()
+
+    var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
+        ?: Constants.REPO_GITEE
+
+    var shouldRequestChange = false
+
     var isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
     var isShowEntryAnimation: MutableLiveData<Boolean> =
@@ -45,11 +52,4 @@ object GlobalValues {
             field = value
             getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
         }
-
-    var config = Configuration()
-
-    var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
-        ?: Constants.REPO_GITEE
-
-    var shouldRequestChange = false
 }

@@ -28,10 +28,9 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val adapter = LibStringAdapter()
-        .apply {
-            mode = LibStringAdapter.Mode.NATIVE
-        }
+    private val adapter = LibStringAdapter().apply {
+        mode = LibStringAdapter.Mode.NATIVE
+    }
 
     override fun initBinding(view: View): FragmentSoAnalysisBinding =
         FragmentSoAnalysisBinding.bind(view)

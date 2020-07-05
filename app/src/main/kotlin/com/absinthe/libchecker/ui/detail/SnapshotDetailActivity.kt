@@ -101,35 +101,20 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
-            ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity.packageName))
-
-            if (entity.labelDiff.new != null && entity.labelDiff.new != entity.labelDiff.old) {
-                tvAppName.text = "${entity.labelDiff.old} $ARROW ${entity.labelDiff.new}"
-            } else {
-                tvAppName.text = entity.labelDiff.old
-            }
-
-            tvPackageName.text = entity.packageName
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
-            if ((entity.versionNameDiff.old != entity.versionNameDiff.new || entity.versionCodeDiff.old != entity.versionCodeDiff.new) && !isNewOrDeleted) {
-                tvVersion.text =
-                    "${entity.versionNameDiff.old} (${entity.versionCodeDiff.old}) $ARROW ${entity.versionNameDiff.new ?: entity.versionNameDiff.old} (${entity.versionCodeDiff.new ?: entity.versionCodeDiff.old})"
-            } else {
-                tvVersion.text = "${entity.versionNameDiff.old} (${entity.versionCodeDiff.old})"
-            }
-
-            if (entity.targetApiDiff.old != entity.targetApiDiff.new && !isNewOrDeleted) {
-                tvTargetApi.text =
-                    "API ${entity.targetApiDiff.old} $ARROW API ${entity.targetApiDiff.new}"
-            } else {
-                tvTargetApi.text = "API ${entity.targetApiDiff.old}"
-            }
+            ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity.packageName))
+            tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
+            tvPackageName.text = entity.packageName
+            tvVersion.text = getDiffString(entity.versionNameDiff, entity.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+            tvTargetApi.text = getDiffString(entity.targetApiDiff, isNewOrDeleted, "API %s")
         }
+
         viewModel.snapshotDetailItems.observe(this, Observer {
             adapter.setList(it)
         })
+
         adapter.setEmptyView(
             when {
                 entity.newInstalled -> R.layout.layout_snapshot_detail_new_install
@@ -144,6 +129,22 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.root.apply {
             fitsSystemWindows = isLandScape
             setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+        }
+    }
+
+    private fun <T> getDiffString(diff: SnapshotDiffItem.DiffNode<T>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+        return if (diff.old != diff.new && !isNewOrDeleted) {
+            "${String.format(format, diff.old.toString())} $ARROW ${String.format(format, diff.new.toString())}"
+        } else {
+            String.format(format, diff.old.toString())
+        }
+    }
+
+    private fun getDiffString(diff1: SnapshotDiffItem.DiffNode<*>, diff2: SnapshotDiffItem.DiffNode<*>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+        return if (diff1.old != diff1.new && diff2.old != diff2.new && !isNewOrDeleted) {
+            "${String.format(format, diff1.old.toString(), diff2.old.toString())} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+        } else {
+            String.format(format, diff1.old.toString(), diff2.old.toString())
         }
     }
 }

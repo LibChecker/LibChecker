@@ -41,12 +41,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
-class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
+class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
+    SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
-    private val mItems = ArrayList<AppItem>()
-    private var changeCount = 0
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -96,20 +95,19 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             tvFirstTip.isVisible = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
         }
 
-        viewModel.apply {
-            AppItemRepository.allItems.value?.let { list ->
-                updateItems(list)
-                mItems.apply {
-                    clear()
-                    addAll(list)
-                }
+        AppItemRepository.allItems.value?.let { list ->
+            updateItems(list)
+            if (binding.vfContainer.displayedChild == 0) {
                 binding.vfContainer.displayedChild = 1
             }
+        }
 
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
-                Once.clearDone(OnceTag.FIRST_LAUNCH)
-                binding.tvFirstTip.isVisible = true
-            }
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
+            Once.clearDone(OnceTag.FIRST_LAUNCH)
+            binding.tvFirstTip.isVisible = true
+        }
+
+        viewModel.apply {
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems(requireContext())
             } else {
@@ -117,19 +115,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     if (it.isNullOrEmpty()) {
                         initItems(requireContext())
                     } else {
-                        if (!isInit) {
+                        if (!viewModel.refreshLock) {
+                            viewModel.refreshLock = true
                             addItem()
-                        } else {
-                            changeCount++
-
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                val count = changeCount
-                                delay(500)
-
-                                if (count == changeCount) {
-                                    addItem()
-                                }
-                            }
                         }
                     }
                 })
@@ -137,10 +125,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
             AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
-                mItems.apply {
-                    clear()
-                    addAll(it)
-                }
 
                 if (!isInit) {
                     binding.vfContainer.displayedChild = 1
@@ -154,13 +138,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 }
             })
             clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
-                if (it) {
-                    binding.recyclerview.apply {
-                        if (canScrollVertically(-1)) {
-                            smoothScrollToPosition(0)
-                        }
-                    }
-                }
+                if (it) { returnTopOfList() }
             })
         }
 
@@ -171,32 +149,16 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 }
             })
             appSortMode.observe(viewLifecycleOwner, Observer { mode ->
-                when (mode) {
-                    Constants.SORT_MODE_DEFAULT -> mItems.sortWith(
-                        compareBy(
-                            { it.abi },
-                            { it.appName })
-                    )
-                    Constants.SORT_MODE_UPDATE_TIME_DESC -> mItems.sortByDescending { it.updateTime }
-                }
-                updateItems(mItems)
-            })
-        }
-    }
+                AppItemRepository.allItems.value?.let { allItems ->
+                    val list = allItems.toMutableList()
 
-    private fun updateItems(newItems: List<AppItem>) {
-        mAdapter.setDiffNewData(newItems.toMutableList())
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            delay(300)
-
-            withContext(Dispatchers.Main) {
-                binding.recyclerview.apply {
-                    if (canScrollVertically(-1)) {
-                        smoothScrollToPosition(0)
+                    when (mode) {
+                        Constants.SORT_MODE_DEFAULT -> list.sortWith(compareBy( { it.abi }, { it.appName }))
+                        Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
                     }
+                    updateItems(list)
                 }
-            }
+            })
         }
     }
 
@@ -226,10 +188,12 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        val filter = mItems.filter {
-            it.appName.contains(newText, ignoreCase = true) || it.packageName.contains(newText, ignoreCase = true)
+        AppItemRepository.allItems.value?.let { allItems ->
+            val filter = allItems.filter {
+                it.appName.contains(newText, ignoreCase = true) || it.packageName.contains(newText, ignoreCase = true)
+            }
+            updateItems(filter)
         }
-        updateItems(filter)
         return false
     }
 
@@ -264,5 +228,28 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         }
 
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun updateItems(newItems: List<AppItem>) {
+        val list = mAdapter.data
+        mAdapter.setDiffNewData(newItems.toMutableList())
+
+        if (list != newItems) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                delay(300)
+
+                withContext(Dispatchers.Main) {
+                    returnTopOfList()
+                }
+            }
+        }
+    }
+
+    private fun returnTopOfList() {
+        binding.recyclerview.apply {
+            if (canScrollVertically(-1)) {
+                smoothScrollToPosition(0)
+            }
+        }
     }
 }

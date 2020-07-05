@@ -104,24 +104,26 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             }
         }
 
-        viewModel.timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            dashboardBinding.tvSnapshotTimestampText.text = if (it != 0L) {
-                getFormatDateString(it)
-            } else {
-                "None"
-            }
-        })
-        viewModel.snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-            dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
-            viewModel.computeDiff(requireContext())
-        })
-        viewModel.snapshotDiffItems.observe(
-            viewLifecycleOwner,
-            androidx.lifecycle.Observer { list ->
-                adapter.setList(list.sortedByDescending { it.updateTime })
-                binding.vfContainer.displayedChild = 1
-                binding.extendedFab.show()
+        viewModel.apply {
+            timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                dashboardBinding.tvSnapshotTimestampText.text = if (it != 0L) {
+                    getFormatDateString(it)
+                } else {
+                    "None"
+                }
             })
+            snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
+                computeDiff(requireContext())
+            })
+            snapshotDiffItems.observe(
+                viewLifecycleOwner,
+                androidx.lifecycle.Observer { list ->
+                    adapter.setList(list.sortedByDescending { it.updateTime })
+                    binding.vfContainer.displayedChild = 1
+                    binding.extendedFab.show()
+                })
+        }
     }
 
     private fun getFormatDateString(timestamp: Long): String {

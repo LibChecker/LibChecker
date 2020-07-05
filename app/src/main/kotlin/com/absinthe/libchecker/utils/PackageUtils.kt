@@ -290,7 +290,7 @@ object PackageUtils {
         return finalList
     }
 
-    fun getAbi(path: String, nativePath: String): Int {
+    fun getAbi(path: String, nativePath: String, isApk: Boolean = false): Int {
         var abi = NO_LIBS
 
         try {
@@ -316,13 +316,12 @@ object PackageUtils {
                 }
             }
             zipFile.close()
-            return if (abi == NO_LIBS) {
+            return if (abi == NO_LIBS && !isApk) {
                 getAbiByNativeDir(nativePath)
             } else {
                 abi
             }
         } catch (e: Exception) {
-            e.printStackTrace()
             return ERROR
         }
     }

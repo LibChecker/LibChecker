@@ -31,10 +31,9 @@ class ComponentsAnalysisFragment :
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val adapter = LibStringAdapter()
-        .apply {
-            mode = LibStringAdapter.Mode.SERVICE
-        }
+    private val adapter = LibStringAdapter().apply {
+        mode = LibStringAdapter.Mode.SERVICE
+    }
 
     override fun initBinding(view: View): FragmentManifestAnalysisBinding =
         FragmentManifestAnalysisBinding.bind(view)
@@ -64,7 +63,8 @@ class ComponentsAnalysisFragment :
                         }.toMutableList())
                         MODE_SORT_BY_LIB
                     } else {
-                        adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }.toMutableList())
+                        adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
+                            .toMutableList())
                         MODE_SORT_BY_SIZE
                     }
                 SPUtils.putInt(
@@ -73,9 +73,7 @@ class ComponentsAnalysisFragment :
                 )
             }
             spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
 
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -114,6 +112,7 @@ class ComponentsAnalysisFragment :
             if (GlobalValues.config.enableComponentsDetail) {
                 val name = adapter.getItem(position).name
                 val regexName = BaseMap.getMap(adapter.mode).findRegex(name)?.regexName
+
                 LibDetailDialogFragment.newInstance(name, adapter.mode, regexName)
                     .apply {
                         ActivityStackManager.topActivity?.apply {
@@ -137,7 +136,11 @@ class ComponentsAnalysisFragment :
             }
             setDiffCallback(LibStringDiffUtil())
         }
-        viewModel.initComponentsData(requireContext(), packageName, LibReferenceActivity.Type.TYPE_SERVICE)
+        viewModel.initComponentsData(
+            requireContext(),
+            packageName,
+            LibReferenceActivity.Type.TYPE_SERVICE
+        )
     }
 
     companion object {

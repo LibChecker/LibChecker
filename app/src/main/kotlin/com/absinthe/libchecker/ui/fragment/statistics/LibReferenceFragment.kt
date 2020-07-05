@@ -32,24 +32,28 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
 
     override fun init() {
-        binding.rvList.adapter = this.adapter
-        binding.vfContainer.apply {
-            setInAnimation(activity, R.anim.anim_fade_in)
-            setOutAnimation(activity, R.anim.anim_fade_out)
+        binding.apply {
+            rvList.adapter = adapter
+            vfContainer.apply {
+                setInAnimation(activity, R.anim.anim_fade_in)
+                setOutAnimation(activity, R.anim.anim_fade_out)
+            }
         }
 
-        adapter.setDiffCallback(RefListDiffUtil())
-        adapter.setOnItemClickListener { _, view, position ->
-            if (AntiShakeUtils.isInvalidClick(view)) {
-                return@setOnItemClickListener
-            }
+        adapter.apply {
+            setDiffCallback(RefListDiffUtil())
+            setOnItemClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemClickListener
+                }
 
-            val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
-                val item = this@LibReferenceFragment.adapter.data[position]
-                putExtra(EXTRA_NAME, item.libName)
-                putExtra(EXTRA_TYPE, item.type)
+                val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
+                    val item = this@LibReferenceFragment.adapter.data[position]
+                    putExtra(EXTRA_NAME, item.libName)
+                    putExtra(EXTRA_TYPE, item.type)
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
     }
 

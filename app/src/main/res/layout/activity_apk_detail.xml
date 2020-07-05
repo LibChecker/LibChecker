@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground"
-    tools:context=".ui.detail.AppDetailActivity">
+    android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
