@@ -336,6 +336,14 @@ object PackageUtils {
             else -> "Unknown"
         }
     }
+    
+    fun getAbiBadgeResource(type: Int): Int {
+        return when (type) {
+            ARMV8 -> R.drawable.ic_64bit
+            ARMV7, ARMV5 -> R.drawable.ic_32bit
+            else -> R.drawable.ic_no_libs
+        }
+    }
 
     private fun getAbiByNativeDir(nativePath: String): Int {
         val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))

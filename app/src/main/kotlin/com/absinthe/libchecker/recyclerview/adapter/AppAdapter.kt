@@ -14,15 +14,8 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) 
             setText(R.id.tv_app_name, item.appName)
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, item.versionName)
-            setText(
-                R.id.tv_abi, PackageUtils.getAbiString(item.abi))
-            setImageResource(
-                R.id.iv_abi_type, when (item.abi) {
-                    ARMV8 -> R.drawable.ic_64bit
-                    ARMV7, ARMV5 -> R.drawable.ic_32bit
-                    else -> R.drawable.ic_no_libs
-                }
-            )
+            setText(R.id.tv_abi, PackageUtils.getAbiString(item.abi))
+            setImageResource(R.id.iv_abi_type, PackageUtils.getAbiBadgeResource(item.abi))
         }
     }
 }

@@ -63,7 +63,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
-                list.add(LibStringItem("Not found", 0))
+                list.add(LibStringItem("Not found"))
             }
 
             withContext(Dispatchers.Main) {
@@ -163,7 +163,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
 
         if (list.isEmpty()) {
-            list.add(LibStringItem(context.getString(R.string.empty_list), 0))
+            list.add(LibStringItem(context.getString(R.string.empty_list)))
         } else {
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 list.sortByDescending { it.size }

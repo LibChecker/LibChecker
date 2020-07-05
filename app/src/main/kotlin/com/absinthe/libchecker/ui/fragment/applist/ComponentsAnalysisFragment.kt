@@ -102,7 +102,7 @@ class ComponentsAnalysisFragment :
             componentsItems.observe(viewLifecycleOwner, Observer {
                 val list = mutableListOf<LibStringItem>()
                 for (item in it) {
-                    list.add(LibStringItem(item, 0))
+                    list.add(LibStringItem(item))
                 }
                 adapter.setDiffNewData(list)
             })

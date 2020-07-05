@@ -16,14 +16,15 @@ class LibReferenceAdapter :
         holder.setText(R.id.tv_lib_name, item.libName)
 
         item.chip?.let {
-            val icon = holder.getView<ImageView>(R.id.iv_icon)
-            icon.setImageResource(it.iconRes)
+            holder.getView<ImageView>(R.id.iv_icon).apply {
+                setImageResource(it.iconRes)
 
-            if (!GlobalValues.isColorfulIcon.value!!) {
-                icon.setColorFilter(
-                    ContextCompat.getColor(context, R.color.textNormal),
-                    PorterDuff.Mode.SRC_IN
-                )
+                if (!GlobalValues.isColorfulIcon.value!!) {
+                    setColorFilter(
+                        ContextCompat.getColor(context, R.color.textNormal),
+                        PorterDuff.Mode.SRC_IN
+                    )
+                }
             }
 
             holder.setText(R.id.tv_label_name, it.name)

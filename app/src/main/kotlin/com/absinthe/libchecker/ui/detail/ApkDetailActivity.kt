@@ -10,9 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.ARMV5
-import com.absinthe.libchecker.bean.ARMV7
-import com.absinthe.libchecker.bean.ARMV8
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
@@ -117,13 +114,7 @@ class ApkDetailActivity : BaseActivity() {
                     )
 
                     layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                    layoutAbi.ivAbiType.setImageResource(
-                        when (abi) {
-                            ARMV8 -> R.drawable.ic_64bit
-                            ARMV7, ARMV5 -> R.drawable.ic_32bit
-                            else -> R.drawable.ic_no_libs
-                        }
-                    )
+                    layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
                 } catch (e: Exception) {
                     supportFinishAfterTransition()
                 }
@@ -153,7 +144,7 @@ class ApkDetailActivity : BaseActivity() {
         mediator.attach()
 
         if (libList.isEmpty()) {
-            libList.add(LibStringItem(getString(R.string.empty_list), 0))
+            libList.add(LibStringItem(getString(R.string.empty_list)))
         } else {
             libList.sortByDescending {
                 NativeLibMap.contains(it.name)
