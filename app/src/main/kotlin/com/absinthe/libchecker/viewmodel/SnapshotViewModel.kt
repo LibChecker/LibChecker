@@ -119,7 +119,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun computeDiff(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        if (snapshotItems.value != null && snapshotItems.value!!.isEmpty()) return@launch
+        if (snapshotItems.value.isNullOrEmpty()) return@launch
 
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager

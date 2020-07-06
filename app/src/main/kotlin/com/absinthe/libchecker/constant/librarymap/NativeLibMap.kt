@@ -880,6 +880,13 @@ object NativeLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "wgs2gcj"
             )
+        ),
+        Pair(
+            "libtensorflowlite_jni.so",
+            LibChip(
+                R.drawable.ic_lib_tensorflow,
+                "TensorFlow Lite"
+            )
         )
     )
 

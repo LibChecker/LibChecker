@@ -1,7 +1,9 @@
 package com.absinthe.libchecker
 
 import android.app.Application
+import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
+import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppUtils
 import com.microsoft.appcenter.AppCenter
@@ -26,5 +28,10 @@ class LibCheckerApp : Application() {
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)
         AppUtils.requestConfiguration()
+    }
+
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        Global.loop()
     }
 }
