@@ -81,6 +81,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
 
         adapter.apply {
+            headerWithEmptyEnable = true
             setEmptyView(R.layout.layout_snapshot_empty_view)
             setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
