@@ -2,7 +2,7 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
@@ -15,7 +15,6 @@ import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.TypeConverter
@@ -26,23 +25,16 @@ import com.blankj.utilcode.util.ToastUtils
 import rikka.core.util.ClipboardUtils
 
 const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
-const val EXTRA_TYPE = "EXTRA_TYPE"
+const val EXTRA_MODE = "EXTRA_MODE"
 
 class ComponentsAnalysisFragment :
     BaseFragment<FragmentManifestAnalysisBinding>(R.layout.fragment_manifest_analysis) {
 
-    private val viewModel by activityViewModels<DetailViewModel>()
-    private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val type by lazy {
-        arguments?.getSerializable(EXTRA_TYPE) as LibReferenceActivity.Type?
-            ?: LibReferenceActivity.Type.TYPE_SERVICE
-    }
-    private val adapter = LibStringAdapter().apply {
-        mode = TypeConverter.libRefTypeToMode(type)
-    }
+    private val viewModel by viewModels<DetailViewModel>()
+    private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) }
+    private val adapter = LibStringAdapter()
 
-    override fun initBinding(view: View): FragmentManifestAnalysisBinding =
-        FragmentManifestAnalysisBinding.bind(view)
+    override fun initBinding(view: View): FragmentManifestAnalysisBinding = FragmentManifestAnalysisBinding.bind(view)
 
     override fun init() {
         binding.apply {
@@ -104,7 +96,10 @@ class ComponentsAnalysisFragment :
             }
         }
 
+        val mode = arguments?.getSerializable(EXTRA_MODE)!! as LibStringAdapter.Mode
+
         adapter.apply {
+            this.mode = mode
             setOnItemClickListener { _, _, position ->
                 openLibDetailDialog(position)
             }
@@ -119,19 +114,25 @@ class ComponentsAnalysisFragment :
             setDiffCallback(LibStringDiffUtil())
         }
 
-        viewModel.initComponentsData(requireContext(), packageName, type)
+        packageName?.let {
+            viewModel.initComponentsData(
+                requireContext(),
+                it,
+                TypeConverter.libModeToRefType(mode)
+            )
+        }
     }
 
     companion object {
         fun newInstance(
             packageName: String,
-            type: LibReferenceActivity.Type
+            mode: LibStringAdapter.Mode
         ): ComponentsAnalysisFragment {
             return ComponentsAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PKG_NAME, packageName)
-                        putSerializable(EXTRA_TYPE, type)
+                        putSerializable(EXTRA_MODE, mode)
                     }
                 }
         }

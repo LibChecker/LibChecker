@@ -17,9 +17,9 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
+import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
@@ -157,10 +157,10 @@ class AppDetailActivity : BaseActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> SoAnalysisFragment.newInstance(pkgName!!)
-                    1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibReferenceActivity.Type.TYPE_SERVICE)
-                    2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibReferenceActivity.Type.TYPE_ACTIVITY)
-                    3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
-                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
+                    1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.SERVICE)
+                    2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.ACTIVITY)
+                    3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.RECEIVER)
+                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.PROVIDER)
                 }
             }
         }

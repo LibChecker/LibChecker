@@ -21,7 +21,7 @@ object TypeConverter {
             LibStringAdapter.Mode.ACTIVITY -> LibReferenceActivity.Type.TYPE_ACTIVITY
             LibStringAdapter.Mode.RECEIVER -> LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
             LibStringAdapter.Mode.PROVIDER -> LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
-            else -> LibReferenceActivity.Type.TYPE_NATIVE
+            LibStringAdapter.Mode.NATIVE -> LibReferenceActivity.Type.TYPE_NATIVE
         }
     }
 }
