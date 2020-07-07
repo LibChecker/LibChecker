@@ -15,6 +15,7 @@ import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
@@ -121,15 +122,18 @@ class ApkDetailActivity : BaseActivity() {
             }
         } ?: finish()
 
-        binding.viewpager.adapter = object : FragmentStateAdapter(this@ApkDetailActivity) {
+        binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
-                return 2
+                return 5
             }
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> SoAnalysisFragment.newInstance(tempFile!!.path)
-                    else -> ComponentsAnalysisFragment.newInstance(tempFile!!.path)
+                    1 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibReferenceActivity.Type.TYPE_SERVICE)
+                    2 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibReferenceActivity.Type.TYPE_ACTIVITY)
+                    3 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER)
+                    else -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER)
                 }
             }
         }
@@ -137,8 +141,11 @@ class ApkDetailActivity : BaseActivity() {
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
                 when (position) {
-                    0 -> tab.text = getText(R.string.tab_so_analysis)
-                    else -> tab.text = getText(R.string.tab_components_analysis)
+                    0 -> tab.text = getText(R.string.ref_category_native)
+                    1 -> tab.text = getText(R.string.ref_category_service)
+                    2 -> tab.text = getText(R.string.ref_category_activity)
+                    3 -> tab.text = getText(R.string.ref_category_br)
+                    else -> tab.text = getText(R.string.ref_category_cp)
                 }
             })
         mediator.attach()

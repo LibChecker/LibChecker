@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -19,20 +18,24 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.TypeConverter
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.ToastUtils
 import rikka.core.util.ClipboardUtils
+
+const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
+const val EXTRA_TYPE = "EXTRA_TYPE"
 
 class ComponentsAnalysisFragment :
     BaseFragment<FragmentManifestAnalysisBinding>(R.layout.fragment_manifest_analysis) {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
+    private val type by lazy { arguments?.getSerializable(EXTRA_TYPE) as LibReferenceActivity.Type }
     private val adapter = LibStringAdapter().apply {
-        mode = LibStringAdapter.Mode.SERVICE
+        mode = TypeConverter.libRefTypeToMode(type)
     }
 
     override fun initBinding(view: View): FragmentManifestAnalysisBinding =
@@ -71,30 +74,6 @@ class ComponentsAnalysisFragment :
                     Constants.PREF_LIB_SORT_MODE,
                     GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
                 )
-            }
-            spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    adapter.mode = when (position) {
-                        0 -> LibStringAdapter.Mode.SERVICE
-                        1 -> LibStringAdapter.Mode.ACTIVITY
-                        2 -> LibStringAdapter.Mode.RECEIVER
-                        else -> LibStringAdapter.Mode.PROVIDER
-                    }
-                    val type = when (position) {
-                        0 -> LibReferenceActivity.Type.TYPE_SERVICE
-                        1 -> LibReferenceActivity.Type.TYPE_ACTIVITY
-                        2 -> LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
-                        else -> LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
-                    }
-                    viewModel.initComponentsData(requireContext(), packageName, type)
-                }
             }
         }
 
@@ -136,19 +115,20 @@ class ComponentsAnalysisFragment :
             }
             setDiffCallback(LibStringDiffUtil())
         }
-        viewModel.initComponentsData(
-            requireContext(),
-            packageName,
-            LibReferenceActivity.Type.TYPE_SERVICE
-        )
+
+        viewModel.initComponentsData(requireContext(), packageName, type)
     }
 
     companion object {
-        fun newInstance(packageName: String): ComponentsAnalysisFragment {
+        fun newInstance(
+            packageName: String,
+            type: LibReferenceActivity.Type
+        ): ComponentsAnalysisFragment {
             return ComponentsAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PKG_NAME, packageName)
+                        putSerializable(EXTRA_TYPE, type)
                     }
                 }
         }
