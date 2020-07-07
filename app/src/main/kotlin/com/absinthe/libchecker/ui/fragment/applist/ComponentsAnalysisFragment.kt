@@ -33,7 +33,10 @@ class ComponentsAnalysisFragment :
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
-    private val type by lazy { arguments?.getSerializable(EXTRA_TYPE) as LibReferenceActivity.Type }
+    private val type by lazy {
+        arguments?.getSerializable(EXTRA_TYPE) as LibReferenceActivity.Type?
+            ?: LibReferenceActivity.Type.TYPE_SERVICE
+    }
     private val adapter = LibStringAdapter().apply {
         mode = TypeConverter.libRefTypeToMode(type)
     }
