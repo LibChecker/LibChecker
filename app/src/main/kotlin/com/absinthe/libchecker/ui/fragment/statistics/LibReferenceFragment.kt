@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -18,7 +19,10 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
+import com.absinthe.libchecker.utils.TypeConverter
+import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
 class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
@@ -53,6 +57,21 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     putExtra(EXTRA_TYPE, item.type)
                 }
                 startActivity(intent)
+            }
+            setOnItemChildClickListener { _, view, position ->
+                if (view.id == R.id.iv_icon) {
+                    if (GlobalValues.config.enableLibDetail) {
+                        val ref = this@LibReferenceFragment.adapter.getItem(position)
+                        val name = ref.libName
+                        val regexName = NativeLibMap.findRegex(name)?.regexName
+                        LibDetailDialogFragment.newInstance(name, TypeConverter.libRefTypeToMode(ref.type), regexName)
+                            .apply {
+                                ActivityStackManager.topActivity?.apply {
+                                    show(supportFragmentManager, tag)
+                                }
+                            }
+                    }
+                }
             }
         }
     }

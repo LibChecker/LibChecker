@@ -16,7 +16,7 @@
         android:background="@null"
         android:padding="10dp">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/iv_icon"
             android:layout_width="@dimen/lib_detail_icon_size"
             android:layout_height="@dimen/lib_detail_icon_size"

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
 import android.graphics.PorterDuff
-import android.widget.ImageView
+import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
@@ -12,11 +12,15 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 class LibReferenceAdapter :
     BaseQuickAdapter<LibReference, BaseViewHolder>(R.layout.item_lib_reference) {
 
+    init {
+        addChildClickViewIds(R.id.iv_icon)
+    }
+
     override fun convert(holder: BaseViewHolder, item: LibReference) {
         holder.setText(R.id.tv_lib_name, item.libName)
 
         item.chip?.let {
-            holder.getView<ImageView>(R.id.iv_icon).apply {
+            holder.getView<ImageButton>(R.id.iv_icon).apply {
                 setImageResource(it.iconRes)
 
                 if (!GlobalValues.isColorfulIcon.value!!) {
