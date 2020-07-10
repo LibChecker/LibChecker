@@ -39,7 +39,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                     }
                 } else {
                     for (item in items) {
-                        if (PackageUtils.getComponentList(item.packageName, type).contains(name)) {
+                        if (PackageUtils.getComponentList(item.packageName, type, false).contains(name)) {
                             list.add(item)
                         }
                     }

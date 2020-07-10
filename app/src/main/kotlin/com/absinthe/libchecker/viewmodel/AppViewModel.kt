@@ -286,7 +286,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 compLibList = PackageUtils.getComponentList(
                     item.packageName,
-                    type
+                    type,
+                    false
                 )
 
                 for (lib in compLibList) {

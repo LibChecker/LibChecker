@@ -96,10 +96,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         applicationInfo.sourceDir = packageName
                         applicationInfo.publicSourceDir = packageName
                     }?.let {
-                        list.addAll(PackageUtils.getComponentList(it, type))
+                        list.addAll(PackageUtils.getComponentList(it, type, true))
                     }
                 } else {
-                    list.addAll(PackageUtils.getComponentList(packageName, type))
+                    list.addAll(PackageUtils.getComponentList(packageName, type, true))
                 }
             } catch (e: Exception) {
                 list.add("Not found")
@@ -107,7 +107,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             if (list.isEmpty()) {
                 try {
-                    list.addAll(PackageUtils.getFreezeComponentList(packageName, type))
+                    list.addAll(PackageUtils.getFreezeComponentList(packageName, type, true))
                 } catch (e: Exception) {
                     list.add("Not found")
                 }

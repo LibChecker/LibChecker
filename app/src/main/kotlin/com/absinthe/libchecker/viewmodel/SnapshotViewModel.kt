@@ -82,25 +82,29 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         gson.toJson(
                             PackageUtils.getComponentList(
                                 packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_SERVICE
+                                LibReferenceActivity.Type.TYPE_SERVICE,
+                                false
                             )
                         ),
                         gson.toJson(
                             PackageUtils.getComponentList(
                                 packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_ACTIVITY
+                                LibReferenceActivity.Type.TYPE_ACTIVITY,
+                                false
                             )
                         ),
                         gson.toJson(
                             PackageUtils.getComponentList(
                                 packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+                                false
                             )
                         ),
                         gson.toJson(
                             PackageUtils.getComponentList(
                                 packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+                                false
                             )
                         )
                     )
@@ -172,7 +176,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                         dbItem.services, gson.toJson(
                                             PackageUtils.getComponentList(
                                                 packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_SERVICE
+                                                LibReferenceActivity.Type.TYPE_SERVICE,
+                                                false
                                             )
                                         )
                                     ),
@@ -180,7 +185,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                         dbItem.activities, gson.toJson(
                                             PackageUtils.getComponentList(
                                                 packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_ACTIVITY
+                                                LibReferenceActivity.Type.TYPE_ACTIVITY,
+                                                false
                                             )
                                         )
                                     ),
@@ -188,7 +194,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                         dbItem.receivers, gson.toJson(
                                             PackageUtils.getComponentList(
                                                 packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+                                                false
                                             )
                                         )
                                     ),
@@ -196,7 +203,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                         dbItem.providers, gson.toJson(
                                             PackageUtils.getComponentList(
                                                 packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+                                                false
                                             )
                                         )
                                     )
@@ -261,7 +269,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 gson.toJson(
                                     PackageUtils.getComponentList(
                                         packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_SERVICE
+                                        LibReferenceActivity.Type.TYPE_SERVICE,
+                                        false
                                     )
                                 )
                             ),
@@ -269,7 +278,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 gson.toJson(
                                     PackageUtils.getComponentList(
                                         packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_ACTIVITY
+                                        LibReferenceActivity.Type.TYPE_ACTIVITY,
+                                        false
                                     )
                                 )
                             ),
@@ -277,7 +287,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 gson.toJson(
                                     PackageUtils.getComponentList(
                                         packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+                                        false
                                     )
                                 )
                             ),
@@ -285,7 +296,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 gson.toJson(
                                     PackageUtils.getComponentList(
                                         packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+                                        false
                                     )
                                 )
                             ),

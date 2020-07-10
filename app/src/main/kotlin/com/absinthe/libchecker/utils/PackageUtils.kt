@@ -209,7 +209,8 @@ object PackageUtils {
 
     fun getComponentList(
         packageName: String,
-        type: LibReferenceActivity.Type
+        type: LibReferenceActivity.Type,
+        isSimpleName: Boolean
     ): List<String> {
         val flag = when (type) {
             LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
@@ -219,12 +220,13 @@ object PackageUtils {
             else -> 0
         }
 
-        return getComponentList(getPackageInfo(packageName, flag), type)
+        return getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
     }
 
     fun getComponentList(
         packageInfo: PackageInfo,
-        type: LibReferenceActivity.Type
+        type: LibReferenceActivity.Type,
+        isSimpleName: Boolean
     ): List<String> {
         val flag = when (type) {
             LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
@@ -245,7 +247,12 @@ object PackageUtils {
         val finalList = mutableListOf<String>()
         list?.let {
             for (component in it) {
-                finalList.add(component.name.removePrefix(packageInfo.packageName))
+                val name = if (isSimpleName) {
+                    component.name.removePrefix(packageInfo.packageName)
+                } else {
+                    component.name
+                }
+                finalList.add(name)
             }
         }
         return finalList
@@ -253,7 +260,8 @@ object PackageUtils {
 
     fun getFreezeComponentList(
         packageName: String,
-        type: LibReferenceActivity.Type
+        type: LibReferenceActivity.Type,
+        isSimpleName: Boolean
     ): List<String> {
         val flag = when (type) {
             LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
@@ -284,7 +292,12 @@ object PackageUtils {
         val finalList = mutableListOf<String>()
         list?.let {
             for (component in it) {
-                finalList.add(component.name.removePrefix(packageName))
+                val name = if (isSimpleName) {
+                    component.name.removePrefix(packageInfo.packageName)
+                } else {
+                    component.name
+                }
+                finalList.add(name)
             }
         }
         return finalList
