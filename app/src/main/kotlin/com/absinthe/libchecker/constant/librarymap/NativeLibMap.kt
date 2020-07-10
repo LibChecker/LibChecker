@@ -920,6 +920,7 @@ object NativeLibMap : BaseMap() {
             Pattern.matches("libBaiduMapSDK_base_v(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
             Pattern.matches("libBaiduMapSDK_map_v(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
             Pattern.matches("liblocSDK(.*)[0-9]a\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
+            Pattern.matches("libcocklogic-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_alibaba, "百川 SDK", "regex_ali_baichuan")
             else -> null
         }
     }

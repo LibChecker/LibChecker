@@ -97,9 +97,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
         AppItemRepository.allItems.value?.let { list ->
             updateItems(list)
-            if (binding.vfContainer.displayedChild == 0) {
-                binding.vfContainer.displayedChild = 1
-            }
         }
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
@@ -127,7 +124,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 updateItems(it)
 
                 if (!isInit) {
-                    binding.vfContainer.displayedChild = 1
                     requestChange(requireContext())
                     isInit = true
                 }
@@ -239,7 +235,14 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 delay(300)
 
                 withContext(Dispatchers.Main) {
-                    returnTopOfList()
+                    try {
+                        if (binding.vfContainer.displayedChild == 0) {
+                            binding.vfContainer.displayedChild = 1
+                        }
+                        returnTopOfList()
+                    } catch (ignore: Exception) {
+
+                    }
                 }
             }
         }
