@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
+import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
@@ -31,6 +32,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
+    @SuppressLint("SetTextI18n")
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
         binding.apply {
@@ -76,7 +78,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
-                displayedChild = 1
             }
         }
 
@@ -107,10 +108,12 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
         viewModel.apply {
             timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
-                dashboardBinding.tvSnapshotTimestampText.text = if (it != 0L) {
-                    getFormatDateString(it)
+                if (it != 0L) {
+                    dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
+                    binding.vfContainer.displayedChild = 0
                 } else {
-                    "None"
+                    dashboardBinding.tvSnapshotTimestampText.text = "None"
+                    binding.vfContainer.displayedChild = 1
                 }
             })
             snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {

@@ -123,6 +123,7 @@ class MainActivity : BaseActivity() {
 
                 //禁止左右滑动
                 isUserInputEnabled = false
+                offscreenPageLimit = 3
             }
 
             // 当ViewPager切换页面时，改变ViewPager的显示
