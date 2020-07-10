@@ -245,7 +245,7 @@ object PackageUtils {
         val finalList = mutableListOf<String>()
         list?.let {
             for (component in it) {
-                finalList.add(component.name)
+                finalList.add(component.name.removePrefix(packageInfo.packageName))
             }
         }
         return finalList
@@ -284,7 +284,7 @@ object PackageUtils {
         val finalList = mutableListOf<String>()
         list?.let {
             for (component in it) {
-                finalList.add(component.name)
+                finalList.add(component.name.removePrefix(packageName))
             }
         }
         return finalList

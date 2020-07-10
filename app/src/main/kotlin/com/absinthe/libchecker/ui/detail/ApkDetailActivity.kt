@@ -19,8 +19,10 @@ import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
+import java.io.FileNotFoundException
 
 class ApkDetailActivity : BaseActivity() {
 
@@ -83,10 +85,16 @@ class ApkDetailActivity : BaseActivity() {
     @SuppressLint("SetTextI18n")
     private fun initData(uri: Uri) {
         val libList = ArrayList<LibStringItem>()
-        val inputStream = contentResolver.openInputStream(uri)
-        tempFile = File(externalCacheDir, "temp.apk")
 
-        FileIOUtils.writeFileFromIS(tempFile, inputStream)
+        try {
+            val inputStream = contentResolver.openInputStream(uri)
+            tempFile = File(externalCacheDir, "temp.apk")
+
+            FileIOUtils.writeFileFromIS(tempFile, inputStream)
+        } catch (e: FileNotFoundException) {
+            ToastUtils.showShort("Please use another File Manager to open the APK")
+            finish()
+        }
 
         val path = tempFile!!.path
         val packageInfo = packageManager.getPackageArchiveInfo(path, 0)

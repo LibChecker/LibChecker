@@ -16,8 +16,8 @@ object Global {
                     Looper.loop()
                 } catch (e: Throwable) {
                     val stack = Log.getStackTraceString(e)
-                    if (stack.contains("BaseFragment") ||
-                        stack.contains("Service.startForeground()")
+                    if (stack.contains("Service.startForeground()") ||
+                        stack.contains("LiveData")
                     ) {
                         logw(e.toString())
                     } else {

@@ -651,6 +651,20 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libconnectionbase.so",
+            LibChip(
+                R.drawable.ic_lib_xiaomi,
+                "小米游戏 SDK"
+            )
+        ),
+        Pair(
+            "libmilinkconnection.so",
+            LibChip(
+                R.drawable.ic_lib_xiaomi,
+                "小米游戏 SDK"
+            )
+        ),
+        Pair(
             "libmibraindec.so",
             LibChip(
                 R.drawable.ic_lib_xiaoai,
