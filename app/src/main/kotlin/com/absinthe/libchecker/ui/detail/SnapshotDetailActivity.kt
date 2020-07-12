@@ -8,6 +8,7 @@ import android.view.View
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDetailItem
@@ -111,6 +112,7 @@ class SnapshotDetailActivity : BaseActivity() {
                     paddingEnd,
                     paddingBottom + UiUtils.getNavBarHeight()
                 )
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
