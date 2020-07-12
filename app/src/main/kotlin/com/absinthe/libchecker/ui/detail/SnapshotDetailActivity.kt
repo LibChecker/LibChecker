@@ -10,14 +10,20 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.recyclerview.adapter.ARROW
-import com.absinthe.libchecker.recyclerview.adapter.SnapshotDetailAdapter
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
+import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 
@@ -99,7 +105,12 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
+                setPadding(
+                    paddingStart,
+                    paddingTop,
+                    paddingEnd,
+                    paddingBottom + UiUtils.getNavBarHeight()
+                )
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
@@ -107,12 +118,24 @@ class SnapshotDetailActivity : BaseActivity() {
             ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity.packageName))
             tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
             tvPackageName.text = entity.packageName
-            tvVersion.text = getDiffString(entity.versionNameDiff, entity.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+            tvVersion.text = getDiffString(
+                entity.versionNameDiff,
+                entity.versionCodeDiff,
+                isNewOrDeleted,
+                "%s (%s)"
+            )
             tvTargetApi.text = getDiffString(entity.targetApiDiff, isNewOrDeleted, "API %s")
         }
 
-        viewModel.snapshotDetailItems.observe(this, Observer {
-            adapter.setList(it)
+        viewModel.snapshotDetailItems.observe(this, Observer { details ->
+            val titleList = listOf(
+                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_NATIVE }), getString(R.string.ref_category_native)),
+                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_SERVICE }), getString(R.string.ref_category_service)),
+                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_ACTIVITY }), getString(R.string.ref_category_activity)),
+                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER }), getString(R.string.ref_category_br)),
+                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER }), getString(R.string.ref_category_cp))
+                )
+            adapter.setList(titleList)
         })
 
         adapter.setEmptyView(
@@ -132,17 +155,51 @@ class SnapshotDetailActivity : BaseActivity() {
         }
     }
 
-    private fun <T> getDiffString(diff: SnapshotDiffItem.DiffNode<T>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+    private fun getNodeList(list: List<SnapshotDetailItem>): MutableList<BaseNode> {
+        val returnList = mutableListOf<BaseNode>()
+
+        if (list.isEmpty()) return returnList
+
+        if (list[0].itemType == LibReferenceActivity.Type.TYPE_NATIVE) {
+            for (item in list) {
+                returnList.add(SnapshotNativeNode(item))
+            }
+        } else {
+            for (item in list) {
+                returnList.add(SnapshotComponentNode(item))
+            }
+        }
+
+        return returnList
+    }
+
+    private fun <T> getDiffString(
+        diff: SnapshotDiffItem.DiffNode<T>,
+        isNewOrDeleted: Boolean = false,
+        format: String = "%s"
+    ): String {
         return if (diff.old != diff.new && !isNewOrDeleted) {
-            "${String.format(format, diff.old.toString())} $ARROW ${String.format(format, diff.new.toString())}"
+            "${String.format(format, diff.old.toString())} $ARROW ${String.format(
+                format,
+                diff.new.toString()
+            )}"
         } else {
             String.format(format, diff.old.toString())
         }
     }
 
-    private fun getDiffString(diff1: SnapshotDiffItem.DiffNode<*>, diff2: SnapshotDiffItem.DiffNode<*>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+    private fun getDiffString(
+        diff1: SnapshotDiffItem.DiffNode<*>,
+        diff2: SnapshotDiffItem.DiffNode<*>,
+        isNewOrDeleted: Boolean = false,
+        format: String = "%s"
+    ): String {
         return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-            "${String.format(format, diff1.old.toString(), diff2.old.toString())} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+            "${String.format(
+                format,
+                diff1.old.toString(),
+                diff2.old.toString()
+            )} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
         } else {
             String.format(format, diff1.old.toString(), diff2.old.toString())
         }

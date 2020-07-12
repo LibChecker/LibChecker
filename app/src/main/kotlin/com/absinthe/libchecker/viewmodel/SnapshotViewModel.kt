@@ -15,7 +15,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.SnapshotItem
-import com.absinthe.libchecker.recyclerview.adapter.ARROW
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
@@ -341,7 +341,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 gson.fromJson(
                     entity.servicesDiff.new,
                     object : TypeToken<List<String>>() {}.type
-                )
+                ),
+                LibReferenceActivity.Type.TYPE_SERVICE
             )
         )
         list.addAll(
@@ -353,7 +354,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 gson.fromJson(
                     entity.activitiesDiff.new,
                     object : TypeToken<List<String>>() {}.type
-                )
+                ),
+                LibReferenceActivity.Type.TYPE_ACTIVITY
             )
         )
         list.addAll(
@@ -365,7 +367,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 gson.fromJson(
                     entity.receiversDiff.new,
                     object : TypeToken<List<String>>() {}.type
-                )
+                ),
+                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
             )
         )
         list.addAll(
@@ -377,7 +380,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 gson.fromJson(
                     entity.providersDiff.new,
                     object : TypeToken<List<String>>() {}.type
-                )
+                ),
+                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
             )
         )
 
@@ -407,7 +411,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             it.name,
                             "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}",
                             CHANGED,
-                            TYPE_NATIVE
+                            LibReferenceActivity.Type.TYPE_NATIVE
                         )
                     )
                 }
@@ -426,7 +430,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     item.name,
                     PackageUtils.sizeToString(item.size),
                     REMOVED,
-                    TYPE_NATIVE
+                    LibReferenceActivity.Type.TYPE_NATIVE
                 )
             )
         }
@@ -436,7 +440,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     item.name,
                     PackageUtils.sizeToString(item.size),
                     ADDED,
-                    TYPE_NATIVE
+                    LibReferenceActivity.Type.TYPE_NATIVE
                 )
             )
         }
@@ -446,7 +450,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     private fun getComponentsDiffList(
         oldList: List<String>,
-        newList: List<String>?
+        newList: List<String>?,
+        type: LibReferenceActivity.Type
     ): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
 
@@ -475,7 +480,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     item,
                     "",
                     REMOVED,
-                    TYPE_COMPONENT
+                    type
                 )
             )
         }
@@ -485,7 +490,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     item,
                     "",
                     ADDED,
-                    TYPE_COMPONENT
+                    type
                 )
             )
         }

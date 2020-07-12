@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview.adapter
+package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.res.ColorStateList
 import android.widget.ImageView
@@ -192,7 +192,8 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<LibStringItem>()
-        val node = CompareDiffNode()
+        val node =
+            CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it.name == item.name }?.let {
