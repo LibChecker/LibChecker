@@ -33,6 +33,7 @@
             android:paddingHorizontal="@dimen/normal_padding"
             android:paddingTop="?actionBarSize"
             android:scrollbars="none"
+            android:scrollbarAlwaysDrawVerticalTrack="false"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
             app:borderTopStyle="whenTop"

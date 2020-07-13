@@ -474,22 +474,28 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             tempNewList.remove(item)
         }
 
+
         var simpleName: String
+        val deletedOldList = mutableListOf<String>()
+        val deletedNewList = mutableListOf<String>()
+
         for (item in tempNewList) {
             simpleName = item.substringAfterLast(".")
             tempOldList.find { it.substringAfterLast(".") == simpleName }?.let {
                 list.add(
                     SnapshotDetailItem(
-                        "$it $ARROW $item",
+                        "$it\n$ARROW\n$item",
                         "",
                         MOVED,
                         type
                     )
                 )
-                tempOldList.remove(it)
-                tempNewList.remove(item)
+                deletedOldList.add(it)
+                deletedNewList.add(item)
             }
         }
+        tempOldList.removeAll(deletedOldList)
+        tempNewList.removeAll(deletedNewList)
 
         for (item in tempOldList) {
             list.add(

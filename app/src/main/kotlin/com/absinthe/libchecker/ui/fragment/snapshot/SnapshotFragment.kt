@@ -28,8 +28,7 @@ import java.util.*
 class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val adapter =
-        SnapshotAdapter()
+    private val adapter = SnapshotAdapter()
 
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 

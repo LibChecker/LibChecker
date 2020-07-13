@@ -93,6 +93,8 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
                 compareNode.removed and !isNewOrDeleted
             holder.getView<TextView>(R.id.indicator_changed).isVisible =
                 compareNode.changed and !isNewOrDeleted
+            holder.getView<TextView>(R.id.indicator_moved).isVisible =
+                compareNode.moved and !isNewOrDeleted
         }
 
         holder.setText(R.id.tv_app_name, getDiffString(item.labelDiff, isNewOrDeleted))
@@ -248,14 +250,19 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         }
 
         var simpleName: String
+        val deletedOldList = mutableListOf<String>()
+        val deletedNewList = mutableListOf<String>()
+
         for (item in tempNewList) {
             simpleName = item.substringAfterLast(".")
             tempOldList.find { it.substringAfterLast(".") == simpleName }?.let {
                 node.moved = true
-                tempOldList.remove(it)
-                tempNewList.remove(item)
+                deletedOldList.add(it)
+                deletedNewList.add(item)
             }
         }
+        tempOldList.removeAll(deletedOldList)
+        tempNewList.removeAll(deletedNewList)
 
         if (tempOldList.isNotEmpty()) {
             node.removed = true
