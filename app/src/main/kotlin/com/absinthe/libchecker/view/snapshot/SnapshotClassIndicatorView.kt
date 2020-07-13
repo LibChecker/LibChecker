@@ -15,6 +15,7 @@ class SnapshotClassIndicatorView : LinearLayout {
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
         LayoutInflater.from(context).inflate(R.layout.layout_snapshot_indicator, this)
         context.obtainStyledAttributes(attrs, R.styleable.SnapshotClassIndicatorView).apply {
+            findViewById<ImageView>(R.id.icon)?.setImageResource(getResourceId(R.styleable.SnapshotClassIndicatorView_icon, 0))
             findViewById<TextView>(R.id.text)?.text = getString(R.styleable.SnapshotClassIndicatorView_text)
             findViewById<ImageView>(R.id.indicator)?.setImageResource(getResourceId(R.styleable.SnapshotClassIndicatorView_indicator, 0))
             recycle()

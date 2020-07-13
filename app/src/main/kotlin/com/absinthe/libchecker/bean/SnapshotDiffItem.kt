@@ -18,6 +18,7 @@ data class SnapshotDiffItem(
     val added: Boolean = false,
     val removed: Boolean = false,
     val changed: Boolean = false,
+    val moved: Boolean = false,
     val newInstalled: Boolean = false,
     val deleted: Boolean = false
 ) : Serializable {

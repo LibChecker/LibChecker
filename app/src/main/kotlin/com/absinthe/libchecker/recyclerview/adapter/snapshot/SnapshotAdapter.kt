@@ -175,6 +175,8 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed
         totalNode.changed =
             nativeCompareNode.changed or servicesCompareNode.changed or activitiesCompareNode.changed or receiversCompareNode.changed or providersCompareNode.changed
+        totalNode.moved =
+            nativeCompareNode.moved or servicesCompareNode.moved or activitiesCompareNode.moved or receiversCompareNode.moved or providersCompareNode.moved
 
         return totalNode
     }
@@ -245,6 +247,16 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             tempNewList.remove(item)
         }
 
+        var simpleName: String
+        for (item in tempNewList) {
+            simpleName = item.substringAfterLast(".")
+            tempOldList.find { it.substringAfterLast(".") == simpleName }?.let {
+                node.moved = true
+                tempOldList.remove(it)
+                tempNewList.remove(item)
+            }
+        }
+
         if (tempOldList.isNotEmpty()) {
             node.removed = true
         }
@@ -273,6 +285,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
     data class CompareDiffNode(
         var added: Boolean = false,
         var removed: Boolean = false,
-        var changed: Boolean = false
+        var changed: Boolean = false,
+        var moved: Boolean = false
     )
 }

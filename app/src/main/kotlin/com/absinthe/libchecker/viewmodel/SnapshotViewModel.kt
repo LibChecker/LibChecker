@@ -474,6 +474,23 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             tempNewList.remove(item)
         }
 
+        var simpleName: String
+        for (item in tempNewList) {
+            simpleName = item.substringAfterLast(".")
+            tempOldList.find { it.substringAfterLast(".") == simpleName }?.let {
+                list.add(
+                    SnapshotDetailItem(
+                        "$it $ARROW $item",
+                        "",
+                        MOVED,
+                        type
+                    )
+                )
+                tempOldList.remove(it)
+                tempNewList.remove(item)
+            }
+        }
+
         for (item in tempOldList) {
             list.add(
                 SnapshotDetailItem(

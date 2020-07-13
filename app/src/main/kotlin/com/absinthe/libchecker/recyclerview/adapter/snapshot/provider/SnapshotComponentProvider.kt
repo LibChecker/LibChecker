@@ -5,9 +5,9 @@ import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
+import com.absinthe.libchecker.bean.MOVED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
-import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -29,6 +29,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
             ADDED -> R.color.material_green_300
             REMOVED -> R.color.material_red_300
             CHANGED -> R.color.material_yellow_300
+            MOVED -> R.color.material_blue_300
             else -> 0
         }
 
@@ -37,6 +38,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                 ADDED -> R.drawable.ic_add
                 REMOVED -> R.drawable.ic_remove
                 CHANGED -> R.drawable.ic_changed
+                MOVED -> R.drawable.ic_move
                 else -> 0
             }
         )

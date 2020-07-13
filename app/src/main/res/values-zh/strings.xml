@@ -63,4 +63,5 @@
     <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
     <string name="string_kotlin_used">使用了 Kotlin</string>
     <string name="string_kotlin_unused">未使用 Kotlin</string>
+    <string name="snapshot_indicator_moved">移动</string>
 </resources>

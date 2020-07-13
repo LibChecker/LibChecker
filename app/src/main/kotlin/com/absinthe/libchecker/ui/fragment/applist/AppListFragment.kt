@@ -239,7 +239,10 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         if (binding.vfContainer.displayedChild == 0) {
                             binding.vfContainer.displayedChild = 1
                         }
-                        returnTopOfList()
+                        
+                        if (GlobalValues.appSortMode.value!! == Constants.SORT_MODE_UPDATE_TIME_DESC) {
+                            returnTopOfList()
+                        }
                     } catch (ignore: Exception) {
 
                     }

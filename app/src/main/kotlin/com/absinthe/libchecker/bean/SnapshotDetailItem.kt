@@ -6,6 +6,7 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 const val ADDED = 0
 const val REMOVED = 1
 const val CHANGED = 2
+const val MOVED = 3
 
 data class SnapshotDetailItem(
     val title: String,

@@ -130,14 +130,37 @@ class SnapshotDetailActivity : BaseActivity() {
         }
 
         viewModel.snapshotDetailItems.observe(this, Observer { details ->
-            val titleList = listOf(
-                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_NATIVE }), getString(R.string.ref_category_native)),
-                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_SERVICE }), getString(R.string.ref_category_service)),
-                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_ACTIVITY }), getString(R.string.ref_category_activity)),
-                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER }), getString(R.string.ref_category_br)),
-                SnapshotTitleNode(getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER }), getString(R.string.ref_category_cp))
-                )
-            adapter.setList(titleList)
+            val titleList = mutableListOf<SnapshotTitleNode>()
+
+            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_NATIVE }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_native)))
+                }
+            }
+            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_SERVICE }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_service)))
+                }
+            }
+            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_ACTIVITY }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_activity)))
+                }
+            }
+            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_br)))
+                }
+            }
+            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_cp)))
+                }
+            }
+
+            if (titleList.isNotEmpty()) {
+                adapter.setList(titleList)
+            }
         })
 
         adapter.setEmptyView(
