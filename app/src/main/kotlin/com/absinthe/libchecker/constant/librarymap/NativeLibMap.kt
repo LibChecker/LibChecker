@@ -798,6 +798,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libmono-native.so",
+            LibChip(
+                R.drawable.ic_lib_xamarin,
+                "Xamarin"
+            )
+        ),
+        Pair(
             "libbmob.so",
             LibChip(
                 R.drawable.ic_question,

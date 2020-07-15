@@ -24,6 +24,7 @@ import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
@@ -36,19 +37,16 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
-    private val viewModel by viewModels<AppViewModel>()
+    private val appViewModel by viewModels<AppViewModel>()
+    private val snapshotViewModel by viewModels<SnapshotViewModel>()
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
-                try {
-                    GlobalValues.shouldRequestChange = true
-                    viewModel.requestChange(this@MainActivity)
-                } catch (e: VerifyError) {
-                    e.printStackTrace()
-                }
+                appViewModel.requestChange(this@MainActivity)
+                snapshotViewModel.computeSnapshots(this@MainActivity)
             }
         }
     }
@@ -70,7 +68,7 @@ class MainActivity : BaseActivity() {
         registerPackageBroadcast()
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-            viewModel.collectPopularLibraries(this)
+            appViewModel.collectPopularLibraries(this)
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }
     }
@@ -78,7 +76,8 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (GlobalValues.shouldRequestChange) {
-            viewModel.requestChange(this)
+            appViewModel.requestChange(this)
+            snapshotViewModel.computeSnapshots(this)
         }
     }
 
@@ -140,7 +139,7 @@ class MainActivity : BaseActivity() {
                                     clickBottomItemFlag = false
                                 }
                             } else {
-                                viewModel.clickBottomItemFlag.value = true
+                                appViewModel.clickBottomItemFlag.value = true
                             }
                         }
                     }
@@ -155,7 +154,7 @@ class MainActivity : BaseActivity() {
                                     clickBottomItemFlag = false
                                 }
                             } else {
-                                viewModel.clickBottomItemFlag.value = true
+                                appViewModel.clickBottomItemFlag.value = true
                             }
                         }
                     }

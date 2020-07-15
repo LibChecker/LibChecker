@@ -43,8 +43,8 @@ android {
         }
     }
 
-// To inline the bytecode built with JVM target 1.8 into
-// bytecode that is being built with JVM target 1.6. (e.g. navArgs)
+    // To inline the bytecode built with JVM target 1.8 into
+    // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
 
     sourceSets { main.java.srcDirs += 'src/main/kotlin' }
 
@@ -85,7 +85,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${lifecycle_version}"
     implementation "androidx.lifecycle:lifecycle-common-java8:${lifecycle_version}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycle_version}"
-
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+    
     // Room components
     def roomVersion = '2.2.5'
     implementation "androidx.room:room-runtime:$roomVersion"

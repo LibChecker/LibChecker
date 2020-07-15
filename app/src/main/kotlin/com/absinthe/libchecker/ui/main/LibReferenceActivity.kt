@@ -47,9 +47,9 @@ class LibReferenceActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         val name = intent.extras?.getString(EXTRA_NAME)
-        val type = intent.extras?.getSerializable(EXTRA_TYPE) as Type
+        val type = intent.extras?.getSerializable(EXTRA_TYPE) as? Type
 
-        if (name == null) {
+        if (name == null || type == null) {
             supportFinishAfterTransition()
         } else {
             initView()
