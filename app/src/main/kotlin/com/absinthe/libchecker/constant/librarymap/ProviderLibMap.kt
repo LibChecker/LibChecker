@@ -133,6 +133,10 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "cn.bmob.v3.util.BmobContentProvider",
             LibChip(R.drawable.ic_question, "Bmob 后端云")
+        ),
+        Pair(
+            "moe.shizuku.api.ShizukuProvider",
+            LibChip(R.drawable.ic_lib_shizuku, "Shizuku")
         )
     )
 

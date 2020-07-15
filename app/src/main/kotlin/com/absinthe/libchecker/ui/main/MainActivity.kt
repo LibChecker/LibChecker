@@ -46,7 +46,7 @@ class MainActivity : BaseActivity() {
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
                 appViewModel.requestChange(this@MainActivity)
-                snapshotViewModel.computeSnapshots(this@MainActivity)
+                snapshotViewModel.computeDiff(this@MainActivity)
             }
         }
     }
@@ -77,7 +77,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         if (GlobalValues.shouldRequestChange) {
             appViewModel.requestChange(this)
-            snapshotViewModel.computeSnapshots(this)
+            snapshotViewModel.computeDiff(this)
         }
     }
 
