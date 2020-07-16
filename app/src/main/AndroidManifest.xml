@@ -6,6 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
+    <uses-sdk tools:overrideLibrary="androidx.appcompat" />
+
     <application
         android:name=".LibCheckerApp"
         android:allowBackup="true"

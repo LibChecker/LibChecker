@@ -37,7 +37,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
     private val adapter = SnapshotDetailAdapter()
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as SnapshotDiffItem? }
+    private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
     init {
         isPaddingToolbar = true
