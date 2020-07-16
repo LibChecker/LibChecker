@@ -22,7 +22,6 @@ import com.blankj.utilcode.util.FileIOUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
-import java.io.FileNotFoundException
 
 class ApkDetailActivity : BaseActivity() {
 
@@ -91,44 +90,44 @@ class ApkDetailActivity : BaseActivity() {
             tempFile = File(externalCacheDir, "temp.apk")
 
             FileIOUtils.writeFileFromIS(tempFile, inputStream)
-        } catch (e: FileNotFoundException) {
+
+            val path = tempFile!!.path
+            val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
+            packageInfo?.let {
+                //Refer to https://juejin.im/post/5cb41f7b6fb9a0688b574228
+                it.applicationInfo.sourceDir = path
+                it.applicationInfo.publicSourceDir = path
+
+                supportActionBar?.apply {
+                    title = it.applicationInfo.loadLabel(packageManager)
+                }
+                binding.apply {
+                    try {
+                        ivAppIcon.apply {
+                            setImageDrawable(it.applicationInfo.loadIcon(packageManager))
+                        }
+                        tvAppName.text = it.applicationInfo.loadLabel(packageManager)
+                        tvPackageName.text = packageInfo.packageName
+                        tvVersion.text = "${it.versionName}(${it.versionCode})"
+                        tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
+
+                        val abi = PackageUtils.getAbi(
+                            it.applicationInfo.sourceDir,
+                            it.applicationInfo.nativeLibraryDir,
+                            isApk = true
+                        )
+
+                        layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
+                        layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
+                    } catch (e: Exception) {
+                        supportFinishAfterTransition()
+                    }
+                }
+            } ?: finish()
+        } catch (e: Exception) {
             ToastUtils.showShort("Please use another File Manager to open the APK")
             finish()
         }
-
-        val path = tempFile!!.path
-        val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
-        packageInfo?.let {
-            //Refer to https://juejin.im/post/5cb41f7b6fb9a0688b574228
-            it.applicationInfo.sourceDir = path
-            it.applicationInfo.publicSourceDir = path
-
-            supportActionBar?.apply {
-                title = it.applicationInfo.loadLabel(packageManager)
-            }
-            binding.apply {
-                try {
-                    ivAppIcon.apply {
-                        setImageDrawable(it.applicationInfo.loadIcon(packageManager))
-                    }
-                    tvAppName.text = it.applicationInfo.loadLabel(packageManager)
-                    tvPackageName.text = packageInfo.packageName
-                    tvVersion.text = "${it.versionName}(${it.versionCode})"
-                    tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
-
-                    val abi = PackageUtils.getAbi(
-                        it.applicationInfo.sourceDir,
-                        it.applicationInfo.nativeLibraryDir,
-                        isApk = true
-                    )
-
-                    layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                    layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
-                } catch (e: Exception) {
-                    supportFinishAfterTransition()
-                }
-            }
-        } ?: finish()
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
