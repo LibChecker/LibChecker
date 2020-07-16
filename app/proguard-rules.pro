@@ -23,9 +23,6 @@
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
 -keep class * extends androidx.fragment.app.Fragment{}
--keep public class com.google.vending.licensing.ILicensingService
--keep public class com.android.vending.licensing.ILicensingService
--keep public class com.google.android.vending.licensing.ILicensingService
 -dontnote com.android.vending.licensing.ILicensingService
 -dontnote com.google.vending.licensing.ILicensingService
 -dontnote com.google.android.vending.licensing.ILicensingService
@@ -74,23 +71,8 @@
 -dontwarn javax.annotation.**
 
 # Understand the @Keep support annotation.
--keep class android.support.annotation.Keep
 -keep class androidx.annotation.Keep
-
--keep @android.support.annotation.Keep class * {*;}
 -keep @androidx.annotation.Keep class * {*;}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <methods>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <fields>;
-}
-
--keepclasseswithmembers class * {
-    @android.support.annotation.Keep <init>(...);
-}
 
 -keepclasseswithmembers class * {
     @androidx.annotation.Keep <methods>;
@@ -120,9 +102,17 @@
 -dontwarn org.xmlpull.v1.XmlSerializer
 -keep class org.xmlpull.v1.* {*;}
 
-#Glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
-   **[] $VALUES;
-   public *;
+## Android architecture components: Lifecycle
+# LifecycleObserver's empty constructor is considered to be unused by proguard
+-keepclassmembers class * implements androidx.lifecycle.LifecycleObserver {
+    <init>(...);
+}
+# ViewModel's empty constructor is considered to be unused by proguard
+-keepclassmembers class * extends androidx.lifecycle.ViewModel {
+    <init>(...);
+}
+# keep methods annotated with @OnLifecycleEvent even if they seem to be unused
+# (Mostly for LiveData.LifecycleBoundObserver.onStateChange(), but who knows)
+-keepclassmembers class * {
+    @androidx.lifecycle.OnLifecycleEvent *;
 }

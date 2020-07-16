@@ -17,7 +17,7 @@ object Global {
                 } catch (e: Throwable) {
                     val stack = Log.getStackTraceString(e)
                     if (stack.contains("Service.startForeground()") ||
-                        stack.contains("LiveData")
+                        stack.contains("requestConfiguration")
                     ) {
                         logw(e.toString())
                     } else {

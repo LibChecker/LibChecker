@@ -20,7 +20,15 @@ object GlobalValues {
         return preferences
     }
 
-    var config = Configuration()
+    var config = Configuration(
+        enableLibDetail = false,
+        enableComponentsDetail = false,
+        showLibName = false,
+        showTeamName = false,
+        showContributor = false,
+        showLibDescription = false,
+        showRelativeUrl = false
+    )
 
     var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
         ?: Constants.REPO_GITEE

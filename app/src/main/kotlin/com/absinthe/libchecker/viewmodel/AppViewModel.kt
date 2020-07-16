@@ -7,7 +7,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.util.Log
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,6 +22,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.AppUtils
@@ -38,7 +39,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var refreshLock = false
     var isInit = false
 
-    private val tag = AppViewModel::class.java.simpleName
     private val repository: LCRepository
 
     init {
@@ -48,7 +48,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d(tag, "initItems")
+        logd("initItems")
 
         repository.deleteAllItems()
 
@@ -69,7 +69,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 packageInfo = PackageUtils.getPackageInfo(info)
                 versionCode = PackageUtils.getVersionCode(packageInfo)
                 abiType = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                isSystemType = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                isSystemType =
+                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
                 appItem = AppItem().apply {
@@ -105,6 +106,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 e.printStackTrace()
                 continue
+            } catch (e: VerifyError) {
+                continue
             }
         }
 
@@ -121,7 +124,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addItem() = viewModelScope.launch(Dispatchers.IO) {
-        Log.d(tag, "addItems")
+        logd("addItems")
 
         dbItems.value?.let { value ->
             val newItems = ArrayList<AppItem>()
@@ -170,8 +173,21 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d(tag, "requestChange")
+        logd("requestChange")
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestChangeImpl(context)
+        } else {
+            try {
+                requestChangeImpl(context)
+            } catch (e: VerifyError) {
+                e.printStackTrace()
+            }
+        }
+        GlobalValues.shouldRequestChange = false
+    }
+
+    private fun requestChangeImpl(context: Context) {
         val appList = context.packageManager
             .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
 
@@ -235,7 +251,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
-        GlobalValues.shouldRequestChange = false
     }
 
     fun collectPopularLibraries(context: Context) = viewModelScope.launch(Dispatchers.IO) {
@@ -268,9 +283,21 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_SERVICE, "Service")
-        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_ACTIVITY, "Activity")
-        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, "Receiver")
-        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, "Provider")
+        collectComponentPopularLibraries(
+            appList,
+            LibReferenceActivity.Type.TYPE_ACTIVITY,
+            "Activity"
+        )
+        collectComponentPopularLibraries(
+            appList,
+            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+            "Receiver"
+        )
+        collectComponentPopularLibraries(
+            appList,
+            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+            "Provider"
+        )
     }
 
     private fun collectComponentPopularLibraries(
@@ -301,7 +328,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         val libMap = BaseMap.getMap(type)
         for (entry in map) {
-            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null) {
+            if (entry.value > 3 && !libMap.getMap()
+                    .containsKey(entry.key) && libMap.findRegex(entry.key) == null
+            ) {
                 val properties: MutableMap<String, String> = java.util.HashMap()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
