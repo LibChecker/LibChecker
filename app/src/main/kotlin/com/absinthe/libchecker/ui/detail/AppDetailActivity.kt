@@ -22,7 +22,6 @@ import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.IntentUtils
@@ -34,10 +33,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
+
 class AppDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
-    private val pkgName by lazy { intent.getStringExtra(EXTRA_PKG_NAME) }
+    private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
 
     init {
         isPaddingToolbar = true

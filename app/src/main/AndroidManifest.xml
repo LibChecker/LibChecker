@@ -29,7 +29,16 @@
         </activity>
         <activity
             android:name=".ui.detail.AppDetailActivity"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action
+                    android:name="android.intent.action.SHOW_APP_INFO">
+                </action>
+                <category
+                    android:name="android.intent.category.DEFAULT">
+                </category>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.detail.ApkDetailActivity"
             android:label="@string/detail_label"

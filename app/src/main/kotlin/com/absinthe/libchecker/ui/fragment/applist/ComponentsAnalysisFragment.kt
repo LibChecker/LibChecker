@@ -14,6 +14,7 @@ import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
@@ -24,14 +25,13 @@ import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.ToastUtils
 import rikka.core.util.ClipboardUtils
 
-const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 const val EXTRA_MODE = "EXTRA_MODE"
 
 class ComponentsAnalysisFragment :
     BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
     private val viewModel by viewModels<DetailViewModel>()
-    private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) }
+    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
@@ -128,7 +128,7 @@ class ComponentsAnalysisFragment :
             return ComponentsAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
-                        putString(EXTRA_PKG_NAME, packageName)
+                        putString(EXTRA_PACKAGE_NAME, packageName)
                         putSerializable(EXTRA_MODE, mode)
                     }
                 }

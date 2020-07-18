@@ -12,8 +12,7 @@ import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
-
-const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
 
@@ -25,7 +24,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
         adapter.setOnItemClickListener { adapter, view, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
-                    putString(EXTRA_PKG_NAME, (adapter.getItem(position) as AppItem).packageName)
+                    putString(EXTRA_PACKAGE_NAME, (adapter.getItem(position) as AppItem).packageName)
                 })
             }
 

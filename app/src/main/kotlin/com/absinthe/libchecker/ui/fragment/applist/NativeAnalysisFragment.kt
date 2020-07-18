@@ -11,11 +11,11 @@ import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.ToastUtils
@@ -27,7 +27,7 @@ const val MODE_SORT_BY_LIB = 1
 class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
     private val viewModel by activityViewModels<DetailViewModel>()
-    private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
+    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
     private val adapter = LibStringAdapter(LibStringAdapter.Mode.NATIVE)
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
@@ -97,7 +97,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             return NativeAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
-                        putString(EXTRA_PKG_NAME, packageName)
+                        putString(EXTRA_PACKAGE_NAME, packageName)
                     }
                 }
         }

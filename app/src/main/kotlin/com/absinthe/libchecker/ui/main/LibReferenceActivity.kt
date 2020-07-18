@@ -16,9 +16,9 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -123,7 +123,7 @@ class LibReferenceActivity : BaseActivity() {
 
             val intent = Intent(this, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
-                    putString(EXTRA_PKG_NAME, adapter.getItem(position).packageName)
+                    putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
                 })
             }
 

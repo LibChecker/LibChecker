@@ -44,7 +44,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "androidx.startup.InitializationProvider",
-            LibChip(R.drawable.ic_lib_jetpack, "Jetpack StartUp")
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack App Startup")
         ),
         Pair(
             "com.google.firebase.provider.FirebaseInitProvider",
