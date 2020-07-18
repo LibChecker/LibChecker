@@ -17,9 +17,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
+class LibStringAdapter(val mode: Mode) : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
-    var mode = Mode.NATIVE
+    private val map: BaseMap = when (mode) {
+        Mode.NATIVE -> NativeLibMap
+        Mode.SERVICE -> ServiceLibMap
+        Mode.ACTIVITY -> ActivityLibMap
+        Mode.RECEIVER -> ReceiverLibMap
+        Mode.PROVIDER -> ProviderLibMap
+    }
 
     init {
         addChildClickViewIds(R.id.chip)
@@ -35,14 +41,6 @@ class LibStringAdapter : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layou
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
             val libIcon = holder.getView<Chip>(R.id.chip)
-
-            val map: BaseMap = when (mode) {
-                Mode.NATIVE -> NativeLibMap
-                Mode.SERVICE -> ServiceLibMap
-                Mode.ACTIVITY -> ActivityLibMap
-                Mode.RECEIVER -> ReceiverLibMap
-                Mode.PROVIDER -> ProviderLibMap
-            }
 
             map.getChip(item.name)?.let {
                 libIcon.apply {

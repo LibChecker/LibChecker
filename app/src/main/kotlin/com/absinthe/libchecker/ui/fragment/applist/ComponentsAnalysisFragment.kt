@@ -32,7 +32,7 @@ class ComponentsAnalysisFragment :
 
     private val viewModel by viewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) }
-    private val adapter = LibStringAdapter()
+    private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
 
     override fun initBinding(view: View): FragmentManifestAnalysisBinding = FragmentManifestAnalysisBinding.bind(view)
 
@@ -96,10 +96,7 @@ class ComponentsAnalysisFragment :
             }
         }
 
-        val mode = arguments?.getSerializable(EXTRA_MODE)!! as LibStringAdapter.Mode
-
         adapter.apply {
-            this.mode = mode
             setOnItemClickListener { _, _, position ->
                 openLibDetailDialog(position)
             }
@@ -118,7 +115,7 @@ class ComponentsAnalysisFragment :
             viewModel.initComponentsData(
                 requireContext(),
                 it,
-                TypeConverter.libModeToRefType(mode)
+                TypeConverter.libModeToRefType(adapter.mode)
             )
         }
     }
