@@ -17,6 +17,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
+import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
@@ -112,9 +113,18 @@ class AppDetailActivity : BaseActivity() {
                             }
                         }
                     }
-                    tvAppName.text = AppUtils.getAppName(packageName)
-                    tvPackageName.text = packageName
-                    tvVersion.text = PackageUtils.getVersionString(packageInfo)
+                    tvAppName.apply {
+                        text = AppUtils.getAppName(packageName)
+                        setLongClickCopiedToClipboard(text.toString())
+                    }
+                    tvPackageName.apply {
+                        text = packageName
+                        setLongClickCopiedToClipboard(text.toString())
+                    }
+                    tvVersion.apply {
+                        text = PackageUtils.getVersionString(packageInfo)
+                        setLongClickCopiedToClipboard(text.toString())
+                    }
                     tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
                     lifecycleScope.launch(Dispatchers.IO) {

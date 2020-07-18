@@ -17,6 +17,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
@@ -86,6 +87,10 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             setEmptyView(R.layout.layout_snapshot_empty_view)
             setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemClickListener
+                }
+
                 val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {
                         putSerializable(EXTRA_ENTITY, getItem(position))

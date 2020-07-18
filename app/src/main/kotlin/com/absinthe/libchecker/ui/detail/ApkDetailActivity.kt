@@ -13,6 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
+import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
@@ -106,9 +107,18 @@ class ApkDetailActivity : BaseActivity() {
                         ivAppIcon.apply {
                             setImageDrawable(it.applicationInfo.loadIcon(packageManager))
                         }
-                        tvAppName.text = it.applicationInfo.loadLabel(packageManager)
-                        tvPackageName.text = packageInfo.packageName
-                        tvVersion.text = "${it.versionName}(${it.versionCode})"
+                        tvAppName.apply {
+                            text = it.applicationInfo.loadLabel(packageManager)
+                            setLongClickCopiedToClipboard(text.toString())
+                        }
+                        tvPackageName.apply {
+                            text = packageInfo.packageName
+                            setLongClickCopiedToClipboard(text.toString())
+                        }
+                        tvVersion.apply {
+                            text = "${it.versionName}(${it.versionCode})"
+                            setLongClickCopiedToClipboard(text.toString())
+                        }
                         tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
 
                         val abi = PackageUtils.getAbi(
