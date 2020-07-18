@@ -32,8 +32,8 @@
 
                 <ImageView
                     android:id="@+id/iv_app_icon"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="@dimen/lib_detail_icon_size"
+                    android:layout_height="@dimen/lib_detail_icon_size"
                     android:contentDescription="App icon"
                     android:transitionName="app_icon"
                     app:layout_constraintStart_toStartOf="parent"

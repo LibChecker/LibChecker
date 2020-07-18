@@ -10,7 +10,7 @@
         style="@style/Widget.MaterialComponents.Chip.Action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/splits_spk"
+        android:text="@string/split_spk"
         app:chipIcon="@drawable/ic_split"
         app:chipMinHeight="28dp"
         app:chipMinTouchTargetSize="0dp"

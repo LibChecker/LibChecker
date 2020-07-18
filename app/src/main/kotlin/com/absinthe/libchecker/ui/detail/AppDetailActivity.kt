@@ -20,7 +20,7 @@ import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
 import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.blankj.utilcode.util.AppUtils
@@ -166,7 +166,7 @@ class AppDetailActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> SoAnalysisFragment.newInstance(pkgName!!)
+                    0 -> NativeAnalysisFragment.newInstance(pkgName!!)
                     1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.SERVICE)
                     2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.ACTIVITY)
                     3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.RECEIVER)

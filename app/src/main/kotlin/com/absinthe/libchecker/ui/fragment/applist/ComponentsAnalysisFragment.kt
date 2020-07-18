@@ -11,7 +11,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
-import com.absinthe.libchecker.databinding.FragmentManifestAnalysisBinding
+import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
@@ -28,13 +28,13 @@ const val EXTRA_PKG_NAME = "EXTRA_PKG_NAME"
 const val EXTRA_MODE = "EXTRA_MODE"
 
 class ComponentsAnalysisFragment :
-    BaseFragment<FragmentManifestAnalysisBinding>(R.layout.fragment_manifest_analysis) {
+    BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
     private val viewModel by viewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
 
-    override fun initBinding(view: View): FragmentManifestAnalysisBinding = FragmentManifestAnalysisBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
     override fun init() {
         binding.apply {

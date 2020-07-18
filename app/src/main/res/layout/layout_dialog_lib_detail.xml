@@ -16,8 +16,8 @@
 
         <ImageView
             android:id="@+id/iv_icon"
-            android:layout_width="@dimen/lib_detail_icon_size"
-            android:layout_height="@dimen/lib_detail_icon_size"
+            android:layout_width="@dimen/lib_reference_icon_size"
+            android:layout_height="@dimen/lib_reference_icon_size"
             android:background="@drawable/bg_gray_circle"
             android:contentDescription="Library's icon"
             android:src="@drawable/ic_question"

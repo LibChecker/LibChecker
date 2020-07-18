@@ -8,7 +8,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.databinding.FragmentSoAnalysisBinding
+import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
@@ -24,19 +24,18 @@ import rikka.core.util.ClipboardUtils
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
 
-class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.fragment_so_analysis) {
+class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PKG_NAME) ?: "" }
     private val adapter = LibStringAdapter(LibStringAdapter.Mode.NATIVE)
 
-    override fun initBinding(view: View): FragmentSoAnalysisBinding =
-        FragmentSoAnalysisBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
     override fun init() {
         binding.apply {
             list.apply {
-                adapter = this@SoAnalysisFragment.adapter
+                adapter = this@NativeAnalysisFragment.adapter
                 setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
             ibSort.setOnClickListener {
@@ -94,8 +93,8 @@ class SoAnalysisFragment : BaseFragment<FragmentSoAnalysisBinding>(R.layout.frag
     }
 
     companion object {
-        fun newInstance(packageName: String): SoAnalysisFragment {
-            return SoAnalysisFragment()
+        fun newInstance(packageName: String): NativeAnalysisFragment {
+            return NativeAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PKG_NAME, packageName)

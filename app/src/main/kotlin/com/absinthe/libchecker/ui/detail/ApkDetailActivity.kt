@@ -16,7 +16,7 @@ import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
 import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.SoAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
@@ -146,7 +146,7 @@ class ApkDetailActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> SoAnalysisFragment.newInstance(tempFile!!.path)
+                    0 -> NativeAnalysisFragment.newInstance(tempFile!!.path)
                     1 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.SERVICE)
                     2 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.ACTIVITY)
                     3 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.RECEIVER)
