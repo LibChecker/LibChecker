@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.BaseActivity
@@ -20,6 +21,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.EXTRA_PKG_NAME
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.blankj.utilcode.util.BarUtils
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import rikka.material.widget.BorderView
 
 const val EXTRA_NAME = "NAME"
@@ -37,6 +39,11 @@ class LibReferenceActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.apply {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+            sharedElementsUseOverlay = false
+        }
+        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
         val name = intent.extras?.getString(EXTRA_NAME)

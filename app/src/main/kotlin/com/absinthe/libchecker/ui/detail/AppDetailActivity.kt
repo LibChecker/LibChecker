@@ -145,7 +145,7 @@ class AppDetailActivity : BaseActivity() {
                                 connect(
                                     chipGroupBinding.root.id,
                                     ConstraintSet.TOP,
-                                    binding.ivAppIcon.id,
+                                    binding.tvVersion.id,
                                     ConstraintSet.BOTTOM,
                                     resources.getDimension(R.dimen.normal_padding).toInt()
                                 )
