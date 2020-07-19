@@ -14,12 +14,12 @@ import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.TypeConverter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,8 +32,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     val libItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
-    val componentsItems: MutableLiveData<List<String>> = MutableLiveData()
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
+    val componentsMap: HashMap<LibStringAdapter.Mode, MutableLiveData<List<String>>> = hashMapOf(
+        Pair(LibStringAdapter.Mode.SERVICE, MutableLiveData()),
+        Pair(LibStringAdapter.Mode.ACTIVITY, MutableLiveData()),
+        Pair(LibStringAdapter.Mode.RECEIVER, MutableLiveData()),
+        Pair(LibStringAdapter.Mode.PROVIDER, MutableLiveData())
+    )
 
     fun initSoAnalysisData(context: Context, packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -71,19 +76,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(context: Context, packageName: String, type: LibReferenceActivity.Type) =
+    fun initComponentsData(context: Context, packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
-            val map = BaseMap.getMap(type)
-            val list: MutableList<String> = mutableListOf()
-
-            val flag = when (type) {
-                LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
-                LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
-                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
-                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
-                else -> 0
-            }
-
             val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PackageManager.MATCH_DISABLED_COMPONENTS
             } else {
@@ -92,40 +86,115 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             try {
                 if (packageName.endsWith("/temp.apk")) {
-                    context.packageManager.getPackageArchiveInfo(packageName, flag or pmFlag)?.apply {
+                    context.packageManager.getPackageArchiveInfo(
+                        packageName,
+                        PackageManager.GET_SERVICES
+                                or PackageManager.GET_ACTIVITIES
+                                or PackageManager.GET_RECEIVERS
+                                or PackageManager.GET_PROVIDERS
+                                or pmFlag
+                    )?.apply {
                         applicationInfo.sourceDir = packageName
                         applicationInfo.publicSourceDir = packageName
                     }?.let {
-                        list.addAll(PackageUtils.getComponentList(it, type, true))
+                        withContext(Dispatchers.IO) {
+                            val services = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.SERVICE), true)
+                            withContext(Dispatchers.Main) {
+                                componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
+                            }
+                        }
+                        withContext(Dispatchers.IO) {
+                            val activities = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.ACTIVITY), true)
+                            withContext(Dispatchers.Main) {
+                                componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
+                            }
+                        }
+                        withContext(Dispatchers.IO) {
+                            val receivers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.RECEIVER), true)
+                            withContext(Dispatchers.Main) {
+                                componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
+                            }
+                        }
+                        withContext(Dispatchers.IO) {
+                            val providers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.PROVIDER), true)
+                            withContext(Dispatchers.Main) {
+                                componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
+                            }
+                        }
                     }
                 } else {
-                    list.addAll(PackageUtils.getComponentList(packageName, type, true))
+                    context.packageManager.getPackageInfo(
+                        packageName,
+                        PackageManager.GET_SERVICES
+                                or PackageManager.GET_ACTIVITIES
+                                or PackageManager.GET_RECEIVERS
+                                or PackageManager.GET_PROVIDERS
+                                or FreezeUtils.PM_FLAGS_GET_APP_INFO
+                    )?.let {
+                        if (!FreezeUtils.isAppFrozen(it.applicationInfo)) {
+                            withContext(Dispatchers.IO) {
+                                val services = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.SERVICE), true)
+                                withContext(Dispatchers.Main) {
+                                    componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
+                                }
+                            }
+                            withContext(Dispatchers.IO) {
+                                val activities = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.ACTIVITY), true)
+                                withContext(Dispatchers.Main) {
+                                    componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
+                                }
+                            }
+                            withContext(Dispatchers.IO) {
+                                val receivers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.RECEIVER), true)
+                                withContext(Dispatchers.Main) {
+                                    componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
+                                }
+                            }
+                            withContext(Dispatchers.IO) {
+                                val providers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.PROVIDER), true)
+                                withContext(Dispatchers.Main) {
+                                    componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
+                                }
+                            }
+                        } else {
+                            context.packageManager.getPackageArchiveInfo(
+                                context.packageManager.getPackageInfo(packageName, 0).applicationInfo.sourceDir,
+                                PackageManager.GET_SERVICES
+                                        or PackageManager.GET_ACTIVITIES
+                                        or PackageManager.GET_RECEIVERS
+                                        or PackageManager.GET_PROVIDERS
+                                        or pmFlag
+                            )?.let {
+                                withContext(Dispatchers.IO) {
+                                    val services = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.SERVICE), true)
+                                    withContext(Dispatchers.Main) {
+                                        componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
+                                    }
+                                }
+                                withContext(Dispatchers.IO) {
+                                    val activities = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.ACTIVITY), true)
+                                    withContext(Dispatchers.Main) {
+                                        componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
+                                    }
+                                }
+                                withContext(Dispatchers.IO) {
+                                    val receivers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.RECEIVER), true)
+                                    withContext(Dispatchers.Main) {
+                                        componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
+                                    }
+                                }
+                                withContext(Dispatchers.IO) {
+                                    val providers = PackageUtils.getComponentList(it, TypeConverter.libModeToRefType(LibStringAdapter.Mode.PROVIDER), true)
+                                    withContext(Dispatchers.Main) {
+                                        componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             } catch (e: Exception) {
-                list.add("Not found")
-            }
-
-            if (list.isEmpty()) {
-                try {
-                    list.addAll(PackageUtils.getFreezeComponentList(packageName, type, true))
-                } catch (e: Exception) {
-                    list.add("Not found")
-                }
-            }
-
-            val comp: Comparator<String> = Comparator { o1, o2 ->
-                if (map.contains(o1) && !map.contains(o2)) {
-                    -1
-                } else if (!map.contains(o1) && map.contains(o2)) {
-                    1
-                } else {
-                    o1.compareTo(o2)
-                }
-            }
-            list.sortWith(comp)
-
-            withContext(Dispatchers.Main) {
-                componentsItems.value = list
+                e.printStackTrace()
             }
         }
 

@@ -17,7 +17,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ktx.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
@@ -27,7 +26,6 @@ import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -67,11 +65,6 @@ class MainActivity : BaseActivity() {
 
         initView()
         registerPackageBroadcast()
-
-        if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-            appViewModel.collectPopularLibraries(this)
-            Once.markDone(OnceTag.HAS_COLLECT_LIB)
-        }
     }
 
     override fun onDestroy() {

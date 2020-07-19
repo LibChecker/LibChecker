@@ -17,6 +17,7 @@ import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
@@ -27,6 +28,7 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
+import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -136,8 +138,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             ?: ColorDrawable(Color.TRANSPARENT)
                         appName = item.label
                         packageName = item.packageName
-                        versionName =
-                            PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
+                        versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
                         abi = item.abi.toInt()
                         isSystem = item.isSystem
                         updateTime = item.lastUpdatedTime
@@ -190,6 +191,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun requestChangeImpl(context: Context) {
         val appList = PackageUtils.getInstallApplications().toMutableList()
+
+        if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+            collectPopularLibraries(appList)
+            Once.markDone(OnceTag.HAS_COLLECT_LIB)
+        }
 
         dbItems.value?.let { value ->
             var packageInfo: PackageInfo
@@ -253,8 +259,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun collectPopularLibraries(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        val appList = PackageUtils.getInstallApplications()
+    private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.IO) {
         val map = HashMap<String, Int>()
         var libList: List<LibStringItem>
         var count: Int

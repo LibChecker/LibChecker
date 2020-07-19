@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.view.Window
+import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,6 +23,7 @@ import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.IntentUtils
@@ -39,6 +41,7 @@ class AppDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
+    private val viewModel by viewModels<DetailViewModel>()
 
     init {
         isPaddingToolbar = true
@@ -158,6 +161,7 @@ class AppDetailActivity : BaseActivity() {
                     supportFinishAfterTransition()
                 }
             }
+            viewModel.initComponentsData(this, packageName)
         } ?: supportFinishAfterTransition()
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {

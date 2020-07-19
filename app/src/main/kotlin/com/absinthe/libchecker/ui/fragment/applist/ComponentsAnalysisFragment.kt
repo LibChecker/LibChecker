@@ -2,8 +2,9 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
@@ -11,17 +12,20 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
+import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.TypeConverter
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.ToastUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 const val EXTRA_MODE = "EXTRA_MODE"
@@ -29,9 +33,10 @@ const val EXTRA_MODE = "EXTRA_MODE"
 class ComponentsAnalysisFragment :
     BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val viewModel by viewModels<DetailViewModel>()
+    private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
+    private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
     private var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
@@ -56,18 +61,8 @@ class ComponentsAnalysisFragment :
             ibSort.setOnClickListener {
                 sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
                         val map = BaseMap.getMap(adapter.mode)
-                        val comp: Comparator<LibStringItem> = Comparator { o1, o2 ->
-                            if (map.contains(o1.name) && !map.contains(o2.name)) {
-                                -1
-                            } else if (!map.contains(o1.name) && map.contains(o2.name)) {
-                                1
-                            } else {
-                                o1.name.compareTo(o2.name)
-                            }
-                        }
-                        val list = adapter.data
-                        list.sortWith(comp)
-                        adapter.setDiffNewData(list)
+                    adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+                        .toMutableList())
                         MODE_SORT_BY_LIB
                     } else {
                         adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
@@ -80,12 +75,28 @@ class ComponentsAnalysisFragment :
         }
 
         viewModel.apply {
-            componentsItems.observe(viewLifecycleOwner, Observer {
-                val list = mutableListOf<LibStringItem>()
-                for (item in it) {
-                    list.add(LibStringItem(item))
+            componentsMap[adapter.mode]?.observe(viewLifecycleOwner, Observer {
+                if (it.isEmpty()) {
+                    emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                } else {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val list = mutableListOf<LibStringItem>()
+                        for (item in it) {
+                            list.add(LibStringItem(item))
+                        }
+
+                        val map = BaseMap.getMap(adapter.mode)
+                        if (sortMode == MODE_SORT_BY_LIB) {
+                            list.sortByDescending { map.contains(it.name) }
+                        } else {
+                            adapter.data.sortedByDescending { it.name }
+                        }
+
+                        withContext(Dispatchers.Main) {
+                            adapter.setDiffNewData(list)
+                        }
+                    }
                 }
-                adapter.setDiffNewData(list)
             })
         }
 
@@ -116,14 +127,12 @@ class ComponentsAnalysisFragment :
                 openLibDetailDialog(position)
             }
             setDiffCallback(LibStringDiffUtil())
+            emptyLayoutBinding.text.text = getString(R.string.loading)
+            setEmptyView(emptyLayoutBinding.root)
         }
 
         packageName?.let {
-            viewModel.initComponentsData(
-                requireContext(),
-                it,
-                TypeConverter.libModeToRefType(adapter.mode)
-            )
+            viewModel.initComponentsData(requireContext(), it)
         }
     }
 

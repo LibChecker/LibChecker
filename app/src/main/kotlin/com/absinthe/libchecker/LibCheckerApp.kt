@@ -7,6 +7,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.app.GlobalLifecycleObserver
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.utils.AppUtils
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
@@ -31,6 +32,7 @@ class LibCheckerApp : Application() {
         Once.initialise(this)
         AppUtils.requestConfiguration()
         ProcessLifecycleOwner.get().lifecycle.addObserver(GlobalLifecycleObserver())
+        NativeLibMap.getMap()
     }
 
     override fun attachBaseContext(base: Context?) {

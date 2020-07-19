@@ -58,7 +58,7 @@ object PackageUtils {
         return try {
             "${packageInfo.versionName ?: "null"}(${getVersionCode(packageInfo)})"
         } catch (e: PackageManager.NameNotFoundException) {
-            ""
+            "Unknown"
         }
     }
 
@@ -264,6 +264,7 @@ object PackageUtils {
                 finalList.add(name)
             }
         }
+
         return finalList
     }
 
