@@ -52,8 +52,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         repository.deleteAllItems()
 
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = PackageUtils.getInstallApplications()
         val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
         var versionCode: Long
@@ -190,8 +189,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChangeImpl(context: Context) {
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = PackageUtils.getInstallApplications().toMutableList()
 
         dbItems.value?.let { value ->
             var packageInfo: PackageInfo
@@ -256,8 +254,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun collectPopularLibraries(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = PackageUtils.getInstallApplications()
         val map = HashMap<String, Int>()
         var libList: List<LibStringItem>
         var count: Int
@@ -349,8 +346,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun computeLibReference(context: Context, flag: LibReferenceActivity.Type) =
         viewModelScope.launch(Dispatchers.IO) {
-            val appList = context.packageManager
-                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+            val appList = PackageUtils.getInstallApplications()
             val map = HashMap<String, RefCountType>()
             val refList = mutableListOf<LibReference>()
             val showSystem = GlobalValues.isShowSystemApps.value ?: false

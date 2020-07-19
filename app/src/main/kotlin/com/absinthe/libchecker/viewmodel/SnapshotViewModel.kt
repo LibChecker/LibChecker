@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -52,8 +51,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         deleteAllSnapshots()
 
         val dbList = mutableListOf<SnapshotItem>()
-        val appList = context.packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = PackageUtils.getInstallApplications()
         var packageInfo: PackageInfo
         val gson = Gson()
 
@@ -127,8 +125,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
-        val appList = packageManager
-            .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        val appList = PackageUtils.getInstallApplications().toMutableList()
         val gson = Gson()
 
         var packageInfo: PackageInfo

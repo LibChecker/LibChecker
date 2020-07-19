@@ -37,6 +37,15 @@ object PackageUtils {
         return Utils.getApp().packageManager.getPackageArchiveInfo(sourcePath, flag)
     }
 
+    fun getInstallApplications(): List<ApplicationInfo> {
+        return try {
+            Utils.getApp().packageManager
+                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+        } catch (e: Exception) {
+            mutableListOf()
+        }
+    }
+
     fun getVersionCode(packageInfo: PackageInfo): Long {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             packageInfo.longVersionCode
