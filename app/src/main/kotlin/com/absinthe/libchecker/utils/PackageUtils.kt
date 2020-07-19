@@ -32,11 +32,6 @@ object PackageUtils {
         return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
     }
 
-    @Throws(PackageManager.NameNotFoundException::class)
-    fun getPackageArchiveInfo(sourcePath: String, flag: Int = 0): PackageInfo? {
-        return Utils.getApp().packageManager.getPackageArchiveInfo(sourcePath, flag)
-    }
-
     fun getInstallApplications(): List<ApplicationInfo> {
         return try {
             Utils.getApp().packageManager
@@ -268,48 +263,21 @@ object PackageUtils {
         return finalList
     }
 
-    fun getFreezeComponentList(
+    fun getComponentList(
         packageName: String,
-        type: LibReferenceActivity.Type,
+        list: Array<out ComponentInfo>,
         isSimpleName: Boolean
     ): List<String> {
-        val flag = when (type) {
-            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
-            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
-            else -> 0
-        }
-
-        val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageManager.MATCH_DISABLED_COMPONENTS
-        } else {
-            PackageManager.GET_DISABLED_COMPONENTS
-        }
-
-        val packageInfo = getPackageInfo(packageName, flag)
-        val archivePackageInfo = getPackageArchiveInfo(packageInfo.applicationInfo.sourceDir, flag or pmFlag)
-            ?: return listOf("Not found")
-
-        val list: Array<out ComponentInfo>? = when (flag) {
-            PackageManager.GET_SERVICES -> archivePackageInfo.services
-            PackageManager.GET_ACTIVITIES -> archivePackageInfo.activities
-            PackageManager.GET_RECEIVERS -> archivePackageInfo.receivers
-            PackageManager.GET_PROVIDERS -> archivePackageInfo.providers
-            else -> null
-        }
-
         val finalList = mutableListOf<String>()
-        list?.let {
-            for (component in it) {
-                val name = if (isSimpleName) {
-                    component.name.removePrefix(packageInfo.packageName)
-                } else {
-                    component.name
-                }
-                finalList.add(name)
+        for (component in list) {
+            val name = if (isSimpleName) {
+                component.name.removePrefix(packageName)
+            } else {
+                component.name
             }
+            finalList.add(name)
         }
+
         return finalList
     }
 

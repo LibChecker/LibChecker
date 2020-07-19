@@ -98,27 +98,6 @@ class ComponentsAnalysisFragment :
                     }
                 }
             })
-            componentsMap[adapter.mode]?.value?.let { componentList ->
-                if (componentList.isNotEmpty()) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val list = mutableListOf<LibStringItem>()
-                        for (item in componentList) {
-                            list.add(LibStringItem(item))
-                        }
-
-                        val map = BaseMap.getMap(adapter.mode)
-                        if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortByDescending { map.contains(it.name) }
-                        } else {
-                            adapter.data.sortedByDescending { it.name }
-                        }
-
-                        withContext(Dispatchers.Main) {
-                            adapter.setDiffNewData(list)
-                        }
-                    }
-                }
-            }
         }
 
         fun openLibDetailDialog(position: Int) {
