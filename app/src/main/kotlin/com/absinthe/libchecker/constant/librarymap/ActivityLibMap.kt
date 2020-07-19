@@ -23,6 +23,10 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_google, "Google AdMob")
         ),
         Pair(
+            "androidx.slice.compat.SlicePermissionActivity",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Slice")
+        ),
+        Pair(
             "com.tencent.tauth.AuthActivity",
             LibChip(R.drawable.ic_lib_tencent, "腾讯开放平台")
         ),
@@ -219,6 +223,10 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_aliyun, "阿里移动推送")
         ),
         Pair(
+            "com.taobao.weex.WXGlobalEventReceiver",
+            LibChip(R.drawable.ic_lib_alibaba, "Weex")
+        ),
+        Pair(
             "cmb.pb.ui.PBKeyboardActivity",
             LibChip(R.drawable.ic_lib_cmb, "招商银行 SDK")
         ),
@@ -253,6 +261,10 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.soundcloud.android.crop.CropImageActivity",
             LibChip(R.drawable.ic_question, "android-crop")
+        ),
+        Pair(
+            "com.yanzhenjie.permission.bridge.BridgeActivity",
+            LibChip(R.drawable.ic_question, "AndPermission")
         )
     )
 

@@ -33,7 +33,7 @@ object GlobalValues {
     var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
         ?: Constants.REPO_GITEE
 
-    var shouldRequestChange = false
+    var shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
 
     var isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))

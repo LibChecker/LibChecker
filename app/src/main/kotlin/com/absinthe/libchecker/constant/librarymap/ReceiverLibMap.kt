@@ -48,6 +48,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "androidx.remotecallback.ProviderRelayReceiver",
+            LibChip(
+                R.drawable.ic_lib_jetpack,
+                "Jetpack Remote Callback"
+            )
+        ),
+        Pair(
             "com.google.firebase.iid.FirebaseInstanceIdReceiver",
             LibChip(
                 R.drawable.ic_lib_firebase,
@@ -125,6 +132,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.huawei.android.pushagent.PushBootReceiver",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "Huawei Push"
+            )
+        ),
+        Pair(
             "com.facebook.CurrentAccessTokenExpirationBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_facebook,
@@ -163,7 +177,21 @@ object ReceiverLibMap : BaseMap() {
             "org.android.agoo.xiaomi.MiPushBroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_aliyun,
-                "阿里移动推送"
+                "MiPush(Aliyun Proxy)"
+            )
+        ),
+        Pair(
+            "org.android.agoo.huawei.HuaweiPushReceiver",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "Huawei Push(Aliyun Proxy)"
+            )
+        ),
+        Pair(
+            "org.android.agoo.vivo.PushMessageReceiverImpl",
+            LibChip(
+                R.drawable.ic_lib_aliyun,
+                "vivo Push(Aliyun Proxy)"
             )
         ),
         Pair(
@@ -189,6 +217,13 @@ object ReceiverLibMap : BaseMap() {
         ),
         Pair(
             "cn.jpush.android.service.PushReceiver",
+            LibChip(
+                R.drawable.ic_lib_jpush,
+                "极光推送"
+            )
+        ),
+        Pair(
+            "cn.jpush.android.service.PluginXiaomiPlatformsReceiver",
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
@@ -234,6 +269,20 @@ object ReceiverLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Weex"
+            )
+        ),
+        Pair(
+            "com.evernote.android.job.JobBootReceiver",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
+            )
+        ),
+        Pair(
+            "com.evernote.android.job.v14.PlatformAlarmReceiver",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
             )
         )
     )

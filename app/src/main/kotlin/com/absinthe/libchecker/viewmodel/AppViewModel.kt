@@ -184,7 +184,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 e.printStackTrace()
             }
         }
-        GlobalValues.shouldRequestChange = false
+        GlobalValues.shouldRequestChange.value = false
     }
 
     private fun requestChangeImpl(context: Context) {

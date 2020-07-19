@@ -10,7 +10,6 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.constant.librarymap.ServiceLibMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
@@ -33,6 +32,7 @@ class ComponentsAnalysisFragment :
     private val viewModel by viewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
+    private var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -54,21 +54,28 @@ class ComponentsAnalysisFragment :
                 )
             }
             ibSort.setOnClickListener {
-                GlobalValues.libSortMode.value =
-                    if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                        adapter.setDiffNewData(adapter.data.sortedByDescending {
-                            ServiceLibMap.contains(it.name)
-                        }.toMutableList())
+                sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
+                        val map = BaseMap.getMap(adapter.mode)
+                        val comp: Comparator<LibStringItem> = Comparator { o1, o2 ->
+                            if (map.contains(o1.name) && !map.contains(o2.name)) {
+                                -1
+                            } else if (!map.contains(o1.name) && map.contains(o2.name)) {
+                                1
+                            } else {
+                                o1.name.compareTo(o2.name)
+                            }
+                        }
+                        val list = adapter.data
+                        list.sortWith(comp)
+                        adapter.setDiffNewData(list)
                         MODE_SORT_BY_LIB
                     } else {
                         adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
                             .toMutableList())
                         MODE_SORT_BY_SIZE
                     }
-                SPUtils.putInt(
-                    Constants.PREF_LIB_SORT_MODE,
-                    GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
-                )
+                GlobalValues.libSortMode.value = sortMode
+                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
             }
         }
 

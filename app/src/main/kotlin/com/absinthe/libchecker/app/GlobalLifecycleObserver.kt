@@ -14,6 +14,6 @@ class GlobalLifecycleObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onBackground() {
-        GlobalValues.shouldRequestChange = true
+        GlobalValues.shouldRequestChange.value = true
     }
 }

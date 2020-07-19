@@ -586,6 +586,27 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_lib_netease,
                 "网易云通信 SDK"
             )
+        ),
+        Pair(
+            "com.evernote.android.job.v14.PlatformAlarmService",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
+            )
+        ),
+        Pair(
+            "com.evernote.android.job.v21.PlatformJobService",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
+            )
+        ),
+        Pair(
+            "com.yanzhenjie.permission.bridge.BridgeService",
+            LibChip(
+                R.drawable.ic_question,
+                "AndPermission"
+            )
         )
     )
 

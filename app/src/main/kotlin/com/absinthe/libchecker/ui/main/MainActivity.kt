@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -70,14 +71,6 @@ class MainActivity : BaseActivity() {
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             appViewModel.collectPopularLibraries(this)
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (GlobalValues.shouldRequestChange) {
-            appViewModel.requestChange(this)
-            snapshotViewModel.computeDiff(this)
         }
     }
 
@@ -164,6 +157,13 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
+
+        GlobalValues.shouldRequestChange.observe(this, Observer {
+            if (it) {
+                appViewModel.requestChange(this)
+                snapshotViewModel.computeDiff(this)
+            }
+        })
     }
 
     private fun registerPackageBroadcast() {

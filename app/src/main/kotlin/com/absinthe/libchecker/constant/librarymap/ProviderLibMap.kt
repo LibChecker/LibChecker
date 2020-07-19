@@ -55,6 +55,10 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_firebase, "Crashlytics")
         ),
         Pair(
+            "com.google.firebase.perf.provider.FirebasePerfProvider",
+            LibChip(R.drawable.ic_lib_firebase, "Firebase Performance")
+        ),
+        Pair(
             "com.google.android.gms.ads.MobileAdsInitProvider",
             LibChip(R.drawable.ic_lib_google, "Google AdMob")
         ),
@@ -107,6 +111,10 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_question, "AndroidUtilCode")
         ),
         Pair(
+            "com.blankj.utilcode.util.Utils\$FileProvider4UtilCode",
+            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+        ),
+        Pair(
             "com.bytedance.sdk.openadsdk.TTFileProvider",
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         ),
@@ -141,6 +149,14 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "moe.shizuku.api.ShizukuProvider",
             LibChip(R.drawable.ic_lib_shizuku, "Shizuku")
+        ),
+        Pair(
+            "com.yanzhenjie.permission.FileProvider",
+            LibChip(R.drawable.ic_question, "AndPermission")
+        ),
+        Pair(
+            "com.just.agentweb.AgentWebFileProvider",
+            LibChip(R.drawable.ic_question, "AgentWeb")
         )
     )
 

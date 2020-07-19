@@ -113,7 +113,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 }
             }
 
-            list.sortByDescending { map.contains(it) }
+            val comp: Comparator<String> = Comparator { o1, o2 ->
+                if (map.contains(o1) && !map.contains(o2)) {
+                    -1
+                } else if (!map.contains(o1) && map.contains(o2)) {
+                    1
+                } else {
+                    o1.compareTo(o2)
+                }
+            }
+            list.sortWith(comp)
 
             withContext(Dispatchers.Main) {
                 componentsItems.value = list
