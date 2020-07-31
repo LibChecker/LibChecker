@@ -38,6 +38,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    val progress: MutableLiveData<Int> = MutableLiveData(0)
     var refreshLock = false
     var isInit = false
 
@@ -64,6 +65,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         var appItem: AppItem
         var lcItem: LCItem
+
+        var count = 1
+        withContext(Dispatchers.Main) {
+            progress.value = 0
+        }
 
         for (info in appList) {
             try {
@@ -109,6 +115,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             } catch (e: VerifyError) {
                 continue
+            } finally {
+                withContext(Dispatchers.Main) {
+                    progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                }
+                count++
             }
         }
 
@@ -131,6 +142,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val newItems = ArrayList<AppItem>()
             var appItem: AppItem
 
+            var count = 1
+            withContext(Dispatchers.Main) {
+                progress.value = 0
+            }
+
             for (item in value) {
                 try {
                     appItem = AppItem().apply {
@@ -152,6 +168,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 } catch (e: Exception) {
                     continue
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        (count.toFloat() / value.size.toFloat() * 100f).toInt()
+                    }
+                    count++
                 }
             }
 

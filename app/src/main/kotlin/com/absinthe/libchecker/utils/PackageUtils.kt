@@ -29,20 +29,20 @@ object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
-        val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageManager.MATCH_DISABLED_COMPONENTS
-        } else {
-            PackageManager.GET_DISABLED_COMPONENTS
-        }
         val packageInfo = Utils.getApp().packageManager.getPackageInfo(
             packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
+            val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                PackageManager.MATCH_DISABLED_COMPONENTS
+            } else {
+                PackageManager.GET_DISABLED_COMPONENTS
+            }
             return Utils.getApp().packageManager.getPackageArchiveInfo(
                 Utils.getApp().packageManager.getPackageInfo(
                     packageInfo.packageName,
                     0
-                ).applicationInfo.sourceDir, pmFlag
+                ).applicationInfo.sourceDir, pmFlag or flag
             ) ?: throw PackageManager.NameNotFoundException()
         }
         return Utils.getApp().packageManager.getPackageInfo(packageName, flag)

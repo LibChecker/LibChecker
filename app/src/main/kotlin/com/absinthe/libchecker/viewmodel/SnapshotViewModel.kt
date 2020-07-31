@@ -30,6 +30,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
+    val progress: MutableLiveData<Int> = MutableLiveData(0)
 
     private val repository: LCRepository
 
@@ -53,6 +54,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val dbList = mutableListOf<SnapshotItem>()
         val appList = PackageUtils.getInstallApplications()
         val gson = Gson()
+
+        var count = 1
+        withContext(Dispatchers.Main) {
+            progress.value = 0
+        }
 
         for (info in appList) {
             try {
@@ -108,6 +114,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
             } catch (e: Exception) {
                 continue
+            } finally {
+                withContext(Dispatchers.Main) {
+                    progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                }
+                count++
             }
         }
 
@@ -131,6 +142,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var versionCode: Long
 
         snapshotItems.value?.let { dbItems ->
+            var count = 1
+            withContext(Dispatchers.Main) {
+                progress.value = 0
+            }
+
             for (dbItem in dbItems) {
                 try {
                     appList.find { it.packageName == dbItem.packageName }?.let {
@@ -234,6 +250,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 } catch (e: Exception) {
                     e.printStackTrace()
                     continue
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                    }
+                    count++
                 }
             }
 

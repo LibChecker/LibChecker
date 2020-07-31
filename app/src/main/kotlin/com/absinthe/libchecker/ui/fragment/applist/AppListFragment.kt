@@ -136,6 +136,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
                 if (it) { returnTopOfList() }
             })
+            progress.observe(viewLifecycleOwner, Observer {
+                binding.progressIndicator.setProgressCompat(it, true)
+            })
         }
 
         GlobalValues.apply {

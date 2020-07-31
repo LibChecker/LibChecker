@@ -83,7 +83,10 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             viewModel.apply {
                 libReference.observe(viewLifecycleOwner, Observer {
                     adapter.setList(it)
-                    binding.vfContainer.displayedChild = 1
+
+                    if (binding.vfContainer.displayedChild == 0) {
+                        binding.vfContainer.displayedChild = 1
+                    }
                 })
                 clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
                     if (it) {

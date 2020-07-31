@@ -24,10 +24,21 @@
                 app:lottie_fileName="loading.json"
                 app:lottie_loop="true" />
 
+            <com.google.android.material.progressindicator.ProgressIndicator
+                android:id="@+id/progressIndicator"
+                style="@style/Widget.MaterialComponents.ProgressIndicator.Linear.Determinate"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="-100dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:indicatorCornerRadius="2dp" />
+
             <TextView
                 android:id="@+id/tv_first_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:text="@string/applist_first_tip"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 

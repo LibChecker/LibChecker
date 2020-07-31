@@ -134,6 +134,9 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     }
                     binding.extendedFab.show()
                 })
+            progress.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+                binding.progressIndicator.setProgressCompat(it, true)
+            })
         }
     }
 

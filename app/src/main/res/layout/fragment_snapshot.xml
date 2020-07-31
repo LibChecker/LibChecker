@@ -13,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
+            android:gravity="center"
             android:paddingTop="?actionBarSize">
 
             <com.airbnb.lottie.LottieAnimationView
@@ -22,6 +22,16 @@
                 app:lottie_autoPlay="true"
                 app:lottie_fileName="loading.json"
                 app:lottie_loop="true" />
+
+            <com.google.android.material.progressindicator.ProgressIndicator
+                android:id="@+id/progressIndicator"
+                style="@style/Widget.MaterialComponents.ProgressIndicator.Linear.Determinate"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="-100dp"
+                app:indicatorColor="?attr/colorPrimary"
+                app:indicatorCornerRadius="2dp" />
 
         </LinearLayout>
 

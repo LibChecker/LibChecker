@@ -2,7 +2,6 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -18,7 +17,6 @@ import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
