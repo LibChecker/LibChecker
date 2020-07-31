@@ -105,47 +105,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         }
                     }
                 } else {
-                    var packageInfo: PackageInfo? = null
-                    while (packageInfo == null) {
-                        packageInfo = context.packageManager.getPackageInfo(
-                            packageName,
-                            FreezeUtils.PM_FLAGS_GET_APP_INFO
-                        )
-                    }
-                    packageInfo.let {
-                        if (!FreezeUtils.isAppFrozen(it.applicationInfo)) {
-                            val services = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_SERVICE, true)
-                            val activities = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_ACTIVITY, true)
-                            val receivers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
-                            val providers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
+                    PackageUtils.getPackageInfo(packageName).let {
+                        val services = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_SERVICE, true)
+                        val activities = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_ACTIVITY, true)
+                        val receivers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
+                        val providers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
 
-                            withContext(Dispatchers.Main) {
-                                componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
-                                componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
-                                componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
-                                componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
-                            }
-                        } else {
-                            context.packageManager.getPackageArchiveInfo(
-                                context.packageManager.getPackageInfo(packageName, 0).applicationInfo.sourceDir,
-                                PackageManager.GET_SERVICES
-                                        or PackageManager.GET_ACTIVITIES
-                                        or PackageManager.GET_RECEIVERS
-                                        or PackageManager.GET_PROVIDERS
-                                        or pmFlag
-                            )?.let {archive ->
-                                val services = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_SERVICE, true)
-                                val activities = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_ACTIVITY, true)
-                                val receivers = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
-                                val providers = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
-
-                                withContext(Dispatchers.Main) {
-                                    componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
-                                    componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
-                                    componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
-                                    componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
-                                }
-                            }
+                        withContext(Dispatchers.Main) {
+                            componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
+                            componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
+                            componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
+                            componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
                         }
                     }
                 }

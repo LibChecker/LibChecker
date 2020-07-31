@@ -45,8 +45,7 @@ class MainActivity : BaseActivity() {
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
-                appViewModel.requestChange(this@MainActivity)
-                snapshotViewModel.computeDiff(this@MainActivity)
+                GlobalValues.shouldRequestChange.value = true
             }
         }
     }
@@ -72,6 +71,14 @@ class MainActivity : BaseActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         handleIntentFromShortcuts(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (GlobalValues.shouldRequestChange.value == true) {
+            appViewModel.requestChange(this)
+            snapshotViewModel.computeDiff(this)
+        }
     }
 
     override fun onDestroy() {

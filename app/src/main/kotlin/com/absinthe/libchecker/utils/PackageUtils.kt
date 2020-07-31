@@ -29,6 +29,22 @@ object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
+        val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            PackageManager.MATCH_DISABLED_COMPONENTS
+        } else {
+            PackageManager.GET_DISABLED_COMPONENTS
+        }
+        val packageInfo = Utils.getApp().packageManager.getPackageInfo(
+            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO
+        )
+        if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
+            return Utils.getApp().packageManager.getPackageArchiveInfo(
+                Utils.getApp().packageManager.getPackageInfo(
+                    packageInfo.packageName,
+                    0
+                ).applicationInfo.sourceDir, pmFlag
+            ) ?: throw PackageManager.NameNotFoundException()
+        }
         return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
     }
 
@@ -168,7 +184,9 @@ object PackageUtils {
             val apkFile = ApkFile(file)
 
             for (dexClass in apkFile.dexClasses) {
-                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString().startsWith("Lkotlinx/")) {
+                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString()
+                        .startsWith("Lkotlinx/")
+                ) {
                     return true
                 }
             }
@@ -327,7 +345,7 @@ object PackageUtils {
             else -> "Unknown"
         }
     }
-    
+
     fun getAbiBadgeResource(type: Int): Int {
         return when (type) {
             ARMV8 -> R.drawable.ic_64bit

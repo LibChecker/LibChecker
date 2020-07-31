@@ -52,61 +52,60 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val dbList = mutableListOf<SnapshotItem>()
         val appList = PackageUtils.getInstallApplications()
-        var packageInfo: PackageInfo
         val gson = Gson()
 
         for (info in appList) {
             try {
-                packageInfo = PackageUtils.getPackageInfo(info)
-
-                dbList.add(
-                    SnapshotItem(
-                        packageInfo.packageName,//Package name
-                        info.loadLabel(context.packageManager).toString(),//App name
-                        packageInfo.versionName ?: "null",//Version name
-                        PackageUtils.getVersionCode(packageInfo),//Version code
-                        packageInfo.firstInstallTime,//Install time
-                        packageInfo.lastUpdateTime,// Update time
-                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
-                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                            .toShort(),//Abi type
-                        info.targetSdkVersion.toShort(),//Target API
-                        gson.toJson(
-                            PackageUtils.getNativeDirLibs(
-                                info.sourceDir,
-                                info.nativeLibraryDir
-                            )
-                        ),//Native libs
-                        gson.toJson(
-                            PackageUtils.getComponentList(
-                                packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_SERVICE,
-                                false
-                            )
-                        ),
-                        gson.toJson(
-                            PackageUtils.getComponentList(
-                                packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_ACTIVITY,
-                                false
-                            )
-                        ),
-                        gson.toJson(
-                            PackageUtils.getComponentList(
-                                packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
-                                false
-                            )
-                        ),
-                        gson.toJson(
-                            PackageUtils.getComponentList(
-                                packageInfo.packageName,
-                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
-                                false
+                PackageUtils.getPackageInfo(info.packageName).let {
+                    dbList.add(
+                        SnapshotItem(
+                            it.packageName,//Package name
+                            info.loadLabel(context.packageManager).toString(),//App name
+                            it.versionName ?: "null",//Version name
+                            PackageUtils.getVersionCode(it),//Version code
+                            it.firstInstallTime,//Install time
+                            it.lastUpdateTime,// Update time
+                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
+                            PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                                .toShort(),//Abi type
+                            info.targetSdkVersion.toShort(),//Target API
+                            gson.toJson(
+                                PackageUtils.getNativeDirLibs(
+                                    info.sourceDir,
+                                    info.nativeLibraryDir
+                                )
+                            ),//Native libs
+                            gson.toJson(
+                                PackageUtils.getComponentList(
+                                    it.packageName,
+                                    LibReferenceActivity.Type.TYPE_SERVICE,
+                                    false
+                                )
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(
+                                    it.packageName,
+                                    LibReferenceActivity.Type.TYPE_ACTIVITY,
+                                    false
+                                )
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(
+                                    it.packageName,
+                                    LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+                                    false
+                                )
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(
+                                    it.packageName,
+                                    LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+                                    false
+                                )
                             )
                         )
                     )
-                )
+                }
             } catch (e: Exception) {
                 continue
             }
