@@ -21,10 +21,7 @@ object PackageUtils {
 
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(info: ApplicationInfo, flag: Int = 0): PackageInfo {
-        return Utils.getApp().packageManager.getPackageInfo(
-            info.packageName,
-            flag
-        )
+        return getPackageInfo(info.packageName, flag)
     }
 
     @Throws(PackageManager.NameNotFoundException::class)

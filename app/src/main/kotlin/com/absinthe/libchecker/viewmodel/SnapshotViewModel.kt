@@ -56,6 +56,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val gson = Gson()
 
         var count = 1
+        val size = appList.size
         withContext(Dispatchers.Main) {
             progress.value = 0
         }
@@ -116,7 +117,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 continue
             } finally {
                 withContext(Dispatchers.Main) {
-                    progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                    progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
                 }
                 count++
             }
@@ -143,6 +144,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         snapshotItems.value?.let { dbItems ->
             var count = 1
+            val size = appList.size
             withContext(Dispatchers.Main) {
                 progress.value = 0
             }
@@ -153,10 +155,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                        if (packageInfo.versionName != dbItem.versionName ||
-                            versionCode > dbItem.versionCode ||
-                            packageInfo.lastUpdateTime > dbItem.lastUpdatedTime
-                        ) {
+                        if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime) {
                             diffList.add(
                                 SnapshotDiffItem(
                                     packageInfo.packageName,
@@ -252,7 +251,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     continue
                 } finally {
                     withContext(Dispatchers.Main) {
-                        progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                        progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
                     }
                     count++
                 }

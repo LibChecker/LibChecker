@@ -67,6 +67,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var lcItem: LCItem
 
         var count = 1
+        val size = appList.size
         withContext(Dispatchers.Main) {
             progress.value = 0
         }
@@ -117,7 +118,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             } finally {
                 withContext(Dispatchers.Main) {
-                    progress.value = (count.toFloat() / appList.size.toFloat() * 100f).toInt()
+                    progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
                 }
                 count++
             }
@@ -143,6 +144,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var appItem: AppItem
 
             var count = 1
+            val size = value.size
             withContext(Dispatchers.Main) {
                 progress.value = 0
             }
@@ -170,7 +172,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     continue
                 } finally {
                     withContext(Dispatchers.Main) {
-                        progress.value = (count.toFloat() / value.size.toFloat() * 100f).toInt()
+                        progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
                     }
                     count++
                 }
