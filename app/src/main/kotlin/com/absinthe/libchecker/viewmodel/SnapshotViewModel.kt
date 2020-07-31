@@ -138,7 +138,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                        if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime) {
+                        if (packageInfo.versionName != dbItem.versionName ||
+                            versionCode > dbItem.versionCode ||
+                            packageInfo.lastUpdateTime > dbItem.lastUpdatedTime
+                        ) {
                             diffList.add(
                                 SnapshotDiffItem(
                                     packageInfo.packageName,

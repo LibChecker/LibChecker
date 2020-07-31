@@ -129,7 +129,9 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer { list ->
                     adapter.setList(list.sortedByDescending { it.updateTime })
-                    binding.vfContainer.displayedChild = 1
+                    if (binding.vfContainer.displayedChild == 0) {
+                        binding.vfContainer.displayedChild = 1
+                    }
                     binding.extendedFab.show()
                 })
         }

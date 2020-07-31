@@ -21,4 +21,8 @@ object Constants {
     const val REPO_GITHUB = "github"
     const val REPO_GITEE = "gitee"
 
+    const val ACTION_APP_LIST = "com.absinthe.libchecker.intent.action.START_APP_LIST"
+    const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"
+    const val ACTION_SNAPSHOT = "com.absinthe.libchecker.intent.action.START_SNAPSHOT"
+
 }

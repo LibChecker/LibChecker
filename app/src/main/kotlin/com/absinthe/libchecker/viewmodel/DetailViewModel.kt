@@ -9,7 +9,6 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
@@ -60,16 +59,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
                 info?.let {
                     list.addAll(
-                        getAbiByNativeDir(
-                            context,
-                            info.sourceDir,
-                            info.nativeLibraryDir ?: ""
-                        )
+                        getAbiByNativeDir(info.sourceDir, info.nativeLibraryDir ?: "")
                     )
                 }
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
-                list.add(LibStringItem("Not found"))
             }
 
             withContext(Dispatchers.Main) {
@@ -103,7 +97,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
                         val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
 
-                        withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.Main) {
                             componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
                             componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
                             componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
@@ -125,7 +119,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                             val receivers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
                             val providers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
 
-                            withContext(Dispatchers.IO) {
+                            withContext(Dispatchers.Main) {
                                 componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
                                 componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
                                 componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
@@ -145,7 +139,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                                 val receivers = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
                                 val providers = PackageUtils.getComponentList(archive.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
 
-                                withContext(Dispatchers.IO) {
+                                withContext(Dispatchers.Main) {
                                     componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
                                     componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
                                     componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
@@ -195,15 +189,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private fun getAbiByNativeDir(
-        context: Context,
-        sourcePath: String,
-        nativePath: String
-    ): List<LibStringItem> {
+    private fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
         val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
 
         if (list.isEmpty()) {
-            list.add(LibStringItem(context.getString(R.string.empty_list)))
+            return list
         } else {
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 list.sortByDescending { it.size }

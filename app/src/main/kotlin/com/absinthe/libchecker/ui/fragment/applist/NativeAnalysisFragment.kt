@@ -7,8 +7,10 @@ import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -27,8 +29,10 @@ const val MODE_SORT_BY_LIB = 1
 class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
     private val viewModel by activityViewModels<DetailViewModel>()
+    private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
     private val adapter = LibStringAdapter(LibStringAdapter.Mode.NATIVE)
+    private var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
@@ -39,26 +43,28 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                 setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
             }
             ibSort.setOnClickListener {
-                GlobalValues.libSortMode.value =
-                    if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                        adapter.setDiffNewData(adapter.data.sortedByDescending {
-                            NativeLibMap.contains(it.name)
-                        }.toMutableList())
-                        MODE_SORT_BY_LIB
-                    } else {
-                        adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }.toMutableList())
-                        MODE_SORT_BY_SIZE
-                    }
-                SPUtils.putInt(
-                    Constants.PREF_LIB_SORT_MODE,
-                    GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
-                )
+                sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
+                    val map = BaseMap.getMap(adapter.mode)
+                    adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+                        .toMutableList())
+                    MODE_SORT_BY_LIB
+                } else {
+                    adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }
+                        .toMutableList())
+                    MODE_SORT_BY_SIZE
+                }
+                GlobalValues.libSortMode.value = sortMode
+                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
             }
         }
 
         viewModel.apply {
             libItems.observe(viewLifecycleOwner, Observer {
-                adapter.setDiffNewData(it.toMutableList())
+                if (it.isEmpty()) {
+                    emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                } else {
+                    adapter.setDiffNewData(it.toMutableList())
+                }
             })
         }
 
@@ -88,6 +94,8 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                 openLibDetailDialog(position)
             }
             setDiffCallback(LibStringDiffUtil())
+            emptyLayoutBinding.text.text = getString(R.string.loading)
+            setEmptyView(emptyLayoutBinding.root)
         }
         viewModel.initSoAnalysisData(requireContext(), packageName)
     }

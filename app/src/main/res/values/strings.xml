@@ -66,8 +66,8 @@
     <string name="detail_label">View App Details</string>
     <string name="not_found">Not found</string>
     <string name="create_an_issue">Assist us to supplement the information</string>
-    <string name="split_spk" translatable="false">Split APK</string>
-    <string name="kotlin_used" translatable="false">Kotlin Used</string>
+    <string name="split_spk" translatable="false">Split APKs</string>
+    <string name="kotlin_used" translatable="false">Kotlin used</string>
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>

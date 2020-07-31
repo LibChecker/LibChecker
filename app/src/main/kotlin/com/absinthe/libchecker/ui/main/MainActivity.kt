@@ -16,6 +16,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ktx.setCurrentItem
@@ -65,6 +66,12 @@ class MainActivity : BaseActivity() {
 
         initView()
         registerPackageBroadcast()
+        handleIntentFromShortcuts(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntentFromShortcuts(intent)
     }
 
     override fun onDestroy() {
@@ -172,5 +179,13 @@ class MainActivity : BaseActivity() {
 
     private fun unregisterPackageBroadcast() {
         unregisterReceiver(requestPackageReceiver)
+    }
+
+    private fun handleIntentFromShortcuts(intent: Intent) {
+        when(intent.action) {
+            Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
+            Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
+            Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
+        }
     }
 }
