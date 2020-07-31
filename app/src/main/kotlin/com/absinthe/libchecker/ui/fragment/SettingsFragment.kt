@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.fragment
 
 import android.content.ComponentName
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -12,6 +13,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -45,6 +47,9 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
 
         findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
             summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+        }
+        findPreference<Preference>(Constants.PREF_RATE)?.apply {
+            onPreferenceClickListener = this@SettingsFragment
         }
     }
 
@@ -98,6 +103,16 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         return when (preference.key) {
             Constants.PREF_LIB_REF_THRESHOLD -> {
                 LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
+                true
+            }
+            Constants.PREF_RATE -> {
+                val hasInstallCoolApk = com.blankj.utilcode.util.AppUtils.isAppInstalled("com.coolapk.market")
+                val marketUrl = if (hasInstallCoolApk) {
+                    URLManager.COOLAPK_APP_PAGE
+                } else {
+                    URLManager.MARKET_PAGE
+                }
+                startActivity(Intent.parseUri(marketUrl, 0))
                 true
             }
             else -> false
