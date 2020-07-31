@@ -14,6 +14,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:orientation="vertical"
             android:paddingTop="?actionBarSize">
 
             <com.airbnb.lottie.LottieAnimationView
@@ -42,8 +43,8 @@
             android:clipToPadding="false"
             android:paddingHorizontal="@dimen/normal_padding"
             android:paddingTop="?actionBarSize"
-            android:scrollbars="none"
             android:scrollbarAlwaysDrawVerticalTrack="false"
+            android:scrollbars="none"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
             app:borderTopStyle="whenTop"

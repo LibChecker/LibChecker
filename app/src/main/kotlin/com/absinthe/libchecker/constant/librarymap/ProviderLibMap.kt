@@ -79,6 +79,10 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_facebook, "Facebook SDK")
         ),
         Pair(
+            "com.facebook.ads.AudienceNetworkContentProvider",
+            LibChip(R.drawable.ic_lib_facebook, "Audience Network")
+        ),
+        Pair(
             "com.bytedance.sdk.openadsdk.multipro.TTMultiProvider",
             LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
         ),
@@ -166,8 +170,7 @@ object ProviderLibMap : BaseMap() {
 
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("com.qihoo360.replugin.component.process.ProcessPitProvider(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
-            Pattern.matches("com.qihoo360.replugin.component.provider.PluginPitProvider(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            Pattern.matches("com.qihoo360.replugin.(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
             else -> null
         }
     }

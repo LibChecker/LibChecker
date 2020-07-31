@@ -265,6 +265,18 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.yanzhenjie.permission.bridge.BridgeActivity",
             LibChip(R.drawable.ic_question, "AndPermission")
+        ),
+        Pair(
+            "com.yanzhenjie.permission.PermissionActivity",
+            LibChip(R.drawable.ic_question, "AndPermission")
+        ),
+        Pair(
+            "com.google.ar.core.InstallActivity",
+            LibChip(R.drawable.ic_lib_google_arcore, "ARCore")
+        ),
+        Pair(
+            "com.cmic.sso.sdk.activity.LoginAuthActivity",
+            LibChip(R.drawable.ic_lib_jverification, "极光认证")
         )
     )
 

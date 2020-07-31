@@ -170,7 +170,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     continue
                 } finally {
                     withContext(Dispatchers.Main) {
-                        (count.toFloat() / value.size.toFloat() * 100f).toInt()
+                        progress.value = (count.toFloat() / value.size.toFloat() * 100f).toInt()
                     }
                     count++
                 }
@@ -285,44 +285,50 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var libList: List<LibStringItem>
         var count: Int
 
-        for (item in appList) {
-            libList = PackageUtils.getNativeDirLibs(
-                item.sourceDir,
-                item.nativeLibraryDir
+        try {
+            for (item in appList) {
+                libList = PackageUtils.getNativeDirLibs(
+                    item.sourceDir,
+                    item.nativeLibraryDir
+                )
+
+                for (lib in libList) {
+                    count = map[lib.name] ?: 0
+                    map[lib.name] = count + 1
+                }
+            }
+
+            for (entry in map) {
+                if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
+                    val properties: MutableMap<String, String> = java.util.HashMap()
+                    properties["Library name"] = entry.key
+                    properties["Library count"] = entry.value.toString()
+
+                    Analytics.trackEvent("Native Library", properties)
+                }
+            }
+
+            collectComponentPopularLibraries(
+                appList,
+                LibReferenceActivity.Type.TYPE_SERVICE,
+                "Service"
             )
-
-            for (lib in libList) {
-                count = map[lib.name] ?: 0
-                map[lib.name] = count + 1
-            }
-        }
-
-        for (entry in map) {
-            if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
-                val properties: MutableMap<String, String> = java.util.HashMap()
-                properties["Library name"] = entry.key
-                properties["Library count"] = entry.value.toString()
-
-                Analytics.trackEvent("Native Library", properties)
-            }
-        }
-
-        collectComponentPopularLibraries(appList, LibReferenceActivity.Type.TYPE_SERVICE, "Service")
-        collectComponentPopularLibraries(
-            appList,
-            LibReferenceActivity.Type.TYPE_ACTIVITY,
-            "Activity"
-        )
-        collectComponentPopularLibraries(
-            appList,
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
-            "Receiver"
-        )
-        collectComponentPopularLibraries(
-            appList,
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
-            "Provider"
-        )
+            collectComponentPopularLibraries(
+                appList,
+                LibReferenceActivity.Type.TYPE_ACTIVITY,
+                "Activity"
+            )
+            collectComponentPopularLibraries(
+                appList,
+                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
+                "Receiver"
+            )
+            collectComponentPopularLibraries(
+                appList,
+                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
+                "Provider"
+            )
+        } catch (ignore: Exception) {}
     }
 
     private fun collectComponentPopularLibraries(
