@@ -30,7 +30,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-    val progress: MutableLiveData<Int> = MutableLiveData(0)
+    val progress: MutableLiveData<Int> = MutableLiveData()
 
     private val repository: LCRepository
 

@@ -42,7 +42,7 @@ class AboutActivity : AbsAboutActivity() {
 
             add(Category("Developers"))
             val developerUrl = if (hasInstallCoolApk) {
-                URLManager.COOLAPK_PAGE
+                URLManager.COOLAPK_HOME_PAGE
             } else {
                 URLManager.GITHUB_PAGE
             }

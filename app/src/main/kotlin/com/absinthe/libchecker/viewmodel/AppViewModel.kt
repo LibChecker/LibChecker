@@ -38,7 +38,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    val progress: MutableLiveData<Int> = MutableLiveData(0)
+    val progress: MutableLiveData<Int> = MutableLiveData()
     var refreshLock = false
     var isInit = false
 
