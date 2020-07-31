@@ -2,7 +2,7 @@
 
     <item
         android:id="@+id/toolbar_rate"
-        android:icon="@drawable/ic_favorite"
+        android:icon="@drawable/ic_favorite_white"
         android:title="@string/toolbar_rate"
         android:showAsAction="always" />
 

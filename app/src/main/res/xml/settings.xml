@@ -67,6 +67,14 @@
 
         </Preference>
 
+        <Preference
+            app:key="rate"
+            app:title="@string/settings_rate_us"
+            app:summary="@string/settings_rate_us_summary"
+            android:icon="@drawable/ic_favorite">
+
+        </Preference>
+
     </PreferenceCategory>
 
 </PreferenceScreen>

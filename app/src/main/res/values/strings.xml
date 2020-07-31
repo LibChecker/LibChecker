@@ -40,6 +40,8 @@
 
     <!--  About  -->
     <string name="settings_about">About</string>
+    <string name="settings_rate_us">Rate us</string>
+    <string name="settings_rate_us_summary">This can make us discover by more people</string>
     <string name="settings_about_summary">This is LibChecker!</string>
     <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
     <string name="toolbar_rate">Rate</string>
