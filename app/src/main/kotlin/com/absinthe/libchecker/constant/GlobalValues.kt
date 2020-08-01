@@ -33,27 +33,27 @@ object GlobalValues {
     var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
         ?: Constants.REPO_GITEE
 
-    var shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
+    val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
 
-    var isShowSystemApps: MutableLiveData<Boolean> =
+    val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
-    var isShowEntryAnimation: MutableLiveData<Boolean> =
+    val isShowEntryAnimation: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true))
-    var isColorfulIcon: MutableLiveData<Boolean> =
+    val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
 
-    var appSortMode: MutableLiveData<Int> = MutableLiveData(
+    val appSortMode: MutableLiveData<Int> = MutableLiveData(
         getPreferences().getInt(
             Constants.PREF_APP_SORT_MODE,
             Constants.SORT_MODE_DEFAULT
         )
     )
-    var libSortMode: MutableLiveData<Int> =
+    val libSortMode: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
-    var libReferenceThreshold: MutableLiveData<Int> =
+    val libReferenceThreshold: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
 
-    var isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData(true)
+    val isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData(true)
     var snapshotTimestamp: Long = 0
         get() = getPreferences().getLong(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
         set(value) {

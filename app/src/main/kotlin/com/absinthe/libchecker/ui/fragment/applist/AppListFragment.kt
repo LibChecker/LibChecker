@@ -137,7 +137,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 if (it) { returnTopOfList() }
             })
             progress.observe(viewLifecycleOwner, Observer {
-                binding.progressIndicator.setProgressCompat(it, true)
+                if (binding.progressIndicator.progress < it) {
+                    binding.progressIndicator.setProgressCompat(it, true)
+                }
             })
         }
 
@@ -218,7 +220,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     }
                     GlobalValues.appSortMode.value = mode
                     SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
-
                     true
                 }
 
