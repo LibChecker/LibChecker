@@ -38,7 +38,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    val progress: MutableLiveData<Int> = MutableLiveData()
+    val progress: MutableLiveData<String> = MutableLiveData()
     var refreshLock = false
     var isInit = false
 
@@ -69,7 +69,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var count = 1
         val size = appList.size
         withContext(Dispatchers.Main) {
-            progress.value = 0
+            progress.value = "0/$size"
         }
 
         for (info in appList) {
@@ -118,7 +118,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             } finally {
                 withContext(Dispatchers.Main) {
-                    progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
+                    progress.value = "$count/$size"
                 }
                 count++
             }
@@ -146,7 +146,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var count = 1
             val size = value.size
             withContext(Dispatchers.Main) {
-                progress.value = 0
+                progress.value = "0/$size"
             }
 
             for (item in value) {
@@ -172,7 +172,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     continue
                 } finally {
                     withContext(Dispatchers.Main) {
-                        progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
+                        progress.value = "$count/$size"
                     }
                     count++
                 }

@@ -30,7 +30,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-    val progress: MutableLiveData<Int> = MutableLiveData()
+    val progress: MutableLiveData<String> = MutableLiveData()
 
     private val repository: LCRepository
 
@@ -58,7 +58,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var count = 1
         val size = appList.size
         withContext(Dispatchers.Main) {
-            progress.value = 0
+            progress.value = "0/$size"
         }
 
         for (info in appList) {
@@ -117,7 +117,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 continue
             } finally {
                 withContext(Dispatchers.Main) {
-                    progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
+                    progress.value = "$count/$size"
                 }
                 count++
             }
@@ -146,7 +146,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             var count = 1
             val size = appList.size
             withContext(Dispatchers.Main) {
-                progress.value = 0
+                progress.value = "0/$size"
             }
 
             for (dbItem in dbItems) {
@@ -251,7 +251,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     continue
                 } finally {
                     withContext(Dispatchers.Main) {
-                        progress.value = (count.toFloat() / size.toFloat() * 100f).toInt()
+                        progress.value = "$count/$size"
                     }
                     count++
                 }

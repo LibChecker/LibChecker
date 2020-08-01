@@ -137,9 +137,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 if (it) { returnTopOfList() }
             })
             progress.observe(viewLifecycleOwner, Observer {
-                if (binding.progressIndicator.progress < it) {
-                    binding.progressIndicator.setProgressCompat(it, true)
-                }
+                binding.tvCount.text = it
             })
         }
 
