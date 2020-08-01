@@ -110,7 +110,12 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             } else {
                 dbItems.observe(viewLifecycleOwner, Observer {
                     if (it.isNullOrEmpty()) {
-                        initItems(requireContext())
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            delay(500)
+                            if (dbItems.value.isNullOrEmpty()) {
+                                initItems(requireContext())
+                            }
+                        }
                     } else {
                         if (!viewModel.refreshLock) {
                             viewModel.refreshLock = true
