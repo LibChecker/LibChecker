@@ -27,11 +27,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
+import java.lang.ref.WeakReference
 
 const val EXTRA_MODE = "EXTRA_MODE"
 
 class ComponentsAnalysisFragment :
-    BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+    BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
@@ -57,20 +58,6 @@ class ComponentsAnalysisFragment :
                     paddingEnd,
                     paddingBottom + UiUtils.getNavBarHeight()
                 )
-            }
-            ibSort.setOnClickListener {
-                sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
-                        val map = BaseMap.getMap(adapter.mode)
-                    adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
-                        .toMutableList())
-                        MODE_SORT_BY_LIB
-                    } else {
-                        adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
-                            .toMutableList())
-                        MODE_SORT_BY_SIZE
-                    }
-                GlobalValues.libSortMode.value = sortMode
-                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
             }
         }
 
@@ -136,6 +123,11 @@ class ComponentsAnalysisFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        Sortable.currentReference = WeakReference(this)
+    }
+
     companion object {
         fun newInstance(
             packageName: String,
@@ -149,5 +141,20 @@ class ComponentsAnalysisFragment :
                     }
                 }
         }
+    }
+
+    override fun sort() {
+        sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
+            val map = BaseMap.getMap(adapter.mode)
+            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+                .toMutableList())
+            MODE_SORT_BY_LIB
+        } else {
+            adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
+                .toMutableList())
+            MODE_SORT_BY_SIZE
+        }
+        GlobalValues.libSortMode.value = sortMode
+        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
     }
 }

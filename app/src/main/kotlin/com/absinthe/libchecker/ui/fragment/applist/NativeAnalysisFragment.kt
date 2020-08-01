@@ -22,11 +22,12 @@ import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.ToastUtils
 import rikka.core.util.ClipboardUtils
+import java.lang.ref.WeakReference
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
 
-class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
+class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
@@ -41,20 +42,6 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             list.apply {
                 adapter = this@NativeAnalysisFragment.adapter
                 setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
-            }
-            ibSort.setOnClickListener {
-                sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
-                    val map = BaseMap.getMap(adapter.mode)
-                    adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
-                        .toMutableList())
-                    MODE_SORT_BY_LIB
-                } else {
-                    adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }
-                        .toMutableList())
-                    MODE_SORT_BY_SIZE
-                }
-                GlobalValues.libSortMode.value = sortMode
-                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
             }
         }
 
@@ -100,6 +87,11 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         viewModel.initSoAnalysisData(requireContext(), packageName)
     }
 
+    override fun onResume() {
+        super.onResume()
+        Sortable.currentReference = WeakReference(this)
+    }
+
     companion object {
         fun newInstance(packageName: String): NativeAnalysisFragment {
             return NativeAnalysisFragment()
@@ -109,5 +101,20 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                     }
                 }
         }
+    }
+
+    override fun sort() {
+        sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
+            val map = BaseMap.getMap(adapter.mode)
+            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+                .toMutableList())
+            MODE_SORT_BY_LIB
+        } else {
+            adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }
+                .toMutableList())
+            MODE_SORT_BY_SIZE
+        }
+        GlobalValues.libSortMode.value = sortMode
+        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
     }
 }

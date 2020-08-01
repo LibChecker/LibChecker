@@ -17,6 +17,7 @@ import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
@@ -131,6 +132,10 @@ class ApkDetailActivity : BaseActivity() {
                         layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
                     } catch (e: Exception) {
                         supportFinishAfterTransition()
+                    }
+
+                    ibSort.setOnClickListener {
+                        Sortable.currentReference?.get()?.sort()
                     }
                 }
             } ?: finish()

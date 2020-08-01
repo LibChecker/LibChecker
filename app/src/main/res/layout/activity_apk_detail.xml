@@ -160,6 +160,34 @@
 
         </com.google.android.material.tabs.TabLayout>
 
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:backgroundTint="?android:colorBackground"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="end">
+
+                <ImageButton
+                    android:id="@+id/ib_sort"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Sort"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_lib_sort"
+                    android:tooltipText="@string/menu_sort"
+                    tools:ignore="HardcodedText"
+                    tools:targetApi="o" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
