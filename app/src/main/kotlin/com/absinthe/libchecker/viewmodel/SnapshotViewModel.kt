@@ -30,7 +30,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-    val progress: MutableLiveData<String> = MutableLiveData()
 
     private val repository: LCRepository
 
@@ -54,12 +53,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val dbList = mutableListOf<SnapshotItem>()
         val appList = PackageUtils.getInstallApplications()
         val gson = Gson()
-
-        var count = 1
-        val size = appList.size
-        withContext(Dispatchers.Main) {
-            progress.value = "0/$size"
-        }
 
         for (info in appList) {
             try {
@@ -115,11 +108,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
             } catch (e: Exception) {
                 continue
-            } finally {
-                withContext(Dispatchers.Main) {
-                    progress.value = "$count/$size"
-                }
-                count++
             }
         }
 
@@ -143,12 +131,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var versionCode: Long
 
         snapshotItems.value?.let { dbItems ->
-            var count = 1
-            val size = appList.size
-            withContext(Dispatchers.Main) {
-                progress.value = "0/$size"
-            }
-
             for (dbItem in dbItems) {
                 try {
                     appList.find { it.packageName == dbItem.packageName }?.let {
@@ -249,11 +231,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 } catch (e: Exception) {
                     e.printStackTrace()
                     continue
-                } finally {
-                    withContext(Dispatchers.Main) {
-                        progress.value = "$count/$size"
-                    }
-                    count++
                 }
             }
 

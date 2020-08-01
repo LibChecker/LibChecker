@@ -38,7 +38,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    val progress: MutableLiveData<String> = MutableLiveData()
     var refreshLock = false
     var isInit = false
 
@@ -65,12 +64,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         var appItem: AppItem
         var lcItem: LCItem
-
-        var count = 1
-        val size = appList.size
-        withContext(Dispatchers.Main) {
-            progress.value = "0/$size"
-        }
 
         for (info in appList) {
             try {
@@ -116,11 +109,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 continue
             } catch (e: VerifyError) {
                 continue
-            } finally {
-                withContext(Dispatchers.Main) {
-                    progress.value = "$count/$size"
-                }
-                count++
             }
         }
 
@@ -143,12 +131,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val newItems = ArrayList<AppItem>()
             var appItem: AppItem
 
-            var count = 1
-            val size = value.size
-            withContext(Dispatchers.Main) {
-                progress.value = "0/$size"
-            }
-
             for (item in value) {
                 try {
                     appItem = AppItem().apply {
@@ -170,11 +152,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 } catch (e: Exception) {
                     continue
-                } finally {
-                    withContext(Dispatchers.Main) {
-                        progress.value = "$count/$size"
-                    }
-                    count++
                 }
             }
 

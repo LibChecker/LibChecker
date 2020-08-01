@@ -24,24 +24,6 @@
                 app:lottie_fileName="loading.json"
                 app:lottie_loop="true" />
 
-<!--            <com.google.android.material.progressindicator.ProgressIndicator-->
-<!--                android:id="@+id/progressIndicator"-->
-<!--                style="@style/Widget.MaterialComponents.ProgressIndicator.Linear.Determinate"-->
-<!--                android:layout_width="300dp"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="center"-->
-<!--                android:layout_marginTop="-100dp"-->
-<!--                app:indicatorColor="?attr/colorPrimary"-->
-<!--                app:indicatorCornerRadius="2dp" />-->
-
-            <TextView
-                android:id="@+id/tv_count"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="-100dp"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                tools:text="30/100" />
-
         </LinearLayout>
 
         <rikka.material.widget.BorderRecyclerView

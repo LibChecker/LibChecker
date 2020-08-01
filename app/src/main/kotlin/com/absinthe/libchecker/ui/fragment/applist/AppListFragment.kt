@@ -141,9 +141,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
                 if (it) { returnTopOfList() }
             })
-            progress.observe(viewLifecycleOwner, Observer {
-                binding.tvCount.text = it
-            })
         }
 
         GlobalValues.apply {
