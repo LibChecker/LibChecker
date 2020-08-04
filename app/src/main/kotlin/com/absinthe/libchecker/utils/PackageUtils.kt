@@ -8,7 +8,7 @@ import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.constant.*
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
 import java.io.File
@@ -228,14 +228,14 @@ object PackageUtils {
 
     fun getComponentList(
         packageName: String,
-        type: LibReferenceActivity.Type,
+        @LibType type: Int,
         isSimpleName: Boolean
     ): List<String> {
         val flag = when (type) {
-            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
-            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
+            SERVICE -> PackageManager.GET_SERVICES
+            ACTIVITY -> PackageManager.GET_ACTIVITIES
+            RECEIVER -> PackageManager.GET_RECEIVERS
+            PROVIDER -> PackageManager.GET_PROVIDERS
             else -> 0
         }
 
@@ -244,22 +244,14 @@ object PackageUtils {
 
     fun getComponentList(
         packageInfo: PackageInfo,
-        type: LibReferenceActivity.Type,
+        @LibType type: Int,
         isSimpleName: Boolean
     ): List<String> {
-        val flag = when (type) {
-            LibReferenceActivity.Type.TYPE_SERVICE -> PackageManager.GET_SERVICES
-            LibReferenceActivity.Type.TYPE_ACTIVITY -> PackageManager.GET_ACTIVITIES
-            LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER -> PackageManager.GET_RECEIVERS
-            LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER -> PackageManager.GET_PROVIDERS
-            else -> 0
-        }
-
-        val list: Array<out ComponentInfo>? = when (flag) {
-            PackageManager.GET_SERVICES -> packageInfo.services
-            PackageManager.GET_ACTIVITIES -> packageInfo.activities
-            PackageManager.GET_RECEIVERS -> packageInfo.receivers
-            PackageManager.GET_PROVIDERS -> packageInfo.providers
+        val list: Array<out ComponentInfo>? = when (type) {
+            SERVICE -> packageInfo.services
+            ACTIVITY -> packageInfo.activities
+            RECEIVER -> packageInfo.receivers
+            PROVIDER -> packageInfo.providers
             else -> null
         }
 

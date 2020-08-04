@@ -12,11 +12,9 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,11 +29,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     val libItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
-    val componentsMap: HashMap<LibStringAdapter.Mode, MutableLiveData<List<String>>> = hashMapOf(
-        Pair(LibStringAdapter.Mode.SERVICE, MutableLiveData()),
-        Pair(LibStringAdapter.Mode.ACTIVITY, MutableLiveData()),
-        Pair(LibStringAdapter.Mode.RECEIVER, MutableLiveData()),
-        Pair(LibStringAdapter.Mode.PROVIDER, MutableLiveData())
+    val componentsMap: HashMap<Int, MutableLiveData<List<String>>> = hashMapOf(
+        Pair(SERVICE, MutableLiveData()),
+        Pair(ACTIVITY, MutableLiveData()),
+        Pair(RECEIVER, MutableLiveData()),
+        Pair(PROVIDER, MutableLiveData())
     )
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
@@ -97,24 +95,24 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
 
                         withContext(Dispatchers.Main) {
-                            componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
-                            componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
-                            componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
-                            componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
+                            componentsMap[SERVICE]?.value = services
+                            componentsMap[ACTIVITY]?.value = activities
+                            componentsMap[RECEIVER]?.value = receivers
+                            componentsMap[PROVIDER]?.value = providers
                         }
                     }
                 } else {
                     PackageUtils.getPackageInfo(packageName).let {
-                        val services = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_SERVICE, true)
-                        val activities = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_ACTIVITY, true)
-                        val receivers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER, true)
-                        val providers = PackageUtils.getComponentList(it.packageName, LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER, true)
+                        val services = PackageUtils.getComponentList(it.packageName, SERVICE, true)
+                        val activities = PackageUtils.getComponentList(it.packageName, ACTIVITY, true)
+                        val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
+                        val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
 
                         withContext(Dispatchers.Main) {
-                            componentsMap[LibStringAdapter.Mode.SERVICE]?.value = services
-                            componentsMap[LibStringAdapter.Mode.ACTIVITY]?.value = activities
-                            componentsMap[LibStringAdapter.Mode.RECEIVER]?.value = receivers
-                            componentsMap[LibStringAdapter.Mode.PROVIDER]?.value = providers
+                            componentsMap[SERVICE]?.value = services
+                            componentsMap[ACTIVITY]?.value = activities
+                            componentsMap[RECEIVER]?.value = receivers
+                            componentsMap[PROVIDER]?.value = providers
                         }
                     }
                 }
@@ -123,7 +121,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun requestLibDetail(libName: String, type: LibStringAdapter.Mode, isRegex: Boolean = false) =
+    fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
             val retrofit = Retrofit.Builder()
                 .baseUrl(ApiManager.root)
@@ -132,11 +130,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             val request = retrofit.create(NativeLibDetailRequest::class.java)
 
             var categoryDir = when (type) {
-                LibStringAdapter.Mode.NATIVE -> "native-libs"
-                LibStringAdapter.Mode.SERVICE -> "services-libs"
-                LibStringAdapter.Mode.ACTIVITY -> "activities-libs"
-                LibStringAdapter.Mode.RECEIVER -> "receivers-libs"
-                LibStringAdapter.Mode.PROVIDER -> "providers-libs"
+                NATIVE -> "native-libs"
+                SERVICE -> "services-libs"
+                ACTIVITY -> "activities-libs"
+                RECEIVER -> "receivers-libs"
+                PROVIDER -> "providers-libs"
+                else -> throw IllegalArgumentException("Illegal LibType.")
             }
             if (isRegex) {
                 categoryDir += "/regex"

@@ -10,8 +10,9 @@ import androidx.lifecycle.ViewModelProvider
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.detail.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -33,7 +34,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
         )
     }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
-    private val type by lazy { arguments?.getSerializable(EXTRA_LIB_TYPE) as LibStringAdapter.Mode }
+    private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
 
     private fun List<String>.toContributorsString(): String {
@@ -105,14 +106,14 @@ class LibDetailDialogFragment : LCDialogFragment() {
     companion object {
         fun newInstance(
             libName: String,
-            mode: LibStringAdapter.Mode,
+            @LibType type: Int,
             regexName: String? = null
         ): LibDetailDialogFragment {
             return LibDetailDialogFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_LIB_NAME, libName)
-                        putSerializable(EXTRA_LIB_TYPE, mode)
+                        putInt(EXTRA_LIB_TYPE, type)
                         putString(EXTRA_REGEX_NAME, regexName)
                     }
                 }

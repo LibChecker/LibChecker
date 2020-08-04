@@ -2,13 +2,15 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.res.ColorStateList
 import android.view.View
+import android.view.ViewStub
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -17,15 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LibStringAdapter(val mode: Mode) : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
 
-    private val map: BaseMap = when (mode) {
-        Mode.NATIVE -> NativeLibMap
-        Mode.SERVICE -> ServiceLibMap
-        Mode.ACTIVITY -> ActivityLibMap
-        Mode.RECEIVER -> ReceiverLibMap
-        Mode.PROVIDER -> ProviderLibMap
-    }
+class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem, BaseViewHolder>(R.layout.item_lib_string) {
+
+    private val map: BaseMap = BaseMap.getMap(type)
 
     init {
         addChildClickViewIds(R.id.chip)
@@ -40,17 +37,18 @@ class LibStringAdapter(val mode: Mode) : BaseQuickAdapter<LibStringItem, BaseVie
         }
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            val libIcon = holder.getView<Chip>(R.id.chip)
+            val libIconStub = holder.getView<ViewStub>(R.id.stub_chip)
 
             map.getChip(item.name)?.let {
-                libIcon.apply {
+                libIconStub.apply {
                     withContext(Dispatchers.Main) {
-                        setChipIconResource(it.iconRes)
-                        text = it.name
-                        visibility = View.VISIBLE
+                        val inflated: Chip = (inflate() as Chip).apply {
+                            setChipIconResource(it.iconRes)
+                            text = it.name
+                        }
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
-                            libIcon.chipIconTint = ColorStateList.valueOf(
+                            inflated.chipIconTint = ColorStateList.valueOf(
                                 ContextCompat.getColor(
                                     context,
                                     R.color.textNormal
@@ -60,16 +58,8 @@ class LibStringAdapter(val mode: Mode) : BaseQuickAdapter<LibStringItem, BaseVie
                     }
                 }
             } ?: withContext(Dispatchers.Main) {
-                libIcon.visibility = View.GONE
+                libIconStub.visibility = View.GONE
             }
         }
-    }
-
-    enum class Mode {
-        NATIVE,
-        SERVICE,
-        ACTIVITY,
-        RECEIVER,
-        PROVIDER
     }
 }

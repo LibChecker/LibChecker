@@ -11,10 +11,13 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.ACTIVITY
+import com.absinthe.libchecker.constant.PROVIDER
+import com.absinthe.libchecker.constant.RECEIVER
+import com.absinthe.libchecker.constant.SERVICE
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
 import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
@@ -152,10 +155,10 @@ class ApkDetailActivity : BaseActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> NativeAnalysisFragment.newInstance(tempFile!!.path)
-                    1 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.SERVICE)
-                    2 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.ACTIVITY)
-                    3 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.RECEIVER)
-                    else -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, LibStringAdapter.Mode.PROVIDER)
+                    1 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, SERVICE)
+                    2 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, ACTIVITY)
+                    3 -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, RECEIVER)
+                    else -> ComponentsAnalysisFragment.newInstance(tempFile!!.path, PROVIDER)
                 }
             }
         }

@@ -14,12 +14,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.ACTIVITY
+import com.absinthe.libchecker.constant.PROVIDER
+import com.absinthe.libchecker.constant.RECEIVER
+import com.absinthe.libchecker.constant.SERVICE
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
 import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
@@ -177,10 +180,10 @@ class AppDetailActivity : BaseActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> NativeAnalysisFragment.newInstance(pkgName!!)
-                    1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.SERVICE)
-                    2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.ACTIVITY)
-                    3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.RECEIVER)
-                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, LibStringAdapter.Mode.PROVIDER)
+                    1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, SERVICE)
+                    2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, ACTIVITY)
+                    3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, RECEIVER)
+                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, PROVIDER)
                 }
             }
         }

@@ -10,7 +10,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
@@ -21,7 +21,6 @@ import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.TypeConverter
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 
@@ -31,7 +30,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     private val adapter = LibReferenceAdapter()
 
     private var isInit = false
-    private var category = LibReferenceActivity.Type.TYPE_NATIVE
+    private var category = NATIVE
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
 
@@ -64,8 +63,8 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                         val ref = this@LibReferenceFragment.adapter.getItem(position)
                         val name = ref.libName
                         val regexName = NativeLibMap.findRegex(name)?.regexName
-                        LibDetailDialogFragment.newInstance(name, TypeConverter.libRefTypeToMode(ref.type), regexName)
-                            .apply {
+                        LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+                                .apply {
                                 ActivityStackManager.topActivity?.apply {
                                     show(supportFragmentManager, tag)
                                 }
@@ -143,12 +142,12 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.ref_category_all -> category = LibReferenceActivity.Type.TYPE_ALL
-            R.id.ref_category_native -> category = LibReferenceActivity.Type.TYPE_NATIVE
-            R.id.ref_category_service -> category = LibReferenceActivity.Type.TYPE_SERVICE
-            R.id.ref_category_activity -> category = LibReferenceActivity.Type.TYPE_ACTIVITY
-            R.id.ref_category_br -> category = LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
-            R.id.ref_category_cp -> category = LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+            R.id.ref_category_all -> category = ALL
+            R.id.ref_category_native -> category = NATIVE
+            R.id.ref_category_service -> category = SERVICE
+            R.id.ref_category_activity -> category = ACTIVITY
+            R.id.ref_category_br -> category = RECEIVER
+            R.id.ref_category_cp -> category = PROVIDER
         }
 
         if (item.itemId != R.id.search) {

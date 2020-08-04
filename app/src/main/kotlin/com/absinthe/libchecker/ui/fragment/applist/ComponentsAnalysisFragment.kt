@@ -10,6 +10,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
@@ -29,14 +31,14 @@ import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 import java.lang.ref.WeakReference
 
-const val EXTRA_MODE = "EXTRA_MODE"
+const val EXTRA_TYPE = "EXTRA_TYPE"
 
 class ComponentsAnalysisFragment :
     BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-    private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
+    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
@@ -61,7 +63,7 @@ class ComponentsAnalysisFragment :
         }
 
         viewModel.apply {
-            componentsMap[adapter.mode]?.observe(viewLifecycleOwner, Observer { componentList ->
+            componentsMap[adapter.type]?.observe(viewLifecycleOwner, Observer { componentList ->
                 if (componentList.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
@@ -71,7 +73,7 @@ class ComponentsAnalysisFragment :
                             list.add(LibStringItem(item))
                         }
 
-                        val map = BaseMap.getMap(adapter.mode)
+                        val map = BaseMap.getMap(adapter.type)
                         if (sortMode == MODE_SORT_BY_LIB) {
                             list.sortByDescending { map.contains(it.name) }
                         } else {
@@ -89,9 +91,9 @@ class ComponentsAnalysisFragment :
         fun openLibDetailDialog(position: Int) {
             if (GlobalValues.config.enableComponentsDetail) {
                 val name = adapter.getItem(position).name
-                val regexName = BaseMap.getMap(adapter.mode).findRegex(name)?.regexName
+                val regexName = BaseMap.getMap(adapter.type).findRegex(name)?.regexName
 
-                LibDetailDialogFragment.newInstance(name, adapter.mode, regexName)
+                LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
                     .apply {
                         ActivityStackManager.topActivity?.apply {
                             show(supportFragmentManager, tag)
@@ -128,15 +130,12 @@ class ComponentsAnalysisFragment :
     }
 
     companion object {
-        fun newInstance(
-            packageName: String,
-            mode: LibStringAdapter.Mode
-        ): ComponentsAnalysisFragment {
+        fun newInstance(packageName: String, @LibType type: Int): ComponentsAnalysisFragment {
             return ComponentsAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PACKAGE_NAME, packageName)
-                        putSerializable(EXTRA_MODE, mode)
+                        putInt(EXTRA_TYPE, type)
                     }
                 }
         }
@@ -144,7 +143,7 @@ class ComponentsAnalysisFragment :
 
     override fun sort() {
         viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-            val map = BaseMap.getMap(adapter.mode)
+            val map = BaseMap.getMap(adapter.type)
             adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
                 .toMutableList())
             MODE_SORT_BY_LIB

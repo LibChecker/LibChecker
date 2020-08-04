@@ -13,13 +13,13 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
@@ -132,27 +132,27 @@ class SnapshotDetailActivity : BaseActivity() {
         viewModel.snapshotDetailItems.observe(this, Observer { details ->
             val titleList = mutableListOf<SnapshotTitleNode>()
 
-            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_NATIVE }).apply {
+            getNodeList(details.filter { it.itemType == NATIVE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_native)))
                 }
             }
-            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_SERVICE }).apply {
+            getNodeList(details.filter { it.itemType == SERVICE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_service)))
                 }
             }
-            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_ACTIVITY }).apply {
+            getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_activity)))
                 }
             }
-            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER }).apply {
+            getNodeList(details.filter { it.itemType == RECEIVER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_br)))
                 }
             }
-            getNodeList(details.filter { it.itemType == LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER }).apply {
+            getNodeList(details.filter { it.itemType == PROVIDER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_cp)))
                 }
@@ -185,7 +185,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
         if (list.isEmpty()) return returnList
 
-        if (list[0].itemType == LibReferenceActivity.Type.TYPE_NATIVE) {
+        if (list[0].itemType == NATIVE) {
             for (item in list) {
                 returnList.add(SnapshotNativeNode(item))
             }

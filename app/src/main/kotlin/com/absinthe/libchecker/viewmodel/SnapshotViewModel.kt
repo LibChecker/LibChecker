@@ -10,12 +10,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.SnapshotItem
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
@@ -70,38 +69,19 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 .toShort(),//Abi type
                             info.targetSdkVersion.toShort(),//Target API
                             gson.toJson(
-                                PackageUtils.getNativeDirLibs(
-                                    info.sourceDir,
-                                    info.nativeLibraryDir
-                                )
+                                PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
                             ),//Native libs
                             gson.toJson(
-                                PackageUtils.getComponentList(
-                                    it.packageName,
-                                    LibReferenceActivity.Type.TYPE_SERVICE,
-                                    false
-                                )
+                                PackageUtils.getComponentList(it.packageName, SERVICE, false)
                             ),
                             gson.toJson(
-                                PackageUtils.getComponentList(
-                                    it.packageName,
-                                    LibReferenceActivity.Type.TYPE_ACTIVITY,
-                                    false
-                                )
+                                PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
                             ),
                             gson.toJson(
-                                PackageUtils.getComponentList(
-                                    it.packageName,
-                                    LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
-                                    false
-                                )
+                                PackageUtils.getComponentList(it.packageName, RECEIVER, false)
                             ),
                             gson.toJson(
-                                PackageUtils.getComponentList(
-                                    it.packageName,
-                                    LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
-                                    false
-                                )
+                                PackageUtils.getComponentList(it.packageName, PROVIDER, false)
                             )
                         )
                     )
@@ -162,46 +142,27 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                     ),
                                     SnapshotDiffItem.DiffNode(
                                         dbItem.nativeLibs, gson.toJson(
-                                            PackageUtils.getNativeDirLibs(
-                                                it.sourceDir,
-                                                it.nativeLibraryDir
-                                            )
+                                            PackageUtils.getNativeDirLibs(it.sourceDir, it.nativeLibraryDir)
                                         )
                                     ),
                                     SnapshotDiffItem.DiffNode(
                                         dbItem.services, gson.toJson(
-                                            PackageUtils.getComponentList(
-                                                packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_SERVICE,
-                                                false
-                                            )
+                                            PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false)
                                         )
                                     ),
                                     SnapshotDiffItem.DiffNode(
                                         dbItem.activities, gson.toJson(
-                                            PackageUtils.getComponentList(
-                                                packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_ACTIVITY,
-                                                false
-                                            )
+                                            PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false)
                                         )
                                     ),
                                     SnapshotDiffItem.DiffNode(
                                         dbItem.receivers, gson.toJson(
-                                            PackageUtils.getComponentList(
-                                                packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
-                                                false
-                                            )
+                                            PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false)
                                         )
                                     ),
                                     SnapshotDiffItem.DiffNode(
                                         dbItem.providers, gson.toJson(
-                                            PackageUtils.getComponentList(
-                                                packageInfo.packageName,
-                                                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
-                                                false
-                                            )
+                                            PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false)
                                         )
                                     )
                                 )
@@ -255,46 +216,27 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(
-                                    PackageUtils.getNativeDirLibs(
-                                        info.sourceDir,
-                                        info.nativeLibraryDir
-                                    )
+                                    PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
                                 )
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(
-                                    PackageUtils.getComponentList(
-                                        packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_SERVICE,
-                                        false
-                                    )
+                                    PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false)
                                 )
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(
-                                    PackageUtils.getComponentList(
-                                        packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_ACTIVITY,
-                                        false
-                                    )
+                                    PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false)
                                 )
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(
-                                    PackageUtils.getComponentList(
-                                        packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER,
-                                        false
-                                    )
+                                    PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false)
                                 )
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(
-                                    PackageUtils.getComponentList(
-                                        packageInfo.packageName,
-                                        LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER,
-                                        false
-                                    )
+                                    PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false)
                                 )
                             ),
                             newInstalled = true
@@ -338,7 +280,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     entity.servicesDiff.new,
                     object : TypeToken<List<String>>() {}.type
                 ),
-                LibReferenceActivity.Type.TYPE_SERVICE
+                SERVICE
             )
         )
         list.addAll(
@@ -351,7 +293,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     entity.activitiesDiff.new,
                     object : TypeToken<List<String>>() {}.type
                 ),
-                LibReferenceActivity.Type.TYPE_ACTIVITY
+                ACTIVITY
             )
         )
         list.addAll(
@@ -364,7 +306,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     entity.receiversDiff.new,
                     object : TypeToken<List<String>>() {}.type
                 ),
-                LibReferenceActivity.Type.TYPE_BROADCAST_RECEIVER
+                RECEIVER
             )
         )
         list.addAll(
@@ -377,7 +319,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     entity.providersDiff.new,
                     object : TypeToken<List<String>>() {}.type
                 ),
-                LibReferenceActivity.Type.TYPE_CONTENT_PROVIDER
+                PROVIDER
             )
         )
 
@@ -403,12 +345,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             oldList.find { it.name == item.name }?.let {
                 if (it.size != item.size) {
                     list.add(
-                        SnapshotDetailItem(
-                            it.name,
-                            "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}",
-                            CHANGED,
-                            LibReferenceActivity.Type.TYPE_NATIVE
-                        )
+                        SnapshotDetailItem(it.name, "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}", CHANGED, NATIVE)
                     )
                 }
                 sameList.add(item)
@@ -422,22 +359,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(
-                    item.name,
-                    PackageUtils.sizeToString(item.size),
-                    REMOVED,
-                    LibReferenceActivity.Type.TYPE_NATIVE
-                )
+                SnapshotDetailItem(item.name, PackageUtils.sizeToString(item.size), REMOVED, NATIVE)
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(
-                    item.name,
-                    PackageUtils.sizeToString(item.size),
-                    ADDED,
-                    LibReferenceActivity.Type.TYPE_NATIVE
-                )
+                SnapshotDetailItem(item.name, PackageUtils.sizeToString(item.size), ADDED, NATIVE)
             )
         }
 
@@ -447,7 +374,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     private fun getComponentsDiffList(
         oldList: List<String>,
         newList: List<String>?,
-        type: LibReferenceActivity.Type
+        @LibType type: Int
     ): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
 
@@ -469,7 +396,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             tempOldList.remove(item)
             tempNewList.remove(item)
         }
-
 
         var simpleName: String
         val deletedOldList = mutableListOf<String>()

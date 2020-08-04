@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
@@ -47,9 +48,9 @@ class LibReferenceActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         val name = intent.extras?.getString(EXTRA_NAME)
-        val type = intent.extras?.getSerializable(EXTRA_TYPE) as? Type
+        val type = intent.extras?.getInt(EXTRA_TYPE) ?: NATIVE
 
-        if (name == null || type == null) {
+        if (name == null) {
             finish()
         } else {
             initView()
@@ -139,14 +140,5 @@ class LibReferenceActivity : BaseActivity() {
                 startActivity(intent)
             }
         }
-    }
-
-    enum class Type {
-        TYPE_ALL,
-        TYPE_NATIVE,
-        TYPE_SERVICE,
-        TYPE_ACTIVITY,
-        TYPE_BROADCAST_RECEIVER,
-        TYPE_CONTENT_PROVIDER,
     }
 }

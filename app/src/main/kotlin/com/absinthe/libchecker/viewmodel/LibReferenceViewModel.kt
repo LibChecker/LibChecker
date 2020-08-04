@@ -5,8 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,12 +17,12 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
 
     val libRefList: MutableLiveData<List<AppItem>> = MutableLiveData()
 
-    fun setData(name: String, type: LibReferenceActivity.Type) = viewModelScope.launch(Dispatchers.IO) {
+    fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<AppItem>()
 
         AppItemRepository.allItems.value?.let { items ->
             try {
-                if (type == LibReferenceActivity.Type.TYPE_NATIVE) {
+                if (type == NATIVE) {
                     for (item in items) {
                         val packageInfo = PackageUtils.getPackageInfo(item.packageName)
 
