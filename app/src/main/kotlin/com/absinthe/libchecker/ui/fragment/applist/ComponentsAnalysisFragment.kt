@@ -38,7 +38,6 @@ class ComponentsAnalysisFragment :
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getSerializable(EXTRA_MODE) as? LibStringAdapter.Mode ?: LibStringAdapter.Mode.SERVICE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
-    private var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -144,7 +143,7 @@ class ComponentsAnalysisFragment :
     }
 
     override fun sort() {
-        sortMode = if (sortMode == MODE_SORT_BY_SIZE) {
+        viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
             val map = BaseMap.getMap(adapter.mode)
             adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
                 .toMutableList())
@@ -154,7 +153,7 @@ class ComponentsAnalysisFragment :
                 .toMutableList())
             MODE_SORT_BY_SIZE
         }
-        GlobalValues.libSortMode.value = sortMode
-        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, sortMode)
+        GlobalValues.libSortMode.value = viewModel.sortMode
+        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
     }
 }

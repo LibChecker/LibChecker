@@ -37,6 +37,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         Pair(LibStringAdapter.Mode.RECEIVER, MutableLiveData()),
         Pair(LibStringAdapter.Mode.PROVIDER, MutableLiveData())
     )
+    var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     fun initSoAnalysisData(context: Context, packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
