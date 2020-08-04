@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.res.ColorStateList
 import android.view.View
-import android.view.ViewStub
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
@@ -37,18 +36,17 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
         }
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            val libIconStub = holder.getView<ViewStub>(R.id.stub_chip)
+            val libIcon = holder.getView<Chip>(R.id.chip)
 
             map.getChip(item.name)?.let {
-                libIconStub.apply {
+                libIcon.apply {
                     withContext(Dispatchers.Main) {
-                        val inflated: Chip = (inflate() as Chip).apply {
-                            setChipIconResource(it.iconRes)
-                            text = it.name
-                        }
+                        setChipIconResource(it.iconRes)
+                        text = it.name
+                        visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
-                            inflated.chipIconTint = ColorStateList.valueOf(
+                            libIcon.chipIconTint = ColorStateList.valueOf(
                                 ContextCompat.getColor(
                                     context,
                                     R.color.textNormal
@@ -58,7 +56,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
                     }
                 }
             } ?: withContext(Dispatchers.Main) {
-                libIconStub.visibility = View.GONE
+                libIcon.visibility = View.GONE
             }
         }
     }

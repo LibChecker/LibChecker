@@ -31,9 +31,7 @@ class LibStringItemView(context: Context) : ContourLayout(context) {
         )
     }
 
-    val chip: Chip = Chip(ContextThemeWrapper(context, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Action)).apply {
-        chipMinHeight = 28.dip.toFloat()
-        chipStartPadding = 10.dip.toFloat()
+    val chip: Chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
         LayoutSpec(
             x = rightTo { parent.right() },
             y = centerVerticallyTo { parent.height() }

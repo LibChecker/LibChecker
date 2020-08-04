@@ -10,6 +10,7 @@
     <color name="textSecondary">#80464646</color>
     <color name="backgroundGray">#FFDFDFDF</color>
     <color name="cardBorder">#FFDDDDDD</color>
+    <color name="libIconBackground">#10000000</color>
 
     <color name="appColorDark">#B1B8DF</color>
 </resources>

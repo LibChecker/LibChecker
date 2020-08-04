@@ -18,7 +18,7 @@
         android:textColor="@color/textNormal"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@id/tv_lib_size"
-        app:layout_constraintEnd_toStartOf="@id/stub_chip"
+        app:layout_constraintEnd_toStartOf="@id/chip"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="libnative.so" />
@@ -34,12 +34,12 @@
         app:layout_constraintTop_toBottomOf="@id/tv_name"
         tools:text="100kb" />
 
-    <ViewStub
-        android:id="@+id/stub_chip"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip"
+        style="@style/App.LibChip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inflatedId="@+id/stub_chip_id"
-        android:layout="@layout/stub_chip"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
