@@ -28,11 +28,7 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : LCDialogFragment() {
 
-    private val dialogView by lazy {
-        LibDetailView(
-            requireContext()
-        )
-    }
+    private val dialogView by lazy { LibDetailView(requireContext()) }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }

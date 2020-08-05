@@ -20,6 +20,7 @@ import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.ActivityStackManager
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -103,7 +104,10 @@ class ComponentsAnalysisFragment :
         }
 
         adapter.apply {
-            setOnItemClickListener { _, _, position ->
+            setOnItemClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemClickListener
+                }
                 openLibDetailDialog(position)
             }
             setOnItemLongClickListener { _, _, position ->
@@ -111,7 +115,10 @@ class ComponentsAnalysisFragment :
                 ToastUtils.showShort(R.string.toast_copied_to_clipboard)
                 true
             }
-            setOnItemChildClickListener { _, _, position ->
+            setOnItemChildClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemChildClickListener
+                }
                 openLibDetailDialog(position)
             }
             setDiffCallback(LibStringDiffUtil())

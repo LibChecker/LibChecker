@@ -20,14 +20,16 @@
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ABI" />
+            android:text="ABI"
+            tools:ignore="HardcodedText" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_kotlin"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kotlin" />
+            android:text="Kotlin"
+            tools:ignore="HardcodedText" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
