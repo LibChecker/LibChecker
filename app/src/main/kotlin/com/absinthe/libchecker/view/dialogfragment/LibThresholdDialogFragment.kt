@@ -1,17 +1,16 @@
 package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.view.settings.LibReferenceThresholdView
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import rikka.material.app.MaterialDialogFragment
 
-class LibThresholdDialogFragment : MaterialDialogFragment() {
+class LibThresholdDialogFragment : DialogFragment() {
 
     private val dialogView by lazy {
         LibReferenceThresholdView(
@@ -19,8 +18,8 @@ class LibThresholdDialogFragment : MaterialDialogFragment() {
         )
     }
 
-    override fun onCreateDialog(context: Context, savedInstanceState: Bundle?): Dialog {
-        return MaterialAlertDialogBuilder(requireContext())
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .setTitle(R.string.lib_ref_threshold)
             .setPositiveButton(android.R.string.ok) { _, _ ->
