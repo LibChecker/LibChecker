@@ -35,10 +35,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             item.deleted -> {
                 holder.itemView.backgroundTintList =
                     ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.material_red_300
-                        )
+                        ContextCompat.getColor(context, R.color.material_red_300)
                     )
                 holder.setTextColor(
                     R.id.tv_version,
@@ -53,10 +50,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
             item.newInstalled -> {
                 holder.itemView.backgroundTintList =
                     ColorStateList.valueOf(
-                        ContextCompat.getColor(
-                            context,
-                            R.color.material_green_300
-                        )
+                        ContextCompat.getColor(context, R.color.material_green_300)
                     )
                 holder.setTextColor(
                     R.id.tv_version,
@@ -188,16 +182,13 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         newList: List<LibStringItem>?
     ): CompareDiffNode {
         if (newList == null) {
-            return CompareDiffNode(
-                removed = true
-            )
+            return CompareDiffNode(removed = true)
         }
 
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<LibStringItem>()
-        val node =
-            CompareDiffNode()
+        val node = CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it.name == item.name }?.let {
@@ -227,16 +218,13 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
         newList: List<String>?
     ): CompareDiffNode {
         if (newList == null) {
-            return CompareDiffNode(
-                removed = true
-            )
+            return CompareDiffNode(removed = true)
         }
 
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
         val sameList = mutableListOf<String>()
-        val node =
-            CompareDiffNode()
+        val node = CompareDiffNode()
 
         for (item in tempNewList) {
             oldList.find { it == item }?.let {

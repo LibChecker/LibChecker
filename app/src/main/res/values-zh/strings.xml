@@ -66,4 +66,6 @@
     <string name="snapshot_indicator_moved">移动</string>
     <string name="settings_rate_us">给我们评分</string>
     <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
+    <string name="cannot_read">无法读取</string>
+    <string name="unknown">未知</string>
 </resources>

@@ -13,8 +13,7 @@ const val SNAPSHOT_TITLE_PROVIDER = 1
 
 class SnapshotTitleProvider : BaseNodeProvider() {
 
-    override val itemViewType: Int =
-        SNAPSHOT_TITLE_PROVIDER
+    override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
     override val layoutId: Int = R.layout.item_snapshot_title
 
     override fun convert(helper: BaseViewHolder, item: BaseNode) {

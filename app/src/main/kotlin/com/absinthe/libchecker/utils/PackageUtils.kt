@@ -19,11 +19,25 @@ import kotlin.collections.ArrayList
 
 object PackageUtils {
 
+    /**
+     * Get packageInfo
+     * @param info ApplicationInfo
+     * @param flag Flag mask
+     * @return PackageInfo
+     * @throws PackageManager.NameNotFoundException
+     */
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(info: ApplicationInfo, flag: Int = 0): PackageInfo {
         return getPackageInfo(info.packageName, flag)
     }
 
+    /**
+     * Get packageInfo
+     * @param packageName Package name string
+     * @param flag Flag mask
+     * @return PackageInfo
+     * @throws PackageManager.NameNotFoundException
+     */
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
         val packageInfo = Utils.getApp().packageManager.getPackageInfo(
@@ -45,15 +59,26 @@ object PackageUtils {
         return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
     }
 
+    /**
+     * Get all installed apps in device
+     * @return list of apps
+     * @throws Exception
+     */
+    @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
         return try {
             Utils.getApp().packageManager
                 .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
         } catch (e: Exception) {
-            mutableListOf()
+            throw Exception()
         }
     }
 
+    /**
+     * Get version code of an app
+     * @param packageInfo PackageInfo
+     * @return version code as Long Integer
+     */
     fun getVersionCode(packageInfo: PackageInfo): Long {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             packageInfo.longVersionCode
@@ -62,6 +87,11 @@ object PackageUtils {
         }
     }
 
+    /**
+     * Get version string of an app ( 1.0.0(1) )
+     * @param packageInfo PackageInfo
+     * @return version code as String
+     */
     fun getVersionString(packageInfo: PackageInfo): String {
         return try {
             "${packageInfo.versionName ?: "null"}(${getVersionCode(packageInfo)})"
@@ -70,6 +100,11 @@ object PackageUtils {
         }
     }
 
+    /**
+     * Get target api string of an app ( API 30 )
+     * @param packageInfo PackageInfo
+     * @return version code as String
+     */
     fun getTargetApiString(packageInfo: PackageInfo): String {
         return try {
             "API ${packageInfo.applicationInfo.targetSdkVersion}"
@@ -78,6 +113,12 @@ object PackageUtils {
         }
     }
 
+    /**
+     * Get native libraries of an app
+     * @param sourcePath Source path of the app
+     * @param nativePath Native library path of the app
+     * @return List of LibStringItem
+     */
     fun getNativeDirLibs(sourcePath: String, nativePath: String): List<LibStringItem> {
         val file = File(nativePath)
         val list = ArrayList<LibStringItem>()
@@ -97,7 +138,12 @@ object PackageUtils {
         return list
     }
 
-    fun getSourceLibs(path: String): ArrayList<LibStringItem> {
+    /**
+     * Get native libraries of an app from source path
+     * @param path Source path of the app
+     * @return List of LibStringItem
+     */
+    private fun getSourceLibs(path: String): ArrayList<LibStringItem> {
         val libList = ArrayList<LibStringItem>()
 
         try {
@@ -132,68 +178,12 @@ object PackageUtils {
         }
     }
 
-    fun isSplitsApk(packageInfo: PackageInfo): Boolean {
-        try {
-            val path = packageInfo.applicationInfo.sourceDir
-            File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-                for (file in it) {
-                    if (file.name.startsWith("split_config.")) {
-                        return true
-                    }
-                }
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            return false
-        }
-
-        return false
-    }
-
-    fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
-        try {
-            val path = packageInfo.applicationInfo.sourceDir
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-            var next: ZipEntry
-
-            while (entries.hasMoreElements()) {
-                next = entries.nextElement()
-
-                when {
-                    next.name.startsWith("kotlin/") -> {
-                        return true
-                    }
-                    next.name.startsWith("META-INF/services/kotlin") -> {
-                        return true
-                    }
-                }
-            }
-            zipFile.close()
-            return isKotlinUsedInClassDex(file)
-        } catch (e: Exception) {
-            return false
-        }
-    }
-
-    fun isKotlinUsedInClassDex(file: File): Boolean {
-        try {
-            val apkFile = ApkFile(file)
-
-            for (dexClass in apkFile.dexClasses) {
-                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString()
-                        .startsWith("Lkotlinx/")
-                ) {
-                    return true
-                }
-            }
-            return false
-        } catch (e: Exception) {
-            return false
-        }
-    }
-
-    fun getSplitLibs(path: String): ArrayList<LibStringItem> {
+    /**
+     * Get native libraries of an app from split apk
+     * @param path Source path of the app
+     * @return List of LibStringItem
+     */
+    private fun getSplitLibs(path: String): ArrayList<LibStringItem> {
         val libList = ArrayList<LibStringItem>()
 
         File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
@@ -226,6 +216,89 @@ object PackageUtils {
         return libList
     }
 
+    /**
+     * Judge that whether an app uses split apks
+     * @param packageInfo PackageInfo
+     * @return true if it uses split apks
+     */
+    fun isSplitsApk(packageInfo: PackageInfo): Boolean {
+        try {
+            val path = packageInfo.applicationInfo.sourceDir
+            File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
+                for (file in it) {
+                    if (file.name.startsWith("split_config.")) {
+                        return true
+                    }
+                }
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            return false
+        }
+
+        return false
+    }
+
+    /**
+     * Judge that whether an app uses Kotlin language
+     * @param packageInfo PackageInfo
+     * @return true if it uses Kotlin language
+     */
+    fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
+        try {
+            val path = packageInfo.applicationInfo.sourceDir
+            val file = File(path)
+            val zipFile = ZipFile(file)
+            val entries = zipFile.entries()
+            var next: ZipEntry
+
+            while (entries.hasMoreElements()) {
+                next = entries.nextElement()
+
+                when {
+                    next.name.startsWith("kotlin/") -> {
+                        return true
+                    }
+                    next.name.startsWith("META-INF/services/kotlin") -> {
+                        return true
+                    }
+                }
+            }
+            zipFile.close()
+            return isKotlinUsedInClassDex(file)
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+    /**
+     * Judge that whether an app uses Kotlin language from classes.dex
+     * @param file APK file of the app
+     * @return true if it uses Kotlin language
+     */
+    private fun isKotlinUsedInClassDex(file: File): Boolean {
+        try {
+            val apkFile = ApkFile(file)
+
+            for (dexClass in apkFile.dexClasses) {
+                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString()
+                        .startsWith("Lkotlinx/")
+                ) {
+                    return true
+                }
+            }
+            return false
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
+    /**
+     * Get components list of an app
+     * @param packageName Package name of the app
+     * @param type Component type
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of String
+     */
     fun getComponentList(
         packageName: String,
         @LibType type: Int,
@@ -242,7 +315,14 @@ object PackageUtils {
         return getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
     }
 
-    fun getComponentList(
+    /**
+     * Get components list of an app
+     * @param packageInfo PackageInfo
+     * @param type Component type
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of String
+     */
+    private fun getComponentList(
         packageInfo: PackageInfo,
         @LibType type: Int,
         isSimpleName: Boolean
@@ -270,6 +350,13 @@ object PackageUtils {
         return finalList
     }
 
+    /**
+     * Get components list of an app
+     * @param packageName Package name of the app
+     * @param list List of components
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of String
+     */
     fun getComponentList(
         packageName: String,
         list: Array<out ComponentInfo>,
@@ -288,6 +375,13 @@ object PackageUtils {
         return finalList
     }
 
+    /**
+     * Get ABI type of an app
+     * @param path Source path of the app
+     * @param nativePath Native path of the app
+     * @param isApk Whether is an APK file
+     * @return ABI type
+     */
     fun getAbi(path: String, nativePath: String, isApk: Boolean = false): Int {
         var abi = NO_LIBS
 
@@ -324,25 +418,11 @@ object PackageUtils {
         }
     }
 
-    fun getAbiString(abi: Int): String {
-        return when (abi) {
-            ARMV8 -> ARMV8_STRING
-            ARMV7 -> ARMV7_STRING
-            ARMV5 -> ARMV5_STRING
-            NO_LIBS -> Utils.getApp().getString(R.string.no_libs)
-            ERROR -> "Can\'t read"
-            else -> "Unknown"
-        }
-    }
-
-    fun getAbiBadgeResource(type: Int): Int {
-        return when (type) {
-            ARMV8 -> R.drawable.ic_64bit
-            ARMV7, ARMV5 -> R.drawable.ic_32bit
-            else -> R.drawable.ic_no_libs
-        }
-    }
-
+    /**
+     * Get ABI type of an app from native path
+     * @param nativePath Native path of the app
+     * @return ABI type
+     */
     private fun getAbiByNativeDir(nativePath: String): Int {
         val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
         val abiList = ArrayList<String>()
@@ -357,6 +437,40 @@ object PackageUtils {
         }
     }
 
+    /**
+     * Get ABI string from ABI type
+     * @param abi ABI type
+     * @return ABI string
+     */
+    fun getAbiString(abi: Int): String {
+        return when (abi) {
+            ARMV8 -> ARMV8_STRING
+            ARMV7 -> ARMV7_STRING
+            ARMV5 -> ARMV5_STRING
+            NO_LIBS -> Utils.getApp().getString(R.string.no_libs)
+            ERROR -> Utils.getApp().getString(R.string.cannot_read)
+            else -> Utils.getApp().getString(R.string.unknown)
+        }
+    }
+
+    /**
+     * Get ABI badge resource from ABI type
+     * @param type ABI type
+     * @return Badge resource
+     */
+    fun getAbiBadgeResource(type: Int): Int {
+        return when (type) {
+            ARMV8 -> R.drawable.ic_64bit
+            ARMV7, ARMV5 -> R.drawable.ic_32bit
+            else -> R.drawable.ic_no_libs
+        }
+    }
+
+    /**
+     * Format size number to string
+     * @param size Size of file
+     * @return String of size number (100KB)
+     */
     fun sizeToString(size: Long): String {
         return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
     }

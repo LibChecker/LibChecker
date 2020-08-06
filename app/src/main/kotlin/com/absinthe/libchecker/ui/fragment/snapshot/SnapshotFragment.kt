@@ -46,6 +46,10 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         ConvertUtils.dp2px(16f) + paddingBottom
                     )
                 setOnClickListener {
+                    if (AntiShakeUtils.isInvalidClick(it)) {
+                        return@setOnClickListener
+                    }
+
                     vfContainer.displayedChild = 0
                     hide()
                     viewModel.computeSnapshots(requireContext())

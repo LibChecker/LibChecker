@@ -49,8 +49,16 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     fun computeSnapshots(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         deleteAllSnapshots()
 
+        var appList: List<ApplicationInfo>? = null
+        while (appList == null) {
+            appList = try {
+                PackageUtils.getInstallApplications()
+            } catch (e: Exception) {
+                null
+            }
+        }
+
         val dbList = mutableListOf<SnapshotItem>()
-        val appList = PackageUtils.getInstallApplications()
         val gson = Gson()
 
         for (info in appList) {
@@ -102,9 +110,17 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     fun computeDiff(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         if (snapshotItems.value.isNullOrEmpty()) return@launch
 
+        var appList: MutableList<ApplicationInfo>? = null
+        while (appList == null) {
+            appList = try {
+                PackageUtils.getInstallApplications().toMutableList()
+            } catch (e: Exception) {
+                null
+            }
+        }
+
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
-        val appList = PackageUtils.getInstallApplications().toMutableList()
         val gson = Gson()
 
         var packageInfo: PackageInfo

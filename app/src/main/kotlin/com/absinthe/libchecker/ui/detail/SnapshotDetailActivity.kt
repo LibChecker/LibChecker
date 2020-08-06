@@ -39,11 +39,8 @@ class SnapshotDetailActivity : BaseActivity() {
     private val viewModel by viewModels<SnapshotViewModel>()
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
-    init {
-        isPaddingToolbar = true
-    }
-
     override fun setViewBinding(): View {
+        isPaddingToolbar = true
         binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -57,12 +54,16 @@ class SnapshotDetailActivity : BaseActivity() {
             initView()
             viewModel.computeDiffDetail(entity)
         } else {
-            supportFinishAfterTransition()
+            onBackPressed()
         }
     }
 
     override fun onBackPressed() {
-        supportFinishAfterTransition()
+        if (GlobalValues.isShowEntryAnimation.value!!) {
+            supportFinishAfterTransition()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

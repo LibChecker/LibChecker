@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
@@ -15,9 +16,7 @@ const val SNAPSHOT_NATIVE_PROVIDER = 2
 
 class SnapshotNativeProvider : BaseNodeProvider() {
 
-    override val itemViewType: Int =
-        SNAPSHOT_NATIVE_PROVIDER
-
+    override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
     override val layoutId: Int = R.layout.item_snapshot_detail_native
 
     override fun convert(helper: BaseViewHolder, item: BaseNode) {
@@ -30,7 +29,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
             ADDED -> R.color.material_green_300
             REMOVED -> R.color.material_red_300
             CHANGED -> R.color.material_yellow_300
-            else -> 0
+            else -> Color.TRANSPARENT
         }
 
         helper.setImageResource(R.id.iv_type_icon,
@@ -38,7 +37,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
                 ADDED -> R.drawable.ic_add
                 REMOVED -> R.drawable.ic_remove
                 CHANGED -> R.drawable.ic_changed
-                else -> 0
+                else -> Color.TRANSPARENT
             }
         )
 

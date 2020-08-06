@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
@@ -30,7 +31,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
             REMOVED -> R.color.material_red_300
             CHANGED -> R.color.material_yellow_300
             MOVED -> R.color.material_blue_300
-            else -> 0
+            else -> Color.TRANSPARENT
         }
 
         helper.setImageResource(R.id.iv_type_icon,
@@ -39,7 +40,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                 REMOVED -> R.drawable.ic_remove
                 CHANGED -> R.drawable.ic_changed
                 MOVED -> R.drawable.ic_move
-                else -> 0
+                else -> Color.TRANSPARENT
             }
         )
 

@@ -29,9 +29,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             }
 
             val options = ActivityOptions.makeSceneTransitionAnimation(
-                (context as AppCompatActivity),
-                view,
-                "app_card_container"
+                (context as AppCompatActivity), view, view.transitionName
             )
 
             if (GlobalValues.isShowEntryAnimation.value!!) {

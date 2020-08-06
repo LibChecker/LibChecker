@@ -10,14 +10,13 @@ import android.provider.Settings
 import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 import com.absinthe.libchecker.R
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.Utils
 
 object UiUtils {
 
-    fun setDarkMode(activity: Activity) {
+    fun setSystemBarStyle(activity: Activity) {
         if (isDarkMode(activity)) {
             activity.window.decorView.systemUiVisibility = (
                     View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
@@ -43,9 +42,10 @@ object UiUtils {
                 }
             }
         }
+        setSystemBarTransparent(activity)
     }
 
-    fun setSystemBarTransparent(activity: AppCompatActivity) {
+    fun setSystemBarTransparent(activity: Activity) {
         val window = activity.window
         val view = window.decorView
         val flag = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or

@@ -14,10 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.ACTIVITY
-import com.absinthe.libchecker.constant.PROVIDER
-import com.absinthe.libchecker.constant.RECEIVER
-import com.absinthe.libchecker.constant.SERVICE
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
@@ -47,11 +44,8 @@ class AppDetailActivity : BaseActivity() {
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
 
-    init {
-        isPaddingToolbar = true
-    }
-
     override fun setViewBinding(): View {
+        isPaddingToolbar = true
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -70,7 +64,11 @@ class AppDetailActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        supportFinishAfterTransition()
+        if (GlobalValues.isShowEntryAnimation.value!!) {
+            supportFinishAfterTransition()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

@@ -14,6 +14,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AppUtils {
 
+    /**
+     * Request online configuration to control functions visibility
+     */
     fun requestConfiguration() {
         val retrofit = Retrofit.Builder()
             .baseUrl(ApiManager.root)

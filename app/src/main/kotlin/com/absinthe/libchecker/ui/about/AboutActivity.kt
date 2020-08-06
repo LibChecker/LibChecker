@@ -12,6 +12,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
@@ -34,7 +35,7 @@ class AboutActivity : AbsAboutActivity() {
 
     override fun onItemsCreated(items: MutableList<Any>) {
 
-        val hasInstallCoolApk = AppUtils.isAppInstalled("com.coolapk.market")
+        val hasInstallCoolApk = AppUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
 
         items.apply {
             add(Category("What's this"))
@@ -83,9 +84,7 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     private fun initView() {
-        UiUtils.setDarkMode(this)
-        UiUtils.setSystemBarTransparent(this)
-
+        UiUtils.setSystemBarStyle(this)
         findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 

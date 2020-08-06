@@ -36,16 +36,16 @@
 
     </LinearLayout>
 
-    <ScrollView
+    <ViewFlipper
+        android:id="@+id/vf_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/normal_padding"
         app:layout_constraintTop_toBottomOf="@id/ll_title">
 
-        <ViewFlipper
-            android:id="@+id/vf_container"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/normal_padding">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -186,56 +186,56 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center">
+        </ScrollView>
 
-                <com.airbnb.lottie.LottieAnimationView
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    app:lottie_autoPlay="true"
-                    app:lottie_fileName="lib_detail_progress_bar.json"
-                    app:lottie_loop="true" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
 
-            </LinearLayout>
+            <com.airbnb.lottie.LottieAnimationView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                app:lottie_autoPlay="true"
+                app:lottie_fileName="lib_detail_progress_bar.json"
+                app:lottie_loop="true" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+        </LinearLayout>
 
-                <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:contentDescription="Not found"
-                    android:src="@drawable/ic_failed"
-                    tools:ignore="HardcodedText" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            tools:ignore="UseCompoundDrawables">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/not_found"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:contentDescription="Not found"
+                android:src="@drawable/ic_failed"
+                tools:ignore="HardcodedText" />
 
-                <TextView
-                    android:id="@+id/tv_create_issue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/normal_padding"
-                    android:drawableStart="@drawable/ic_github"
-                    android:drawablePadding="5dp"
-                    android:gravity="center_vertical"
-                    android:text="@string/create_an_issue"
-                    android:textAppearance="?attr/textAppearanceSubtitle2"
-                    android:textColorLink="@color/textNormal" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/not_found"
+                android:textAppearance="?attr/textAppearanceBody2" />
 
-            </LinearLayout>
+            <TextView
+                android:id="@+id/tv_create_issue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/normal_padding"
+                android:drawableStart="@drawable/ic_github"
+                android:drawablePadding="5dp"
+                android:gravity="center_vertical"
+                android:text="@string/create_an_issue"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textColorLink="@color/textNormal" />
 
-        </ViewFlipper>
+        </LinearLayout>
 
-    </ScrollView>
+    </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

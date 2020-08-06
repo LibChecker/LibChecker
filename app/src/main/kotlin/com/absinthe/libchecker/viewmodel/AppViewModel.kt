@@ -52,7 +52,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         repository.deleteAllItems()
 
-        val appList = PackageUtils.getInstallApplications()
+        var appList: List<ApplicationInfo>? = null
+        while (appList == null) {
+            appList = try {
+                PackageUtils.getInstallApplications()
+            } catch (e: Exception) {
+                null
+            }
+        }
+
         val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
         var versionCode: Long
@@ -188,7 +196,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun requestChangeImpl(context: Context) {
-        val appList = PackageUtils.getInstallApplications().toMutableList()
+        var appList: MutableList<ApplicationInfo>? = null
+        while (appList == null) {
+            appList = try {
+                PackageUtils.getInstallApplications().toMutableList()
+            } catch (e: Exception) {
+                null
+            }
+        }
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             collectPopularLibraries(appList)
@@ -351,7 +366,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun computeLibReference(context: Context, @LibType type: Int) =
         viewModelScope.launch(Dispatchers.IO) {
-            val appList = PackageUtils.getInstallApplications()
+            var appList: List<ApplicationInfo>? = null
+            while (appList == null) {
+                appList = try {
+                    PackageUtils.getInstallApplications()
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
             val map = HashMap<String, RefCountType>()
             val refList = mutableListOf<LibReference>()
             val showSystem = GlobalValues.isShowSystemApps.value ?: false

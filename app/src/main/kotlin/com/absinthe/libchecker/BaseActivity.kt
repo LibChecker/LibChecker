@@ -5,8 +5,7 @@ import android.os.Bundle
 import android.view.View
 import com.absinthe.libchecker.ui.app.AppActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.utils.UiUtils.setDarkMode
-import com.absinthe.libchecker.utils.UiUtils.setSystemBarTransparent
+import com.absinthe.libchecker.utils.UiUtils.setSystemBarStyle
 import com.blankj.utilcode.util.BarUtils
 import java.lang.ref.WeakReference
 
@@ -21,17 +20,16 @@ abstract class BaseActivity : AppActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setViewBindingImpl(setViewBinding())
 
-        setDarkMode(this)
-        setSystemBarTransparent(this)
+        reference = WeakReference(this)
+        ActivityStackManager.addActivity(reference)
+
+        setViewBindingImpl(setViewBinding())
+        setSystemBarStyle(this)
 
         if (isPaddingToolbar) {
             root?.setPadding(0, BarUtils.getStatusBarHeight(), 0, 0)
         }
-
-        reference = WeakReference(this)
-        ActivityStackManager.addActivity(reference)
     }
 
     override fun onDestroy() {

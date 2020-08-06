@@ -17,7 +17,8 @@ object Global {
                 } catch (e: Throwable) {
                     val stack = Log.getStackTraceString(e)
                     if (stack.contains("Service.startForeground()") ||
-                        stack.contains("requestConfiguration")
+                        stack.contains("requestConfiguration") ||
+                        stack.contains("com.swift.sandhook")
                     ) {
                         logw(e.toString())
                     } else {

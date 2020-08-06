@@ -15,29 +15,18 @@ object AntiShakeUtils {
     /**
      * Whether this click event is invalid.
      *
-     * @param target target view
-     * @return true, invalid click event.
-     * @see .isInvalidClick
-     */
-    fun isInvalidClick(target: View): Boolean {
-        return isInvalidClick(target, INTERNAL_TIME)
-    }
-
-    /**
-     * Whether this click event is invalid.
-     *
      * @param target       target view
      * @param internalTime the internal time. The unit is millisecond.
      * @return true, invalid click event.
      */
     fun isInvalidClick(
         target: View,
-        @IntRange(from = 0) internalTime: Long
+        @IntRange(from = 0) internalTime: Long = INTERNAL_TIME
     ): Boolean {
         val curTimeStamp = System.currentTimeMillis()
-        val o= target.getTag(R.id.last_click_time)
+        val o = target.getTag(R.id.last_click_time)
 
-        if (o == null){
+        if (o == null) {
             target.setTag(R.id.last_click_time, curTimeStamp)
             return false
         }

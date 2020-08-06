@@ -65,9 +65,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 }
 
                 val options = ActivityOptions.makeSceneTransitionAnimation(
-                    requireActivity(),
-                    view,
-                    "app_card_container"
+                    requireActivity(), view, view.transitionName
                 )
 
                 if (GlobalValues.isShowEntryAnimation.value!!) {
@@ -114,6 +112,11 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                             delay(500)
                             if (dbItems.value.isNullOrEmpty()) {
                                 initItems(requireContext())
+                            } else {
+                                if (!viewModel.refreshLock) {
+                                    viewModel.refreshLock = true
+                                    addItem()
+                                }
                             }
                         }
                     } else {

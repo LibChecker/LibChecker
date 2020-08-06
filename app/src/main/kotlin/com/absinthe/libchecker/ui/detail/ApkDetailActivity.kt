@@ -33,11 +33,8 @@ class ApkDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityApkDetailBinding
     private var tempFile: File? = null
 
-    init {
-        isPaddingToolbar = true
-    }
-
     override fun setViewBinding(): View {
+        isPaddingToolbar = true
         binding = ActivityApkDetailBinding.inflate(layoutInflater)
         return binding.root
     }

@@ -33,6 +33,13 @@ object GlobalValues {
     var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
         ?: Constants.REPO_GITEE
 
+    var snapshotTimestamp: Long = 0
+        get() = getPreferences().getLong(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
+        set(value) {
+            field = value
+            getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
+        }
+
     val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
 
     val isShowSystemApps: MutableLiveData<Boolean> =
@@ -54,10 +61,4 @@ object GlobalValues {
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
 
     val isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData(true)
-    var snapshotTimestamp: Long = 0
-        get() = getPreferences().getLong(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
-        set(value) {
-            field = value
-            getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
-        }
 }

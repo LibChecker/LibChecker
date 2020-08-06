@@ -9,7 +9,7 @@ class GlobalLifecycleObserver : LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onForeground() {
-
+        GlobalValues.shouldRequestChange.value = true
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
