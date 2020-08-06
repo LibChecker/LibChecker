@@ -1,23 +1,24 @@
 package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.view.ClassifyDialogView
-import com.absinthe.libchecker.view.LCDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import rikka.material.app.MaterialDialogFragment
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
-class ClassifyDialogFragment : LCDialogFragment() {
+class ClassifyDialogFragment : MaterialDialogFragment() {
 
     var item: ArrayList<AppItem> = ArrayList()
     private val dialogView by lazy { ClassifyDialogView(requireContext()) }
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreateDialog(context: Context, savedInstanceState: Bundle?): Dialog {
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<AppItem>(
                 EXTRA_ITEM_LIST

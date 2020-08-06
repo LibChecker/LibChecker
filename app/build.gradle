@@ -109,7 +109,7 @@ dependencies {
     implementation 'net.dongliu:apk-parser:2.6.10'
 
     implementation "rikka.appcompat:appcompat:1.2.0-rc01"
-    implementation "rikka.core:core:1.2.1"
+    implementation "rikka.core:core:1.2.3"
     implementation "rikka.material:material:1.4.1"
 
     //Network

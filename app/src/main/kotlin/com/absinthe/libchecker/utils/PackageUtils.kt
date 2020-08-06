@@ -101,6 +101,16 @@ object PackageUtils {
     }
 
     /**
+     * Get version string of an app ( 1.0.0(1) )
+     * @param versionName Version name
+     * @param versionCode Version code
+     * @return version code as String
+     */
+    fun getVersionString(versionName: String, versionCode: Long): String {
+        return "${versionName}(${versionCode})"
+    }
+
+    /**
      * Get target api string of an app ( API 30 )
      * @param packageInfo PackageInfo
      * @return version code as String

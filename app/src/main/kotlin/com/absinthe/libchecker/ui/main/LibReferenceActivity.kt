@@ -54,7 +54,6 @@ class LibReferenceActivity : BaseActivity() {
             finish()
         } else {
             initView()
-            binding.vfContainer.displayedChild = 0
             viewModel.setData(name, type)
         }
     }
@@ -129,9 +128,7 @@ class LibReferenceActivity : BaseActivity() {
             }
 
             val options = ActivityOptions.makeSceneTransitionAnimation(
-                this,
-                view,
-                "app_card_container"
+                this, view, view.transitionName
             )
 
             if (GlobalValues.isShowEntryAnimation.value!!) {

@@ -54,6 +54,10 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     hide()
                     viewModel.computeSnapshots(requireContext())
                 }
+                setOnLongClickListener {
+                    hide()
+                    true
+                }
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
@@ -102,9 +106,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 }
 
                 val options = ActivityOptions.makeSceneTransitionAnimation(
-                    requireActivity(),
-                    view,
-                    "app_card_container"
+                    requireActivity(), view, view.transitionName
                 )
 
                 if (GlobalValues.isShowEntryAnimation.value!!) {

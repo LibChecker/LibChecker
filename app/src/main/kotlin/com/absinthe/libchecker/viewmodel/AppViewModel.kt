@@ -138,26 +138,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var appItem: AppItem
 
             for (item in value) {
-                try {
-                    appItem = AppItem().apply {
-                        icon = AppUtils.getAppIcon(item.packageName)
-                            ?: ColorDrawable(Color.TRANSPARENT)
-                        appName = item.label
-                        packageName = item.packageName
-                        versionName = PackageUtils.getVersionString(PackageUtils.getPackageInfo(item.packageName))
-                        abi = item.abi.toInt()
-                        isSystem = item.isSystem
-                        updateTime = item.lastUpdatedTime
-                        isKotlinUsed = item.isKotlinUsed
-                    }
+                appItem = AppItem().apply {
+                    icon = AppUtils.getAppIcon(item.packageName)
+                        ?: ColorDrawable(Color.TRANSPARENT)
+                    appName = item.label
+                    packageName = item.packageName
+                    versionName = PackageUtils.getVersionString(item.versionName, item.versionCode)
+                    abi = item.abi.toInt()
+                    isSystem = item.isSystem
+                    updateTime = item.lastUpdatedTime
+                    isKotlinUsed = item.isKotlinUsed
+                }
 
-                    GlobalValues.isShowSystemApps.value?.let {
-                        if (it || (!it && !item.isSystem)) {
-                            newItems.add(appItem)
-                        }
+                GlobalValues.isShowSystemApps.value?.let {
+                    if (it || (!it && !item.isSystem)) {
+                        newItems.add(appItem)
                     }
-                } catch (e: Exception) {
-                    continue
                 }
             }
 

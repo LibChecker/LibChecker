@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.dialogfragment
 
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.core.text.HtmlCompat
@@ -13,10 +14,10 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
 import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.view.LCDialogFragment
 import com.absinthe.libchecker.view.detail.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import rikka.material.app.MaterialDialogFragment
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
@@ -26,7 +27,7 @@ const val VF_CHILD_DETAIL = 0
 const val VF_CHILD_LOADING = 1
 const val VF_CHILD_FAILED = 2
 
-class LibDetailDialogFragment : LCDialogFragment() {
+class LibDetailDialogFragment : MaterialDialogFragment() {
 
     private val dialogView by lazy { LibDetailView(requireContext()) }
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
@@ -37,7 +38,7 @@ class LibDetailDialogFragment : LCDialogFragment() {
         return this.joinToString(separator = ", ")
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreateDialog(context: Context, savedInstanceState: Bundle?): Dialog {
         dialogView.binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
