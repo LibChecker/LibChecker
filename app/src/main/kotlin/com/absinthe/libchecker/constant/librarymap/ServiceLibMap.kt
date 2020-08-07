@@ -602,6 +602,13 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.evernote.android.job.JobRescheduleService",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
+            )
+        ),
+        Pair(
             "com.yanzhenjie.permission.bridge.BridgeService",
             LibChip(
                 R.drawable.ic_question,

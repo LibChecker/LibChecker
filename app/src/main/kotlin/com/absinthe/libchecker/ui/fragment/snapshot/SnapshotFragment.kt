@@ -9,6 +9,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
@@ -22,6 +23,8 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.ConvertUtils
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.widget.BorderView
 import java.text.SimpleDateFormat
 import java.util.*
@@ -53,9 +56,11 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     vfContainer.displayedChild = 0
                     hide()
                     viewModel.computeSnapshots(requireContext())
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_CLICK, EventProperties().set("Action", "Click to Save"))
                 }
                 setOnLongClickListener {
                     hide()
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_CLICK, EventProperties().set("Action", "Long Click to Hide"))
                     true
                 }
             }

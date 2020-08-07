@@ -23,6 +23,8 @@ import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 
 class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
@@ -153,6 +155,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
         if (item.itemId != R.id.search) {
             computeRef()
         }
+        Analytics.trackEvent(Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set("Type", category.toLong()))
         return super.onOptionsItemSelected(item)
     }
 

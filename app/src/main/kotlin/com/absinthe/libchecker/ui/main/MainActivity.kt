@@ -27,6 +27,8 @@ import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -194,5 +196,6 @@ class MainActivity : BaseActivity() {
             Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
             Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
         }
+        Analytics.trackEvent(Constants.Event.LAUNCH_ACTION, EventProperties().set("Action", intent.action))
     }
 }

@@ -277,6 +277,10 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.cmic.sso.sdk.activity.LoginAuthActivity",
             LibChip(R.drawable.ic_lib_jverification, "极光认证")
+        ),
+        Pair(
+            "pub.devrel.easypermissions.AppSettingsDialogHolderActivity",
+            LibChip(R.drawable.ic_question, "EasyPermissions")
         )
     )
 

@@ -19,12 +19,15 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 
 class AboutActivity : AbsAboutActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         initView()
+        Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ABOUT", "Entered"))
     }
 
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {

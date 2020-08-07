@@ -28,4 +28,11 @@ object Constants {
     const val ACTION_SNAPSHOT = "com.absinthe.libchecker.intent.action.START_SNAPSHOT"
 
     const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
+
+    object Event {
+        const val LAUNCH_ACTION = "Launch Action"
+        const val SNAPSHOT_CLICK = "Snapshot Click"
+        const val SETTINGS = "Settings"
+        const val LIB_REFERENCE_FILTER_TYPE = "Lib Reference Filter Type"
+    }
 }

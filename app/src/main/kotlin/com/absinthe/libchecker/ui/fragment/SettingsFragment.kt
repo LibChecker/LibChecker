@@ -19,6 +19,8 @@ import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.blankj.utilcode.util.BarUtils
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 
 class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener,
     Preference.OnPreferenceClickListener {
@@ -67,15 +69,18 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         return when (preference.key) {
             Constants.PREF_SHOW_SYSTEM_APPS -> {
                 GlobalValues.isShowSystemApps.value = newValue as Boolean
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue))
                 true
             }
             Constants.PREF_RULES_REPO -> {
                 GlobalValues.repo = newValue as String
                 AppUtils.requestConfiguration()
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
                 true
             }
             Constants.PREF_ENTRY_ANIMATION -> {
                 GlobalValues.isShowEntryAnimation.value = newValue as Boolean
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ENTRY_ANIMATION", newValue))
                 true
             }
             Constants.PREF_APK_ANALYTICS -> {
@@ -89,10 +94,12 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                     ComponentName(requireActivity(), ApkDetailActivity::class.java),
                     flag, PackageManager.DONT_KILL_APP
                 )
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_APK_ANALYTICS", newValue))
                 true
             }
             Constants.PREF_COLORFUL_ICON -> {
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_COLORFUL_ICON", newValue))
                 true
             }
             else -> false
@@ -113,6 +120,7 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                     URLManager.MARKET_PAGE
                 }
                 startActivity(Intent.parseUri(marketUrl, 0))
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
                 true
             }
             else -> false
