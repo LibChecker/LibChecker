@@ -27,6 +27,7 @@ abstract class BaseMap {
                 ACTIVITY -> ActivityLibMap
                 RECEIVER -> ReceiverLibMap
                 PROVIDER -> ProviderLibMap
+                DEX -> DexLibMap
                 else -> throw IllegalArgumentException("Illegal LibType.")
             }
         }

@@ -170,31 +170,34 @@ class AppDetailActivity : BaseActivity() {
             viewModel.initComponentsData(this, packageName)
         } ?: supportFinishAfterTransition()
 
+        val types = listOf(
+            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
+        )
+        val tabTitles = listOf(
+            getText(R.string.ref_category_native),
+            getText(R.string.ref_category_service),
+            getText(R.string.ref_category_activity),
+            getText(R.string.ref_category_br),
+            getText(R.string.ref_category_cp),
+            getText(R.string.ref_category_dex)
+        )
+
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
-                return 5
+                return types.size
             }
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> NativeAnalysisFragment.newInstance(pkgName!!)
-                    1 -> ComponentsAnalysisFragment.newInstance(pkgName!!, SERVICE)
-                    2 -> ComponentsAnalysisFragment.newInstance(pkgName!!, ACTIVITY)
-                    3 -> ComponentsAnalysisFragment.newInstance(pkgName!!, RECEIVER)
-                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, PROVIDER)
+                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, types[position])
                 }
             }
         }
 
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                when (position) {
-                    0 -> tab.text = getText(R.string.ref_category_native)
-                    1 -> tab.text = getText(R.string.ref_category_service)
-                    2 -> tab.text = getText(R.string.ref_category_activity)
-                    3 -> tab.text = getText(R.string.ref_category_br)
-                    else -> tab.text = getText(R.string.ref_category_cp)
-                }
+                tab.text = tabTitles[position]
             })
         mediator.attach()
     }

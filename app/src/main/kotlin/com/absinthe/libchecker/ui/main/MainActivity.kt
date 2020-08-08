@@ -18,6 +18,7 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.ktx.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
@@ -68,6 +69,7 @@ class MainActivity : BaseActivity() {
         initView()
         registerPackageBroadcast()
         handleIntentFromShortcuts(intent)
+        initMap()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -197,5 +199,14 @@ class MainActivity : BaseActivity() {
             Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
         }
         Analytics.trackEvent(Constants.Event.LAUNCH_ACTION, EventProperties().set("Action", intent.action))
+    }
+
+    private fun initMap() {
+        NativeLibMap
+        ServiceLibMap
+        ActivityLibMap
+        ReceiverLibMap
+        ProviderLibMap
+        DexLibMap
     }
 }

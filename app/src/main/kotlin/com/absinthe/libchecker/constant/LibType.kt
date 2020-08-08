@@ -14,8 +14,9 @@ const val SERVICE = 1
 const val ACTIVITY = 2
 const val RECEIVER = 3
 const val PROVIDER = 4
+const val DEX = 5
 
-@IntDef(ALL, NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER)
+@IntDef(ALL, NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX)
 @Target(AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.SOURCE)
 annotation class LibType
