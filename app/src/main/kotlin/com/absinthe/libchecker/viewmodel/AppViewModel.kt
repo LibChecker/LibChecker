@@ -29,6 +29,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -190,6 +191,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         if (requestChangeLock) {
             return@launch
         }
+        requestChangeLock = true
         logd("Request change START")
 
         val timeRecorder = TimeRecorder()
@@ -203,10 +205,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: VerifyError) {
                 e.printStackTrace()
             }
-        }
-        withContext(Dispatchers.Main) {
-            GlobalValues.shouldRequestChange.value = false
-            requestChangeLock = false
         }
 
         timeRecorder.end()
@@ -286,6 +284,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 } catch (e: Exception) {
                     continue
                 }
+            }
+            GlobalScope.launch(Dispatchers.Main) {
+                GlobalValues.shouldRequestChange.value = false
+                requestChangeLock = false
+            }
+        } ?: let {
+            GlobalScope.launch(Dispatchers.Main) {
+                GlobalValues.shouldRequestChange.value = true
+                requestChangeLock = false
             }
         }
     }

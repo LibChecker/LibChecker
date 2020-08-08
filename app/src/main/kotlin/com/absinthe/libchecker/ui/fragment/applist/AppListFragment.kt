@@ -46,6 +46,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
+    private var hasInit = false
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -130,6 +131,12 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
             AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
+
+                if (!hasInit) {
+                    viewModel.requestChange(requireContext())
+                    hasInit = true
+                    (requireActivity() as MainActivity).hasInit = true
+                }
 
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)

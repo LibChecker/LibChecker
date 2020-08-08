@@ -38,6 +38,7 @@ const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity() {
 
+    var hasInit = false
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
     private val appViewModel by viewModels<AppViewModel>()
@@ -79,8 +80,7 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (GlobalValues.shouldRequestChange.value == true) {
-            appViewModel.requestChangeLock = true
+        if (GlobalValues.shouldRequestChange.value == true && hasInit) {
             appViewModel.requestChange(this)
             snapshotViewModel.computeDiff(this)
         }
@@ -172,8 +172,9 @@ class MainActivity : BaseActivity() {
 
         GlobalValues.shouldRequestChange.observe(this, Observer {
             if (it) {
-                appViewModel.requestChangeLock = true
-                appViewModel.requestChange(this)
+                if (hasInit) {
+                    appViewModel.requestChange(this)
+                }
                 snapshotViewModel.computeDiff(this)
             }
         })
