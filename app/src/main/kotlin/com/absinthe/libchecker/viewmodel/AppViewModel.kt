@@ -24,6 +24,7 @@ import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.TimeRecorder
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
@@ -37,7 +38,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var refreshLock = false
-    var isInit = false
+    var requestChangeLock = false
 
     private val repository: LCRepository
 
@@ -48,7 +49,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        logd("initItems")
+        logd("Init all items START")
+
+        val timeRecorder = TimeRecorder()
+        timeRecorder.start()
 
         repository.deleteAllItems()
 
@@ -128,10 +132,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             GlobalValues.isObservingDBItems.value = true
             AppItemRepository.allItems.value = newItems
         }
+
+        timeRecorder.end()
+        logd("Init all items END, $timeRecorder")
     }
 
     fun addItem() = viewModelScope.launch(Dispatchers.IO) {
-        logd("addItems")
+        logd("Add all items START")
+
+        val timeRecorder = TimeRecorder()
+        timeRecorder.start()
 
         dbItems.value?.let { value ->
             val newItems = ArrayList<AppItem>()
@@ -170,12 +180,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 AppItemRepository.allItems.value = newItems
             }
 
+            timeRecorder.end()
+            logd("Add all items END, $timeRecorder")
             refreshLock = false
         }
     }
 
     fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        logd("requestChange")
+        if (requestChangeLock) {
+            return@launch
+        }
+        logd("Request change START")
+
+        val timeRecorder = TimeRecorder()
+        timeRecorder.start()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestChangeImpl(context)
@@ -188,7 +206,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
         withContext(Dispatchers.Main) {
             GlobalValues.shouldRequestChange.value = false
+            requestChangeLock = false
         }
+
+        timeRecorder.end()
+        logd("Request change END, $timeRecorder")
     }
 
     private fun requestChangeImpl(context: Context) {

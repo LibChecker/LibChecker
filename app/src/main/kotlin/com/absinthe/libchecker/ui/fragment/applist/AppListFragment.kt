@@ -131,11 +131,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
                 updateItems(it)
 
-                if (!isInit) {
-                    requestChange(requireContext())
-                    isInit = true
-                }
-
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
                     Once.markDone(OnceTag.DB_MIGRATE_2_3)
@@ -148,9 +143,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, Observer {
-                if (viewModel.isInit) {
-                    viewModel.addItem()
-                }
+                viewModel.addItem()
             })
             appSortMode.observe(viewLifecycleOwner, Observer { mode ->
                 AppItemRepository.allItems.value?.let { allItems ->

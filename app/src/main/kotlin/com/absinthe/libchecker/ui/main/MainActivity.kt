@@ -80,6 +80,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (GlobalValues.shouldRequestChange.value == true) {
+            appViewModel.requestChangeLock = true
             appViewModel.requestChange(this)
             snapshotViewModel.computeDiff(this)
         }
@@ -171,6 +172,7 @@ class MainActivity : BaseActivity() {
 
         GlobalValues.shouldRequestChange.observe(this, Observer {
             if (it) {
+                appViewModel.requestChangeLock = true
                 appViewModel.requestChange(this)
                 snapshotViewModel.computeDiff(this)
             }

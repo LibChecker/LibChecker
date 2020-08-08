@@ -187,21 +187,20 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.lay
 
         val tempOldList = oldList.toMutableList()
         val tempNewList = newList.toMutableList()
-        val sameList = mutableListOf<LibStringItem>()
         val node = CompareDiffNode()
 
-        for (item in tempNewList) {
-            oldList.find { it.name == item.name }?.let {
-                if (it.size != item.size) {
+        val iterator = tempNewList.iterator()
+        var nextItem: LibStringItem
+
+        while (iterator.hasNext()) {
+            nextItem = iterator.next()
+            oldList.find { it.name == nextItem.name }?.let {
+                if (it.size != nextItem.size) {
                     node.changed = true
                 }
-                sameList.add(item)
+                iterator.remove()
+                tempOldList.remove(tempOldList.find { item -> item.name == nextItem.name })
             }
-        }
-
-        for (item in sameList) {
-            tempOldList.remove(tempOldList.find { it.name == item.name })
-            tempNewList.remove(tempNewList.find { it.name == item.name })
         }
 
         if (tempOldList.isNotEmpty()) {
