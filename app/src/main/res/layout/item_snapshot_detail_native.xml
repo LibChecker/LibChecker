@@ -47,7 +47,7 @@
             android:fontFamily="sans-serif-condensed"
             android:textColor="@color/material_black_1000"
             android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/chip"
             app:layout_constraintStart_toStartOf="@id/tv_name"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
             tools:text="100kb" />
@@ -59,6 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_lib_size"
             app:layout_constraintTop_toBottomOf="@id/tv_lib_size" />
 
