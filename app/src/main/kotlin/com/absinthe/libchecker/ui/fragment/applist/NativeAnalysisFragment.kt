@@ -91,7 +91,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             emptyLayoutBinding.text.text = getString(R.string.loading)
             setEmptyView(emptyLayoutBinding.root)
         }
-        viewModel.initSoAnalysisData(requireContext(), packageName)
+        viewModel.initSoAnalysisData(packageName)
     }
 
     override fun onResume() {

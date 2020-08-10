@@ -127,7 +127,7 @@ class ComponentsAnalysisFragment :
         }
 
         packageName?.let {
-            viewModel.initComponentsData(requireContext(), it)
+            viewModel.initComponentsData(it)
         }
     }
 

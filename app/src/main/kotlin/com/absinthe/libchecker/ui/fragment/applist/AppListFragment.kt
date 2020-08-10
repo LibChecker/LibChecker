@@ -105,14 +105,14 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
         viewModel.apply {
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-                initItems(requireContext())
+                initItems()
             } else {
                 dbItems.observe(viewLifecycleOwner, Observer {
                     if (it.isNullOrEmpty()) {
                         lifecycleScope.launch(Dispatchers.IO) {
                             delay(500)
                             if (dbItems.value.isNullOrEmpty()) {
-                                initItems(requireContext())
+                                initItems()
                             } else {
                                 if (!viewModel.refreshLock) {
                                     viewModel.refreshLock = true
@@ -133,7 +133,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 updateItems(it)
 
                 if (!hasInit) {
-                    viewModel.requestChange(requireContext())
+                    viewModel.requestChange()
                     hasInit = true
                     (requireActivity() as MainActivity).hasInit = true
                 }

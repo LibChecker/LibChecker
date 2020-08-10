@@ -161,7 +161,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     private fun computeRef() {
         binding.vfContainer.displayedChild = 0
-        viewModel.computeLibReference(requireContext(), category)
+        viewModel.computeLibReference(category)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

@@ -55,7 +55,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
                     vfContainer.displayedChild = 0
                     hide()
-                    viewModel.computeSnapshots(requireContext())
+                    viewModel.computeSnapshots()
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_CLICK, EventProperties().set("Action", "Click to Save"))
                 }
                 setOnLongClickListener {
@@ -134,7 +134,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             })
             snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
                 dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
-                computeDiff(requireContext())
+                computeDiff()
             })
             snapshotDiffItems.observe(
                 viewLifecycleOwner,

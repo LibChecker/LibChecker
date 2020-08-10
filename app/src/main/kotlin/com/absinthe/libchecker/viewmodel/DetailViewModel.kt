@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
@@ -37,8 +38,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     )
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
-    fun initSoAnalysisData(context: Context, packageName: String) =
+    fun initSoAnalysisData(packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
+            val context: Context = getApplication<LibCheckerApp>()
             val list = ArrayList<LibStringItem>()
 
             try {
@@ -68,8 +70,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun initComponentsData(context: Context, packageName: String) =
+    fun initComponentsData(packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
+            val context: Context = getApplication<LibCheckerApp>()
+
             val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 PackageManager.MATCH_DISABLED_COMPONENTS
             } else {

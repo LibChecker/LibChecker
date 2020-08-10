@@ -81,8 +81,8 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (GlobalValues.shouldRequestChange.value == true && hasInit) {
-            appViewModel.requestChange(this)
-            snapshotViewModel.computeDiff(this)
+            appViewModel.requestChange()
+            snapshotViewModel.computeDiff()
         }
     }
 
@@ -173,9 +173,9 @@ class MainActivity : BaseActivity() {
         GlobalValues.shouldRequestChange.observe(this, Observer {
             if (it) {
                 if (hasInit) {
-                    appViewModel.requestChange(this)
+                    appViewModel.requestChange()
                 }
-                snapshotViewModel.computeDiff(this)
+                snapshotViewModel.computeDiff()
             }
         })
     }

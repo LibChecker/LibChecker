@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.database.LCDatabase
@@ -46,9 +47,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         repository.deleteAllSnapshots()
     }
 
-    fun computeSnapshots(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeSnapshots() = viewModelScope.launch(Dispatchers.IO) {
         deleteAllSnapshots()
 
+        val context: Context = getApplication<LibCheckerApp>()
         var appList: List<ApplicationInfo>? = null
         while (appList == null) {
             appList = try {
@@ -107,9 +109,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun computeDiff(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeDiff() = viewModelScope.launch(Dispatchers.IO) {
         if (snapshotItems.value.isNullOrEmpty()) return@launch
 
+        val context: Context = getApplication<LibCheckerApp>()
         var appList: MutableList<ApplicationInfo>? = null
         while (appList == null) {
             appList = try {

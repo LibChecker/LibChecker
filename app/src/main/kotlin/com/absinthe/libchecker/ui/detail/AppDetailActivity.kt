@@ -167,7 +167,7 @@ class AppDetailActivity : BaseActivity() {
                     Sortable.currentReference?.get()?.sort()
                 }
             }
-            viewModel.initComponentsData(this, packageName)
+            viewModel.initComponentsData(packageName)
         } ?: supportFinishAfterTransition()
 
         val types = listOf(

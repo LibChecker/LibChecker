@@ -12,6 +12,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
@@ -48,8 +49,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         dbItems = repository.allItems
     }
 
-    fun initItems(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun initItems() = viewModelScope.launch(Dispatchers.IO) {
         logd("Init all items START")
+
+        val context: Context = getApplication<LibCheckerApp>()
 
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
@@ -186,8 +189,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun requestChange() = viewModelScope.launch(Dispatchers.IO) {
         logd("Request change START")
+
+        val context: Context = getApplication<LibCheckerApp>()
 
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
@@ -382,8 +387,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         @LibType val type: Int
     )
 
-    fun computeLibReference(context: Context, @LibType type: Int) =
+    fun computeLibReference(@LibType type: Int) =
         viewModelScope.launch(Dispatchers.IO) {
+            val context: Context = getApplication<LibCheckerApp>()
             var appList: List<ApplicationInfo>? = null
             while (appList == null) {
                 appList = try {
