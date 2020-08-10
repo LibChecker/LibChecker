@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -43,7 +44,8 @@ class SnapshotComponentProvider : BaseNodeProvider() {
             else -> Color.TRANSPARENT
         }
 
-        helper.setImageResource(R.id.iv_type_icon,
+        helper.setImageResource(
+            R.id.iv_type_icon,
             when (snapshotItem.diffType) {
                 ADDED -> R.drawable.ic_add
                 REMOVED -> R.drawable.ic_remove
@@ -53,16 +55,19 @@ class SnapshotComponentProvider : BaseNodeProvider() {
             }
         )
 
-        helper.itemView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+        helper.itemView.backgroundTintList =
+            ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            val chip = helper.getView<Chip>(R.id.chip)
+
             BaseMap.getMap(snapshotItem.itemType).getChip(snapshotItem.name)?.let {
-                val chip = helper.getView<Chip>(R.id.chip)
                 chip.apply {
                     withContext(Dispatchers.Main) {
                         setChipIconResource(it.iconRes)
                         text = it.name
-                        chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+                        chipBackgroundColor =
+                            ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
                         visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
@@ -75,7 +80,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                         }
                     }
                 }
-            }
+            } ?: let { chip.isGone = true }
         }
     }
 }
