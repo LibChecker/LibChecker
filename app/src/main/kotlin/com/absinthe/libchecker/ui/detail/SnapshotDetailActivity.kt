@@ -14,13 +14,18 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.utils.ActivityStackManager
+import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
@@ -171,6 +176,24 @@ class SnapshotDetailActivity : BaseActivity() {
                 else -> R.layout.layout_snapshot_empty_view
             }
         )
+        adapter.setOnItemChildClickListener { _, view, position ->
+            if (view.id == R.id.chip) {
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemChildClickListener
+                }
+                if (GlobalValues.config.enableLibDetail) {
+                    val item = (adapter.data[position] as BaseSnapshotNode).item
+                    val name = item.name
+                    val regexName = NativeLibMap.findRegex(name)?.regexName
+                    LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
+                        .apply {
+                            ActivityStackManager.topActivity?.apply {
+                                show(supportFragmentManager, tag)
+                            }
+                        }
+                }
+            }
+        }
     }
 
     private fun setRootPadding() {

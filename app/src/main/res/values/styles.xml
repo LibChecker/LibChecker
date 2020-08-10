@@ -31,9 +31,12 @@
     </style>
 
     <style name="App.LibChip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipMinHeight">28dp</item>
         <item name="chipMinTouchTargetSize">0dp</item>
         <item name="chipStartPadding">10dp</item>
+    </style>
+
+    <style name="ThemeOverlay.Preference" parent="PreferenceThemeOverlay">
+        <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
     </style>
 
 </resources>

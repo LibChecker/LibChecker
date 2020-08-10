@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "properties": [],
-      "versionCode": 243,
-      "versionName": "1.7.0.r243.c16ab06",
+      "versionCode": 266,
+      "versionName": "1.7.3.r266.be1b9b8",
       "enabled": true,
       "outputFile": "app-release.apk"
     }

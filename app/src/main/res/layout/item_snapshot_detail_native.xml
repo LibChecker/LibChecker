@@ -13,6 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:padding="10dp">
 
         <ImageView
@@ -58,7 +59,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/material_black_1000"
             android:visibility="gone"
+            app:chipStrokeColor="#20000000"
+            app:chipStrokeWidth="1dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/tv_lib_size"
             app:layout_constraintTop_toBottomOf="@id/tv_lib_size" />

@@ -4,86 +4,49 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.View
-import androidx.preference.DropDownPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AppUtils
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
-import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import moe.shizuku.preference.ListPreference
+import moe.shizuku.preference.PreferenceFragment
+import moe.shizuku.preference.SwitchPreference
+import rikka.material.widget.BorderRecyclerView
+import rikka.material.widget.BorderView
+import rikka.recyclerview.fixEdgeEffect
 
-class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener,
-    Preference.OnPreferenceClickListener {
+class SettingsFragment : PreferenceFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
 
-        findPreference<SwitchPreferenceCompat>(Constants.PREF_SHOW_SYSTEM_APPS)?.apply {
-            onPreferenceChangeListener = this@SettingsFragment
-        }
-        findPreference<SwitchPreferenceCompat>(Constants.PREF_ENTRY_ANIMATION)?.apply {
-            onPreferenceChangeListener = this@SettingsFragment
-        }
-        findPreference<SwitchPreferenceCompat>(Constants.PREF_APK_ANALYTICS)?.apply {
-            onPreferenceChangeListener = this@SettingsFragment
-        }
-        findPreference<SwitchPreferenceCompat>(Constants.PREF_COLORFUL_ICON)?.apply {
-            onPreferenceChangeListener = this@SettingsFragment
-        }
-        findPreference<DropDownPreference>(Constants.PREF_RULES_REPO)?.apply {
-            onPreferenceChangeListener = this@SettingsFragment
-        }
-        findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
-            onPreferenceClickListener = this@SettingsFragment
-        }
-
-        findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
-            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
-        }
-        findPreference<Preference>(Constants.PREF_RATE)?.apply {
-            onPreferenceClickListener = this@SettingsFragment
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        listView.setPadding(
-            0,
-            UiUtils.getActionBarSize(requireActivity()) + BarUtils.getStatusBarHeight(),
-            0,
-            0
-        )
-    }
-
-    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        return when (preference.key) {
-            Constants.PREF_SHOW_SYSTEM_APPS -> {
+        (findPreference(Constants.PREF_SHOW_SYSTEM_APPS) as SwitchPreference).apply {
+            setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isShowSystemApps.value = newValue as Boolean
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue))
                 true
             }
-            Constants.PREF_RULES_REPO -> {
-                GlobalValues.repo = newValue as String
-                AppUtils.requestConfiguration()
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
-                true
-            }
-            Constants.PREF_ENTRY_ANIMATION -> {
+        }
+        (findPreference(Constants.PREF_ENTRY_ANIMATION) as SwitchPreference).apply {
+            setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isShowEntryAnimation.value = newValue as Boolean
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ENTRY_ANIMATION", newValue))
                 true
             }
-            Constants.PREF_APK_ANALYTICS -> {
+        }
+        (findPreference(Constants.PREF_APK_ANALYTICS) as SwitchPreference).apply {
+            setOnPreferenceChangeListener { _, newValue ->
                 val flag = if (newValue as Boolean) {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 } else {
@@ -97,22 +60,34 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_APK_ANALYTICS", newValue))
                 true
             }
-            Constants.PREF_COLORFUL_ICON -> {
+        }
+        (findPreference(Constants.PREF_COLORFUL_ICON) as SwitchPreference).apply {
+            setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_COLORFUL_ICON", newValue))
                 true
             }
-            else -> false
         }
-    }
-
-    override fun onPreferenceClick(preference: Preference): Boolean {
-        return when (preference.key) {
-            Constants.PREF_LIB_REF_THRESHOLD -> {
+        (findPreference(Constants.PREF_RULES_REPO) as ListPreference).apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                GlobalValues.repo = newValue as String
+                AppUtils.requestConfiguration()
+                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
+                true
+            }
+        }
+        findPreference(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
+            setOnPreferenceClickListener {
                 LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 true
             }
-            Constants.PREF_RATE -> {
+        }
+
+        findPreference(Constants.PREF_ABOUT)?.apply {
+            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+        }
+        findPreference(Constants.PREF_RATE)?.apply {
+            setOnPreferenceClickListener {
                 val hasInstallCoolApk = com.blankj.utilcode.util.AppUtils.isAppInstalled("com.coolapk.market")
                 val marketUrl = if (hasInstallCoolApk) {
                     URLManager.COOLAPK_APP_PAGE
@@ -123,7 +98,24 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
                 true
             }
-            else -> false
         }
+    }
+
+    override fun onCreateItemDecoration(): DividerDecoration? {
+        return CategoryDivideDividerDecoration()
+    }
+
+    override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
+        val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+        recyclerView.fixEdgeEffect()
+
+        val lp = recyclerView.layoutParams
+        if (lp is FrameLayout.LayoutParams) {
+            lp.rightMargin = recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin).toInt()
+            lp.leftMargin = lp.rightMargin
+        }
+
+        recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
+        return recyclerView
     }
 }

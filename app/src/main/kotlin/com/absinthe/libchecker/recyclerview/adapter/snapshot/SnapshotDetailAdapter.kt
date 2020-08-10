@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
@@ -13,6 +14,7 @@ class SnapshotDetailAdapter : BaseNodeAdapter() {
         addNodeProvider(SnapshotTitleProvider())
         addNodeProvider(SnapshotNativeProvider())
         addNodeProvider(SnapshotComponentProvider())
+        addChildClickViewIds(R.id.chip)
     }
 
     override fun getItemType(data: List<BaseNode>, position: Int): Int {

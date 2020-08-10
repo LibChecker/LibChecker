@@ -62,6 +62,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                     withContext(Dispatchers.Main) {
                         setChipIconResource(it.iconRes)
                         text = it.name
+                        chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
                         visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
