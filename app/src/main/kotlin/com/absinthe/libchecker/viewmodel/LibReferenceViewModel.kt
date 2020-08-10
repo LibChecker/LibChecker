@@ -1,10 +1,12 @@
 package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
+import android.content.pm.PackageInfo
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.LibType
 import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.database.AppItemRepository
@@ -21,32 +23,38 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
         val list = mutableListOf<AppItem>()
 
         AppItemRepository.allItems.value?.let { items ->
-            try {
-                if (type == NATIVE) {
-                    for (item in items) {
-                        val packageInfo = PackageUtils.getPackageInfo(item.packageName)
+            if (type == NATIVE) {
+                var packageInfo: PackageInfo
+                var natives: List<LibStringItem>
 
-                        val natives = PackageUtils.getNativeDirLibs(
+                for (item in items) {
+                    natives = try {
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                        PackageUtils.getNativeDirLibs(
                             packageInfo.applicationInfo.sourceDir,
                             packageInfo.applicationInfo.nativeLibraryDir
                         )
-
-                        for (native in natives) {
-                            if (native.name == name) {
-                                list.add(item)
-                                break
-                            }
-                        }
+                    } catch (e: Exception) {
+                        listOf()
                     }
-                } else {
-                    for (item in items) {
-                        if (PackageUtils.getComponentList(item.packageName, type, false).contains(name)) {
+
+                    for (native in natives) {
+                        if (native.name == name) {
                             list.add(item)
+                            break
                         }
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } else {
+                for (item in items) {
+                    try {
+                        if (PackageUtils.getComponentList(item.packageName, type, false).contains(name)) {
+                            list.add(item)
+                        }
+                    } catch (e: Exception) {
+                        continue
+                    }
+                }
             }
         }
 

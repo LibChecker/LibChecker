@@ -204,7 +204,7 @@ class MainActivity : BaseActivity() {
         Analytics.trackEvent(Constants.Event.LAUNCH_ACTION, EventProperties().set("Action", intent.action))
     }
 
-    private fun initMap() {
+    private fun initMap() = lifecycleScope.launch(Dispatchers.IO) {
         NativeLibMap
         ServiceLibMap
         ActivityLibMap

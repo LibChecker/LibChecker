@@ -361,7 +361,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             oldList.find { it.name == item.name }?.let {
                 if (it.size != item.size) {
                     list.add(
-                        SnapshotDetailItem(it.name, "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}", CHANGED, NATIVE)
+                        SnapshotDetailItem(it.name, it.name, "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}", CHANGED, NATIVE)
                     )
                 }
                 sameList.add(item)
@@ -375,12 +375,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(item.name, PackageUtils.sizeToString(item.size), REMOVED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), REMOVED, NATIVE)
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(item.name, PackageUtils.sizeToString(item.size), ADDED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), ADDED, NATIVE)
             )
         }
 
@@ -422,6 +422,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             tempOldList.find { it.substringAfterLast(".") == simpleName }?.let {
                 list.add(
                     SnapshotDetailItem(
+                        item,
                         "$it\n$ARROW\n$item",
                         "",
                         MOVED,
@@ -439,6 +440,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             list.add(
                 SnapshotDetailItem(
                     item,
+                    item,
                     "",
                     REMOVED,
                     type
@@ -448,6 +450,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         for (item in tempNewList) {
             list.add(
                 SnapshotDetailItem(
+                    item,
                     item,
                     "",
                     ADDED,

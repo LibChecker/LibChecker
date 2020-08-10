@@ -46,7 +46,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
                         visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
-                            libIcon.chipIconTint = ColorStateList.valueOf(
+                            chipIconTint = ColorStateList.valueOf(
                                 ContextCompat.getColor(
                                     context,
                                     R.color.textNormal

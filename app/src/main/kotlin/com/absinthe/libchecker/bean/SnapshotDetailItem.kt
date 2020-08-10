@@ -8,6 +8,7 @@ const val CHANGED = 2
 const val MOVED = 3
 
 data class SnapshotDetailItem(
+    val name: String,
     val title: String,
     val extra: String,
     val diffType: Int,

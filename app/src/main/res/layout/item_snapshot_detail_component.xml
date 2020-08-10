@@ -40,6 +40,16 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="com.google...Activity" />
 
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip"
+            style="@style/App.LibChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/tv_name"
+            app:layout_constraintTop_toBottomOf="@id/tv_name" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

@@ -41,7 +41,7 @@ object PackageUtils {
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
         val packageInfo = Utils.getApp().packageManager.getPackageInfo(
-            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO
+            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
             val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -56,7 +56,7 @@ object PackageUtils {
                 ).applicationInfo.sourceDir, pmFlag or flag
             ) ?: throw PackageManager.NameNotFoundException()
         }
-        return Utils.getApp().packageManager.getPackageInfo(packageName, flag)
+        return packageInfo
     }
 
     /**

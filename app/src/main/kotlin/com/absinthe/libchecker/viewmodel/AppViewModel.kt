@@ -39,7 +39,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var refreshLock = false
-    var requestChangeLock = false
 
     private val repository: LCRepository
 
@@ -188,10 +187,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun requestChange(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        if (requestChangeLock) {
-            return@launch
-        }
-        requestChangeLock = true
         logd("Request change START")
 
         val timeRecorder = TimeRecorder()
@@ -287,12 +282,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
             GlobalScope.launch(Dispatchers.Main) {
                 GlobalValues.shouldRequestChange.value = false
-                requestChangeLock = false
             }
         } ?: let {
             GlobalScope.launch(Dispatchers.Main) {
                 GlobalValues.shouldRequestChange.value = true
-                requestChangeLock = false
             }
         }
     }
