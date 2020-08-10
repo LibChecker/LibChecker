@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -53,8 +54,9 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         helper.itemView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            val chip = helper.getView<Chip>(R.id.chip)
+
             BaseMap.getMap(snapshotItem.itemType).getChip(snapshotItem.name)?.let {
-                val chip = helper.getView<Chip>(R.id.chip)
                 chip.apply {
                     withContext(Dispatchers.Main) {
                         setChipIconResource(it.iconRes)
@@ -72,7 +74,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
                         }
                     }
                 }
-            }
+            } ?: let { chip.isGone = true }
         }
     }
 }
