@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -7,6 +8,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -85,6 +88,22 @@ class SettingsFragment : PreferenceFragment() {
 
         findPreference(Constants.PREF_ABOUT)?.apply {
             summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+        }
+        findPreference(Constants.PREF_HELP)?.apply {
+            setOnPreferenceClickListener {
+                try {
+                    CustomTabsIntent.Builder().build().apply {
+                        launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
+                    }
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                    val intent = Intent(Intent.ACTION_VIEW).apply {
+                        data = URLManager.DOCS_PAGE.toUri()
+                    }
+                    requireActivity().startActivity(intent)
+                }
+                true
+            }
         }
         findPreference(Constants.PREF_RATE)?.apply {
             setOnPreferenceClickListener {

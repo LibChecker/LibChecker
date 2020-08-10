@@ -60,12 +60,14 @@
     <string name="colorful_icon">Colorful Icon</string>
     <string name="rules_repo_title">Rules Repo</string>
     <string name="lib_ref_threshold">Library Reference Threshold</string>
+    <string name="help_docs">Help Docs</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
     <string name="apk_analytics_summary">Open the detail page when click an APK file</string>
     <string name="colorful_icon_summary">Part of the marked libraries will appear as a colored logo</string>
     <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
+    <string name="help_docs_summary">Learn how to use LibChecker</string>
 
     <!--  Detail  -->
     <string name="detail_label">View App Details</string>

@@ -11,6 +11,7 @@ object Constants {
     const val PREF_COLORFUL_ICON = "colorfulIcon"
     const val PREF_LIB_REF_THRESHOLD = "libRefThreshold"
     const val PREF_ABOUT = "about"
+    const val PREF_HELP = "help"
     const val PREF_RATE = "rate"
 
     const val PREF_APP_SORT_MODE = "appSortMode"

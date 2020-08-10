@@ -68,4 +68,6 @@
     <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
     <string name="cannot_read">无法读取</string>
     <string name="unknown">未知</string>
+    <string name="help_docs">帮助文档</string>
+    <string name="help_docs_summary">学习如何使用 LibChecker</string>
 </resources>

@@ -10,4 +10,6 @@ object URLManager {
     const val GITHUB_PAGE = "https://github.com/zhaobozhen"
 
     const val GITHUB_REPO_PAGE = "https://github.com/zhaobozhen/LibChecker"
+
+    const val DOCS_PAGE = "https://absinthe.life/LibChecker-Docs"
 }

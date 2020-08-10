@@ -90,3 +90,4 @@ app/.settings/org.eclipse.buildship.core.prefs
 .idea/kotlinc.xml
 .idea/codeStyles/codeStyleConfig.xml
 .idea/codeStyles/codeStyleConfig.xml
+.idea/jarRepositories.xml

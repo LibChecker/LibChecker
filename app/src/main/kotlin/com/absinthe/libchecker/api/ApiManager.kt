@@ -12,7 +12,7 @@ object ApiManager {
         "https://gitee.com/zhaobozhen/LibChecker-Rules/raw/master/"
 
     const val CONFIGURATION_URL = "configuration/configuration_v$CONFIGURATION_VERSION.json"
-    const val GITHUB_NEW_ISSUE_URL = "https://github.com/zhaobozhen/LibChecker-Rules/issues/new/"
+    const val GITHUB_NEW_ISSUE_URL = "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
 
     var root = GITHUB_ROOT_URL
         get() = when (GlobalValues.repo) {
