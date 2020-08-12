@@ -16,13 +16,9 @@ import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.ToastUtils
 import rikka.core.util.ClipboardUtils
 import java.lang.ref.WeakReference
 
@@ -78,7 +74,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             }
             setOnItemLongClickListener { _, _, position ->
                 ClipboardUtils.put(requireContext(), getItem(position).name)
-                ToastUtils.showShort(R.string.toast_copied_to_clipboard)
+                Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
                 true
             }
             setOnItemChildClickListener { _, view, position ->

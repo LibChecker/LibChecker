@@ -74,7 +74,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
                         }
                     }
                 }
-            } ?: let { chip.isGone = true }
+            } ?: withContext(Dispatchers.Main) { chip.isGone = true }
         }
     }
 }

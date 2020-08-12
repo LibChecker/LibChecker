@@ -14,4 +14,6 @@
     <integer name="rd_material_dialog_enter_scale_anim_duration">225</integer>
     <integer name="rd_material_dialog_exit_alpha_anim_duration">150</integer>
     <integer name="rd_material_dialog_exit_scale_anim_duration">150</integer>
+
+    <dimen name="toast_radius">24dp</dimen>
 </resources>

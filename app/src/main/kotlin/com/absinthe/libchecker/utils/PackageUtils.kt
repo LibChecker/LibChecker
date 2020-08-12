@@ -67,8 +67,7 @@ object PackageUtils {
     @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
         return try {
-            Utils.getApp().packageManager
-                .getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES)
+            ActivityStackManager.topActivity!!.packageManager.getInstalledApplications(0)
         } catch (e: Exception) {
             throw Exception()
         }
@@ -241,7 +240,7 @@ object PackageUtils {
                     }
                 }
             }
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
             return false
         }
 

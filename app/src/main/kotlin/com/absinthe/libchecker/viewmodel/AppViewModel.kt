@@ -86,7 +86,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 isSystemType =
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
-
                 appItem = AppItem().apply {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
@@ -97,6 +96,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     updateTime = packageInfo.lastUpdateTime
                     isKotlinUsed = isKotlinType
                 }
+
                 lcItem = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
@@ -117,10 +117,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 insert(lcItem)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 e.printStackTrace()
-                continue
-            } catch (e: VerifyError) {
                 continue
             }
         }

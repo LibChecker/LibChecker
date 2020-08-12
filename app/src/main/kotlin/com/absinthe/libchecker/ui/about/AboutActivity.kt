@@ -14,9 +14,9 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
@@ -105,7 +105,7 @@ class AboutActivity : AbsAboutActivity() {
                 })
             } catch (e: ActivityNotFoundException) {
                 e.printStackTrace()
-                ToastUtils.showLong("There's not existing any app market")
+                Toasty.showLong(this, "There's not existing any app market")
             }
         }
         return super.onOptionsItemSelected(menuItem)
