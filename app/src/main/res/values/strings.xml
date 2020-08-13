@@ -49,6 +49,7 @@
     <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
     <string name="toolbar_rate">Rate</string>
     <string name="resource_declaration">Part of the resources in the application are comes from: </string>
+    <string name="other_works">Other Works</string>
 
     <!--  Settings  -->
     <string name="pref_group_normal">Normal</string>

@@ -16,6 +16,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libraries.Absinthe
 import com.blankj.utilcode.util.AppUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
@@ -52,6 +53,9 @@ class AboutActivity : AbsAboutActivity() {
             }
             add(Contributor(R.mipmap.pic_rabbit, "Absinthe", "Developer & Designer", developerUrl))
             add(Contributor(R.drawable.ic_github, "Source Code", URLManager.GITHUB_REPO_PAGE, URLManager.GITHUB_REPO_PAGE))
+
+            add(Category("Other Works"))
+            addAll(Absinthe.getAboutPageRecommendedApps(this@AboutActivity, BuildConfig.APPLICATION_ID))
 
             add(Category("Acknowledgement"))
             add(Card(

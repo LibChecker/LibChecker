@@ -70,4 +70,5 @@
     <string name="unknown">未知</string>
     <string name="help_docs">帮助文档</string>
     <string name="help_docs_summary">学习如何使用 LibChecker</string>
+    <string name="other_works">其他作品</string>
 </resources>

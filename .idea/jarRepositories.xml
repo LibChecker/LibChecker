@@ -36,5 +36,10 @@
       <option name="name" value="maven3" />
       <option name="url" value="https://dl.bintray.com/rikkaw/MaterialPreference" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="maven2" />
+      <option name="name" value="maven2" />
+      <option name="url" value="https://dl.bintray.com/absinthe/libraries" />
+    </remote-repository>
   </component>
 </project>
