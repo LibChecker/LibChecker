@@ -133,6 +133,15 @@ class AppDetailActivity : BaseActivity() {
                     }
                     tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
+                    val abi = PackageUtils.getAbi(
+                        packageInfo.applicationInfo.sourceDir,
+                        packageInfo.applicationInfo.nativeLibraryDir,
+                        isApk = false
+                    )
+
+                    layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
+                    layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
+
                     lifecycleScope.launch(Dispatchers.IO) {
                         val lcDao = LCDatabase.getDatabase(application).lcDao()
                         val repository = LCRepository(lcDao)

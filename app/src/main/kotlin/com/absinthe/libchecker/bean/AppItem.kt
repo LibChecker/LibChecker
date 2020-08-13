@@ -12,9 +12,9 @@ const val ARMV7 = 1
 const val ARMV5 = 2
 const val NO_LIBS = 3
 
-const val ARMV8_STRING = "ARMv8"
-const val ARMV7_STRING = "ARMv7"
-const val ARMV5_STRING = "ARMv5"
+const val ARMV8_STRING = "arm64-v8a"
+const val ARMV7_STRING = "armeabi-v7a"
+const val ARMV5_STRING = "armeabi"
 
 class AppItem() : Parcelable {
     var icon: Drawable = ColorDrawable(Color.TRANSPARENT)

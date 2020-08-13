@@ -51,7 +51,7 @@
                     android:textColor="@color/textNormal"
                     android:textSize="16sp"
                     android:transitionName="app_name"
-                    app:layout_constraintEnd_toStartOf="@id/tv_target_api"
+                    app:layout_constraintEnd_toStartOf="@id/ll_target_api"
                     app:layout_constraintStart_toEndOf="@id/iv_app_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="LibChecker" />
@@ -82,16 +82,31 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_package_name"
                     tools:text="1.2.0(120)" />
 
-                <TextView
-                    android:id="@+id/tv_target_api"
+                <LinearLayout
+                    android:id="@+id/ll_target_api"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed-medium"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:orientation="vertical"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
-                    tools:text="API 29" />
+                    app:layout_constraintTop_toTopOf="@id/iv_app_icon">
+
+                    <TextView
+                        android:id="@+id/tv_target_api"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-condensed-medium"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="13sp"
+                        tools:text="API 29" />
+
+                    <include
+                        android:id="@+id/layout_abi"
+                        layout="@layout/layout_abi_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

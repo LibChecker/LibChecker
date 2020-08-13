@@ -13,7 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.databinding.ActivityApkDetailBinding
+import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
@@ -27,12 +27,12 @@ import java.io.File
 
 class ApkDetailActivity : BaseActivity() {
 
-    private lateinit var binding: ActivityApkDetailBinding
+    private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
 
     override fun setViewBinding(): View {
         isPaddingToolbar = true
-        binding = ActivityApkDetailBinding.inflate(layoutInflater)
+        binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
     }
 

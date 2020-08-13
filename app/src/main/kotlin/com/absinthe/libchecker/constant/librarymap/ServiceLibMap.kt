@@ -595,6 +595,13 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.evernote.android.job.v14.PlatformAlarmServiceExact",
+            LibChip(
+                R.drawable.ic_lib_evernote,
+                "Android-Job"
+            )
+        ),
+        Pair(
             "com.evernote.android.job.v21.PlatformJobService",
             LibChip(
                 R.drawable.ic_lib_evernote,
