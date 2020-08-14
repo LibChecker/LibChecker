@@ -43,7 +43,7 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.delete(item)
     }
 
-    suspend fun deleteAllSnapshots() {
+    fun deleteAllSnapshots() {
         lcDao.deleteAllSnapshots()
     }
 }

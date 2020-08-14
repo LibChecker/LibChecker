@@ -39,14 +39,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         snapshotItems = repository.allSnapshotItems
     }
 
-    fun insertSnapshots(items: List<SnapshotItem>) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertSnapshots(items)
-    }
-
-    fun deleteAllSnapshots() = viewModelScope.launch(Dispatchers.IO) {
-        repository.deleteAllSnapshots()
-    }
-
     fun computeSnapshots() = viewModelScope.launch(Dispatchers.IO) {
         deleteAllSnapshots()
 
@@ -346,6 +338,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             snapshotDetailItems.value = list
         }
     }
+
+    private fun insertSnapshots(items: List<SnapshotItem>) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insertSnapshots(items)
+    }
+
+    private fun deleteAllSnapshots() = repository.deleteAllSnapshots()
 
     private fun getNativeDiffList(
         oldList: List<LibStringItem>,

@@ -15,7 +15,7 @@
         <item name="toolbarStyle">@style/Widget.Material.Toolbar</item>
 
         <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
 
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
@@ -38,7 +38,7 @@
         <item name="toolbarStyle">@style/Widget.Material.Toolbar</item>
 
         <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
-        <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
+        <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
 
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
