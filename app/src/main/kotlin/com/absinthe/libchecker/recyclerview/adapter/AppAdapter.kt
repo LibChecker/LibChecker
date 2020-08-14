@@ -1,12 +1,20 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import com.zhangyue.we.x2c.X2C
+import com.zhangyue.we.x2c.ano.Xml
 
-class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(R.layout.item_app) {
+@Xml(layouts = ["item_app"])
+class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(0) {
+
+    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
+    }
 
     override fun convert(holder: BaseViewHolder, item: AppItem) {
         holder.apply {

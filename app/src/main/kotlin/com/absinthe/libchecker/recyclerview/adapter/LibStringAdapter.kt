@@ -31,7 +31,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
     }
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(X2C.inflate(context, R.layout.item_lib_string, null))
+        return createBaseViewHolder(X2C.inflate(context, R.layout.item_lib_string, parent, false))
     }
 
     override fun convert(holder: BaseViewHolder, item: LibStringItem) {

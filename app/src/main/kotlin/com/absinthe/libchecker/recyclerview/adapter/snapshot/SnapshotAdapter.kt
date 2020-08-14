@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.res.ColorStateList
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -14,12 +15,19 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.zhangyue.we.x2c.X2C
+import com.zhangyue.we.x2c.ano.Xml
 
 const val ARROW = "→"
 
-class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(R.layout.item_snapshot) {
+@Xml(layouts = ["item_snapshot"])
+class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
     private val gson = Gson()
+
+    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return createBaseViewHolder(X2C.inflate(context, R.layout.item_snapshot, parent, false))
+    }
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
         val drawable = try {
