@@ -21,7 +21,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:lottie_autoPlay="true"
-                app:lottie_fileName="loading.json"
+                app:lottie_fileName="anim_clock.json"
+                app:lottie_speed="-1"
                 app:lottie_loop="true" />
 
         </LinearLayout>
