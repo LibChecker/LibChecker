@@ -15,5 +15,5 @@
 
     <dimen name="toast_radius">24dp</dimen>
 
-    <dimen name="condense_abi_badge_width">56dp</dimen>
+    <dimen name="condense_abi_badge_width">60dp</dimen>
 </resources>
