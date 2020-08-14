@@ -119,6 +119,10 @@ dependencies {
     implementation "moe.shizuku.preference:preference-appcompat:$rikkaPreference"
     implementation "moe.shizuku.preference:preference-simplemenu-appcompat:$rikkaPreference"
 
+    //XML layout to Java code
+    annotationProcessor 'com.zhangyue.we:x2c-apt:1.1.2'
+    implementation 'com.zhangyue.we:x2c-lib:1.0.6'
+
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.8.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

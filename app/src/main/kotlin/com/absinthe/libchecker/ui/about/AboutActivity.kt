@@ -76,6 +76,7 @@ class AboutActivity : AbsAboutActivity() {
             add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
             add(License("gson", "Google", License.APACHE_2, "https://github.com/google/gson"))
             add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
+            add(License("libraries", "RikkaApps", License.APACHE_2, "https://github.com/RikkaApps/libraries"))
             add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
             add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
             add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
@@ -85,8 +86,8 @@ class AboutActivity : AbsAboutActivity() {
             add(License("Retrofit", "Square", License.APACHE_2, "https://github.com/square/retrofit"))
             add(License("contour", "Square", License.APACHE_2, "https://github.com/cashapp/contour"))
             add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
-            add(License("libraries", "RikkaApps", License.APACHE_2, "https://github.com/RikkaApps/libraries"))
             add(License("apk-parser", "hsiafan", "BSD-2-Clause", "https://github.com/hsiafan/apk-parser"))
+            add(License("X2C", "iReaderAndroid", License.MIT, "https://github.com/iReaderAndroid/X2C"))
         }
     }
 
