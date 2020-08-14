@@ -110,7 +110,7 @@ class AboutActivity : AbsAboutActivity() {
                 })
             } catch (e: ActivityNotFoundException) {
                 e.printStackTrace()
-                Toasty.showLong(this, "There's not existing any app market")
+                Toasty.showLong(this, R.string.toast_not_existing_market)
             }
         }
         return super.onOptionsItemSelected(menuItem)

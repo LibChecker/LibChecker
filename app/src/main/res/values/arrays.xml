@@ -10,10 +10,4 @@
         <item>gitee</item>
     </string-array>
 
-    <string-array name="list_comp_category">
-        <item>@string/ref_category_service</item>
-        <item>@string/ref_category_activity</item>
-        <item>@string/ref_category_br</item>
-        <item>@string/ref_category_cp</item>
-    </string-array>
 </resources>

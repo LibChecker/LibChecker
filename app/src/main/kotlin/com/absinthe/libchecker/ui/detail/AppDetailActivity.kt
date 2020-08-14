@@ -113,9 +113,9 @@ class AppDetailActivity : BaseActivity() {
                             try {
                                 startActivity(IntentUtils.getLaunchAppIntent(pkgName))
                             } catch (e: ActivityNotFoundException) {
-                                Toasty.show(this@AppDetailActivity, "Can\'t open this app")
+                                Toasty.show(this@AppDetailActivity, R.string.toast_cant_open_app)
                             } catch (e: NullPointerException) {
-                                Toasty.show(this@AppDetailActivity, "Package name is null")
+                                Toasty.show(this@AppDetailActivity, R.string.toast_package_name_null)
                             }
                         }
                     }
@@ -180,15 +180,15 @@ class AppDetailActivity : BaseActivity() {
         } ?: supportFinishAfterTransition()
 
         val types = listOf(
-            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
+            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
         )
         val tabTitles = listOf(
             getText(R.string.ref_category_native),
             getText(R.string.ref_category_service),
             getText(R.string.ref_category_activity),
             getText(R.string.ref_category_br),
-            getText(R.string.ref_category_cp)
-//            getText(R.string.ref_category_dex)
+            getText(R.string.ref_category_cp),
+            getText(R.string.ref_category_dex)
         )
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {

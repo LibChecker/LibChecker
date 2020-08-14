@@ -483,4 +483,27 @@ object PackageUtils {
     fun sizeToString(size: Long): String {
         return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
     }
+
+    fun getDexList(packageName: String, isApk: Boolean = false): List<String> {
+        val packageInfo: PackageInfo
+        val list = mutableListOf<String>()
+
+        try {
+            packageInfo = getPackageInfo(packageName)
+        } catch (e: PackageManager.NameNotFoundException) {
+            return listOf()
+        }
+
+        if (!isApk) {
+            val path = packageInfo.applicationInfo.sourceDir
+            val apkFile = ApkFile(File(path))
+
+            apkFile.dexClasses.forEach {
+                list.add(it.classType)
+            }
+            return list
+        } else {
+            return listOf()
+        }
+    }
 }

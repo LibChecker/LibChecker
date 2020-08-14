@@ -137,20 +137,20 @@ class ApkDetailActivity : BaseActivity() {
                 }
             } ?: finish()
         } catch (e: Exception) {
-            Toasty.show(this, "Please use another File Manager to open the APK")
+            Toasty.show(this, R.string.toast_use_another_file_manager)
             finish()
         }
 
         val types = listOf(
-            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
+            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
         )
         val tabTitles = listOf(
             getText(R.string.ref_category_native),
             getText(R.string.ref_category_service),
             getText(R.string.ref_category_activity),
             getText(R.string.ref_category_br),
-            getText(R.string.ref_category_cp)
-//            getText(R.string.ref_category_dex)
+            getText(R.string.ref_category_cp),
+            getText(R.string.ref_category_dex)
         )
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {

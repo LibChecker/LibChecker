@@ -18,7 +18,6 @@
     <string name="string_32_bit">32 位</string>
     <string name="chart_no_data_text">加载中</string>
     <string name="title_statistics_dialog">%s架构的 Apps</string>
-    <string name="format_native_libs_title"><b>%s</b> 中的 Native 库</string>
     <string name="empty_list">空列表</string>
     <string name="menu_sort">排序</string>
     <string name="menu_sort_by_time_desc">按更新时间降序</string>
@@ -54,7 +53,6 @@
     <string name="snapshot_indicator_removed">移除</string>
     <string name="snapshot_indicator_changed">变更</string>
     <string name="snapshot_apps_count">快照应用程序数量</string>
-    <string name="snapshot_btn_saving">正在保存快照</string>
     <string name="snapshot_empty_list_title">没有变更</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
@@ -70,5 +68,8 @@
     <string name="unknown">未知</string>
     <string name="help_docs">帮助文档</string>
     <string name="help_docs_summary">学习如何使用 LibChecker</string>
-    <string name="other_works">其他作品</string>
+    <string name="toast_not_existing_market">应用市场不存在</string>
+    <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
+    <string name="toast_cant_open_app">无法打开此 App</string>
+    <string name="toast_package_name_null">包名wei\'kong</string>
 </resources>
