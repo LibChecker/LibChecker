@@ -20,8 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed-medium"
-        android:textSize="11sp"
+        android:textSize="9sp"
         tools:ignore="SmallSp"
-        tools:text="arm64-v8a" />
+        tools:text="armeabi-v7a" />
 
 </LinearLayout>

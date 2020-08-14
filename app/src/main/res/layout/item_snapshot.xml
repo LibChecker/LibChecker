@@ -98,7 +98,7 @@
             <include
                 android:id="@+id/layout_abi_badge"
                 layout="@layout/layout_abi_badge"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/condense_abi_badge_width"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -115,7 +115,7 @@
             <include
                 android:id="@+id/layout_abi_badge_new"
                 layout="@layout/layout_abi_badge"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/condense_abi_badge_width"
                 android:layout_height="wrap_content"
                 android:visibility="gone" />
 
