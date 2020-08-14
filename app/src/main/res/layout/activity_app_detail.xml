@@ -132,6 +132,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?android:colorBackground"
+            app:tabGravity="start"
             app:tabMode="scrollable">
 
             <com.google.android.material.tabs.TabItem
@@ -159,10 +160,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/ref_category_cp" />
 
-<!--            <com.google.android.material.tabs.TabItem-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/ref_category_dex" />-->
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ref_category_dex" />
 
         </com.google.android.material.tabs.TabLayout>
 

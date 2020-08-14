@@ -17,7 +17,6 @@ import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -34,7 +33,6 @@ class ComponentsAnalysisFragment :
     BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
-    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
 
@@ -121,10 +119,6 @@ class ComponentsAnalysisFragment :
             emptyLayoutBinding.text.text = getString(R.string.loading)
             setEmptyView(emptyLayoutBinding.root)
         }
-
-        packageName?.let {
-            viewModel.initComponentsData(it)
-        }
     }
 
     override fun onResume() {
@@ -133,11 +127,10 @@ class ComponentsAnalysisFragment :
     }
 
     companion object {
-        fun newInstance(packageName: String, @LibType type: Int): ComponentsAnalysisFragment {
+        fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
             return ComponentsAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
-                        putString(EXTRA_PACKAGE_NAME, packageName)
                         putInt(EXTRA_TYPE, type)
                     }
                 }

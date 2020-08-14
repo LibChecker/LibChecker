@@ -198,8 +198,9 @@ class AppDetailActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    0 -> NativeAnalysisFragment.newInstance(pkgName!!)
-                    else -> ComponentsAnalysisFragment.newInstance(pkgName!!, types[position])
+                    types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
+                    types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
+                    else -> ComponentsAnalysisFragment.newInstance(types[position])
                 }
             }
         }

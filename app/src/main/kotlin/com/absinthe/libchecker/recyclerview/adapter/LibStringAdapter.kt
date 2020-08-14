@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.DEX
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -39,7 +40,12 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
         holder.setGone(R.id.tv_lib_size, item.size == 0L)
 
         if (item.size != 0L) {
-            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.size))
+            val text = if (type == DEX) {
+                "${item.size} files"
+            } else {
+                PackageUtils.sizeToString(item.size)
+            }
+            holder.setText(R.id.tv_lib_size, text)
         }
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {

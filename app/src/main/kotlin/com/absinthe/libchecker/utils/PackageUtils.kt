@@ -484,9 +484,10 @@ object PackageUtils {
         return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
     }
 
-    fun getDexList(packageName: String, isApk: Boolean = false): List<String> {
+    fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
         val packageInfo: PackageInfo
-        val list = mutableListOf<String>()
+        val map = mutableMapOf<String, Int>()
+        val list = mutableListOf<LibStringItem>()
 
         try {
             packageInfo = getPackageInfo(packageName)
@@ -498,10 +499,29 @@ object PackageUtils {
             val path = packageInfo.applicationInfo.sourceDir
             val apkFile = ApkFile(File(path))
 
+            var splits: List<String>
+            var key: String
+
             apkFile.dexClasses.forEach {
-                list.add(it.classType)
+                splits = it.classType.removePrefix("L").split("/")
+
+                key = if (splits.size <= 3) {
+                    "${splits[0]}.${splits[1]}"
+                } else {
+                    "${splits[0]}.${splits[1]}.${splits[2]}"
+                }
+
+                map[key]?.let { value ->
+                    map[key] = value + 1
+                } ?: let {
+                    map[key] = 0
+                }
             }
-            return list
+
+            for (item in map) {
+                list.add(LibStringItem(item.key, item.value.toLong()))
+            }
+            return list.sortedBy { it.name }
         } else {
             return listOf()
         }

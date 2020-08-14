@@ -5,13 +5,13 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.NATIVE
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
+import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -29,8 +29,9 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
-    private val adapter = LibStringAdapter(NATIVE)
+    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
@@ -43,13 +44,19 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
 
         viewModel.apply {
-            libItems.observe(viewLifecycleOwner, Observer {
+            val observer = Observer<List<LibStringItem>> {
                 if (it.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
                     adapter.setDiffNewData(it.toMutableList())
                 }
-            })
+            }
+
+            if (type == DEX) {
+                dexLibItems.observe(viewLifecycleOwner, observer)
+            } else {
+                nativeLibItems.observe(viewLifecycleOwner, observer)
+            }
         }
 
         fun openLibDetailDialog(position: Int) {
@@ -87,7 +94,12 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             emptyLayoutBinding.text.text = getString(R.string.loading)
             setEmptyView(emptyLayoutBinding.root)
         }
-        viewModel.initSoAnalysisData(packageName)
+
+        if (type == DEX) {
+            viewModel.initDexData(packageName)
+        } else {
+            viewModel.initSoAnalysisData(packageName)
+        }
     }
 
     override fun onResume() {
@@ -96,11 +108,13 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
     }
 
     companion object {
-        fun newInstance(packageName: String): NativeAnalysisFragment {
+        fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
             return NativeAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PACKAGE_NAME, packageName)
+                        putInt(EXTRA_TYPE, type)
+                        logd("sasa: type = $type")
                     }
                 }
         }

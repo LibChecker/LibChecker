@@ -28,14 +28,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    val libItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
+
+    val nativeLibItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
+    val dexLibItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
     val componentsMap: HashMap<Int, MutableLiveData<List<String>>> = hashMapOf(
         SERVICE to MutableLiveData(),
         ACTIVITY to MutableLiveData(),
         RECEIVER to MutableLiveData(),
-        PROVIDER to MutableLiveData(),
-        DEX to MutableLiveData()
+        PROVIDER to MutableLiveData()
     )
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
@@ -67,9 +68,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             withContext(Dispatchers.Main) {
-                libItems.value = list
+                nativeLibItems.value = list
             }
         }
+
+    fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+        val list = PackageUtils.getDexList(packageName)
+
+        withContext(Dispatchers.Main) {
+            dexLibItems.value = list
+        }
+    }
 
     fun initComponentsData(packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -98,14 +107,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
                         val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
                         val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
-                        val dexes = PackageUtils.getDexList(it.packageName, true)
 
                         withContext(Dispatchers.Main) {
                             componentsMap[SERVICE]?.value = services
                             componentsMap[ACTIVITY]?.value = activities
                             componentsMap[RECEIVER]?.value = receivers
                             componentsMap[PROVIDER]?.value = providers
-                            componentsMap[DEX]?.value = dexes
                         }
                     }
                 } else {
@@ -114,14 +121,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val activities = PackageUtils.getComponentList(it.packageName, ACTIVITY, true)
                         val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
                         val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
-                        val dexes = PackageUtils.getDexList(it.packageName, true)
 
                         withContext(Dispatchers.Main) {
                             componentsMap[SERVICE]?.value = services
                             componentsMap[ACTIVITY]?.value = activities
                             componentsMap[RECEIVER]?.value = receivers
                             componentsMap[PROVIDER]?.value = providers
-                            componentsMap[DEX]?.value = dexes
                         }
                     }
                 }
