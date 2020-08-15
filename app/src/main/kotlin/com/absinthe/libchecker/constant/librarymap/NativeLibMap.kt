@@ -936,13 +936,6 @@ object NativeLibMap : BaseMap() {
                 R.drawable.ic_lib_rongyun,
                 "融云 IM"
             )
-        ),
-        Pair(
-            "libRongIMLib.so",
-            LibChip(
-                R.drawable.ic_lib_rongyun,
-                "融云 IM"
-            )
         )
     )
 
