@@ -7,6 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -19,6 +20,7 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -32,6 +34,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     private val adapter = LibReferenceAdapter()
 
     private var isInit = false
+    private var isListInit = false
     private var category = NATIVE
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
@@ -88,6 +91,8 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     if (binding.vfContainer.displayedChild == 0) {
                         binding.vfContainer.displayedChild = 1
                     }
+                    isListInit = true
+                    ((requireActivity() as MainActivity).supportActionBar as Toolbar).menu.findItem(R.id.search)?.isVisible = true
                 })
                 clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
                     if (it) {
@@ -138,6 +143,10 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
         menu.findItem(R.id.search).apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
+
+            if (!isListInit) {
+                isVisible = false
+            }
         }
         super.onCreateOptionsMenu(menu, inflater)
     }

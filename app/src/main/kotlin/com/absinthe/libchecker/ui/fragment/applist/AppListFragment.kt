@@ -12,6 +12,7 @@ import android.view.View
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -47,6 +48,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
     private var hasInit = false
+    private var isListInit = false
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -183,6 +185,10 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         menu.findItem(R.id.search).apply {
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
+
+            if (!isListInit) {
+                isVisible = false
+            }
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
@@ -250,6 +256,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         if (GlobalValues.appSortMode.value!! == Constants.SORT_MODE_UPDATE_TIME_DESC) {
                             returnTopOfList()
                         }
+
+                        ((requireActivity() as MainActivity).supportActionBar as Toolbar).menu.findItem(R.id.search)?.isVisible = true
+                        isListInit = true
                     } catch (ignore: Exception) {
 
                     }
