@@ -12,7 +12,6 @@ import android.view.View
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -49,6 +48,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     private val mAdapter = AppAdapter()
     private var hasInit = false
     private var isListInit = false
+    private var menu: Menu? = null
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -170,6 +170,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.app_list_menu, menu)
+        this.menu = menu
 
         val searchView = SearchView(requireContext()).apply {
             setIconifiedByDefault(false)
@@ -257,7 +258,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                             returnTopOfList()
                         }
 
-                        ((requireActivity() as MainActivity).supportActionBar as Toolbar).menu.findItem(R.id.search)?.isVisible = true
+                        menu?.findItem(R.id.search)?.isVisible = true
                         isListInit = true
                     } catch (ignore: Exception) {
 

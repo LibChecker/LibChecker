@@ -7,7 +7,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -20,7 +19,6 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -35,6 +33,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     private var isInit = false
     private var isListInit = false
+    private var menu: Menu? = null
     private var category = NATIVE
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
@@ -92,7 +91,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                         binding.vfContainer.displayedChild = 1
                     }
                     isListInit = true
-                    ((requireActivity() as MainActivity).supportActionBar as Toolbar).menu.findItem(R.id.search)?.isVisible = true
+                    menu?.findItem(R.id.search)?.isVisible = true
                 })
                 clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
                     if (it) {
@@ -128,6 +127,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.lib_ref_menu, menu)
+        this.menu = menu
 
         val searchView = SearchView(requireContext()).apply {
             setIconifiedByDefault(false)
