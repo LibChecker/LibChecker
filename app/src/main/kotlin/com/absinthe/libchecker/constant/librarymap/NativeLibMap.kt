@@ -922,6 +922,27 @@ object NativeLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "环信 IM"
             )
+        ),
+        Pair(
+            "libQPlayer.so",
+            LibChip(
+                R.drawable.ic_lib_qiniu,
+                "PLDroidPlayer"
+            )
+        ),
+        Pair(
+            "libRongIMLib.so",
+            LibChip(
+                R.drawable.ic_lib_rongyun,
+                "融云 IM"
+            )
+        ),
+        Pair(
+            "libRongIMLib.so",
+            LibChip(
+                R.drawable.ic_lib_rongyun,
+                "融云 IM"
+            )
         )
     )
 
@@ -943,6 +964,8 @@ object NativeLibMap : BaseMap() {
             Pattern.matches("libBaiduMapSDK_map_v(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
             Pattern.matches("liblocSDK(.*)[0-9]a\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
             Pattern.matches("libcocklogic-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_alibaba, "百川 SDK", "regex_ali_baichuan")
+            Pattern.matches("libbdpush_V(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度云推送", "regex_baidu_push")
+            Pattern.matches("libjcore(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_jpush, "极光推送", "regex_jpush")
             else -> null
         }
     }

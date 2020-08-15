@@ -209,6 +209,27 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.igexin.download.DownloadReceiver",
+            LibChip(
+                R.drawable.ic_question,
+                "个推"
+            )
+        ),
+        Pair(
+            "com.igexin.sdk.MiuiPushReceiver",
+            LibChip(
+                R.drawable.ic_question,
+                "MiPush(GeTui Proxy)"
+            )
+        ),
+        Pair(
+            "com.igexin.sdk.HmsPushSubReceiver",
+            LibChip(
+                R.drawable.ic_question,
+                "Huawei Push(GeTui Proxy)"
+            )
+        ),
+        Pair(
             "cn.jpush.android.service.AlarmReceiver",
             LibChip(
                 R.drawable.ic_lib_jpush,
@@ -223,10 +244,24 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
-            "cn.jpush.android.service.PluginXiaomiPlatformsReceiver",
+            "cn.jpush.android.service.SchedulerReceiver",
             LibChip(
                 R.drawable.ic_lib_jpush,
                 "极光推送"
+            )
+        ),
+        Pair(
+            "cn.jpush.android.service.PluginXiaomiPlatformsReceiver",
+            LibChip(
+                R.drawable.ic_lib_jpush,
+                "MiPush(JPush Proxy)"
+            )
+        ),
+        Pair(
+            "cn.jpush.android.service.PluginMeizuPlatformsReceiver",
+            LibChip(
+                R.drawable.ic_lib_jpush,
+                "Meizu Push(JPush Proxy)"
             )
         ),
         Pair(
