@@ -71,5 +71,5 @@
     <string name="toast_not_existing_market">应用市场不存在</string>
     <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
     <string name="toast_cant_open_app">无法打开此 App</string>
-    <string name="toast_package_name_null">包名wei\'kong</string>
+    <string name="toast_package_name_null">包名为空</string>
 </resources>
