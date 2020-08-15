@@ -43,10 +43,6 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_tencent, "防水墙")
         ),
         Pair(
-            "cn.sharesdk.tencent.qq.ReceiveActivity",
-            LibChip(R.drawable.ic_lib_tencent, "QQ 分享")
-        ),
-        Pair(
             "com.qq.e.ads.LandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
