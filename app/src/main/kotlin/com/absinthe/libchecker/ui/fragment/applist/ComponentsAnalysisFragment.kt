@@ -11,7 +11,7 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
-import com.absinthe.libchecker.constant.NATIVE
+import com.absinthe.libchecker.constant.SERVICE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
@@ -33,7 +33,7 @@ class ComponentsAnalysisFragment :
     BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
-    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
+    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: SERVICE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.BaseActivity
@@ -20,6 +21,7 @@ import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -29,6 +31,7 @@ class ApkDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
+    private val viewModel by viewModels<DetailViewModel>()
 
     override fun setViewBinding(): View {
         isPaddingToolbar = true
@@ -82,15 +85,16 @@ class ApkDetailActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun initData(uri: Uri) {
+        tempFile = File(externalCacheDir, "temp.apk")
+
+        val path = tempFile!!.path
         val libList = ArrayList<LibStringItem>()
 
         try {
             val inputStream = contentResolver.openInputStream(uri)
-            tempFile = File(externalCacheDir, "temp.apk")
 
             FileIOUtils.writeFileFromIS(tempFile, inputStream)
 
-            val path = tempFile!!.path
             val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
             packageInfo?.let {
                 //Refer to https://juejin.im/post/5cb41f7b6fb9a0688b574228
@@ -135,6 +139,7 @@ class ApkDetailActivity : BaseActivity() {
                         Sortable.currentReference?.get()?.sort()
                     }
                 }
+                viewModel.initComponentsData(path)
             } ?: finish()
         } catch (e: Exception) {
             Toasty.show(this, R.string.toast_use_another_file_manager)
@@ -142,7 +147,7 @@ class ApkDetailActivity : BaseActivity() {
         }
 
         val types = listOf(
-            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
+            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
         )
         val tabTitles = listOf(
             getText(R.string.ref_category_native),
@@ -160,8 +165,8 @@ class ApkDetailActivity : BaseActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(tempFile!!.path, NATIVE)
-                    types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(tempFile!!.path, DEX)
+                    types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path, NATIVE)
+                    types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(path, DEX)
                     else -> ComponentsAnalysisFragment.newInstance(types[position])
                 }
             }

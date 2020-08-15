@@ -11,7 +11,6 @@ import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
-import com.absinthe.libchecker.ktx.logd
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -114,7 +113,6 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                     arguments = Bundle().apply {
                         putString(EXTRA_PACKAGE_NAME, packageName)
                         putInt(EXTRA_TYPE, type)
-                        logd("sasa: type = $type")
                     }
                 }
         }

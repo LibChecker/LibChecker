@@ -15,12 +15,12 @@ data class SnapshotDiffItem(
     val activitiesDiff: DiffNode<String>,
     val receiversDiff: DiffNode<String>,
     val providersDiff: DiffNode<String>,
-    val added: Boolean = false,
-    val removed: Boolean = false,
-    val changed: Boolean = false,
-    val moved: Boolean = false,
-    val newInstalled: Boolean = false,
-    val deleted: Boolean = false
+    var added: Boolean = false,
+    var removed: Boolean = false,
+    var changed: Boolean = false,
+    var moved: Boolean = false,
+    var newInstalled: Boolean = false,
+    var deleted: Boolean = false
 ) : Serializable {
     data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 }

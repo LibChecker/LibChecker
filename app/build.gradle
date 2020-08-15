@@ -6,7 +6,7 @@ apply from: 'and_res_guard.gradle'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.1"
+    buildToolsVersion "30.0.2"
 
     signingConfigs {
         release {
