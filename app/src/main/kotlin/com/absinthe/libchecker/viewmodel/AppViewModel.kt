@@ -31,7 +31,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 
-const val GET_INSTALL_APPS_RETRY_PERIOD = 100L
+const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 

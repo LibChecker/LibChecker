@@ -23,6 +23,7 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import kotlinx.android.synthetic.main.activity_main.*
 import rikka.material.widget.BorderView
 
 const val EXTRA_NAME = "NAME"
@@ -53,6 +54,7 @@ class LibReferenceActivity : BaseActivity() {
         if (name == null) {
             finish()
         } else {
+            toolbar.title = name
             initView()
             viewModel.setData(name, type)
         }

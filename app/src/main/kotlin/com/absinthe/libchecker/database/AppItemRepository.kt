@@ -4,5 +4,8 @@ import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.bean.AppItem
 
 object AppItemRepository {
+
     val allItems: MutableLiveData<List<AppItem>> = MutableLiveData()
+
+    //Todo All installed applications LiveData list
 }

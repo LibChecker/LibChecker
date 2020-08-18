@@ -133,8 +133,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         snapshotItems.value?.let { dbItems ->
             for (dbItem in dbItems) {
-                try {
-                    appList.find { it.packageName == dbItem.packageName }?.let {
+                appList.find { it.packageName == dbItem.packageName }?.let {
+                    try {
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
@@ -196,28 +196,28 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         }
 
                         appList.remove(it)
-                    } ?: run {
-                        diffList.add(
-                            SnapshotDiffItem(
-                                dbItem.packageName,
-                                dbItem.lastUpdatedTime,
-                                SnapshotDiffItem.DiffNode(dbItem.label),
-                                SnapshotDiffItem.DiffNode(dbItem.versionName),
-                                SnapshotDiffItem.DiffNode(dbItem.versionCode),
-                                SnapshotDiffItem.DiffNode(dbItem.abi),
-                                SnapshotDiffItem.DiffNode(dbItem.targetApi),
-                                SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
-                                SnapshotDiffItem.DiffNode(dbItem.services),
-                                SnapshotDiffItem.DiffNode(dbItem.activities),
-                                SnapshotDiffItem.DiffNode(dbItem.receivers),
-                                SnapshotDiffItem.DiffNode(dbItem.providers),
-                                deleted = true
-                            )
-                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        appList.remove(it)
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    continue
+                } ?: run {
+                    diffList.add(
+                        SnapshotDiffItem(
+                            dbItem.packageName,
+                            dbItem.lastUpdatedTime,
+                            SnapshotDiffItem.DiffNode(dbItem.label),
+                            SnapshotDiffItem.DiffNode(dbItem.versionName),
+                            SnapshotDiffItem.DiffNode(dbItem.versionCode),
+                            SnapshotDiffItem.DiffNode(dbItem.abi),
+                            SnapshotDiffItem.DiffNode(dbItem.targetApi),
+                            SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
+                            SnapshotDiffItem.DiffNode(dbItem.services),
+                            SnapshotDiffItem.DiffNode(dbItem.activities),
+                            SnapshotDiffItem.DiffNode(dbItem.receivers),
+                            SnapshotDiffItem.DiffNode(dbItem.providers),
+                            deleted = true
+                        )
+                    )
                 }
             }
 
