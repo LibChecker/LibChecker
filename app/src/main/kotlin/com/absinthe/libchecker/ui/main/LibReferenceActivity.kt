@@ -10,10 +10,12 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NATIVE
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
@@ -24,6 +26,9 @@ import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 
 const val EXTRA_NAME = "NAME"
@@ -54,9 +59,16 @@ class LibReferenceActivity : BaseActivity() {
         if (name == null) {
             finish()
         } else {
-            toolbar.title = name
             initView()
             viewModel.setData(name, type)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                BaseMap.getMap(type).getChip(name)?.let {
+                    withContext(Dispatchers.Main) {
+                        toolbar.title = it.name
+                    }
+                }
+            }
         }
     }
 

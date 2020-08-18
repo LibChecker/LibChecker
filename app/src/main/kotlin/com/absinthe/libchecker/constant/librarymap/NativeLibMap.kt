@@ -98,6 +98,20 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libmtanativecrash_v2.so",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "腾讯移动分析"
+            )
+        ),
+        Pair(
+            "libMtaNativeCrash.so",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "腾讯移动分析"
+            )
+        ),
+        Pair(
             "libliteavsdk.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
@@ -936,7 +950,21 @@ object NativeLibMap : BaseMap() {
                 R.drawable.ic_lib_rongyun,
                 "融云 IM"
             )
-        )
+        ),
+        Pair(
+            "libboost_multidex.so",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "BoostMultiDex"
+            )
+        ),
+        Pair(
+            "libpingpp.so",
+            LibChip(
+                R.drawable.ic_question,
+                "Ping++"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
