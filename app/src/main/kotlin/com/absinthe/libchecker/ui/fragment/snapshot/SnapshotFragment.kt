@@ -29,6 +29,9 @@ import rikka.material.widget.BorderView
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val VF_LOADING = 0
+const val VF_LIST = 1
+
 class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
@@ -41,26 +44,30 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
         binding.apply {
             extendedFab.apply {
-                (layoutParams as CoordinatorLayout.LayoutParams)
-                    .setMargins(
-                        0,
-                        0,
-                        ConvertUtils.dp2px(16f),
-                        ConvertUtils.dp2px(16f) + paddingBottom
-                    )
+                (layoutParams as CoordinatorLayout.LayoutParams).setMargins(
+                    0,
+                    0,
+                    ConvertUtils.dp2px(16f),
+                    ConvertUtils.dp2px(16f) + paddingBottom
+                )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
                         return@setOnClickListener
                     }
 
-                    vfContainer.displayedChild = 0
-                    hide()
+                    flip(VF_LOADING)
                     viewModel.computeSnapshots()
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_CLICK, EventProperties().set("Action", "Click to Save"))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_CLICK,
+                        EventProperties().set("Action", "Click to Save")
+                    )
                 }
                 setOnLongClickListener {
                     hide()
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_CLICK, EventProperties().set("Action", "Long Click to Hide"))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_CLICK,
+                        EventProperties().set("Action", "Long Click to Hide")
+                    )
                     true
                 }
             }
@@ -70,7 +77,12 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
-                setPadding(paddingStart, paddingTop + BarUtils.getStatusBarHeight(), paddingEnd, paddingBottom)
+                setPadding(
+                    paddingStart,
+                    paddingTop + BarUtils.getStatusBarHeight(),
+                    paddingEnd,
+                    paddingBottom
+                )
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -126,10 +138,10 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
                 if (it != 0L) {
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
-                    binding.vfContainer.displayedChild = 0
+                    flip(VF_LOADING)
                 } else {
                     dashboardBinding.tvSnapshotTimestampText.text = "None"
-                    binding.vfContainer.displayedChild = 1
+                    flip(VF_LIST)
                 }
             })
             snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
@@ -140,10 +152,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 viewLifecycleOwner,
                 androidx.lifecycle.Observer { list ->
                     adapter.setList(list.sortedByDescending { it.updateTime })
-                    if (binding.vfContainer.displayedChild == 0) {
-                        binding.vfContainer.displayedChild = 1
-                    }
-                    binding.extendedFab.show()
+                    flip(VF_LIST)
                 })
         }
     }
@@ -152,5 +161,22 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
         val date = Date(timestamp)
         return simpleDateFormat.format(date)
+    }
+
+    private fun flip(child: Int) {
+        if (binding.vfContainer.displayedChild == child) {
+            return
+        }
+        if (child == VF_LOADING) {
+            if (binding.extendedFab.isShown) {
+                binding.extendedFab.hide()
+            }
+        } else {
+            if (!binding.extendedFab.isShown) {
+                binding.extendedFab.show()
+            }
+        }
+
+        binding.vfContainer.displayedChild = child
     }
 }

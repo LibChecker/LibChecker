@@ -29,10 +29,9 @@ import com.absinthe.libchecker.utils.TimeRecorder
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+
+const val GET_INSTALL_APPS_RETRY_PERIOD = 100L
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -59,14 +58,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         repository.deleteAllItems()
 
-        var appList: List<ApplicationInfo>? = null
-        while (appList == null) {
+        var appList: List<ApplicationInfo>?
+
+        do {
             appList = try {
                 PackageUtils.getInstallApplications()
             } catch (e: Exception) {
+                delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
             }
-        }
+        } while (appList == null)
 
         val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
@@ -209,15 +210,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         logd("Request change END, $timeRecorder")
     }
 
-    private fun requestChangeImpl(context: Context) {
-        var appList: MutableList<ApplicationInfo>? = null
-        while (appList == null) {
+    private suspend fun requestChangeImpl(context: Context) {
+        var appList: MutableList<ApplicationInfo>?
+
+        do {
             appList = try {
                 PackageUtils.getInstallApplications().toMutableList()
             } catch (e: Exception) {
+                delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
             }
-        }
+        } while (appList == null)
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             collectPopularLibraries(appList)
@@ -388,14 +391,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun computeLibReference(@LibType type: Int) =
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
-            var appList: List<ApplicationInfo>? = null
-            while (appList == null) {
+            var appList: List<ApplicationInfo>?
+
+            do {
                 appList = try {
                     PackageUtils.getInstallApplications()
                 } catch (e: Exception) {
+                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
                     null
                 }
-            }
+            } while (appList == null)
 
             val map = HashMap<String, RefCountType>()
             val refList = mutableListOf<LibReference>()
