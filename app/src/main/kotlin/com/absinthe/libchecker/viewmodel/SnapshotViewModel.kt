@@ -60,6 +60,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val dbList = mutableListOf<SnapshotItem>()
         val gson = Gson()
+        val exceptionInfoList = mutableListOf<ApplicationInfo>()
 
         for (info in appList) {
             try {
@@ -94,6 +95,47 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         )
                     )
                 }
+            } catch (e: Exception) {
+                exceptionInfoList.add(info)
+                continue
+            }
+        }
+
+        while (exceptionInfoList.isNotEmpty()) {
+            try {
+                val info = exceptionInfoList[0]
+                PackageUtils.getPackageInfo(info.packageName).let {
+                    dbList.add(
+                        SnapshotItem(
+                            it.packageName,//Package name
+                            info.loadLabel(context.packageManager).toString(),//App name
+                            it.versionName ?: "null",//Version name
+                            PackageUtils.getVersionCode(it),//Version code
+                            it.firstInstallTime,//Install time
+                            it.lastUpdateTime,// Update time
+                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
+                            PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                                .toShort(),//Abi type
+                            info.targetSdkVersion.toShort(),//Target API
+                            gson.toJson(
+                                PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
+                            ),//Native libs
+                            gson.toJson(
+                                PackageUtils.getComponentList(it.packageName, SERVICE, false)
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(it.packageName, RECEIVER, false)
+                            ),
+                            gson.toJson(
+                                PackageUtils.getComponentList(it.packageName, PROVIDER, false)
+                            )
+                        )
+                    )
+                }
+                exceptionInfoList.removeAt(0)
             } catch (e: Exception) {
                 continue
             }
