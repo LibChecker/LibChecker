@@ -127,6 +127,7 @@ class SettingsFragment : PreferenceFragment() {
     override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
+        recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +15,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
+import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
@@ -39,17 +40,19 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     private val viewModel by activityViewModels<SnapshotViewModel>()
     private val adapter = SnapshotAdapter()
 
-    override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
+    override fun initBinding(view: View): FragmentSnapshotBinding =
+        FragmentSnapshotBinding.bind(view)
 
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
+
         binding.apply {
             extendedFab.apply {
-                (layoutParams as CoordinatorLayout.LayoutParams).setMargins(
+                (layoutParams as ConstraintLayout.LayoutParams).setMargins(
                     0,
                     0,
                     ConvertUtils.dp2px(16f),
-                    ConvertUtils.dp2px(16f) + paddingBottom
+                    ConvertUtils.dp2px(70f) + paddingBottom
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
@@ -79,12 +82,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
-                setPadding(
-                    paddingStart,
-                    paddingTop + BarUtils.getStatusBarHeight(),
-                    paddingEnd,
-                    paddingBottom
-                )
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                         super.onScrolled(recyclerView, dx, dy)
@@ -96,9 +93,19 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         }
                     }
                 })
+
+                val beforePaddingTop = paddingTop + BarUtils.getStatusBarHeight()
+
+                if (itemDecorationCount == 0) {
+                    addItemDecoration(
+                        HorizontalSpacesItemDecoration(
+                            resources.getDimension(R.dimen.normal_padding).toInt() / 2
+                        )
+                    )
+                }
                 setPadding(
                     paddingStart,
-                    paddingTop,
+                    beforePaddingTop,
                     paddingEnd,
                     paddingBottom + UiUtils.getNavBarHeight()
                 )
@@ -142,7 +149,8 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
                     flip(VF_LOADING)
                 } else {
-                    dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+                    dashboardBinding.tvSnapshotTimestampText.text =
+                        getString(R.string.snapshot_none)
                     flip(VF_LIST)
                 }
             })
@@ -187,10 +195,13 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         binding.vfContainer.displayedChild = child
     }
 
-    private fun getSuitableLayoutManager() : RecyclerView.LayoutManager {
-        return when(resources.configuration.orientation) {
+    private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+        return when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
+                2,
+                StaggeredGridLayoutManager.VERTICAL
+            )
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
     }
