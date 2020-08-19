@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.fragment.applist
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
@@ -15,6 +14,7 @@ import com.absinthe.libchecker.constant.SERVICE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
@@ -48,17 +48,12 @@ class ComponentsAnalysisFragment :
                         DividerItemDecoration.VERTICAL
                     )
                 )
-                setPadding(
-                    paddingStart,
-                    paddingTop,
-                    paddingEnd,
-                    paddingBottom + UiUtils.getNavBarHeight()
-                )
+                addPaddingBottom(UiUtils.getNavBarHeight())
             }
         }
 
         viewModel.apply {
-            componentsMap[adapter.type]?.observe(viewLifecycleOwner, Observer { componentList ->
+            componentsMap[adapter.type]?.observe(viewLifecycleOwner, { componentList ->
                 if (componentList.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {

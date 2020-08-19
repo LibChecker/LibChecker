@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintSet
@@ -19,7 +20,8 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
-import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.extensions.finishCompat
+import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
@@ -27,7 +29,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.IntentUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
@@ -44,7 +45,7 @@ class AppDetailActivity : BaseActivity() {
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
 
-    override fun setViewBinding(): View {
+    override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
@@ -58,7 +59,7 @@ class AppDetailActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            supportFinishAfterTransition()
+            finishCompat()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -205,18 +206,9 @@ class AppDetailActivity : BaseActivity() {
             }
         }
 
-        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
-            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                tab.text = tabTitles[position]
-            })
-        mediator.attach()
-    }
-
-    private fun setRootPadding() {
-        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        binding.root.apply {
-            fitsSystemWindows = isLandScape
-            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
+            tab.text = tabTitles[position]
         }
+        mediator.attach()
     }
 }

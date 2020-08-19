@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
@@ -84,7 +83,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
         if (!isInit) {
             viewModel.apply {
-                libReference.observe(viewLifecycleOwner, Observer {
+                libReference.observe(viewLifecycleOwner, {
                     adapter.setList(it)
 
                     if (binding.vfContainer.displayedChild == 0) {
@@ -93,7 +92,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     isListInit = true
                     menu?.findItem(R.id.search)?.isVisible = true
                 })
-                clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
+                clickBottomItemFlag.observe(viewLifecycleOwner, {
                     if (it) {
                         binding.rvList.apply {
                             if (canScrollVertically(-1)) {
@@ -103,10 +102,10 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     }
                 })
             }
-            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
+            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
                 computeRef()
             })
-            GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, Observer {
+            GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, {
                 viewModel.refreshRef()
             })
 

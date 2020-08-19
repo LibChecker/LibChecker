@@ -5,11 +5,9 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -17,6 +15,10 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.isOrientationLandscape
+import com.absinthe.libchecker.extensions.paddingBottomCompat
+import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -40,7 +42,7 @@ class LibReferenceActivity : BaseActivity() {
     private val adapter = AppAdapter()
     private val viewModel by viewModels<LibReferenceViewModel>()
 
-    override fun setViewBinding(): View {
+    override fun setViewBinding(): ViewGroup {
         binding = ActivityLibReferenceBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -82,18 +84,16 @@ class LibReferenceActivity : BaseActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.root.apply {
-            fitsSystemWindows =
-                resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-            setPadding(paddingStart, 0, paddingEnd, paddingBottom)
+            fitsSystemWindows = isOrientationLandscape
+            paddingTopCompat = 0
         }
     }
 
     private fun initView() {
         binding.apply {
             root.apply {
-                fitsSystemWindows =
-                    resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-                setPadding(paddingStart, 0, paddingEnd, paddingBottom)
+                fitsSystemWindows = isOrientationLandscape
+                paddingTopCompat = 0
             }
 
             setAppBar(appbar, toolbar)
@@ -106,12 +106,8 @@ class LibReferenceActivity : BaseActivity() {
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         appBar?.setRaised(!top)
                     }
-                setPadding(
-                    0,
-                    paddingTop + BarUtils.getStatusBarHeight(),
-                    0,
-                    UiUtils.getNavBarHeight()
-                )
+                paddingBottomCompat = UiUtils.getNavBarHeight()
+                addPaddingTop(BarUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(
@@ -125,7 +121,7 @@ class LibReferenceActivity : BaseActivity() {
             }
         }
 
-        viewModel.libRefList.observe(this, Observer {
+        viewModel.libRefList.observe(this, {
             adapter.setList(it)
             binding.vfContainer.displayedChild = 1
         })

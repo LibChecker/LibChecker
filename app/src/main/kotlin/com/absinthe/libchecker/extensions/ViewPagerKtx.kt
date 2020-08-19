@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ktx
+package com.absinthe.libchecker.extensions
 
 import android.animation.Animator
 import android.animation.TimeInterpolator

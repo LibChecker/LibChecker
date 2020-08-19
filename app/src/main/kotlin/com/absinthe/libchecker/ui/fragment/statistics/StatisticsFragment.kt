@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentStatisticsBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -15,7 +16,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
         FragmentStatisticsBinding.bind(view)
 
     override fun init() {
-        binding.root.setPadding(0, binding.root.paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+        binding.root.addPaddingTop(BarUtils.getStatusBarHeight())
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 2
@@ -29,13 +30,12 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
             }
         }
 
-        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
-            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                when (position) {
-                    0 -> tab.text = getText(R.string.tab_lib_reference_statistics)
-                    else -> tab.text = getText(R.string.tab_pie_chart)
-                }
-            })
+        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
+            when (position) {
+                0 -> tab.text = getText(R.string.tab_lib_reference_statistics)
+                else -> tab.text = getText(R.string.tab_pie_chart)
+            }
+        }
         mediator.attach()
     }
 }

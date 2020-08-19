@@ -23,7 +23,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
-import com.absinthe.libchecker.ktx.logd
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.TimeRecorder
 import com.blankj.utilcode.util.AppUtils

@@ -16,7 +16,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +27,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
@@ -92,7 +92,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
-                setPadding(0, paddingTop + BarUtils.getStatusBarHeight(), 0, 0)
+                addPaddingTop(BarUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -114,7 +114,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems()
             } else {
-                dbItems.observe(viewLifecycleOwner, Observer {
+                dbItems.observe(viewLifecycleOwner, {
                     if (it.isNullOrEmpty()) {
                         lifecycleScope.launch(Dispatchers.IO) {
                             delay(500)
@@ -136,7 +136,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 })
             }
 
-            AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
+            AppItemRepository.allItems.observe(viewLifecycleOwner, {
                 updateItems(it)
 
                 if (!hasInit) {
@@ -150,16 +150,16 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     Once.markDone(OnceTag.DB_MIGRATE_2_3)
                 }
             })
-            clickBottomItemFlag.observe(viewLifecycleOwner, Observer {
+            clickBottomItemFlag.observe(viewLifecycleOwner, {
                 if (it) { returnTopOfList() }
             })
         }
 
         GlobalValues.apply {
-            isShowSystemApps.observe(viewLifecycleOwner, Observer {
+            isShowSystemApps.observe(viewLifecycleOwner, {
                 viewModel.addItem()
             })
-            appSortMode.observe(viewLifecycleOwner, Observer { mode ->
+            appSortMode.observe(viewLifecycleOwner, { mode ->
                 AppItemRepository.allItems.value?.let { allItems ->
                     val list = allItems.toMutableList()
 

@@ -5,12 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -20,7 +18,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.ktx.setCurrentItem
+import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -54,7 +52,7 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    override fun setViewBinding(): View {
+    override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -170,7 +168,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        GlobalValues.shouldRequestChange.observe(this, Observer {
+        GlobalValues.shouldRequestChange.observe(this, {
             if (it) {
                 if (hasInit) {
                     appViewModel.requestChange()

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ktx
+package com.absinthe.libchecker.extensions
 
 import android.util.Log
 

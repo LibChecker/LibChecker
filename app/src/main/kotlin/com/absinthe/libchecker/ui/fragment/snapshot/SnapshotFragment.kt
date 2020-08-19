@@ -15,6 +15,8 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
@@ -94,8 +96,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     }
                 })
 
-                val beforePaddingTop = paddingTop + BarUtils.getStatusBarHeight()
-
                 if (itemDecorationCount == 0) {
                     addItemDecoration(
                         HorizontalSpacesItemDecoration(
@@ -103,12 +103,8 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         )
                     )
                 }
-                setPadding(
-                    paddingStart,
-                    beforePaddingTop,
-                    paddingEnd,
-                    paddingBottom + UiUtils.getNavBarHeight()
-                )
+                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -144,7 +140,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
 
         viewModel.apply {
-            timestamp.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            timestamp.observe(viewLifecycleOwner, {
                 if (it != 0L) {
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
                     flip(VF_LOADING)
@@ -154,13 +150,12 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     flip(VF_LIST)
                 }
             })
-            snapshotItems.observe(viewLifecycleOwner, androidx.lifecycle.Observer {
+            snapshotItems.observe(viewLifecycleOwner, {
                 dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
                 computeDiff()
             })
             snapshotDiffItems.observe(
-                viewLifecycleOwner,
-                androidx.lifecycle.Observer { list ->
+                viewLifecycleOwner, { list ->
                     adapter.setList(list.sortedByDescending { it.updateTime })
                     flip(VF_LIST)
                 })

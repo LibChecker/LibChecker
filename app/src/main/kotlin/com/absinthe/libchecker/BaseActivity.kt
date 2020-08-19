@@ -2,7 +2,9 @@ package com.absinthe.libchecker
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.View
+import android.view.ViewGroup
+import com.absinthe.libchecker.extensions.paddingTopCompat
+import com.absinthe.libchecker.extensions.setSystemPadding
 import com.absinthe.libchecker.ui.app.AppActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.UiUtils.setSystemBarStyle
@@ -12,11 +14,15 @@ import java.lang.ref.WeakReference
 @SuppressLint("Registered")
 abstract class BaseActivity : AppActivity() {
 
-    protected var root: View? = null
+    protected var root: ViewGroup? = null
     protected var isPaddingToolbar = false
     private lateinit var reference: WeakReference<BaseActivity>
 
-    protected abstract fun setViewBinding(): View
+    protected abstract fun setViewBinding(): ViewGroup
+
+    protected fun setRootPadding() {
+        root?.setSystemPadding()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +34,7 @@ abstract class BaseActivity : AppActivity() {
         setSystemBarStyle(this)
 
         if (isPaddingToolbar) {
-            root?.setPadding(0, BarUtils.getStatusBarHeight(), 0, 0)
+            root?.paddingTopCompat = BarUtils.getStatusBarHeight()
         }
     }
 
@@ -37,7 +43,7 @@ abstract class BaseActivity : AppActivity() {
         super.onDestroy()
     }
 
-    private fun setViewBindingImpl(root: View) {
+    private fun setViewBindingImpl(root: ViewGroup) {
         this.root = root
         setContentView(root)
     }

@@ -5,7 +5,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -15,14 +15,13 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.ktx.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.BarUtils
 import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
@@ -33,7 +32,7 @@ class ApkDetailActivity : BaseActivity() {
     private var tempFile: File? = null
     private val viewModel by viewModels<DetailViewModel>()
 
-    override fun setViewBinding(): View {
+    override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
@@ -63,7 +62,6 @@ class ApkDetailActivity : BaseActivity() {
         setRootPadding()
     }
 
-    @SuppressLint("SetTextI18n")
     private fun initView(uri: Uri) {
         setRootPadding()
         setSupportActionBar(binding.toolbar)
@@ -73,14 +71,6 @@ class ApkDetailActivity : BaseActivity() {
         }
 
         initData(uri)
-    }
-
-    private fun setRootPadding() {
-        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        binding.root.apply {
-            fitsSystemWindows = isLandScape
-            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -172,10 +162,9 @@ class ApkDetailActivity : BaseActivity() {
             }
         }
 
-        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager,
-            TabLayoutMediator.TabConfigurationStrategy { tab, position ->
-                tab.text = tabTitles[position]
-            })
+        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
+            tab.text = tabTitles[position]
+        }
         mediator.attach()
 
         if (libList.isEmpty()) {

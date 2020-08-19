@@ -11,6 +11,7 @@ import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -38,7 +39,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         binding.apply {
             list.apply {
                 adapter = this@NativeAnalysisFragment.adapter
-                setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + UiUtils.getNavBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight())
             }
         }
 

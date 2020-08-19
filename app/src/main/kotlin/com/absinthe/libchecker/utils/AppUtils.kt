@@ -4,8 +4,8 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.ktx.logd
-import com.absinthe.libchecker.ktx.loge
+import com.absinthe.libchecker.extensions.logd
+import com.absinthe.libchecker.extensions.loge
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

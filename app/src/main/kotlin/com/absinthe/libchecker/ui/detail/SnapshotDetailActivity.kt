@@ -5,9 +5,9 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -16,6 +16,8 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
@@ -28,7 +30,6 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.BarUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -44,7 +45,7 @@ class SnapshotDetailActivity : BaseActivity() {
     private val viewModel by viewModels<SnapshotViewModel>()
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
-    override fun setViewBinding(): View {
+    override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
         binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)
         return binding.root
@@ -73,7 +74,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            supportFinishAfterTransition()
+            finishCompat()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -112,12 +113,7 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                setPadding(
-                    paddingStart,
-                    paddingTop,
-                    paddingEnd,
-                    paddingBottom + UiUtils.getNavBarHeight()
-                )
+                addPaddingBottom(UiUtils.getNavBarHeight())
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 
@@ -135,7 +131,7 @@ class SnapshotDetailActivity : BaseActivity() {
             tvTargetApi.text = getDiffString(entity.targetApiDiff, isNewOrDeleted, "API %s")
         }
 
-        viewModel.snapshotDetailItems.observe(this, Observer { details ->
+        viewModel.snapshotDetailItems.observe(this, { details ->
             val titleList = mutableListOf<SnapshotTitleNode>()
 
             getNodeList(details.filter { it.itemType == NATIVE }).apply {
@@ -193,14 +189,6 @@ class SnapshotDetailActivity : BaseActivity() {
                         }
                 }
             }
-        }
-    }
-
-    private fun setRootPadding() {
-        val isLandScape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        binding.root.apply {
-            fitsSystemWindows = isLandScape
-            setPadding(0, if (isLandScape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
         }
     }
 

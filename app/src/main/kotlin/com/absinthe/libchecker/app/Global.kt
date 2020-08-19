@@ -3,7 +3,7 @@ package com.absinthe.libchecker.app
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.absinthe.libchecker.ktx.logw
+import com.absinthe.libchecker.extensions.logw
 
 object Global {
 
