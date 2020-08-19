@@ -29,7 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="30dp"
-                android:text="@string/applist_first_tip"
+                android:text="@string/app_list_first_tip"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 
         </LinearLayout>
@@ -44,8 +44,7 @@
             android:scrollbars="vertical"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
-            app:borderTopStyle="whenTop"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:borderTopStyle="whenTop" />
 
     </ViewFlipper>
 

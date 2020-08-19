@@ -52,7 +52,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
             setEntryLabelColor(Color.BLACK)
-            setNoDataText(getString(R.string.chart_no_data_text))
+            setNoDataText(getString(R.string.loading))
             setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
             setOnChartValueSelectedListener(this@PieChartFragment)
             setHoleColor(Color.TRANSPARENT)

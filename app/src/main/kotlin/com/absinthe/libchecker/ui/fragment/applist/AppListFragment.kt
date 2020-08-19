@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.applist
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -17,6 +18,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.Constants
@@ -83,6 +87,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         binding.apply {
             recyclerview.apply {
                 adapter = mAdapter
+                layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
@@ -194,6 +199,11 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         super.onCreateOptionsMenu(menu, inflater)
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.recyclerview.layoutManager = getSuitableLayoutManager()
+    }
+
     override fun onQueryTextSubmit(query: String?): Boolean {
         return false
     }
@@ -273,6 +283,14 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }
+        }
+    }
+
+    private fun getSuitableLayoutManager() : RecyclerView.LayoutManager {
+        return when(resources.configuration.orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
     }
 }

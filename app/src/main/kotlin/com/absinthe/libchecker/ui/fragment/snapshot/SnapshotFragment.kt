@@ -1,13 +1,15 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
-import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -39,7 +41,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
-    @SuppressLint("SetTextI18n")
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
         binding.apply {
@@ -73,6 +74,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
+                layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
@@ -140,7 +142,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
                     flip(VF_LOADING)
                 } else {
-                    dashboardBinding.tvSnapshotTimestampText.text = "None"
+                    dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
                     flip(VF_LIST)
                 }
             })
@@ -155,6 +157,11 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     flip(VF_LIST)
                 })
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        binding.recyclerview.layoutManager = getSuitableLayoutManager()
     }
 
     private fun getFormatDateString(timestamp: Long): String {
@@ -178,5 +185,13 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
 
         binding.vfContainer.displayedChild = child
+    }
+
+    private fun getSuitableLayoutManager() : RecyclerView.LayoutManager {
+        return when(resources.configuration.orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
+        }
     }
 }

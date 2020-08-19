@@ -16,7 +16,6 @@
     <string name="no_libs">无原生库</string>
     <string name="string_64_bit">64 位</string>
     <string name="string_32_bit">32 位</string>
-    <string name="chart_no_data_text">加载中</string>
     <string name="title_statistics_dialog">%s架构的 Apps</string>
     <string name="empty_list">空列表</string>
     <string name="menu_sort">排序</string>
@@ -56,7 +55,7 @@
     <string name="snapshot_empty_list_title">没有变更</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
-    <string name="applist_first_tip">第一次加载需要一些时间</string>
+    <string name="app_list_first_tip">第一次加载需要一些时间</string>
     <string name="loading">加载中…</string>
     <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
     <string name="string_kotlin_used">使用了 Kotlin</string>

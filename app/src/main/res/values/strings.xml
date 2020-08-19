@@ -1,4 +1,5 @@
 <resources>
+    <!--  General  -->
     <string name="app_name">LibChecker</string>
     <string name="title_app_list">Apps List</string>
     <string name="title_statistics">Statistics</string>
@@ -16,13 +17,12 @@
     <string name="cannot_read">Can\'t read</string>
     <string name="unknown">Unknown</string>
     <string name="empty_list">Empty list</string>
-    <string name="applist_first_tip">The first load will take some time</string>
+    <string name="app_list_first_tip">The first load will take some time</string>
 
     <string name="menu_sort_by_time_desc">Descending by update time</string>
     <string name="menu_sort_default">Default order</string>
 
     <!-- Statistics   -->
-    <string name="chart_no_data_text">Loading</string>
     <string name="title_statistics_dialog">Apps with %s ABI</string>
     <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
     <string name="tab_pie_chart">Pie chart</string>
@@ -83,6 +83,7 @@
     <string name="toast_package_name_null">Package name is null</string>
 
     <!--  Snapshot  -->
+    <string name="snapshot_none" translatable="false">None</string>
     <string name="snapshot_btn_save_current">Save current snapshot</string>
     <string name="snapshot_current_timestamp">Current Snapshot Timestamp</string>
     <string name="snapshot_apps_count">Count of Applications in Snapshot</string>
@@ -91,6 +92,6 @@
     <string name="snapshot_indicator_changed">Changed</string>
     <string name="snapshot_indicator_moved">Moved</string>
     <string name="snapshot_empty_list_title">No Changes</string>
-    <string name="snapshot_detail_new_install_title">This App hsa newly installed</string>
+    <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
 </resources>

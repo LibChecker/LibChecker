@@ -37,8 +37,7 @@
             android:scrollbars="none"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
-            app:borderTopStyle="whenTop"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:borderTopStyle="whenTop" />
 
     </ViewFlipper>
 
