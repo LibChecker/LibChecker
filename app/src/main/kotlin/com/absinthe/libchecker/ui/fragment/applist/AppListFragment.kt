@@ -35,7 +35,6 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
@@ -49,6 +48,7 @@ import rikka.material.widget.BorderView
 class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
     SearchView.OnQueryTextListener {
 
+    private val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
     private var hasRequestChanges = false
@@ -99,7 +99,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            tvFirstTip.isVisible = AppUtils.isFirstLaunch
+            tvFirstTip.isVisible = isFirstLaunch
         }
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
@@ -207,7 +207,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 }
             })
 
-            if (AppUtils.isFirstLaunch) {
+            if (isFirstLaunch) {
                 refreshLock = true
                 initItems()
             }
@@ -227,7 +227,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 hasRequestChanges = true
                 (requireActivity() as MainActivity).hasRequestChanges = true
 
-                if (AppUtils.isFirstLaunch) {
+                if (isFirstLaunch) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
                     Once.markDone(OnceTag.DB_MIGRATE_2_3)
                 }

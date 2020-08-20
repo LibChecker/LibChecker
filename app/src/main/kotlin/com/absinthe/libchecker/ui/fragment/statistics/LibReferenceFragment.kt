@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
@@ -63,17 +62,15 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             }
             setOnItemChildClickListener { _, view, position ->
                 if (view.id == R.id.iv_icon) {
-                    if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
-                        val ref = this@LibReferenceFragment.adapter.getItem(position)
-                        val name = ref.libName
-                        val regexName = NativeLibMap.findRegex(name)?.regexName
-                        LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-                                .apply {
-                                ActivityStackManager.topActivity?.apply {
-                                    show(supportFragmentManager, tag)
-                                }
+                    val ref = this@LibReferenceFragment.adapter.getItem(position)
+                    val name = ref.libName
+                    val regexName = NativeLibMap.findRegex(name)?.regexName
+                    LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+                        .apply {
+                            ActivityStackManager.topActivity?.apply {
+                                show(supportFragmentManager, tag)
                             }
-                    }
+                        }
                 }
             }
         }

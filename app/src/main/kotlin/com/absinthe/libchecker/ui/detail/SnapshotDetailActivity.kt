@@ -177,17 +177,16 @@ class SnapshotDetailActivity : BaseActivity() {
                 if (AntiShakeUtils.isInvalidClick(view)) {
                     return@setOnItemChildClickListener
                 }
-                if (GlobalValues.config.enableLibDetail) {
-                    val item = (adapter.data[position] as BaseSnapshotNode).item
-                    val name = item.name
-                    val regexName = NativeLibMap.findRegex(name)?.regexName
-                    LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
-                        .apply {
-                            ActivityStackManager.topActivity?.apply {
-                                show(supportFragmentManager, tag)
-                            }
+
+                val item = (adapter.data[position] as BaseSnapshotNode).item
+                val name = item.name
+                val regexName = NativeLibMap.findRegex(name)?.regexName
+                LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
+                    .apply {
+                        ActivityStackManager.topActivity?.apply {
+                            show(supportFragmentManager, tag)
                         }
-                }
+                    }
             }
         }
     }

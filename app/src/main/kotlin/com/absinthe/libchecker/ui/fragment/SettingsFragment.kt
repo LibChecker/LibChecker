@@ -18,7 +18,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -74,7 +73,6 @@ class SettingsFragment : PreferenceFragment() {
         (findPreference(Constants.PREF_RULES_REPO) as ListPreference).apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.repo = newValue as String
-                AppUtils.requestConfiguration()
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
                 true
             }

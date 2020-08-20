@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
 import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -67,22 +65,14 @@ class LibDetailDialogFragment : DialogFragment() {
         viewModel.detailBean.observe(requireActivity(), {
             if (it != null) {
                 dialogView.binding.apply {
-                    GlobalValues.config.apply {
-                        llLabel.isGone = !showLibName
-                        llTeam.isGone = !showTeamName
-                        llContributor.isGone = !showContributor
-                        llDescription.isGone = !showLibDescription
-                        llRelativeUrl.isGone = !showRelativeUrl
-
-                        tvLabelName.text = it.label
-                        tvTeamName.text = it.team
-                        tvContributorName.text = it.contributors.toContributorsString()
-                        tvDescriptionName.text = it.description
-                        tvRelativeName.apply {
-                            isClickable = true
-                            movementMethod = LinkMovementMethod.getInstance()
-                            text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
-                        }
+                    tvLabelName.text = it.label
+                    tvTeamName.text = it.team
+                    tvContributorName.text = it.contributors.toContributorsString()
+                    tvDescriptionName.text = it.description
+                    tvRelativeName.apply {
+                        isClickable = true
+                        movementMethod = LinkMovementMethod.getInstance()
+                        text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
                     }
 
                     vfContainer.displayedChild = VF_CHILD_DETAIL
