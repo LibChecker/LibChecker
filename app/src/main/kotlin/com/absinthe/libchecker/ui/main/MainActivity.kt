@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
@@ -17,37 +18,39 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.*
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity() {
 
-    var hasInit = false
+    var hasRequestChanges = false
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
     private val appViewModel by viewModels<AppViewModel>()
-    private val snapshotViewModel by viewModels<SnapshotViewModel>()
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
-                GlobalValues.shouldRequestChange.value = true
+                appViewModel.requestChange()
             }
         }
     }
@@ -68,6 +71,7 @@ class MainActivity : BaseActivity() {
         initView()
         registerPackageBroadcast()
         handleIntentFromShortcuts(intent)
+        initAllApplicationInfoItems()
         initMap()
     }
 
@@ -78,9 +82,8 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (GlobalValues.shouldRequestChange.value == true && hasInit) {
+        if (GlobalValues.shouldRequestChange.value == true && hasRequestChanges) {
             appViewModel.requestChange()
-            snapshotViewModel.computeDiff()
         }
     }
 
@@ -128,7 +131,7 @@ class MainActivity : BaseActivity() {
                 offscreenPageLimit = 3
             }
 
-            // 当ViewPager切换页面时，改变ViewPager的显示
+            // 当 ViewPager 切换页面时，改变 ViewPager 的显示
             navView.setOnNavigationItemSelectedListener {
                 when (it.itemId) {
                     R.id.navigation_app_list -> {
@@ -137,6 +140,7 @@ class MainActivity : BaseActivity() {
                         } else {
                             if (!clickBottomItemFlag) {
                                 clickBottomItemFlag = true
+
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     delay(200)
                                     clickBottomItemFlag = false
@@ -152,6 +156,7 @@ class MainActivity : BaseActivity() {
                         } else {
                             if (!clickBottomItemFlag) {
                                 clickBottomItemFlag = true
+
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     delay(200)
                                     clickBottomItemFlag = false
@@ -169,12 +174,12 @@ class MainActivity : BaseActivity() {
         }
 
         GlobalValues.shouldRequestChange.observe(this, {
-            if (it) {
-                if (hasInit) {
-                    appViewModel.requestChange()
-                }
-                snapshotViewModel.computeDiff()
+            if (it && hasRequestChanges) {
+                appViewModel.requestChange()
             }
+        })
+        AppItemRepository.allApplicationInfoItems.observe(this, {
+            AppItemRepository.shouldRefreshAppList = true
         })
     }
 
@@ -200,6 +205,25 @@ class MainActivity : BaseActivity() {
             Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
         }
         Analytics.trackEvent(Constants.Event.LAUNCH_ACTION, EventProperties().set("Action", intent.action))
+    }
+
+    private fun initAllApplicationInfoItems() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            var appList: List<ApplicationInfo>?
+
+            do {
+                appList = try {
+                    PackageUtils.getInstallApplications()
+                } catch (e: Exception) {
+                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
+                    null
+                }
+            } while (appList == null)
+
+            withContext(Dispatchers.Main) {
+                AppItemRepository.allApplicationInfoItems.value = appList
+            }
+        }
     }
 
     private fun initMap() = lifecycleScope.launch(Dispatchers.IO) {

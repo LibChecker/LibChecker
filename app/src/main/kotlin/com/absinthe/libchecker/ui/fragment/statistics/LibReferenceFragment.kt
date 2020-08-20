@@ -8,9 +8,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -30,8 +32,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     private val viewModel by activityViewModels<AppViewModel>()
     private val adapter = LibReferenceAdapter()
 
-    private var isInit = false
-    private var isListInit = false
+    private var isListReady = false
     private var menu: Menu? = null
     private var category = NATIVE
 
@@ -62,7 +63,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             }
             setOnItemChildClickListener { _, view, position ->
                 if (view.id == R.id.iv_icon) {
-                    if (GlobalValues.config.enableLibDetail) {
+                    if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
                         val ref = this@LibReferenceFragment.adapter.getItem(position)
                         val name = ref.libName
                         val regexName = NativeLibMap.findRegex(name)?.regexName
@@ -76,42 +77,37 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                 }
             }
         }
-    }
 
-    override fun onStart() {
-        super.onStart()
+        viewModel.apply {
+            libReference.observe(viewLifecycleOwner, {
+                adapter.setList(it)
 
-        if (!isInit) {
-            viewModel.apply {
-                libReference.observe(viewLifecycleOwner, {
-                    adapter.setList(it)
-
-                    if (binding.vfContainer.displayedChild == 0) {
-                        binding.vfContainer.displayedChild = 1
-                    }
-                    isListInit = true
-                    menu?.findItem(R.id.search)?.isVisible = true
-                })
-                clickBottomItemFlag.observe(viewLifecycleOwner, {
-                    if (it) {
-                        binding.rvList.apply {
-                            if (canScrollVertically(-1)) {
-                                smoothScrollToPosition(0)
-                            }
+                if (binding.vfContainer.displayedChild == 0) {
+                    binding.vfContainer.displayedChild = 1
+                }
+                isListReady = true
+                menu?.findItem(R.id.search)?.isVisible = true
+            })
+            clickBottomItemFlag.observe(viewLifecycleOwner, {
+                if (it) {
+                    binding.rvList.apply {
+                        if (canScrollVertically(-1)) {
+                            smoothScrollToPosition(0)
                         }
                     }
-                })
-            }
-            GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
-                computeRef()
+                }
             })
-            GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, {
-                viewModel.refreshRef()
-            })
-
-            computeRef()
-            isInit = true
         }
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
+            computeRef()
+        })
+        GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, {
+            viewModel.refreshRef()
+        })
+
+        AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
+            computeRef()
+        })
     }
 
     override fun onResume() {
@@ -143,7 +139,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
 
-            if (!isListInit) {
+            if (!isListReady) {
                 isVisible = false
             }
         }
@@ -168,7 +164,10 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     }
 
     private fun computeRef() {
-        binding.vfContainer.displayedChild = 0
+        if (binding.vfContainer.displayedChild == 1) {
+            binding.vfContainer.displayedChild = 0
+        }
+
         viewModel.computeLibReference(category)
     }
 

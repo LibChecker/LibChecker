@@ -7,8 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.GlobalValues
@@ -32,6 +31,7 @@ class LibDetailDialogFragment : DialogFragment() {
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
+    private val viewModel by viewModels<DetailViewModel>()
 
     private fun List<String>.toContributorsString(): String {
         return this.joinToString(separator = ", ")
@@ -64,8 +64,7 @@ class LibDetailDialogFragment : DialogFragment() {
     override fun onStart() {
         super.onStart()
 
-        val viewModel = ViewModelProvider(this).get(DetailViewModel::class.java)
-        viewModel.detailBean.observe(requireActivity(), Observer {
+        viewModel.detailBean.observe(requireActivity(), {
             if (it != null) {
                 dialogView.binding.apply {
                     GlobalValues.config.apply {

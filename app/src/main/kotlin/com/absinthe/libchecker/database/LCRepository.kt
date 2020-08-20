@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 
 class LCRepository(private val lcDao: LCDao) {
 
-    val allItems: LiveData<List<LCItem>> = lcDao.getItems()
+    val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
     val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshots()
 
     suspend fun insert(item: LCItem) {

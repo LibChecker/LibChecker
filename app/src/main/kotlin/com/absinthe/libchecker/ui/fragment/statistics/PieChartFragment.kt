@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
@@ -63,11 +62,11 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             check(R.id.btn_abi)
         }
 
-        AppItemRepository.allItems.observe(viewLifecycleOwner, Observer {
+        AppItemRepository.allDatabaseItems.observe(viewLifecycleOwner, {
             setAbiData()
         })
 
-        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, Observer {
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
             setAbiData()
         })
     }
@@ -80,7 +79,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        AppItemRepository.allItems.value?.let {
+        AppItemRepository.allDatabaseItems.value?.let {
             val list = mutableListOf(0, 0, 0)
 
             for (item in it) {
@@ -138,7 +137,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        AppItemRepository.allItems.value?.let {
+        AppItemRepository.allDatabaseItems.value?.let {
             val list = mutableListOf(0, 0)
 
             for (item in it) {
@@ -206,7 +205,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         getString(R.string.title_statistics_dialog),
                         getString(R.string.string_64_bit)
                     )
-                    AppItemRepository.allItems.value?.filter { it.abi == ARMV8 }
+                    AppItemRepository.allDatabaseItems.value?.filter { it.abi == ARMV8 }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
@@ -216,14 +215,14 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         getString(R.string.title_statistics_dialog),
                         getString(R.string.string_32_bit)
                     )
-                    AppItemRepository.allItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
+                    AppItemRepository.allDatabaseItems.value?.filter { it.abi == ARMV7 || it.abi == ARMV5 }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 2f -> {
                     dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
-                    AppItemRepository.allItems.value?.filter { it.abi == NO_LIBS }
+                    AppItemRepository.allDatabaseItems.value?.filter { it.abi == NO_LIBS }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
@@ -233,14 +232,14 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             when (h.x) {
                 0f -> {
                     dialogTitle = getString(R.string.string_kotlin_used)
-                    AppItemRepository.allItems.value?.filter { it.isKotlinUsed }
+                    AppItemRepository.allDatabaseItems.value?.filter { it.isKotlinUsed }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 1f -> {
                     dialogTitle = getString(R.string.string_kotlin_unused)
-                    AppItemRepository.allItems.value?.filter { !it.isKotlinUsed }
+                    AppItemRepository.allDatabaseItems.value?.filter { !it.isKotlinUsed }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }

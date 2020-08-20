@@ -13,10 +13,12 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
@@ -27,7 +29,6 @@ import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.blankj.utilcode.util.BarUtils
-import com.blankj.utilcode.util.ConvertUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.widget.BorderView
@@ -41,6 +42,8 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
     private val adapter = SnapshotAdapter()
+    private var isSnapshotDatabaseItemsReady = false
+    private var isApplicationInfoItemsReady = false
 
     override fun initBinding(view: View): FragmentSnapshotBinding =
         FragmentSnapshotBinding.bind(view)
@@ -51,10 +54,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0,
-                    0,
-                    ConvertUtils.dp2px(16f),
-                    ConvertUtils.dp2px(70f) + paddingBottom
+                    0, 0, 16.dp, 70.dp + paddingBottom
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
@@ -145,20 +145,31 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
                     flip(VF_LOADING)
                 } else {
-                    dashboardBinding.tvSnapshotTimestampText.text =
-                        getString(R.string.snapshot_none)
+                    dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
                     flip(VF_LIST)
                 }
             })
             snapshotItems.observe(viewLifecycleOwner, {
+                isSnapshotDatabaseItemsReady = true
                 dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
-                computeDiff()
+
+                if (isApplicationInfoItemsReady) {
+                    computeDiff()
+                }
+            })
+            AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
+                isApplicationInfoItemsReady = true
+
+                if (isSnapshotDatabaseItemsReady) {
+                    computeDiff()
+                }
             })
             snapshotDiffItems.observe(
                 viewLifecycleOwner, { list ->
                     adapter.setList(list.sortedByDescending { it.updateTime })
                     flip(VF_LIST)
-                })
+                }
+            )
         }
     }
 

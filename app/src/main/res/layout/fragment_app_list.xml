@@ -28,7 +28,7 @@
                 android:id="@+id/tv_first_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="-50dp"
                 android:text="@string/app_list_first_tip"
                 android:textAppearance="?attr/textAppearanceHeadline6" />
 

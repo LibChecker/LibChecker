@@ -45,7 +45,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
         repository = LCRepository(lcDao)
-        dbItems = repository.allItems
+        dbItems = repository.allDatabaseItems
     }
 
     fun initItems() = viewModelScope.launch(Dispatchers.IO) {
@@ -131,12 +131,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         withContext(Dispatchers.Main) {
-            GlobalValues.isObservingDBItems.value = true
-            AppItemRepository.allItems.value = newItems
+            AppItemRepository.allDatabaseItems.value = newItems
         }
 
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
+        refreshLock = false
     }
 
     fun addItem() = viewModelScope.launch(Dispatchers.IO) {
@@ -179,7 +179,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             withContext(Dispatchers.Main) {
-                AppItemRepository.allItems.value = newItems
+                AppItemRepository.allDatabaseItems.value = newItems
             }
 
             timeRecorder.end()
@@ -211,16 +211,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun requestChangeImpl(context: Context) {
-        var appList: MutableList<ApplicationInfo>?
+        var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
 
-        do {
-            appList = try {
-                PackageUtils.getInstallApplications().toMutableList()
-            } catch (e: Exception) {
-                delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                null
-            }
-        } while (appList == null)
+        if (appList.isNullOrEmpty()) {
+            do {
+                appList = try {
+                    PackageUtils.getInstallApplications().toMutableList()
+                } catch (e: Exception) {
+                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
+                    null
+                }
+            } while (appList == null)
+        }
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             collectPopularLibraries(appList)
@@ -391,16 +393,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun computeLibReference(@LibType type: Int) =
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
-            var appList: List<ApplicationInfo>?
+            var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
-            do {
-                appList = try {
-                    PackageUtils.getInstallApplications()
-                } catch (e: Exception) {
-                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                    null
-                }
-            } while (appList == null)
+            if (appList.isNullOrEmpty()) {
+                do {
+                    appList = try {
+                        PackageUtils.getInstallApplications()
+                    } catch (e: Exception) {
+                        delay(GET_INSTALL_APPS_RETRY_PERIOD)
+                        null
+                    }
+                } while (appList == null)
+            }
 
             val map = HashMap<String, RefCountType>()
             val refList = mutableListOf<LibReference>()

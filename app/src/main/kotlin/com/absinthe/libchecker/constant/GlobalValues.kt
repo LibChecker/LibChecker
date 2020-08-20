@@ -59,6 +59,4 @@ object GlobalValues {
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
     val libReferenceThreshold: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
-
-    val isObservingDBItems: MutableLiveData<Boolean> = MutableLiveData(true)
 }

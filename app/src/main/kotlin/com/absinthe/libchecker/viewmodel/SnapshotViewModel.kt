@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.SnapshotItem
@@ -47,16 +48,18 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         deleteAllSnapshots()
 
         val context: Context = getApplication<LibCheckerApp>()
-        var appList: List<ApplicationInfo>?
+        var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
-        do {
-            appList = try {
-                PackageUtils.getInstallApplications()
-            } catch (e: Exception) {
-                delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                null
-            }
-        } while (appList == null)
+        if (appList.isNullOrEmpty()) {
+            do {
+                appList = try {
+                    PackageUtils.getInstallApplications()
+                } catch (e: Exception) {
+                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
+                    null
+                }
+            } while (appList == null)
+        }
 
         val dbList = mutableListOf<SnapshotItem>()
         val gson = Gson()
@@ -153,16 +156,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         if (snapshotItems.value.isNullOrEmpty()) return@launch
 
         val context: Context = getApplication<LibCheckerApp>()
-        var appList: MutableList<ApplicationInfo>?
-
-        do {
-            appList = try {
-                PackageUtils.getInstallApplications().toMutableList()
-            } catch (e: Exception) {
-                delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                null
-            }
-        } while (appList == null)
+        val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value!!.toMutableList()
 
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager

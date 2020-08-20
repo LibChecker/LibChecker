@@ -68,9 +68,13 @@ object PackageUtils {
      */
     @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
-        logd("getInstallApplications")
         return try {
-            ActivityStackManager.topActivity!!.packageManager.getInstalledApplications(0)
+            val timer = TimeRecorder()
+            timer.start()
+            val list= ActivityStackManager.topActivity!!.packageManager.getInstalledApplications(0)
+            timer.end()
+            logd("getInstallApplications: $timer")
+            list
         } catch (e: Exception) {
             throw Exception()
         }

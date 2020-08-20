@@ -35,6 +35,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
+import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
@@ -50,8 +51,8 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
-    private var hasInit = false
-    private var isListInit = false
+    private var hasRequestChanges = false
+    private var isListReady = false
     private var menu: Menu? = null
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
@@ -98,11 +99,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            tvFirstTip.isVisible = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
-        }
-
-        AppItemRepository.allItems.value?.let { list ->
-            updateItems(list)
+            tvFirstTip.isVisible = AppUtils.isFirstLaunch
         }
 
         if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
@@ -110,66 +107,14 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             binding.tvFirstTip.isVisible = true
         }
 
-        viewModel.apply {
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-                initItems()
-            } else {
-                dbItems.observe(viewLifecycleOwner, {
-                    if (it.isNullOrEmpty()) {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            delay(500)
-                            if (dbItems.value.isNullOrEmpty()) {
-                                initItems()
-                            } else {
-                                if (!viewModel.refreshLock) {
-                                    viewModel.refreshLock = true
-                                    addItem()
-                                }
-                            }
-                        }
-                    } else {
-                        if (!viewModel.refreshLock) {
-                            viewModel.refreshLock = true
-                            addItem()
-                        }
-                    }
-                })
-            }
+        initObserver()
+    }
 
-            AppItemRepository.allItems.observe(viewLifecycleOwner, {
-                updateItems(it)
-
-                if (!hasInit) {
-                    viewModel.requestChange()
-                    hasInit = true
-                    (requireActivity() as MainActivity).hasInit = true
-                }
-
-                if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
-                    Once.markDone(OnceTag.FIRST_LAUNCH)
-                    Once.markDone(OnceTag.DB_MIGRATE_2_3)
-                }
-            })
-            clickBottomItemFlag.observe(viewLifecycleOwner, {
-                if (it) { returnTopOfList() }
-            })
-        }
-
-        GlobalValues.apply {
-            isShowSystemApps.observe(viewLifecycleOwner, {
-                viewModel.addItem()
-            })
-            appSortMode.observe(viewLifecycleOwner, { mode ->
-                AppItemRepository.allItems.value?.let { allItems ->
-                    val list = allItems.toMutableList()
-
-                    when (mode) {
-                        Constants.SORT_MODE_DEFAULT -> list.sortWith(compareBy( { it.abi }, { it.appName }))
-                        Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
-                    }
-                    updateItems(list)
-                }
-            })
+    override fun onResume() {
+        super.onResume()
+        if (AppItemRepository.shouldRefreshAppList) {
+            AppItemRepository.shouldRefreshAppList = false
+            updateItems(AppItemRepository.allDatabaseItems.value!!)
         }
     }
 
@@ -192,7 +137,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
             actionView = searchView
 
-            if (!isListInit) {
+            if (!isListReady) {
                 isVisible = false
             }
         }
@@ -209,9 +154,10 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        AppItemRepository.allItems.value?.let { allItems ->
-            val filter = allItems.filter {
-                it.appName.contains(newText, ignoreCase = true) || it.packageName.contains(newText, ignoreCase = true)
+        AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
+            val filter = allDatabaseItems.filter {
+                it.appName.contains(newText, ignoreCase = true) ||
+                        it.packageName.contains(newText, ignoreCase = true)
             }
             updateItems(filter)
         }
@@ -250,6 +196,66 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         return super.onOptionsItemSelected(item)
     }
 
+    private fun initObserver() {
+        viewModel.apply {
+            dbItems.observe(viewLifecycleOwner, {
+                if (it.isNotEmpty()) {
+                    if (!refreshLock) {
+                        refreshLock = true
+                        addItem()
+                    }
+                }
+            })
+
+            if (AppUtils.isFirstLaunch) {
+                refreshLock = true
+                initItems()
+            }
+
+            clickBottomItemFlag.observe(viewLifecycleOwner, {
+                if (it) {
+                    returnTopOfList()
+                }
+            })
+        }
+
+        AppItemRepository.allDatabaseItems.observe(viewLifecycleOwner, {
+            updateItems(it)
+
+            if (!hasRequestChanges) {
+                viewModel.requestChange()
+                hasRequestChanges = true
+                (requireActivity() as MainActivity).hasRequestChanges = true
+
+                if (AppUtils.isFirstLaunch) {
+                    Once.markDone(OnceTag.FIRST_LAUNCH)
+                    Once.markDone(OnceTag.DB_MIGRATE_2_3)
+                }
+            }
+        })
+
+        GlobalValues.apply {
+            isShowSystemApps.observe(viewLifecycleOwner, {
+                viewModel.addItem()
+            })
+            appSortMode.observe(viewLifecycleOwner, { mode ->
+                AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
+                    val list = allDatabaseItems.toMutableList()
+
+                    when (mode) {
+                        Constants.SORT_MODE_DEFAULT -> list.sortWith(
+                            compareBy(
+                                { it.abi },
+                                { it.appName })
+                        )
+                        Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
+                    }
+                    updateItems(list)
+                }
+            })
+        }
+    }
+
     private fun updateItems(newItems: List<AppItem>) {
         val list = mAdapter.data
         mAdapter.setDiffNewData(newItems.toMutableList())
@@ -263,13 +269,13 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         if (binding.vfContainer.displayedChild == 0) {
                             binding.vfContainer.displayedChild = 1
                         }
-                        
+
                         if (GlobalValues.appSortMode.value!! == Constants.SORT_MODE_UPDATE_TIME_DESC) {
                             returnTopOfList()
                         }
 
                         menu?.findItem(R.id.search)?.isVisible = true
-                        isListInit = true
+                        isListReady = true
                     } catch (ignore: Exception) {
 
                     }
@@ -286,10 +292,13 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         }
     }
 
-    private fun getSuitableLayoutManager() : RecyclerView.LayoutManager {
-        return when(resources.configuration.orientation) {
+    private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+        return when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
+                2,
+                StaggeredGridLayoutManager.VERTICAL
+            )
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
     }

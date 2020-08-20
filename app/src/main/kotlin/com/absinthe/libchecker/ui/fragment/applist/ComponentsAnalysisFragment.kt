@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
@@ -79,7 +80,7 @@ class ComponentsAnalysisFragment :
         }
 
         fun openLibDetailDialog(position: Int) {
-            if (GlobalValues.config.enableComponentsDetail) {
+            if (GlobalValues.config.enableComponentsDetail || BuildConfig.DEBUG) {
                 val name = adapter.getItem(position).name
                 val regexName = BaseMap.getMap(adapter.type).findRegex(name)?.regexName
 

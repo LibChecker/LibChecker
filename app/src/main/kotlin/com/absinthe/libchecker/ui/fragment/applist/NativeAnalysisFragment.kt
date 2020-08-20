@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.*
@@ -60,7 +61,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
 
         fun openLibDetailDialog(position: Int) {
-            if (GlobalValues.config.enableLibDetail) {
+            if (GlobalValues.config.enableLibDetail || BuildConfig.DEBUG) {
                 val name = adapter.getItem(position).name
                 val regexName = NativeLibMap.findRegex(name)?.regexName
                 LibDetailDialogFragment.newInstance(name, adapter.type, regexName)

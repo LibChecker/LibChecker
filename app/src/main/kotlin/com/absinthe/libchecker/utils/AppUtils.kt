@@ -4,8 +4,10 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.Configuration
 import com.absinthe.libchecker.api.request.ConfigurationRequest
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
+import jonathanfinerty.once.Once
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -39,4 +41,5 @@ object AppUtils {
         })
     }
 
+    val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
 }

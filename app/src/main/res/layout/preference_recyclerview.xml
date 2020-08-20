@@ -9,7 +9,7 @@
     android:fadeScrollbars="true"
     android:overScrollMode="never"
     android:paddingTop="?actionBarSize"
-    android:paddingBottom="8dp"
+    android:paddingBottom="100dp"
     android:scrollbarStyle="outsideOverlay"
     android:scrollbars="vertical"
     app:borderBottomStyle="never"

@@ -22,7 +22,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
     fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<AppItem>()
 
-        AppItemRepository.allItems.value?.let { items ->
+        AppItemRepository.allDatabaseItems.value?.let { items ->
             if (type == NATIVE) {
                 var packageInfo: PackageInfo
                 var natives: List<LibStringItem>
