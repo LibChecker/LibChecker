@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.res.ColorStateList
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -59,12 +59,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
                         visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
-                            chipIconTint = ColorStateList.valueOf(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.textNormal
-                                )
-                            )
+                            chipDrawable.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                         }
                     }
                 }

@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.LibType
@@ -39,9 +40,10 @@ class LibDetailDialogFragment : DialogFragment() {
         dialogView.binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
-            ivIcon.setImageResource(
-                BaseMap.getMap(type).getMap()[libName]?.iconRes ?: R.drawable.ic_logo
-            )
+            ivIcon.load(BaseMap.getMap(type).getMap()[libName]?.iconRes ?: R.drawable.ic_logo) {
+                crossfade(true)
+                placeholder(R.drawable.ic_logo)
+            }
             tvCreateIssue.apply {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()

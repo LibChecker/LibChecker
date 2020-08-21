@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.SimpleItemAnimator
+import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDetailItem
@@ -119,7 +120,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
-            ivAppIcon.setImageDrawable(AppUtils.getAppIcon(entity.packageName))
+            ivAppIcon.load(AppUtils.getAppIcon(entity.packageName))
             tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
             tvPackageName.text = entity.packageName
             tvVersion.text = getDiffString(

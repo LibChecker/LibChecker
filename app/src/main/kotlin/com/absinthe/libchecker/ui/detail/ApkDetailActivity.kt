@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
@@ -96,9 +97,7 @@ class ApkDetailActivity : BaseActivity() {
                 }
                 binding.apply {
                     try {
-                        ivAppIcon.apply {
-                            setImageDrawable(it.applicationInfo.loadIcon(packageManager))
-                        }
+                        ivAppIcon.load(it.applicationInfo.loadIcon(packageManager))
                         tvAppName.apply {
                             text = it.applicationInfo.loadLabel(packageManager)
                             setLongClickCopiedToClipboard(text.toString())
@@ -120,7 +119,7 @@ class ApkDetailActivity : BaseActivity() {
                         )
 
                         layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                        layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
+                        layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
                     } catch (e: Exception) {
                         supportFinishAfterTransition()
                     }

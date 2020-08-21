@@ -2,10 +2,14 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.view.View
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
+import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
@@ -44,8 +48,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
             else -> Color.TRANSPARENT
         }
 
-        helper.setImageResource(
-            R.id.iv_type_icon,
+        helper.getView<ImageView>(R.id.iv_type_icon).load(
             when (snapshotItem.diffType) {
                 ADDED -> R.drawable.ic_add
                 REMOVED -> R.drawable.ic_remove
@@ -71,12 +74,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                         visibility = View.VISIBLE
 
                         if (!GlobalValues.isColorfulIcon.value!!) {
-                            chipIconTint = ColorStateList.valueOf(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.textNormal
-                                )
-                            )
+                            chipDrawable.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                         }
                     }
                 }

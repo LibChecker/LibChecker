@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.*
@@ -109,7 +110,7 @@ class AppDetailActivity : BaseActivity() {
                 try {
                     val packageInfo = PackageUtils.getPackageInfo(packageName)
                     ivAppIcon.apply {
-                        setImageDrawable(AppUtils.getAppIcon(packageName))
+                        load(AppUtils.getAppIcon(packageName))
                         setOnClickListener {
                             try {
                                 startActivity(IntentUtils.getLaunchAppIntent(pkgName))
@@ -141,7 +142,7 @@ class AppDetailActivity : BaseActivity() {
                     )
 
                     layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                    layoutAbi.ivAbiType.setImageResource(PackageUtils.getAbiBadgeResource(abi))
+                    layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         val lcDao = LCDatabase.getDatabase(application).lcDao()

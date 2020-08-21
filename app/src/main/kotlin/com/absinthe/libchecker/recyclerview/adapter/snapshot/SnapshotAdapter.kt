@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
@@ -31,7 +32,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         } catch (e: Exception) {
             null
         }
-        holder.setImageDrawable(R.id.iv_icon, drawable)
+        holder.getView<ImageView>(R.id.iv_icon).load(drawable)
 
         var isNewOrDeleted = false
 
@@ -99,7 +100,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         holder.setText(R.id.tv_version, getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)"))
         holder.setText(R.id.tv_target_api, getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s"))
         holder.setText(R.id.tv_abi, PackageUtils.getAbiString(item.abiDiff.old.toInt()))
-        holder.setImageResource(R.id.iv_abi_type, PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))
+        holder.getView<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))
 
         if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
             holder.getView<TextView>(R.id.tv_arrow).isVisible = true
@@ -107,7 +108,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
             val abiBadgeNewLayout = holder.getView<LinearLayout>(R.id.layout_abi_badge_new)
             abiBadgeNewLayout.isVisible = true
             abiBadgeNewLayout.findViewById<TextView>(R.id.tv_abi).text = PackageUtils.getAbiString(item.abiDiff.new.toInt())
-            abiBadgeNewLayout.findViewById<ImageView>(R.id.iv_abi_type).setImageResource(PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))
+            abiBadgeNewLayout.findViewById<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))
         } else {
             holder.getView<TextView>(R.id.tv_arrow).isGone = true
             holder.getView<LinearLayout>(R.id.layout_abi_badge_new).isGone = true

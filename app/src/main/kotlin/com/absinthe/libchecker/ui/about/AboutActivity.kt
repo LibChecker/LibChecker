@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -32,7 +33,7 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
-        icon.setImageResource(R.drawable.pic_splash)
+        icon.load(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
     }
