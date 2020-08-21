@@ -113,8 +113,10 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     override fun onResume() {
         super.onResume()
         if (AppItemRepository.shouldRefreshAppList) {
-            AppItemRepository.shouldRefreshAppList = false
-            updateItems(AppItemRepository.allDatabaseItems.value!!)
+            AppItemRepository.allDatabaseItems.value?.let {
+                updateItems(it)
+                AppItemRepository.shouldRefreshAppList = false
+            }
         }
     }
 

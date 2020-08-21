@@ -87,11 +87,12 @@
             android:id="@+id/tv_abi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
             android:fontFamily="sans-serif-condensed-medium"
+            android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/iv_abi_type"
+            tools:ignore="SmallSp"
             tools:text="arm64-v8a" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

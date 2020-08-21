@@ -54,7 +54,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 70.dp + paddingBottom
+                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight()
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
