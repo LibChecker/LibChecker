@@ -27,6 +27,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
@@ -36,6 +37,7 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
@@ -94,6 +96,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

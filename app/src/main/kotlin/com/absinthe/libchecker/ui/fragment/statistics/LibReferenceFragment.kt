@@ -13,6 +13,7 @@ import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
@@ -21,6 +22,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.ActivityStackManager
 import com.absinthe.libchecker.utils.AntiShakeUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.microsoft.appcenter.analytics.Analytics
@@ -40,6 +42,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     override fun init() {
         binding.apply {
             rvList.adapter = adapter
+            rvList.addPaddingBottom(UiUtils.getNavBarHeight())
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
