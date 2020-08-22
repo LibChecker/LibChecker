@@ -178,9 +178,6 @@ class MainActivity : BaseActivity() {
                 appViewModel.requestChange()
             }
         })
-        AppItemRepository.allApplicationInfoItems.observe(this, {
-            AppItemRepository.shouldRefreshAppList = true
-        })
     }
 
     private fun registerPackageBroadcast() {

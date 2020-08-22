@@ -16,6 +16,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
@@ -66,6 +67,7 @@ class SettingsFragment : PreferenceFragment() {
         (findPreference(Constants.PREF_COLORFUL_ICON) as SwitchPreference).apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
+                AppItemRepository.allApplicationInfoItems.value = AppItemRepository.allApplicationInfoItems.value
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_COLORFUL_ICON", newValue))
                 true
             }

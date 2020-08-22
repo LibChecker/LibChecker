@@ -106,6 +106,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
         })
 
         AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
+            AppItemRepository.shouldRefreshAppList = true
             computeRef()
         })
     }

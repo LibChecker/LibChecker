@@ -7,8 +7,8 @@ import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.databinding.LayoutLibRefThresholdBinding
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.view.settings.LibReferenceThresholdView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 
@@ -16,14 +16,13 @@ class LibThresholdDialogFragment : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val binding = LayoutLibRefThresholdBinding.inflate(layoutInflater)
-        binding.slider.value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
+        val view = LibReferenceThresholdView(requireContext())
 
         return AlertDialog.Builder(requireContext())
-            .setView(binding.root)
+            .setView(view)
             .setTitle(R.string.lib_ref_threshold)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-                val threshold = binding.slider.value.toInt()
+                val threshold = view.slider.value.toInt()
                 GlobalValues.libReferenceThreshold.value = threshold
                 SPUtils.putInt(Constants.PREF_LIB_REF_THRESHOLD, threshold)
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong()))

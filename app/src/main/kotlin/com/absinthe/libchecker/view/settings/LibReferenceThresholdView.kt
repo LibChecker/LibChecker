@@ -1,24 +1,25 @@
 package com.absinthe.libchecker.view.settings
 
 import android.content.Context
+import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.absinthe.libchecker.constant.GlobalValues
 import com.google.android.material.slider.Slider
-import com.squareup.contour.ContourLayout
 
-class LibReferenceThresholdView(context: Context) : ContourLayout(context) {
+class LibReferenceThresholdView(context: Context) : ConstraintLayout(context) {
 
     val slider: Slider = Slider(context).apply {
         valueFrom = 1f
         valueTo = 50f
         stepSize = 1f
         value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
-        applyLayout(
-            x = matchParentX(),
-            y = topTo { parent.top() }
-        )
     }
 
     init {
-        contourHeightOf { slider.height() + 10.ydip }
+        id = View.generateViewId()
+
+        addView(slider, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+            topToTop = this@LibReferenceThresholdView.id
+        })
     }
 }

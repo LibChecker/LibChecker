@@ -159,6 +159,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             })
             AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
                 isApplicationInfoItemsReady = true
+                AppItemRepository.shouldRefreshAppList = true
 
                 if (isSnapshotDatabaseItemsReady) {
                     computeDiff()

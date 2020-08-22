@@ -85,7 +85,6 @@ class AboutActivity : AbsAboutActivity() {
             add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
             add(License("OkHttp", "Square", License.APACHE_2, "https://github.com/square/okhttp"))
             add(License("Retrofit", "Square", License.APACHE_2, "https://github.com/square/retrofit"))
-            add(License("contour", "Square", License.APACHE_2, "https://github.com/cashapp/contour"))
             add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
             add(License("apk-parser", "hsiafan", "BSD-2-Clause", "https://github.com/hsiafan/apk-parser"))
             add(License("X2C", "iReaderAndroid", License.MIT, "https://github.com/iReaderAndroid/X2C"))
