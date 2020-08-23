@@ -22,9 +22,9 @@ import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.android.synthetic.main.activity_main.*
@@ -106,7 +106,7 @@ class LibReferenceActivity : BaseActivity() {
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         appBar?.setRaised(!top)
                     }
-                paddingBottomCompat = UiUtils.getNavBarHeight()
+                paddingBottomCompat = UiUtils.getNavBarHeight(contentResolver)
                 addPaddingTop(BarUtils.getStatusBarHeight())
             }
             vfContainer.apply {

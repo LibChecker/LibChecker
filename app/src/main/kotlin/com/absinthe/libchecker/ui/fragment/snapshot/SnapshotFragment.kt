@@ -25,9 +25,9 @@ import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -54,7 +54,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight()
+                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().contentResolver)
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
@@ -104,7 +104,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     )
                 }
                 addPaddingTop(BarUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

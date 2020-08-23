@@ -35,10 +35,10 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.AntiShakeUtils
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
@@ -96,7 +96,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 addPaddingTop(BarUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

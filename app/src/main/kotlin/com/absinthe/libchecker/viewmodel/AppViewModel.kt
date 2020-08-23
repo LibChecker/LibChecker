@@ -25,7 +25,7 @@ import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.TimeRecorder
+import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once

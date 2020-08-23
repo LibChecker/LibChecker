@@ -25,7 +25,7 @@ class AlwaysMarqueeTextView : AppCompatTextView {
         ellipsize = TextUtils.TruncateAt.MARQUEE
         isFocusable = true
         isFocusableInTouchMode = true
-        marqueeRepeatLimit = -1
+        marqueeRepeatLimit = -1 /*Infinity*/
         setSingleLine()
     }
 }

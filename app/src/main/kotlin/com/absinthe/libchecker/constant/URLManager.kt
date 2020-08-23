@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.constant
 
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libraries.Absinthe
+import com.absinthe.libraries.me.Absinthe
 
 object URLManager {
     const val MARKET_PAGE = "${Absinthe.MARKET_DETAIL_SCHEME}${BuildConfig.APPLICATION_ID}"

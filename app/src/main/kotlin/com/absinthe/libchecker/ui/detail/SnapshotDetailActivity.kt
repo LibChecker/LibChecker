@@ -25,11 +25,11 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.utils.ActivityStackManager
-import com.absinthe.libchecker.utils.AntiShakeUtils
-import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.manager.ActivityStackManager
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
@@ -114,7 +114,7 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                addPaddingBottom(UiUtils.getNavBarHeight())
+                addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 
