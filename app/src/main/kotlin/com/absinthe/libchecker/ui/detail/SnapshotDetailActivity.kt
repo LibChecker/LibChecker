@@ -26,7 +26,6 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -185,9 +184,7 @@ class SnapshotDetailActivity : BaseActivity() {
                 val regexName = NativeLibMap.findRegex(name)?.regexName
                 LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
                     .apply {
-                        MainActivity.INSTANCE?.apply {
-                            show(supportFragmentManager, tag)
-                        }
+                        show(supportFragmentManager, tag)
                     }
             }
         }

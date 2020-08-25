@@ -19,7 +19,6 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -65,12 +64,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
                     val regexName = NativeLibMap.findRegex(name)?.regexName
-                    LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-                        .apply {
-                            MainActivity.INSTANCE?.apply {
-                                show(supportFragmentManager, tag)
-                            }
-                        }
+                    LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }
         }
@@ -157,7 +151,12 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
         if (item.itemId != R.id.search) {
             computeRef()
         }
-        Analytics.trackEvent(Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set("Type", category.toLong()))
+        Analytics.trackEvent(
+            Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
+                "Type",
+                category.toLong()
+            )
+        )
         return super.onOptionsItemSelected(item)
     }
 
@@ -176,7 +175,10 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     override fun onQueryTextChange(newText: String): Boolean {
         viewModel.libReference.value?.let { list ->
             val filter = list.filter {
-                it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(newText, ignoreCase = true) ?: false
+                it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+                    newText,
+                    ignoreCase = true
+                ) ?: false
             }
             adapter.setDiffNewData(filter.toMutableList())
         }

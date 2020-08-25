@@ -50,6 +50,7 @@ class LibReferenceActivity : BaseActivity() {
             sharedElementsUseOverlay = false
         }
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
+        postponeEnterTransition()
         super.onCreate(savedInstanceState)
 
         val name = intent.extras?.getString(EXTRA_NAME)
@@ -73,7 +74,7 @@ class LibReferenceActivity : BaseActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            onBackPressed()
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -87,11 +88,7 @@ class LibReferenceActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-            supportFinishAfterTransition()
-        } else {
-            super.onBackPressed()
-        }
+        finish()
     }
 
     private fun initView() {

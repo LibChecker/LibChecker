@@ -18,7 +18,6 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -86,12 +85,7 @@ class ComponentsAnalysisFragment :
             val name = adapter.getItem(position).name
             val regexName = BaseMap.getMap(adapter.type).findRegex(name)?.regexName
 
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-                .apply {
-                    MainActivity.INSTANCE?.apply {
-                        show(supportFragmentManager, tag)
-                    }
-                }
+            LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
         }
 
         adapter.apply {

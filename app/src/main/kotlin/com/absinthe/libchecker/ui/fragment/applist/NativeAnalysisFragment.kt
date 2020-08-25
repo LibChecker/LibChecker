@@ -16,7 +16,6 @@ import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -66,12 +65,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).name
             val regexName = NativeLibMap.findRegex(name)?.regexName
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-                .apply {
-                    MainActivity.INSTANCE?.apply {
-                        show(supportFragmentManager, tag)
-                    }
-                }
+            LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
         }
 
         adapter.apply {
@@ -109,18 +103,6 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         Sortable.currentReference = WeakReference(this)
     }
 
-    companion object {
-        fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
-            return NativeAnalysisFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putString(EXTRA_PACKAGE_NAME, packageName)
-                        putInt(EXTRA_TYPE, type)
-                    }
-                }
-        }
-    }
-
     override fun sort() {
         viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
             val map = BaseMap.getMap(adapter.type)
@@ -134,5 +116,17 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
         GlobalValues.libSortMode.value = viewModel.sortMode
         SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
+    }
+
+    companion object {
+        fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
+            return NativeAnalysisFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putString(EXTRA_PACKAGE_NAME, packageName)
+                        putInt(EXTRA_TYPE, type)
+                    }
+                }
+        }
     }
 }
