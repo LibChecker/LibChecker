@@ -86,6 +86,14 @@ class LibReferenceActivity : BaseActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
+            supportFinishAfterTransition()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     private fun initView() {
         binding.apply {
             root.apply {

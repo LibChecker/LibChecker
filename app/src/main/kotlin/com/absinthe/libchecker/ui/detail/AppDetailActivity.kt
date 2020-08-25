@@ -91,7 +91,7 @@ class AppDetailActivity : BaseActivity() {
                 duration = 250L
             }
         }
-        findViewById<View>(android.R.id.content).transitionName = "app_card_container"
+        findViewById<View>(android.R.id.content).transitionName = pkgName
         setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
     }
 
