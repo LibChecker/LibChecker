@@ -15,10 +15,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.isOrientationLandscape
-import com.absinthe.libchecker.extensions.paddingBottomCompat
-import com.absinthe.libchecker.extensions.paddingTopCompat
+import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -141,7 +138,7 @@ class LibReferenceActivity : BaseActivity() {
                 this, view, view.transitionName
             )
 
-            if (GlobalValues.isShowEntryAnimation.value!!) {
+            if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
                 startActivity(intent, options.toBundle())
             } else {
                 startActivity(intent)

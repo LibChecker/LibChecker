@@ -23,6 +23,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.databinding.LayoutChipGroupBinding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
@@ -66,7 +67,7 @@ class AppDetailActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (GlobalValues.isShowEntryAnimation.value!!) {
+        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
             supportFinishAfterTransition()
         } else {
             super.onBackPressed()

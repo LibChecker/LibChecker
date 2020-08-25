@@ -10,7 +10,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.extensions.logd
-import com.absinthe.libraries.utils.manager.ActivityStackManager
+import com.absinthe.libchecker.java.FreezeUtils
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
@@ -72,7 +73,7 @@ object PackageUtils {
         return try {
             val timer = TimeRecorder()
             timer.start()
-            val list= ActivityStackManager.topActivity!!.packageManager.getInstalledApplications(0)
+            val list = MainActivity.INSTANCE?.packageManager?.getInstalledApplications(0) ?: listOf()
             timer.end()
             logd("getInstallApplications: $timer")
             list

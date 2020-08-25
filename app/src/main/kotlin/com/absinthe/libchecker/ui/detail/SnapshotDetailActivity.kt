@@ -19,15 +19,16 @@ import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.finishCompat
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import com.absinthe.libraries.utils.manager.ActivityStackManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
@@ -66,7 +67,7 @@ class SnapshotDetailActivity : BaseActivity() {
     }
 
     override fun onBackPressed() {
-        if (GlobalValues.isShowEntryAnimation.value!!) {
+        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
             supportFinishAfterTransition()
         } else {
             super.onBackPressed()
@@ -184,7 +185,7 @@ class SnapshotDetailActivity : BaseActivity() {
                 val regexName = NativeLibMap.findRegex(name)?.regexName
                 LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
                     .apply {
-                        ActivityStackManager.topActivity?.apply {
+                        MainActivity.INSTANCE?.apply {
                             show(supportFragmentManager, tag)
                         }
                     }

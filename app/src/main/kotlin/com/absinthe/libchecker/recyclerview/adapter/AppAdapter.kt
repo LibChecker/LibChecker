@@ -4,7 +4,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -26,6 +26,7 @@ class AppAdapter : BaseQuickAdapter<AppItem, BaseViewHolder>(0) {
             setText(R.id.tv_version, item.versionName)
             setText(R.id.tv_abi, PackageUtils.getAbiString(item.abi))
             getView<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abi))
+            itemView.transitionName = item.packageName
         }
     }
 }

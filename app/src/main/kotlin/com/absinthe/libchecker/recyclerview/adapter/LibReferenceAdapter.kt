@@ -8,6 +8,7 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
@@ -31,7 +32,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
             holder.getView<ImageButton>(R.id.iv_icon).apply {
                 load(it.iconRes)
 
-                if (!GlobalValues.isColorfulIcon.value!!) {
+                if (!GlobalValues.isColorfulIcon.valueUnsafe) {
                     colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                 }
             }

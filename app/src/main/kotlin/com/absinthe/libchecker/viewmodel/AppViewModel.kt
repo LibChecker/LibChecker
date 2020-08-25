@@ -24,6 +24,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.extensions.logd
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.blankj.utilcode.util.AppUtils
@@ -606,7 +607,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             for (entry in map) {
-                if (entry.value.count >= GlobalValues.libReferenceThreshold.value!! && entry.key.isNotBlank()) {
+                if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
 
                     val chip = BaseMap.getMap(entry.value.type).getChip(entry.key)
                     refList.add(
@@ -625,7 +626,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun refreshRef() {
         libReference.value?.let { ref ->
             libReference.value =
-                ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.value!! }
+                ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.valueUnsafe }
         }
     }
 

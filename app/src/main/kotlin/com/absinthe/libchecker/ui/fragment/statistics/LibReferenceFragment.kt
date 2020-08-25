@@ -19,9 +19,9 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.absinthe.libraries.utils.manager.ActivityStackManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -67,7 +67,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                     val regexName = NativeLibMap.findRegex(name)?.regexName
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName)
                         .apply {
-                            ActivityStackManager.topActivity?.apply {
+                            MainActivity.INSTANCE?.apply {
                                 show(supportFragmentManager, tag)
                             }
                         }

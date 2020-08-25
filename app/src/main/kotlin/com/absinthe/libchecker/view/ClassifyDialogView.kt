@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -32,7 +33,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
                 (context as AppCompatActivity), view, view.transitionName
             )
 
-            if (GlobalValues.isShowEntryAnimation.value!!) {
+            if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
                 context.startActivity(intent, options.toBundle())
             } else {
                 context.startActivity(intent)

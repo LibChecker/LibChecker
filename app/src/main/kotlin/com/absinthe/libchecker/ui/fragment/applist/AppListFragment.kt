@@ -29,6 +29,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
@@ -78,7 +79,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     requireActivity(), view, view.transitionName
                 )
 
-                if (GlobalValues.isShowEntryAnimation.value!!) {
+                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
                     startActivity(intent, options.toBundle())
                 } else {
                     startActivity(intent)
@@ -275,7 +276,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                             binding.vfContainer.displayedChild = 1
                         }
 
-                        if (GlobalValues.appSortMode.value!! == Constants.SORT_MODE_UPDATE_TIME_DESC) {
+                        if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) {
                             returnTopOfList()
                         }
 

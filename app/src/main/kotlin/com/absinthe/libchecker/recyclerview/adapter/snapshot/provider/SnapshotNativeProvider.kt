@@ -17,6 +17,7 @@ import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
@@ -68,7 +69,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
                         chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
                         visibility = View.VISIBLE
 
-                        if (!GlobalValues.isColorfulIcon.value!!) {
+                        if (!GlobalValues.isColorfulIcon.valueUnsafe) {
                             chipDrawable.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                         }
                     }

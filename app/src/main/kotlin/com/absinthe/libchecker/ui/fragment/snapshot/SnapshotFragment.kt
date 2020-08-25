@@ -19,6 +19,7 @@ import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
@@ -131,7 +132,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     requireActivity(), view, view.transitionName
                 )
 
-                if (GlobalValues.isShowEntryAnimation.value!!) {
+                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
                     startActivity(intent, options.toBundle())
                 } else {
                     startActivity(intent)

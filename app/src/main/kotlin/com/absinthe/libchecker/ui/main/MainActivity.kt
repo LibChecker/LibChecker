@@ -68,6 +68,7 @@ class MainActivity : BaseActivity() {
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
+        INSTANCE = this
         initView()
         registerPackageBroadcast()
         handleIntentFromShortcuts(intent)
@@ -89,6 +90,7 @@ class MainActivity : BaseActivity() {
 
     override fun onDestroy() {
         unregisterPackageBroadcast()
+        INSTANCE = null
         super.onDestroy()
     }
 
@@ -172,12 +174,6 @@ class MainActivity : BaseActivity() {
                 true
             }
         }
-
-        GlobalValues.shouldRequestChange.observe(this, {
-            if (it && hasRequestChanges) {
-                appViewModel.requestChange()
-            }
-        })
     }
 
     private fun registerPackageBroadcast() {
@@ -230,5 +226,9 @@ class MainActivity : BaseActivity() {
         ReceiverLibMap
         ProviderLibMap
         DexLibMap
+    }
+
+    companion object {
+        var INSTANCE: MainActivity? = null
     }
 }

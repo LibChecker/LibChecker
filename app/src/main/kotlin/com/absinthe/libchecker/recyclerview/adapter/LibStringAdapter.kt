@@ -12,6 +12,7 @@ import com.absinthe.libchecker.constant.DEX
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
 import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -58,7 +59,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItem,
                         text = it.name
                         visibility = View.VISIBLE
 
-                        if (!GlobalValues.isColorfulIcon.value!!) {
+                        if (!GlobalValues.isColorfulIcon.valueUnsafe) {
                             chipDrawable.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                         }
                     }

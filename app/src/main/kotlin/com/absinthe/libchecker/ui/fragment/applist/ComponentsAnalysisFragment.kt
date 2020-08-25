@@ -18,11 +18,11 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.absinthe.libraries.utils.manager.ActivityStackManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
@@ -88,7 +88,7 @@ class ComponentsAnalysisFragment :
 
             LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
                 .apply {
-                    ActivityStackManager.topActivity?.apply {
+                    MainActivity.INSTANCE?.apply {
                         show(supportFragmentManager, tag)
                     }
                 }
