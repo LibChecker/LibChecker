@@ -50,7 +50,6 @@ class LibReferenceActivity : BaseActivity() {
             sharedElementsUseOverlay = false
         }
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
-        postponeEnterTransition()
         super.onCreate(savedInstanceState)
 
         val name = intent.extras?.getString(EXTRA_NAME)

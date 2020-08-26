@@ -61,7 +61,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
     override fun init() {
-        postponeEnterTransition()
         setHasOptionsMenu(true)
 
         mAdapter.apply {

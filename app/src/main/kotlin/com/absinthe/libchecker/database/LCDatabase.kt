@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-@Database(entities = [LCItem::class, SnapshotItem::class], version = 3, exportSchema = false)
+@Database(entities = [LCItem::class, SnapshotItem::class], version = 4, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -29,7 +29,7 @@ abstract class LCDatabase : RoomDatabase() {
                     LCDatabase::class.java,
                     "lc_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
                 return instance
@@ -52,6 +52,17 @@ abstract class LCDatabase : RoomDatabase() {
                 )
                 database.execSQL(
                     "ALTER TABLE item_table ADD COLUMN isKotlinUsed INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
+        private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE snapshot_table ADD COLUMN timeStamp INTEGER NOT NULL DEFAULT 0"
+                )
+                database.execSQL(
+                    "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL"
                 )
             }
         }
