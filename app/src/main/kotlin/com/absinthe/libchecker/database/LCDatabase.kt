@@ -62,7 +62,7 @@ abstract class LCDatabase : RoomDatabase() {
                     "ALTER TABLE snapshot_table ADD COLUMN timeStamp INTEGER NOT NULL DEFAULT 0"
                 )
                 database.execSQL(
-                    "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL DEFAULT ''"
+                    "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL DEFAULT '[]'"
                 )
             }
         }

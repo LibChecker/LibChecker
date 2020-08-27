@@ -12,6 +12,7 @@ import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
 import java.io.File
@@ -316,11 +317,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentList(
-        packageName: String,
-        @LibType type: Int,
-        isSimpleName: Boolean
-    ): List<String> {
+    fun getComponentList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<String> {
         val flag = when (type) {
             SERVICE -> PackageManager.GET_SERVICES
             ACTIVITY -> PackageManager.GET_ACTIVITIES
@@ -339,11 +336,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    private fun getComponentList(
-        packageInfo: PackageInfo,
-        @LibType type: Int,
-        isSimpleName: Boolean
-    ): List<String> {
+    private fun getComponentList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<String> {
         val list: Array<out ComponentInfo>? = when (type) {
             SERVICE -> packageInfo.services
             ACTIVITY -> packageInfo.activities
@@ -374,11 +367,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentList(
-        packageName: String,
-        list: Array<out ComponentInfo>,
-        isSimpleName: Boolean
-    ): List<String> {
+    fun getComponentList(packageName: String, list: Array<out ComponentInfo>, isSimpleName: Boolean): List<String> {
         val finalList = mutableListOf<String>()
         for (component in list) {
             val name = if (isSimpleName) {
@@ -534,5 +523,14 @@ object PackageUtils {
         } else {
             return listOf()
         }
+    }
+
+    /**
+     * Get permissions of an application
+     * @param packageName Package name of the app
+     * @return Permissions list
+     */
+    fun getPermissionsList(packageName: String): List<String> {
+        return PermissionUtils.getPermissions(packageName)
     }
 }

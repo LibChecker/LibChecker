@@ -75,4 +75,5 @@
     <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
     <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
     <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
+    <string name="ref_category_perm">权限</string>
 </resources>

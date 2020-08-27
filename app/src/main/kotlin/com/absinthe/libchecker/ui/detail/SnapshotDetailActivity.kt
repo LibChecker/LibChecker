@@ -160,6 +160,11 @@ class SnapshotDetailActivity : BaseActivity() {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_cp)))
                 }
             }
+            getNodeList(details.filter { it.itemType == PERMISSION }).apply {
+                if (isNotEmpty()) {
+                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_perm)))
+                }
+            }
 
             if (titleList.isNotEmpty()) {
                 adapter.setList(titleList)
