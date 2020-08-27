@@ -1,16 +1,17 @@
 package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItemChip
 
-class LibStringDiffUtil : DiffUtil.ItemCallback<LibStringItem>() {
+class LibStringDiffUtil : DiffUtil.ItemCallback<LibStringItemChip>() {
 
-    override fun areItemsTheSame(oldItem: LibStringItem, newItem: LibStringItem): Boolean {
-        return oldItem.name == newItem.name
+    override fun areItemsTheSame(oldItem: LibStringItemChip, newItem: LibStringItemChip): Boolean {
+        return oldItem.item.name == newItem.item.name
     }
 
-    override fun areContentsTheSame(oldItem: LibStringItem, newItem: LibStringItem): Boolean {
-        return oldItem.name == newItem.name
-                && oldItem.size == newItem.size
+    override fun areContentsTheSame(oldItem: LibStringItemChip, newItem: LibStringItemChip): Boolean {
+        return oldItem.item.name == newItem.item.name
+                && oldItem.item.size == newItem.item.size
+                && oldItem.chip == newItem.chip
     }
 }

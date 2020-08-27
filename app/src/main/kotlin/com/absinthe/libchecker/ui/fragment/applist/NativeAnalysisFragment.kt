@@ -5,7 +5,7 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
@@ -47,7 +47,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
 
         viewModel.apply {
-            val observer = Observer<List<LibStringItem>> {
+            val observer = Observer<List<LibStringItemChip>> {
                 if (it.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
@@ -63,7 +63,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
 
         fun openLibDetailDialog(position: Int) {
-            val name = adapter.getItem(position).name
+            val name = adapter.getItem(position).item.name
             val regexName = NativeLibMap.findRegex(name)?.regexName
             LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
         }
@@ -76,7 +76,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                 openLibDetailDialog(position)
             }
             setOnItemLongClickListener { _, _, position ->
-                ClipboardUtils.put(requireContext(), getItem(position).name)
+                ClipboardUtils.put(requireContext(), getItem(position).item.name)
                 Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
                 true
             }
@@ -106,11 +106,11 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
     override fun sort() {
         viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
             val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }
                 .toMutableList())
             MODE_SORT_BY_LIB
         } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.size }
+            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }
                 .toMutableList())
             MODE_SORT_BY_SIZE
         }

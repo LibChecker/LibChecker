@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibType
@@ -61,16 +62,17 @@ class ComponentsAnalysisFragment :
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val list = mutableListOf<LibStringItem>()
+                        val list = mutableListOf<LibStringItemChip>()
+                        val map = BaseMap.getMap(adapter.type)
+
                         for (item in componentList) {
-                            list.add(LibStringItem(item))
+                            list.add(LibStringItemChip(LibStringItem(item), map.getChip(item)))
                         }
 
-                        val map = BaseMap.getMap(adapter.type)
                         if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortByDescending { map.contains(it.name) }
+                            list.sortByDescending { it.chip != null }
                         } else {
-                            adapter.data.sortedByDescending { it.name }
+                            adapter.data.sortedByDescending { it.item.name }
                         }
 
                         withContext(Dispatchers.Main) {
@@ -82,7 +84,7 @@ class ComponentsAnalysisFragment :
         }
 
         fun openLibDetailDialog(position: Int) {
-            val name = adapter.getItem(position).name
+            val name = adapter.getItem(position).item.name
             val regexName = BaseMap.getMap(adapter.type).findRegex(name)?.regexName
 
             LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
@@ -96,7 +98,7 @@ class ComponentsAnalysisFragment :
                 openLibDetailDialog(position)
             }
             setOnItemLongClickListener { _, _, position ->
-                ClipboardUtils.put(requireContext(), getItem(position).name)
+                ClipboardUtils.put(requireContext(), getItem(position).item.name)
                 Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
                 true
             }
@@ -131,11 +133,11 @@ class ComponentsAnalysisFragment :
     override fun sort() {
         viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
             val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.name) }
+            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }
                 .toMutableList())
             MODE_SORT_BY_LIB
         } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.name }
+            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.name }
                 .toMutableList())
             MODE_SORT_BY_SIZE
         }

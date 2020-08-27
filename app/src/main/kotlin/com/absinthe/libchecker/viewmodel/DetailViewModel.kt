@@ -12,7 +12,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
-import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
@@ -30,8 +30,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
 
-    val nativeLibItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
-    val dexLibItems: MutableLiveData<List<LibStringItem>> = MutableLiveData()
+    val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
+    val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val componentsMap: HashMap<Int, MutableLiveData<List<String>>> = hashMapOf(
         SERVICE to MutableLiveData(),
         ACTIVITY to MutableLiveData(),
@@ -43,7 +43,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     fun initSoAnalysisData(packageName: String) =
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
-            val list = ArrayList<LibStringItem>()
+            val list = ArrayList<LibStringItemChip>()
 
             try {
                 val info = if (packageName.endsWith("/temp.apk")) {
@@ -75,8 +75,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val list = PackageUtils.getDexList(packageName)
 
+        val chipList = mutableListOf<LibStringItemChip>()
+        list.forEach {
+            chipList.add(LibStringItemChip(it, null))
+        }
+
         withContext(Dispatchers.Main) {
-            dexLibItems.value = list
+            dexLibItems.value = chipList
         }
     }
 
@@ -171,20 +176,22 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItem> {
+    private fun getAbiByNativeDir(sourcePath: String, nativePath: String): List<LibStringItemChip> {
         val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
+        val chipList = mutableListOf<LibStringItemChip>()
 
         if (list.isEmpty()) {
-            return list
+            return chipList
         } else {
+            list.forEach {
+                chipList.add(LibStringItemChip(it, NativeLibMap.getChip(it.name)))
+            }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
-                list.sortByDescending { it.size }
+                chipList.sortByDescending { it.item.size }
             } else {
-                list.sortByDescending {
-                    NativeLibMap.contains(it.name)
-                }
+                chipList.sortByDescending { it.chip != null }
             }
         }
-        return list
+        return chipList
     }
 }
