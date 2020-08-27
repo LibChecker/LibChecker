@@ -319,7 +319,21 @@ object ReceiverLibMap : BaseMap() {
                 R.drawable.ic_lib_evernote,
                 "Android-Job"
             )
-        )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.PushServiceReceiver",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.RegistrationReceiver",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

@@ -97,7 +97,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$roomVersion"
 
     implementation 'androidx.core:core-ktx:1.5.0-alpha02'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha05'
     implementation 'androidx.browser:browser:1.2.0'
@@ -136,5 +136,5 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

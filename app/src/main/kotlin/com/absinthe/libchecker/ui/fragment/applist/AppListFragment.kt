@@ -229,7 +229,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             updateItems(it)
 
             if (!hasRequestChanges) {
-                viewModel.requestChange()
+                viewModel.requestChange(requireActivity().packageManager)
                 hasRequestChanges = true
                 (requireActivity() as MainActivity).hasRequestChanges = true
 

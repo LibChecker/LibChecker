@@ -50,7 +50,7 @@ class MainActivity : BaseActivity() {
                 intent.action == Intent.ACTION_PACKAGE_REMOVED ||
                 intent.action == Intent.ACTION_PACKAGE_REPLACED
             ) {
-                appViewModel.requestChange()
+                appViewModel.requestChange(packageManager)
             }
         }
     }
@@ -83,7 +83,7 @@ class MainActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         if (GlobalValues.shouldRequestChange.value == true && hasRequestChanges) {
-            appViewModel.requestChange()
+            appViewModel.requestChange(packageManager)
         }
     }
 

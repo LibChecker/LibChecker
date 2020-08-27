@@ -76,19 +76,27 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.huawei.hms.activity.BridgeActivity",
-            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core")
         ),
         Pair(
             "com.huawei.android.hms.agent.common.HMSAgentActivity",
-            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core")
         ),
         Pair(
             "com.huawei.android.hms.agent.pay.HMSPayAgentActivity",
-            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core")
         ),
         Pair(
             "com.huawei.android.hms.agent.hwid.HMSSignInAgentActivity",
-            LibChip(R.drawable.ic_lib_huawei, "HMS SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core")
+        ),
+        Pair(
+            "com.huawei.hms.dtm.PreviewActivity",
+            LibChip(R.drawable.ic_lib_huawei, "Huawei DTM")
+        ),
+        Pair(
+            "com.huawei.openalliance.ad.activity.PPSLauncherActivity",
+            LibChip(R.drawable.ic_lib_huawei, "Huawei Ads SDK")
         ),
         Pair(
             "com.alipay.sdk.app.H5PayActivity",
@@ -289,7 +297,15 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.bestpay.app.H5PayActivity",
             LibChip(R.drawable.ic_question, "翼支付")
-        )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.hwproxy.HwNotifyActivity",
+            LibChip(R.drawable.ic_lib_baidu, "百度云推送")
+        ),
+        Pair(
+            "com.baidu.mobads.AppActivity",
+            LibChip(R.drawable.ic_lib_baidu, "移动应用推广 SDK")
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

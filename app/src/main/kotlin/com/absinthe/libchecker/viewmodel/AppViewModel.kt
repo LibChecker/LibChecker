@@ -14,6 +14,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.bean.ERROR
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.*
@@ -189,19 +190,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun requestChange() = viewModelScope.launch(Dispatchers.IO) {
+    fun requestChange(packageManager: PackageManager) = viewModelScope.launch(Dispatchers.IO) {
         logd("Request change START")
-
-        val context: Context = getApplication<LibCheckerApp>()
 
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestChangeImpl(context)
+            requestChangeImpl(packageManager)
         } else {
             try {
-                requestChangeImpl(context)
+                requestChangeImpl(packageManager)
             } catch (e: VerifyError) {
                 e.printStackTrace()
             }
@@ -211,7 +210,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         logd("Request change END, $timeRecorder")
     }
 
-    private suspend fun requestChangeImpl(context: Context) {
+    private suspend fun requestChangeImpl(packageManager: PackageManager) {
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
 
         if (appList.isNullOrEmpty()) {
@@ -242,18 +241,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
-                            lcItem = LCItem(
-                                it.packageName,
-                                it.loadLabel(context.packageManager).toString(),
-                                packageInfo.versionName ?: "null",
-                                versionCode,
-                                packageInfo.firstInstallTime,
-                                packageInfo.lastUpdateTime,
-                                (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort(),
-                                PackageUtils.isSplitsApk(packageInfo),
-                                PackageUtils.isKotlinUsed(packageInfo)
-                            )
+                            var abi: Int
+                            do {
+                                abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
+                                lcItem = LCItem(
+                                    it.packageName,
+                                    it.loadLabel(packageManager).toString(),
+                                    packageInfo.versionName ?: "null",
+                                    versionCode,
+                                    packageInfo.firstInstallTime,
+                                    packageInfo.lastUpdateTime,
+                                    (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                                    abi.toShort(),
+                                    PackageUtils.isSplitsApk(packageInfo),
+                                    PackageUtils.isKotlinUsed(packageInfo)
+                                )
+                            } while (abi == ERROR)
                             update(lcItem)
                         }
 
@@ -273,7 +276,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                     lcItem = LCItem(
                         info.packageName,
-                        info.loadLabel(context.packageManager).toString(),
+                        info.loadLabel(packageManager).toString(),
                         packageInfo.versionName ?: "null",
                         versionCode,
                         packageInfo.firstInstallTime,
@@ -283,6 +286,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         PackageUtils.isSplitsApk(packageInfo),
                         PackageUtils.isKotlinUsed(packageInfo)
                     )
+                    var abi: Int
+                    do {
+                        abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                        lcItem = LCItem(
+                            info.packageName,
+                            info.loadLabel(packageManager).toString(),
+                            packageInfo.versionName ?: "null",
+                            versionCode,
+                            packageInfo.firstInstallTime,
+                            packageInfo.lastUpdateTime,
+                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                            abi.toShort(),
+                            PackageUtils.isSplitsApk(packageInfo),
+                            PackageUtils.isKotlinUsed(packageInfo)
+                        )
+                    } while (abi == ERROR)
 
                     insert(lcItem)
                 } catch (e: Exception) {

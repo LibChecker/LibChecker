@@ -406,6 +406,27 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libMNN.so",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "MNN"
+            )
+        ),
+        Pair(
+            "libMNN_CL.so",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "MNN"
+            )
+        ),
+        Pair(
+            "libMNN_Express.so",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "MNN"
+            )
+        ),
+        Pair(
             "libtencentloc.so",
             LibChip(
                 R.drawable.ic_lib_tencent_map,
@@ -965,6 +986,20 @@ object NativeLibMap : BaseMap() {
                 "Ping++"
             )
         ),
+        Pair(
+            "libagora-rtc-sdk-jni.so",
+            LibChip(
+                R.drawable.ic_lib_webrtc,
+                "WebRTC"
+            )
+        ),
+        Pair(
+            "libUE4.so",
+            LibChip(
+                R.drawable.ic_lib_unreal_engine,
+                "Unreal Engine"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
@@ -987,6 +1022,7 @@ object NativeLibMap : BaseMap() {
             Pattern.matches("libcocklogic-(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_alibaba, "百川 SDK", "regex_ali_baichuan")
             Pattern.matches("libbdpush_V(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_baidu, "百度云推送", "regex_baidu_push")
             Pattern.matches("libjcore(.*)\\.so", name) -> LibChip(R.drawable.ic_lib_jpush, "极光推送", "regex_jpush")
+            Pattern.matches("libtnet-(.*)\\.so", name) -> LibChip(R.drawable.ic_question, "libtnet", "regex_libtnet")
             else -> null
         }
     }

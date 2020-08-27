@@ -161,7 +161,19 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "com.just.agentweb.AgentWebFileProvider",
             LibChip(R.drawable.ic_question, "AgentWeb")
-        )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.PushInfoProvider",
+            LibChip(R.drawable.ic_lib_baidu, "百度云推送")
+        ),
+        Pair(
+            "com.baidu.mobads.openad.FileProvider",
+            LibChip(R.drawable.ic_lib_baidu, "移动应用推广 SDK")
+        ),
+        Pair(
+            "me.jessyan.autosize.InitProvider",
+            LibChip(R.drawable.ic_question, "AndroidAutoSize")
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

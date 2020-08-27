@@ -196,6 +196,20 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.heytap.msp.push.service.CompatibleDataMessageCallbackService",
+            LibChip(
+                R.drawable.ic_lib_oppo,
+                "OPPO Push"
+            )
+        ),
+        Pair(
+            "com.heytap.msp.push.service.DataMessageCallbackService",
+            LibChip(
+                R.drawable.ic_lib_oppo,
+                "OPPO Push"
+            )
+        ),
+        Pair(
             "com.alibaba.sdk.android.push.MsgService",
             LibChip(
                 R.drawable.ic_lib_aliyun,
@@ -284,6 +298,20 @@ object ServiceLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "Mtop SDK"
+            )
+        ),
+        Pair(
+            "com.edge.pcdn.PcdnLiveService",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "PCDN SDK"
+            )
+        ),
+        Pair(
+            "com.edge.pcdn.PcdnVodService",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "PCDN SDK"
             )
         ),
         Pair(
@@ -621,7 +649,43 @@ object ServiceLibMap : BaseMap() {
                 R.drawable.ic_question,
                 "AndPermission"
             )
-        )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.CommandService",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.HmsPushPatchMessageService",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.PushService",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
+        Pair(
+            "com.baidu.android.pushservice.job.PushJobService",
+            LibChip(
+                R.drawable.ic_lib_baidu,
+                "百度云推送"
+            )
+        ),
+        Pair(
+            "com.bytedance.boost_multidex.OptimizeService",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "BoostMultiDex"
+            )
+        ),
+
     )
 
     override fun getMap(): HashMap<String, LibChip> {

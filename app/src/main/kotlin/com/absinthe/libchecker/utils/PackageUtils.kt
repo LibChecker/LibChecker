@@ -72,7 +72,7 @@ object PackageUtils {
         return try {
             val timer = TimeRecorder()
             timer.start()
-            val list = Utils.getApp().packageManager?.getInstalledApplications(0) ?: listOf()
+            val list = Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: listOf()
             timer.end()
             logd("getInstallApplications: $timer")
             list
