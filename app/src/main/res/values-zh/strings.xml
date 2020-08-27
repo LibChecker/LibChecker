@@ -71,4 +71,8 @@
     <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
     <string name="toast_cant_open_app">无法打开此 App</string>
     <string name="toast_package_name_null">包名为空</string>
+    <string name="reload_apps">重载应用列表</string>
+    <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
+    <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
+    <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
 </resources>

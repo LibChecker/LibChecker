@@ -11,6 +11,10 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.insert(item)
     }
 
+    suspend fun insert(list: List<LCItem>) {
+        lcDao.insert(list)
+    }
+
     suspend fun update(item: LCItem) {
         lcDao.update(item)
     }

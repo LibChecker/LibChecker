@@ -10,6 +10,7 @@ object Constants {
     const val PREF_RULES_REPO = "rulesRepository"
     const val PREF_COLORFUL_ICON = "colorfulIcon"
     const val PREF_LIB_REF_THRESHOLD = "libRefThreshold"
+    const val PREF_RELOAD_APPS = "reloadApps"
     const val PREF_ABOUT = "about"
     const val PREF_HELP = "help"
     const val PREF_RATE = "rate"

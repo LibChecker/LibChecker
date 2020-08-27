@@ -8,8 +8,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -20,6 +22,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
+import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import moe.shizuku.preference.ListPreference
@@ -82,6 +85,22 @@ class SettingsFragment : PreferenceFragment() {
         findPreference(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
             setOnPreferenceClickListener {
                 LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
+                true
+            }
+        }
+        findPreference(Constants.PREF_RELOAD_APPS)?.apply {
+            setOnPreferenceClickListener {
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.dialog_title_reload_apps)
+                    .setMessage(R.string.dialog_subtitle_reload_apps)
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        val viewModel by activityViewModels<AppViewModel>()
+                        viewModel.reloadAppsFlag.value = true
+                        Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RELOAD_APPS", "Ok"))
+                    }
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .create()
+                    .show()
                 true
             }
         }

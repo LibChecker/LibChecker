@@ -15,6 +15,9 @@ interface LCDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: LCItem)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(list: List<LCItem>)
+
     @Update
     suspend fun update(item: LCItem)
 

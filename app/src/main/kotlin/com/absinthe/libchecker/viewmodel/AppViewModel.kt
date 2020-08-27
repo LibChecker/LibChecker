@@ -40,6 +40,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val clickBottomItemFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var refreshLock = false
 
     private val repository: LCRepository
@@ -71,6 +72,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         } while (appList == null)
 
+        val lcItems = mutableListOf<LCItem>()
         val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
         var versionCode: Long
@@ -89,6 +91,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 isSystemType =
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
+
                 appItem = AppItem().apply {
                     icon = info.loadIcon(context.packageManager)
                     appName = info.loadLabel(context.packageManager).toString()
@@ -119,12 +122,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
 
-                insert(lcItem)
+                lcItems.add(lcItem)
             } catch (e: Throwable) {
                 e.printStackTrace()
                 continue
             }
         }
+
+        insert(lcItems)
 
         //Sort
         when (GlobalValues.appSortMode.value) {
@@ -138,7 +143,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
-        refreshLock = false
     }
 
     fun addItem() = viewModelScope.launch(Dispatchers.IO) {
@@ -651,6 +655,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.insert(item)
+    }
+
+    private fun insert(list: List<LCItem>) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(list)
     }
 
     private fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {

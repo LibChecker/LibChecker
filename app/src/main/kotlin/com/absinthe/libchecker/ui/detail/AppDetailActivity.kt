@@ -194,16 +194,19 @@ class AppDetailActivity : BaseActivity() {
             getText(R.string.ref_category_dex)
         )
 
-        binding.viewpager.adapter = object : FragmentStateAdapter(this) {
-            override fun getItemCount(): Int {
-                return types.size
-            }
+        binding.viewpager.apply {
+            offscreenPageLimit = 2
+            adapter = object : FragmentStateAdapter(this@AppDetailActivity) {
+                override fun getItemCount(): Int {
+                    return types.size
+                }
 
-            override fun createFragment(position: Int): Fragment {
-                return when (position) {
-                    types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
-                    types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
-                    else -> ComponentsAnalysisFragment.newInstance(types[position])
+                override fun createFragment(position: Int): Fragment {
+                    return when (position) {
+                        types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
+                        types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
+                        else -> ComponentsAnalysisFragment.newInstance(types[position])
+                    }
                 }
             }
         }

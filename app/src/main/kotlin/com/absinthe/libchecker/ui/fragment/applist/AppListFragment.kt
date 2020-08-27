@@ -214,13 +214,21 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             })
 
             if (isFirstLaunch) {
-                refreshLock = true
                 initItems()
             }
 
             clickBottomItemFlag.observe(viewLifecycleOwner, {
                 if (it) {
                     returnTopOfList()
+                }
+            })
+            reloadAppsFlag.observe(viewLifecycleOwner, {
+                if (it) {
+                    binding.tvFirstTip.isVisible = true
+                    if (binding.vfContainer.displayedChild == 1) {
+                        binding.vfContainer.displayedChild = 0
+                    }
+                    initItems()
                 }
             })
         }

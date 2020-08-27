@@ -70,31 +70,32 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
-                            it.packageName,//Package name
-                            info.loadLabel(context.packageManager).toString(),//App name
-                            it.versionName ?: "null",//Version name
-                            PackageUtils.getVersionCode(it),//Version code
-                            it.firstInstallTime,//Install time
-                            it.lastUpdateTime,// Update time
-                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
-                            PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                                .toShort(),//Abi type
-                            info.targetSdkVersion.toShort(),//Target API
-                            gson.toJson(
+                            packageName = it.packageName,
+                            timeStamp = 0,  //Todo
+                            label = info.loadLabel(context.packageManager).toString(),
+                            versionName = it.versionName ?: "null",
+                            versionCode = PackageUtils.getVersionCode(it),
+                            installedTime = it.firstInstallTime,
+                            lastUpdatedTime = it.lastUpdateTime,
+                            isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                            abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                            targetApi = info.targetSdkVersion.toShort(),
+                            nativeLibs = gson.toJson(
                                 PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
-                            ),//Native libs
-                            gson.toJson(
+                            ),
+                            services = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, SERVICE, false)
                             ),
-                            gson.toJson(
+                            activities = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
                             ),
-                            gson.toJson(
+                            receivers = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, RECEIVER, false)
                             ),
-                            gson.toJson(
+                            providers = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, PROVIDER, false)
-                            )
+                            ),
+                            permissions = ""    //Todo
                         )
                     )
                 }
@@ -110,31 +111,32 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
-                            it.packageName,//Package name
-                            info.loadLabel(context.packageManager).toString(),//App name
-                            it.versionName ?: "null",//Version name
-                            PackageUtils.getVersionCode(it),//Version code
-                            it.firstInstallTime,//Install time
-                            it.lastUpdateTime,// Update time
-                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,//Is system app
-                            PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                                .toShort(),//Abi type
-                            info.targetSdkVersion.toShort(),//Target API
-                            gson.toJson(
+                            packageName = it.packageName,
+                            timeStamp = 0,  //Todo
+                            label = info.loadLabel(context.packageManager).toString(),
+                            versionName = it.versionName ?: "null",
+                            versionCode = PackageUtils.getVersionCode(it),
+                            installedTime = it.firstInstallTime,
+                            lastUpdatedTime = it.lastUpdateTime,
+                            isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                            abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                            targetApi = info.targetSdkVersion.toShort(),
+                            nativeLibs = gson.toJson(
                                 PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
-                            ),//Native libs
-                            gson.toJson(
+                            ),
+                            services = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, SERVICE, false)
                             ),
-                            gson.toJson(
+                            activities = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
                             ),
-                            gson.toJson(
+                            receivers = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, RECEIVER, false)
                             ),
-                            gson.toJson(
+                            providers = gson.toJson(
                                 PackageUtils.getComponentList(it.packageName, PROVIDER, false)
-                            )
+                            ),
+                            permissions = ""    //Todo
                         )
                     )
                 }

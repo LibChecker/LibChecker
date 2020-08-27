@@ -51,6 +51,12 @@
             app:summary="@string/lib_ref_threshold_summary"
             app:icon="@drawable/ic_threshold"/>
 
+        <Preference
+            app:key="reloadApps"
+            app:title="@string/reload_apps"
+            app:summary="@string/reload_apps_summary"
+            app:icon="@drawable/ic_refresh"/>
+
     </moe.shizuku.preference.PreferenceCategory>
 
     <moe.shizuku.preference.PreferenceCategory

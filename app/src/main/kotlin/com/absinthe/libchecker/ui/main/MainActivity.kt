@@ -54,6 +54,7 @@ class MainActivity : BaseActivity() {
             }
         }
     }
+    private val viewModel by viewModels<AppViewModel>()
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -72,6 +73,7 @@ class MainActivity : BaseActivity() {
         registerPackageBroadcast()
         handleIntentFromShortcuts(intent)
         initAllApplicationInfoItems()
+        initObserver()
         initMap()
     }
 
@@ -215,6 +217,14 @@ class MainActivity : BaseActivity() {
                 AppItemRepository.allApplicationInfoItems.value = appList
             }
         }
+    }
+
+    private fun initObserver() {
+        viewModel.reloadAppsFlag.observe(this, {
+            if (it) {
+                binding.viewpager.setCurrentItem(0, true)
+            }
+        })
     }
 
     private fun initMap() = lifecycleScope.launch(Dispatchers.IO) {

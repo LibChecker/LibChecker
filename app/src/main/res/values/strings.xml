@@ -59,6 +59,7 @@
     <string name="colorful_icon">Colorful Icon</string>
     <string name="rules_repo_title">Rules Repo</string>
     <string name="lib_ref_threshold">Library Reference Threshold</string>
+    <string name="reload_apps">Reload Apps List</string>
     <string name="help_docs">Help Docs</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
@@ -66,6 +67,7 @@
     <string name="apk_analytics_summary">Open the detail page when click an APK file</string>
     <string name="colorful_icon_summary">Part of the marked libraries will appear as a colored logo</string>
     <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
+    <string name="reload_apps_summary">Have a try when apps list is shown abnormally</string>
     <string name="help_docs_summary">Learn how to use LibChecker</string>
 
     <!--  Detail  -->
@@ -94,4 +96,8 @@
     <string name="snapshot_empty_list_title">No Changes</string>
     <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
+
+    <!--  Dialog  -->
+    <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
+    <string name="dialog_subtitle_reload_apps">This may take a few seconds</string>
 </resources>
