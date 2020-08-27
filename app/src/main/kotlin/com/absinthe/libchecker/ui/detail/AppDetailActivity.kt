@@ -179,41 +179,41 @@ class AppDetailActivity : BaseActivity() {
                     Sortable.currentReference?.get()?.sort()
                 }
             }
-            viewModel.initComponentsData(packageName)
-        } ?: supportFinishAfterTransition()
 
-        val types = listOf(
-            NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
-        )
-        val tabTitles = listOf(
-            getText(R.string.ref_category_native),
-            getText(R.string.ref_category_service),
-            getText(R.string.ref_category_activity),
-            getText(R.string.ref_category_br),
-            getText(R.string.ref_category_cp),
-            getText(R.string.ref_category_dex)
-        )
+            val types = listOf(
+                NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
+            )
+            val tabTitles = listOf(
+                getText(R.string.ref_category_native),
+                getText(R.string.ref_category_service),
+                getText(R.string.ref_category_activity),
+                getText(R.string.ref_category_br),
+                getText(R.string.ref_category_cp),
+                getText(R.string.ref_category_dex)
+            )
 
-        binding.viewpager.apply {
-            offscreenPageLimit = 2
-            adapter = object : FragmentStateAdapter(this@AppDetailActivity) {
-                override fun getItemCount(): Int {
-                    return types.size
-                }
+            binding.viewpager.apply {
+                adapter = object : FragmentStateAdapter(this@AppDetailActivity) {
+                    override fun getItemCount(): Int {
+                        return types.size
+                    }
 
-                override fun createFragment(position: Int): Fragment {
-                    return when (position) {
-                        types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
-                        types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
-                        else -> ComponentsAnalysisFragment.newInstance(types[position])
+                    override fun createFragment(position: Int): Fragment {
+                        return when (position) {
+                            types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
+                            types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
+                            else -> ComponentsAnalysisFragment.newInstance(types[position])
+                        }
                     }
                 }
             }
-        }
 
-        val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
-            tab.text = tabTitles[position]
-        }
-        mediator.attach()
+            val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
+                tab.text = tabTitles[position]
+            }
+            mediator.attach()
+
+            viewModel.initComponentsData(packageName)
+        } ?: supportFinishAfterTransition()
     }
 }

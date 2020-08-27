@@ -40,37 +40,36 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     )
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
-    fun initSoAnalysisData(packageName: String) =
-        viewModelScope.launch(Dispatchers.IO) {
-            val context: Context = getApplication<LibCheckerApp>()
-            val list = ArrayList<LibStringItemChip>()
+    fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+        val context: Context = getApplication<LibCheckerApp>()
+        val list = ArrayList<LibStringItemChip>()
 
-            try {
-                val info = if (packageName.endsWith("/temp.apk")) {
-                    context.packageManager.getPackageArchiveInfo(
-                        packageName,
-                        0
-                    )?.applicationInfo?.apply {
-                        sourceDir = packageName
-                        publicSourceDir = packageName
-                    }
-                } else {
-                    context.packageManager.getApplicationInfo(packageName, 0)
+        try {
+            val info = if (packageName.endsWith("/temp.apk")) {
+                context.packageManager.getPackageArchiveInfo(
+                    packageName,
+                    0
+                )?.applicationInfo?.apply {
+                    sourceDir = packageName
+                    publicSourceDir = packageName
                 }
-
-                info?.let {
-                    list.addAll(
-                        getAbiByNativeDir(info.sourceDir, info.nativeLibraryDir ?: "")
-                    )
-                }
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
+            } else {
+                context.packageManager.getApplicationInfo(packageName, 0)
             }
 
-            withContext(Dispatchers.Main) {
-                nativeLibItems.value = list
+            info?.let {
+                list.addAll(
+                    getAbiByNativeDir(info.sourceDir, info.nativeLibraryDir ?: "")
+                )
             }
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
         }
+
+        withContext(Dispatchers.Main) {
+            nativeLibItems.value = list
+        }
+    }
 
     fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val list = PackageUtils.getDexList(packageName)
