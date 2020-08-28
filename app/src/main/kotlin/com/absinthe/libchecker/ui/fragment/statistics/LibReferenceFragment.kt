@@ -16,6 +16,7 @@ import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
@@ -24,8 +25,9 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.lang.ref.WeakReference
 
-class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
+class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener, IListController {
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val adapter = LibReferenceAdapter()
@@ -79,15 +81,6 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                 isListReady = true
                 menu?.findItem(R.id.search)?.isVisible = true
             })
-            clickBottomItemFlag.observe(viewLifecycleOwner, {
-                if (it) {
-                    binding.rvList.apply {
-                        if (canScrollVertically(-1)) {
-                            smoothScrollToPosition(0)
-                        }
-                    }
-                }
-            })
         }
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
             computeRef()
@@ -104,6 +97,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     override fun onResume() {
         super.onResume()
+        IListController.controller = WeakReference(this)
         setHasOptionsMenu(true)
     }
 
@@ -183,5 +177,13 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             adapter.setDiffNewData(filter.toMutableList())
         }
         return false
+    }
+
+    override fun onReturnTop() {
+        binding.rvList.apply {
+            if (canScrollVertically(-1)) {
+                smoothScrollToPosition(0)
+            }
+        }
     }
 }

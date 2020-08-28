@@ -31,8 +31,9 @@ import moe.shizuku.preference.SwitchPreference
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
 import rikka.recyclerview.fixEdgeEffect
+import java.lang.ref.WeakReference
 
-class SettingsFragment : PreferenceFragment() {
+class SettingsFragment : PreferenceFragment(), IListController {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -139,6 +140,11 @@ class SettingsFragment : PreferenceFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        IListController.controller = WeakReference(this)
+    }
+
     override fun onCreateItemDecoration(): DividerDecoration? {
         return CategoryDivideDividerDecoration()
     }
@@ -156,5 +162,9 @@ class SettingsFragment : PreferenceFragment() {
 
         recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
         return recyclerView
+    }
+
+    override fun onReturnTop() {
+
     }
 }

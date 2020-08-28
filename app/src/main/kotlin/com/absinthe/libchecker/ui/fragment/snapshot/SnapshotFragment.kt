@@ -25,6 +25,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -33,13 +34,14 @@ import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.widget.BorderView
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
+class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot), IListController {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
     private val adapter = SnapshotAdapter()
@@ -175,6 +177,11 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        IListController.controller = WeakReference(this)
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.recyclerview.layoutManager = getSuitableLayoutManager()
@@ -211,6 +218,14 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 StaggeredGridLayoutManager.VERTICAL
             )
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
+        }
+    }
+
+    override fun onReturnTop() {
+        binding.recyclerview.apply {
+            if (canScrollVertically(-1)) {
+                smoothScrollToPosition(0)
+            }
         }
     }
 }

@@ -17,10 +17,12 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.extensions.setCurrentItem
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -31,6 +33,7 @@ import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,21 +43,12 @@ const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity() {
 
-    var hasRequestChanges = false
     private lateinit var binding: ActivityMainBinding
+
     private var clickBottomItemFlag = false
+    private var isDatabaseFinishInit = false
+
     private val appViewModel by viewModels<AppViewModel>()
-    private val requestPackageReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == Intent.ACTION_PACKAGE_ADDED ||
-                intent.action == Intent.ACTION_PACKAGE_REMOVED ||
-                intent.action == Intent.ACTION_PACKAGE_REPLACED
-            ) {
-                appViewModel.requestChange(packageManager)
-            }
-        }
-    }
-    private val viewModel by viewModels<AppViewModel>()
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -70,7 +64,6 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
-        registerPackageBroadcast()
         handleIntentFromShortcuts(intent)
         initAllApplicationInfoItems()
         initObserver()
@@ -84,9 +77,15 @@ class MainActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (GlobalValues.shouldRequestChange.value == true && hasRequestChanges) {
+        registerPackageBroadcast()
+        if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(packageManager)
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterPackageBroadcast()
     }
 
     override fun onDestroy() {
@@ -135,44 +134,39 @@ class MainActivity : BaseActivity() {
 
             // 当 ViewPager 切换页面时，改变 ViewPager 的显示
             navView.setOnNavigationItemSelectedListener {
+
+                fun performClickNavigationItem(index: Int) {
+                    if (binding.viewpager.currentItem != index) {
+                        binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
+                    } else {
+                        if (!clickBottomItemFlag) {
+                            clickBottomItemFlag = true
+
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                delay(200)
+                                clickBottomItemFlag = false
+                            }
+                        } else {
+                            IListController.controller?.get()?.onReturnTop()
+                        }
+                    }
+                }
+
                 when (it.itemId) {
-                    R.id.navigation_app_list -> {
-                        if (binding.viewpager.currentItem != 0) {
-                            binding.viewpager.setCurrentItem(0, PAGE_TRANSFORM_DURATION)
-                        } else {
-                            if (!clickBottomItemFlag) {
-                                clickBottomItemFlag = true
-
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    delay(200)
-                                    clickBottomItemFlag = false
-                                }
-                            } else {
-                                appViewModel.clickBottomItemFlag.value = true
-                            }
-                        }
-                    }
-                    R.id.navigation_classify -> {
-                        if (binding.viewpager.currentItem != 1) {
-                            binding.viewpager.setCurrentItem(1, PAGE_TRANSFORM_DURATION)
-                        } else {
-                            if (!clickBottomItemFlag) {
-                                clickBottomItemFlag = true
-
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    delay(200)
-                                    clickBottomItemFlag = false
-                                }
-                            } else {
-                                appViewModel.clickBottomItemFlag.value = true
-                            }
-                        }
-                    }
-                    R.id.navigation_snapshot -> binding.viewpager.setCurrentItem(2, PAGE_TRANSFORM_DURATION)
-                    R.id.navigation_settings -> binding.viewpager.setCurrentItem(3, PAGE_TRANSFORM_DURATION)
+                    R.id.navigation_app_list -> performClickNavigationItem(0)
+                    R.id.navigation_classify -> performClickNavigationItem(1)
+                    R.id.navigation_snapshot -> performClickNavigationItem(2)
+                    R.id.navigation_settings -> performClickNavigationItem(3)
                 }
                 true
             }
+        }
+    }
+
+    private val requestPackageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            appViewModel.isRequestingChange = true
+            appViewModel.requestChange(packageManager)
         }
     }
 
@@ -220,11 +214,27 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initObserver() {
-        viewModel.reloadAppsFlag.observe(this, {
-            if (it) {
-                binding.viewpager.setCurrentItem(0, true)
+        appViewModel.apply {
+            dbItems.observe(this@MainActivity, {
+                if (it.isNotEmpty()) {
+                    isDatabaseFinishInit = true
+                    if (!refreshLock) {
+                        refreshLock = true
+                        addItem()
+                    }
+                }
+            })
+
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
+                initItems()
             }
-        })
+
+            reloadAppsFlag.observe(this@MainActivity, {
+                if (it) {
+                    binding.viewpager.setCurrentItem(0, true)
+                }
+            })
+        }
     }
 
     private fun initMap() = lifecycleScope.launch(Dispatchers.IO) {

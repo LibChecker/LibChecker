@@ -35,6 +35,7 @@ import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
@@ -47,9 +48,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
+import java.lang.ref.WeakReference
 
-class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
-    SearchView.OnQueryTextListener {
+class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener, IListController {
 
     private val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private val viewModel by activityViewModels<AppViewModel>()
@@ -116,6 +117,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     override fun onResume() {
         super.onResume()
+        IListController.controller = WeakReference(this)
         if (AppItemRepository.shouldRefreshAppList) {
             AppItemRepository.allDatabaseItems.value?.let {
                 updateItems(it)
@@ -204,24 +206,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     private fun initObserver() {
         viewModel.apply {
-            dbItems.observe(viewLifecycleOwner, {
-                if (it.isNotEmpty()) {
-                    if (!refreshLock) {
-                        refreshLock = true
-                        addItem()
-                    }
-                }
-            })
-
-            if (isFirstLaunch) {
-                initItems()
-            }
-
-            clickBottomItemFlag.observe(viewLifecycleOwner, {
-                if (it) {
-                    returnTopOfList()
-                }
-            })
             reloadAppsFlag.observe(viewLifecycleOwner, {
                 if (it) {
                     binding.tvFirstTip.isVisible = true
@@ -239,7 +223,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             if (!hasRequestChanges) {
                 viewModel.requestChange(requireActivity().packageManager)
                 hasRequestChanges = true
-                (requireActivity() as MainActivity).hasRequestChanges = true
 
                 if (isFirstLaunch) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
@@ -315,5 +298,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             )
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
+    }
+
+    override fun onReturnTop() {
+        returnTopOfList()
     }
 }
