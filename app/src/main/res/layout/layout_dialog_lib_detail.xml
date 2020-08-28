@@ -152,7 +152,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:textAppearance="?attr/textAppearanceBody2"
-                        android:textColor="@color/textSecondary"
+                        android:textColor="?attr/colorControlNormal"
                         tools:text="An app which can look at the CPU architecture of apps in your device." />
 
                 </LinearLayout>

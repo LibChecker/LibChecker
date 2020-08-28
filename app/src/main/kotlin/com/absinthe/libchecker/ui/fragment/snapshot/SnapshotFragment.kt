@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,6 +80,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     )
                     true
                 }
+                isVisible = false
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter

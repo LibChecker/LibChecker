@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@null"
+    android:clickable="true"
     android:clipToPadding="false"
+    android:focusable="true"
     android:minHeight="40dp"
     android:paddingVertical="3dp">
 

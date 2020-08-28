@@ -118,10 +118,13 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     override fun onResume() {
         super.onResume()
         IListController.controller = WeakReference(this)
-        if (AppItemRepository.shouldRefreshAppList) {
-            AppItemRepository.allDatabaseItems.value?.let {
-                updateItems(it)
-                AppItemRepository.shouldRefreshAppList = false
+
+        if (!isFirstLaunch) {
+            if (AppItemRepository.shouldRefreshAppList) {
+                AppItemRepository.allDatabaseItems.value?.let {
+                    updateItems(it)
+                    AppItemRepository.shouldRefreshAppList = false
+                }
             }
         }
     }
@@ -233,21 +236,32 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, {
-                viewModel.addItem()
+                if (isListReady) {
+                    viewModel.addItem()
+                }
             })
             appSortMode.observe(viewLifecycleOwner, { mode ->
-                AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
-                    val list = allDatabaseItems.toMutableList()
+                if (isListReady) {
+                    AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
+                        val list = allDatabaseItems.toMutableList()
 
-                    when (mode) {
-                        Constants.SORT_MODE_DEFAULT -> list.sortWith(
-                            compareBy(
-                                { it.abi },
-                                { it.appName })
-                        )
-                        Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
+                        when (mode) {
+                            Constants.SORT_MODE_DEFAULT -> list.sortWith(
+                                compareBy(
+                                    { it.abi },
+                                    { it.appName })
+                            )
+                            Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
+                        }
+                        updateItems(list)
                     }
-                    updateItems(list)
+                }
+            })
+            shouldRequestChange.observe(viewLifecycleOwner, {
+                if (!it) {
+                    if (binding.vfContainer.displayedChild == 0) {
+                        binding.vfContainer.displayedChild = 1
+                    }
                 }
             })
         }
@@ -292,15 +306,19 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
         return when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
-                2,
-                StaggeredGridLayoutManager.VERTICAL
-            )
+            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
     }
 
     override fun onReturnTop() {
-        returnTopOfList()
+        if (binding.recyclerview.canScrollVertically(-1)) {
+            returnTopOfList()
+        } else {
+            if (binding.vfContainer.displayedChild == 1) {
+                binding.vfContainer.displayedChild = 0
+            }
+            viewModel.requestChange(requireActivity().packageManager)
+        }
     }
 }

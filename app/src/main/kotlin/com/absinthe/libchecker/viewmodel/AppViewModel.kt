@@ -18,7 +18,9 @@ import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.bean.ERROR
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
@@ -231,7 +233,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-            collectPopularLibraries(appList)
+            collectPopularLibraries(appList.toList())
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }
 
@@ -373,7 +375,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 PROVIDER,
                 "Provider"
             )
-        } catch (ignore: Exception) {}
+        } catch (ignore: Exception) {
+
+        }
     }
 
     private fun collectComponentPopularLibraries(
@@ -400,8 +404,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         val libMap = BaseMap.getMap(type)
         for (entry in map) {
-            if (entry.value > 3 && !libMap.getMap()
-                    .containsKey(entry.key) && libMap.findRegex(entry.key) == null
+            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null
             ) {
                 val properties: MutableMap<String, String> = java.util.HashMap()
                 properties["Library name"] = entry.key
