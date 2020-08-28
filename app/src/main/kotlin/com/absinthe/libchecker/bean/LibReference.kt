@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.bean
 
 import com.absinthe.libchecker.constant.LibChip
-import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.annotation.LibType
 
 data class LibReference(
     val libName: String,

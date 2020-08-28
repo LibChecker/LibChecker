@@ -10,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.database.AppItemRepository

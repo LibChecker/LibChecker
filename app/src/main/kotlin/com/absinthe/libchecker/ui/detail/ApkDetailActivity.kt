@@ -12,8 +12,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard

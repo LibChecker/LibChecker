@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest

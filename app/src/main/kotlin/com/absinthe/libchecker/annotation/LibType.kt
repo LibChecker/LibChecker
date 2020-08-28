@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.constant
+package com.absinthe.libchecker.annotation
 
 import androidx.annotation.IntDef
 
@@ -18,6 +18,6 @@ const val DEX = 5
 const val PERMISSION = 6
 
 @IntDef(ALL, NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX, PERMISSION)
-@Target(AnnotationTarget.VALUE_PARAMETER)
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FIELD, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 annotation class LibType

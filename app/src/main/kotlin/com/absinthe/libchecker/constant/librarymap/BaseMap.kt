@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.constant.librarymap
 
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.*
 
 abstract class BaseMap {

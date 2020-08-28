@@ -15,10 +15,10 @@
             android:gravity="center">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottie"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 app:lottie_autoPlay="true"
-                app:lottie_fileName="lib_reference_loading.json"
                 app:lottie_loop="true" />
 
         </LinearLayout>

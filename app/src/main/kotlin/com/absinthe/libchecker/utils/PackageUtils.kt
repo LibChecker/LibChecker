@@ -7,8 +7,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder

@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.NATIVE
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.*

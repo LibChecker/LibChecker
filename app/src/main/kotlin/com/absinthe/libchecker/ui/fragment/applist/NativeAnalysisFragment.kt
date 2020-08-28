@@ -5,6 +5,9 @@ import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.BaseMap

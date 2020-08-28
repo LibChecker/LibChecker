@@ -10,8 +10,8 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibType
-import com.absinthe.libchecker.constant.SERVICE
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding

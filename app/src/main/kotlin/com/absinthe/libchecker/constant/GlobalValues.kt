@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.AppUtils
 import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -48,4 +49,6 @@ object GlobalValues {
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
     val libReferenceThreshold: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
+
+    val season = AppUtils.getCurrentSeason()
 }

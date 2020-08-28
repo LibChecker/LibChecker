@@ -88,11 +88,6 @@ class MainActivity : BaseActivity() {
         unregisterPackageBroadcast()
     }
 
-    override fun onDestroy() {
-        unregisterPackageBroadcast()
-        super.onDestroy()
-    }
-
     override fun onBackPressed() {
         super.onBackPressed()
         finish()

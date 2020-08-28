@@ -16,6 +16,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository

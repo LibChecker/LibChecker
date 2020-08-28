@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.*

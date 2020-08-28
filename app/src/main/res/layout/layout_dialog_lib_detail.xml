@@ -197,7 +197,7 @@
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 app:lottie_autoPlay="true"
-                app:lottie_fileName="lib_detail_progress_bar.json"
+                app:lottie_fileName="lib_detail_rocket.json"
                 app:lottie_loop="true" />
 
         </LinearLayout>

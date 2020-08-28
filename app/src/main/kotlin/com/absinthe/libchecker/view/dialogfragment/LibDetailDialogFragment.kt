@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.constant.LibType
-import com.absinthe.libchecker.constant.NATIVE
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.view.detail.LibDetailView
 import com.absinthe.libchecker.viewmodel.DetailViewModel

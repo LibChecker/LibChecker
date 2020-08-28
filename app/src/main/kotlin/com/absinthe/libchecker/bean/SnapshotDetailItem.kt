@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.bean
 
-import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.annotation.LibType
 
 const val ADDED = 0
 const val REMOVED = 1

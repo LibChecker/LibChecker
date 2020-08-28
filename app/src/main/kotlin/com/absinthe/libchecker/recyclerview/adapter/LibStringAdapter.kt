@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.DEX
+import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibType
+import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter

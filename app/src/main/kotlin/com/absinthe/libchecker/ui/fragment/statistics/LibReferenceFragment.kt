@@ -9,6 +9,7 @@ import android.view.View
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.*
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
@@ -44,6 +45,19 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
+            }
+            lottie.apply {
+                imageAssetsFolder = "/"
+
+                val assetName = when(GlobalValues.season) {
+                    SPRING -> "lib_reference_spring.json"
+                    SUMMER -> "lib_reference_summer.json"
+                    AUTUMN -> "lib_reference_autumn.json"
+                    WINTER -> "lib_reference_winter.json"
+                    else -> "lib_reference_summer.json"
+                }
+
+                setAnimation(assetName)
             }
         }
 
