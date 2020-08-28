@@ -28,6 +28,7 @@ abstract class BaseMap {
                 RECEIVER -> ReceiverLibMap
                 PROVIDER -> ProviderLibMap
                 DEX -> DexLibMap
+                PERMISSION -> DexLibMap
                 else -> throw IllegalArgumentException("Illegal LibType.")
             }
         }

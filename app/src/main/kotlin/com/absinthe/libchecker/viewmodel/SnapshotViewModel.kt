@@ -342,8 +342,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         for (item in sameList) {
-            tempOldList.removeAll(sameList)
-            tempNewList.removeAll(sameList)
+            tempOldList.remove(tempOldList.find { it.name == item.name })
+            tempNewList.remove(tempNewList.find { it.name == item.name })
         }
 
         for (item in tempOldList) {
