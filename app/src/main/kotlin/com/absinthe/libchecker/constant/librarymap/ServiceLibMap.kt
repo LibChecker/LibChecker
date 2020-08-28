@@ -685,7 +685,13 @@ object ServiceLibMap : BaseMap() {
                 "BoostMultiDex"
             )
         ),
-
+        Pair(
+            "com.ksad.download.service.DownloadService",
+            LibChip(
+                R.drawable.ic_lib_kuaishou,
+                "快手广告 SDK"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
