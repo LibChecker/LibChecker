@@ -11,8 +11,8 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.*
@@ -119,6 +119,19 @@ class LibReferenceActivity : BaseActivity() {
                     this@LibReferenceActivity,
                     R.anim.anim_fade_out
                 )
+            }
+            lottie.apply {
+                imageAssetsFolder = "/"
+
+                val assetName = when(GlobalValues.season) {
+                    SPRING -> "lib_reference_spring.json"
+                    SUMMER -> "lib_reference_summer.json"
+                    AUTUMN -> "lib_reference_autumn.json"
+                    WINTER -> "lib_reference_winter.json"
+                    else -> "lib_reference_summer.json"
+                }
+
+                setAnimation(assetName)
             }
         }
 
