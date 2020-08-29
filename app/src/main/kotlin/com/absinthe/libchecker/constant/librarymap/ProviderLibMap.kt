@@ -84,7 +84,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.bytedance.sdk.openadsdk.multipro.TTMultiProvider",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+            LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK")
         ),
         Pair(
             "cn.jpush.android.service.DataProvider",
@@ -120,7 +120,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.bytedance.sdk.openadsdk.TTFileProvider",
-            LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK")
+            LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK")
         ),
         Pair(
             "com.liulishuo.okdownload.OkDownloadProvider",

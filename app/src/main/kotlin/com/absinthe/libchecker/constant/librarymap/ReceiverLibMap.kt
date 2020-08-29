@@ -197,8 +197,15 @@ object ReceiverLibMap : BaseMap() {
         Pair(
             "com.ss.android.downloadlib.core.download.DownloadReceiver",
             LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
+            )
+        ),
+        Pair(
+            "com.bytedance.embedapplog.collector.Collector",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
             )
         ),
         Pair(
@@ -332,6 +339,13 @@ object ReceiverLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_baidu,
                 "百度云推送"
+            )
+        ),
+        Pair(
+            "com.ksad.download.DownloadReceiver",
+            LibChip(
+                R.drawable.ic_lib_kuaishou,
+                "快手广告 SDK"
             )
         ),
     )

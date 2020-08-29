@@ -891,15 +891,29 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libnms.so",
             LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
             )
         ),
         Pair(
             "libtobEmbedEncrypt.so",
             LibChip(
-                R.drawable.ic_lib_toutiao,
-                "头条广告 SDK"
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
+            )
+        ),
+        Pair(
+            "libbuffer_pg.so",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
+            )
+        ),
+        Pair(
+            "libfile_lock_pg.so",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
             )
         ),
         Pair(

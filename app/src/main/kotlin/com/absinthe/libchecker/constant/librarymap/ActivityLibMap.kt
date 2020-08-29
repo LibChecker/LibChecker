@@ -319,9 +319,9 @@ object ActivityLibMap : BaseMap() {
     override fun findRegex(name: String): LibChip? {
         return when {
             Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker", "regex_tinker")
-            Pattern.matches("com.bytedance.sdk.openadsdk.activity.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
-            Pattern.matches("com.ss.android.socialbase.appdownloader.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
-            Pattern.matches("com.ss.android.downloadlib.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            Pattern.matches("com.bytedance.sdk.openadsdk.activity.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
+            Pattern.matches("com.ss.android.socialbase.appdownloader.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
+            Pattern.matches("com.ss.android.downloadlib.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
             Pattern.matches("com.yxcorp.gifshow.ad(.*)", name) -> LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK", "regex_kuaishou_ad")
             Pattern.matches("com.yxcorp.map.advertisement.(.*)", name) -> LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK", "regex_kuaishou_ad")
             else -> null

@@ -692,6 +692,13 @@ object ServiceLibMap : BaseMap() {
                 "快手广告 SDK"
             )
         ),
+        Pair(
+            "com.bytedance.tea.crash.upload.CrashUploadService",
+            LibChip(
+                R.drawable.ic_lib_bytedance,
+                "Pangle SDK"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
@@ -701,8 +708,8 @@ object ServiceLibMap : BaseMap() {
     override fun findRegex(name: String): LibChip? {
         return when {
             Pattern.matches("com.qihoo360.replugin.component.service.server.PluginPitService(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
-            Pattern.matches("com.ss.android.socialbase.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
-            Pattern.matches("com.bytedance.sdk.openadsdk.(.*)", name) -> LibChip(R.drawable.ic_lib_toutiao, "头条广告 SDK", "regex_toutiao_ad")
+            Pattern.matches("com.ss.android.socialbase.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
+            Pattern.matches("com.bytedance.sdk.openadsdk.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
             else -> null
         }
     }
