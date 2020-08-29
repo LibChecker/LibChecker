@@ -76,4 +76,6 @@
     <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
     <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
     <string name="ref_category_perm">权限</string>
+    <string name="join_telegram_group">划水</string>
+    <string name="join_telegram_group_summary">来一起划水</string>
 </resources>

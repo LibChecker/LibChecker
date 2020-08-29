@@ -138,6 +138,14 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
+        findPreference("tg")?.apply {
+            setOnPreferenceClickListener {
+                startActivity(Intent(Intent.ACTION_VIEW, "https://t.me/libcheckerr".toUri()).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+                true
+            }
+        }
     }
 
     override fun onResume() {
