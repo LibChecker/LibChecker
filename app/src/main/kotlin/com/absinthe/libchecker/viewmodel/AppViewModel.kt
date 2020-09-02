@@ -232,11 +232,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } while (appList == null)
         }
 
-        if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-            collectPopularLibraries(appList.toList())
-            Once.markDone(OnceTag.HAS_COLLECT_LIB)
-        }
-
         dbItems.value?.let { value ->
             var packageInfo: PackageInfo
             var versionCode: Long
@@ -324,6 +319,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             GlobalScope.launch(Dispatchers.Main) {
                 GlobalValues.shouldRequestChange.value = true
             }
+        }
+
+        if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+            collectPopularLibraries(appList.toList())
+            Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }
     }
 
