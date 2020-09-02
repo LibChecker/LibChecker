@@ -122,7 +122,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         super.onResume()
         IListController.controller = WeakReference(this)
 
-        if (!isFirstLaunch) {
+        if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
                 AppItemRepository.allDatabaseItems.value?.let {
                     updateItems(it)
