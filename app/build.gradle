@@ -107,7 +107,7 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4'
     implementation 'com.drakeet.about:about:2.4.1'
     implementation 'com.drakeet.multitype:multitype:4.2.0'
-    implementation 'com.airbnb.android:lottie:3.4.1'
+    implementation 'com.airbnb.android:lottie:3.4.2'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.blankj:utilcodex:1.29.0'
     implementation 'com.jonathanfinerty.once:once:1.3.0'
@@ -116,7 +116,7 @@ dependencies {
 
     implementation "rikka.appcompat:appcompat:1.2.0-rc01"
     implementation "rikka.core:core:1.2.3"
-    implementation "rikka.material:material:1.4.1"
+    implementation "rikka.material:material:1.4.3"
     implementation "rikka.recyclerview:recyclerview-utils:1.1.0"
 
     def rikkaPreference = '4.2.0-alpha03'
@@ -135,6 +135,6 @@ dependencies {
 
     testImplementation 'junit:junit:4.13'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

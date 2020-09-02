@@ -404,8 +404,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         val libMap = BaseMap.getMap(type)
         for (entry in map) {
-            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null
-            ) {
+            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null) {
                 val properties: MutableMap<String, String> = java.util.HashMap()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
