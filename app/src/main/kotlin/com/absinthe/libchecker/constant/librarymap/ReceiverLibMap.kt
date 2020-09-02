@@ -41,6 +41,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "androidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiver",
+            LibChip(
+                R.drawable.ic_lib_jetpack,
+                "Jetpack Work Manager"
+            )
+        ),
+        Pair(
             "androidx.media.session.MediaButtonReceiver",
             LibChip(
                 R.drawable.ic_lib_jetpack,

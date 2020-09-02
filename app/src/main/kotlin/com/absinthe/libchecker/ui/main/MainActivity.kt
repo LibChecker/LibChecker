@@ -132,7 +132,9 @@ class MainActivity : BaseActivity() {
 
                 fun performClickNavigationItem(index: Int) {
                     if (binding.viewpager.currentItem != index) {
-                        binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
+                        if (!binding.viewpager.isFakeDragging) {
+                            binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
+                        }
                     } else {
                         if (!clickBottomItemFlag) {
                             clickBottomItemFlag = true

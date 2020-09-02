@@ -50,6 +50,9 @@ import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 import java.lang.ref.WeakReference
 
+const val VF_LOADING = 0
+const val VF_LIST = 1
+
 class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener, IListController {
 
     private val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
@@ -212,9 +215,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             reloadAppsFlag.observe(viewLifecycleOwner, {
                 if (it) {
                     binding.tvFirstTip.isVisible = true
-                    if (binding.vfContainer.displayedChild == 1) {
-                        binding.vfContainer.displayedChild = 0
-                    }
+                    flip(VF_LOADING)
                     initItems()
                 }
             })
@@ -259,15 +260,17 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             })
             shouldRequestChange.observe(viewLifecycleOwner, {
                 if (!it) {
-                    if (binding.vfContainer.displayedChild == 0) {
-                        binding.vfContainer.displayedChild = 1
-                    }
+                    flip(VF_LIST)
                 }
             })
         }
     }
 
     private fun updateItems(newItems: List<AppItem>) {
+        if (newItems.isEmpty()) {
+            return
+        }
+
         val list = mAdapter.data
         mAdapter.setDiffNewData(newItems.toMutableList())
 
@@ -277,9 +280,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
                 withContext(Dispatchers.Main) {
                     try {
-                        if (binding.vfContainer.displayedChild == 0) {
-                            binding.vfContainer.displayedChild = 1
-                        }
+                        flip(VF_LIST)
 
                         if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) {
                             returnTopOfList()
@@ -311,13 +312,17 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         }
     }
 
+    private fun flip(page: Int) {
+        if (binding.vfContainer.displayedChild != page) {
+            binding.vfContainer.displayedChild = page
+        }
+    }
+
     override fun onReturnTop() {
         if (binding.recyclerview.canScrollVertically(-1)) {
             returnTopOfList()
         } else {
-            if (binding.vfContainer.displayedChild == 1) {
-                binding.vfContainer.displayedChild = 0
-            }
+            flip(VF_LOADING)
             viewModel.requestChange(requireActivity().packageManager)
         }
     }

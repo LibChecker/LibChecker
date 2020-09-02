@@ -23,6 +23,14 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_huawei, "Huawei Push")
         ),
         Pair(
+            "com.huawei.hms.aaid.InitProvider",
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core AAID")
+        ),
+        Pair(
+            "com.huawei.openalliance.ad.download.DownloadFileProvider",
+            LibChip(R.drawable.ic_lib_huawei, "Huawei Ads SDK")
+        ),
+        Pair(
             "androidx.core.content.FileProvider",
             LibChip(R.drawable.ic_android_outline, "File Provider")
         ),
@@ -173,6 +181,10 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "me.jessyan.autosize.InitProvider",
             LibChip(R.drawable.ic_question, "AndroidAutoSize")
+        ),
+        Pair(
+            "com.qihoo360.mobilesafe.svcmanager.ServiceProvider\t",
+            LibChip(R.drawable.ic_lib_360, "RePlugin")
         ),
     )
 
