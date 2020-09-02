@@ -53,12 +53,12 @@ object PackageUtils {
             } else {
                 PackageManager.GET_DISABLED_COMPONENTS
             }
-            return Utils.getApp().packageManager.getPackageArchiveInfo(
-                Utils.getApp().packageManager.getPackageInfo(
-                    packageInfo.packageName,
-                    0
-                ).applicationInfo.sourceDir, pmFlag or flag
-            ) ?: throw PackageManager.NameNotFoundException()
+            val info = Utils.getApp().packageManager.getPackageInfo(packageInfo.packageName, 0)
+
+            return Utils.getApp().packageManager.getPackageArchiveInfo(info.applicationInfo.sourceDir, pmFlag or flag)?.apply {
+                applicationInfo.sourceDir = info.applicationInfo.sourceDir
+                applicationInfo.nativeLibraryDir = info.applicationInfo.nativeLibraryDir
+            } ?: throw PackageManager.NameNotFoundException()
         }
         return packageInfo
     }

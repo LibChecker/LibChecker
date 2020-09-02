@@ -5,10 +5,10 @@ import android.content.pm.PackageInfo
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
