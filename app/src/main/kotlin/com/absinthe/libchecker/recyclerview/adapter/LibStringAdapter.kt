@@ -50,7 +50,11 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 visibility = View.VISIBLE
 
                 if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                    chipDrawable.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                    val icon = chipIcon
+                    icon?.let {
+                        it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                        chipIcon = it
+                    }
                 }
             }
         } ?: let { libIcon.visibility = View.GONE }
