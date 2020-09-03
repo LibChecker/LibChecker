@@ -152,11 +152,18 @@ class AppDetailActivity : BaseActivity() {
                             val lcDao = LCDatabase.getDatabase(application).lcDao()
                             val repository = LCRepository(lcDao)
                             val lcItem = repository.getItem(packageName)
-                            val chipGroupBinding =
-                                LayoutChipGroupBinding.inflate(layoutInflater).apply {
-                                    chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
-                                    chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
-                                }
+
+                            val isSplitApk = lcItem?.isSplitApk ?: false
+                            val isKotlinUsed = lcItem?.isKotlinUsed ?: false
+
+                            if (!isSplitApk && !isKotlinUsed) {
+                                return@launch
+                            }
+
+                            val chipGroupBinding = LayoutChipGroupBinding.inflate(layoutInflater).apply {
+                                    chipSplitApk.isVisible = isSplitApk
+                                    chipKotlinUsed.isVisible = isKotlinUsed
+                            }
                             chipGroupBinding.root.id = View.generateViewId()
 
                             withContext(Dispatchers.Main) {

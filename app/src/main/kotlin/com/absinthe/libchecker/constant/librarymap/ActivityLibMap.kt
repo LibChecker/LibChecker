@@ -316,14 +316,18 @@ object ActivityLibMap : BaseMap() {
         return MAP
     }
 
+    private val PATTERN_TINKER = Pattern.compile("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)")
+    private val PATTERN_PANGLE_1 = Pattern.compile("com.bytedance.sdk.openadsdk.activity.(.*)")
+    private val PATTERN_PANGLE_2 = Pattern.compile("com.ss.android.socialbase.appdownloader.(.*)")
+    private val PATTERN_PANGLE_3 = Pattern.compile("com.ss.android.downloadlib.(.*)")
+    private val PATTERN_KSAD_1 = Pattern.compile("com.yxcorp.gifshow.ad(.*)")
+    private val PATTERN_KSAD_2 = Pattern.compile("com.yxcorp.map.advertisement.(.*)")
+
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("com.tencent.tinker.loader.hotplug.ActivityStubs(.*)", name) -> LibChip(R.drawable.ic_lib_tencent, "Tinker", "regex_tinker")
-            Pattern.matches("com.bytedance.sdk.openadsdk.activity.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
-            Pattern.matches("com.ss.android.socialbase.appdownloader.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
-            Pattern.matches("com.ss.android.downloadlib.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
-            Pattern.matches("com.yxcorp.gifshow.ad(.*)", name) -> LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK", "regex_kuaishou_ad")
-            Pattern.matches("com.yxcorp.map.advertisement.(.*)", name) -> LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK", "regex_kuaishou_ad")
+            PATTERN_TINKER.matcher(name).matches() -> LibChip(R.drawable.ic_lib_tencent, "Tinker", "regex_tinker")
+            matchAllPatterns(name, PATTERN_PANGLE_1, PATTERN_PANGLE_2, PATTERN_PANGLE_3) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
+            matchAllPatterns(name, PATTERN_KSAD_1, PATTERN_KSAD_2) -> LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK", "regex_kuaishou_ad")
             else -> null
         }
     }

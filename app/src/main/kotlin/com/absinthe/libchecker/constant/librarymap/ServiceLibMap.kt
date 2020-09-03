@@ -705,11 +705,14 @@ object ServiceLibMap : BaseMap() {
         return MAP
     }
 
+    private val PATTERN_REPLUGIN = Pattern.compile("com.qihoo360.replugin.component.service.server.PluginPitService(.*)")
+    private val PATTERN_PANGLE_1 = Pattern.compile("com.ss.android.socialbase.(.*)")
+    private val PATTERN_PANGLE_2 = Pattern.compile("com.bytedance.sdk.openadsdk.(.*)")
+
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("com.qihoo360.replugin.component.service.server.PluginPitService(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
-            Pattern.matches("com.ss.android.socialbase.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
-            Pattern.matches("com.bytedance.sdk.openadsdk.(.*)", name) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
+            PATTERN_REPLUGIN.matcher(name).matches() -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            matchAllPatterns(name, PATTERN_PANGLE_1, PATTERN_PANGLE_2) -> LibChip(R.drawable.ic_lib_bytedance, "Pangle SDK", "regex_pangle")
             else -> null
         }
     }

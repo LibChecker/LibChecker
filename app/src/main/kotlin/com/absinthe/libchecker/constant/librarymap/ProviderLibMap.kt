@@ -192,9 +192,11 @@ object ProviderLibMap : BaseMap() {
         return MAP
     }
 
+    private val PATTERN_REPLUGIN = Pattern.compile("com.qihoo360.replugin.(.*)")
+
     override fun findRegex(name: String): LibChip? {
         return when {
-            Pattern.matches("com.qihoo360.replugin.(.*)", name) -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
+            PATTERN_REPLUGIN.matcher(name).matches() -> LibChip(R.drawable.ic_lib_360, "RePlugin", "regex_replugin")
             else -> null
         }
     }
