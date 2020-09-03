@@ -1,5 +1,11 @@
 package com.absinthe.libchecker.utils
 
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.os.MessageQueue
+import android.util.Log
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
@@ -18,4 +24,40 @@ object AppUtils {
         }
     }
 
+}
+
+/**
+ * From drakeet
+ */
+fun doOnMainThreadIdle(action: () -> Unit, timeout: Long? = null) {
+    val handler = Handler(Looper.getMainLooper())
+
+    val idleHandler = MessageQueue.IdleHandler {
+        handler.removeCallbacksAndMessages(null)
+        action()
+        return@IdleHandler false
+    }
+
+    fun setupIdleHandler(queue: MessageQueue) {
+        if (timeout != null) {
+            handler.postDelayed({
+                queue.removeIdleHandler(idleHandler)
+                action()
+                if (BuildConfig.DEBUG) {
+                    Log.d("doOnMainThreadIdle", "${timeout}ms timeout!")
+                }
+            }, timeout)
+        }
+        queue.addIdleHandler(idleHandler)
+    }
+
+    if (Looper.getMainLooper() == Looper.myLooper()) {
+        setupIdleHandler(Looper.myQueue())
+    } else {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            setupIdleHandler(Looper.getMainLooper().queue)
+        } else {
+            handler.post { setupIdleHandler(Looper.myQueue()) }
+        }
+    }
 }

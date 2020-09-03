@@ -17,7 +17,7 @@ import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
@@ -30,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.IntentUtils
@@ -146,32 +147,34 @@ class AppDetailActivity : BaseActivity() {
                     layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
                     layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
 
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val lcDao = LCDatabase.getDatabase(application).lcDao()
-                        val repository = LCRepository(lcDao)
-                        val lcItem = repository.getItem(packageName)
-                        val chipGroupBinding =
-                            LayoutChipGroupBinding.inflate(layoutInflater).apply {
-                                chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
-                                chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
-                            }
-                        chipGroupBinding.root.id = View.generateViewId()
+                    doOnMainThreadIdle({
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val lcDao = LCDatabase.getDatabase(application).lcDao()
+                            val repository = LCRepository(lcDao)
+                            val lcItem = repository.getItem(packageName)
+                            val chipGroupBinding =
+                                LayoutChipGroupBinding.inflate(layoutInflater).apply {
+                                    chipSplitApk.isVisible = lcItem?.isSplitApk ?: false
+                                    chipKotlinUsed.isVisible = lcItem?.isKotlinUsed ?: false
+                                }
+                            chipGroupBinding.root.id = View.generateViewId()
 
-                        withContext(Dispatchers.Main) {
-                            binding.headerContentLayout.addView(chipGroupBinding.root)
-                            ConstraintSet().apply {
-                                clone(binding.headerContentLayout)
-                                connect(
-                                    chipGroupBinding.root.id,
-                                    ConstraintSet.TOP,
-                                    binding.tvVersion.id,
-                                    ConstraintSet.BOTTOM,
-                                    resources.getDimension(R.dimen.normal_padding).toInt()
-                                )
-                                applyTo(binding.headerContentLayout)
+                            withContext(Dispatchers.Main) {
+                                binding.headerContentLayout.addView(chipGroupBinding.root)
+                                ConstraintSet().apply {
+                                    clone(binding.headerContentLayout)
+                                    connect(
+                                        chipGroupBinding.root.id,
+                                        ConstraintSet.TOP,
+                                        binding.tvVersion.id,
+                                        ConstraintSet.BOTTOM,
+                                        resources.getDimension(R.dimen.normal_padding).toInt()
+                                    )
+                                    applyTo(binding.headerContentLayout)
+                                }
                             }
                         }
-                    }
+                    })
                 } catch (e: Exception) {
                     supportFinishAfterTransition()
                 }
