@@ -115,7 +115,35 @@ object NativeLibMap : BaseMap() {
             "libliteavsdk.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
-                "腾讯云直播 SDK"
+                "腾讯云短视频 SDK"
+            )
+        ),
+        Pair(
+            "libtxffmpeg.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯云短视频 SDK"
+            )
+        ),
+        Pair(
+            "libtxplayer.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯云短视频 SDK"
+            )
+        ),
+        Pair(
+            "libtxsdl.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯云短视频 SDK"
+            )
+        ),
+        Pair(
+            "libtraeimp-rtmp.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "TRTC SDK"
             )
         ),
         Pair(
