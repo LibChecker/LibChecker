@@ -65,7 +65,7 @@ class AboutActivity : AbsAboutActivity() {
                             "<a href=\"https://www.iconfont.cn/\">https://www.iconfont.cn/</a><br>"+
                             "<a href=\"https://lottiefiles.com/22122-fanimation\">https://lottiefiles.com/22122-fanimation</a><br>" +
                             "<a href=\"https://lottiefiles.com/21836-blast-off\">https://lottiefiles.com/21836-blast-off</a><br>" +
-                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a>" +
+                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a><br>" +
                             "<a href=\"https://lottiefiles.com/7907-3d-camera\">https://lottiefiles.com/7907-3d-camera</a>"
                 , HtmlCompat.FROM_HTML_MODE_LEGACY)
             ))

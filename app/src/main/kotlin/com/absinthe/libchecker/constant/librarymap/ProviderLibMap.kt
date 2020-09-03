@@ -183,7 +183,7 @@ object ProviderLibMap : BaseMap() {
             LibChip(R.drawable.ic_question, "AndroidAutoSize")
         ),
         Pair(
-            "com.qihoo360.mobilesafe.svcmanager.ServiceProvider\t",
+            "com.qihoo360.mobilesafe.svcmanager.ServiceProvider",
             LibChip(R.drawable.ic_lib_360, "RePlugin")
         ),
     )
