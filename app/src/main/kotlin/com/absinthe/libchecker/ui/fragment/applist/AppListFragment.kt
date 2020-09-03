@@ -14,6 +14,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -108,11 +109,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
             tvFirstTip.isVisible = isFirstLaunch
-        }
-
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.DB_MIGRATE_2_3)) {
-            Once.clearDone(OnceTag.FIRST_LAUNCH)
-            binding.tvFirstTip.isVisible = true
         }
 
         initObserver()
@@ -229,8 +225,8 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 hasRequestChanges = true
 
                 if (isFirstLaunch) {
+                    binding.tvFirstTip.isGone = true
                     Once.markDone(OnceTag.FIRST_LAUNCH)
-                    Once.markDone(OnceTag.DB_MIGRATE_2_3)
                 }
             }
         })

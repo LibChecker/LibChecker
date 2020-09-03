@@ -44,8 +44,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var refreshLock = false
-    var isRequestingChange = false
 
+    private var isInitingItems = false
     private val repository: LCRepository
 
     init {
@@ -58,10 +58,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         logd("Init all items START")
 
         val context: Context = getApplication<LibCheckerApp>()
-
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
+        isInitingItems = true
         repository.deleteAllItems()
 
         var appList: List<ApplicationInfo>?
@@ -144,6 +144,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             AppItemRepository.allDatabaseItems.value = newItems
         }
 
+        isInitingItems = false
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
     }
@@ -199,6 +200,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         logd("Request change START")
+        if (isInitingItems) {
+            logd("Request change isInitingItems return")
+            return@launch
+        }
 
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
@@ -213,7 +218,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        isRequestingChange = false
         timeRecorder.end()
         logd("Request change END, $timeRecorder")
     }

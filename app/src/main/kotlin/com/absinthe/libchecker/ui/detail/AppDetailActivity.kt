@@ -10,6 +10,7 @@ import android.view.Window
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
@@ -33,6 +34,9 @@ import com.blankj.utilcode.util.IntentUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
@@ -140,22 +144,27 @@ class AppDetailActivity : BaseActivity() {
                     layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
                     layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
 
-                    val lcDao = LCDatabase.getDatabase(application).lcDao()
-                    val repository = LCRepository(lcDao)
-                    val lcItem = repository.getItem(packageName)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val lcDao = LCDatabase.getDatabase(application).lcDao()
+                        val repository = LCRepository(lcDao)
+                        val lcItem = repository.getItem(packageName)
 
-                    val isSplitApk = lcItem?.isSplitApk ?: false
-                    val isKotlinUsed = lcItem?.isKotlinUsed ?: false
+                        val isSplitApk = lcItem?.isSplitApk ?: false
+                        val isKotlinUsed = lcItem?.isKotlinUsed ?: false
 
-                    if (isSplitApk) {
-                        binding.chipGroup.isVisible = true
-                        binding.chipSplitApk.isVisible = true
-                    }
-                    if (isKotlinUsed) {
-                        binding.chipGroup.isVisible = true
-                        binding.chipKotlinUsed.isVisible = true
+                        withContext(Dispatchers.Main) {
+                            if (isSplitApk) {
+                                binding.chipGroup.isVisible = true
+                                binding.chipSplitApk.isVisible = true
+                            }
+                            if (isKotlinUsed) {
+                                binding.chipGroup.isVisible = true
+                                binding.chipKotlinUsed.isVisible = true
+                            }
+                        }
                     }
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     supportFinishAfterTransition()
                 }
 

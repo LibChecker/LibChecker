@@ -161,7 +161,6 @@ class MainActivity : BaseActivity() {
 
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            appViewModel.isRequestingChange = true
             appViewModel.requestChange(packageManager, true)
         }
     }
