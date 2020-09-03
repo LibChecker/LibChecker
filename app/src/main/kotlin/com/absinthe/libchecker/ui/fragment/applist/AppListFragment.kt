@@ -323,7 +323,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
             returnTopOfList()
         } else {
             flip(VF_LOADING)
-            viewModel.requestChange(requireActivity().packageManager)
+            viewModel.requestChange(requireActivity().packageManager, true)
         }
     }
 }

@@ -79,7 +79,7 @@ class MainActivity : BaseActivity() {
         super.onResume()
         registerPackageBroadcast()
         if (GlobalValues.shouldRequestChange.value == true) {
-            appViewModel.requestChange(packageManager)
+            appViewModel.requestChange(packageManager, true)
         }
     }
 
@@ -162,7 +162,7 @@ class MainActivity : BaseActivity() {
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             appViewModel.isRequestingChange = true
-            appViewModel.requestChange(packageManager)
+            appViewModel.requestChange(packageManager, true)
         }
     }
 

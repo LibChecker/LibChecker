@@ -197,17 +197,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun requestChange(packageManager: PackageManager) = viewModelScope.launch(Dispatchers.IO) {
+    fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         logd("Request change START")
 
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestChangeImpl(packageManager)
+            requestChangeImpl(packageManager, needRefresh)
         } else {
             try {
-                requestChangeImpl(packageManager)
+                requestChangeImpl(packageManager, needRefresh)
             } catch (e: VerifyError) {
                 e.printStackTrace()
             }
@@ -218,10 +218,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         logd("Request change END, $timeRecorder")
     }
 
-    private suspend fun requestChangeImpl(packageManager: PackageManager) {
+    private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
 
-        if (appList.isNullOrEmpty()) {
+        if (appList.isNullOrEmpty() || needRefresh) {
             do {
                 appList = try {
                     PackageUtils.getInstallApplications().toMutableList()
