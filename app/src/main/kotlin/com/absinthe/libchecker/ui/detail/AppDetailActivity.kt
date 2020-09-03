@@ -153,13 +153,12 @@ class AppDetailActivity : BaseActivity() {
                         val isKotlinUsed = lcItem?.isKotlinUsed ?: false
 
                         withContext(Dispatchers.Main) {
-                            if (isSplitApk) {
+                            if (isSplitApk || isKotlinUsed) {
                                 binding.chipGroup.isVisible = true
-                                binding.chipSplitApk.isVisible = true
-                            }
-                            if (isKotlinUsed) {
-                                binding.chipGroup.isVisible = true
-                                binding.chipKotlinUsed.isVisible = true
+                                binding.chipSplitApk.isVisible = isSplitApk
+                                binding.chipKotlinUsed.isVisible = isKotlinUsed
+                            } else {
+                                binding.chipGroup.isVisible = false
                             }
                         }
                     }
