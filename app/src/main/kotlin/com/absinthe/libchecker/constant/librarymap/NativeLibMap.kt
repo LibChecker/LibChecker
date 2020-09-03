@@ -1014,6 +1014,20 @@ object NativeLibMap : BaseMap() {
                 "Unreal Engine"
             )
         ),
+        Pair(
+            "libfreetype.so",
+            LibChip(
+                R.drawable.ic_question,
+                "FreeType"
+            )
+        ),
+        Pair(
+            "libgpuimage-library.so",
+            LibChip(
+                R.drawable.ic_question,
+                "GPUImage"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
