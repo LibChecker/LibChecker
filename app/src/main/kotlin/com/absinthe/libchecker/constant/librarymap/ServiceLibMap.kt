@@ -343,13 +343,6 @@ object ServiceLibMap : BaseMap() {
             )
         ),
         Pair(
-            "com.tencent.android.tpush.rpc.XGRemoteService",
-            LibChip(
-                R.drawable.ic_lib_tencent,
-                "信鸽推送"
-            )
-        ),
-        Pair(
             "com.tencent.matrix.resource.CanaryWorkerService",
             LibChip(
                 R.drawable.ic_lib_tencent,
@@ -480,6 +473,27 @@ object ServiceLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
                 "腾讯云通信"
+            )
+        ),
+        Pair(
+            "com.tencent.android.tpush.service.XGVipPushService",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯移动推送"
+            )
+        ),
+        Pair(
+            "com.tencent.android.tpush.rpc.XGRemoteService",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯移动推送"
+            )
+        ),
+        Pair(
+            "com.tencent.tpns.mqttchannel.services.MqttService",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯移动推送"
             )
         ),
         Pair(

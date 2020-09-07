@@ -104,11 +104,19 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.tencent.android.tpush.XGPushProvider",
-            LibChip(R.drawable.ic_lib_tencent, "信鸽推送")
+            LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
         ),
         Pair(
             "com.tencent.android.tpush.SettingsContentProvider",
-            LibChip(R.drawable.ic_lib_tencent, "信鸽推送")
+            LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
+        ),
+        Pair(
+            "com.tencent.android.tpush.XGVipPushKAProvider",
+            LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
+        ),
+        Pair(
+            "com.tencent.tpns.baseapi.base.SettingsContentProvider",
+            LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
         ),
         Pair(
             "com.igexin.download.DownloadProvider",
@@ -137,6 +145,10 @@ object ProviderLibMap : BaseMap() {
         Pair(
             "com.netease.nimlib.ipc.NIMContentProvider",
             LibChip(R.drawable.ic_lib_netease, "网易云通信 SDK")
+        ),
+        Pair(
+            "com.qiyukf.nim.uikit.provider.UnicornProvider",
+            LibChip(R.drawable.ic_lib_netease, "七鱼 SDK")
         ),
         Pair(
             "com.sensorsdata.analytics.android.sdk.data.SensorsDataContentProvider",

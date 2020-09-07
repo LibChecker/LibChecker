@@ -281,8 +281,29 @@ object ReceiverLibMap : BaseMap() {
         Pair(
             "com.tencent.android.tpush.XGPushReceiver",
             LibChip(
-                R.drawable.ic_lib_tencent,
-                "信鸽推送"
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯移动推送"
+            )
+        ),
+        Pair(
+            "com.tencent.android.mipush.XMPushMessageReceiver",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "MiPush(TPNS Proxy)"
+            )
+        ),
+        Pair(
+            "com.tencent.android.mzpush.MZPushMessageReceiver",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "Meizu Push(TPNS Proxy)"
+            )
+        ),
+        Pair(
+            "com.tencent.android.vivopush.VivoPushMessageReceiver",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "vivo Push(TPNS Proxy)"
             )
         ),
         Pair(

@@ -36,5 +36,6 @@ object Constants {
         const val SNAPSHOT_CLICK = "Snapshot Click"
         const val SETTINGS = "Settings"
         const val LIB_REFERENCE_FILTER_TYPE = "Lib Reference Filter Type"
+        const val EASTER_EGG = "Easter Egg"
     }
 }

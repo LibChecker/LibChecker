@@ -39,10 +39,13 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -170,6 +173,11 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                         it.packageName.contains(newText, ignoreCase = true)
             }
             updateItems(filter)
+
+            if (newText.equals("Easter Egg", true)) {
+                Toasty.show(requireContext(), "🥚")
+                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
+            }
         }
         return false
     }

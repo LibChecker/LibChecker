@@ -10,4 +10,6 @@
     <color name="libIconBackground">#10000000</color>
 
     <color name="appColorDark">#B1B8DF</color>
+    <color name="renge">#FFAB373A</color>
+
 </resources>

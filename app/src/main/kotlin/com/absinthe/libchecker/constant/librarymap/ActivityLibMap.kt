@@ -310,6 +310,10 @@ object ActivityLibMap : BaseMap() {
             "com.kuaishou.commercial.downloader.center.AdDownloadCenterV2Activity",
             LibChip(R.drawable.ic_lib_kuaishou, "快手广告 SDK")
         ),
+        Pair(
+            "com.tencent.android.tpush.TpnsActivity",
+            LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

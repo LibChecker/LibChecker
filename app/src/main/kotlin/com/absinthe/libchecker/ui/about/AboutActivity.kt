@@ -1,15 +1,21 @@
 package com.absinthe.libchecker.ui.about
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.drawable.ColorDrawable
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -23,8 +29,13 @@ import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AboutActivity : AbsAboutActivity() {
+
+    private var shouldShowEasterEggCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -32,10 +43,49 @@ class AboutActivity : AbsAboutActivity() {
         Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ABOUT", "Entered"))
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
         icon.load(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
+
+        icon.setOnClickListener {
+            val rebornCoroutine = lifecycleScope.launch(Dispatchers.IO) {
+                delay(300)
+                shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 10 else 0
+            }
+
+            if (shouldShowEasterEggCount < 10) {
+                rebornCoroutine.cancel()
+                shouldShowEasterEggCount++
+                rebornCoroutine.start()
+            } else if (shouldShowEasterEggCount == 10) {
+                slogan.text = "RengeChecker"
+                rebornCoroutine.cancel()
+                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 10 hits"))
+            } else {
+                if (shouldShowEasterEggCount < 20) {
+                    rebornCoroutine.cancel()
+                    shouldShowEasterEggCount++
+                    rebornCoroutine.start()
+                } else if (shouldShowEasterEggCount == 20) {
+                    val inputStream = assets.open("renge.webp")
+                    icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
+                    slogan.text = "えい、私もよ。"
+                    setHeaderBackground(ColorDrawable(ContextCompat.getColor(this, R.color.renge)))
+                    setHeaderContentScrim(ColorDrawable(ContextCompat.getColor(this, R.color.renge)))
+                    window.statusBarColor = ContextCompat.getColor(this, R.color.renge)
+
+                    val fd = assets.openFd("renge_no_koe.aac")
+                    MediaPlayer().apply {
+                        setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
+                        prepare()
+                        start()
+                    }
+                    Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 20 hits!"))
+                }
+            }
+        }
     }
 
     override fun onItemsCreated(items: MutableList<Any>) {
@@ -92,11 +142,6 @@ class AboutActivity : AbsAboutActivity() {
         }
     }
 
-    private fun initView() {
-        UiUtils.setSystemBarStyle(this)
-        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.about_menu, menu)
         return true
@@ -116,4 +161,10 @@ class AboutActivity : AbsAboutActivity() {
         }
         return super.onOptionsItemSelected(menuItem)
     }
+
+    private fun initView() {
+        UiUtils.setSystemBarStyle(this)
+        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
+    }
+
 }

@@ -10,7 +10,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
@@ -21,6 +22,7 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -189,6 +191,11 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                 ) ?: false
             }
             adapter.setDiffNewData(filter.toMutableList())
+
+            if (newText.equals("Easter Egg", true)) {
+                Toasty.show(requireContext(), "🥚")
+                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Lib Reference Search"))
+            }
         }
         return false
     }
