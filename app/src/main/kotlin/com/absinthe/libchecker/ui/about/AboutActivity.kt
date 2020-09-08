@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 
 class AboutActivity : AbsAboutActivity() {
 
-    private var shouldShowEasterEggCount = 0
+    private var shouldShowEasterEggCount = 1
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -52,7 +52,7 @@ class AboutActivity : AbsAboutActivity() {
         icon.setOnClickListener {
             val rebornCoroutine = lifecycleScope.launch(Dispatchers.IO) {
                 delay(300)
-                shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 10 else 0
+                shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 11 else 1
             }
 
             if (shouldShowEasterEggCount < 10) {
@@ -62,6 +62,7 @@ class AboutActivity : AbsAboutActivity() {
             } else if (shouldShowEasterEggCount == 10) {
                 slogan.text = "RengeChecker"
                 rebornCoroutine.cancel()
+                shouldShowEasterEggCount++
                 Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 10 hits"))
             } else {
                 if (shouldShowEasterEggCount < 20) {
