@@ -48,13 +48,12 @@ class AboutActivity : AbsAboutActivity() {
         icon.load(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
-
-        icon.setOnClickListener {
-            val rebornCoroutine = lifecycleScope.launch(Dispatchers.IO) {
-                delay(300)
-                shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 11 else 1
-            }
-
+        
+        val rebornCoroutine = lifecycleScope.launch(Dispatchers.IO) {
+            delay(300)
+            shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 11 else 1
+        }
+        icon.setOnClickListener {       
             if (shouldShowEasterEggCount < 10) {
                 rebornCoroutine.cancel()
                 shouldShowEasterEggCount++
