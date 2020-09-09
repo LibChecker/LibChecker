@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,11 +12,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.bean.AppItem
-import com.absinthe.libchecker.bean.ERROR
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -31,7 +27,6 @@ import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import com.blankj.utilcode.util.AppUtils
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
@@ -43,7 +38,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    var refreshLock = false
 
     private var isInitingItems = false
     private val repository: LCRepository
@@ -76,14 +70,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         } while (appList == null)
 
         val lcItems = mutableListOf<LCItem>()
-        val newItems = ArrayList<AppItem>()
         var packageInfo: PackageInfo
         var versionCode: Long
         var abiType: Int
         var isSystemType: Boolean
         var isKotlinType: Boolean
 
-        var appItem: AppItem
         var lcItem: LCItem
 
         for (info in appList) {
@@ -94,17 +86,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 isSystemType =
                     (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
-
-                appItem = AppItem().apply {
-                    icon = info.loadIcon(context.packageManager)
-                    appName = info.loadLabel(context.packageManager).toString()
-                    packageName = info.packageName
-                    versionName = PackageUtils.getVersionString(packageInfo)
-                    abi = abiType
-                    isSystem = isSystemType
-                    updateTime = packageInfo.lastUpdateTime
-                    isKotlinUsed = isKotlinType
-                }
 
                 lcItem = LCItem(
                     info.packageName,
@@ -119,12 +100,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     isKotlinType
                 )
 
-                GlobalValues.isShowSystemApps.value?.let {
-                    if (it || (!it && !lcItem.isSystem)) {
-                        newItems.add(appItem)
-                    }
-                }
-
                 lcItems.add(lcItem)
             } catch (e: Throwable) {
                 e.printStackTrace()
@@ -134,68 +109,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         insert(lcItems)
 
-        //Sort
-        when (GlobalValues.appSortMode.value) {
-            Constants.SORT_MODE_DEFAULT -> newItems.sortWith(compareBy({ it.abi }, { it.appName }))
-            Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
-        }
-
-        withContext(Dispatchers.Main) {
-            AppItemRepository.allDatabaseItems.value = newItems
-        }
-
         isInitingItems = false
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
-    }
-
-    fun addItem() = viewModelScope.launch(Dispatchers.IO) {
-        logd("Add all items START")
-
-        val timeRecorder = TimeRecorder()
-        timeRecorder.start()
-
-        dbItems.value?.let { value ->
-            val newItems = ArrayList<AppItem>()
-            var appItem: AppItem
-
-            for (item in value) {
-                appItem = AppItem().apply {
-                    icon = AppUtils.getAppIcon(item.packageName)
-                        ?: ColorDrawable(Color.TRANSPARENT)
-                    appName = item.label
-                    packageName = item.packageName
-                    versionName = PackageUtils.getVersionString(item.versionName, item.versionCode)
-                    abi = item.abi.toInt()
-                    isSystem = item.isSystem
-                    updateTime = item.lastUpdatedTime
-                    isKotlinUsed = item.isKotlinUsed
-                }
-
-                GlobalValues.isShowSystemApps.value?.let {
-                    if (it || (!it && !item.isSystem)) {
-                        newItems.add(appItem)
-                    }
-                }
-            }
-
-            when (GlobalValues.appSortMode.value) {
-                Constants.SORT_MODE_DEFAULT -> newItems.sortWith(
-                    compareBy(
-                        { it.abi },
-                        { it.appName })
-                )
-                Constants.SORT_MODE_UPDATE_TIME_DESC -> newItems.sortByDescending { it.updateTime }
-            }
-
-            withContext(Dispatchers.Main) {
-                AppItemRepository.allDatabaseItems.value = newItems
-            }
-
-            timeRecorder.end()
-            logd("Add all items END, $timeRecorder")
-            refreshLock = false
-        }
     }
 
     fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {

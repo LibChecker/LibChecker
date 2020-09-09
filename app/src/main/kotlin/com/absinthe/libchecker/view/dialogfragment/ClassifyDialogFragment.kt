@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.absinthe.libchecker.bean.AppItem
+import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.view.ClassifyDialogView
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
@@ -13,17 +13,17 @@ const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
 class ClassifyDialogFragment : DialogFragment() {
 
-    var item: ArrayList<AppItem> = ArrayList()
+    var item: ArrayList<LCItem> = ArrayList()
     private val dialogView by lazy { ClassifyDialogView(requireContext()) }
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (savedInstanceState != null) {
-            savedInstanceState.getParcelableArrayList<AppItem>(
+            savedInstanceState.getParcelableArrayList<LCItem>(
                 EXTRA_ITEM_LIST
             )?.toList()?.let {
                 dialogView.adapter.setList(it)
-                item = it as ArrayList<AppItem>
+                item = it as ArrayList<LCItem>
             }
         } else {
             dialogView.adapter.setList(item)

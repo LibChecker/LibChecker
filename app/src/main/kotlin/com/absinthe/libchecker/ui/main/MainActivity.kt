@@ -213,10 +213,6 @@ class MainActivity : BaseActivity() {
             dbItems.observe(this@MainActivity, {
                 if (it.isNotEmpty()) {
                     isDatabaseFinishInit = true
-                    if (!refreshLock) {
-                        refreshLock = true
-                        addItem()
-                    }
                 }
             })
 

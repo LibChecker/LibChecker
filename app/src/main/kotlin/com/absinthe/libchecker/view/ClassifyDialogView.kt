@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -22,10 +21,10 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-        adapter.setOnItemClickListener { adapter, view, position ->
+        adapter.setOnItemClickListener { _, view, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
-                    putString(EXTRA_PACKAGE_NAME, (adapter.getItem(position) as AppItem).packageName)
+                    putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
                 })
             }
 

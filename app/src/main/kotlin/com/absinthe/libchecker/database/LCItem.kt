@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.database
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.android.parcel.Parcelize
 
+@Parcelize
 @Entity(tableName = "item_table")
 data class LCItem(
     @PrimaryKey @ColumnInfo(name = "packageName") val packageName: String,
@@ -16,4 +19,4 @@ data class LCItem(
     @ColumnInfo(name = "abi") val abi: Short,
     @ColumnInfo(name = "isSplitApk") val isSplitApk: Boolean,
     @ColumnInfo(name = "isKotlinUsed") val isKotlinUsed: Boolean
-)
+) : Parcelable

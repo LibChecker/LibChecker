@@ -22,11 +22,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.AppItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
@@ -123,7 +123,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
-                AppItemRepository.allDatabaseItems.value?.let {
+                viewModel.dbItems.value?.let {
                     updateItems(it)
                     AppItemRepository.shouldRefreshAppList = false
                 }
@@ -167,9 +167,9 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
+        viewModel.dbItems.value?.let { allDatabaseItems ->
             val filter = allDatabaseItems.filter {
-                it.appName.contains(newText, ignoreCase = true) ||
+                it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
             }
             updateItems(filter)
@@ -223,40 +223,39 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     initItems()
                 }
             })
-        }
+            dbItems.observe(viewLifecycleOwner, {
+                updateItems(it)
 
-        AppItemRepository.allDatabaseItems.observe(viewLifecycleOwner, {
-            updateItems(it)
+                if (!hasRequestChanges) {
+                    viewModel.requestChange(requireActivity().packageManager)
+                    hasRequestChanges = true
 
-            if (!hasRequestChanges) {
-                viewModel.requestChange(requireActivity().packageManager)
-                hasRequestChanges = true
-
-                if (isFirstLaunch) {
-                    binding.tvFirstTip.isGone = true
-                    Once.markDone(OnceTag.FIRST_LAUNCH)
+                    if (isFirstLaunch) {
+                        binding.tvFirstTip.isGone = true
+                        Once.markDone(OnceTag.FIRST_LAUNCH)
+                    }
                 }
-            }
-        })
+            })
+        }
 
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, {
                 if (isListReady) {
-                    viewModel.addItem()
+                    updateItems(viewModel.dbItems.value!!)
                 }
             })
             appSortMode.observe(viewLifecycleOwner, { mode ->
                 if (isListReady) {
-                    AppItemRepository.allDatabaseItems.value?.let { allDatabaseItems ->
+                    viewModel.dbItems.value?.let { allDatabaseItems ->
                         val list = allDatabaseItems.toMutableList()
 
                         when (mode) {
                             Constants.SORT_MODE_DEFAULT -> list.sortWith(
                                 compareBy(
                                     { it.abi },
-                                    { it.appName })
+                                    { it.label })
                             )
-                            Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.updateTime }
+                            Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.lastUpdatedTime }
                         }
                         updateItems(list)
                     }
@@ -270,13 +269,28 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         }
     }
 
-    private fun updateItems(newItems: List<AppItem>) {
+    private fun updateItems(newItems: List<LCItem>) {
         if (newItems.isEmpty()) {
             return
         }
 
         val list = mAdapter.data
-        mAdapter.setDiffNewData(newItems.toMutableList())
+        val filterList = mutableListOf<LCItem>()
+
+        GlobalValues.isShowSystemApps.value?.let { isShowSystem ->
+            newItems.forEach {
+                if (isShowSystem || (!isShowSystem && !it.isSystem)) {
+                    filterList.add(it)
+                }
+            }
+        }
+
+        when (GlobalValues.appSortMode.value) {
+            Constants.SORT_MODE_DEFAULT -> filterList.sortWith(compareBy({ it.abi }, { it.label }))
+            Constants.SORT_MODE_UPDATE_TIME_DESC -> filterList.sortByDescending { it.lastUpdatedTime }
+        }
+
+        mAdapter.setDiffNewData(filterList)
 
         if (list != newItems) {
             lifecycleScope.launch(Dispatchers.IO) {

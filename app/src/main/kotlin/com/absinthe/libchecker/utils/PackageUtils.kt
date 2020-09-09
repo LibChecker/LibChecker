@@ -8,7 +8,15 @@ import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.Constants.ARMV5
+import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
+import com.absinthe.libchecker.constant.Constants.ARMV7
+import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
+import com.absinthe.libchecker.constant.Constants.ARMV8
+import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
+import com.absinthe.libchecker.constant.Constants.ERROR
+import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder

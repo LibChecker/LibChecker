@@ -4,6 +4,16 @@ object Constants {
 
     const val APP_CENTER_SECRET = "5f11b856-0a27-4438-a038-9e18e4797133"
 
+    const val ERROR = -1
+    const val ARMV8 = 0
+    const val ARMV7 = 1
+    const val ARMV5 = 2
+    const val NO_LIBS = 3
+
+    const val ARMV8_STRING = "arm64-v8a"
+    const val ARMV7_STRING = "armeabi-v7a"
+    const val ARMV5_STRING = "armeabi"
+
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
     const val PREF_ENTRY_ANIMATION = "entryAnimation"
     const val PREF_APK_ANALYTICS = "apkAnalytics"
