@@ -60,6 +60,7 @@ android {
     sourceSets {
         getByName("main").java.apply {
             srcDirs("src/main/kotlin")
+            srcDirs("src/main/java")
             srcDirs("src/main/proto")
         }
     }
@@ -172,20 +173,18 @@ protobuf {
         // Optional: an artifact spec for a protoc plugin, with "grpc" as
         // the identifier, which can be referred to in the "plugins"
         // container of the "generateProtoTasks" closure.
-        id("javalite") {
-            artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
-        }
         id("grpc") {
             artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
         }
         generateProtoTasks {
             all().forEach {
                 it.builtins {
-                    //  remove("java")
+                    create("java") {
+                        option("lite")
+                    }
                 }
 
                 it.plugins{
-                    create("javalite"){ }
                     create("grpc") {
                         option("lite")
                     }
