@@ -354,9 +354,11 @@ object PackageUtils {
         }
 
         val finalList = mutableListOf<String>()
+        var name: String
+
         list?.let {
             for (component in it) {
-                val name = if (isSimpleName) {
+                name = if (isSimpleName) {
                     component.name.removePrefix(packageInfo.packageName)
                 } else {
                     component.name
@@ -377,8 +379,10 @@ object PackageUtils {
      */
     fun getComponentList(packageName: String, list: Array<out ComponentInfo>, isSimpleName: Boolean): List<String> {
         val finalList = mutableListOf<String>()
+        var name: String
+
         for (component in list) {
-            val name = if (isSimpleName) {
+            name = if (isSimpleName) {
                 component.name.removePrefix(packageName)
             } else {
                 component.name
@@ -403,9 +407,10 @@ object PackageUtils {
             val file = File(path)
             val zipFile = ZipFile(file)
             val entries = zipFile.entries()
+            var name: String
 
             while (entries.hasMoreElements()) {
-                val name = entries.nextElement().name
+                name = entries.nextElement().name
 
                 if (name.contains("lib/")) {
                     if (name.contains("arm64-v8a")) {
@@ -422,6 +427,7 @@ object PackageUtils {
                 }
             }
             zipFile.close()
+
             return if (abi == NO_LIBS && !isApk) {
                 getAbiByNativeDir(nativePath)
             } else {

@@ -69,6 +69,8 @@ class AboutActivity : AbsAboutActivity() {
                     shouldShowEasterEggCount++
                     rebornCoroutine.start()
                 } else if (shouldShowEasterEggCount == 20) {
+                    shouldShowEasterEggCount++
+
                     val inputStream = assets.open("renge.webp")
                     icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
                     slogan.text = "えい、私もよ。"

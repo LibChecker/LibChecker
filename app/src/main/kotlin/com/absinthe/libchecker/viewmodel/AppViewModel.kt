@@ -16,6 +16,7 @@ import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
@@ -156,6 +157,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var packageInfo: PackageInfo
             var versionCode: Long
             var lcItem: LCItem
+            var abi: Int
 
             for (dbItem in value) {
                 try {
@@ -164,7 +166,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
-                            var abi: Int
                             do {
                                 abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
                                 lcItem = LCItem(
@@ -209,7 +210,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         PackageUtils.isSplitsApk(packageInfo),
                         PackageUtils.isKotlinUsed(packageInfo)
                     )
-                    var abi: Int
                     do {
                         abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
                         lcItem = LCItem(
@@ -264,10 +264,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     map[lib.name] = count + 1
                 }
             }
+            val properties: MutableMap<String, String> = HashMap()
 
             for (entry in map) {
                 if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
-                    val properties: MutableMap<String, String> = java.util.HashMap()
+                    properties.clear()
                     properties["Library name"] = entry.key
                     properties["Library count"] = entry.value.toString()
 
@@ -323,9 +324,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val libMap = BaseMap.getMap(type)
+        val properties: MutableMap<String, String> = HashMap()
+
         for (entry in map) {
             if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null) {
-                val properties: MutableMap<String, String> = java.util.HashMap()
+                properties.clear()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
 
@@ -383,11 +386,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         }
 
                         try {
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_SERVICES
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_SERVICES
+                            )
 
                             packageInfo.services?.let {
                                 for (service in it) {
@@ -396,11 +398,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
 
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_ACTIVITIES
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
                             packageInfo.activities?.let {
                                 for (activity in it) {
                                     count = map[activity.name]?.count ?: 0
@@ -408,11 +409,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
 
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_RECEIVERS
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
                             packageInfo.receivers?.let {
                                 for (receiver in it) {
                                     count = map[receiver.name]?.count ?: 0
@@ -420,11 +420,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
 
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_PROVIDERS
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
                             packageInfo.providers?.let {
                                 for (provider in it) {
                                     count = map[provider.name]?.count ?: 0
@@ -450,8 +449,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         for (lib in libList) {
                             count = map[lib.name]?.count ?: 0
-                            map[lib.name] =
-                                RefCountType(count + 1, NATIVE)
+                            map[lib.name] = RefCountType(count + 1, NATIVE)
                         }
                     }
                 }
@@ -488,11 +486,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         }
 
                         try {
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_ACTIVITIES
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_ACTIVITIES
+                            )
                             packageInfo.activities?.let {
                                 for (activity in it) {
                                     count = map[activity.name]?.count ?: 0
@@ -512,11 +509,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         }
 
                         try {
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_RECEIVERS
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_RECEIVERS
+                            )
                             packageInfo.receivers?.let {
                                 for (receiver in it) {
                                     count = map[receiver.name]?.count ?: 0
@@ -536,11 +532,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         }
 
                         try {
-                            packageInfo =
-                                context.packageManager.getPackageInfo(
-                                    item.packageName,
-                                    PackageManager.GET_PROVIDERS
-                                )
+                            packageInfo = context.packageManager.getPackageInfo(
+                                item.packageName,
+                                PackageManager.GET_PROVIDERS
+                            )
                             packageInfo.providers?.let {
                                 for (provider in it) {
                                     count = map[provider.name]?.count ?: 0
@@ -554,13 +549,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
+            var chip: LibChip?
             for (entry in map) {
                 if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
-
-                    val chip = BaseMap.getMap(entry.value.type).getChip(entry.key)
-                    refList.add(
-                        LibReference(entry.key, chip, entry.value.count, entry.value.type)
-                    )
+                    chip = BaseMap.getMap(entry.value.type).getChip(entry.key)
+                    refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
                 }
             }
 
@@ -573,8 +566,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshRef() {
         libReference.value?.let { ref ->
-            libReference.value =
-                ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.valueUnsafe }
+            libReference.value = ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.valueUnsafe }
         }
     }
 

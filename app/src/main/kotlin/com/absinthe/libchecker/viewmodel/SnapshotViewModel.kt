@@ -106,9 +106,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
+        var info: ApplicationInfo
         while (exceptionInfoList.isNotEmpty()) {
             try {
-                val info = exceptionInfoList[0]
+                info = exceptionInfoList[0]
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
@@ -268,7 +269,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<SnapshotDetailItem>()
-        val gson = Gson()
 
         list.addAll(
             getNativeDiffList(
