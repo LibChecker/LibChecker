@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
@@ -63,7 +63,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         val dbList = mutableListOf<SnapshotItem>()
-        val gson = Gson()
         val exceptionInfoList = mutableListOf<ApplicationInfo>()
 
         for (info in appList) {
@@ -134,6 +133,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
                 exceptionInfoList.removeAt(0)
             } catch (e: Exception) {
+                exceptionInfoList.removeAt(0)
                 continue
             }
         }
@@ -154,7 +154,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
-        val gson = Gson()
 
         var packageInfo: PackageInfo
         var versionCode: Long

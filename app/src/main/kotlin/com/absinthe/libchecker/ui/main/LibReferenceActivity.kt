@@ -59,7 +59,9 @@ class LibReferenceActivity : BaseActivity() {
             finish()
         } else {
             initView()
-            viewModel.setData(name, type)
+            viewModel.dbItems.observe(this, {
+                viewModel.setData(name, type)
+            })
 
             lifecycleScope.launch(Dispatchers.IO) {
                 BaseMap.getMap(type).getChip(name)?.let {
