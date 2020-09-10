@@ -1,8 +1,11 @@
+import com.google.protobuf.gradle.*
+
 plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("android.extensions")
     kotlin("kapt")
+    id("com.google.protobuf")
 }
 apply {
     from("and_res_guard.gradle")
@@ -55,7 +58,10 @@ android {
     // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
 
     sourceSets {
-        getByName("main").java.srcDirs("src/main/kotlin")
+        getByName("main").java.apply {
+            srcDirs("src/main/kotlin")
+            srcDirs("src/main/proto")
+        }
     }
 
     compileOptions {
@@ -76,6 +82,9 @@ android {
 configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
+
+val grpcVersion by extra("1.31.1")
+val protocVersion by extra("3.13.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -109,8 +118,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha05")
     implementation("androidx.browser:browser:1.2.0")
 
-    implementation("com.google.android.material:material:1.2.0")
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.android.material:material:1.2.1")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
@@ -120,6 +128,10 @@ dependencies {
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.0.0-rc1")
+
+    //Serilization
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
     implementation("rikka.appcompat:appcompat:1.2.0-rc01")
     implementation("rikka.core:core:1.2.3")
@@ -140,10 +152,48 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okio:okio:2.7.0")
 
+    // gRPC
+    implementation("io.grpc:grpc-okhttp:$grpcVersion")
+    implementation("io.grpc:grpc-protobuf-lite:$grpcVersion")
+    implementation("io.grpc:grpc-stub:$grpcVersion")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+
     testImplementation("junit:junit:4.13")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protocVersion"
+    }
+    plugins {
+        // Optional: an artifact spec for a protoc plugin, with "grpc" as
+        // the identifier, which can be referred to in the "plugins"
+        // container of the "generateProtoTasks" closure.
+        id("javalite") {
+            artifact = "com.google.protobuf:protoc-gen-javalite:3.0.0"
+        }
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+        }
+        generateProtoTasks {
+            all().forEach {
+                it.builtins {
+                    //  remove("java")
+                }
+
+                it.plugins{
+                    create("javalite"){ }
+                    create("grpc") {
+                        option("lite")
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 fun String.runCommand(workingDir: File = file("./")): String {

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package protocol;
+
+option java_package = "com.absinthe.libchecker.protocol";
+option java_outer_classname = "LibCheckerProtocol";
+
+message Snapshot {
+  int32 id = 1;
+  int32 version = 2;
+  string contentType = 3;
+  string messageType = 4;
+  string content = 5;
+  bytes data = 6;
+  uint64 time = 7;
+}
