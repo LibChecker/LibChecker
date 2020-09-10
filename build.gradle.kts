@@ -5,6 +5,9 @@ buildscript {
         google()
         jcenter()
         mavenCentral()
+        maven("https://maven.aliyun.com/repository/central")
+        maven("https://maven.aliyun.com/repository/public")
+        maven("https://maven.aliyun.com/repository/google")
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.0.1")
@@ -21,6 +24,9 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        maven("https://maven.aliyun.com/repository/central")
+        maven("https://maven.aliyun.com/repository/public")
+        maven("https://maven.aliyun.com/repository/google")
         maven("https://jitpack.io")
         maven("https://dl.bintray.com/absinthe/libraries")
         maven("https://dl.bintray.com/rikkaw/Libraries")
