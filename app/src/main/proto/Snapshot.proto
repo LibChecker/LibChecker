@@ -6,11 +6,20 @@ option java_package = "com.absinthe.libchecker.protocol";
 option java_outer_classname = "LibCheckerProtocol";
 
 message Snapshot {
-  int32 id = 1;
-  int32 version = 2;
-  string contentType = 3;
-  string messageType = 4;
-  string content = 5;
-  bytes data = 6;
-  uint64 time = 7;
+  string packageName = 1;
+  int64 timeStamp = 2;
+  string label = 3;
+  string versionName = 4;
+  int64 versionCode = 5;
+  int64 installedTime = 6;
+  int64 lastUpdatedTime = 7;
+  bool isSystem = 8;
+  sint32 abi = 9;
+  sint32 targetApi = 10;
+  string nativeLibs = 11;
+  string services = 12;
+  string activities = 13;
+  string receivers = 14;
+  string providers = 15;
+  string permissions = 16;
 }
