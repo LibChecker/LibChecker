@@ -17,8 +17,12 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.SnapshotItem
+import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.protocol.Snapshot
+import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
+import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -26,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -645,5 +650,47 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             node.added = true
         }
         return node
+    }
+
+    fun backup(timeStamp: Int) {
+        val builder: SnapshotList.Builder = SnapshotList.newBuilder()
+
+        val snapshotList = mutableListOf<Snapshot>()
+        val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
+
+        snapshotItems.value?.forEach {
+                loge(it.packageName)
+                snapshotBuilder.apply {
+                    packageName = it.packageName
+                    setTimeStamp(it.timeStamp)
+                    label = it.label
+                    versionName = it.versionName
+                    versionCode = it.versionCode
+                    installedTime = it.installedTime
+                    lastUpdatedTime = it.lastUpdatedTime
+                    isSystem = it.isSystem
+                    abi = it.abi.toInt()
+                    targetApi = it.targetApi.toInt()
+                    nativeLibs = it.nativeLibs
+                    services = it.services
+                    activities = it.activities
+                    receivers = it.receivers
+                    providers = it.providers
+                    permissions = it.permissions
+                }
+
+                snapshotList.add(snapshotBuilder.build())
+            }
+
+        builder.addAllSnapshots(snapshotList)
+        val str = builder.build().toByteArray()
+
+        val file = File(Utils.getApp().cacheDir, "proto.txt")
+        FileUtils.createOrExistsFile(file)
+
+        file.outputStream().apply {
+            write(str)
+            close()
+        }
     }
 }

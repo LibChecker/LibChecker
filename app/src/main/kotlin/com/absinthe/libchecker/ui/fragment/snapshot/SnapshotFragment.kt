@@ -28,6 +28,7 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -54,6 +55,10 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
+
+        dashboardBinding.root.setOnClickListener {
+            startActivity(Intent(requireContext(), AlbumActivity::class.java))
+        }
 
         binding.apply {
             extendedFab.apply {

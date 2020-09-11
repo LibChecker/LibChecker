@@ -6,6 +6,7 @@ plugins {
     kotlin("android.extensions")
     kotlin("kapt")
     id("com.google.protobuf")
+    id("kotlin-android")
 }
 apply {
     from("and_res_guard.gradle")
@@ -93,6 +94,7 @@ dependencies {
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.0.4")
+    implementation("androidx.appcompat:appcompat:1.2.0")
 
     val appCenterSdkVersion = "3.3.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")

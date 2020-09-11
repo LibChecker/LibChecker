@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.absinthe.libchecker">
 
+    <uses-sdk tools:overrideLibrary="androidx.appcompat" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-
-    <uses-sdk tools:overrideLibrary="androidx.appcompat" />
 
     <application
         android:name=".LibCheckerApp"
@@ -17,40 +17,36 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-
+        <activity android:name=".ui.snapshot.AlbumActivity"></activity>
         <activity
             android:name=".ui.main.MainActivity"
+            android:configChanges="orientation"
             android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:configChanges="orientation">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
-
         <activity
             android:name=".ui.detail.AppDetailActivity"
-            android:launchMode="singleTask"
-            android:configChanges="orientation">
+            android:configChanges="orientation"
+            android:launchMode="singleTask">
             <intent-filter>
-                <action
-                    android:name="android.intent.action.SHOW_APP_INFO">
-                </action>
-                <category
-                    android:name="android.intent.category.DEFAULT">
-                </category>
+                <action android:name="android.intent.action.SHOW_APP_INFO"></action>
+
+                <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.detail.ApkDetailActivity"
-            android:label="@string/detail_label"
-            android:configChanges="orientation">
+            android:configChanges="orientation"
+            android:label="@string/detail_label">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -60,16 +56,14 @@
                 <data android:mimeType="application/vnd.android.package-archive" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ui.detail.SnapshotDetailActivity"
+        <activity
+            android:name=".ui.detail.SnapshotDetailActivity"
             android:configChanges="orientation" />
-
         <activity
             android:name=".ui.main.LibReferenceActivity"
+            android:configChanges="orientation"
             android:label="@string/tab_lib_reference_statistics"
-            android:launchMode="singleTask"
-            android:configChanges="orientation" />
-
+            android:launchMode="singleTask" />
         <activity
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"

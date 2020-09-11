@@ -4,6 +4,11 @@ package protocol;
 
 option java_package = "com.absinthe.libchecker.protocol";
 option java_outer_classname = "LibCheckerProtocol";
+option java_multiple_files = true;
+
+message SnapshotList {
+  repeated Snapshot snapshots = 1;
+}
 
 message Snapshot {
   string packageName = 1;
@@ -14,8 +19,8 @@ message Snapshot {
   int64 installedTime = 6;
   int64 lastUpdatedTime = 7;
   bool isSystem = 8;
-  sint32 abi = 9;
-  sint32 targetApi = 10;
+  uint32 abi = 9;
+  uint32 targetApi = 10;
   string nativeLibs = 11;
   string services = 12;
   string activities = 13;
