@@ -116,3 +116,5 @@
 -keepclassmembers class * {
     @androidx.lifecycle.OnLifecycleEvent *;
 }
+
+-keep public class com.absinthe.libchecker.protocol.*  { *; }

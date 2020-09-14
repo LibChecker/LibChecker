@@ -5,6 +5,7 @@
     <string name="title_statistics">Statistics</string>
     <string name="title_snapshot">Snapshot</string>
     <string name="title_settings">Settings</string>
+    <string name="title_album">Album</string>
     <string name="loading">Loading…</string>
 
     <!--  App list  -->
@@ -79,6 +80,7 @@
     <string name="create_an_issue">Assist us to supplement the information</string>
     <string name="split_spk" translatable="false">Split APKs</string>
     <string name="kotlin_used" translatable="false">Kotlin used</string>
+    <string name="items_count">Items count: </string>
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>

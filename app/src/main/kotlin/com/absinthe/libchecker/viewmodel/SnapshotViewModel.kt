@@ -685,7 +685,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         builder.addAllSnapshots(snapshotList)
         val str = builder.build().toByteArray()
 
-        val file = File(Utils.getApp().cacheDir, "proto.txt")
+        val file = File(Utils.getApp().cacheDir, "proto.lcss")
         FileUtils.createOrExistsFile(file)
 
         file.outputStream().apply {

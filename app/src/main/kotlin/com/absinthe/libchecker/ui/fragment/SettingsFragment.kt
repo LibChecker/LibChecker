@@ -133,8 +133,13 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 } else {
                     URLManager.MARKET_PAGE
                 }
-                startActivity(Intent.parseUri(marketUrl, 0))
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
+
+                try {
+                    startActivity(Intent.parseUri(marketUrl, 0))
+                    Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
                 true
             }
         }
