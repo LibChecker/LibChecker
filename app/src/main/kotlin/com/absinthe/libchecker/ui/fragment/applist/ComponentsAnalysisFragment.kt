@@ -6,12 +6,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
@@ -39,6 +39,7 @@ class ComponentsAnalysisFragment :
     private val viewModel by activityViewModels<DetailViewModel>()
     private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: SERVICE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private var isListReady = false
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -80,6 +81,10 @@ class ComponentsAnalysisFragment :
                         }
                     }
                 }
+                if (!isListReady) {
+                    viewModel.itemsCountLiveData.value = componentList.size
+                    isListReady = true
+                }
             })
         }
 
@@ -117,6 +122,10 @@ class ComponentsAnalysisFragment :
     override fun onResume() {
         super.onResume()
         Sortable.currentReference = WeakReference(this)
+
+        if (isListReady) {
+            viewModel.itemsCountLiveData.value = adapter.data.size
+        }
     }
 
     companion object {

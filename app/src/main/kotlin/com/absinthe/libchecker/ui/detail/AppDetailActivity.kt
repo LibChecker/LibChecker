@@ -45,6 +45,7 @@ class AppDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
+    private var currentItemsCount = 0
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -204,6 +205,13 @@ class AppDetailActivity : BaseActivity() {
                 tab.text = tabTitles[position]
             }
             mediator.attach()
+
+            viewModel.itemsCountLiveData.observe(this, {
+                if (currentItemsCount != it) {
+                    binding.tsComponentCount.setText(it.toString())
+                    currentItemsCount = it
+                }
+            })
 
             viewModel.initComponentsData(packageName)
         } ?: supportFinishAfterTransition()

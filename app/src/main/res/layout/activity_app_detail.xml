@@ -201,11 +201,27 @@
             android:backgroundTint="?android:colorBackground"
             app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="end">
+                android:layout_height="match_parent"
+                android:background="@null">
+
+                <TextView
+                    android:id="@+id/tv_items"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Items: "
+                    android:layout_marginStart="@dimen/normal_padding"
+                    android:textColor="@color/textNormal"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <com.absinthe.libchecker.view.detail.TextSwitcherView
+                    android:id="@+id/ts_component_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:paddingVertical="8dp"
+                    app:layout_constraintStart_toEndOf="@id/tv_items" />
 
                 <ImageButton
                     android:id="@+id/ib_sort"
@@ -216,10 +232,13 @@
                     android:scaleType="center"
                     android:src="@drawable/ic_lib_sort"
                     android:tooltipText="@string/menu_sort"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="HardcodedText"
                     tools:targetApi="o" />
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.cardview.widget.CardView>
 

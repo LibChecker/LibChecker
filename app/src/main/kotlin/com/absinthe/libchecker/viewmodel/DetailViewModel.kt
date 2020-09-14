@@ -14,7 +14,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.PackageUtils
@@ -39,6 +39,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         RECEIVER to MutableLiveData(),
         PROVIDER to MutableLiveData()
     )
+    val itemsCountLiveData: MutableLiveData<Int> = MutableLiveData()
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {

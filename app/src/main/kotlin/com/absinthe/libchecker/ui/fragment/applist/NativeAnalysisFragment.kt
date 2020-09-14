@@ -9,7 +9,8 @@ import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
@@ -38,6 +39,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
     private val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
     private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
+    private var isListReady = false
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
@@ -55,6 +57,11 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
                     adapter.setDiffNewData(it.toMutableList())
+                }
+
+                if (!isListReady) {
+                    viewModel.itemsCountLiveData.value = it.size
+                    isListReady = true
                 }
             }
 
@@ -104,6 +111,10 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
     override fun onResume() {
         super.onResume()
         Sortable.currentReference = WeakReference(this)
+
+        if (isListReady) {
+            viewModel.itemsCountLiveData.value = adapter.data.size
+        }
     }
 
     override fun sort() {
