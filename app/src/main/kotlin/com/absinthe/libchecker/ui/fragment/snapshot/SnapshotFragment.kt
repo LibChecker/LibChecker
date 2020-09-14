@@ -37,8 +37,6 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.widget.BorderView
 import java.lang.ref.WeakReference
-import java.text.SimpleDateFormat
-import java.util.*
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -192,12 +190,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.recyclerview.layoutManager = getSuitableLayoutManager()
-    }
-
-    private fun getFormatDateString(timestamp: Long): String {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-        val date = Date(timestamp)
-        return simpleDateFormat.format(date)
     }
 
     private fun flip(child: Int) {

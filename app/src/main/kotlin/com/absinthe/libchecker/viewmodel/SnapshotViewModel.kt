@@ -22,7 +22,6 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -30,7 +29,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
+import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -652,7 +653,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         return node
     }
 
-    fun backup(timeStamp: Int) {
+    fun backup(os: OutputStream, timeStamp: Long) {
         val builder: SnapshotList.Builder = SnapshotList.newBuilder()
 
         val snapshotList = mutableListOf<Snapshot>()
@@ -662,7 +663,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 loge(it.packageName)
                 snapshotBuilder.apply {
                     packageName = it.packageName
-                    setTimeStamp(it.timeStamp)
+                    setTimeStamp(timeStamp)
                     label = it.label
                     versionName = it.versionName
                     versionCode = it.versionCode
@@ -685,12 +686,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         builder.addAllSnapshots(snapshotList)
         val str = builder.build().toByteArray()
 
-        val file = File(Utils.getApp().cacheDir, "proto.lcss")
-        FileUtils.createOrExistsFile(file)
+        os.write(str)
+        os.close()
+    }
 
-        file.outputStream().apply {
-            write(str)
-            close()
-        }
+    fun getFormatDateString(timestamp: Long): String {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+        val date = Date(timestamp)
+        return simpleDateFormat.format(date)
     }
 }

@@ -41,6 +41,8 @@ object Constants {
 
     const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
 
+    const val REQUEST_CODE_BACKUP = 1001
+
     object Event {
         const val LAUNCH_ACTION = "Launch Action"
         const val SNAPSHOT_CLICK = "Snapshot Click"
