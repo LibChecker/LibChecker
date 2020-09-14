@@ -31,6 +31,8 @@ class ApkDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
+    private var currentItemsCount = 0
+
     private val viewModel by viewModels<DetailViewModel>()
 
     override fun setViewBinding(): ViewGroup {
@@ -128,6 +130,14 @@ class ApkDetailActivity : BaseActivity() {
                         Sortable.currentReference?.get()?.sort()
                     }
                 }
+
+                viewModel.itemsCountLiveData.observe(this, { count ->
+                    if (currentItemsCount != count) {
+                        binding.tsComponentCount.setText(count.toString())
+                        currentItemsCount = count
+                    }
+                })
+
                 viewModel.initComponentsData(path)
             } ?: finish()
         } catch (e: Exception) {
