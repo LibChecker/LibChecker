@@ -173,6 +173,6 @@ class SettingsFragment : PreferenceFragment(), IListController {
     }
 
     override fun onReturnTop() {
-
+        //Do nothing
     }
 }

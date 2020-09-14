@@ -67,7 +67,7 @@
             app:key="about"
             app:title="@string/settings_about"
             app:summary="@string/settings_about_summary"
-            android:icon="@drawable/ic_logo">
+            app:icon="@drawable/ic_logo">
 
             <intent
                 android:targetPackage="com.absinthe.libchecker"
@@ -95,7 +95,7 @@
             app:key="tg"
             app:title="@string/join_telegram_group"
             app:summary="@string/join_telegram_group_summary"
-            android:icon="@drawable/ic_telegram">
+            app:icon="@drawable/ic_telegram">
 
         </Preference>
 

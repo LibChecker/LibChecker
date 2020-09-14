@@ -17,7 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
-        <activity android:name=".ui.snapshot.AlbumActivity"></activity>
         <activity
             android:name=".ui.main.MainActivity"
             android:configChanges="orientation"
@@ -38,9 +37,8 @@
             android:configChanges="orientation"
             android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.SHOW_APP_INFO"></action>
-
-                <category android:name="android.intent.category.DEFAULT"></category>
+                <action android:name="android.intent.action.SHOW_APP_INFO" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -59,6 +57,7 @@
         <activity
             android:name=".ui.detail.SnapshotDetailActivity"
             android:configChanges="orientation" />
+        <activity android:name=".ui.snapshot.AlbumActivity" />
         <activity
             android:name=".ui.main.LibReferenceActivity"
             android:configChanges="orientation"

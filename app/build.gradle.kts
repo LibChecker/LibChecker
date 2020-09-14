@@ -6,7 +6,6 @@ plugins {
     kotlin("android.extensions")
     kotlin("kapt")
     id("com.google.protobuf")
-    id("kotlin-android")
 }
 apply {
     from("and_res_guard.gradle")
@@ -85,7 +84,7 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.31.1")
+val grpcVersion by extra("1.32.1")
 val protocVersion by extra("3.13.0")
 
 dependencies {
@@ -93,8 +92,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.0.4")
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("com.absinthe.libraries.utils:utils:1.0.6")
 
     val appCenterSdkVersion = "3.3.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
@@ -130,7 +128,7 @@ dependencies {
     implementation("com.blankj:utilcodex:1.29.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.0.0-rc1")
+    implementation("io.coil-kt:coil:1.0.0-rc2")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")
@@ -146,14 +144,14 @@ dependencies {
     implementation("moe.shizuku.preference:preference-simplemenu-appcompat:$rikkaPreference")
 
     //XML layout to Java code
-    annotationProcessor("com.zhangyue.we:x2c-apt:1.1.2")
     implementation("com.zhangyue.we:x2c-lib:1.0.6")
+    annotationProcessor("com.zhangyue.we:x2c-apt:1.1.2")
 
     //Network
-    implementation("com.squareup.okhttp3:okhttp:4.8.1")
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okio:okio:2.7.0")
+    implementation("com.squareup.okio:okio:2.8.0")
 
     // gRPC
     implementation("io.grpc:grpc-okhttp:$grpcVersion")
