@@ -156,6 +156,7 @@ class MainActivity : BaseActivity() {
                 }
                 true
             }
+            navView.setOnClickListener { /*Do nothing*/ }
         }
     }
 

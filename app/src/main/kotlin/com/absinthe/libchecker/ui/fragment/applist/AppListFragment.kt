@@ -300,7 +300,8 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                     try {
                         flip(VF_LIST)
 
-                        if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) {
+                        if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
+                            && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
                             returnTopOfList()
                         }
 
