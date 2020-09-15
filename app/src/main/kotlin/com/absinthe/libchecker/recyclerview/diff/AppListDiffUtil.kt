@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 
 class AppListDiffUtil : DiffUtil.ItemCallback<LCItem>() {
 

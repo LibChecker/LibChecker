@@ -6,8 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
 
-@Database(entities = [LCItem::class, SnapshotItem::class], version = 4, exportSchema = false)
+@Database(entities = [LCItem::class, SnapshotItem::class], version = 5, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -29,7 +31,7 @@ abstract class LCDatabase : RoomDatabase() {
                     LCDatabase::class.java,
                     "lc_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build()
                 INSTANCE = instance
                 return instance
@@ -63,6 +65,14 @@ abstract class LCDatabase : RoomDatabase() {
                 )
                 database.execSQL(
                     "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL DEFAULT '[]'"
+                )
+            }
+        }
+
+        private val MIGRATION_4_5: Migration = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE timestamp_table (timestamp INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(timestamp))"
                 )
             }
         }

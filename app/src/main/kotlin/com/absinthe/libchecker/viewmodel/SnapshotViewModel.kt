@@ -16,7 +16,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
-import com.absinthe.libchecker.database.SnapshotItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -51,6 +51,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun computeSnapshots() = viewModelScope.launch(Dispatchers.IO) {
+        val ts = System.currentTimeMillis()
         GlobalValues.snapshotTimestamp = 0
         deleteAllSnapshots()
 
@@ -77,7 +78,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     dbList.add(
                         SnapshotItem(
                             packageName = it.packageName,
-                            timeStamp = 0,  //Todo
+                            timeStamp = ts,
                             label = info.loadLabel(context.packageManager).toString(),
                             versionName = it.versionName ?: "null",
                             versionCode = PackageUtils.getVersionCode(it),
@@ -120,7 +121,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     dbList.add(
                         SnapshotItem(
                             packageName = it.packageName,
-                            timeStamp = 0,  //Todo
+                            timeStamp = ts,
                             label = info.loadLabel(context.packageManager).toString(),
                             versionName = it.versionName ?: "null",
                             versionCode = PackageUtils.getVersionCode(it),
@@ -147,7 +148,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         insertSnapshots(dbList)
         withContext(Dispatchers.Main) {
-            val ts = System.currentTimeMillis()
             GlobalValues.snapshotTimestamp = ts
             timestamp.value = ts
         }
@@ -694,5 +694,19 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
         val date = Date(timestamp)
         return simpleDateFormat.format(date)
+    }
+
+    fun migrateFrom4To5() = viewModelScope.launch(Dispatchers.IO) {
+        snapshotItems.value?.let {
+            if (it.isNotEmpty()) {
+                val list = it
+
+                list.forEach { item ->
+                    item.timeStamp = GlobalValues.snapshotTimestamp
+                }
+
+                repository.update(list.toList())
+            }
+        }
     }
 }

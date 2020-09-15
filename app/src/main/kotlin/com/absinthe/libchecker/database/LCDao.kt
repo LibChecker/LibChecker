@@ -2,6 +2,8 @@ package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
 
 @Dao
 interface LCDao {
@@ -38,6 +40,9 @@ interface LCDao {
 
     @Update
     suspend fun update(item: SnapshotItem)
+
+    @Update
+    suspend fun update(items: List<SnapshotItem>)
 
     @Delete
     suspend fun delete(item: SnapshotItem)

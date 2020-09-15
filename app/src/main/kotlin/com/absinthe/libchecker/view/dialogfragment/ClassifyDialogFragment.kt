@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.view.ClassifyDialogView
 
 const val EXTRA_TITLE = "EXTRA_TITLE"

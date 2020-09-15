@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
 
 class LCRepository(private val lcDao: LCDao) {
 
@@ -41,6 +43,10 @@ class LCRepository(private val lcDao: LCDao) {
 
     suspend fun update(item: SnapshotItem) {
         lcDao.update(item)
+    }
+
+    suspend fun update(items: List<SnapshotItem>) {
+        lcDao.update(items)
     }
 
     suspend fun delete(item: SnapshotItem) {

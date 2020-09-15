@@ -26,7 +26,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop

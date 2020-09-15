@@ -11,7 +11,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV7
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment

@@ -10,7 +10,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter

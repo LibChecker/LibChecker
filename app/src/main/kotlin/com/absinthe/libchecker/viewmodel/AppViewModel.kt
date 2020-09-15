@@ -22,7 +22,7 @@ import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCItem
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.valueUnsafe
