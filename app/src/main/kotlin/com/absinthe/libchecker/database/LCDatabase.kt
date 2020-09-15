@@ -8,8 +8,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
 
-@Database(entities = [LCItem::class, SnapshotItem::class], version = 5, exportSchema = false)
+@Database(entities = [LCItem::class, SnapshotItem::class, TimeStampItem::class], version = 7, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -31,7 +32,7 @@ abstract class LCDatabase : RoomDatabase() {
                     LCDatabase::class.java,
                     "lc_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .build()
                 INSTANCE = instance
                 return instance
@@ -74,6 +75,27 @@ abstract class LCDatabase : RoomDatabase() {
                 database.execSQL(
                     "CREATE TABLE timestamp_table (timestamp INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(timestamp))"
                 )
+            }
+        }
+
+        private val MIGRATION_5_6: Migration = object : Migration(5, 6) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                //Add TimeStampItem entity
+            }
+        }
+
+        private val MIGRATION_6_7: Migration = object : Migration(6, 7) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Create the new table
+                database.execSQL(
+                    "CREATE TABLE snapshot_new (id INTEGER, packageName TEXT NOT NULL, timeStamp INTEGER NOT NULL DEFAULT 0, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, permissions TEXT NOT NULL, PRIMARY KEY(id))")
+                // Copy the data
+                database.execSQL(
+                    "INSERT INTO snapshot_new (packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions) SELECT packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions FROM snapshot_table")
+                // Remove the old table
+                database.execSQL("DROP TABLE snapshot_table")
+                // Change the table name to the correct one
+                database.execSQL("ALTER TABLE snapshot_new RENAME TO snapshot_table")
             }
         }
     }

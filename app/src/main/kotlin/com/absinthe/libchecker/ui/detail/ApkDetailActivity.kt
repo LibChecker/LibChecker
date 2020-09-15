@@ -31,7 +31,7 @@ class ApkDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
-    private var currentItemsCount = 0
+    private var currentItemsCount = -1
 
     private val viewModel by viewModels<DetailViewModel>()
 

@@ -17,6 +17,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -33,15 +34,17 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+const val CURRENT_SNAPSHOT = -1L
+
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
+    val repository: LCRepository
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
 
     private val gson: Gson
-    private val repository: LCRepository
 
     init {
         val lcDao = LCDatabase.getDatabase(application).lcDao()
@@ -50,10 +53,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         gson = Gson()
     }
 
+    fun getSnapshotsSize(timeStamp: Long): Int = repository.getSnapshots(timeStamp).size
+
     fun computeSnapshots() = viewModelScope.launch(Dispatchers.IO) {
         val ts = System.currentTimeMillis()
         GlobalValues.snapshotTimestamp = 0
-        deleteAllSnapshots()
 
         val context: Context = getApplication<LibCheckerApp>()
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
@@ -77,6 +81,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
+                            id = null,
                             packageName = it.packageName,
                             timeStamp = ts,
                             label = info.loadLabel(context.packageManager).toString(),
@@ -120,6 +125,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
+                            id = null,
                             packageName = it.packageName,
                             timeStamp = ts,
                             label = info.loadLabel(context.packageManager).toString(),
@@ -147,14 +153,25 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         insertSnapshots(dbList)
+        insertTimeStamp(TimeStampItem(ts))
+
         withContext(Dispatchers.Main) {
             GlobalValues.snapshotTimestamp = ts
             timestamp.value = ts
         }
     }
 
-    fun computeDiff() = viewModelScope.launch(Dispatchers.IO) {
-        if (snapshotItems.value.isNullOrEmpty()) return@launch
+    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch(Dispatchers.IO) {
+        if (currTimeStamp == CURRENT_SNAPSHOT) {
+            compareDiffWithApplicationList(preTimeStamp)
+        } else {
+            compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
+        }
+    }
+
+    private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) {
+        val preList = repository.getSnapshots(preTimeStamp)
+        if (preList.isNullOrEmpty()) { return }
 
         val context: Context = getApplication<LibCheckerApp>()
         val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value!!.toMutableList()
@@ -167,7 +184,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
 
-        snapshotItems.value?.let { dbItems ->
+        preList.let { dbItems ->
             for (dbItem in dbItems) {
                 appList.find { it.packageName == dbItem.packageName }?.let {
                     try {
@@ -273,6 +290,93 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
+    private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
+        val preList = repository.getSnapshots(preTimeStamp)
+        if (preList.isNullOrEmpty()) { return }
+
+        val currList = repository.getSnapshots(currTimeStamp).toMutableList()
+        if (currList.isNullOrEmpty()) { return }
+
+        val diffList = mutableListOf<SnapshotDiffItem>()
+
+        var compareDiffNode: CompareDiffNode
+        var snapshotDiffItem: SnapshotDiffItem
+
+        for (preItem in preList) {
+            currList.find { it.packageName == preItem.packageName }?.let {
+                if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
+                    snapshotDiffItem = SnapshotDiffItem(
+                        packageName = it.packageName,
+                        updateTime = it.lastUpdatedTime,
+                        labelDiff = SnapshotDiffItem.DiffNode(it.label, preItem.label),
+                        versionNameDiff = SnapshotDiffItem.DiffNode(it.versionName, preItem.versionName),
+                        versionCodeDiff = SnapshotDiffItem.DiffNode(it.versionCode, preItem.versionCode),
+                        abiDiff = SnapshotDiffItem.DiffNode(it.abi, preItem.abi),
+                        targetApiDiff = SnapshotDiffItem.DiffNode(it.targetApi, preItem.targetApi),
+                        nativeLibsDiff = SnapshotDiffItem.DiffNode(it.nativeLibs, preItem.nativeLibs),
+                        servicesDiff = SnapshotDiffItem.DiffNode(it.services, preItem.services),
+                        activitiesDiff = SnapshotDiffItem.DiffNode(it.activities, preItem.activities),
+                        receiversDiff = SnapshotDiffItem.DiffNode(it.receivers, preItem.receivers),
+                        providersDiff = SnapshotDiffItem.DiffNode(it.providers, preItem.providers),
+                        permissionsDiff = SnapshotDiffItem.DiffNode(it.permissions, preItem.permissions)
+                    )
+                    compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
+                    snapshotDiffItem.added = compareDiffNode.added
+                    snapshotDiffItem.removed = compareDiffNode.removed
+                    snapshotDiffItem.changed = compareDiffNode.changed
+                    snapshotDiffItem.moved = compareDiffNode.moved
+
+                    diffList.add(snapshotDiffItem)
+                }
+                currList.remove(it)
+            } ?: run {
+                diffList.add(
+                    SnapshotDiffItem(
+                        preItem.packageName,
+                        preItem.lastUpdatedTime,
+                        SnapshotDiffItem.DiffNode(preItem.label),
+                        SnapshotDiffItem.DiffNode(preItem.versionName),
+                        SnapshotDiffItem.DiffNode(preItem.versionCode),
+                        SnapshotDiffItem.DiffNode(preItem.abi),
+                        SnapshotDiffItem.DiffNode(preItem.targetApi),
+                        SnapshotDiffItem.DiffNode(preItem.nativeLibs),
+                        SnapshotDiffItem.DiffNode(preItem.services),
+                        SnapshotDiffItem.DiffNode(preItem.activities),
+                        SnapshotDiffItem.DiffNode(preItem.receivers),
+                        SnapshotDiffItem.DiffNode(preItem.providers),
+                        SnapshotDiffItem.DiffNode(preItem.permissions),
+                        deleted = true
+                    )
+                )
+            }
+        }
+
+        for (info in currList) {
+            diffList.add(
+                SnapshotDiffItem(
+                    info.packageName,
+                    info.lastUpdatedTime,
+                    SnapshotDiffItem.DiffNode(info.label),
+                    SnapshotDiffItem.DiffNode(info.versionName),
+                    SnapshotDiffItem.DiffNode(info.versionCode),
+                    SnapshotDiffItem.DiffNode(info.abi),
+                    SnapshotDiffItem.DiffNode(info.targetApi),
+                    SnapshotDiffItem.DiffNode(info.nativeLibs),
+                    SnapshotDiffItem.DiffNode(info.services),
+                    SnapshotDiffItem.DiffNode(info.activities),
+                    SnapshotDiffItem.DiffNode(info.receivers),
+                    SnapshotDiffItem.DiffNode(info.providers),
+                    SnapshotDiffItem.DiffNode(info.permissions),
+                    newInstalled = true
+                )
+            )
+        }
+
+        withContext(Dispatchers.Main) {
+            snapshotDiffItems.value = diffList
+        }
+    }
+
     fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<SnapshotDetailItem>()
 
@@ -324,7 +428,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         repository.insertSnapshots(items)
     }
 
-    private fun deleteAllSnapshots() = repository.deleteAllSnapshots()
+    private fun insertTimeStamp(timestamp: TimeStampItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(timestamp)
+    }
 
     private fun getNativeDiffList(oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
@@ -655,11 +761,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun backup(os: OutputStream, timeStamp: Long) {
         val builder: SnapshotList.Builder = SnapshotList.newBuilder()
+        val backupList = repository.getSnapshots(timeStamp)
 
         val snapshotList = mutableListOf<Snapshot>()
         val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
 
-        snapshotItems.value?.forEach {
+        backupList.forEach {
                 loge(it.packageName)
                 snapshotBuilder.apply {
                     packageName = it.packageName
@@ -697,16 +804,20 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun migrateFrom4To5() = viewModelScope.launch(Dispatchers.IO) {
+        val ts = GlobalValues.snapshotTimestamp
+
         snapshotItems.value?.let {
             if (it.isNotEmpty()) {
                 val list = it
 
                 list.forEach { item ->
-                    item.timeStamp = GlobalValues.snapshotTimestamp
+                    item.timeStamp = ts
                 }
 
                 repository.update(list.toList())
             }
         }
+
+        repository.insert(TimeStampItem(ts))
     }
 }

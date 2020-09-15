@@ -5,9 +5,11 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -37,6 +39,9 @@ import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
 import java.lang.ref.WeakReference
 
@@ -56,8 +61,36 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
 
-        dashboardBinding.root.setOnClickListener {
-            startActivity(Intent(requireContext(), AlbumActivity::class.java))
+        dashboardBinding.apply {
+            root.setOnClickListener {
+                startActivity(Intent(requireContext(), AlbumActivity::class.java))
+            }
+
+            fun changeTimeNode() {
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val timeStampList = viewModel.repository.getTimeStamps()
+                    val charList = mutableListOf<String>()
+                    timeStampList.forEach { charList.add(viewModel.getFormatDateString(it.timestamp)) }
+
+                    withContext(Dispatchers.Main) {
+                        AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.dialog_title_change_timestamp)
+                            .setItems(charList.toTypedArray()) { _, which ->
+                                GlobalValues.snapshotTimestamp = timeStampList[which].timestamp
+                                viewModel.compareDiff(timeStampList[which].timestamp)
+                                flip(VF_LOADING)
+                            }
+                            .show()
+                    }
+                }
+            }
+
+            tvSnapshotTimestampText.setOnClickListener {
+                changeTimeNode()
+            }
+            ivArrow.setOnClickListener{
+                changeTimeNode()
+            }
         }
 
         binding.apply {
@@ -161,10 +194,23 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             })
             snapshotItems.observe(viewLifecycleOwner, {
                 isSnapshotDatabaseItemsReady = true
-                dashboardBinding.tvSnapshotAppsCountText.text = it.size.toString()
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val count = getSnapshotsSize(GlobalValues.snapshotTimestamp).toString()
+
+                    withContext(Dispatchers.Main) {
+                        dashboardBinding.tvSnapshotAppsCountText.text = count
+                    }
+                }
 
                 if (isApplicationInfoItemsReady) {
-                    computeDiff()
+                    compareDiff(GlobalValues.snapshotTimestamp)
+                    isSnapshotDatabaseItemsReady = false
+                }
+
+                if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
+                    viewModel.migrateFrom4To5()
+                    Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
                 }
             })
             AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
@@ -172,7 +218,8 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 AppItemRepository.shouldRefreshAppList = true
 
                 if (isSnapshotDatabaseItemsReady) {
-                    computeDiff()
+                    compareDiff(GlobalValues.snapshotTimestamp)
+                    isApplicationInfoItemsReady = false
                 }
             })
             snapshotDiffItems.observe(
@@ -181,11 +228,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     flip(VF_LIST)
                 }
             )
-
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_4_5)) {
-                viewModel.migrateFrom4To5()
-                Once.markDone(OnceTag.MIGRATION_4_5)
-            }
         }
     }
 

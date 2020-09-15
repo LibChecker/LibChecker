@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
 
 @Dao
 interface LCDao {
@@ -32,6 +33,9 @@ interface LCDao {
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
     fun getSnapshots(): LiveData<List<SnapshotItem>>
 
+    @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+    fun getSnapshots(timestamp: Long): List<SnapshotItem>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: SnapshotItem)
 
@@ -49,4 +53,10 @@ interface LCDao {
 
     @Query("DELETE FROM snapshot_table")
     fun deleteAllSnapshots()
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(item: TimeStampItem)
+
+    @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
+    fun getTimeStamps(): List<TimeStampItem>
 }

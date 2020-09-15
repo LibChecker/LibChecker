@@ -30,11 +30,23 @@
             android:id="@+id/tv_snapshot_timestamp_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:fontFamily="sans-serif-black"
             android:textColor="@color/textNormal"
             app:layout_constraintStart_toStartOf="@id/tv_snapshot_timestamp_title"
             app:layout_constraintTop_toBottomOf="@id/tv_snapshot_timestamp_title"
             tools:text="2020-06-17-00:39:45" />
+
+        <ImageView
+            android:id="@+id/iv_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_arrow_drop_down"
+            app:layout_constraintBottom_toBottomOf="@id/tv_snapshot_timestamp_text"
+            app:layout_constraintStart_toEndOf="@id/tv_snapshot_timestamp_text"
+            app:layout_constraintTop_toTopOf="@id/tv_snapshot_timestamp_text" />
 
         <TextView
             android:id="@+id/tv_snapshot_apps_count_title"

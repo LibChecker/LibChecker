@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "snapshot_table")
 data class SnapshotItem(
-    @PrimaryKey @ColumnInfo(name = "packageName") val packageName: String,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Int?,
+    @ColumnInfo(name = "packageName") val packageName: String,
     @ColumnInfo(name = "timeStamp") var timeStamp: Long,
     @ColumnInfo(name = "label") val label: String,
     @ColumnInfo(name = "versionName") val versionName: String,

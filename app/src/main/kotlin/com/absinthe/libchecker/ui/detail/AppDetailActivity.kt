@@ -45,7 +45,7 @@ class AppDetailActivity : BaseActivity() {
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
-    private var currentItemsCount = 0
+    private var currentItemsCount = -1
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true

@@ -101,6 +101,7 @@
     <string name="snapshot_empty_list_title">No Changes</string>
     <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
+    <string name="dialog_title_change_timestamp">Change time node</string>
 
     <!--  Dialog  -->
     <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
