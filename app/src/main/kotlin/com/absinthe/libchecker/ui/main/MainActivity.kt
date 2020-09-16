@@ -30,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
+import com.blankj.utilcode.util.FileUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -38,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
@@ -68,6 +70,7 @@ class MainActivity : BaseActivity() {
         initAllApplicationInfoItems()
         initObserver()
         initMap()
+        clearApkCache()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -236,5 +239,9 @@ class MainActivity : BaseActivity() {
         ReceiverLibMap
         ProviderLibMap
         DexLibMap
+    }
+
+    private fun clearApkCache() {
+        FileUtils.delete(File(externalCacheDir, "temp.apk"))
     }
 }

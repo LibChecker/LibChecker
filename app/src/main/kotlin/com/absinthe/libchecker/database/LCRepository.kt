@@ -58,6 +58,11 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.delete(item)
     }
 
+    fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
+        lcDao.deleteSnapshots(timestamp)
+        lcDao.delete(TimeStampItem(timestamp))
+    }
+
     fun deleteAllSnapshots() {
         lcDao.deleteAllSnapshots()
     }

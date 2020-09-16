@@ -33,4 +33,12 @@
         android:layout_gravity="center"
         android:text="Save" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:text="Delete" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

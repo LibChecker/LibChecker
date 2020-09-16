@@ -6,12 +6,18 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -49,6 +55,23 @@ class AlbumActivity : BaseActivity() {
                     )
                 }
             })
+        }
+        binding.btnDelete.setOnClickListener {
+            lifecycleScope.launch(Dispatchers.IO) {
+                val timeStampList = viewModel.repository.getTimeStamps()
+                val charList = mutableListOf<String>()
+                timeStampList.forEach { charList.add(viewModel.getFormatDateString(it.timestamp)) }
+
+                withContext(Dispatchers.Main) {
+                    AlertDialog.Builder(this@AlbumActivity)
+                        .setTitle(R.string.dialog_title_change_timestamp)
+                        .setItems(charList.toTypedArray()) { _, which ->
+                            viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
+                            GlobalValues.snapshotTimestamp = timeStampList[which - 1].timestamp
+                        }
+                        .show()
+                }
+            }
         }
     }
 

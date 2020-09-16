@@ -53,6 +53,11 @@ class ApkDetailActivity : BaseActivity() {
         }
     }
 
+    override fun onDestroy() {
+        tempFile?.delete()
+        super.onDestroy()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()

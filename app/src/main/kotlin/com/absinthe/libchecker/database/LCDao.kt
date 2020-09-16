@@ -9,6 +9,7 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 @Dao
 interface LCDao {
 
+    //Item Table
     @Query("SELECT * from item_table ORDER BY label ASC")
     fun getItems(): LiveData<List<LCItem>>
 
@@ -30,6 +31,7 @@ interface LCDao {
     @Query("DELETE FROM item_table")
     fun deleteAllItems()
 
+    //Snapshot Table
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
     fun getSnapshots(): LiveData<List<SnapshotItem>>
 
@@ -54,9 +56,16 @@ interface LCDao {
     @Query("DELETE FROM snapshot_table")
     fun deleteAllSnapshots()
 
+    @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
+    fun deleteSnapshots(timestamp: Long)
+
+    //TimeStamp Table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: TimeStampItem)
 
     @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
     fun getTimeStamps(): List<TimeStampItem>
+
+    @Delete
+    fun delete(item: TimeStampItem)
 }
