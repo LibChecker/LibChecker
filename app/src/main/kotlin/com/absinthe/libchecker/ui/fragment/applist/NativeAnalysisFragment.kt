@@ -19,6 +19,7 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -27,7 +28,6 @@ import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
-import java.lang.ref.WeakReference
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
@@ -110,7 +110,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
     override fun onResume() {
         super.onResume()
-        Sortable.currentReference = WeakReference(this)
+        (requireActivity() as IDetailContainer).currentFragment = this
 
         if (isListReady) {
             viewModel.itemsCountLiveData.value = adapter.data.size

@@ -30,6 +30,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.ui.fragment.IListController
+import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -43,7 +44,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
-import java.lang.ref.WeakReference
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -233,7 +233,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
 
     override fun onResume() {
         super.onResume()
-        IListController.controller = WeakReference(this)
+        (requireActivity() as IListContainer).controller = this
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

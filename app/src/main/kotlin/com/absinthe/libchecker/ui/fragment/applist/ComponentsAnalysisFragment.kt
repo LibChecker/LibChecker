@@ -18,6 +18,7 @@ import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
+import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -29,12 +30,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
-import java.lang.ref.WeakReference
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-class ComponentsAnalysisFragment :
-    BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
+class ComponentsAnalysisFragment : BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: SERVICE) }
@@ -121,7 +120,7 @@ class ComponentsAnalysisFragment :
 
     override fun onResume() {
         super.onResume()
-        Sortable.currentReference = WeakReference(this)
+        (requireActivity() as IDetailContainer).currentFragment = this
 
         if (isListReady) {
             viewModel.itemsCountLiveData.value = adapter.data.size

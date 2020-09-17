@@ -66,8 +66,14 @@ class AlbumActivity : BaseActivity() {
                     AlertDialog.Builder(this@AlbumActivity)
                         .setTitle(R.string.dialog_title_change_timestamp)
                         .setItems(charList.toTypedArray()) { _, which ->
-                            viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
-                            GlobalValues.snapshotTimestamp = timeStampList[which - 1].timestamp
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
+                            }
+                            GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
+                                0L
+                            } else {
+                                timeStampList[0].timestamp
+                            }
                         }
                         .show()
                 }

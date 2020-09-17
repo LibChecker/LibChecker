@@ -40,12 +40,14 @@ import kotlinx.coroutines.withContext
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
-class AppDetailActivity : BaseActivity() {
+class AppDetailActivity : BaseActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
     private var currentItemsCount = -1
+
+    override var currentFragment: Sortable? = null
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -169,7 +171,7 @@ class AppDetailActivity : BaseActivity() {
                 }
 
                 ibSort.setOnClickListener {
-                    Sortable.currentReference?.get()?.sort()
+                    currentFragment?.sort()
                 }
             }
 

@@ -43,7 +43,7 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity(), IListContainer {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -51,6 +51,8 @@ class MainActivity : BaseActivity() {
     private var isDatabaseFinishInit = false
 
     private val appViewModel by viewModels<AppViewModel>()
+
+    override var controller: IListController? = null
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -146,7 +148,7 @@ class MainActivity : BaseActivity() {
                                 clickBottomItemFlag = false
                             }
                         } else {
-                            IListController.controller?.get()?.onReturnTop()
+                            controller?.onReturnTop()
                         }
                     }
                 }

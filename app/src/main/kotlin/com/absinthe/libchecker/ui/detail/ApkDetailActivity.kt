@@ -27,13 +27,15 @@ import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import java.io.File
 
-class ApkDetailActivity : BaseActivity() {
+class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
     private var currentItemsCount = -1
 
     private val viewModel by viewModels<DetailViewModel>()
+
+    override var currentFragment: Sortable? = null
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -132,7 +134,7 @@ class ApkDetailActivity : BaseActivity() {
                     }
 
                     ibSort.setOnClickListener {
-                        Sortable.currentReference?.get()?.sort()
+                        currentFragment?.sort()
                     }
                 }
 
