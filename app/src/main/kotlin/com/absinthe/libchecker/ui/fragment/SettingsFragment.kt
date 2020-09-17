@@ -20,6 +20,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
+import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
@@ -31,7 +32,6 @@ import moe.shizuku.preference.SwitchPreference
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
 import rikka.recyclerview.fixEdgeEffect
-import java.lang.ref.WeakReference
 
 class SettingsFragment : PreferenceFragment(), IListController {
 
@@ -155,7 +155,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
 
     override fun onResume() {
         super.onResume()
-        IListController.controller = WeakReference(this)
+        (requireActivity() as IListContainer).controller = this
     }
 
     override fun onCreateItemDecoration(): DividerDecoration? {
