@@ -12,8 +12,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.fragment_statistics) {
 
-    override fun initBinding(view: View): FragmentStatisticsBinding =
-        FragmentStatisticsBinding.bind(view)
+    override fun initBinding(view: View): FragmentStatisticsBinding = FragmentStatisticsBinding.bind(view)
 
     override fun init() {
         binding.root.addPaddingTop(BarUtils.getStatusBarHeight())

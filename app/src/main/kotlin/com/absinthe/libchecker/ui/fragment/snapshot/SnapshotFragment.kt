@@ -193,6 +193,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 }
             })
             snapshotItems.observe(viewLifecycleOwner, {
+                viewModel.timestamp.value = GlobalValues.snapshotTimestamp
                 isSnapshotDatabaseItemsReady = true
 
                 lifecycleScope.launch(Dispatchers.IO) {

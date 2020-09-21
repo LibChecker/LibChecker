@@ -17,9 +17,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.java.FreezeUtils
-import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
@@ -79,12 +77,7 @@ object PackageUtils {
     @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
         return try {
-            val timer = TimeRecorder()
-            timer.start()
-            val list = Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: listOf()
-            timer.end()
-            logd("getInstallApplications: $timer")
-            list
+            Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: listOf()
         } catch (e: Exception) {
             throw Exception()
         }
@@ -147,18 +140,15 @@ object PackageUtils {
      */
     fun getNativeDirLibs(sourcePath: String, nativePath: String): List<LibStringItem> {
         val file = File(nativePath)
-        val list = ArrayList<LibStringItem>()
-
-        file.listFiles()?.let { fileList ->
-            for (abi in fileList) {
-                if (!list.any { it.name == abi.name }) {
-                    list.add(LibStringItem(abi.name, abi.length()))
-                }
-            }
-        }
+        val list = file.listFiles()
+            ?.asSequence()
+            ?.distinctBy { it.name }
+            ?.map { LibStringItem(it.name, it.length()) }
+            ?.toList()
+            ?: listOf()
 
         if (list.isEmpty()) {
-            list.addAll(getSourceLibs(sourcePath))
+            return getSourceLibs(sourcePath)
         }
 
         return list
@@ -169,38 +159,28 @@ object PackageUtils {
      * @param path Source path of the app
      * @return List of LibStringItem
      */
-    private fun getSourceLibs(path: String): ArrayList<LibStringItem> {
-        val libList = ArrayList<LibStringItem>()
+    private fun getSourceLibs(path: String): List<LibStringItem> {
+        val file = File(path)
+        val zipFile = ZipFile(file)
+        val entries = zipFile.entries()
 
         try {
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-
-            var splitName: String
-            var next: ZipEntry
-
-            while (entries.hasMoreElements()) {
-                next = entries.nextElement()
-
-                if (next.name.contains("lib/")) {
-                    splitName = next.name.split("/").last()
-
-                    if (!libList.any { it.name == splitName }) {
-                        libList.add(LibStringItem(splitName, next.size))
-                    }
-                }
-            }
-            zipFile.close()
+            val libList = entries.asSequence()
+                .filter { it.name.contains("lib/") }
+                .distinctBy { it.name.split("/").last() }
+                .map { LibStringItem(it.name.split("/").last(), it.size) }
+                .toList()
 
             if (libList.isEmpty()) {
-                libList.addAll(getSplitLibs(path))
+                return getSplitLibs(path)
             }
 
             return libList
         } catch (e: Exception) {
             e.printStackTrace()
-            return libList
+            return listOf()
+        } finally {
+            zipFile.close()
         }
     }
 
@@ -251,10 +231,8 @@ object PackageUtils {
         try {
             val path = packageInfo.applicationInfo.sourceDir
             File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-                for (file in it) {
-                    if (file.name.startsWith("split_config.")) {
-                        return true
-                    }
+                if (it.any { item -> item.name.startsWith("split_config.") }) {
+                    return true
                 }
             }
         } catch (e: Exception) {
@@ -270,29 +248,20 @@ object PackageUtils {
      * @return true if it uses Kotlin language
      */
     fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
-        try {
-            val path = packageInfo.applicationInfo.sourceDir
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-            var next: ZipEntry
+        val path = packageInfo.applicationInfo.sourceDir
+        val file = File(path)
+        val zipFile = ZipFile(file)
 
-            while (entries.hasMoreElements()) {
-                next = entries.nextElement()
-
-                when {
-                    next.name.startsWith("kotlin/") -> {
-                        return true
-                    }
-                    next.name.startsWith("META-INF/services/kotlin") -> {
-                        return true
-                    }
-                }
+        return try {
+            if (zipFile.entries().asSequence().any { it.name.startsWith("kotlin/") || it.name.startsWith("META-INF/services/kotlin") }) {
+                true
+            } else {
+                isKotlinUsedInClassDex(file)
             }
-            zipFile.close()
-            return isKotlinUsedInClassDex(file)
         } catch (e: Exception) {
-            return false
+            false
+        } finally {
+            zipFile.close()
         }
     }
 
@@ -302,19 +271,10 @@ object PackageUtils {
      * @return true if it uses Kotlin language
      */
     private fun isKotlinUsedInClassDex(file: File): Boolean {
-        try {
-            val apkFile = ApkFile(file)
-
-            for (dexClass in apkFile.dexClasses) {
-                if (dexClass.toString().startsWith("Lkotlin/") || dexClass.toString()
-                        .startsWith("Lkotlinx/")
-                ) {
-                    return true
-                }
-            }
-            return false
+        return try {
+            ApkFile(file).dexClasses.any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
         } catch (e: Exception) {
-            return false
+            false
         }
     }
 
@@ -353,21 +313,16 @@ object PackageUtils {
             else -> null
         }
 
-        val finalList = mutableListOf<String>()
-        var name: String
-
-        list?.let {
-            for (component in it) {
-                name = if (isSimpleName) {
-                    component.name.removePrefix(packageInfo.packageName)
+        return list?.asSequence()
+            ?.map {
+                if (isSimpleName) {
+                    it.name.removePrefix(packageInfo.packageName)
                 } else {
-                    component.name
+                    it.name
                 }
-                finalList.add(name)
             }
-        }
-
-        return finalList
+            ?.toList()
+            ?: listOf()
     }
 
     /**
@@ -378,19 +333,15 @@ object PackageUtils {
      * @return List of String
      */
     fun getComponentList(packageName: String, list: Array<out ComponentInfo>, isSimpleName: Boolean): List<String> {
-        val finalList = mutableListOf<String>()
-        var name: String
-
-        for (component in list) {
-            name = if (isSimpleName) {
-                component.name.removePrefix(packageName)
-            } else {
-                component.name
+        return list.asSequence()
+            .map {
+                if (isSimpleName) {
+                    it.name.removePrefix(packageName)
+                } else {
+                    it.name
+                }
             }
-            finalList.add(name)
-        }
-
-        return finalList
+            .toList()
     }
 
     /**

@@ -69,6 +69,7 @@ class AlbumActivity : BaseActivity() {
                             lifecycleScope.launch(Dispatchers.IO) {
                                 viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
                             }
+                            charList.removeAt(which)
                             GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
                                 0L
                             } else {
