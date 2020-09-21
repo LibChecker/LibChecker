@@ -244,6 +244,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.igexin.sdk.FlymePushReceiver",
+            LibChip(
+                R.drawable.ic_question,
+                "Meizu Push(GeTui Proxy)"
+            )
+        ),
+        Pair(
             "cn.jpush.android.service.AlarmReceiver",
             LibChip(
                 R.drawable.ic_lib_jpush,

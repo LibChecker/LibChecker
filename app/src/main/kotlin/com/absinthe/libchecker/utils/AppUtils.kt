@@ -6,10 +6,13 @@ import android.os.Looper
 import android.os.MessageQueue
 import android.util.Log
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.blankj.utilcode.util.Utils
+import java.text.SimpleDateFormat
 import java.util.*
 
 object AppUtils {
@@ -22,6 +25,15 @@ object AppUtils {
             12, 1, 2 -> WINTER
             else -> -1
         }
+    }
+
+    fun setTitle(): String {
+        val sb = StringBuilder(Utils.getApp().getString(R.string.app_name))
+
+        if (SimpleDateFormat("MMdd", Locale.getDefault()).format(Date()) == "1225") {
+            sb.append("\uD83C\uDF84")
+        }
+        return sb.toString()
     }
 
 }

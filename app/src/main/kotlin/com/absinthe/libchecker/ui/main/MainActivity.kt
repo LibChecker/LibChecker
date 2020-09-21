@@ -27,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
+import com.absinthe.libchecker.utils.AppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
@@ -100,6 +101,7 @@ class MainActivity : BaseActivity(), IListContainer {
     private fun initView() {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+        supportActionBar?.title = AppUtils.setTitle()
 
         binding.apply {
             viewpager.apply {

@@ -198,6 +198,10 @@ object ProviderLibMap : BaseMap() {
             "com.qihoo360.mobilesafe.svcmanager.ServiceProvider",
             LibChip(R.drawable.ic_lib_360, "RePlugin")
         ),
+        Pair(
+            "cn.sharesdk.framework.utils.ShareSDKFileProvider",
+            LibChip(R.drawable.ic_question, "ShareSDK")
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

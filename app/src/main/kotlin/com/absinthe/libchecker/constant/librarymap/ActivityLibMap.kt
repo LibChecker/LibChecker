@@ -43,6 +43,14 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_tencent, "防水墙")
         ),
         Pair(
+            "com.tencent.midas.wx.APMidasWXPayActivity",
+            LibChip(R.drawable.ic_lib_tencent, "米大师")
+        ),
+        Pair(
+            "com.tencent.midas.proxyactivity.APMidasPayProxyActivity",
+            LibChip(R.drawable.ic_lib_tencent, "米大师")
+        ),
+        Pair(
             "com.qq.e.ads.LandscapeADActivity",
             LibChip(R.drawable.ic_lib_tencent_ad, "腾讯广告 SDK")
         ),
