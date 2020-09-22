@@ -16,4 +16,10 @@
     <dimen name="toast_radius">24dp</dimen>
 
     <dimen name="condense_abi_badge_width">60dp</dimen>
+
+    <dimen name="main_card_icon_size">45dp</dimen>
+    <dimen name="main_card_padding">10dp</dimen>
+    <dimen name="main_card_corner">5dp</dimen>
+    <dimen name="main_card_inset_horizontal">20dp</dimen>
+    <dimen name="main_card_inset_vertical">30dp</dimen>
 </resources>

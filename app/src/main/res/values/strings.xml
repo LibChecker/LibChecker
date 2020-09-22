@@ -101,9 +101,21 @@
     <string name="snapshot_empty_list_title">No Changes</string>
     <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
-    <string name="dialog_title_change_timestamp">Change time node</string>
 
     <!--  Dialog  -->
     <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
     <string name="dialog_subtitle_reload_apps">This may take a few seconds</string>
+    <string name="dialog_title_change_timestamp">Change time node</string>
+    <string name="dialog_title_keep_previous_snapshot">Attention</string>
+    <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
+    <string name="btn_keep">Keep</string>
+    <string name="btn_drop">Drop</string>
+
+    <!--  Album  -->
+    <string name="album_item_comparation_title">Comparation</string>
+    <string name="album_item_comparation_subtitle">Compare with two snapshots</string>
+    <string name="album_item_management_title">Management</string>
+    <string name="album_item_management_subtitle">Manage all snapshots</string>
+    <string name="album_item_backup_restore_title">Backup &amp; Restore</string>
+    <string name="album_item_backup_restore_subtitle">Backup and restore snapshots</string>
 </resources>

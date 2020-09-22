@@ -14,6 +14,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.utils.StorageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +35,6 @@ class AlbumActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         initView()
     }
 
@@ -43,20 +43,9 @@ class AlbumActivity : BaseActivity() {
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.btnSave.setOnClickListener {
-            viewModel.snapshotItems.observe(this, {
-                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-                val date = Date(GlobalValues.snapshotTimestamp)
-                val formatted = simpleDateFormat.format(date)
-
-                if (StorageUtils.isExternalStorageWritable) {
-                    StorageUtils.createFile(this, "*/*",
-                        "LibChecker-Snapshot-Backups-$formatted.lcss"
-                    )
-                }
-            })
-        }
-        binding.btnDelete.setOnClickListener {
+        binding.itemComparation.setOnClickListener { Toasty.show(this, "TODO") }
+        binding.itemManagement.setOnClickListener {
+            Toasty.show(this, "TODO")
             lifecycleScope.launch(Dispatchers.IO) {
                 val timeStampList = viewModel.repository.getTimeStamps()
                 val charList = mutableListOf<String>()
@@ -79,6 +68,20 @@ class AlbumActivity : BaseActivity() {
                         .show()
                 }
             }
+        }
+        binding.itemBackupRestore.setOnClickListener {
+            Toasty.show(this, "TODO")
+            viewModel.snapshotItems.observe(this, {
+                val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
+                val date = Date(GlobalValues.snapshotTimestamp)
+                val formatted = simpleDateFormat.format(date)
+
+                if (StorageUtils.isExternalStorageWritable) {
+                    StorageUtils.createFile(this, "*/*",
+                        "LibChecker-Snapshot-Backups-$formatted.lcss"
+                    )
+                }
+            })
         }
     }
 

@@ -55,9 +55,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun getSnapshotsSize(timeStamp: Long): Int = repository.getSnapshots(timeStamp).size
 
-    fun computeSnapshots() = viewModelScope.launch(Dispatchers.IO) {
+    fun computeSnapshots(dropPrevious: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         val ts = System.currentTimeMillis()
-        GlobalValues.snapshotTimestamp = 0
 
         val context: Context = getApplication<LibCheckerApp>()
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
@@ -154,6 +153,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         insertSnapshots(dbList)
         insertTimeStamp(TimeStampItem(ts))
+
+        if (dropPrevious) {
+            repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
+        }
 
         withContext(Dispatchers.Main) {
             GlobalValues.snapshotTimestamp = ts

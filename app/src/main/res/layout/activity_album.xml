@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
@@ -14,8 +14,8 @@
         style="?appBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -26,19 +26,46 @@
 
     </rikka.material.widget.AppBarLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Save" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/appbar">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="100dp"
-        android:text="Delete" />
+        <com.absinthe.libchecker.view.snapshot.AlbumItemView
+            android:id="@+id/item_comparation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="4dp"
+            app:albumItemSubtitle="@string/album_item_comparation_subtitle"
+            app:albumItemTitle="@string/album_item_comparation_title"
+            app:itemIcon="@drawable/ic_compare"
+            app:itemIconTint="@color/material_red_300" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+        <com.absinthe.libchecker.view.snapshot.AlbumItemView
+            android:id="@+id/item_management"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="4dp"
+            app:albumItemSubtitle="@string/album_item_management_subtitle"
+            app:albumItemTitle="@string/album_item_management_title"
+            app:itemIcon="@drawable/ic_manage"
+            app:itemIconTint="@color/material_blue_300" />
+
+        <com.absinthe.libchecker.view.snapshot.AlbumItemView
+            android:id="@+id/item_backup_restore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="4dp"
+            app:albumItemSubtitle="@string/album_item_backup_restore_subtitle"
+            app:albumItemTitle="@string/album_item_backup_restore_title"
+            app:itemIcon="@drawable/ic_backup"
+            app:itemIconTint="@color/material_green_300" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

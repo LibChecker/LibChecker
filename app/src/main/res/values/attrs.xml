@@ -5,4 +5,11 @@
         <attr name="indicator" format="color" />
         <attr name="text" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="AlbumItemView">
+        <attr name="albumItemTitle" format="string" />
+        <attr name="albumItemSubtitle" format="string" />
+        <attr name="itemIcon" format="reference" />
+        <attr name="itemIconTint" format="color" />
+    </declare-styleable>
 </resources>

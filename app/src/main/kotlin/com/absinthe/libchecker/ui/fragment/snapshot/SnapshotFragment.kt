@@ -103,12 +103,26 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         return@setOnClickListener
                     }
 
-                    flip(VF_LOADING)
-                    viewModel.computeSnapshots()
-                    Analytics.trackEvent(
-                        Constants.Event.SNAPSHOT_CLICK,
-                        EventProperties().set("Action", "Click to Save")
-                    )
+                    fun computeNewSnapshot(dropPrevious: Boolean = false) {
+                        flip(VF_LOADING)
+                        viewModel.computeSnapshots(dropPrevious)
+                        Analytics.trackEvent(
+                            Constants.Event.SNAPSHOT_CLICK,
+                            EventProperties().set("Action", "Click to Save")
+                        )
+                    }
+
+                    AlertDialog.Builder(requireContext())
+                        .setTitle(R.string.dialog_title_keep_previous_snapshot)
+                        .setMessage(R.string.dialog_message_keep_previous_snapshot)
+                        .setPositiveButton(R.string.btn_keep) { _, _ ->
+                            computeNewSnapshot(false)
+                        }
+                        .setNegativeButton(R.string.btn_drop) { _, _ ->
+                            computeNewSnapshot(true)
+                        }
+                        .setNeutralButton(android.R.string.cancel, null)
+                        .show()
                 }
                 setOnLongClickListener {
                     hide()
