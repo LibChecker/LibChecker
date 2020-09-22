@@ -43,7 +43,7 @@ class AlbumActivity : BaseActivity() {
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.itemComparation.setOnClickListener { Toasty.show(this, "TODO") }
+        binding.itemComparison.setOnClickListener { Toasty.show(this, "TODO") }
         binding.itemManagement.setOnClickListener {
             Toasty.show(this, "TODO")
             lifecycleScope.launch(Dispatchers.IO) {

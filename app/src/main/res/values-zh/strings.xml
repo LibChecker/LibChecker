@@ -85,8 +85,8 @@
     <string name="dialog_message_keep_previous_snapshot">是否保留上一张快照？</string>
     <string name="btn_keep">保留</string>
     <string name="btn_drop">丢弃</string>
-    <string name="album_item_comparation_title">对比</string>
-    <string name="album_item_comparation_subtitle">对比两个快照</string>
+    <string name="album_item_comparison_title">对比</string>
+    <string name="album_item_comparison_subtitle">对比两个快照</string>
     <string name="album_item_management_title">管理</string>
     <string name="album_item_management_subtitle">管理所有快照</string>
     <string name="album_item_backup_restore_title">备份与恢复</string>
