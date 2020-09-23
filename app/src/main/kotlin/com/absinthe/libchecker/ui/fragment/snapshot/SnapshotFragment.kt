@@ -210,7 +210,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 viewModel.timestamp.value = GlobalValues.snapshotTimestamp
                 isSnapshotDatabaseItemsReady = true
 
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val count = getSnapshotsSize(GlobalValues.snapshotTimestamp).toString()
 
                     withContext(Dispatchers.Main) {

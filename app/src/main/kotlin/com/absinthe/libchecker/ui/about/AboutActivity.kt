@@ -49,7 +49,7 @@ class AboutActivity : AbsAboutActivity() {
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
         
-        val rebornCoroutine = lifecycleScope.launch(Dispatchers.IO) {
+        val rebornCoroutine = lifecycleScope.launch(Dispatchers.Default) {
             delay(300)
             shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 11 else 1
         }

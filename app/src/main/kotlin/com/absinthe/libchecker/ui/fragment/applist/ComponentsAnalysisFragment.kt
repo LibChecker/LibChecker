@@ -61,7 +61,7 @@ class ComponentsAnalysisFragment : BaseFragment<FragmentLibComponentBinding>(R.l
                 if (componentList.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
-                    lifecycleScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch {
                         val list = mutableListOf<LibStringItemChip>()
                         val map = BaseMap.getMap(adapter.type)
 

@@ -28,7 +28,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     override fun convert(holder: BaseViewHolder, item: LCItem) {
         holder.apply {
-            (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            (context as BaseActivity).lifecycleScope.launch {
                 val icon = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
                 withContext(Dispatchers.Main) {
                     getView<ImageView>(R.id.iv_icon).load(icon)

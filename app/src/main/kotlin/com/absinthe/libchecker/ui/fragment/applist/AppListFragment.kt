@@ -293,7 +293,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
         mAdapter.setDiffNewData(filterList)
 
         if (list != newItems) {
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 delay(300)
 
                 withContext(Dispatchers.Main) {

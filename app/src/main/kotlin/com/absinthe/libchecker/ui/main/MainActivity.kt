@@ -145,7 +145,7 @@ class MainActivity : BaseActivity(), IListContainer {
                         if (!clickBottomItemFlag) {
                             clickBottomItemFlag = true
 
-                            lifecycleScope.launch(Dispatchers.IO) {
+                            lifecycleScope.launch {
                                 delay(200)
                                 clickBottomItemFlag = false
                             }
@@ -198,7 +198,7 @@ class MainActivity : BaseActivity(), IListContainer {
     }
 
     private fun initAllApplicationInfoItems() {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             var appList: List<ApplicationInfo>?
 
             do {
@@ -236,7 +236,7 @@ class MainActivity : BaseActivity(), IListContainer {
         }
     }
 
-    private fun initMap() = lifecycleScope.launch(Dispatchers.IO) {
+    private fun initMap() = lifecycleScope.launch {
         NativeLibMap
         ServiceLibMap
         ActivityLibMap

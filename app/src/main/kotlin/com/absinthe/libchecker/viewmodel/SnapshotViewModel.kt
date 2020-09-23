@@ -55,7 +55,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun getSnapshotsSize(timeStamp: Long): Int = repository.getSnapshots(timeStamp).size
 
-    fun computeSnapshots(dropPrevious: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeSnapshots(dropPrevious: Boolean = false) = viewModelScope.launch {
         val ts = System.currentTimeMillis()
 
         val context: Context = getApplication<LibCheckerApp>()
@@ -164,7 +164,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch(Dispatchers.IO) {
+    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch {
         if (currTimeStamp == CURRENT_SNAPSHOT) {
             compareDiffWithApplicationList(preTimeStamp)
         } else {
@@ -380,7 +380,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch(Dispatchers.IO) {
+    fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
         val list = mutableListOf<SnapshotDetailItem>()
 
         list.addAll(

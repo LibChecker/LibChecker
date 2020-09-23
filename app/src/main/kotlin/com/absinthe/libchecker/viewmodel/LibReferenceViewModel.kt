@@ -10,8 +10,8 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
         dbItems = repository.allDatabaseItems
     }
 
-    fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun setData(name: String, @LibType type: Int) = viewModelScope.launch {
         val list = mutableListOf<LCItem>()
 
         dbItems.value?.let { items ->
