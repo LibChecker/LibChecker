@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
@@ -15,7 +16,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
-import com.absinthe.libchecker.constant.*
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
@@ -121,7 +122,14 @@ class SnapshotDetailActivity : BaseActivity() {
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
-            ivAppIcon.load(AppUtils.getAppIcon(entity.packageName))
+            ivAppIcon.apply {
+                load(AppUtils.getAppIcon(entity.packageName))
+                setOnClickListener {
+                    startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
+                        putExtra(EXTRA_PACKAGE_NAME, entity.packageName)
+                    })
+                }
+            }
             tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
             tvPackageName.text = entity.packageName
             tvVersion.text = getDiffString(

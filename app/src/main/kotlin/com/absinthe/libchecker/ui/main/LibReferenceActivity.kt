@@ -121,6 +121,7 @@ class LibReferenceActivity : BaseActivity() {
                     this@LibReferenceActivity,
                     R.anim.anim_fade_out
                 )
+                displayedChild = 0
             }
             lottie.apply {
                 imageAssetsFolder = "/"
