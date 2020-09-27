@@ -20,6 +20,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
         val node = item as SnapshotTitleNode
 
         helper.setText(R.id.tv_title, node.title)
+        helper.setText(R.id.tv_count, node.childNode.size.toString())
 
         val ivArrow = helper.getView<ImageView>(R.id.iv_arrow)
         if (node.isExpanded) {

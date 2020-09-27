@@ -33,4 +33,8 @@ class AlbumItemView : MaterialCardView {
         isClickable = true
         isFocusable = true
     }
+
+    override fun performClick(): Boolean {
+        return super.performClick()
+    }
 }

@@ -39,6 +39,7 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.SHOW_APP_INFO" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -60,9 +61,14 @@
             android:configChanges="orientation" />
         <activity
             android:name=".ui.snapshot.AlbumActivity"
-            android:label="@string/title_album"
-            android:configChanges="orientation">
+            android:configChanges="orientation"
+            android:label="@string/title_album">
         </activity>
+        <activity
+            android:name=".ui.album.BackupActivity"
+            android:label="@string/album_item_backup_restore_title">
+        </activity>
+
         <activity
             android:name=".ui.main.LibReferenceActivity"
             android:configChanges="orientation"

@@ -18,12 +18,21 @@
 
     <TextView
         android:id="@+id/tv_title"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingVertical="6dp"
         android:paddingStart="10dp"
-        android:paddingEnd="15dp"
+        android:paddingEnd="10dp"
         android:textAppearance="?attr/textAppearanceListItemSmall"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_toast"
+        android:paddingVertical="2dp"
+        android:paddingHorizontal="4dp"
+        android:textSize="12sp" />
 
 </LinearLayout>

@@ -110,17 +110,16 @@ class AboutActivity : AbsAboutActivity() {
             add(Category("Other Works"))
             addAll(Absinthe.getAboutPageRecommendedApps(this@AboutActivity, BuildConfig.APPLICATION_ID))
 
+            val list = listOf(
+                "https://www.iconfont.cn/",
+                "https://lottiefiles.com/22122-fanimation",
+                "https://lottiefiles.com/21836-blast-off",
+                "https://lottiefiles.com/1309-smiley-stack",
+                "https://lottiefiles.com/7907-3d-camera",
+                "https://chojugiga.com/2017/09/05/da4choju53_0031/"
+            )
             add(Category("Acknowledgement"))
-            add(Card(
-                HtmlCompat.fromHtml(
-                    getString(R.string.resource_declaration) + "<br>" +
-                            "<a href=\"https://www.iconfont.cn/\">https://www.iconfont.cn/</a><br>"+
-                            "<a href=\"https://lottiefiles.com/22122-fanimation\">https://lottiefiles.com/22122-fanimation</a><br>" +
-                            "<a href=\"https://lottiefiles.com/21836-blast-off\">https://lottiefiles.com/21836-blast-off</a><br>" +
-                            "<a href=\"https://lottiefiles.com/1309-smiley-stack\">https://lottiefiles.com/1309-smiley-stack</a><br>" +
-                            "<a href=\"https://lottiefiles.com/7907-3d-camera\">https://lottiefiles.com/7907-3d-camera</a>"
-                , HtmlCompat.FROM_HTML_MODE_LEGACY)
-            ))
+            add(Card(HtmlCompat.fromHtml(getAcknowledgementHtmlString(list), HtmlCompat.FROM_HTML_MODE_LEGACY)))
 
             add(Category("Open Source Licenses"))
             add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
@@ -169,4 +168,12 @@ class AboutActivity : AbsAboutActivity() {
         findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
+    private fun getAcknowledgementHtmlString(list: List<String>): String {
+        val sb = StringBuilder()
+        val formatItem = "<a href=\"%s\">%s</a><br>"
+
+        sb.append(getString(R.string.resource_declaration)).append("<br>")
+        list.forEach { sb.append(String.format(formatItem, it, it)) }
+        return sb.toString()
+    }
 }

@@ -108,6 +108,7 @@
     <string name="dialog_title_change_timestamp">Change time node</string>
     <string name="dialog_title_keep_previous_snapshot">Attention</string>
     <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
+    <string name="dialog_title_select_to_delete">Choose a Date to Delete Snapshot</string>
     <string name="btn_keep">Keep</string>
     <string name="btn_drop">Drop</string>
 
@@ -118,4 +119,9 @@
     <string name="album_item_management_subtitle">Manage all snapshots</string>
     <string name="album_item_backup_restore_title">Backup &amp; Restore</string>
     <string name="album_item_backup_restore_subtitle">Backup and restore snapshots</string>
+    <string name="album_backup">Backup</string>
+    <string name="album_backup_summary">Back up all snapshots</string>
+    <string name="album_restore">Restore</string>
+    <string name="album_restore_summary">Restore snapshots from backup file</string>
+
 </resources>

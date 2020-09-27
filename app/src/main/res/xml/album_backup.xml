@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--suppress ALL -->
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <moe.shizuku.preference.PreferenceCategory
+        app:key="backupCategory"
+        app:title="@string/album_backup">
+
+        <Preference
+            app:key="localBackup"
+            app:title="@string/album_backup"
+            app:summary="@string/album_backup_summary"
+            app:icon="@drawable/ic_backup"/>
+
+    </moe.shizuku.preference.PreferenceCategory>
+
+    <moe.shizuku.preference.PreferenceCategory
+        app:key="restoreCategory"
+        app:title="@string/album_restore">
+
+        <Preference
+            app:key="localRestore"
+            app:title="@string/album_restore"
+            app:summary="@string/album_restore_summary"
+            android:icon="@drawable/ic_restore">
+
+        </Preference>
+
+    </moe.shizuku.preference.PreferenceCategory>
+
+</PreferenceScreen>

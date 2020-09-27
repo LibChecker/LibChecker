@@ -91,4 +91,9 @@
     <string name="album_item_management_subtitle">管理所有快照</string>
     <string name="album_item_backup_restore_title">备份与恢复</string>
     <string name="album_item_backup_restore_subtitle">备份与恢复快照</string>
+    <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
+    <string name="album_backup">备份</string>
+    <string name="album_restore">恢复</string>
+    <string name="album_backup_summary">将所有快照备份</string>
+    <string name="album_restore_summary">从备份文件恢复快照</string>
 </resources>

@@ -14,7 +14,7 @@ class LCRepository(private val lcDao: LCDao) {
         return lcDao.getItem(packageName)
     }
 
-    fun getSnapshots(timestamp: Long) = lcDao.getSnapshots(timestamp)
+    suspend fun getSnapshots(timestamp: Long) = lcDao.getSnapshots(timestamp)
 
     fun getTimeStamps(): List<TimeStampItem> = lcDao.getTimeStamps()
 

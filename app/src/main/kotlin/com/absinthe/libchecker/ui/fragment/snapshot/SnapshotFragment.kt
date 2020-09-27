@@ -77,8 +77,9 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                             .setTitle(R.string.dialog_title_change_timestamp)
                             .setItems(charList.toTypedArray()) { _, which ->
                                 GlobalValues.snapshotTimestamp = timeStampList[which].timestamp
-                                viewModel.compareDiff(timeStampList[which].timestamp)
+                                viewModel.timestamp.value = timeStampList[which].timestamp
                                 flip(VF_LOADING)
+                                viewModel.compareDiff(timeStampList[which].timestamp)
                             }
                             .show()
                     }
@@ -203,6 +204,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                     flip(VF_LOADING)
                 } else {
                     dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+                    snapshotDiffItems.value = listOf()
                     flip(VF_LIST)
                 }
             })
@@ -210,13 +212,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 viewModel.timestamp.value = GlobalValues.snapshotTimestamp
                 isSnapshotDatabaseItemsReady = true
 
-                lifecycleScope.launch {
-                    val count = getSnapshotsSize(GlobalValues.snapshotTimestamp).toString()
-
-                    withContext(Dispatchers.Main) {
-                        dashboardBinding.tvSnapshotAppsCountText.text = count
-                    }
-                }
+                computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
 
                 if (isApplicationInfoItemsReady) {
                     compareDiff(GlobalValues.snapshotTimestamp)
@@ -226,6 +222,11 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
                     viewModel.migrateFrom4To5()
                     Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
+                }
+            })
+            snapshotAppsCount.observe(viewLifecycleOwner, {
+                if (it != null) {
+                    dashboardBinding.tvSnapshotAppsCountText.text = it.toString()
                 }
             })
             AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {

@@ -29,6 +29,9 @@ object Constants {
     const val PREF_LIB_SORT_MODE = "libSortMode"
     const val PREF_SNAPSHOT_TIMESTAMP = "snapshotTimestamp"
 
+    const val PREF_LOCAL_BACKUP = "localBackup"
+    const val PREF_LOCAL_RESTORE = "localRestore"
+
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_DEFAULT = 1
 
@@ -42,6 +45,7 @@ object Constants {
     const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
 
     const val REQUEST_CODE_BACKUP = 1001
+    const val REQUEST_CODE_RESTORE_BACKUP = 1002
 
     object Event {
         const val LAUNCH_ACTION = "Launch Action"
