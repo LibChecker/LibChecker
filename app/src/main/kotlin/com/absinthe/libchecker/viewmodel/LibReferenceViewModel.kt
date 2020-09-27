@@ -29,7 +29,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
         dbItems = repository.allDatabaseItems
     }
 
-    fun setData(name: String, @LibType type: Int) = viewModelScope.launch {
+    fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<LCItem>()
 
         dbItems.value?.let { items ->

@@ -63,7 +63,7 @@ class LibReferenceActivity : BaseActivity() {
                 viewModel.setData(name, type)
             })
 
-            lifecycleScope.launch(Dispatchers.Default) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 BaseMap.getMap(type).getChip(name)?.let {
                     withContext(Dispatchers.Main) {
                         toolbar.title = it.name
