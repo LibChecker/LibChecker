@@ -18,6 +18,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -311,18 +312,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-        val preList: List<SnapshotItem>
-        withContext(Dispatchers.IO) {
-            preList = repository.getSnapshots(preTimeStamp)
-        }
+        val preList = repository.getSnapshots(preTimeStamp)
         if (preList.isNullOrEmpty()) {
             return@launch
         }
 
-        val currList: MutableList<SnapshotItem>
-        withContext(Dispatchers.IO) {
-            currList = repository.getSnapshots(currTimeStamp).toMutableList()
-        }
+        val currList = repository.getSnapshots(currTimeStamp).toMutableList()
         if (currList.isNullOrEmpty()) {
             return@launch
         }
@@ -403,6 +398,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 )
             }
         }
+        logd("compareDiffWithSnapshotList4")
 
         withContext(Dispatchers.Main) {
             snapshotDiffItems.value = diffList

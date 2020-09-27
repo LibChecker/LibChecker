@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="?attr/listPreferredItemHeightSmall"
     android:background="?attr/selectableItemBackground"
@@ -26,13 +27,9 @@
         android:textAppearance="?attr/textAppearanceListItemSmall"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/tv_count"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_count"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_toast"
-        android:paddingVertical="2dp"
-        android:paddingHorizontal="4dp"
-        android:textSize="12sp" />
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

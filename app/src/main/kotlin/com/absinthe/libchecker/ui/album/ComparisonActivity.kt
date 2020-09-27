@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Gravity
+import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -55,6 +56,13 @@ class ComparisonActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
+            onBackPressed()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun initView() {
@@ -120,14 +128,17 @@ class ComparisonActivity : BaseActivity() {
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight(contentResolver)
+                    0, 0, 16.dp, paddingBottom + UiUtils.getNavBarHeight(contentResolver)
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
                         return@setOnClickListener
                     }
-
+                    if (leftTimeStamp == rightTimeStamp) {
+                        return@setOnClickListener
+                    }
                     viewModel.compareDiff(leftTimeStamp.coerceAtMost(rightTimeStamp), leftTimeStamp.coerceAtLeast(rightTimeStamp))
+                    flip(VF_LOADING)
                 }
                 setOnLongClickListener {
                     hide()

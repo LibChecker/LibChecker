@@ -14,6 +14,7 @@
     <integer name="rd_material_dialog_exit_scale_anim_duration">150</integer>
 
     <dimen name="toast_radius">24dp</dimen>
+    <dimen name="snapshot_detail_count_radius">36dp</dimen>
 
     <dimen name="condense_abi_badge_width">60dp</dimen>
 
