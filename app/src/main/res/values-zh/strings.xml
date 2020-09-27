@@ -96,4 +96,6 @@
     <string name="album_restore">恢复</string>
     <string name="album_backup_summary">将所有快照备份</string>
     <string name="album_restore_summary">从备份文件恢复快照</string>
+    <string name="album_compare">对比</string>
+    <string name="album_click_to_choose">点击选择</string>
 </resources>

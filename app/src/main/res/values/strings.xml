@@ -113,6 +113,7 @@
     <string name="btn_drop">Drop</string>
 
     <!--  Album  -->
+    <string name="album_compare">Compare</string>
     <string name="album_item_comparison_title">Comparison</string>
     <string name="album_item_comparison_subtitle">Compare with two snapshots</string>
     <string name="album_item_management_title">Management</string>
@@ -123,5 +124,6 @@
     <string name="album_backup_summary">Back up all snapshots</string>
     <string name="album_restore">Restore</string>
     <string name="album_restore_summary">Restore snapshots from backup file</string>
+    <string name="album_click_to_choose">Click to Choose</string>
 
 </resources>

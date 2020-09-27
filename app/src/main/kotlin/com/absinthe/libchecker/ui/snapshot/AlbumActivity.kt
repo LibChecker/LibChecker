@@ -19,7 +19,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.ui.album.BackupActivity
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,7 +48,9 @@ class AlbumActivity : BaseActivity() {
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.itemComparison.setOnClickListener { Toasty.show(this, "TODO") }
+        binding.itemComparison.setOnClickListener {
+            startActivity(Intent(this, ComparisonActivity::class.java))
+        }
         binding.itemManagement.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 var timeStampList = viewModel.repository.getTimeStamps()

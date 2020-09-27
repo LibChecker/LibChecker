@@ -68,6 +68,10 @@
             android:name=".ui.album.BackupActivity"
             android:label="@string/album_item_backup_restore_title">
         </activity>
+        <activity
+            android:name=".ui.album.ComparisonActivity"
+            android:label="@string/album_item_comparison_title">
+        </activity>
 
         <activity
             android:name=".ui.main.LibReferenceActivity"

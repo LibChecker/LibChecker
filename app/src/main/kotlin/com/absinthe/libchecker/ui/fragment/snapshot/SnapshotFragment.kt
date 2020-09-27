@@ -55,8 +55,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
 
-    override fun initBinding(view: View): FragmentSnapshotBinding =
-        FragmentSnapshotBinding.bind(view)
+    override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
     override fun init() {
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
