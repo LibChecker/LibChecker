@@ -16,6 +16,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
@@ -36,6 +37,8 @@ import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -147,31 +150,37 @@ class SnapshotDetailActivity : BaseActivity() {
             getNodeList(details.filter { it.itemType == NATIVE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_native)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Native", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == SERVICE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_service)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Service", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_activity)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Activity", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == RECEIVER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_br)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Receiver", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == PROVIDER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_cp)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Provider", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == PERMISSION }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_perm)))
+                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Permission", this.size.toLong()))
                 }
             }
 

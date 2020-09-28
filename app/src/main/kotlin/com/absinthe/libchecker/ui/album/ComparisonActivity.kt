@@ -134,7 +134,7 @@ class ComparisonActivity : BaseActivity() {
                     if (AntiShakeUtils.isInvalidClick(it)) {
                         return@setOnClickListener
                     }
-                    if (leftTimeStamp == rightTimeStamp) {
+                    if (leftTimeStamp == rightTimeStamp || leftTimeStamp == 0L || rightTimeStamp == 0L) {
                         return@setOnClickListener
                     }
                     viewModel.compareDiff(leftTimeStamp.coerceAtMost(rightTimeStamp), leftTimeStamp.coerceAtLeast(rightTimeStamp))
