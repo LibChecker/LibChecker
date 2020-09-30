@@ -54,7 +54,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             lottie.apply {
                 imageAssetsFolder = "/"
 
-                val assetName = when(GlobalValues.season) {
+                val assetName = when (GlobalValues.season) {
                     SPRING -> "lib_reference_spring.json"
                     SUMMER -> "lib_reference_summer.json"
                     AUTUMN -> "lib_reference_autumn.json"
@@ -114,11 +114,6 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             AppItemRepository.shouldRefreshAppList = true
             computeRef()
         })
-    }
-
-    override fun onResume() {
-        super.onResume()
-        setHasOptionsMenu(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

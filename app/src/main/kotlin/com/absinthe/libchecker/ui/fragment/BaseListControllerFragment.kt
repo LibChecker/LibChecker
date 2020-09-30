@@ -10,6 +10,7 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int): BaseF
         if ((requireActivity() as IListContainer).controller != this) {
             ((requireActivity() as IListContainer).controller as? Fragment)?.setHasOptionsMenu(false)
             (requireActivity() as IListContainer).controller = this
+            setHasOptionsMenu(true)
         }
     }
 }
