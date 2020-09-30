@@ -18,6 +18,7 @@
             android:orientation="vertical">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/loading"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:lottie_autoPlay="true"

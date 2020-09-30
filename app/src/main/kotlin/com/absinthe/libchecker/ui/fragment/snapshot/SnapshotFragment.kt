@@ -28,9 +28,7 @@ import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
-import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.main.IListContainer
+import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -48,7 +46,7 @@ import rikka.material.widget.BorderView
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot), IListController {
+class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
     private val adapter = SnapshotAdapter()
@@ -112,17 +110,21 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                         )
                     }
 
-                    AlertDialog.Builder(requireContext())
-                        .setTitle(R.string.dialog_title_keep_previous_snapshot)
-                        .setMessage(R.string.dialog_message_keep_previous_snapshot)
-                        .setPositiveButton(R.string.btn_keep) { _, _ ->
-                            computeNewSnapshot(false)
-                        }
-                        .setNegativeButton(R.string.btn_drop) { _, _ ->
-                            computeNewSnapshot(true)
-                        }
-                        .setNeutralButton(android.R.string.cancel, null)
-                        .show()
+                    if (GlobalValues.snapshotTimestamp == 0L) {
+                        computeNewSnapshot()
+                    } else {
+                        AlertDialog.Builder(requireContext())
+                            .setTitle(R.string.dialog_title_keep_previous_snapshot)
+                            .setMessage(R.string.dialog_message_keep_previous_snapshot)
+                            .setPositiveButton(R.string.btn_keep) { _, _ ->
+                                computeNewSnapshot(false)
+                            }
+                            .setNegativeButton(R.string.btn_drop) { _, _ ->
+                                computeNewSnapshot(true)
+                            }
+                            .setNeutralButton(android.R.string.cancel, null)
+                            .show()
+                    }
                 }
                 setOnLongClickListener {
                     hide()
@@ -167,6 +169,7 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
+            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         adapter.apply {
@@ -246,11 +249,6 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as IListContainer).controller = this
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.recyclerview.layoutManager = getSuitableLayoutManager()
@@ -264,10 +262,12 @@ class SnapshotFragment : BaseFragment<FragmentSnapshotBinding>(R.layout.fragment
             if (binding.extendedFab.isShown) {
                 binding.extendedFab.hide()
             }
+            binding.loading.resumeAnimation()
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()
             }
+            binding.loading.pauseAnimation()
         }
 
         binding.vfContainer.displayedChild = child

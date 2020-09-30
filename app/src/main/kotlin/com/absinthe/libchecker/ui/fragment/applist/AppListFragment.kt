@@ -35,9 +35,7 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.main.IListContainer
+import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -57,7 +55,7 @@ import rikka.material.widget.BorderView
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener, IListController {
+class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
     private val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private val viewModel by activityViewModels<AppViewModel>()
@@ -112,6 +110,7 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
             tvFirstTip.isVisible = isFirstLaunch
+            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         initObserver()
@@ -119,7 +118,6 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as IListContainer).controller = this
 
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
@@ -334,6 +332,11 @@ class AppListFragment : BaseFragment<FragmentAppListBinding>(R.layout.fragment_a
     private fun flip(page: Int) {
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
+        }
+        if (page == VF_LOADING) {
+            binding.loading.resumeAnimation()
+        } else {
+            binding.loading.pauseAnimation()
         }
     }
 

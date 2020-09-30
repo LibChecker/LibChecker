@@ -18,11 +18,9 @@ import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
-import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.ui.fragment.IListController
+import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
-import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
@@ -32,7 +30,7 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 
-class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener, IListController {
+class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
     private val adapter = LibReferenceAdapter()
@@ -65,6 +63,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
                 }
 
                 setAnimation(assetName)
+                enableMergePathsForKitKatAndAbove(true)
             }
         }
 
@@ -98,6 +97,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
                 if (binding.vfContainer.displayedChild == 0) {
                     binding.vfContainer.displayedChild = 1
+                    binding.lottie.pauseAnimation()
                 }
                 isListReady = true
                 menu?.findItem(R.id.search)?.isVisible = true
@@ -118,13 +118,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as IListContainer).controller = this
         setHasOptionsMenu(true)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        setHasOptionsMenu(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -178,6 +172,7 @@ class LibReferenceFragment : BaseFragment<FragmentLibReferenceBinding>(R.layout.
     private fun computeRef() {
         if (binding.vfContainer.displayedChild == 1) {
             binding.vfContainer.displayedChild = 0
+            binding.lottie.resumeAnimation()
         }
 
         viewModel.computeLibReference(category)

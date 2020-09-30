@@ -17,6 +17,7 @@
             android:paddingTop="?actionBarSize">
 
             <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/loading"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 app:lottie_autoPlay="true"

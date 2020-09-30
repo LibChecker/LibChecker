@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
@@ -155,6 +156,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
 
     override fun onResume() {
         super.onResume()
+        ((requireActivity() as IListContainer).controller as? Fragment)?.setHasOptionsMenu(false)
         (requireActivity() as IListContainer).controller = this
     }
 

@@ -168,6 +168,7 @@ class ComparisonActivity : BaseActivity() {
                 setOutAnimation(this@ComparisonActivity, R.anim.anim_fade_out)
                 displayedChild = VF_LIST
             }
+            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         adapter.apply {
@@ -222,10 +223,12 @@ class ComparisonActivity : BaseActivity() {
             if (binding.extendedFab.isShown) {
                 binding.extendedFab.hide()
             }
+            binding.loading.resumeAnimation()
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()
             }
+            binding.loading.pauseAnimation()
         }
 
         binding.vfContainer.displayedChild = child
