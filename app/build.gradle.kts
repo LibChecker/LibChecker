@@ -113,10 +113,10 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha03")
+    implementation("androidx.core:core-ktx:1.5.0-alpha04")
     implementation("androidx.constraintlayout:constraintlayout:2.0.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha05")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha06")
     implementation("androidx.browser:browser:1.2.0")
 
     implementation("com.google.android.material:material:1.2.1")
