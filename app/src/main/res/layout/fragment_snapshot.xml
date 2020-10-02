@@ -32,11 +32,14 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="?actionBarSize"
-            android:scrollbarAlwaysDrawVerticalTrack="false"
-            android:scrollbars="none"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
-            app:borderTopStyle="whenTop" />
+            app:borderTopStyle="whenTop"
+            app:fastScrollEnabled="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@android:color/transparent"
+            app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@android:color/transparent"/>
 
     </ViewFlipper>
 
