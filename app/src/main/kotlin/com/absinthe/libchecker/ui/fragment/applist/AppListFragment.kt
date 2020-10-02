@@ -5,6 +5,7 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -42,6 +43,7 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -231,6 +233,14 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     if (isFirstLaunch) {
                         binding.tvFirstTip.isGone = true
                         Once.markDone(OnceTag.FIRST_LAUNCH)
+                    }
+                }
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    it.forEach { item ->
+                        if (mAdapter.iconMap[item.packageName] != null) {
+                            mAdapter.iconMap[item.packageName] = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
+                        }
                     }
                 }
             })

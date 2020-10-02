@@ -23,7 +23,7 @@ import kotlinx.coroutines.withContext
 @Xml(layouts = ["item_app"])
 class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
     
-    private val iconMap = hashMapOf<String, Drawable>()
+    val iconMap = hashMapOf<String, Drawable>()
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
