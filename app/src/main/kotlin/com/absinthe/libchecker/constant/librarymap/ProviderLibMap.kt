@@ -120,19 +120,19 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.igexin.download.DownloadProvider",
-            LibChip(R.drawable.ic_question, "个推")
+            LibChip(R.drawable.ic_sdk_placeholder, "个推")
         ),
         Pair(
             "com.squareup.picasso.PicassoProvider",
-            LibChip(R.drawable.ic_question, "Picasso")
+            LibChip(R.drawable.ic_sdk_placeholder, "Picasso")
         ),
         Pair(
             "com.blankj.utilcode.util.UtilsFileProvider",
-            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndroidUtilCode")
         ),
         Pair(
             "com.blankj.utilcode.util.Utils\$FileProvider4UtilCode",
-            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndroidUtilCode")
         ),
         Pair(
             "com.bytedance.sdk.openadsdk.TTFileProvider",
@@ -140,7 +140,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.liulishuo.okdownload.OkDownloadProvider",
-            LibChip(R.drawable.ic_question, "OkDownload")
+            LibChip(R.drawable.ic_sdk_placeholder, "OkDownload")
         ),
         Pair(
             "com.netease.nimlib.ipc.NIMContentProvider",
@@ -168,7 +168,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "cn.bmob.v3.util.BmobContentProvider",
-            LibChip(R.drawable.ic_question, "Bmob 后端云")
+            LibChip(R.drawable.ic_sdk_placeholder, "Bmob 后端云")
         ),
         Pair(
             "moe.shizuku.api.ShizukuProvider",
@@ -176,11 +176,11 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.yanzhenjie.permission.FileProvider",
-            LibChip(R.drawable.ic_question, "AndPermission")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndPermission")
         ),
         Pair(
             "com.just.agentweb.AgentWebFileProvider",
-            LibChip(R.drawable.ic_question, "AgentWeb")
+            LibChip(R.drawable.ic_sdk_placeholder, "AgentWeb")
         ),
         Pair(
             "com.baidu.android.pushservice.PushInfoProvider",
@@ -192,7 +192,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "me.jessyan.autosize.InitProvider",
-            LibChip(R.drawable.ic_question, "AndroidAutoSize")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndroidAutoSize")
         ),
         Pair(
             "com.qihoo360.mobilesafe.svcmanager.ServiceProvider",
@@ -200,7 +200,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "cn.sharesdk.framework.utils.ShareSDKFileProvider",
-            LibChip(R.drawable.ic_question, "ShareSDK")
+            LibChip(R.drawable.ic_sdk_placeholder, "ShareSDK")
         ),
     )
 

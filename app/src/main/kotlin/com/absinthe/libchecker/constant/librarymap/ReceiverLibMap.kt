@@ -218,35 +218,35 @@ object ReceiverLibMap : BaseMap() {
         Pair(
             "com.igexin.sdk.PushReceiver",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "个推"
             )
         ),
         Pair(
             "com.igexin.download.DownloadReceiver",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "个推"
             )
         ),
         Pair(
             "com.igexin.sdk.MiuiPushReceiver",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "MiPush(GeTui Proxy)"
             )
         ),
         Pair(
             "com.igexin.sdk.HmsPushSubReceiver",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "Huawei Push(GeTui Proxy)"
             )
         ),
         Pair(
             "com.igexin.sdk.FlymePushReceiver",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "Meizu Push(GeTui Proxy)"
             )
         ),

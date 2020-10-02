@@ -188,11 +188,11 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.yalantis.ucrop.UCropActivity",
-            LibChip(R.drawable.ic_question, "uCrop")
+            LibChip(R.drawable.ic_sdk_placeholder, "uCrop")
         ),
         Pair(
             "com.yalantis.ucrop.PictureMultiCuttingActivity",
-            LibChip(R.drawable.ic_question, "uCrop")
+            LibChip(R.drawable.ic_sdk_placeholder, "uCrop")
         ),
         Pair(
             "com.zhihu.matisse.internal.ui.AlbumPreviewActivity",
@@ -220,11 +220,11 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.igexin.sdk.PushActivity",
-            LibChip(R.drawable.ic_question, "个推")
+            LibChip(R.drawable.ic_sdk_placeholder, "个推")
         ),
         Pair(
             "com.igexin.sdk.GActivity",
-            LibChip(R.drawable.ic_question, "个推")
+            LibChip(R.drawable.ic_sdk_placeholder, "个推")
         ),
         Pair(
             "com.xiaomi.account.openauth.AuthorizeActivity",
@@ -232,11 +232,11 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.blankj.utilcode.util.UtilsTransActivity",
-            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndroidUtilCode")
         ),
         Pair(
             "com.blankj.utilcode.util.UtilsTransActivity4MainProcess",
-            LibChip(R.drawable.ic_question, "AndroidUtilCode")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndroidUtilCode")
         ),
         Pair(
             "com.alibaba.sdk.android.push.keeplive.PushExtActivity",
@@ -272,7 +272,7 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.pingplusplus.android.PaymentActivity",
-            LibChip(R.drawable.ic_question, "Ping++")
+            LibChip(R.drawable.ic_sdk_placeholder, "Ping++")
         ),
         Pair(
             "com.unity3d.player.UnityPlayerActivity",
@@ -280,15 +280,15 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.soundcloud.android.crop.CropImageActivity",
-            LibChip(R.drawable.ic_question, "android-crop")
+            LibChip(R.drawable.ic_sdk_placeholder, "android-crop")
         ),
         Pair(
             "com.yanzhenjie.permission.bridge.BridgeActivity",
-            LibChip(R.drawable.ic_question, "AndPermission")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndPermission")
         ),
         Pair(
             "com.yanzhenjie.permission.PermissionActivity",
-            LibChip(R.drawable.ic_question, "AndPermission")
+            LibChip(R.drawable.ic_sdk_placeholder, "AndPermission")
         ),
         Pair(
             "com.google.ar.core.InstallActivity",
@@ -300,11 +300,11 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "pub.devrel.easypermissions.AppSettingsDialogHolderActivity",
-            LibChip(R.drawable.ic_question, "EasyPermissions")
+            LibChip(R.drawable.ic_sdk_placeholder, "EasyPermissions")
         ),
         Pair(
             "com.bestpay.app.H5PayActivity",
-            LibChip(R.drawable.ic_question, "翼支付")
+            LibChip(R.drawable.ic_sdk_placeholder, "翼支付")
         ),
         Pair(
             "com.baidu.android.pushservice.hwproxy.HwNotifyActivity",
@@ -321,6 +321,10 @@ object ActivityLibMap : BaseMap() {
         Pair(
             "com.tencent.android.tpush.TpnsActivity",
             LibChip(R.drawable.ic_lib_tencent_cloud, "腾讯移动推送")
+        ),
+        Pair(
+            "com.umeng.socialize.media.WBShareCallBackActivity",
+            LibChip(R.drawable.ic_lib_umeng, "U-Share")
         ),
     )
 

@@ -562,7 +562,7 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libpl_droidsonroids_gif.so",
             LibChip(
-                R.drawable.ic_lib_gif,
+                R.drawable.ic_sdk_placeholder,
                 "android-gif-drawable"
             )
         ),
@@ -807,14 +807,14 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libarcore_sdk_c.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "ViroCore"
             )
         ),
         Pair(
             "libmp3lame.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "LAME"
             )
         ),
@@ -870,49 +870,49 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libbmob.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "Bmob 后端云"
             )
         ),
         Pair(
             "libdexjni.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
         Pair(
             "libDexHelper.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
         Pair(
             "libDexHelper-x86.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
         Pair(
             "libSecShell.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
         Pair(
             "libSecShell-x86.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
         Pair(
             "libsecexe.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "梆梆安全"
             )
         ),
@@ -947,14 +947,14 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libgetuiext3.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "个推"
             )
         ),
         Pair(
             "libepic.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "Epic"
             )
         ),
@@ -975,7 +975,7 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libJni_wgs2gcj.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "wgs2gcj"
             )
         ),
@@ -996,7 +996,7 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libhyphenate.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "环信 IM"
             )
         ),
@@ -1024,7 +1024,7 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libpingpp.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "Ping++"
             )
         ),
@@ -1045,14 +1045,14 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libfreetype.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "FreeType"
             )
         ),
         Pair(
             "libgpuimage-library.so",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "GPUImage"
             )
         ),
@@ -1077,6 +1077,8 @@ object NativeLibMap : BaseMap() {
     private val PATTERN_BAIDU_PUSH = Pattern.compile("libbdpush_V(.*)\\.so")
     private val PATTERN_JPUSH = Pattern.compile("libjcore(.*)\\.so")
     private val PATTERN_LIBTNET = Pattern.compile("libtnet-(.*)\\.so")
+    private val PATTERN_TENCENT_LEGU_1 = Pattern.compile("libshell-super(.*)\\.so")
+    private val PATTERN_TENCENT_LEGU_2 = Pattern.compile("libshella-(.*)\\.so")
 
     override fun findRegex(name: String): LibChip? {
         return when {
@@ -1086,11 +1088,13 @@ object NativeLibMap : BaseMap() {
             PATTERN_BAICHUAN.matcher(name).matches() -> LibChip(R.drawable.ic_lib_alibaba, "百川 SDK", "regex_ali_baichuan")
             PATTERN_BAIDU_PUSH.matcher(name).matches() -> LibChip(R.drawable.ic_lib_baidu, "百度云推送", "regex_baidu_push")
             PATTERN_JPUSH.matcher(name).matches() -> LibChip(R.drawable.ic_lib_jpush, "极光推送", "regex_jpush")
-            PATTERN_LIBTNET.matcher(name).matches() -> LibChip(R.drawable.ic_question, "libtnet", "regex_libtnet")
+            PATTERN_LIBTNET.matcher(name).matches() -> LibChip(R.drawable.ic_sdk_placeholder, "libtnet", "regex_libtnet")
             matchAllPatterns(name, PATTERN_ALI_SECURITY_1, PATTERN_ALI_SECURITY_2, PATTERN_ALI_SECURITY_3, PATTERN_ALI_SECURITY_4) ->
                 LibChip(R.drawable.ic_lib_ali_security, "阿里聚安全", "regex_ali_security")
             matchAllPatterns(name, PATTERN_BAIDU_MAP_1, PATTERN_BAIDU_MAP_2, PATTERN_BAIDU_MAP_3, PATTERN_BAIDU_MAP_4) ->
                 LibChip(R.drawable.ic_lib_baidu, "百度地图 SDK", "regex_baidu_map")
+            matchAllPatterns(name, PATTERN_TENCENT_LEGU_1, PATTERN_TENCENT_LEGU_2) ->
+                LibChip(R.drawable.ic_lib_tencent, "腾讯乐固", "regex_tencent_legu")
             else -> null
         }
     }

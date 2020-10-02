@@ -555,28 +555,28 @@ object ServiceLibMap : BaseMap() {
         Pair(
             "com.liulishuo.filedownloader.services.FileDownloadService\$SeparateProcessService",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "FileDownloader"
             )
         ),
         Pair(
             "com.liulishuo.filedownloader.services.FileDownloadService\$SharedMainProcessService",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "FileDownloader"
             )
         ),
         Pair(
             "com.igexin.sdk.PushService",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "个推"
             )
         ),
         Pair(
             "com.blankj.utilcode.util.MessengerUtils\$ServerService",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "AndroidUtilCode"
             )
         ),
@@ -660,7 +660,7 @@ object ServiceLibMap : BaseMap() {
         Pair(
             "com.yanzhenjie.permission.bridge.BridgeService",
             LibChip(
-                R.drawable.ic_question,
+                R.drawable.ic_sdk_placeholder,
                 "AndPermission"
             )
         ),
