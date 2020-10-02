@@ -5,9 +5,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.lifecycle.lifecycleScope
 import coil.load
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
@@ -16,9 +14,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Xml(layouts = ["item_app"])
 class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
@@ -32,16 +27,8 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
     override fun convert(holder: BaseViewHolder, item: LCItem) {
         holder.apply {
             iconMap[item.packageName]?.let {
-                getView<ImageView>(R.id.iv_icon).load(it)
-            } ?: let {
-                (context as BaseActivity).lifecycleScope.launch {
-                    val icon = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
-                    iconMap[item.packageName] = icon
-                    withContext(Dispatchers.Main) {
-                        getView<ImageView>(R.id.iv_icon).load(icon)
-                    }
-                }
-            }
+                setImageDrawable(R.id.iv_icon, it)
+            } ?: setImageDrawable(R.id.iv_icon, AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT))
             setText(R.id.tv_app_name, item.label)
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))

@@ -116,14 +116,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        logd("Request change START")
         if (isInitingItems) {
             logd("Request change isInitingItems return")
             return@launch
         }
-
-        val timeRecorder = TimeRecorder()
-        timeRecorder.start()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestChangeImpl(packageManager, needRefresh)
@@ -134,13 +130,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 e.printStackTrace()
             }
         }
-
-        timeRecorder.end()
-        logd("Request change END, $timeRecorder")
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
+        logd("Request change START")
+        val timeRecorder = TimeRecorder()
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
+
+        timeRecorder.start()
 
         if (appList.isNullOrEmpty() || needRefresh) {
             do {
@@ -241,6 +238,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+        timeRecorder.end()
+        logd("Request change END, $timeRecorder")
+
+        delay(10000)
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             collectPopularLibraries(appList.toList())
             Once.markDone(OnceTag.HAS_COLLECT_LIB)

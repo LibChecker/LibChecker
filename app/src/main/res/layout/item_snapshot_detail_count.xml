@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_snapshot_detail_count"
-        android:paddingHorizontal="6dp"
+        android:paddingHorizontal="8dp"
         android:paddingVertical="2dp"
         android:textSize="12sp"
         android:textColor="@color/grey_600"

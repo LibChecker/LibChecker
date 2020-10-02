@@ -45,6 +45,7 @@
             app:borderTopDrawable="@null"
             app:borderTopStyle="whenTop"
             app:fastScrollEnabled="true"
+            android:scrollbarDefaultDelayBeforeFade="1250"
             app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@android:color/transparent"
             app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"

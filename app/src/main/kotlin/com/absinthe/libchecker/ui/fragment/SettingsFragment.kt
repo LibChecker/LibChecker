@@ -168,6 +168,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        recyclerView.scrollBarStyle = RecyclerView.SCROLL_AXIS_NONE
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {
