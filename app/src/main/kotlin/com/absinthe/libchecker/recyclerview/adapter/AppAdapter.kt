@@ -2,6 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +22,8 @@ import kotlinx.coroutines.withContext
 
 @Xml(layouts = ["item_app"])
 class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
+    
+    private val iconMap = hashMapOf<String, Drawable>()
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
@@ -28,10 +31,15 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     override fun convert(holder: BaseViewHolder, item: LCItem) {
         holder.apply {
-            (context as BaseActivity).lifecycleScope.launch {
-                val icon = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
-                withContext(Dispatchers.Main) {
-                    getView<ImageView>(R.id.iv_icon).load(icon)
+            iconMap[item.packageName]?.let {
+                getView<ImageView>(R.id.iv_icon).load(it)
+            } ?: let {
+                (context as BaseActivity).lifecycleScope.launch {
+                    val icon = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
+                    iconMap[item.packageName] = icon
+                    withContext(Dispatchers.Main) {
+                        getView<ImageView>(R.id.iv_icon).load(icon)
+                    }
                 }
             }
             setText(R.id.tv_app_name, item.label)

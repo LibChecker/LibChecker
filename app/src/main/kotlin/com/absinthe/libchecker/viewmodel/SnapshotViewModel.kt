@@ -163,7 +163,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         insertSnapshots(dbList)
-        insertTimeStamp(TimeStampItem(ts))
+        insertTimeStamp(ts)
 
         if (dropPrevious) {
             repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
@@ -458,8 +458,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         repository.insertSnapshots(items)
     }
 
-    private fun insertTimeStamp(timestamp: TimeStampItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(timestamp)
+    private fun insertTimeStamp(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
+        if (timestamp == 0L) {
+            return@launch
+        }
+        repository.insert(TimeStampItem(timestamp))
     }
 
     private fun getNativeDiffList(oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {
@@ -860,7 +863,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         repository.insertSnapshots(finalList)
-        timeStampSet.forEach { repository.insert(TimeStampItem(it)) }
+        timeStampSet.forEach { insertTimeStamp(it) }
     }
 
     fun getFormatDateString(timestamp: Long): String {
@@ -884,6 +887,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        repository.insert(TimeStampItem(ts))
+        insertTimeStamp(ts)
     }
 }

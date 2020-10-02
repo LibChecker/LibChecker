@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailCountAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotDetailCountNode
@@ -23,6 +24,7 @@ const val SNAPSHOT_TITLE_PROVIDER = 1
 
 class SnapshotTitleProvider : BaseNodeProvider() {
 
+    private val countMap = mutableMapOf<Int, List<Int>>()
     override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
     override val layoutId: Int = R.layout.item_snapshot_title
 
@@ -33,26 +35,46 @@ class SnapshotTitleProvider : BaseNodeProvider() {
         val finalList = mutableListOf<SnapshotDetailCountNode>()
         val ivArrow = helper.getView<ImageView>(R.id.iv_arrow)
 
-        helper.setText(R.id.tv_title, node.title)
+        val titleRes = when(node.type) {
+            NATIVE -> R.string.ref_category_native
+            SERVICE -> R.string.ref_category_service
+            ACTIVITY -> R.string.ref_category_activity
+            RECEIVER -> R.string.ref_category_br
+            PROVIDER -> R.string.ref_category_cp
+            else -> R.string.ref_category_perm
+        }
+        helper.setText(R.id.tv_title, context.getString(titleRes))
         helper.getView<RecyclerView>(R.id.rv_count).apply {
             adapter = countAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
 
-        (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            @Suppress("UNCHECKED_CAST")
-            (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
-                countList[diffNode.item.diffType]++
-            }
-
-            for (i in countList.indices) {
-                if (countList[i] != 0) {
-                    finalList.add(SnapshotDetailCountNode(countList[i], i))
+        countMap[node.type]?.let {
+            for (i in it.indices) {
+                if (it[i] != 0) {
+                    finalList.add(SnapshotDetailCountNode(it[i], i))
                 }
             }
 
-            withContext(Dispatchers.Main) {
-                countAdapter.setList(finalList)
+            countAdapter.setList(finalList)
+        } ?: let {
+            (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+                @Suppress("UNCHECKED_CAST")
+                (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
+                    countList[diffNode.item.diffType]++
+                }
+
+                countMap[node.type] = countList
+
+                for (i in countList.indices) {
+                    if (countList[i] != 0) {
+                        finalList.add(SnapshotDetailCountNode(countList[i], i))
+                    }
+                }
+
+                withContext(Dispatchers.Main) {
+                    countAdapter.setList(finalList)
+                }
             }
         }
 

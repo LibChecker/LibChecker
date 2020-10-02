@@ -149,37 +149,37 @@ class SnapshotDetailActivity : BaseActivity() {
 
             getNodeList(details.filter { it.itemType == NATIVE }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_native)))
+                    titleList.add(SnapshotTitleNode(this, NATIVE))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Native", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == SERVICE }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_service)))
+                    titleList.add(SnapshotTitleNode(this, SERVICE))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Service", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_activity)))
+                    titleList.add(SnapshotTitleNode(this, ACTIVITY))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Activity", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == RECEIVER }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_br)))
+                    titleList.add(SnapshotTitleNode(this, RECEIVER))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Receiver", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == PROVIDER }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_cp)))
+                    titleList.add(SnapshotTitleNode(this, PROVIDER))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Provider", this.size.toLong()))
                 }
             }
             getNodeList(details.filter { it.itemType == PERMISSION }).apply {
                 if (isNotEmpty()) {
-                    titleList.add(SnapshotTitleNode(this, getString(R.string.ref_category_perm)))
+                    titleList.add(SnapshotTitleNode(this, PERMISSION))
                     Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Permission", this.size.toLong()))
                 }
             }
