@@ -18,7 +18,7 @@ import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.finishCompat
@@ -204,7 +204,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
                 val item = (adapter.data[position] as BaseSnapshotNode).item
                 val name = item.name
-                val regexName = NativeLibMap.findRegex(name)?.regexName
+                val regexName = BaseMap.getMap(item.itemType).findRegex(name)?.regexName
                 LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
                     .apply {
                         show(supportFragmentManager, tag)

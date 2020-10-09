@@ -30,7 +30,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         val drawable = try {
             PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
         } catch (e: Exception) {
-            null
+            ContextCompat.getDrawable(context, R.drawable.ic_app_list)
         }
         holder.getView<ImageView>(R.id.iv_icon).load(drawable)
 

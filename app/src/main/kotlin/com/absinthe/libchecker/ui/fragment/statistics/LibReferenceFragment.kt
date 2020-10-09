@@ -12,7 +12,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
@@ -85,7 +85,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 if (view.id == R.id.iv_icon) {
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
-                    val regexName = NativeLibMap.findRegex(name)?.regexName
+                    val regexName = BaseMap.getMap(ref.type).findRegex(name)?.regexName
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }

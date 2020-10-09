@@ -17,6 +17,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
@@ -357,31 +358,29 @@ object PackageUtils {
      */
     fun getAbi(path: String, nativePath: String, isApk: Boolean = false): Int {
         var abi = NO_LIBS
+        var elementName: String
+
+        val file = File(path)
+        val zipFile = ZipFile(file)
+        val entries = zipFile.entries()
 
         try {
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-            var name: String
-
             while (entries.hasMoreElements()) {
-                name = entries.nextElement().name
+                elementName = entries.nextElement().name
 
-                if (name.contains("lib/")) {
-                    if (name.contains("arm64-v8a")) {
+                if (elementName.contains("lib/")) {
+                    if (elementName.contains("arm64-v8a")) {
                         abi = ARMV8
-                    } else if (name.contains("armeabi-v7a")) {
-                        if (abi != ARMV8) {
-                            abi = ARMV7
-                        }
-                    } else if (name.contains("armeabi")) {
-                        if (abi != ARMV8 && abi != ARMV7) {
+                        break
+                    } else if (elementName.contains("armeabi-v7a")) {
+                        abi = ARMV7
+                    } else if (elementName.contains("armeabi")) {
+                        if (abi != ARMV7) {
                             abi = ARMV5
                         }
                     }
                 }
             }
-            zipFile.close()
 
             return if (abi == NO_LIBS && !isApk) {
                 getAbiByNativeDir(nativePath)
@@ -389,8 +388,10 @@ object PackageUtils {
                 abi
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            loge(e.toString())
             return ERROR
+        } finally {
+            zipFile.close()
         }
     }
 
@@ -401,14 +402,11 @@ object PackageUtils {
      */
     private fun getAbiByNativeDir(nativePath: String): Int {
         val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
-        val abiList = ArrayList<String>()
 
         val fileList = file.listFiles() ?: return NO_LIBS
-        fileList.iterator().forEach { abiList.add(it.name) }
-
         return when {
-            abiList.contains("arm64") -> ARMV8
-            abiList.contains("arm") -> ARMV7
+            fileList.any { it.name.contains("arm64") } -> ARMV8
+            fileList.any { it.name.contains("arm") } -> ARMV7
             else -> NO_LIBS
         }
     }

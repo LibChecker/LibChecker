@@ -18,7 +18,6 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -334,17 +333,17 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         snapshotDiffItem = SnapshotDiffItem(
                             packageName = it.packageName,
                             updateTime = it.lastUpdatedTime,
-                            labelDiff = SnapshotDiffItem.DiffNode(it.label, preItem.label),
-                            versionNameDiff = SnapshotDiffItem.DiffNode(it.versionName, preItem.versionName),
-                            versionCodeDiff = SnapshotDiffItem.DiffNode(it.versionCode, preItem.versionCode),
-                            abiDiff = SnapshotDiffItem.DiffNode(it.abi, preItem.abi),
-                            targetApiDiff = SnapshotDiffItem.DiffNode(it.targetApi, preItem.targetApi),
-                            nativeLibsDiff = SnapshotDiffItem.DiffNode(it.nativeLibs, preItem.nativeLibs),
-                            servicesDiff = SnapshotDiffItem.DiffNode(it.services, preItem.services),
-                            activitiesDiff = SnapshotDiffItem.DiffNode(it.activities, preItem.activities),
-                            receiversDiff = SnapshotDiffItem.DiffNode(it.receivers, preItem.receivers),
-                            providersDiff = SnapshotDiffItem.DiffNode(it.providers, preItem.providers),
-                            permissionsDiff = SnapshotDiffItem.DiffNode(it.permissions, preItem.permissions)
+                            labelDiff = SnapshotDiffItem.DiffNode(preItem.label, it.label),
+                            versionNameDiff = SnapshotDiffItem.DiffNode(preItem.versionName, it.versionName),
+                            versionCodeDiff = SnapshotDiffItem.DiffNode(preItem.versionCode, it.versionCode),
+                            abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, it.abi),
+                            targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, it.targetApi),
+                            nativeLibsDiff = SnapshotDiffItem.DiffNode(preItem.nativeLibs, it.nativeLibs),
+                            servicesDiff = SnapshotDiffItem.DiffNode(preItem.services, it.services),
+                            activitiesDiff = SnapshotDiffItem.DiffNode(preItem.activities, it.activities),
+                            receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, it.receivers),
+                            providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, it.providers),
+                            permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions)
                         )
                         compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
                         snapshotDiffItem.added = compareDiffNode.added
@@ -398,7 +397,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 )
             }
         }
-        logd("compareDiffWithSnapshotList4")
 
         withContext(Dispatchers.Main) {
             snapshotDiffItems.value = diffList

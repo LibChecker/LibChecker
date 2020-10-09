@@ -78,7 +78,7 @@
             app:key="help"
             app:title="@string/help_docs"
             app:summary="@string/help_docs_summary"
-            android:icon="@drawable/ic_help">
+            app:icon="@drawable/ic_help">
 
         </Preference>
 
