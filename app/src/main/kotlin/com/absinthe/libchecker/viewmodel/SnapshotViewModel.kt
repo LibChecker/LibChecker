@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.database.sqlite.SQLiteBlobTooBigException
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -120,7 +121,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         )
                     }
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    loge(e.toString())
                     exceptionInfoList.add(info)
                     continue
                 }
@@ -161,8 +162,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        insertSnapshots(dbList)
-        insertTimeStamp(ts)
+        try {
+            insertSnapshots(dbList)
+            insertTimeStamp(ts)
+        } catch (e: SQLiteBlobTooBigException) {
+            loge(e.toString())
+        }
 
         if (dropPrevious) {
             repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
@@ -237,7 +242,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                             appList.remove(it)
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            loge(e.toString())
                             appList.remove(it)
                         }
                     } ?: run {

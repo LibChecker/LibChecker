@@ -66,7 +66,7 @@
             app:key="about"
             app:title="@string/settings_about"
             app:summary="@string/settings_about_summary"
-            app:icon="@drawable/ic_logo">
+            app:icon="@drawable/ic_logo_setting">
 
             <intent
                 android:targetPackage="com.absinthe.libchecker"
