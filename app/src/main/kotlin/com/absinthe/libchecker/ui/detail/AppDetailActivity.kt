@@ -176,7 +176,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
             }
 
             val types = listOf(
-                NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER/*, DEX*/
+                NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
             )
             val tabTitles = listOf(
                 getText(R.string.ref_category_native),

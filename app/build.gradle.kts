@@ -123,12 +123,12 @@ dependencies {
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.4.2")
+    implementation("com.airbnb.android:lottie:3.4.4")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.blankj:utilcodex:1.29.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.0.0-rc2")
+    implementation("io.coil-kt:coil:1.0.0-rc3")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")
@@ -151,7 +151,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okio:okio:2.8.0")
+    implementation("com.squareup.okio:okio:2.9.0")
 
     // gRPC
     implementation("io.grpc:grpc-okhttp:$grpcVersion")
@@ -159,8 +159,8 @@ dependencies {
     implementation("io.grpc:grpc-stub:$grpcVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-    testImplementation("junit:junit:4.13")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
+    testImplementation("junit:junit:4.13.1")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.5")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

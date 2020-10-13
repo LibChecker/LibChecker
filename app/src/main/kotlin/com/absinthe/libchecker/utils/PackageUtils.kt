@@ -451,8 +451,6 @@ object PackageUtils {
 
     fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
         val packageInfo: PackageInfo
-        val map = mutableMapOf<String, Int>()
-        val list = mutableListOf<LibStringItem>()
 
         try {
             packageInfo = getPackageInfo(packageName)
@@ -460,35 +458,40 @@ object PackageUtils {
             return listOf()
         }
 
-        if (!isApk) {
+        return if (!isApk) {
             val path = packageInfo.applicationInfo.sourceDir
             val apkFile = ApkFile(File(path))
-
+            val map = mutableMapOf<String, Int>()
             var splits: List<String>
-            var key: String
+            var simple: String
+            var chunkThreeSet = mutableSetOf<String>()
 
-            apkFile.dexClasses.forEach {
-                splits = it.classType.removePrefix("L").split("/")
-
-                key = if (splits.size <= 3) {
-                    "${splits[0]}.${splits[1]}"
-                } else {
-                    "${splits[0]}.${splits[1]}.${splits[2]}"
+            apkFile.dexClasses.asSequence()
+                .map { it.packageName }
+                .filter { !it.startsWith(packageName) }
+                .forEach { item ->
+                    splits = item.split(".")
+                    if (splits.size > 1 && splits.any { it.length > 2 }) {
+                        simple = splits.subList(0, splits.size.coerceAtMost(3)).joinToString(separator = ".")
+                        map[simple]?.let { map[simple] = map[simple]!! + 1 } ?: let { map[simple] = 1 }
+                    }
                 }
 
-                map[key]?.let { value ->
-                    map[key] = value + 1
-                } ?: let {
-                    map[key] = 0
+            map.forEach {
+                splits = it.key.split(".")
+                simple = splits.subList(0, 3).joinToString(separator = ".")
+                if (splits.size > 2 && !chunkThreeSet.contains(simple)) {
+                    if (map.filter { fil -> fil.key.startsWith(simple) }.size > 1) {
+                        chunkThreeSet.add(simple)
+                    }
                 }
             }
+            //Todo Continue checking chunkFourSet until the new set is empty，and compare each chunk to get the shortest package name
+            //Todo Thinking about using tree for solutoin
 
-            for (item in map) {
-                list.add(LibStringItem(item.key, item.value.toLong()))
-            }
-            return list.sortedBy { it.name }
+            map.map { LibStringItem(it.key, it.value.toLong()) }
         } else {
-            return listOf()
+            listOf()
         }
     }
 
