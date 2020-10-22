@@ -461,35 +461,18 @@ object PackageUtils {
         return if (!isApk) {
             val path = packageInfo.applicationInfo.sourceDir
             val apkFile = ApkFile(File(path))
-            val map = mutableMapOf<String, Int>()
             var splits: List<String>
-            var simple: String
-            var chunkThreeSet = mutableSetOf<String>()
 
             apkFile.dexClasses.asSequence()
                 .map { it.packageName }
                 .filter { !it.startsWith(packageName) }
-                .forEach { item ->
+                .map { item ->
                     splits = item.split(".")
-                    if (splits.size > 1 && splits.any { it.length > 2 }) {
-                        simple = splits.subList(0, splits.size.coerceAtMost(3)).joinToString(separator = ".")
-                        map[simple]?.let { map[simple] = map[simple]!! + 1 } ?: let { map[simple] = 1 }
-                    }
+                    LibStringItem(splits.subList(0, splits.size.coerceAtMost(3)).joinToString(separator = "."))
                 }
-
-            map.forEach {
-                splits = it.key.split(".")
-                simple = splits.subList(0, 3).joinToString(separator = ".")
-                if (splits.size > 2 && !chunkThreeSet.contains(simple)) {
-                    if (map.filter { fil -> fil.key.startsWith(simple) }.size > 1) {
-                        chunkThreeSet.add(simple)
-                    }
-                }
-            }
-            //Todo Continue checking chunkFourSet until the new set is empty，and compare each chunk to get the shortest package name
-            //Todo Thinking about using tree for solutoin
-
-            map.map { LibStringItem(it.key, it.value.toLong()) }
+                .toSet()
+                .filter { it.name.length > 8 }
+                .toList()
         } else {
             listOf()
         }

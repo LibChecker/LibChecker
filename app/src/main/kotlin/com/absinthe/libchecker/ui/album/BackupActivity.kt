@@ -16,6 +16,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.StorageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import moe.shizuku.preference.PreferenceFragment
 import rikka.material.widget.BorderRecyclerView
@@ -72,7 +73,9 @@ class BackupActivity : BaseActivity() {
             data?.data?.let { intentData ->
                 try {
                     contentResolver.openInputStream(intentData)?.let { inputStream ->
-                        viewModel.restore(inputStream)
+                        viewModel.restore(inputStream) {
+                            Toasty.show(this, "Backup file error")
+                        }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()

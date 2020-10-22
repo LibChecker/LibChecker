@@ -27,6 +27,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -833,8 +834,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         os.close()
     }
 
-    fun restore(inputStream: InputStream) = viewModelScope.launch(Dispatchers.IO) {
-        val list: SnapshotList = SnapshotList.parseFrom(inputStream)
+    fun restore(inputStream: InputStream, action: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        val list: SnapshotList = try {
+            SnapshotList.parseFrom(inputStream)
+        } catch (e: InvalidProtocolBufferException) {
+            withContext(Dispatchers.Main) {
+                action()
+            }
+            SnapshotList.newBuilder().build()
+        }
         val finalList = mutableListOf<SnapshotItem>()
         val timeStampSet = mutableSetOf<Long>()
 

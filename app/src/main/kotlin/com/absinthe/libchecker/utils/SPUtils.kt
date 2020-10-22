@@ -3,9 +3,8 @@ package com.absinthe.libchecker.utils
 import android.content.Context
 import androidx.core.content.edit
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.constant.SP_NAME
 import com.blankj.utilcode.util.Utils
-
-const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object SPUtils {
 

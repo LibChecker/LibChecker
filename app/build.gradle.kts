@@ -120,7 +120,7 @@ dependencies {
     implementation("androidx.browser:browser:1.2.0")
 
     implementation("com.google.android.material:material:1.2.1")
-    implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.4")
+    implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
     implementation("com.airbnb.android:lottie:3.4.4")
