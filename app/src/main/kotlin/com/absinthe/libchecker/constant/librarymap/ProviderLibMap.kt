@@ -32,11 +32,11 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "androidx.core.content.FileProvider",
-            LibChip(R.drawable.ic_android_outline, "File Provider")
+            LibChip(R.drawable.ic_lib_android, "File Provider")
         ),
         Pair(
             "android.support.v4.content.FileProvider",
-            LibChip(R.drawable.ic_android_outline, "File Provider")
+            LibChip(R.drawable.ic_lib_android, "File Provider")
         ),
         Pair(
             "androidx.lifecycle.ProcessLifecycleOwnerInitializer",

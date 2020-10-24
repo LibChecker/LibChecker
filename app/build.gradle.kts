@@ -128,7 +128,7 @@ dependencies {
     implementation("com.blankj:utilcodex:1.29.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.0.0-rc3")
+    implementation("io.coil-kt:coil:1.0.0")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")

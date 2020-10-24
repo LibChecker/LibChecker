@@ -45,7 +45,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                             packageInfo.applicationInfo.nativeLibraryDir
                         )
                     } catch (e: Exception) {
-                        listOf()
+                        emptyList()
                     }
 
                     for (native in natives) {

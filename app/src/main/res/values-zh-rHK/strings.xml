@@ -98,4 +98,5 @@
     <string name="album_restore_summary">從備份文件還原快照</string>
     <string name="album_compare">比較</string>
     <string name="album_click_to_choose">點擊選擇</string>
+    <string name="snapshot_empty_list_subtitle">看起來它的組件沒有任何變化，但內部可能發生了很多事情哦</string>
 </resources>

@@ -34,5 +34,9 @@
         android:id="@+id/ref_category_cp"
         android:title="@string/ref_category_cp"
         android:icon="@drawable/ic_sort" />
+    <item
+        android:id="@+id/ref_category_dex"
+        android:title="@string/ref_category_dex"
+        android:icon="@drawable/ic_sort" />
 
 </menu>

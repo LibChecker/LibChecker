@@ -202,7 +202,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         if (h == null) return
 
         var dialogTitle = ""
-        var item: List<LCItem> = listOf()
+        var item: List<LCItem> = emptyList()
 
         if (pieType == TYPE_ABI) {
             when (h.x) {

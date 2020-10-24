@@ -19,4 +19,13 @@
         android:text="@string/snapshot_empty_list_title"
         android:textAppearance="?attr/textAppearanceHeadline5" />
 
+    <TextView
+        android:id="@+id/tv_subtitle"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/snapshot_empty_list_subtitle"
+        android:textAppearance="?attr/textAppearanceSubtitle2" />
+
 </LinearLayout>

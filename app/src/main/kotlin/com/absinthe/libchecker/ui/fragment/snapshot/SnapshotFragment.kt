@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
+import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
@@ -174,7 +176,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         adapter.apply {
             headerWithEmptyEnable = true
-            setEmptyView(R.layout.layout_snapshot_empty_view)
+            val emptyViewBinding = LayoutSnapshotEmptyViewBinding.inflate(layoutInflater)
+            emptyViewBinding.tvSubtitle.isGone = true
+            setEmptyView(emptyViewBinding.root)
             setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {
@@ -206,7 +210,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     flip(VF_LOADING)
                 } else {
                     dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
-                    snapshotDiffItems.value = listOf()
+                    snapshotDiffItems.value = emptyList()
                     flip(VF_LIST)
                 }
             })

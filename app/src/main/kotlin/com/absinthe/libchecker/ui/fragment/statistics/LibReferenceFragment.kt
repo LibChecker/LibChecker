@@ -150,6 +150,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             R.id.ref_category_activity -> category = ACTIVITY
             R.id.ref_category_br -> category = RECEIVER
             R.id.ref_category_cp -> category = PROVIDER
+            R.id.ref_category_dex -> category = DEX
         }
 
         if (item.itemId != R.id.search) {

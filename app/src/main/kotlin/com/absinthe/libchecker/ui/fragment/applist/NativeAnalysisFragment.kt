@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -12,7 +13,6 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
@@ -48,6 +48,14 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             list.apply {
                 adapter = this@NativeAnalysisFragment.adapter
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                if (type == DEX) {
+                    addItemDecoration(
+                        DividerItemDecoration(
+                            requireContext(),
+                            DividerItemDecoration.VERTICAL
+                        )
+                    )
+                }
             }
         }
 
@@ -74,8 +82,8 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = NativeLibMap.findRegex(name)?.regexName
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
+            val regexName = BaseMap.getMap(type).findRegex(name)?.regexName
+            LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
         }
 
         adapter.apply {

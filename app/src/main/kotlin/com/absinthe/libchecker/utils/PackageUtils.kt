@@ -78,7 +78,7 @@ object PackageUtils {
     @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
         return try {
-            Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: listOf()
+            Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: emptyList()
         } catch (e: Exception) {
             throw Exception()
         }
@@ -146,7 +146,7 @@ object PackageUtils {
                 .distinctBy { it.name }
                 .map { LibStringItem(it.name, it.length()) }
                 .toList()
-        } ?: listOf()
+        } ?: emptyList()
 
         if (list.isEmpty()) {
             return getSourceLibs(sourcePath)
@@ -179,8 +179,8 @@ object PackageUtils {
 
             return libList
         } catch (e: Exception) {
-            e.printStackTrace()
-            return listOf()
+            loge(e.toString())
+            return emptyList()
         } finally {
             zipFile?.close()
         }
@@ -327,7 +327,7 @@ object PackageUtils {
                 }
             }
             ?.toList()
-            ?: listOf()
+            ?: emptyList()
     }
 
     /**
@@ -449,32 +449,68 @@ object PackageUtils {
         return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
     }
 
+    /**
+     * Get part of DEX classes of an app
+     * @param packageName Package name
+     * @param isApk True if it is an apk file
+     * @return List of LibStringItem
+     */
     fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
         val packageInfo: PackageInfo
 
         try {
             packageInfo = getPackageInfo(packageName)
         } catch (e: PackageManager.NameNotFoundException) {
-            return listOf()
+            return emptyList()
         }
 
-        return if (!isApk) {
+        if (!isApk) {
             val path = packageInfo.applicationInfo.sourceDir
             val apkFile = ApkFile(File(path))
             var splits: List<String>
 
-            apkFile.dexClasses.asSequence()
+            val primaryList = apkFile.dexClasses.asSequence()
                 .map { it.packageName }
                 .filter { !it.startsWith(packageName) }
                 .map { item ->
                     splits = item.split(".")
-                    LibStringItem(splits.subList(0, splits.size.coerceAtMost(3)).joinToString(separator = "."))
+
+                    when {
+                        //Remove obfuscated classes
+                        splits.any { it.length == 1 } -> LibStringItem("")
+                        //Merge AndroidX classes
+                        splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
+                        //Filter classes which paths level greater than 4
+                        else -> LibStringItem(splits.subList(0, splits.size.coerceAtMost(4)).joinToString(separator = "."))
+                    }
                 }
                 .toSet()
-                .filter { it.name.length > 8 }
-                .toList()
+                .filter { it.name.length > 11 && it.name.contains(".") }    //Remove obfuscated classes
+                .toMutableList()
+
+            //Merge path level 3 classes
+            primaryList.filter { it.name.split(".").size == 3 }.forEach {
+                primaryList.removeAll { item -> item.name.startsWith(it.name) }
+            }
+            //Merge path level 4 classes
+            var pathLevel3Item: String
+            var filter: List<LibStringItem>
+            primaryList.filter { it.name.split(".").size == 4 }.forEach {
+                if (it.name.startsWith("com.google.android")) {
+                    return@forEach
+                }
+
+                pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
+                filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
+
+                if (filter.isNotEmpty()) {
+                    primaryList.removeAll(filter)
+                    primaryList.add(LibStringItem(pathLevel3Item))
+                }
+            }
+            return primaryList
         } else {
-            listOf()
+            return emptyList()
         }
     }
 

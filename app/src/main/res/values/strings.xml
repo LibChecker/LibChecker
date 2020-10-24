@@ -99,6 +99,7 @@
     <string name="snapshot_indicator_changed">Changed</string>
     <string name="snapshot_indicator_moved">Moved</string>
     <string name="snapshot_empty_list_title">No Changes</string>
+    <string name="snapshot_empty_list_subtitle">It seems that there is no change in its components, but a lot of things may have happened inside.</string>
     <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
 

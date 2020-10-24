@@ -338,28 +338,28 @@ object NativeLibMap : BaseMap() {
         Pair(
             "libRSSupport.so",
             LibChip(
-                R.drawable.ic_android_outline,
+                R.drawable.ic_lib_android,
                 "RenderScript"
             )
         ),
         Pair(
             "librsjni.so",
             LibChip(
-                R.drawable.ic_android_outline,
+                R.drawable.ic_lib_android,
                 "RenderScript"
             )
         ),
         Pair(
             "librsjni_androidx.so",
             LibChip(
-                R.drawable.ic_android_outline,
+                R.drawable.ic_lib_android,
                 "RenderScript"
             )
         ),
         Pair(
             "libframesequence.so",
             LibChip(
-                R.drawable.ic_android_outline,
+                R.drawable.ic_lib_android,
                 "FrameSequence"
             )
         ),

@@ -5,10 +5,9 @@ import android.graphics.ColorMatrixColorFilter
 import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -33,12 +32,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
         holder.setGone(R.id.tv_lib_size, item.item.size == 0L)
 
         if (item.item.size != 0L) {
-            val text = if (type == DEX) {
-                "${item.item.size} files"
-            } else {
-                PackageUtils.sizeToString(item.item.size)
-            }
-            holder.setText(R.id.tv_lib_size, text)
+            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item.size))
         }
 
         val libIcon = holder.getView<Chip>(R.id.chip)
