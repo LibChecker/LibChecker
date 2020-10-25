@@ -6,7 +6,7 @@
     android:background="?attr/selectableItemBackgroundBorderless"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    android:paddingHorizontal="12dp"
+    android:paddingHorizontal="8dp"
     android:paddingVertical="@dimen/normal_padding_24">
 
     <ImageView
@@ -26,6 +26,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:fontFamily="sans-serif-condensed-medium"
+        android:gravity="center_horizontal"
+        android:lines="2"
+        android:textSize="12sp"
         tools:text="Launch" />
 
 </LinearLayout>

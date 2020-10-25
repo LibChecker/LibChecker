@@ -1,12 +1,21 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.content.ActivityNotFoundException
+import android.content.ComponentName
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
+import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.Toasty
 import com.blankj.utilcode.util.AppUtils
@@ -23,6 +32,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
+    private val mAdapter = AppInfoAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = LayoutBottomSheetAppInfoBinding.inflate(inflater)
@@ -55,5 +65,28 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
         binding.infoSettings.setOnClickListener {
             AppUtils.launchAppDetailsSettings(packageName)
         }
+        binding.rvList.apply {
+            adapter = mAdapter
+            layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+            setHasFixedSize(true)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mAdapter.setList(getResolveInfoList())
+            mAdapter.setOnItemClickListener { _, _, position ->
+                val info = mAdapter.data[position]
+                startActivity(Intent().apply {
+                    component = ComponentName(info.activityInfo.packageName, info.activityInfo.name)
+                    putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                })
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.N)
+    private fun getResolveInfoList(): List<ResolveInfo> {
+        return requireContext().packageManager.queryIntentActivities(
+            Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
+        ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
     }
 }

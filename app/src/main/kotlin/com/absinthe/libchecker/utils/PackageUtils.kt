@@ -476,7 +476,7 @@ object PackageUtils {
             return emptyList()
         }
 
-        if (!isApk) {
+        if (!isApk) {   //Todo apk dex analysis
             val path = packageInfo.applicationInfo.sourceDir
             val apkFile = ApkFile(File(path))
             var splits: List<String>
@@ -503,6 +503,7 @@ object PackageUtils {
             //Merge path level 3 classes
             primaryList.filter { it.name.split(".").size == 3 }.forEach {
                 primaryList.removeAll { item -> item.name.startsWith(it.name) }
+                primaryList.add(it)
             }
             //Merge path level 4 classes
             var pathLevel3Item: String
