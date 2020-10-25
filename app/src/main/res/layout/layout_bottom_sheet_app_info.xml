@@ -5,16 +5,26 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/normal_padding_24">
 
+    <View
+        android:id="@+id/handler"
+        android:layout_width="32dp"
+        android:layout_height="4dp"
+        android:background="@drawable/bg_dialog_handler"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/further_operation"
         android:textAppearance="?attr/textAppearanceHeadline5"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/handler" />
 
     <com.absinthe.libchecker.view.detail.AppInfoItemView
         android:id="@+id/info_launch"
@@ -43,6 +53,7 @@
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:overScrollMode="never"
         app:layout_constraintTop_toBottomOf="@id/info_launch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
