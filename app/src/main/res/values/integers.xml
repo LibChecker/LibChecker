@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="scrollbar_default_delay_before_fade">1250</integer>
+</resources>

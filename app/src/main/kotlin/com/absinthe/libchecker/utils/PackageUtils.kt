@@ -17,6 +17,10 @@ import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.constant.Constants.X86
+import com.absinthe.libchecker.constant.Constants.X86_64
+import com.absinthe.libchecker.constant.Constants.X86_64_STRING
+import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.blankj.utilcode.util.PermissionUtils
@@ -369,14 +373,20 @@ object PackageUtils {
                 elementName = entries.nextElement().name
 
                 if (elementName.contains("lib/")) {
-                    if (elementName.contains("arm64-v8a")) {
+                    if (elementName.contains(ARMV8_STRING)) {
                         abi = ARMV8
                         break
-                    } else if (elementName.contains("armeabi-v7a")) {
+                    } else if (elementName.contains(ARMV7_STRING)) {
                         abi = ARMV7
-                    } else if (elementName.contains("armeabi")) {
+                    } else if (elementName.contains(ARMV5_STRING)) {
                         if (abi != ARMV7) {
                             abi = ARMV5
+                        }
+                    } else if (elementName.contains(X86_64_STRING)) {
+                        abi = X86_64
+                    } else if (elementName.contains(X86_STRING)) {
+                        if (abi != X86_64) {
+                            abi = X86
                         }
                     }
                 }
@@ -407,6 +417,8 @@ object PackageUtils {
         return when {
             fileList.any { it.name.contains("arm64") } -> ARMV8
             fileList.any { it.name.contains("arm") } -> ARMV7
+            fileList.any { it.name.contains("x86_64") } -> X86_64
+            fileList.any { it.name.contains("x86") } -> X86
             else -> NO_LIBS
         }
     }

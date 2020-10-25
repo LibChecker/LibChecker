@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/normal_padding_24">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/further_operation"
+        android:textAppearance="?attr/textAppearanceHeadline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.absinthe.libchecker.view.detail.AppInfoItemView
+        android:id="@+id/info_launch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/normal_padding_24"
+        app:infoBackgroundTint="@color/material_deep_purple_300"
+        app:infoSrc="@drawable/ic_launch"
+        app:itemTitle="@string/app_info_launch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
+        app:layout_constraintWidth_percent="0.25" />
+
+    <com.absinthe.libchecker.view.detail.AppInfoItemView
+        android:id="@+id/info_settings"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:infoBackgroundTint="@color/material_blue_grey_300"
+        app:infoSrc="@drawable/ic_settings"
+        app:itemTitle="@string/app_info_settings"
+        app:layout_constraintStart_toEndOf="@id/info_launch"
+        app:layout_constraintTop_toTopOf="@id/info_launch"
+        app:layout_constraintWidth_percent="0.25" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/info_launch" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

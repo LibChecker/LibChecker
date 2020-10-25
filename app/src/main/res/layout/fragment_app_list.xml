@@ -19,8 +19,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/loading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/lottie_anim_size"
+                android:layout_height="@dimen/lottie_anim_size"
                 app:lottie_autoPlay="true"
                 app:lottie_fileName="app_list_loading.json"
                 app:lottie_loop="true" />
@@ -29,9 +29,10 @@
                 android:id="@+id/tv_first_tip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-50dp"
+                android:layout_marginTop="24dp"
                 android:text="@string/app_list_first_tip"
-                android:textAppearance="?attr/textAppearanceHeadline6" />
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textSize="18sp" />
 
         </LinearLayout>
 
@@ -41,11 +42,11 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="?actionBarSize"
+            android:scrollbarDefaultDelayBeforeFade="@integer/scrollbar_default_delay_before_fade"
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
             app:borderTopStyle="whenTop"
             app:fastScrollEnabled="true"
-            android:scrollbarDefaultDelayBeforeFade="1250"
             app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@android:color/transparent"
             app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"

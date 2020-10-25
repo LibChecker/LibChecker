@@ -16,8 +16,8 @@
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="@dimen/lottie_anim_size"
+                android:layout_height="@dimen/lottie_anim_size"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true" />
 
@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:scrollbarDefaultDelayBeforeFade="1250"
+            android:scrollbarDefaultDelayBeforeFade="@integer/scrollbar_default_delay_before_fade"
             app:fastScrollEnabled="true"
             app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@android:color/transparent"

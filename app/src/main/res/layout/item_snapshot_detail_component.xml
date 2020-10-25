@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="5dp"
+    android:layout_marginVertical="4dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="3dp"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="@dimen/main_card_corner_radius"
+    app:cardElevation="@dimen/main_card_elevation">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
-        android:padding="10dp">
+        android:padding="@dimen/main_card_padding">
 
         <ImageView
             android:id="@+id/iv_type_icon"

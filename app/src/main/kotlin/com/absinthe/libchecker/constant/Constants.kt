@@ -9,10 +9,14 @@ object Constants {
     const val ARMV7 = 1
     const val ARMV5 = 2
     const val NO_LIBS = 3
+    const val X86 = 4
+    const val X86_64 = 5
 
     const val ARMV8_STRING = "arm64-v8a"
     const val ARMV7_STRING = "armeabi-v7a"
     const val ARMV5_STRING = "armeabi"
+    const val X86_STRING = "x86"
+    const val X86_64_STRING = "x86_64"
 
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
     const val PREF_ENTRY_ANIMATION = "entryAnimation"

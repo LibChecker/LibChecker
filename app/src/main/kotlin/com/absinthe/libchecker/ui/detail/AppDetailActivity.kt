@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.content.ActivityNotFoundException
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
@@ -26,11 +25,10 @@ import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.IntentUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -115,12 +113,11 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                     ivAppIcon.apply {
                         load(AppUtils.getAppIcon(packageName))
                         setOnClickListener {
-                            try {
-                                startActivity(IntentUtils.getLaunchAppIntent(pkgName))
-                            } catch (e: ActivityNotFoundException) {
-                                Toasty.show(this@AppDetailActivity, R.string.toast_cant_open_app)
-                            } catch (e: NullPointerException) {
-                                Toasty.show(this@AppDetailActivity, R.string.toast_package_name_null)
+                            AppInfoBottomShellDialogFragment().apply {
+                                arguments = Bundle().apply {
+                                    putString(EXTRA_PACKAGE_NAME, pkgName)
+                                }
+                                show(supportFragmentManager, tag)
                             }
                         }
                     }

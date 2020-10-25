@@ -16,6 +16,7 @@
 
         <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
         <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
 
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
@@ -39,6 +40,7 @@
 
         <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
         <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
 
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>

@@ -198,7 +198,7 @@
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/detail_toolbar_size"
             android:backgroundTint="?android:colorBackground"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -226,8 +226,8 @@
 
                 <ImageButton
                     android:id="@+id/ib_sort"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="@dimen/detail_toolbar_size"
+                    android:layout_height="@dimen/detail_toolbar_size"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Sort"
                     android:scaleType="center"

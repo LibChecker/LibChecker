@@ -9,7 +9,7 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:minHeight="40dp"
-    android:paddingVertical="3dp">
+    android:paddingVertical="4dp">
 
     <TextView
         android:id="@+id/tv_name"

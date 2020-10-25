@@ -119,7 +119,7 @@
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:padding="@dimen/normal_padding"
-            android:scrollbarDefaultDelayBeforeFade="1250"
+            android:scrollbarDefaultDelayBeforeFade="@integer/scrollbar_default_delay_before_fade"
             app:fastScrollEnabled="true"
             app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@android:color/transparent"

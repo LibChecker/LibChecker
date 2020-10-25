@@ -7,13 +7,13 @@
     android:clickable="true"
     android:focusable="true"
     android:transitionName="app_card_container"
-    app:cardCornerRadius="3dp"
-    app:cardElevation="1dp">
+    app:cardCornerRadius="@dimen/main_card_corner_radius"
+    app:cardElevation="@dimen/main_card_elevation">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp">
+        android:padding="@dimen/main_card_padding">
 
         <ImageView
             android:id="@+id/iv_icon"

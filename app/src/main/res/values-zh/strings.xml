@@ -99,4 +99,7 @@
     <string name="album_compare">对比</string>
     <string name="album_click_to_choose">点击选择</string>
     <string name="snapshot_empty_list_subtitle">看起来它的组件没有任何变化，但内部可能发生了很多事情哦</string>
+    <string name="further_operation">进一步操作</string>
+    <string name="app_info_launch">启动</string>
+    <string name="app_info_settings">设置</string>
 </resources>

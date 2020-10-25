@@ -19,7 +19,7 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="4dp"
         android:importantForAccessibility="no"
         tools:src="@drawable/ic_changed" />
 
@@ -28,7 +28,7 @@
         android:layout_width="20dp"
         android:layout_height="5dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="4dp"
         android:importantForAccessibility="no"
         android:src="@color/material_green_A400" />
 

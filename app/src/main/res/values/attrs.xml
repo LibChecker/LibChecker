@@ -12,4 +12,10 @@
         <attr name="itemIcon" format="reference" />
         <attr name="itemIconTint" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="AppInfoItemView">
+        <attr name="itemTitle" format="string" />
+        <attr name="infoSrc" format="reference" />
+        <attr name="infoBackgroundTint" format="color" />
+    </declare-styleable>
 </resources>
