@@ -120,27 +120,26 @@ class AlbumActivity : BaseActivity() {
 
     @SuppressLint("ClickableViewAccessibility")
     private val touchListener = View.OnTouchListener { _, event ->
-            var touchFlag = false
+        var touchFlag = false
 
-            when(event?.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    touchFlag = false
-                    longClickCount++
-                    itemClickObserver.value = true
-                }
-                MotionEvent.ACTION_UP -> {
-                    longClickCount--
-                    itemClickObserver.value = false
+        when (event?.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                touchFlag = false
+                longClickCount++
+                itemClickObserver.value = true
+            }
+            MotionEvent.ACTION_UP -> {
+                longClickCount--
+                itemClickObserver.value = false
 
-                    if (longClickCount > 1) {
-                        touchFlag = true
-                    }
-                }
-                MotionEvent.ACTION_MOVE -> {
+                if (longClickCount > 1) {
                     touchFlag = true
                 }
             }
-            touchFlag
+            MotionEvent.ACTION_MOVE -> {
+                touchFlag = true
+            }
         }
+        touchFlag
     }
 }
