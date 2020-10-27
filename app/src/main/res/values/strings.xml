@@ -78,7 +78,7 @@
     <string name="detail_label">View App Details</string>
     <string name="not_found">Not found</string>
     <string name="create_an_issue">Assist us to supplement the information</string>
-    <string name="split_spk" translatable="false">Split APKs</string>
+    <string name="app_bundle" translatable="false">App Bundle</string>
     <string name="kotlin_used" translatable="false">Kotlin used</string>
     <string name="items_count">Items count: </string>
     <string name="further_operation">Further Operation</string>

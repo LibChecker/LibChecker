@@ -60,10 +60,13 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
                 Toasty.show(requireContext(), R.string.toast_cant_open_app)
             } catch (e: NullPointerException) {
                 Toasty.show(requireContext(), R.string.toast_package_name_null)
+            } finally {
+                dismiss()
             }
         }
         binding.infoSettings.setOnClickListener {
             AppUtils.launchAppDetailsSettings(packageName)
+            dismiss()
         }
         binding.rvList.apply {
             adapter = mAdapter
@@ -79,6 +82,7 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
                     component = ComponentName(info.activityInfo.packageName, info.activityInfo.name)
                     putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
                 })
+                dismiss()
             }
         }
     }

@@ -124,8 +124,8 @@
                         style="@style/App.LibChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/split_spk"
-                        app:chipIcon="@drawable/ic_split" />
+                        android:text="@string/app_bundle"
+                        app:chipIcon="@drawable/ic_aab" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_kotlin_used"

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant.librarymap
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.LibChip
+import java.util.regex.Pattern
 
 /**
  * <pre>
@@ -153,7 +154,35 @@ object DexLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_jetpack, "Jetpack MultiDex")
         ),
         Pair(
+            "androidx.print",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Print")
+        ),
+        Pair(
+            "androidx.documentfile",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack DocumentFile")
+        ),
+        Pair(
+            "androidx.work",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack Work Manager")
+        ),
+        Pair(
+            "androidx.databinding",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack DataBinding")
+        ),
+        Pair(
+            "androidx.exifinterface",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack ExifInterface")
+        ),
+        Pair(
+            "androidx.sqlite",
+            LibChip(R.drawable.ic_lib_jetpack, "Jetpack SQLite")
+        ),
+        Pair(
             "com.xiaomi.mipush",
+            LibChip(R.drawable.ic_lib_xiaomi, "MiPush")
+        ),
+        Pair(
+            "com.xiaomi.push",
             LibChip(R.drawable.ic_lib_xiaomi, "MiPush")
         ),
         Pair(
@@ -161,48 +190,8 @@ object DexLibMap : BaseMap() {
             LibChip(R.drawable.ic_kotlin_logo, "Kotlin Reflect")
         ),
         Pair(
-            "kotlin.coroutines.jvm",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin Coroutines")
-        ),
-        Pair(
-            "kotlin.coroutines",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin Coroutines")
-        ),
-        Pair(
-            "kotlinx.coroutines",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin Coroutines")
-        ),
-        Pair(
             "kotlin.sequences",
             LibChip(R.drawable.ic_kotlin_logo, "Kotlin Sequences")
-        ),
-        Pair(
-            "kotlin.annotation",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "kotlin.internal",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "kotlin.contracts",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "kotlin.random",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "kotlin.ranges",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "kotlin.comparisions",
-            LibChip(R.drawable.ic_kotlin_logo, "Kotlin")
-        ),
-        Pair(
-            "okhttp3.internal",
-            LibChip(R.drawable.ic_sdk_placeholder, "OKHttp3")
         ),
         Pair(
             "com.google.android.material",
@@ -220,13 +209,90 @@ object DexLibMap : BaseMap() {
             "com.google.android.flexbox",
             LibChip(R.drawable.ic_lib_google, "FlexBox")
         ),
+        Pair(
+            "com.google.gson",
+            LibChip(R.drawable.ic_lib_google, "gson")
+        ),
+        Pair(
+            "com.google.protobuf",
+            LibChip(R.drawable.ic_lib_google, "Protocol Buffer")
+        ),
+        Pair(
+            "com.google.zxing",
+            LibChip(R.drawable.ic_lib_google, "ZXing")
+        ),
+        Pair(
+            "com.google.firebase",
+            LibChip(R.drawable.ic_lib_firebase, "Firebase")
+        ),
+        Pair(
+            "com.bumptech.glide",
+            LibChip(R.drawable.ic_sdk_placeholder, "Glide")
+        ),
+        Pair(
+            "com.airbnb.lottie",
+            LibChip(R.drawable.ic_lib_airbnb, "Lottie")
+        ),
+        Pair(
+            "com.sina.weibo",
+            LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
+        ),
+        Pair(
+            "com.alipay.sdk",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
+            "com.alipay.android",
+            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
+        ),
+        Pair(
+            "org.greenbot.eventbus",
+            LibChip(R.drawable.ic_sdk_placeholder, "EventBus")
+        ),
+        Pair(
+            "org.greenbot.greendao",
+            LibChip(R.drawable.ic_sdk_placeholder, "GreenDAO")
+        ),
+        Pair(
+            "com.tencent.bugly",
+            LibChip(R.drawable.ic_lib_bugly, "Bugly")
+        ),
+        Pair(
+            "com.alibaba.fastjson",
+            LibChip(R.drawable.ic_lib_alibaba, "fastjson")
+        ),
+        Pair(
+            "butterknife.internal",
+            LibChip(R.drawable.ic_sdk_placeholder, "ButterKnife")
+        ),
+        Pair(
+            "com.microsoft.appcenter",
+            LibChip(R.drawable.ic_lib_microsoft, "App Center")
+        ),
+        Pair(
+            "com.facebook.fresco",
+            LibChip(R.drawable.ic_lib_facebook, "Fresco")
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
         return MAP
     }
 
+    private val PATTERN_KOTLIN_COROUTINES_1 = Pattern.compile("kotlin.coroutines.(.*)")
+    private val PATTERN_KOTLIN_COROUTINES_2 = Pattern.compile("kotlinx.coroutines.(.*)")
+    private val PATTERN_KOTLIN = Pattern.compile("kotlin.(.*)")
+    private val PATTERN_OKHTTP3 = Pattern.compile("okhttp3.(.*)")
+    private val PATTERN_RETROFIT2 = Pattern.compile("retrofit2.(.*)")
+
     override fun findRegex(name: String): LibChip? {
-        return null
+        return when {
+            PATTERN_KOTLIN.matcher(name).matches() -> LibChip(R.drawable.ic_kotlin_logo, "Kotlin", "regex_kotlin")
+            matchAllPatterns(name, PATTERN_KOTLIN_COROUTINES_1, PATTERN_KOTLIN_COROUTINES_2) ->
+                LibChip(R.drawable.ic_kotlin_logo, "Kotlin Coroutines", "regex_kotlin_coroutines")
+            PATTERN_OKHTTP3.matcher(name).matches() -> LibChip(R.drawable.ic_lib_square, "OKHttp3", "regex_okhttp3")
+            PATTERN_RETROFIT2.matcher(name).matches() -> LibChip(R.drawable.ic_lib_square, "Retrofit2", "regex_retrofit2")
+            else -> null
+        }
     }
 }
