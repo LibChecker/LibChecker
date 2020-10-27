@@ -20,6 +20,7 @@ import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,9 +30,9 @@ class AlbumActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAlbumBinding
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val itemLongClickFlagList = mutableListOf(false, false, false)
     private val itemClickObserver = MutableLiveData<Boolean>()
     private var isEasterEggAdded = false
+    private var longClickCount = 0
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityAlbumBinding.inflate(layoutInflater)
@@ -79,11 +80,17 @@ class AlbumActivity : BaseActivity() {
         binding.itemBackupRestore.setOnClickListener {
             startActivity(Intent(this, BackupActivity::class.java))
         }
-        binding.itemComparison.setOnTouchListener(getTouchListener(0))
-        binding.itemManagement.setOnTouchListener(getTouchListener(1))
-        binding.itemBackupRestore.setOnTouchListener(getTouchListener(2))
+        binding.itemTrack.setOnClickListener {
+            Toasty.show(this, "Todo")
+        }
+
+        binding.itemComparison.setOnTouchListener(touchListener)
+        binding.itemManagement.setOnTouchListener(touchListener)
+        binding.itemBackupRestore.setOnTouchListener(touchListener)
+        binding.itemTrack.setOnTouchListener(touchListener)
+
         itemClickObserver.observe(this, {
-            if (itemLongClickFlagList[0] && itemLongClickFlagList[1] && itemLongClickFlagList[2] && !isEasterEggAdded) {
+            if (longClickCount >= 2 && !isEasterEggAdded) {
                 val easterEgg = ImageView(this).apply {
                     layoutParams = LinearLayout.LayoutParams(200.dp, 200.dp).apply {
                         gravity = Gravity.CENTER_HORIZONTAL
@@ -112,23 +119,20 @@ class AlbumActivity : BaseActivity() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun getTouchListener(position: Int): View.OnTouchListener {
-        return View.OnTouchListener { _, event ->
+    private val touchListener = View.OnTouchListener { _, event ->
             var touchFlag = false
 
             when(event?.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     touchFlag = false
-                    itemLongClickFlagList[position] = true
+                    longClickCount++
                     itemClickObserver.value = true
                 }
                 MotionEvent.ACTION_UP -> {
-                    itemLongClickFlagList[position] = false
+                    longClickCount--
                     itemClickObserver.value = false
 
-                    var flags = 0
-                    itemLongClickFlagList.forEach { if (it) flags++ }
-                    if (flags > 1) {
+                    if (longClickCount > 1) {
                         touchFlag = true
                     }
                 }

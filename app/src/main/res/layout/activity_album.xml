@@ -67,6 +67,17 @@
             app:itemIcon="@drawable/ic_backup"
             app:itemIconTint="@color/material_green_300" />
 
+        <com.absinthe.libchecker.view.snapshot.AlbumItemView
+            android:id="@+id/item_track"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/album_item_margin_horizontal"
+            android:layout_marginVertical="@dimen/album_item_margin_vertival"
+            app:albumItemSubtitle="@string/album_item_track_subtitle"
+            app:albumItemTitle="@string/album_item_track_title"
+            app:itemIcon="@drawable/ic_track"
+            app:itemIconTint="@color/material_orange_300" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

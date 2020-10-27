@@ -79,7 +79,10 @@
     <string name="not_found">Not found</string>
     <string name="create_an_issue">Assist us to supplement the information</string>
     <string name="app_bundle" translatable="false">App Bundle</string>
+    <string name="app_bundle_details">The Android App Bundle is Android\'s new, official publishing format that offers a more efficient way to build and release your app. The Android App Bundle lets you more easily deliver a great experience in a smaller app size, which can improve install success and reduce uninstalls. It\'s easy to switch. You don\'t need to refactor your code to start benefiting from a smaller app. And once you\'ve switched, you\'ll benefit from modular app development and customizable feature delivery.</string>
     <string name="kotlin_used" translatable="false">Kotlin used</string>
+    <string name="kotlin_details">Kotlin is a cross-platform, statically typed, general-purpose programming language with type inference. Kotlin is designed to interoperate fully with Java, and the JVM version of Kotlin\'s standard library depends on the Java Class Library, but type inference allows its syntax to be more concise.</string>
+    <string name="kotlin_string" translatable="false">Kotlin</string>
     <string name="items_count">Items count: </string>
     <string name="further_operation">Further Operation</string>
     <string name="app_info_launch">Launch</string>
@@ -124,6 +127,8 @@
     <string name="album_item_management_subtitle">Manage all snapshots</string>
     <string name="album_item_backup_restore_title">Backup &amp; Restore</string>
     <string name="album_item_backup_restore_subtitle">Backup and restore snapshots</string>
+    <string name="album_item_track_title">Track</string>
+    <string name="album_item_track_subtitle">Select applications to force a comparison change</string>
     <string name="album_backup">Backup</string>
     <string name="album_backup_summary">Back up all snapshots</string>
     <string name="album_restore">Restore</string>

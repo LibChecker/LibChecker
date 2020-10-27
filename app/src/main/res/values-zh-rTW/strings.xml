@@ -102,4 +102,8 @@
     <string name="further_operation">進一步操作</string>
     <string name="app_info_settings">設定</string>
     <string name="app_info_launch">啟動</string>
+    <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一種官方發布格式，可讓您以更高效的方式開發和發布應用。借助 Android App Bundle，您可以更輕鬆地以更小的應用提供優質的使用體驗，從而提升安裝成功率並減少卸載量。轉換過程輕鬆便捷。您無需重構代碼即可開始獲享較小應用的優勢。改用這種格式後，您可以體驗模塊化應用開發和可自定義功能交付，並從中受益。</string>
+    <string name="kotlin_details">Kotlin 是一種在 Java 虛擬機上運行的靜態類型編程語言。雖然與 Java 語法並不兼容，但在 JVM 環境中 Kotlin 被設計成可以和 Java 代碼相互運作，並可以重複使用如 Java 集合框架等的現有 Java 引用的函數庫。</string>
+    <string name="album_item_track_title">追踪</string>
+    <string name="album_item_track_subtitle">選擇應用進行強制對比變化</string>
 </resources>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -155,8 +156,28 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                         withContext(Dispatchers.Main) {
                             if (isSplitApk || isKotlinUsed) {
                                 binding.chipGroup.isVisible = true
-                                binding.chipSplitApk.isVisible = isSplitApk
-                                binding.chipKotlinUsed.isVisible = isKotlinUsed
+                                binding.chipAppBundle.apply {
+                                    isVisible = isSplitApk
+                                    setOnClickListener {
+                                        AlertDialog.Builder(this@AppDetailActivity)
+                                            .setIcon(R.drawable.ic_aab)
+                                            .setTitle(R.string.app_bundle)
+                                            .setMessage(R.string.app_bundle_details)
+                                            .setPositiveButton(android.R.string.ok, null)
+                                            .show()
+                                    }
+                                }
+                                binding.chipKotlinUsed.apply {
+                                    isVisible = isKotlinUsed
+                                    setOnClickListener {
+                                        AlertDialog.Builder(this@AppDetailActivity)
+                                            .setIcon(R.drawable.ic_kotlin_logo)
+                                            .setTitle(R.string.kotlin_string)
+                                            .setMessage(R.string.kotlin_details)
+                                            .setPositiveButton(android.R.string.ok, null)
+                                            .show()
+                                    }
+                                }
                             } else {
                                 binding.chipGroup.isVisible = false
                             }

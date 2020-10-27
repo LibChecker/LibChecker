@@ -120,7 +120,7 @@
                     tools:visibility="visible">
 
                     <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_split_apk"
+                        android:id="@+id/chip_app_bundle"
                         style="@style/App.LibChip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
