@@ -344,7 +344,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     fun computeLibReference(@LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
-        val context: Context = getApplication<LibCheckerApp>()
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
         if (appList.isNullOrEmpty()) {
@@ -374,9 +373,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         continue
                     }
 
+                    packageInfo = PackageUtils.getPackageInfo(item.packageName)
                     libList = PackageUtils.getNativeDirLibs(
-                        item.sourceDir,
-                        item.nativeLibraryDir
+                        packageInfo.applicationInfo.sourceDir,
+                        packageInfo.applicationInfo.nativeLibraryDir
                     )
 
                     for (lib in libList) {
@@ -386,11 +386,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     try {
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_SERVICES
-                        )
-
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
                         packageInfo.services?.let {
                             for (service in it) {
                                 count = map[service.name]?.count ?: 0
@@ -398,10 +394,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
 
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_ACTIVITIES
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_ACTIVITIES)
                         packageInfo.activities?.let {
                             for (activity in it) {
                                 count = map[activity.name]?.count ?: 0
@@ -409,10 +402,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
 
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_RECEIVERS
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_RECEIVERS)
                         packageInfo.receivers?.let {
                             for (receiver in it) {
                                 count = map[receiver.name]?.count ?: 0
@@ -420,10 +410,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         }
 
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_PROVIDERS
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_PROVIDERS)
                         packageInfo.providers?.let {
                             for (provider in it) {
                                 count = map[provider.name]?.count ?: 0
@@ -442,9 +429,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         continue
                     }
 
+                    packageInfo = PackageUtils.getPackageInfo(item.packageName)
                     libList = PackageUtils.getNativeDirLibs(
-                        item.sourceDir,
-                        item.nativeLibraryDir
+                        packageInfo.applicationInfo.sourceDir,
+                        packageInfo.applicationInfo.nativeLibraryDir
                     )
 
                     for (lib in libList) {
@@ -461,12 +449,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     try {
-                        packageInfo =
-                            context.packageManager.getPackageInfo(
-                                item.packageName,
-                                PackageManager.GET_SERVICES
-                            )
-
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_SERVICES)
                         packageInfo.services?.let {
                             for (service in it) {
                                 count = map[service.name]?.count ?: 0
@@ -486,10 +469,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     try {
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_ACTIVITIES
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_ACTIVITIES)
                         packageInfo.activities?.let {
                             for (activity in it) {
                                 count = map[activity.name]?.count ?: 0
@@ -509,10 +489,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     try {
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_RECEIVERS
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_RECEIVERS)
                         packageInfo.receivers?.let {
                             for (receiver in it) {
                                 count = map[receiver.name]?.count ?: 0
@@ -532,10 +509,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     try {
-                        packageInfo = context.packageManager.getPackageInfo(
-                            item.packageName,
-                            PackageManager.GET_PROVIDERS
-                        )
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_PROVIDERS)
                         packageInfo.providers?.let {
                             for (provider in it) {
                                 count = map[provider.name]?.count ?: 0

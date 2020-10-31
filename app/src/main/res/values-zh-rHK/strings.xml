@@ -106,4 +106,5 @@
     <string name="kotlin_details">Kotlin 是一種在 Java 虛擬機上運行的靜態類型編程語言。雖然與 Java 語法並不兼容，但在 JVM 環境中 Kotlin 被設計成可以和 Java 代碼相互運作，並可以重複使用如 Java 集合框架等的現有 Java 引用的函數庫。</string>
     <string name="album_item_track_title">追踪</string>
     <string name="album_item_track_subtitle">選擇應用進行強制對比變化</string>
+    <string name="uncharted_territory">未知領域</string>
 </resources>

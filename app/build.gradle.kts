@@ -89,7 +89,7 @@ val protocVersion by extra("3.13.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.0.5")
@@ -114,7 +114,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
 
     implementation("androidx.core:core-ktx:1.5.0-alpha04")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha06")
     implementation("androidx.browser:browser:1.2.0")
@@ -125,7 +125,7 @@ dependencies {
     implementation("com.drakeet.multitype:multitype:4.2.0")
     implementation("com.airbnb.android:lottie:3.4.4")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.blankj:utilcodex:1.29.0")
+    implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.0.0")
@@ -145,7 +145,7 @@ dependencies {
 
     //XML layout to Java code
     implementation("com.zhangyue.we:x2c-lib:1.0.6")
-    annotationProcessor("com.zhangyue.we:x2c-apt:1.1.2")
+    kapt("com.zhangyue.we:x2c-apt:1.1.2")
 
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.9.0")

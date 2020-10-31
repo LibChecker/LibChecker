@@ -38,6 +38,7 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
@@ -306,25 +307,19 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         mAdapter.setDiffNewData(filterList)
 
         if (list != newItems) {
-            lifecycleScope.launch {
-                delay(300)
+            doOnMainThreadIdle({
+                try {
+                    flip(VF_LIST)
 
-                withContext(Dispatchers.Main) {
-                    try {
-                        flip(VF_LIST)
-
-                        if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                            && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                            returnTopOfList()
-                        }
-
-                        menu?.findItem(R.id.search)?.isVisible = true
-                        isListReady = true
-                    } catch (ignore: Exception) {
-
+                    if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
+                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+                        returnTopOfList()
                     }
-                }
-            }
+
+                    menu?.findItem(R.id.search)?.isVisible = true
+                    isListReady = true
+                } catch (ignore: Exception) { }
+            })
         }
     }
 

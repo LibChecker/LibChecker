@@ -14,6 +14,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.databinding.LayoutDexEmptyListBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
@@ -36,6 +37,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
     private val viewModel by activityViewModels<DetailViewModel>()
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private val dexEmptyLayoutBinding by lazy { LayoutDexEmptyListBinding.inflate(layoutInflater) }
     private val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
     private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
@@ -106,7 +108,12 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
             }
             setDiffCallback(LibStringDiffUtil())
             emptyLayoutBinding.text.text = getString(R.string.loading)
-            setEmptyView(emptyLayoutBinding.root)
+
+            if (type == DEX) {
+                setEmptyView(dexEmptyLayoutBinding.root)
+            } else {
+                setEmptyView(emptyLayoutBinding.root)
+            }
         }
 
         if (type == DEX) {
@@ -128,12 +135,10 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
     override fun sort() {
         viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
             val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }
-                .toMutableList())
+            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }.toMutableList())
             MODE_SORT_BY_LIB
         } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }
-                .toMutableList())
+            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }.toMutableList())
             MODE_SORT_BY_SIZE
         }
         GlobalValues.libSortMode.value = viewModel.sortMode

@@ -433,6 +433,8 @@ object PackageUtils {
             ARMV8 -> ARMV8_STRING
             ARMV7 -> ARMV7_STRING
             ARMV5 -> ARMV5_STRING
+            X86_64 -> X86_64_STRING
+            X86 -> X86_STRING
             NO_LIBS -> Utils.getApp().getString(R.string.no_libs)
             ERROR -> Utils.getApp().getString(R.string.cannot_read)
             else -> Utils.getApp().getString(R.string.unknown)
@@ -446,8 +448,8 @@ object PackageUtils {
      */
     fun getAbiBadgeResource(type: Int): Int {
         return when (type) {
-            ARMV8 -> R.drawable.ic_64bit
-            ARMV7, ARMV5 -> R.drawable.ic_32bit
+            ARMV8, X86_64 -> R.drawable.ic_64bit
+            ARMV7, ARMV5, X86 -> R.drawable.ic_32bit
             else -> R.drawable.ic_no_libs
         }
     }
@@ -478,6 +480,9 @@ object PackageUtils {
 
         if (!isApk) {   //Todo apk dex analysis
             val path = packageInfo.applicationInfo.sourceDir
+            if (path.isNullOrEmpty()) {
+                return emptyList()
+            }
             val apkFile = ApkFile(File(path))
             var splits: List<String>
 
