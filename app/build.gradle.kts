@@ -145,7 +145,7 @@ dependencies {
 
     //XML layout to Java code
     implementation("com.zhangyue.we:x2c-lib:1.0.6")
-    kapt("com.zhangyue.we:x2c-apt:1.1.2")
+    annotationProcessor("com.zhangyue.we:x2c-apt:1.1.2")
 
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
