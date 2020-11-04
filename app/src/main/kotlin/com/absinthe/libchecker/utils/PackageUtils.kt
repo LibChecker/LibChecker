@@ -21,6 +21,7 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.blankj.utilcode.util.PermissionUtils
@@ -374,18 +375,24 @@ object PackageUtils {
 
                 if (elementName.contains("lib/")) {
                     if (elementName.contains(ARMV8_STRING)) {
-                        abi = ARMV8
+                        if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
+                            abi = ARMV8
+                        }
                         break
                     } else if (elementName.contains(ARMV7_STRING)) {
-                        abi = ARMV7
+                        if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
+                            abi = ARMV7
+                        }
                     } else if (elementName.contains(ARMV5_STRING)) {
-                        if (abi != ARMV7) {
+                        if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) && abi != ARMV7) {
                             abi = ARMV5
                         }
                     } else if (elementName.contains(X86_64_STRING)) {
-                        abi = X86_64
+                        if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
+                            abi = X86_64
+                        }
                     } else if (elementName.contains(X86_STRING)) {
-                        if (abi != X86_64) {
+                        if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") } && abi != X86_64) {
                             abi = X86
                         }
                     }
@@ -412,15 +419,38 @@ object PackageUtils {
      */
     private fun getAbiByNativeDir(nativePath: String): Int {
         val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
+        val abis = mutableSetOf<Int>()
 
         val fileList = file.listFiles() ?: return NO_LIBS
-        return when {
-            fileList.any { it.name.contains("arm64") } -> ARMV8
-            fileList.any { it.name.contains("arm") } -> ARMV7
-            fileList.any { it.name.contains("x86_64") } -> X86_64
-            fileList.any { it.name.contains("x86") } -> X86
-            else -> NO_LIBS
+
+        fileList.forEach {
+            when {
+                it.name.contains("arm64") -> abis.add(ARMV8)
+                it.name.contains("arm") -> abis.add(ARMV7)
+                it.name.contains("x86_64") -> abis.add(X86_64)
+                it.name.contains("x86") -> abis.add(X86)
+                else -> return NO_LIBS
+            }
         }
+
+        if (abis.contains(ARMV8)) {
+            if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
+                return ARMV8
+            }
+        } else if (abis.contains(ARMV7)) {
+            if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
+                return ARMV8
+            }
+        } else if (abis.contains(X86_64)) {
+            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
+                return X86_64
+            }
+        } else {
+            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
+                return X86
+            }
+        }
+        return NO_LIBS
     }
 
     /**

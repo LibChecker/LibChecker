@@ -2,6 +2,7 @@ package com.absinthe.libchecker.constant
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
@@ -51,4 +52,6 @@ object GlobalValues {
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
 
     val season = AppUtils.getCurrentSeason()
+
+    val deviceSupportedAbis = Build.SUPPORTED_ABIS
 }
