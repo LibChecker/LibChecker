@@ -21,7 +21,8 @@ data class SnapshotDiffItem(
     var changed: Boolean = false,
     var moved: Boolean = false,
     var newInstalled: Boolean = false,
-    var deleted: Boolean = false
+    var deleted: Boolean = false,
+    var isTrackItem: Boolean = false
 ) : Serializable {
     data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 }

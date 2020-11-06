@@ -4,17 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
+import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import com.absinthe.libchecker.view.ClassifyDialogView
-import com.absinthe.libraries.utils.utils.UiUtils
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
-class ClassifyBottomSheetDialogFragment : BottomSheetDialogFragment() {
+class ClassifyBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     var item: ArrayList<LCItem> = ArrayList()
     private val dialogView by lazy { ClassifyDialogView(requireContext()) }
@@ -41,18 +39,5 @@ class ClassifyBottomSheetDialogFragment : BottomSheetDialogFragment() {
         outState.putParcelableArrayList(EXTRA_ITEM_LIST, item)
         outState.putString(EXTRA_TITLE, dialogTitle)
         super.onSaveInstanceState(outState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.let {
-            it.findViewById<View>(com.google.android.material.R.id.container).fitsSystemWindows = false
-            UiUtils.setSystemBarStyle(it)
-        }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
     }
 }

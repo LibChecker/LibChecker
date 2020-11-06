@@ -19,10 +19,10 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.IntentUtils
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 /**
  * <pre>
@@ -31,7 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  * </pre>
  */
 
-class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
+class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
@@ -40,19 +40,6 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
         val binding = LayoutBottomSheetAppInfoBinding.inflate(inflater)
         initView(binding)
         return binding.root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.let {
-            it.findViewById<View>(com.google.android.material.R.id.container).fitsSystemWindows = false
-            UiUtils.setSystemBarStyle(it)
-        }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
     }
 
     private fun initView(binding: LayoutBottomSheetAppInfoBinding) {

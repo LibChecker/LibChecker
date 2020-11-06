@@ -20,7 +20,7 @@ import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.ui.album.TrackActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,7 +81,7 @@ class AlbumActivity : BaseActivity() {
             startActivity(Intent(this, BackupActivity::class.java))
         }
         binding.itemTrack.setOnClickListener {
-            Toasty.show(this, "Todo")
+            startActivity(Intent(this, TrackActivity::class.java))
         }
 
         binding.itemComparison.setOnTouchListener(touchListener)

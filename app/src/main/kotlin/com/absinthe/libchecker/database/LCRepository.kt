@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
 class LCRepository(private val lcDao: LCDao) {
 
@@ -18,6 +19,8 @@ class LCRepository(private val lcDao: LCDao) {
 
     fun getTimeStamps(): List<TimeStampItem> = lcDao.getTimeStamps()
 
+    suspend fun getTrackItems(): List<TrackItem> = lcDao.getTrackItems()
+
     suspend fun insert(item: LCItem) {
         lcDao.insert(item)
     }
@@ -27,6 +30,10 @@ class LCRepository(private val lcDao: LCDao) {
     }
 
     suspend fun insert(item: SnapshotItem) {
+        lcDao.insert(item)
+    }
+
+    suspend fun insert(item: TrackItem) {
         lcDao.insert(item)
     }
 
@@ -55,6 +62,10 @@ class LCRepository(private val lcDao: LCDao) {
     }
 
     suspend fun delete(item: LCItem) {
+        lcDao.delete(item)
+    }
+
+    suspend fun delete(item: TrackItem) {
         lcDao.delete(item)
     }
 

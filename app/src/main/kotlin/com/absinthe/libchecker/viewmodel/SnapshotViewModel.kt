@@ -208,7 +208,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
 
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
+            val allTrackItems = repository.getTrackItems()
+
             preList.let { dbItems ->
                 for (dbItem in dbItems) {
                     appList.find { it.packageName == dbItem.packageName }?.let {
@@ -216,7 +218,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             packageInfo = PackageUtils.getPackageInfo(it)
                             versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                            if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime) {
+                            if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime ||
+                                    allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }) {
                                 snapshotDiffItem = SnapshotDiffItem(
                                     packageName = packageInfo.packageName,
                                     updateTime = packageInfo.lastUpdateTime,
@@ -230,7 +233,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                     activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false))),
                                     receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false))),
                                     providersDiff = SnapshotDiffItem.DiffNode(dbItem.providers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false))),
-                                    permissionsDiff = SnapshotDiffItem.DiffNode(dbItem.permissions, gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName)))
+                                    permissionsDiff = SnapshotDiffItem.DiffNode(dbItem.permissions, gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))),
+                                    isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                                 )
                                 compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
                                 snapshotDiffItem.added = compareDiffNode.added
@@ -262,7 +266,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 SnapshotDiffItem.DiffNode(dbItem.receivers),
                                 SnapshotDiffItem.DiffNode(dbItem.providers),
                                 SnapshotDiffItem.DiffNode(dbItem.permissions),
-                                deleted = true
+                                deleted = true,
+                                isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
                             )
                         )
                     }
@@ -300,7 +305,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 SnapshotDiffItem.DiffNode(
                                     gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))
                                 ),
-                                newInstalled = true
+                                newInstalled = true,
+                                isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
                             )
                         )
                     } catch (e: Exception) {
@@ -332,7 +338,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
 
-        withContext(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
+            val allTrackItems = repository.getTrackItems()
+
             for (preItem in preList) {
                 currList.find { it.packageName == preItem.packageName }?.let {
                     if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
@@ -349,7 +357,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             activitiesDiff = SnapshotDiffItem.DiffNode(preItem.activities, it.activities),
                             receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, it.receivers),
                             providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, it.providers),
-                            permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions)
+                            permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions),
+                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                         )
                         compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
                         snapshotDiffItem.added = compareDiffNode.added
@@ -376,7 +385,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             SnapshotDiffItem.DiffNode(preItem.receivers),
                             SnapshotDiffItem.DiffNode(preItem.providers),
                             SnapshotDiffItem.DiffNode(preItem.permissions),
-                            deleted = true
+                            deleted = true,
+                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
                         )
                     )
                 }
@@ -398,7 +408,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         SnapshotDiffItem.DiffNode(info.receivers),
                         SnapshotDiffItem.DiffNode(info.providers),
                         SnapshotDiffItem.DiffNode(info.permissions),
-                        newInstalled = true
+                        newInstalled = true,
+                        isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
                     )
                 )
             }

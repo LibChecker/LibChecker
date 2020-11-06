@@ -5,6 +5,7 @@ import androidx.room.*
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
 @Dao
 interface LCDao {
@@ -68,4 +69,14 @@ interface LCDao {
 
     @Delete
     fun delete(item: TimeStampItem)
+
+    //Track table
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(item: TrackItem)
+
+    @Delete
+    suspend fun delete(item: TrackItem)
+
+    @Query("SELECT * from track_table")
+    suspend fun getTrackItems(): List<TrackItem>
 }

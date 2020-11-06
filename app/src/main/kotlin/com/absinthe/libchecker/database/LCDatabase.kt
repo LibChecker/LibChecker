@@ -9,8 +9,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
-@Database(entities = [LCItem::class, SnapshotItem::class, TimeStampItem::class], version = 7, exportSchema = false)
+@Database(entities = [LCItem::class, SnapshotItem::class, TimeStampItem::class, TrackItem::class], version = 8, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -32,7 +33,8 @@ abstract class LCDatabase : RoomDatabase() {
                     LCDatabase::class.java,
                     "lc_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
+                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .build()
                 INSTANCE = instance
                 return instance
@@ -96,6 +98,14 @@ abstract class LCDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE snapshot_table")
                 // Change the table name to the correct one
                 database.execSQL("ALTER TABLE snapshot_new RENAME TO snapshot_table")
+            }
+        }
+
+        private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE track_table (packageName TEXT NOT NULL, PRIMARY KEY(packageName))"
+                )
             }
         }
     }

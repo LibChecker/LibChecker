@@ -22,7 +22,7 @@
             android:name=".ui.main.MainActivity"
             android:configChanges="orientation"
             android:label="@string/app_name"
-            android:launchMode="singleTask">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -72,7 +72,10 @@
             android:name=".ui.album.ComparisonActivity"
             android:label="@string/album_item_comparison_title">
         </activity>
-
+        <activity
+            android:name=".ui.album.TrackActivity"
+            android:label="@string/album_item_track_title">
+        </activity>
         <activity
             android:name=".ui.main.LibReferenceActivity"
             android:configChanges="orientation"
