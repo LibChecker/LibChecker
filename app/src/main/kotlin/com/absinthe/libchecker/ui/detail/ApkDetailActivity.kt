@@ -13,9 +13,8 @@ import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
@@ -88,7 +87,6 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         tempFile = File(externalCacheDir, "temp.apk")
 
         val path = tempFile!!.path
-        val libList = ArrayList<LibStringItem>()
 
         try {
             val inputStream = contentResolver.openInputStream(uri)
@@ -121,16 +119,13 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         }
                         tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
 
-                        val abi = PackageUtils.getAbi(
-                            it.applicationInfo.sourceDir,
-                            it.applicationInfo.nativeLibraryDir,
-                            isApk = true
-                        )
+                        val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
 
                         layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
                         layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
                     } catch (e: Exception) {
-                        supportFinishAfterTransition()
+                        loge(e.toString())
+                        finish()
                     }
 
                     ibSort.setOnClickListener {
@@ -146,7 +141,10 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                 })
 
                 viewModel.initComponentsData(path)
-            } ?: finish()
+            } ?: run {
+                loge("empty")
+                finish()
+            }
         } catch (e: Exception) {
             Toasty.show(this, R.string.toast_use_another_file_manager)
             finish()
@@ -182,13 +180,5 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
             tab.text = tabTitles[position]
         }
         mediator.attach()
-
-        if (libList.isEmpty()) {
-            libList.add(LibStringItem(getString(R.string.empty_list)))
-        } else {
-            libList.sortByDescending {
-                NativeLibMap.contains(it.name)
-            }
-        }
     }
 }

@@ -64,7 +64,11 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         viewModel.apply {
             val observer = Observer<List<LibStringItemChip>> {
                 if (it.isEmpty()) {
-                    emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                    if (type == DEX) {
+                        dexEmptyLayoutBinding.text.text = getString(R.string.uncharted_territory)
+                    } else {
+                        emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                    }
                 } else {
                     adapter.setDiffNewData(it.toMutableList())
                 }
@@ -107,7 +111,12 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
                 openLibDetailDialog(position)
             }
             setDiffCallback(LibStringDiffUtil())
-            emptyLayoutBinding.text.text = getString(R.string.loading)
+
+            if (type == DEX) {
+                dexEmptyLayoutBinding.text.text = getString(R.string.loading)
+            } else {
+                emptyLayoutBinding.text.text = getString(R.string.loading)
+            }
 
             if (type == DEX) {
                 setEmptyView(dexEmptyLayoutBinding.root)

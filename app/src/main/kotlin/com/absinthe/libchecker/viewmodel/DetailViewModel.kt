@@ -17,6 +17,7 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
@@ -195,7 +196,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun getDexChipList(packageName: String): List<LibStringItemChip> {
-        val list = PackageUtils.getDexList(packageName).toMutableList()
+        loge("getDexChipList")
+        val list = PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
 
         if (list.isEmpty()) {

@@ -500,16 +500,14 @@ object PackageUtils {
      * @return List of LibStringItem
      */
     fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
-        val packageInfo: PackageInfo
 
         try {
-            packageInfo = getPackageInfo(packageName)
-        } catch (e: PackageManager.NameNotFoundException) {
-            return emptyList()
-        }
+            val path = if (isApk) {
+                packageName
+            } else {
+                getPackageInfo(packageName).applicationInfo.sourceDir
+            }
 
-        if (!isApk) {   //Todo apk dex analysis
-            val path = packageInfo.applicationInfo.sourceDir
             if (path.isNullOrEmpty()) {
                 return emptyList()
             }
@@ -557,7 +555,8 @@ object PackageUtils {
                 }
             }
             return primaryList
-        } else {
+        } catch (e: Exception) {
+            loge(e.toString())
             return emptyList()
         }
     }

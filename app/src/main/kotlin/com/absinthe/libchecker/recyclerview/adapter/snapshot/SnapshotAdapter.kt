@@ -84,6 +84,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
             holder.getView<TextView>(R.id.indicator_added).isGone = true
             holder.getView<TextView>(R.id.indicator_removed).isGone = true
             holder.getView<TextView>(R.id.indicator_changed).isGone = true
+            holder.getView<TextView>(R.id.indicator_moved).isGone = true
         } else {
             holder.getView<TextView>(R.id.indicator_added).isVisible =
                 item.added and !isNewOrDeleted

@@ -50,7 +50,6 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
@@ -220,8 +219,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             reloadAppsFlag.observe(viewLifecycleOwner, {
                 if (isListReady && it) {
                     binding.tvFirstTip.isVisible = true
-                    flip(VF_LOADING)
-                    initItems()
+                    doOnMainThreadIdle({
+                        flip(VF_LOADING)
+                        initItems()
+                    })
                 }
             })
             dbItems.observe(viewLifecycleOwner, {
@@ -277,7 +278,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
             shouldRequestChange.observe(viewLifecycleOwner, {
                 if (isListReady && !it) {
-                    flip(VF_LIST)
+                    doOnMainThreadIdle({
+                        flip(VF_LIST)
+                    })
                 }
             })
         }
