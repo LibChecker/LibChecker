@@ -238,14 +238,6 @@ object DexLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_weibo, "微博 SDK")
         ),
         Pair(
-            "com.alipay.sdk",
-            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
-        ),
-        Pair(
-            "com.alipay.android",
-            LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK")
-        ),
-        Pair(
             "org.greenbot.eventbus",
             LibChip(R.drawable.ic_sdk_placeholder, "EventBus")
         ),
@@ -258,12 +250,28 @@ object DexLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_bugly, "Bugly")
         ),
         Pair(
+            "com.tencent.smtt",
+            LibChip(R.drawable.ic_lib_tencent, "TBS")
+        ),
+        Pair(
+            "com.tencent.tbs",
+            LibChip(R.drawable.ic_lib_tencent, "TBS")
+        ),
+        Pair(
+            "com.tencent.map",
+            LibChip(R.drawable.ic_lib_tencent_map, "腾讯地图 SDK")
+        ),
+        Pair(
             "com.alibaba.fastjson",
             LibChip(R.drawable.ic_lib_alibaba, "fastjson")
         ),
         Pair(
             "butterknife.internal",
-            LibChip(R.drawable.ic_sdk_placeholder, "ButterKnife")
+            LibChip(R.drawable.ic_sdk_placeholder, "Butter Knife")
+        ),
+        Pair(
+            "butterknife.runtime",
+            LibChip(R.drawable.ic_sdk_placeholder, "Butter Knife")
         ),
         Pair(
             "com.microsoft.appcenter",
@@ -272,6 +280,22 @@ object DexLibMap : BaseMap() {
         Pair(
             "com.facebook.fresco",
             LibChip(R.drawable.ic_lib_facebook, "Fresco")
+        ),
+        Pair(
+            "com.ta.utdid2",
+            LibChip(R.drawable.ic_lib_aliyun, "UTDID")
+        ),
+        Pair(
+            "com.amap.api",
+            LibChip(R.drawable.ic_lib_amap, "高德 SDK")
+        ),
+        Pair(
+            "com.huawei.hianalytics",
+            LibChip(R.drawable.ic_lib_huawei, "HMS Analytics Kit")
+        ),
+        Pair(
+            "tv.danmaku.ijk",
+            LibChip(R.drawable.ic_lib_bilibili, "IJKPlayer")
         ),
     )
 
@@ -284,6 +308,9 @@ object DexLibMap : BaseMap() {
     private val PATTERN_KOTLIN = Pattern.compile("kotlin.(.*)")
     private val PATTERN_OKHTTP3 = Pattern.compile("okhttp3.(.*)")
     private val PATTERN_RETROFIT2 = Pattern.compile("retrofit2.(.*)")
+    private val PATTERN_OKIO = Pattern.compile("okio.(.*)")
+    private val PATTERN_ALIPAY = Pattern.compile("com.alipay.(.*)")
+    private val PATTERN_FLUTTER = Pattern.compile("io.flutter.(.*)")
 
     override fun findRegex(name: String): LibChip? {
         return when {
@@ -292,6 +319,9 @@ object DexLibMap : BaseMap() {
                 LibChip(R.drawable.ic_kotlin_logo, "Kotlin Coroutines", "regex_kotlin_coroutines")
             PATTERN_OKHTTP3.matcher(name).matches() -> LibChip(R.drawable.ic_lib_square, "OKHttp3", "regex_okhttp3")
             PATTERN_RETROFIT2.matcher(name).matches() -> LibChip(R.drawable.ic_lib_square, "Retrofit2", "regex_retrofit2")
+            PATTERN_OKIO.matcher(name).matches() -> LibChip(R.drawable.ic_lib_square, "Okio", "regex_okio")
+            PATTERN_ALIPAY.matcher(name).matches() -> LibChip(R.drawable.ic_lib_alipay, "支付宝 SDK", "regex_alipay")
+            PATTERN_FLUTTER.matcher(name).matches() -> LibChip(R.drawable.ic_lib_flutter, "Flutter", "regex_flutter")
             else -> null
         }
     }

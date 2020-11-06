@@ -112,6 +112,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libhardcoder.so",
+            LibChip(
+                R.drawable.ic_lib_tencent,
+                "HardCoder"
+            )
+        ),
+        Pair(
             "libliteavsdk.so",
             LibChip(
                 R.drawable.ic_lib_tencent_cloud,
