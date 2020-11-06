@@ -46,6 +46,7 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
         super.onStart()
         dialog?.window?.let {
             it.findViewById<View>(com.google.android.material.R.id.container).fitsSystemWindows = false
+            UiUtils.setSystemBarStyle(it)
         }
     }
 

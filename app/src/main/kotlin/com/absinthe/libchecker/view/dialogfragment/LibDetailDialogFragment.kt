@@ -9,11 +9,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.view.detail.LibDetailView
+import com.absinthe.libchecker.databinding.LayoutDialogLibDetailBinding
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
@@ -26,7 +26,7 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : DialogFragment() {
 
-    private val dialogView by lazy { LibDetailView(requireContext()) }
+    private lateinit var dialogViewBinding: LayoutDialogLibDetailBinding
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
@@ -37,7 +37,8 @@ class LibDetailDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogView.binding.apply {
+        dialogViewBinding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
+        dialogViewBinding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
             ivIcon.load(BaseMap.getMap(type).getMap()[libName]?.iconRes ?: R.drawable.ic_logo) {
@@ -48,16 +49,17 @@ class LibDetailDialogFragment : DialogFragment() {
                 isClickable = true
                 movementMethod = LinkMovementMethod.getInstance()
                 text = HtmlCompat.fromHtml(
-                    "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${resources.getText(
-                        R.string.create_an_issue
-                    )} </a>"
-                    , HtmlCompat.FROM_HTML_MODE_LEGACY
+                    "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${
+                        resources.getText(
+                            R.string.create_an_issue
+                        )
+                    } </a>", HtmlCompat.FROM_HTML_MODE_LEGACY
                 )
             }
         }
 
         return AlertDialog.Builder(requireContext())
-            .setView(dialogView)
+            .setView(dialogViewBinding.root)
             .create()
     }
 
@@ -66,7 +68,7 @@ class LibDetailDialogFragment : DialogFragment() {
 
         viewModel.detailBean.observe(requireActivity(), {
             if (it != null) {
-                dialogView.binding.apply {
+                dialogViewBinding.apply {
                     tvLabelName.text = it.label
                     tvTeamName.text = it.team
                     tvContributorName.text = it.contributors.toContributorsString()
@@ -80,7 +82,7 @@ class LibDetailDialogFragment : DialogFragment() {
                     vfContainer.displayedChild = VF_CHILD_DETAIL
                 }
             } else {
-                dialogView.binding.vfContainer.displayedChild = VF_CHILD_FAILED
+                dialogViewBinding.vfContainer.displayedChild = VF_CHILD_FAILED
             }
         })
         regexName?.let {

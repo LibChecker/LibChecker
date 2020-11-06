@@ -25,7 +25,7 @@ abstract class BaseActivity : AppActivity() {
         super.onCreate(savedInstanceState)
 
         setViewBindingImpl(setViewBinding())
-        setSystemBarStyle(this)
+        setSystemBarStyle(window)
 
         if (isPaddingToolbar) {
             root?.paddingTopCompat = BarUtils.getStatusBarHeight()

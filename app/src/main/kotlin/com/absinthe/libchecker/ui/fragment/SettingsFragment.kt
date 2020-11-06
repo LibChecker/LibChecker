@@ -29,12 +29,20 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import moe.shizuku.preference.ListPreference
 import moe.shizuku.preference.PreferenceFragment
+import moe.shizuku.preference.SimpleMenuPreference
 import moe.shizuku.preference.SwitchPreference
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
+import rikka.recyclerview.addVerticalPadding
 import rikka.recyclerview.fixEdgeEffect
 
 class SettingsFragment : PreferenceFragment(), IListController {
+
+    companion object {
+        init {
+            SimpleMenuPreference.setLightFixEnabled(true)
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
@@ -167,9 +175,8 @@ class SettingsFragment : PreferenceFragment(), IListController {
     override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
+        recyclerView.addVerticalPadding(0, 8)
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
-        recyclerView.scrollBarStyle = RecyclerView.SCROLL_AXIS_NONE
-        recyclerView.scrollToPosition(0)
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {

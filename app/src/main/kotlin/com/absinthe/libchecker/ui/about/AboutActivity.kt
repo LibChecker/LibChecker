@@ -169,7 +169,7 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     private fun initView() {
-        UiUtils.setSystemBarStyle(this)
+        UiUtils.setSystemBarStyle(window)
         findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).addPaddingTop(BarUtils.getStatusBarHeight())
     }
 

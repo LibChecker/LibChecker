@@ -39,7 +39,6 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -122,7 +121,6 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-                FastScrollerBuilder(this).useMd2Style().build()
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled

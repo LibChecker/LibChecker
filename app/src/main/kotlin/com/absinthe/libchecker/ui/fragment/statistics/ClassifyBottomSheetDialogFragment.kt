@@ -8,6 +8,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
 import com.absinthe.libchecker.view.ClassifyDialogView
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
@@ -46,6 +47,7 @@ class ClassifyBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.onStart()
         dialog?.window?.let {
             it.findViewById<View>(com.google.android.material.R.id.container).fitsSystemWindows = false
+            UiUtils.setSystemBarStyle(it)
         }
     }
 
@@ -53,6 +55,4 @@ class ClassifyBottomSheetDialogFragment : BottomSheetDialogFragment() {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
     }
-
-
 }
