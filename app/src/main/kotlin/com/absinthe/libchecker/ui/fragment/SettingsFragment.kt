@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
@@ -161,11 +160,6 @@ class SettingsFragment : PreferenceFragment(), IListController {
         (requireActivity() as IListContainer).controller = this
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        listView.scrollToPosition(0)
-    }
-
     override fun onCreateItemDecoration(): DividerDecoration? {
         return CategoryDivideDividerDecoration()
     }
@@ -175,6 +169,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         recyclerView.fixEdgeEffect()
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.scrollBarStyle = RecyclerView.SCROLL_AXIS_NONE
+        recyclerView.scrollToPosition(0)
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {

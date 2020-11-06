@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.graphics.Color
+import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -14,7 +15,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.view.dialogfragment.ClassifyDialogFragment
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
@@ -253,7 +253,11 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             }
         }
 
-        val dialog = ClassifyDialogFragment.newInstance(dialogTitle)
+        val dialog = ClassifyBottomSheetDialogFragment().apply {
+            arguments = Bundle().apply {
+                putString(EXTRA_TITLE, dialogTitle)
+            }
+        }
         dialog.show(requireActivity().supportFragmentManager, tag)
         dialog.item = ArrayList(item)
     }

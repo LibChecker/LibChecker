@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.res.ColorStateList
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -30,9 +31,12 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         val drawable = try {
             PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
         } catch (e: Exception) {
-            ContextCompat.getDrawable(context, R.drawable.ic_app_list)
+            ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
+                setTint(ContextCompat.getColor(context, R.color.textNormal))
+            }
         }
         holder.getView<ImageView>(R.id.iv_icon).load(drawable)
+        holder.getView<View>(R.id.view_red_mask).isVisible = item.deleted
 
         var isNewOrDeleted = false
 

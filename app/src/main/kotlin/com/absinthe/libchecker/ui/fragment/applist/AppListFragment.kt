@@ -52,6 +52,7 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
 
 const val VF_LOADING = 0
@@ -106,6 +107,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 addPaddingTop(BarUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

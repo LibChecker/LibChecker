@@ -28,7 +28,11 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
         holder.apply {
             iconMap[item.packageName]?.let {
                 setImageDrawable(R.id.iv_icon, it)
-            } ?: setImageDrawable(R.id.iv_icon, AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT))
+            } ?: run {
+                val drawable = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
+                setImageDrawable(R.id.iv_icon, drawable)
+                iconMap[item.packageName] = drawable
+            }
             setText(R.id.tv_app_name, item.label)
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))

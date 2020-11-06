@@ -71,7 +71,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
@@ -129,6 +129,7 @@ dependencies {
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.0.0")
+    implementation("me.zhanghai.android.fastscroll:library:1.1.5")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")

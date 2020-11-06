@@ -15,9 +15,11 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.IntentUtils
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -72,6 +74,7 @@ class AppInfoBottomShellDialogFragment : BottomSheetDialogFragment() {
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
+            addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

@@ -2,14 +2,13 @@ package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.os.Bundle
+import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -29,6 +28,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
@@ -46,6 +46,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -112,8 +113,27 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
         AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
             AppItemRepository.shouldRefreshAppList = true
-            computeRef()
+
+            if (adapter.data.isEmpty()) {
+                computeRef()
+            }
         })
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        if (savedInstanceState != null) {
+            savedInstanceState.getParcelableArrayList<LibReference>(
+                EXTRA_ITEM_LIST
+            )?.toList()?.let {
+                adapter.setList(it)
+            }
+        }
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelableArrayList(EXTRA_ITEM_LIST, ArrayList(adapter.data))
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

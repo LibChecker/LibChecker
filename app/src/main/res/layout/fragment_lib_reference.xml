@@ -28,12 +28,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:scrollbarDefaultDelayBeforeFade="@integer/scrollbar_default_delay_before_fade"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
-            app:fastScrollHorizontalTrackDrawable="@android:color/transparent"
-            app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
-            app:fastScrollVerticalTrackDrawable="@android:color/transparent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </ViewFlipper>

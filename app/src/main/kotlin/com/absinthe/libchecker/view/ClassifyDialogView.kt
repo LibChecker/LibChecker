@@ -13,6 +13,7 @@ import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
 
@@ -43,6 +44,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
+            FastScrollerBuilder(this).useMd2Style().build()
         }
 
         addView(rvList)

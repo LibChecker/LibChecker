@@ -20,7 +20,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -31,6 +30,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNative
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
@@ -39,6 +39,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -121,6 +122,7 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                FastScrollerBuilder(this).useMd2Style().build()
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
