@@ -186,6 +186,10 @@ object DexLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_xiaomi, "MiPush")
         ),
         Pair(
+            "com.xiaomi.xmpush",
+            LibChip(R.drawable.ic_lib_xiaomi, "MiPush")
+        ),
+        Pair(
             "kotlin.reflect",
             LibChip(R.drawable.ic_kotlin_logo, "Kotlin Reflect")
         ),
@@ -325,4 +329,14 @@ object DexLibMap : BaseMap() {
             else -> null
         }
     }
+
+    val DEEP_LEVEL_3_SET = hashSetOf(
+        "com.google.android",
+        "com.samsung.android",
+        "com.alibaba.android",
+        "cn.com.chinatelecom",
+        "com.github.chrisbanes",
+        "com.google.thirdparty",
+        ""
+    )
 }

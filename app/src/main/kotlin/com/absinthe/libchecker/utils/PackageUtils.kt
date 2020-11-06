@@ -22,6 +22,7 @@ import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.blankj.utilcode.util.PermissionUtils
@@ -525,24 +526,27 @@ object PackageUtils {
                         splits.any { it.length == 1 } -> LibStringItem("")
                         //Merge AndroidX classes
                         splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
-                        //Filter classes which paths level greater than 4
+                        //Filter classes which paths deep level greater than 4
                         else -> LibStringItem(splits.subList(0, splits.size.coerceAtMost(4)).joinToString(separator = "."))
                     }
                 }
                 .toSet()
-                .filter { it.name.length > 11 && it.name.contains(".") }    //Remove obfuscated classes
+                .filter {
+                    it.name.length > 11 && it.name.contains(".") &&
+                            ( !it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o") )
+                }    //Remove obfuscated classes
                 .toMutableList()
 
-            //Merge path level 3 classes
+            //Merge path deep level 3 classes
             primaryList.filter { it.name.split(".").size == 3 }.forEach {
                 primaryList.removeAll { item -> item.name.startsWith(it.name) }
                 primaryList.add(it)
             }
-            //Merge path level 4 classes
+            //Merge path deep level 4 classes
             var pathLevel3Item: String
             var filter: List<LibStringItem>
             primaryList.filter { it.name.split(".").size == 4 }.forEach {
-                if (it.name.startsWith("com.google.android")) {
+                if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
                     return@forEach
                 }
 
