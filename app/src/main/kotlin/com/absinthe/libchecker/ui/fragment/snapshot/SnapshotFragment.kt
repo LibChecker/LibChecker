@@ -38,6 +38,7 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
+import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -89,7 +90,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             tvSnapshotTimestampText.setOnClickListener {
                 changeTimeNode()
             }
-            ivArrow.setOnClickListener{
+            ivArrow.setOnClickListener {
                 changeTimeNode()
             }
         }
@@ -301,6 +302,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     override fun onResume() {
         super.onResume()
         if (AppItemRepository.shouldRefreshAppList) {
+            (requireActivity() as MainActivity).binding.navView
+                .animate()
+                .translationY(0F)
+                .setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR)
+                .setDuration(225)
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }

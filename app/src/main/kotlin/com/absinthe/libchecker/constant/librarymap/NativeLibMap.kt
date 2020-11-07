@@ -1067,7 +1067,21 @@ object NativeLibMap : BaseMap() {
             "libtdjni.so",
             LibChip(
                 R.drawable.ic_telegram,
-                "tdlib"
+                "TDLib"
+            )
+        ),
+        Pair(
+            "libopenssl.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "OpenSSL"
+            )
+        ),
+        Pair(
+            "libchrome.so",
+            LibChip(
+                R.drawable.ic_lib_chromium,
+                "libchrome"
             )
         ),
     )

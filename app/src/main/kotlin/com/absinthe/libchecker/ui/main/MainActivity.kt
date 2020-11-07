@@ -46,7 +46,7 @@ const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity(), IListContainer {
 
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
 
     private var clickBottomItemFlag = false
     private var isDatabaseFinishInit = false
