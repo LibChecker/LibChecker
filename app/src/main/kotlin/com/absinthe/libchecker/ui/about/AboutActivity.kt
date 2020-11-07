@@ -145,6 +145,7 @@ class AboutActivity : AbsAboutActivity() {
             add(License("apk-parser", "hsiafan", "BSD-2-Clause", "https://github.com/hsiafan/apk-parser"))
             add(License("X2C", "iReaderAndroid", License.MIT, "https://github.com/iReaderAndroid/X2C"))
             add(License("coil", "coil-kt", License.APACHE_2, "https://github.com/coil-kt/coil"))
+            add(License("AndroidFastScroll", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AndroidFastScroll"))
         }
     }
 

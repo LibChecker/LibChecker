@@ -1063,6 +1063,13 @@ object NativeLibMap : BaseMap() {
                 "GPUImage"
             )
         ),
+        Pair(
+            "libtdjni.so",
+            LibChip(
+                R.drawable.ic_telegram,
+                "tdlib"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

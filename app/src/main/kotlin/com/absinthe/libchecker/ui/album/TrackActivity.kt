@@ -15,8 +15,8 @@ import com.absinthe.libchecker.bean.TrackListItem
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
-import com.absinthe.libchecker.databinding.LayoutTrackLoadingBinding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
@@ -27,6 +27,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -37,7 +38,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
     private lateinit var binding: ActivityTrackBinding
     private val lcDao by lazy { LCDatabase.getDatabase(application).lcDao() }
     private val repository by lazy { LCRepository(lcDao) }
-    private val adapter by lazy { TrackAdapter(repository) }
+    private val adapter = TrackAdapter()
     private val list = mutableListOf<TrackListItem>()
     private var menu: Menu? = null
     private var isListReady = false
@@ -69,12 +70,32 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
         }
         adapter.apply {
             setDiffCallback(TrackListDiff())
-            setOnItemClickListener { _, view, _ ->
-                view.findViewById<SwitchMaterial>(R.id.track_switch).apply {
-                    isChecked = !isChecked
+
+            fun doSaveItemState(pos: Int, state: Boolean) {
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (state) {
+                        repository.insert(TrackItem(data[pos].packageName))
+                    } else {
+                        repository.delete(TrackItem(data[pos].packageName))
+                    }
+                    withContext(Dispatchers.Main) {
+                        list.find { it.packageName == data[pos].packageName }?.switchState = state
+                    }
                 }
             }
-            setEmptyView(LayoutTrackLoadingBinding.inflate(layoutInflater).root)
+
+            setOnItemClickListener { _, view, position ->
+                view.findViewById<SwitchMaterial>(R.id.track_switch).apply {
+                    isChecked = !isChecked
+                    doSaveItemState(position, isChecked)
+                }
+            }
+            setOnItemChildClickListener { _, view, position ->
+                if (view.id == R.id.track_switch) {
+                    doSaveItemState(position, (view as SwitchMaterial).isChecked)
+                }
+            }
+            setEmptyView(R.layout.layout_track_loading)
         }
 
         AppItemRepository.allApplicationInfoItems.observe(this, { appList ->
@@ -99,6 +120,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     adapter.setList(list)
                     menu?.findItem(R.id.search)?.isVisible = true
                     isListReady = true
+                    adapter.setEmptyView(R.layout.layout_empty_list)
                 }
             }
         })
@@ -143,7 +165,9 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         adapter.setDiffNewData(
-            list.filter { it.label.contains(newText, true) || it.packageName.contains(newText) }.toMutableList()
+            list.filter { it.label.contains(newText, true) || it.packageName.contains(newText) }
+                .sortedByDescending { it.switchState }
+                .toMutableList()
         )
         return false
     }
