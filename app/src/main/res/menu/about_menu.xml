@@ -1,9 +1,10 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/toolbar_rate"
         android:icon="@drawable/ic_favorite_white"
         android:title="@string/toolbar_rate"
-        android:showAsAction="always" />
+        app:showAsAction="always" />
 
 </menu>

@@ -26,4 +26,14 @@
 
     </rikka.material.widget.AppBarLayout>
 
+    <rikka.material.widget.BorderRecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="?actionBarSize"
+        app:borderBottomStyle="never"
+        app:borderTopDrawable="@null"
+        app:borderTopStyle="whenTop" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

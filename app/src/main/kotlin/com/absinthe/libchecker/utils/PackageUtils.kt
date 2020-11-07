@@ -339,7 +339,7 @@ object PackageUtils {
     /**
      * Get components list of an app
      * @param packageName Package name of the app
-     * @param list List of components
+     * @param list List of components(can be nullable)
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */

@@ -1,42 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search"
         android:title="@string/menu_search"
-        android:showAsAction="always|collapseActionView"
-        android:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView"
         tools:ignore="AlwaysShowAction" />
 
     <item
         android:id="@+id/ref_category_all"
-        android:title="@string/ref_category_all"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_all" />
     <item
         android:id="@+id/ref_category_native"
-        android:title="@string/ref_category_native"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_native" />
     <item
         android:id="@+id/ref_category_service"
-        android:title="@string/ref_category_service"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_service" />
     <item
         android:id="@+id/ref_category_activity"
-        android:title="@string/ref_category_activity"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_activity" />
     <item
         android:id="@+id/ref_category_br"
-        android:title="@string/ref_category_br"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_br" />
     <item
         android:id="@+id/ref_category_cp"
-        android:title="@string/ref_category_cp"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_cp" />
     <item
         android:id="@+id/ref_category_dex"
-        android:title="@string/ref_category_dex"
-        android:icon="@drawable/ic_sort" />
+        android:icon="@drawable/ic_sort"
+        android:title="@string/ref_category_dex" />
 
 </menu>

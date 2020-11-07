@@ -4,12 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/normal_padding">
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    android:padding="@dimen/normal_padding"
+    tools:context=".ui.fragment.statistics.StatisticsFragment">
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/buttons_group"
@@ -36,5 +32,12 @@
             tools:ignore="HardcodedText" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/chart"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/buttons_group" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

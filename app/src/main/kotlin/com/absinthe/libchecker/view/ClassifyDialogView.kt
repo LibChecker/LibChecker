@@ -9,10 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libraries.utils.utils.UiUtils
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
@@ -44,6 +46,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
+            addPaddingBottom(UiUtils.getNavBarHeight(context.contentResolver))
             FastScrollerBuilder(this).useMd2Style().build()
         }
 

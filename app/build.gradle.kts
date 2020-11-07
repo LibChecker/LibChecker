@@ -26,7 +26,7 @@ android {
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "1.9.4"
+    val baseVersionName = "1.10.0"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
@@ -81,7 +81,7 @@ android {
 }
 
 configurations.all {
-    exclude(group = "androidx.appcompat", module = "appcompat")
+    exclude(group = "rikka.appcompat", module = "appcompat")
 }
 
 val grpcVersion by extra("1.32.1")
@@ -99,6 +99,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
     implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.appcompat:appcompat:1.2.0")
 
     // Lifecycle
     val lifecycleVersion = "2.2.0"
@@ -135,7 +136,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
-    implementation("rikka.appcompat:appcompat:1.2.0-rc01")
+//    implementation("rikka.appcompat:appcompat:1.2.0-rc01")
     implementation("rikka.core:core:1.2.3")
     implementation("rikka.material:material:1.4.3")
     implementation("rikka.recyclerview:recyclerview-utils:1.1.0")

@@ -28,6 +28,7 @@ import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
+import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -180,6 +181,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             emptyViewBinding.tvSubtitle.isGone = true
             setEmptyView(emptyViewBinding.root)
             setHeaderView(dashboardBinding.root)
+            setDiffCallback(SnapshotDiffUtil())
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {
                     return@setOnItemClickListener
@@ -246,7 +248,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             })
             snapshotDiffItems.observe(
                 viewLifecycleOwner, { list ->
-                    adapter.setList(list.sortedByDescending { it.updateTime })
+                    adapter.setDiffNewData(list.sortedByDescending { it.updateTime }.toMutableList())
                     flip(VF_LIST)
                 }
             )
@@ -293,6 +295,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (AppItemRepository.shouldRefreshAppList) {
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }
 }
