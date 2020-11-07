@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
@@ -158,6 +159,10 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             if (!isListReady) {
                 isVisible = false
             }
+        }
+
+        menu.findItem(R.id.ref_category_dex).apply {
+            isVisible = BuildConfig.DEBUG
         }
         super.onCreateOptionsMenu(menu, inflater)
     }
