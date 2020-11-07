@@ -343,7 +343,10 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentList(packageName: String, list: Array<out ComponentInfo>, isSimpleName: Boolean): List<String> {
+    fun getComponentList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
+        if (list.isNullOrEmpty()) {
+            return emptyList()
+        }
         return list.asSequence()
             .map {
                 if (isSimpleName) {
