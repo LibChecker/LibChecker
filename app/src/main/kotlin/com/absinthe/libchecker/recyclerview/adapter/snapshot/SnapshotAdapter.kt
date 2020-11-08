@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.res.ColorStateList
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.View
@@ -106,7 +107,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         if (item.isTrackItem) {
             val imageSpan = ImageSpan(context, R.drawable.ic_track)
             val spannable = SpannableString(" ${getDiffString(item.labelDiff, isNewOrDeleted)}")
-            spannable.setSpan(imageSpan, 0, 1, 0)
+            spannable.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
             tvAppName.text = spannable
         } else {
             tvAppName.text = getDiffString(item.labelDiff, isNewOrDeleted)

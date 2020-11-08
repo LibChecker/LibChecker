@@ -307,6 +307,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 .translationY(0F)
                 .setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR)
                 .setDuration(225)
+            binding.extendedFab.show()
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }
