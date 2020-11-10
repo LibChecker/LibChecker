@@ -25,6 +25,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.extensions.logd
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -373,16 +374,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         continue
                     }
 
-                    packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                    libList = PackageUtils.getNativeDirLibs(
-                        packageInfo.applicationInfo.sourceDir,
-                        packageInfo.applicationInfo.nativeLibraryDir
-                    )
+                    try {
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                        libList = PackageUtils.getNativeDirLibs(
+                            packageInfo.applicationInfo.sourceDir,
+                            packageInfo.applicationInfo.nativeLibraryDir
+                        )
 
-                    for (lib in libList) {
-                        count = map[lib.name]?.count ?: 0
-                        map[lib.name] =
-                            RefCountType(count + 1, NATIVE)
+                        for (lib in libList) {
+                            count = map[lib.name]?.count ?: 0
+                            map[lib.name] =
+                                RefCountType(count + 1, NATIVE)
+                        }
+                    } catch (e: Exception) {
+                        loge(e.toString())
                     }
 
                     try {

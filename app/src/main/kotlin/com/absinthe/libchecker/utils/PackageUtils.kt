@@ -307,7 +307,11 @@ object PackageUtils {
             else -> 0
         }
 
-        return getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
+        return try {
+            getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     /**
