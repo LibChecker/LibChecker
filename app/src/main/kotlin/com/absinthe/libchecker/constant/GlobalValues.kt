@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.AppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -53,5 +54,9 @@ object GlobalValues {
 
     val season = AppUtils.getCurrentSeason()
 
-    val deviceSupportedAbis = Build.SUPPORTED_ABIS
+    val deviceSupportedAbis = if (PackageUtils.isIntelCpu()) {
+        Build.SUPPORTED_ABIS.filter { it.startsWith("x86") }
+    } else {
+        Build.SUPPORTED_ABIS.toList()
+    }
 }

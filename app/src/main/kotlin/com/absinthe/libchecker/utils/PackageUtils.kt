@@ -28,7 +28,9 @@ import com.absinthe.libchecker.java.FreezeUtils
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
+import java.io.BufferedReader
 import java.io.File
+import java.io.FileReader
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -449,7 +451,7 @@ object PackageUtils {
             if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
                 return X86_64
             }
-        } else {
+        } else if (abis.contains(X86)) {
             if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
                 return X86
             }
@@ -575,5 +577,14 @@ object PackageUtils {
      */
     fun getPermissionsList(packageName: String): List<String> {
         return PermissionUtils.getPermissions(packageName)
+    }
+
+    fun isIntelCpu(): Boolean {
+        return try {
+            BufferedReader(FileReader("/proc/cpuinfo"))
+                .readLine().contains("Intel")
+        } catch (e: Exception) {
+            false
+        }
     }
 }
