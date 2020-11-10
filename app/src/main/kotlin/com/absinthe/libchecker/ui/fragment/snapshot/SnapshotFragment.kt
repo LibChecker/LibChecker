@@ -34,6 +34,7 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -43,6 +44,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.widget.BorderView
@@ -251,6 +253,22 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 viewLifecycleOwner, { list ->
                     adapter.setDiffNewData(list.sortedByDescending { it.updateTime }.toMutableList())
                     flip(VF_LIST)
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        delay(250)
+
+                        doOnMainThreadIdle({
+                            if (!binding.recyclerview.canScrollVertically(-1)) {
+                                (requireActivity() as MainActivity).binding.navView
+                                    .animate()
+                                    .translationY(0F)
+                                    .setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR)
+                                    .setDuration(225)
+                                binding.extendedFab.show()
+                                (requireActivity() as MainActivity).binding.navView
+                            }
+                        })
+                    }
                 }
             )
         }
@@ -302,12 +320,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     override fun onResume() {
         super.onResume()
         if (AppItemRepository.shouldRefreshAppList) {
-            (requireActivity() as MainActivity).binding.navView
-                .animate()
-                .translationY(0F)
-                .setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR)
-                .setDuration(225)
-            binding.extendedFab.show()
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }
