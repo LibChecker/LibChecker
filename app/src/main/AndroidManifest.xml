@@ -85,6 +85,11 @@
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
+
+        <provider
+            android:name=".provider.CoreProvider"
+            android:authorities="${applicationId}.coreprovider"
+            android:permission="com.absinthe.libchecker.permission.GET_LIBRARY_INFO" />
     </application>
 
 </manifest>
