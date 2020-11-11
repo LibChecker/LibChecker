@@ -30,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
-        minSdkVersion(21)
+        minSdkVersion(23)
         targetSdkVersion(30)
         versionCode = gitCommitCount
         versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"

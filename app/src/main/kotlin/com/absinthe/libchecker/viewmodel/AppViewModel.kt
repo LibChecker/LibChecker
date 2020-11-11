@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -122,15 +121,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             return@launch
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestChangeImpl(packageManager, needRefresh)
-        } else {
-            try {
-                requestChangeImpl(packageManager, needRefresh)
-            } catch (e: VerifyError) {
-                e.printStackTrace()
-            }
-        }
+        requestChangeImpl(packageManager, needRefresh)
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {

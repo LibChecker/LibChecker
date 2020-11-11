@@ -17,8 +17,6 @@ public class FreezeUtils {
 
     static {
         try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-                throw new UnsupportedOperationException();
             //noinspection JavaReflectionMemberAccess
             AI_FIELD = ApplicationInfo.class.getDeclaredField("privateFlags");
             AI_FIELD.setAccessible(true);

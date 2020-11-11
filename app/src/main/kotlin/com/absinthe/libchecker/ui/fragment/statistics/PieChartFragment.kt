@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants.ARMV5
@@ -103,7 +104,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                     PieEntry(
                         list[i].toFloat(),
                         parties[i % parties.size],
-                        resources.getDrawable(R.drawable.ic_logo, null)
+                        ResourcesCompat.getDrawable(resources, R.drawable.ic_logo, null)
                     )
                 )
             }
@@ -161,7 +162,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                     PieEntry(
                         list[i].toFloat(),
                         parties[i % parties.size],
-                        resources.getDrawable(R.drawable.ic_kotlin_logo, null)
+                        ResourcesCompat.getDrawable(resources, R.drawable.ic_kotlin_logo, null)
                     )
                 )
             }
