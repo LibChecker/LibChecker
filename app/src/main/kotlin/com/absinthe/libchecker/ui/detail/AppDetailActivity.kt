@@ -27,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
@@ -112,7 +113,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                 try {
                     val packageInfo = PackageUtils.getPackageInfo(packageName)
                     ivAppIcon.apply {
-                        load(AppUtils.getAppIcon(packageName))
+                        load(LCAppUtils.getAppIcon(packageName))
                         setOnClickListener {
                             AppInfoBottomShellDialogFragment().apply {
                                 arguments = Bundle().apply {

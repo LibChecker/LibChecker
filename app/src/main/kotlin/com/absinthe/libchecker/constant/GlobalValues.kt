@@ -7,7 +7,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
-import com.absinthe.libchecker.utils.AppUtils
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.blankj.utilcode.util.Utils
 
@@ -52,7 +52,7 @@ object GlobalValues {
     val libReferenceThreshold: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
 
-    val season = AppUtils.getCurrentSeason()
+    val season = LCAppUtils.getCurrentSeason()
 
     val deviceSupportedAbis = if (PackageUtils.isIntelCpu()) {
         Build.SUPPORTED_ABIS.filter { it.startsWith("x86") }

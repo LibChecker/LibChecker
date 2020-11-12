@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.utils
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -11,11 +14,12 @@ import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
 import java.text.SimpleDateFormat
 import java.util.*
 
-object AppUtils {
+object LCAppUtils {
 
     fun getCurrentSeason(): Int {
         return when(Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
@@ -36,6 +40,13 @@ object AppUtils {
         return sb.toString()
     }
 
+    fun getAppIcon(packageName: String): Drawable {
+        return try {
+            AppUtils.getAppIcon(packageName)
+        } catch (e: Exception) {
+            ColorDrawable(Color.TRANSPARENT)
+        }
+    }
 }
 
 /**

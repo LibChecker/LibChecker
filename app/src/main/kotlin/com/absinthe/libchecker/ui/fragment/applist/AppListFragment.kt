@@ -5,7 +5,6 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -36,6 +35,7 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -44,7 +44,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -238,7 +237,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
                     it.forEach { item ->
                         if (mAdapter.iconMap[item.packageName] == null) {
-                            mAdapter.iconMap[item.packageName] = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
+                            mAdapter.iconMap[item.packageName] = LCAppUtils.getAppIcon(item.packageName)
                         }
                     }
                 }

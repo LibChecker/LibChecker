@@ -1,15 +1,13 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import android.widget.ImageView
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
@@ -29,7 +27,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             iconMap[item.packageName]?.let {
                 setImageDrawable(R.id.iv_icon, it)
             } ?: run {
-                val drawable = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
+                val drawable = LCAppUtils.getAppIcon(item.packageName)
                 setImageDrawable(R.id.iv_icon, drawable)
                 iconMap[item.packageName] = drawable
             }

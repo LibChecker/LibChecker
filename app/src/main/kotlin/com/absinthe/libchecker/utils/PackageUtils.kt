@@ -23,8 +23,10 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
+import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
+import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
@@ -85,6 +87,10 @@ object PackageUtils {
      */
     @Throws(Exception::class)
     fun getInstallApplications(): List<ApplicationInfo> {
+        if (!XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
+            throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
+        }
+
         return try {
             Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: emptyList()
         } catch (e: Exception) {

@@ -28,6 +28,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
@@ -126,7 +127,7 @@ class SnapshotDetailActivity : BaseActivity() {
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
             ivAppIcon.apply {
-                load(AppUtils.getAppIcon(entity.packageName))
+                load(LCAppUtils.getAppIcon(entity.packageName))
                 setOnClickListener {
                     startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
                         putExtra(EXTRA_PACKAGE_NAME, entity.packageName)

@@ -24,6 +24,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
@@ -65,6 +66,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         do {
             appList = try {
                 PackageUtils.getInstallApplications()
+            } catch (e: MiuiOpsException) {
+                emptyList()
             } catch (e: Exception) {
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
@@ -144,6 +147,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             do {
                 appList = try {
                     PackageUtils.getInstallApplications().toMutableList()
+                } catch (e: MiuiOpsException) {
+                    mutableListOf()
                 } catch (e: Exception) {
                     delay(GET_INSTALL_APPS_RETRY_PERIOD)
                     null
@@ -351,6 +356,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             do {
                 appList = try {
                     PackageUtils.getInstallApplications()
+                } catch (e: MiuiOpsException) {
+                    emptyList()
                 } catch (e: Exception) {
                     delay(GET_INSTALL_APPS_RETRY_PERIOD)
                     null

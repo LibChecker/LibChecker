@@ -92,9 +92,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.0.9")
+    implementation("com.absinthe.libraries.utils:utils:1.1.0")
 
-    val appCenterSdkVersion = "3.3.0"
+    val appCenterSdkVersion = "3.3.1"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 

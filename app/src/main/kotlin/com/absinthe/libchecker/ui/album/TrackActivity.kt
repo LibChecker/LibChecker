@@ -19,6 +19,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.extensions.logd
@@ -106,7 +107,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     .asSequence()
                     .map {
                         TrackListItem(
-                            icon = AppUtils.getAppIcon(it.packageName),
+                            icon = LCAppUtils.getAppIcon(it.packageName),
                             label = AppUtils.getAppName(it.packageName),
                             packageName = it.packageName,
                             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }

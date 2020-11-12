@@ -107,4 +107,5 @@
     <string name="album_item_track_title">追踪</string>
     <string name="album_item_track_subtitle">选择应用进行强制对比变化</string>
     <string name="uncharted_territory">未知领域</string>
+    <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
 </resources>
