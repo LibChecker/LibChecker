@@ -441,15 +441,19 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         continue
                     }
 
-                    packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                    libList = PackageUtils.getNativeDirLibs(
-                        packageInfo.applicationInfo.sourceDir,
-                        packageInfo.applicationInfo.nativeLibraryDir
-                    )
+                    try {
+                        packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                        libList = PackageUtils.getNativeDirLibs(
+                            packageInfo.applicationInfo.sourceDir,
+                            packageInfo.applicationInfo.nativeLibraryDir
+                        )
 
-                    for (lib in libList) {
-                        count = map[lib.name]?.count ?: 0
-                        map[lib.name] = RefCountType(count + 1, NATIVE)
+                        for (lib in libList) {
+                            count = map[lib.name]?.count ?: 0
+                            map[lib.name] = RefCountType(count + 1, NATIVE)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }

@@ -11,6 +11,7 @@ import android.view.Window
 import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -37,6 +38,7 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.blankj.utilcode.util.FileUtils
+import com.google.android.material.animation.AnimationUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -51,7 +53,7 @@ const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity(), IListContainer {
 
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     private var clickBottomItemFlag = false
     private var isDatabaseFinishInit = false
@@ -102,6 +104,14 @@ class MainActivity : BaseActivity(), IListContainer {
 
     override fun onBackPressed() {
         finish()
+    }
+
+    fun showNavigationView() {
+        binding.navView
+            .animate()
+            .translationY(0F)
+            .setDuration(225)
+            .interpolator = AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR
     }
 
     private fun initView() {
@@ -268,10 +278,12 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
 
                 binding.root.addView(mask)
+                binding.navView.isVisible = false
             }
         } else {
             binding.root.findViewById<ConstraintLayout>(R.id.layout_deny)?.let {
                 binding.root.removeView(it)
+                binding.navView.isVisible = true
             }
         }
     }
