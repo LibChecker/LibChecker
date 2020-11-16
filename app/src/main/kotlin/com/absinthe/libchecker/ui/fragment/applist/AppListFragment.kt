@@ -245,6 +245,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 if (!hasRequestChanges) {
                     viewModel.requestChange(requireActivity().packageManager)
                     hasRequestChanges = true
+                    viewModel.shouldReturnTopOfList = true
 
                     if (isFirstLaunch) {
                         binding.tvFirstTip.isGone = true
@@ -317,7 +318,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
                         && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                        returnTopOfList()
+                        if (viewModel.shouldReturnTopOfList) {
+                            viewModel.shouldReturnTopOfList = false
+                            returnTopOfList()
+                        }
                     }
 
                     menu?.findItem(R.id.search)?.isVisible = true

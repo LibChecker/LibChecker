@@ -41,6 +41,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    var shouldReturnTopOfList = false
 
     private var isInitingItems = false
     private val repository: LCRepository

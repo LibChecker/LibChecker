@@ -136,14 +136,14 @@ object ServiceLibMap : BaseMap() {
             "com.huawei.hms.support.api.push.service.HmsMsgService",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
             "com.huawei.updatesdk.service.deamon.download.DownloadService",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
