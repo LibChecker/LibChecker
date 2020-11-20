@@ -93,6 +93,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         }
 
         adapter.apply {
+            animationEnable = true
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {
                     return@setOnItemClickListener

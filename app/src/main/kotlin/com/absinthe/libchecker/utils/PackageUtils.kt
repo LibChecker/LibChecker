@@ -469,23 +469,32 @@ object PackageUtils {
         return NO_LIBS
     }
 
+    private val ABI_STRING_MAP = hashMapOf(
+        ARMV8 to ARMV8_STRING,
+        ARMV7 to ARMV7_STRING,
+        ARMV5 to ARMV5_STRING,
+        X86_64 to X86_64_STRING,
+        X86 to X86_STRING,
+        NO_LIBS to Utils.getApp().getString(R.string.no_libs),
+        ERROR to Utils.getApp().getString(R.string.cannot_read)
+    )
+
     /**
      * Get ABI string from ABI type
      * @param abi ABI type
      * @return ABI string
      */
     fun getAbiString(abi: Int): String {
-        return when (abi) {
-            ARMV8 -> ARMV8_STRING
-            ARMV7 -> ARMV7_STRING
-            ARMV5 -> ARMV5_STRING
-            X86_64 -> X86_64_STRING
-            X86 -> X86_STRING
-            NO_LIBS -> Utils.getApp().getString(R.string.no_libs)
-            ERROR -> Utils.getApp().getString(R.string.cannot_read)
-            else -> Utils.getApp().getString(R.string.unknown)
-        }
+        return ABI_STRING_MAP[abi] ?: Utils.getApp().getString(R.string.unknown)
     }
+
+    private val ABI_BADGE_MAP = hashMapOf(
+        ARMV8 to R.drawable.ic_64bit,
+        X86_64 to R.drawable.ic_64bit,
+        ARMV7 to R.drawable.ic_32bit,
+        ARMV5 to R.drawable.ic_32bit,
+        X86 to R.drawable.ic_32bit
+    )
 
     /**
      * Get ABI badge resource from ABI type
@@ -493,11 +502,7 @@ object PackageUtils {
      * @return Badge resource
      */
     fun getAbiBadgeResource(type: Int): Int {
-        return when (type) {
-            ARMV8, X86_64 -> R.drawable.ic_64bit
-            ARMV7, ARMV5, X86 -> R.drawable.ic_32bit
-            else -> R.drawable.ic_no_libs
-        }
+        return ABI_BADGE_MAP[type] ?: R.drawable.ic_no_libs
     }
 
     /**
@@ -548,7 +553,7 @@ object PackageUtils {
                 .toSet()
                 .filter {
                     it.name.length > 11 && it.name.contains(".") &&
-                            ( !it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o") )
+                            (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
                 }    //Remove obfuscated classes
                 .toMutableList()
 

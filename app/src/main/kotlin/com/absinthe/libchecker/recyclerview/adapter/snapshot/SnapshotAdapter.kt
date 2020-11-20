@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.text.Spannable
 import android.text.SpannableString
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
@@ -20,25 +22,29 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val ARROW = "→"
 
 @Xml(layouts = ["item_snapshot"])
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
+    private val iconSize by lazy { context.resources.getDimensionPixelSize(R.dimen.app_icon_size) }
+    private val iconLoader by lazy { AppIconLoader(iconSize, false,context) }
+
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_snapshot, parent, false))
     }
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
-        val drawable = try {
-            PackageUtils.getPackageInfo(item.packageName).applicationInfo.loadIcon(context.packageManager)
+        val iconBitmap = try {
+            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
         } catch (e: Exception) {
             ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
                 setTint(ContextCompat.getColor(context, R.color.textNormal))
-            }
+            }?.toBitmap(iconSize, iconSize)
         }
-        holder.getView<ImageView>(R.id.iv_icon).load(drawable)
+        holder.getView<ImageView>(R.id.iv_icon).load(iconBitmap)
         holder.getView<View>(R.id.view_red_mask).isVisible = item.deleted
 
         var isNewOrDeleted = false

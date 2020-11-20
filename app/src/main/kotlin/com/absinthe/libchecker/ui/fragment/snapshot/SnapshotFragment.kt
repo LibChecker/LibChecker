@@ -257,7 +257,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         delay(250)
 
                         doOnMainThreadIdle({
-                            if (!binding.recyclerview.canScrollVertically(-1)) {
+                            if ((requireActivity() as MainActivity).controller is SnapshotFragment
+                                && !binding.recyclerview.canScrollVertically(-1)
+                            ) {
                                 (requireActivity() as MainActivity).showNavigationView()
                                 binding.extendedFab.show()
                             }

@@ -35,7 +35,7 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -51,6 +51,7 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.zhanghai.android.appiconloader.AppIconLoader
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
 
@@ -122,6 +123,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onResume() {
         super.onResume()
 
+        if (!binding.recyclerview.canScrollVertically(-1)) {
+            viewModel.shouldReturnTopOfList = true
+        }
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
                 viewModel.dbItems.value?.let {
@@ -234,18 +238,15 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     withContext(Dispatchers.Main) {
                         updateItems(it)
                     }
-
+                    val iconLoader = AppIconLoader(requireContext().resources.getDimensionPixelSize(R.dimen.app_icon_size), false, requireContext())
                     it.forEach { item ->
-                        if (mAdapter.iconMap[item.packageName] == null) {
-                            mAdapter.iconMap[item.packageName] = LCAppUtils.getAppIcon(item.packageName)
-                        }
+                        iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName).applicationInfo)
                     }
                 }
 
                 if (!hasRequestChanges) {
                     viewModel.requestChange(requireActivity().packageManager)
                     hasRequestChanges = true
-                    viewModel.shouldReturnTopOfList = true
 
                     if (isFirstLaunch) {
                         binding.tvFirstTip.isGone = true
@@ -317,7 +318,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     flip(VF_LIST)
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
+                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE
+                    ) {
                         if (viewModel.shouldReturnTopOfList) {
                             viewModel.shouldReturnTopOfList = false
                             returnTopOfList()
@@ -326,7 +328,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
                     menu?.findItem(R.id.search)?.isVisible = true
                     isListReady = true
-                } catch (ignore: Exception) { }
+                } catch (ignore: Exception) {
+                }
             })
         }
     }

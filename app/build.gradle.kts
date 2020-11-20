@@ -85,7 +85,7 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.32.1")
-val protocVersion by extra("3.13.0")
+val protocVersion by extra("3.14.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -114,7 +114,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha04")
+    implementation("androidx.core:core-ktx:1.5.0-alpha05")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha06")
@@ -131,6 +131,7 @@ dependencies {
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
+    implementation("me.zhanghai.android.appiconloader:appiconloader:1.2.0")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")
