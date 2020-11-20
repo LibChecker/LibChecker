@@ -35,7 +35,6 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -51,7 +50,6 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.zhanghai.android.appiconloader.AppIconLoader
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
 
@@ -237,10 +235,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 lifecycleScope.launch(Dispatchers.IO) {
                     withContext(Dispatchers.Main) {
                         updateItems(it)
-                    }
-                    val iconLoader = AppIconLoader(requireContext().resources.getDimensionPixelSize(R.dimen.app_icon_size), false, requireContext())
-                    it.forEach { item ->
-                        iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName).applicationInfo)
                     }
                 }
 

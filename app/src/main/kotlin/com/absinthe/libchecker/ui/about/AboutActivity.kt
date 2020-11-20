@@ -123,6 +123,9 @@ class AboutActivity : AbsAboutActivity() {
             add(Category("Acknowledgement"))
             add(Card(HtmlCompat.fromHtml(getAcknowledgementHtmlString(list), HtmlCompat.FROM_HTML_MODE_LEGACY)))
 
+            add(Category("Declaration"))
+            add(Card(getString(R.string.library_declaration)))
+
             add(Category("Open Source Licenses"))
             add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
             add(License("MultiType", "drakeet", License.APACHE_2, "https://github.com/drakeet/MultiType"))
@@ -146,6 +149,7 @@ class AboutActivity : AbsAboutActivity() {
             add(License("X2C", "iReaderAndroid", License.MIT, "https://github.com/iReaderAndroid/X2C"))
             add(License("coil", "coil-kt", License.APACHE_2, "https://github.com/coil-kt/coil"))
             add(License("AndroidFastScroll", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AndroidFastScroll"))
+            add(License("AppIconLoader", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AppIconLoader"))
         }
     }
 

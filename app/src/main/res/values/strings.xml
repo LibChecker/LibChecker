@@ -52,6 +52,7 @@
     <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
     <string name="toolbar_rate">Rate</string>
     <string name="resource_declaration">Part of the resources in the application are comes from: </string>
+    <string name="library_declaration">All marked libraries information in LibChecker comes from the development documentation or code repository of the SDK to which it belongs. If the information is incorrect, please contact: absinthe@absinthe.life</string>
 
     <!--  Settings  -->
     <string name="pref_group_normal">Normal</string>

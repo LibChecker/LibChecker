@@ -110,4 +110,5 @@
     <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
     <string name="anonymous_statistics">匿名统计</string>
     <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
+    <string name="library_declaration">LibChecker 中的所有标记库信息均来自于其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
 </resources>
