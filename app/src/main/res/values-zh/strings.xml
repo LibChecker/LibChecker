@@ -108,4 +108,6 @@
     <string name="album_item_track_subtitle">选择应用进行强制对比变化</string>
     <string name="uncharted_territory">未知领域</string>
     <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
+    <string name="anonymous_statistics">匿名统计</string>
+    <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
 </resources>

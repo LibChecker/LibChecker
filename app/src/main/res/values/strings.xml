@@ -66,6 +66,7 @@
     <string name="reload_apps">Reload Apps List</string>
     <string name="help_docs">Help Docs</string>
     <string name="join_telegram_group">Communication</string>
+    <string name="anonymous_statistics">Anonymous statistics</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
@@ -75,6 +76,7 @@
     <string name="reload_apps_summary">Have a try when apps list is shown abnormally</string>
     <string name="help_docs_summary">Learn how to use LibChecker</string>
     <string name="join_telegram_group_summary">Join our Telegram group</string>
+    <string name="anonymous_statistics_summary">We use Microsoft AppCenter to anonymously send the most commonly used marked libraries and some usage habits data to make LibChecker more practical</string>
 
     <!--  Detail  -->
     <string name="detail_label">View App Details</string>

@@ -98,6 +98,13 @@
 
         </Preference>
 
+        <SwitchPreference
+            app:key="analytics"
+            app:title="@string/anonymous_statistics"
+            app:summary="@string/anonymous_statistics_summary"
+            app:icon="@drawable/ic_appcenter"
+            app:defaultValue="true"/>
+
     </moe.shizuku.preference.PreferenceCategory>
 
 </PreferenceScreen>

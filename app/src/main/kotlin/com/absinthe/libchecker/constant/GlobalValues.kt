@@ -40,6 +40,8 @@ object GlobalValues {
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true))
     val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
+    val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
+        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
 
     val appSortMode: MutableLiveData<Int> = MutableLiveData(
         getPreferences().getInt(
