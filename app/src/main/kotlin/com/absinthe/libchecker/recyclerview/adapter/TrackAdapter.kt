@@ -20,7 +20,12 @@ class TrackAdapter :BaseQuickAdapter<TrackListItem, BaseViewHolder>(R.layout.ite
     }
 
     override fun convert(holder: BaseViewHolder, item: TrackListItem) {
-        holder.getView<ImageView>(R.id.iv_icon).load(iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo))
+        val icon = try {
+            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+        } catch (e: PackageManager.NameNotFoundException) {
+            null
+        }
+        holder.getView<ImageView>(R.id.iv_icon).load(icon)
         holder.setText(R.id.tv_app_name, item.label)
         holder.setText(R.id.tv_package_name, item.packageName)
         holder.getView<SwitchMaterial>(R.id.track_switch).apply {

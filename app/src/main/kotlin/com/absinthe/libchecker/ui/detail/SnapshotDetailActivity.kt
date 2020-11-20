@@ -129,7 +129,12 @@ class SnapshotDetailActivity : BaseActivity() {
 
             ivAppIcon.apply {
                 val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@SnapshotDetailActivity)
-                load(appIconLoader.loadIcon(PackageUtils.getPackageInfo(entity.packageName, PackageManager.GET_META_DATA).applicationInfo))
+                val icon = try {
+                    appIconLoader.loadIcon(PackageUtils.getPackageInfo(entity.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    null
+                }
+                load(icon)
                 setOnClickListener {
                     startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
                         putExtra(EXTRA_PACKAGE_NAME, entity.packageName)

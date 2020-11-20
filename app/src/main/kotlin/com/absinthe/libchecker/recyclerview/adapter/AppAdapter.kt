@@ -36,13 +36,19 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                     load(it)
                 } ?: let {
                     GlobalScope.launch(Dispatchers.IO) {
-                        val bitmap = iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                        val bitmap = try {
+                            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            null
+                        }
                         withContext(Dispatchers.Main) {
                             findViewWithTag<ImageView>(item.packageName)?.let {
                                 load(bitmap)
                             }
                         }
-                        iconMap[item.packageName] = bitmap
+                        if (bitmap != null) {
+                            iconMap[item.packageName] = bitmap
+                        }
                     }
                 }
             }
