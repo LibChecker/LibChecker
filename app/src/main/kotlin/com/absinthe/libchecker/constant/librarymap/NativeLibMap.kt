@@ -1084,6 +1084,27 @@ object NativeLibMap : BaseMap() {
                 "libchrome"
             )
         ),
+        Pair(
+            "libhuawei_arengine_ndk.so",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "HUAWEI AR Engine"
+            )
+        ),
+        Pair(
+            "libhuawei_arengine_jni.so",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "HUAWEI AR Engine"
+            )
+        ),
+        Pair(
+            "libhuawei_arengine_impl.so",
+            LibChip(
+                R.drawable.ic_lib_huawei,
+                "HUAWEI AR Engine"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {

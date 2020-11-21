@@ -5,7 +5,6 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -44,7 +43,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -123,6 +121,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onResume() {
         super.onResume()
 
+        if (!binding.recyclerview.canScrollVertically(-1)) {
+            viewModel.shouldReturnTopOfList = true
+        }
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
                 viewModel.dbItems.value?.let {
@@ -235,12 +236,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     withContext(Dispatchers.Main) {
                         updateItems(it)
                     }
-
-                    it.forEach { item ->
-                        if (mAdapter.iconMap[item.packageName] == null) {
-                            mAdapter.iconMap[item.packageName] = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
-                        }
-                    }
                 }
 
                 if (!hasRequestChanges) {
@@ -317,13 +312,18 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     flip(VF_LIST)
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE) {
-                        returnTopOfList()
+                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE
+                    ) {
+                        if (viewModel.shouldReturnTopOfList) {
+                            viewModel.shouldReturnTopOfList = false
+                            returnTopOfList()
+                        }
                     }
 
                     menu?.findItem(R.id.search)?.isVisible = true
                     isListReady = true
-                } catch (ignore: Exception) { }
+                } catch (ignore: Exception) {
+                }
             })
         }
     }

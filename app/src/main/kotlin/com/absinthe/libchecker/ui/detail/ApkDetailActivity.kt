@@ -24,6 +24,7 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
+import me.zhanghai.android.appiconloader.AppIconLoader
 import java.io.File
 
 class ApkDetailActivity : BaseActivity(), IDetailContainer {
@@ -104,7 +105,8 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                 }
                 binding.apply {
                     try {
-                        ivAppIcon.load(it.applicationInfo.loadIcon(packageManager))
+                        val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@ApkDetailActivity)
+                        ivAppIcon.load(appIconLoader.loadIcon(it.applicationInfo))
                         tvAppName.apply {
                             text = it.applicationInfo.loadLabel(packageManager)
                             setLongClickCopiedToClipboard(text.toString())

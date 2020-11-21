@@ -39,7 +39,6 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
-import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -258,14 +257,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         delay(250)
 
                         doOnMainThreadIdle({
-                            if (!binding.recyclerview.canScrollVertically(-1)) {
-                                (requireActivity() as MainActivity).binding.navView
-                                    .animate()
-                                    .translationY(0F)
-                                    .setInterpolator(AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR)
-                                    .setDuration(225)
+                            if ((requireActivity() as MainActivity).controller is SnapshotFragment
+                                && !binding.recyclerview.canScrollVertically(-1)
+                            ) {
+                                (requireActivity() as MainActivity).showNavigationView()
                                 binding.extendedFab.show()
-                                (requireActivity() as MainActivity).binding.navView
                             }
                         })
                     }

@@ -114,35 +114,35 @@ object ReceiverLibMap : BaseMap() {
             "com.huawei.hms.support.api.push.PushEventReceiver",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
             "com.huawei.hms.support.api.push.PushReceiver",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
             "com.huawei.hms.support.api.push.PushMsgReceiver",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
             "com.huawei.android.pushagent.PushEventReceiver",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
             "com.huawei.android.pushagent.PushBootReceiver",
             LibChip(
                 R.drawable.ic_lib_huawei,
-                "Huawei Push"
+                "HUAWEI Push"
             )
         ),
         Pair(
@@ -191,7 +191,7 @@ object ReceiverLibMap : BaseMap() {
             "org.android.agoo.huawei.HuaweiPushReceiver",
             LibChip(
                 R.drawable.ic_lib_aliyun,
-                "Huawei Push(Aliyun Proxy)"
+                "HUAWEI Push(Aliyun Proxy)"
             )
         ),
         Pair(
@@ -240,7 +240,7 @@ object ReceiverLibMap : BaseMap() {
             "com.igexin.sdk.HmsPushSubReceiver",
             LibChip(
                 R.drawable.ic_sdk_placeholder,
-                "Huawei Push(GeTui Proxy)"
+                "HUAWEI Push(GeTui Proxy)"
             )
         ),
         Pair(

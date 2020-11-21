@@ -3,7 +3,9 @@ package com.absinthe.libchecker.app
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import com.absinthe.libchecker.extensions.logw
+import com.blankj.utilcode.util.Utils
 
 object Global {
 
@@ -15,17 +17,25 @@ object Global {
                 try {
                     Looper.loop()
                 } catch (e: Throwable) {
-                    val stack = Log.getStackTraceString(e)
-                    if (stack.contains("Service.startForeground()") ||
-                        stack.contains("com.swift.sandhook") ||
-                        stack.contains("MainActivity.onResume")
-                    ) {
-                        logw(e.toString())
-                    } else {
-                        throw e
-                    }
+                    dealStackTraceException(e)
                 }
             }
+        }
+    }
+
+    @Throws(Throwable::class)
+    private fun dealStackTraceException(e: Throwable) {
+        val stack = Log.getStackTraceString(e)
+
+        if (stack.contains("Service.startForeground()") ||
+            stack.contains("com.swift.sandhook")
+        ) {
+            logw(e.toString())
+        } else if (stack.contains("ClipboardService")) {
+            logw(e.toString())
+            Toast.makeText(Utils.getApp(), "Cannot access to ClipboardService", Toast.LENGTH_SHORT).show()
+        } else {
+            throw e
         }
     }
 }

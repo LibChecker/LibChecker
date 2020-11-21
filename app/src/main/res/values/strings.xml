@@ -20,6 +20,7 @@
     <string name="empty_list">Empty list</string>
     <string name="uncharted_territory">Uncharted territory</string>
     <string name="app_list_first_tip">The first load will take some time</string>
+    <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
 
     <string name="menu_sort_by_time_desc">Descending by update time</string>
     <string name="menu_sort_default">Default order</string>
@@ -51,6 +52,7 @@
     <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
     <string name="toolbar_rate">Rate</string>
     <string name="resource_declaration">Part of the resources in the application are comes from: </string>
+    <string name="library_declaration">All marked libraries information in LibChecker comes from the development documentation or code repository of the SDK to which it belongs. If the information is incorrect, please contact: absinthe@absinthe.life</string>
 
     <!--  Settings  -->
     <string name="pref_group_normal">Normal</string>
@@ -65,6 +67,7 @@
     <string name="reload_apps">Reload Apps List</string>
     <string name="help_docs">Help Docs</string>
     <string name="join_telegram_group">Communication</string>
+    <string name="anonymous_statistics">Anonymous statistics</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
@@ -74,6 +77,7 @@
     <string name="reload_apps_summary">Have a try when apps list is shown abnormally</string>
     <string name="help_docs_summary">Learn how to use LibChecker</string>
     <string name="join_telegram_group_summary">Join our Telegram group</string>
+    <string name="anonymous_statistics_summary">We use Microsoft AppCenter to anonymously send the most commonly used marked libraries and some usage habits data to make LibChecker more practical</string>
 
     <!--  Detail  -->
     <string name="detail_label">View App Details</string>

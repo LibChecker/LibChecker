@@ -78,11 +78,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
             }
         }
 
-        if (node.isExpanded) {
-            onExpansionToggled(ivArrow, true)
-        } else {
-            onExpansionToggled(ivArrow, false)
-        }
+        onExpansionToggled(ivArrow, node.isExpanded)
     }
 
     override fun onClick(helper: BaseViewHolder, view: View, data: BaseNode, position: Int) {

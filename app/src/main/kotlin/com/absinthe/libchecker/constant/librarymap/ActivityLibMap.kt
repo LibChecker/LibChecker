@@ -100,11 +100,11 @@ object ActivityLibMap : BaseMap() {
         ),
         Pair(
             "com.huawei.hms.dtm.PreviewActivity",
-            LibChip(R.drawable.ic_lib_huawei, "Huawei DTM")
+            LibChip(R.drawable.ic_lib_huawei, "HUAWEI DTM")
         ),
         Pair(
             "com.huawei.openalliance.ad.activity.PPSLauncherActivity",
-            LibChip(R.drawable.ic_lib_huawei, "Huawei Ads SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HUAWEI Ads SDK")
         ),
         Pair(
             "com.alipay.sdk.app.H5PayActivity",

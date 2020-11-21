@@ -107,4 +107,8 @@
     <string name="album_item_track_title">追踪</string>
     <string name="album_item_track_subtitle">選擇應用進行強制對比變化</string>
     <string name="uncharted_territory">未知領域</string>
+    <string name="get_app_list_denied_tip">請授予 LibChecker\n“讀取應用清單”\n權限</string>
+    <string name="anonymous_statistics_summary">我們使用 Microsoft AppCenter 來匿名發送最常被人們使用的標記庫和一些使用習慣數據來使得 LibChecker 變得更加實用</string>
+    <string name="anonymous_statistics">匿名統計</string>
+    <string name="library_declaration">LibChecker 中的所有標記庫信息均來自於其所屬的 SDK 的開發文檔或代碼倉庫，如果信息有有誤，請聯繫：absinthe@absinthe.life</string>
 </resources>

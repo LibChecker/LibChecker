@@ -9,6 +9,9 @@ import android.os.Bundle
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -21,17 +24,21 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.databinding.LayoutGetAppListDeniedBinding
+import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
-import com.absinthe.libchecker.utils.AppUtils
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
+import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.blankj.utilcode.util.FileUtils
+import com.google.android.material.animation.AnimationUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -46,7 +53,7 @@ const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity(), IListContainer {
 
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     private var clickBottomItemFlag = false
     private var isDatabaseFinishInit = false
@@ -87,6 +94,7 @@ class MainActivity : BaseActivity(), IListContainer {
         if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(packageManager, true)
         }
+        addOrRemoveMiuiAppsListMask()
     }
 
     override fun onPause() {
@@ -98,10 +106,18 @@ class MainActivity : BaseActivity(), IListContainer {
         finish()
     }
 
+    fun showNavigationView() {
+        binding.navView
+            .animate()
+            .translationY(0F)
+            .setDuration(225)
+            .interpolator = AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR
+    }
+
     private fun initView() {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
-        supportActionBar?.title = AppUtils.setTitle()
+        supportActionBar?.title = LCAppUtils.setTitle()
 
         binding.apply {
             viewpager.apply {
@@ -204,6 +220,8 @@ class MainActivity : BaseActivity(), IListContainer {
             do {
                 appList = try {
                     PackageUtils.getInstallApplications()
+                } catch (e: MiuiOpsException) {
+                    emptyList()
                 } catch (e: Exception) {
                     delay(GET_INSTALL_APPS_RETRY_PERIOD)
                     null
@@ -247,5 +265,26 @@ class MainActivity : BaseActivity(), IListContainer {
 
     private fun clearApkCache() {
         FileUtils.delete(File(externalCacheDir, "temp.apk"))
+    }
+
+    private fun addOrRemoveMiuiAppsListMask() {
+        if (!XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
+            if (binding.root.findViewById<ConstraintLayout>(R.id.layout_deny) == null) {
+                val mask = LayoutGetAppListDeniedBinding.inflate(layoutInflater).root.apply {
+                    layoutParams = CoordinatorLayout.LayoutParams(
+                        CoordinatorLayout.LayoutParams.MATCH_PARENT,
+                        CoordinatorLayout.LayoutParams.MATCH_PARENT
+                    )
+                }
+
+                binding.root.addView(mask)
+                binding.navView.isVisible = false
+            }
+        } else {
+            binding.root.findViewById<ConstraintLayout>(R.id.layout_deny)?.let {
+                binding.root.removeView(it)
+                binding.navView.isVisible = true
+            }
+        }
     }
 }

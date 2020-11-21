@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
@@ -28,17 +29,18 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -126,7 +128,13 @@ class SnapshotDetailActivity : BaseActivity() {
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
             ivAppIcon.apply {
-                load(AppUtils.getAppIcon(entity.packageName))
+                val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@SnapshotDetailActivity)
+                val icon = try {
+                    appIconLoader.loadIcon(PackageUtils.getPackageInfo(entity.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    null
+                }
+                load(icon)
                 setOnClickListener {
                     startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
                         putExtra(EXTRA_PACKAGE_NAME, entity.packageName)

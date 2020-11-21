@@ -26,7 +26,7 @@ android {
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "1.10.1"
+    val baseVersionName = "1.10.4"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
@@ -85,16 +85,16 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.32.1")
-val protocVersion by extra("3.13.0")
+val protocVersion by extra("3.14.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.0.9")
+    implementation("com.absinthe.libraries.utils:utils:1.1.0")
 
-    val appCenterSdkVersion = "3.3.0"
+    val appCenterSdkVersion = "3.3.1"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
@@ -114,7 +114,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha04")
+    implementation("androidx.core:core-ktx:1.5.0-alpha05")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha06")
@@ -131,6 +131,7 @@ dependencies {
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.0.0")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
+    implementation("me.zhanghai.android.appiconloader:appiconloader:1.2.0")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")

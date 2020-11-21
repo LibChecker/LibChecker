@@ -1,24 +1,28 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.view.ViewGroup
 import android.widget.ImageView
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 @Xml(layouts = ["item_app"])
 class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
-    
-    val iconMap = hashMapOf<String, Drawable>()
+
+    private val iconLoader by lazy { AppIconLoader(context.resources.getDimensionPixelSize(R.dimen.app_icon_size), false, context) }
+    private val iconMap = mutableMapOf<String, Bitmap>()
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
@@ -26,13 +30,29 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     override fun convert(holder: BaseViewHolder, item: LCItem) {
         holder.apply {
-            iconMap[item.packageName]?.let {
-                setImageDrawable(R.id.iv_icon, it)
-            } ?: run {
-                val drawable = AppUtils.getAppIcon(item.packageName) ?: ColorDrawable(Color.TRANSPARENT)
-                setImageDrawable(R.id.iv_icon, drawable)
-                iconMap[item.packageName] = drawable
+            getView<ImageView>(R.id.iv_icon).apply {
+                tag = item.packageName
+                iconMap[item.packageName]?.let {
+                    load(it)
+                } ?: let {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        val bitmap = try {
+                            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            null
+                        }
+                        withContext(Dispatchers.Main) {
+                            findViewWithTag<ImageView>(item.packageName)?.let {
+                                load(bitmap)
+                            }
+                        }
+                        if (bitmap != null) {
+                            iconMap[item.packageName] = bitmap
+                        }
+                    }
+                }
             }
+
             setText(R.id.tv_app_name, item.label)
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))

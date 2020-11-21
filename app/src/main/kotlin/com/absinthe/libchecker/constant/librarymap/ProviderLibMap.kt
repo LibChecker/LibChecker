@@ -20,7 +20,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.huawei.hms.support.api.push.PushProvider",
-            LibChip(R.drawable.ic_lib_huawei, "Huawei Push")
+            LibChip(R.drawable.ic_lib_huawei, "HUAWEI Push")
         ),
         Pair(
             "com.huawei.hms.aaid.InitProvider",
@@ -28,7 +28,7 @@ object ProviderLibMap : BaseMap() {
         ),
         Pair(
             "com.huawei.openalliance.ad.download.DownloadFileProvider",
-            LibChip(R.drawable.ic_lib_huawei, "Huawei Ads SDK")
+            LibChip(R.drawable.ic_lib_huawei, "HUAWEI Ads SDK")
         ),
         Pair(
             "androidx.core.content.FileProvider",

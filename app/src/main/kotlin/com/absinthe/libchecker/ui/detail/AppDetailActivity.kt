@@ -36,6 +36,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
@@ -112,7 +113,8 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                 try {
                     val packageInfo = PackageUtils.getPackageInfo(packageName)
                     ivAppIcon.apply {
-                        load(AppUtils.getAppIcon(packageName))
+                        val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
+                        load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
                             AppInfoBottomShellDialogFragment().apply {
                                 arguments = Bundle().apply {

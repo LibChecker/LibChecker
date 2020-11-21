@@ -106,7 +106,6 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     .asSequence()
                     .map {
                         TrackListItem(
-                            icon = AppUtils.getAppIcon(it.packageName),
                             label = AppUtils.getAppName(it.packageName),
                             packageName = it.packageName,
                             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
