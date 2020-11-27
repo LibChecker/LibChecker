@@ -2,28 +2,20 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
-import com.absinthe.libchecker.ui.detail.IDetailContainer
-import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
-import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
@@ -33,12 +25,9 @@ import rikka.core.util.ClipboardUtils
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-class ComponentsAnalysisFragment : BaseFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component), Sortable {
+class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val viewModel by activityViewModels<DetailViewModel>()
-    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: SERVICE) }
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
-    private var isListReady = false
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -118,15 +107,6 @@ class ComponentsAnalysisFragment : BaseFragment<FragmentLibComponentBinding>(R.l
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as IDetailContainer).currentFragment = this
-
-        if (isListReady) {
-            viewModel.itemsCountLiveData.value = adapter.data.size
-        }
-    }
-
     companion object {
         fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
             return ComponentsAnalysisFragment()
@@ -136,20 +116,5 @@ class ComponentsAnalysisFragment : BaseFragment<FragmentLibComponentBinding>(R.l
                     }
                 }
         }
-    }
-
-    override fun sort() {
-        viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-            val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }
-                .toMutableList())
-            MODE_SORT_BY_LIB
-        } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.name }
-                .toMutableList())
-            MODE_SORT_BY_SIZE
-        }
-        GlobalValues.libSortMode.value = viewModel.sortMode
-        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
     }
 }
