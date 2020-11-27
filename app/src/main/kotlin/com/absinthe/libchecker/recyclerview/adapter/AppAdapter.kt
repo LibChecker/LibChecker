@@ -33,7 +33,9 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             getView<ImageView>(R.id.iv_icon).apply {
                 tag = item.packageName
                 iconMap[item.packageName]?.let {
-                    load(it)
+                    load(it) {
+                        crossfade(true)
+                    }
                 } ?: let {
                     GlobalScope.launch(Dispatchers.IO) {
                         val bitmap = try {
@@ -43,7 +45,9 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                         }
                         withContext(Dispatchers.Main) {
                             findViewWithTag<ImageView>(item.packageName)?.let {
-                                load(bitmap)
+                                load(bitmap) {
+                                    crossfade(true)
+                                }
                             }
                         }
                         if (bitmap != null) {

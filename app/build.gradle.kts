@@ -26,7 +26,7 @@ android {
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "1.10.4"
+    val baseVersionName = "1.10.5"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
@@ -89,7 +89,7 @@ val protocVersion by extra("3.14.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.1.0")
@@ -129,7 +129,7 @@ dependencies {
     implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.0.0")
+    implementation("io.coil-kt:coil:1.1.0")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.2.0")
 

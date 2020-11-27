@@ -1105,6 +1105,13 @@ object NativeLibMap : BaseMap() {
                 "HUAWEI AR Engine"
             )
         ),
+        Pair(
+            "libsecsdk.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "MSA SDK"
+            )
+        ),
     )
 
     override fun getMap(): HashMap<String, LibChip> {
