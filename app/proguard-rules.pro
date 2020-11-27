@@ -118,3 +118,5 @@
 }
 
 -keep public class com.absinthe.libchecker.protocol.*  { *; }
+
+-dontwarn org.conscrypt.ConscryptHostnameVerifier
