@@ -185,6 +185,7 @@ class MainActivity : BaseActivity(), IListContainer {
 
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
+            appViewModel.shouldReturnTopOfList = true
             appViewModel.requestChange(packageManager, true)
         }
     }

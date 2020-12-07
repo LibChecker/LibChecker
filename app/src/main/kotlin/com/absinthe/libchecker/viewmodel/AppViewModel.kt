@@ -227,6 +227,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             GlobalScope.launch(Dispatchers.Main) {
+                if (GlobalValues.shouldRequestChange.value == true) {
+                    shouldReturnTopOfList = true
+                }
                 GlobalValues.shouldRequestChange.value = false
                 AppItemRepository.shouldRefreshAppList = true
             }

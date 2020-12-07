@@ -43,6 +43,8 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
 
     override fun init() {
+        setHasOptionsMenu(true)
+
         binding.apply {
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter

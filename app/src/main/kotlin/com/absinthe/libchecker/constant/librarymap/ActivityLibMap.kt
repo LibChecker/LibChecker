@@ -99,6 +99,10 @@ object ActivityLibMap : BaseMap() {
             LibChip(R.drawable.ic_lib_huawei, "HMS Core")
         ),
         Pair(
+            "com.huawei.hms.activity.EnableServiceActivity",
+            LibChip(R.drawable.ic_lib_huawei, "HMS Core")
+        ),
+        Pair(
             "com.huawei.hms.dtm.PreviewActivity",
             LibChip(R.drawable.ic_lib_huawei, "HUAWEI DTM")
         ),

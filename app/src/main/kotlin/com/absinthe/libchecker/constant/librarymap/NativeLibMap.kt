@@ -189,6 +189,13 @@ object NativeLibMap : BaseMap() {
             )
         ),
         Pair(
+            "libhttpdns.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "腾讯云 HTTPDNS"
+            )
+        ),
+        Pair(
             "libijkplayer.so",
             LibChip(
                 R.drawable.ic_lib_bilibili,
@@ -267,6 +274,27 @@ object NativeLibMap : BaseMap() {
         ),
         Pair(
             "libglog_init.so",
+            LibChip(
+                R.drawable.ic_lib_react,
+                "React Native"
+            )
+        ),
+        Pair(
+            "libreactnative.so",
+            LibChip(
+                R.drawable.ic_lib_react,
+                "React Native"
+            )
+        ),
+        Pair(
+            "libreactnativeblob.so",
+            LibChip(
+                R.drawable.ic_lib_react,
+                "React Native"
+            )
+        ),
+        Pair(
+            "libreactnativejnifb.so",
             LibChip(
                 R.drawable.ic_lib_react,
                 "React Native"
@@ -428,6 +456,13 @@ object NativeLibMap : BaseMap() {
         ),
         Pair(
             "libandfix.so",
+            LibChip(
+                R.drawable.ic_lib_alibaba,
+                "AndFix"
+            )
+        ),
+        Pair(
+            "libandfix_x86.so",
             LibChip(
                 R.drawable.ic_lib_alibaba,
                 "AndFix"
@@ -1110,6 +1145,41 @@ object NativeLibMap : BaseMap() {
             LibChip(
                 R.drawable.ic_sdk_placeholder,
                 "MSA SDK"
+            )
+        ),
+        Pair(
+            "lib39285EFA.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "MSA SDK"
+            )
+        ),
+        Pair(
+            "libA3AEECD8.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "MSA SDK"
+            )
+        ),
+        Pair(
+            "libbugsnag-ndk.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "Bugsnag"
+            )
+        ),
+        Pair(
+            "libbugsnag-plugin-android-anr.so",
+            LibChip(
+                R.drawable.ic_sdk_placeholder,
+                "Bugsnag"
+            )
+        ),
+        Pair(
+            "libucrop.so",
+            LibChip(
+                R.drawable.ic_lib_tencent_cloud,
+                "uCrop"
             )
         ),
     )

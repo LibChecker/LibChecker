@@ -15,6 +15,8 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
     override fun initBinding(view: View): FragmentStatisticsBinding = FragmentStatisticsBinding.bind(view)
 
     override fun init() {
+        setHasOptionsMenu(true)
+
         binding.root.addPaddingTop(BarUtils.getStatusBarHeight())
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {

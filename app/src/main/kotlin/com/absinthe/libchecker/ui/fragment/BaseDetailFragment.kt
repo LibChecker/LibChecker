@@ -24,13 +24,14 @@ import com.absinthe.libchecker.viewmodel.DetailViewModel
 abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), Sortable {
 
     protected val viewModel by activityViewModels<DetailViewModel>()
-    protected val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
+    protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
+    protected val adapter by lazy { LibStringAdapter(type) }
     protected var isListReady = false
 
     override fun onVisibilityChanged(visible: Boolean) {
         super.onVisibilityChanged(visible)
         if (visible) {
-            (requireActivity() as IDetailContainer).currentFragment = this@BaseDetailFragment
+            (requireActivity() as IDetailContainer).currentFragment = this
 
             if (isListReady) {
                 viewModel.itemsCountLiveData.value = adapter.data.size
@@ -44,7 +45,11 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
             adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }.toMutableList())
             MODE_SORT_BY_LIB
         } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }.toMutableList())
+            if (type == NATIVE) {
+                adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }.toMutableList())
+            } else {
+                adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.name }.toMutableList())
+            }
             MODE_SORT_BY_SIZE
         }
         GlobalValues.libSortMode.value = viewModel.sortMode

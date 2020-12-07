@@ -11,8 +11,8 @@ import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -154,7 +154,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         }
         findPreference(Constants.PREF_TELEGRAM)?.apply {
             setOnPreferenceClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, "https://t.me/libcheckerr".toUri()).apply {
+                startActivity(Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri()).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 })
                 true
@@ -170,11 +170,13 @@ class SettingsFragment : PreferenceFragment(), IListController {
 
     override fun onResume() {
         super.onResume()
-        ((requireActivity() as IListContainer).controller as? Fragment)?.setHasOptionsMenu(false)
-        (requireActivity() as IListContainer).controller = this
+        if ((requireActivity() as IListContainer).controller != this) {
+            (requireActivity() as IListContainer).controller = this
+            requireActivity().invalidateOptionsMenu()
+        }
     }
 
-    override fun onCreateItemDecoration(): DividerDecoration? {
+    override fun onCreateItemDecoration(): DividerDecoration {
         return CategoryDivideDividerDecoration()
     }
 
@@ -191,6 +193,11 @@ class SettingsFragment : PreferenceFragment(), IListController {
         }
 
         recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
+
+        lifecycleScope.launchWhenResumed {
+            recyclerView.scrollToPosition(0)
+        }
+
         return recyclerView
     }
 

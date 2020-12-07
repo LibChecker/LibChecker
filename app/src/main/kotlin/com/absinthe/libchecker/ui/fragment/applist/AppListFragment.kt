@@ -312,7 +312,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     flip(VF_LIST)
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE
+                        && binding.recyclerview.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
                     ) {
                         if (viewModel.shouldReturnTopOfList) {
                             viewModel.shouldReturnTopOfList = false
