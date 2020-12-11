@@ -195,7 +195,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
 
         lifecycleScope.launchWhenResumed {
-            recyclerView.scrollToPosition(0)
+            recyclerView.smoothScrollToPosition(0)
         }
 
         return recyclerView

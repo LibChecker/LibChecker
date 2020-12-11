@@ -268,6 +268,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             )
         }
+
+        lifecycleScope.launchWhenResumed {
+            delay(2000)
+
+            withContext(Dispatchers.Main) {
+                binding.extendedFab.shrink()
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
