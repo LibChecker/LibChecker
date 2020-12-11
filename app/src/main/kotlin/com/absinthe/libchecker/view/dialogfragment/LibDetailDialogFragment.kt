@@ -26,8 +26,7 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : DialogFragment() {
 
-    private var _dialogViewBinding: LayoutDialogLibDetailBinding? = null
-    private val dialogViewBinding get() = _dialogViewBinding!!
+    private lateinit var dialogViewBinding: LayoutDialogLibDetailBinding
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
@@ -38,7 +37,7 @@ class LibDetailDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _dialogViewBinding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
+        dialogViewBinding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
         dialogViewBinding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
@@ -91,11 +90,6 @@ class LibDetailDialogFragment : DialogFragment() {
         } ?: let {
             viewModel.requestLibDetail(libName, type)
         }
-    }
-
-    override fun onDestroy() {
-        _dialogViewBinding = null
-        super.onDestroy()
     }
 
     companion object {
