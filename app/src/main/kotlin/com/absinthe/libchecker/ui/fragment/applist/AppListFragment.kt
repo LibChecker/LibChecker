@@ -284,10 +284,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun updateItems(newItems: List<LCItem>) {
-        if (newItems.isEmpty()) {
-            return
-        }
-
         val list = mAdapter.data
         val filterList = mutableListOf<LCItem>()
 

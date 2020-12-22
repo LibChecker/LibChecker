@@ -70,12 +70,20 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         }
 
         viewModel.dbItems.observe(viewLifecycleOwner, {
-            setAbiData()
+            setData()
         })
 
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
-            setAbiData()
+            setData()
         })
+    }
+
+    private fun setData() {
+        if (pieType == TYPE_ABI) {
+            setAbiData()
+        } else if (pieType == TYPE_KOTLIN) {
+            setKotlinData()
+        }
     }
 
     private fun setAbiData() {
@@ -90,6 +98,9 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             val list = mutableListOf(0, 0, 0)
 
             for (item in it) {
+                if (GlobalValues.isShowSystemApps.value == false) {
+                    if (item.isSystem) continue
+                }
                 when (item.abi) {
                     ARMV8.toShort() -> list[0]++
                     ARMV5.toShort(), ARMV7.toShort() -> list[1]++
@@ -205,6 +216,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         var dialogTitle = ""
         var item: List<LCItem> = emptyList()
 
+        val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+            viewModel.dbItems.value
+        } else {
+            viewModel.dbItems.value?.filter { !it.isSystem }
+        }
+
         if (pieType == TYPE_ABI) {
             when (h.x) {
                 0f -> {
@@ -212,7 +229,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         getString(R.string.title_statistics_dialog),
                         getString(R.string.string_64_bit)
                     )
-                    viewModel.dbItems.value?.filter { it.abi == ARMV8.toShort() }
+                    filteredList?.filter { it.abi == ARMV8.toShort() }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
@@ -222,14 +239,14 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         getString(R.string.title_statistics_dialog),
                         getString(R.string.string_32_bit)
                     )
-                    viewModel.dbItems.value?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
+                    filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 2f -> {
                     dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
-                    viewModel.dbItems.value?.filter { it.abi == NO_LIBS.toShort() }
+                    filteredList?.filter { it.abi == NO_LIBS.toShort() }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
@@ -239,14 +256,14 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             when (h.x) {
                 0f -> {
                     dialogTitle = getString(R.string.string_kotlin_used)
-                    viewModel.dbItems.value?.filter { it.isKotlinUsed }
+                    filteredList?.filter { it.isKotlinUsed }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
                 }
                 1f -> {
                     dialogTitle = getString(R.string.string_kotlin_unused)
-                    viewModel.dbItems.value?.filter { !it.isKotlinUsed }
+                    filteredList?.filter { !it.isKotlinUsed }
                         ?.let { filter ->
                             item = ArrayList(filter)
                         }
@@ -271,12 +288,11 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         when (checkedId) {
             R.id.btn_abi -> if (isChecked) {
                 pieType = TYPE_ABI
-                setAbiData()
             }
             R.id.btn_kotlin -> if (isChecked) {
                 pieType = TYPE_KOTLIN
-                setKotlinData()
             }
         }
+        setData()
     }
 }
