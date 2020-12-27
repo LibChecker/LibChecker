@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.database.sqlite.SQLiteBlobTooBigException
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -29,7 +28,6 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -62,121 +60,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         withContext(Dispatchers.Main) {
             snapshotAppsCount.value = count
-        }
-    }
-
-    fun computeSnapshots(dropPrevious: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        val ts = System.currentTimeMillis()
-
-        val context: Context = getApplication<LibCheckerApp>()
-        var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
-
-        if (appList.isNullOrEmpty()) {
-            do {
-                appList = try {
-                    PackageUtils.getInstallApplications()
-                } catch (e: Exception) {
-                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                    null
-                }
-            } while (appList == null)
-        }
-
-        val dbList = mutableListOf<SnapshotItem>()
-        val exceptionInfoList = mutableListOf<ApplicationInfo>()
-
-        withContext(Dispatchers.Default) {
-            for (info in appList) {
-                try {
-                    PackageUtils.getPackageInfo(info.packageName).let {
-                        dbList.add(
-                            SnapshotItem(
-                                id = null,
-                                packageName = it.packageName,
-                                timeStamp = ts,
-                                label = info.loadLabel(context.packageManager).toString(),
-                                versionName = it.versionName ?: "null",
-                                versionCode = PackageUtils.getVersionCode(it),
-                                installedTime = it.firstInstallTime,
-                                lastUpdatedTime = it.lastUpdateTime,
-                                isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
-                                targetApi = info.targetSdkVersion.toShort(),
-                                nativeLibs = gson.toJson(
-                                    PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
-                                ),
-                                services = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, SERVICE, false)
-                                ),
-                                activities = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
-                                ),
-                                receivers = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, RECEIVER, false)
-                                ),
-                                providers = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, PROVIDER, false)
-                                ),
-                                permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
-                            )
-                        )
-                    }
-                } catch (e: Exception) {
-                    loge(e.toString())
-                    exceptionInfoList.add(info)
-                    continue
-                }
-            }
-
-            var info: ApplicationInfo
-            while (exceptionInfoList.isNotEmpty()) {
-                try {
-                    info = exceptionInfoList[0]
-                    PackageUtils.getPackageInfo(info.packageName).let {
-                        dbList.add(
-                            SnapshotItem(
-                                id = null,
-                                packageName = it.packageName,
-                                timeStamp = ts,
-                                label = info.loadLabel(context.packageManager).toString(),
-                                versionName = it.versionName ?: "null",
-                                versionCode = PackageUtils.getVersionCode(it),
-                                installedTime = it.firstInstallTime,
-                                lastUpdatedTime = it.lastUpdateTime,
-                                isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
-                                targetApi = info.targetSdkVersion.toShort(),
-                                nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)),
-                                services = gson.toJson(PackageUtils.getComponentList(it.packageName, SERVICE, false)),
-                                activities = gson.toJson(PackageUtils.getComponentList(it.packageName, ACTIVITY, false)),
-                                receivers = gson.toJson(PackageUtils.getComponentList(it.packageName, RECEIVER, false)),
-                                providers = gson.toJson(PackageUtils.getComponentList(it.packageName, PROVIDER, false)),
-                                permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
-                            )
-                        )
-                    }
-                    exceptionInfoList.removeAt(0)
-                } catch (e: Exception) {
-                    exceptionInfoList.removeAt(0)
-                    continue
-                }
-            }
-        }
-
-        try {
-            insertSnapshots(dbList)
-            insertTimeStamp(ts)
-        } catch (e: SQLiteBlobTooBigException) {
-            loge(e.toString())
-        }
-
-        if (dropPrevious) {
-            repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
-        }
-
-        withContext(Dispatchers.Main) {
-            GlobalValues.snapshotTimestamp = ts
-            timestamp.value = ts
         }
     }
 
@@ -467,10 +350,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         withContext(Dispatchers.Main) {
             snapshotDetailItems.value = list
         }
-    }
-
-    private fun insertSnapshots(items: List<SnapshotItem>) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertSnapshots(items)
     }
 
     private fun insertTimeStamp(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
