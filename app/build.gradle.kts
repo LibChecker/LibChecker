@@ -94,7 +94,7 @@ dependencies {
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.1.1")
 
-    val appCenterSdkVersion = "3.3.1"
+    val appCenterSdkVersion = "4.1.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
@@ -124,14 +124,14 @@ dependencies {
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.4.4")
+    implementation("com.airbnb.android:lottie:3.5.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.1.0")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
-    implementation("me.zhanghai.android.appiconloader:appiconloader:1.2.0")
+    implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.0")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")
@@ -163,7 +163,7 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     testImplementation("junit:junit:4.13.1")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.5")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.6")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

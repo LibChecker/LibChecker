@@ -7,7 +7,7 @@ plugins {
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.2"
+    buildToolsVersion = "30.0.3"
 
     signingConfigs {
         register("release") {
@@ -71,13 +71,13 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.0.9")
+    implementation("com.absinthe.libraries.utils:utils:1.1.1")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core-ktx:1.5.0-alpha04")
+    implementation("androidx.core:core-ktx:1.5.0-alpha05")
 
     testImplementation("junit:junit:4.13.1")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.5")
