@@ -7,6 +7,8 @@
     <string name="title_settings">Settings</string>
     <string name="title_album">Album</string>
     <string name="loading">Loading…</string>
+    <string name="channel_shoot">Save snapshots</string>
+    <string name="noti_shoot_title">Saving current snapshot</string>
 
     <!--  App list  -->
     <string name="menu_search">Search</string>

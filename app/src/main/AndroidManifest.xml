@@ -14,7 +14,6 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -88,7 +87,7 @@
             android:theme="@style/AppTheme.About" />
 
         <service
-            android:name=".ui.ShootIntentService" />
+            android:name=".services.ShootService" />
         
         <provider
             android:name=".provider.CoreProvider"

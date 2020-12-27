@@ -111,4 +111,6 @@
     <string name="anonymous_statistics_summary">我們使用 Microsoft AppCenter 來匿名發送最常被人們使用的標記庫和一些使用習慣數據來使得 LibChecker 變得更加實用</string>
     <string name="anonymous_statistics">匿名統計</string>
     <string name="library_declaration">LibChecker 中的所有標記庫信息均來自於其所屬的 SDK 的開發文檔或代碼倉庫，如果信息有有誤，請聯繫：absinthe@absinthe.life</string>
+    <string name="channel_shoot">儲存快照</string>
+    <string name="noti_shoot_title">正在儲存目前快照</string>
 </resources>
