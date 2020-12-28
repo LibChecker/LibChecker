@@ -22,9 +22,13 @@ class MonkeyKingManager {
     fun queryBlockedComponent(context: Context, packageName: String): List<ShareCmpInfo.Component> {
         val contentResolver = context.contentResolver
         val uri = Uri.parse(URI_AUTHORIZATION)
-        val bundle = contentResolver.call(uri, "cmps", packageName, null)
-        val shareCmpInfoString = bundle?.getString("cmp_list")
-        return Gson().fromJson(shareCmpInfoString, ShareCmpInfo::class.java).components
+        return try {
+            val bundle = contentResolver.call(uri, "cmps", packageName, null)
+            val shareCmpInfoString = bundle?.getString("cmp_list")
+            Gson().fromJson(shareCmpInfoString, ShareCmpInfo::class.java).components
+        } catch (e: Throwable) {
+            emptyList()
+        }
     }
 
     fun addBlockedComponent(context: Context, packageName: String,
