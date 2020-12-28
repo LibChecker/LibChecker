@@ -113,4 +113,6 @@
     <string name="library_declaration">LibChecker 中的所有標記庫信息均來自於其所屬的 SDK 的開發文檔或代碼倉庫，如果信息有有誤，請聯繫：absinthe@absinthe.life</string>
     <string name="channel_shoot">儲存快照</string>
     <string name="noti_shoot_title">正在儲存目前快照</string>
+    <string name="integration_monkey_king_menu_block">使用\"大聖淨化\"禁用此組件</string>
+    <string name="integration_monkey_king_menu_unblock">使用\"大聖淨化\"解禁此組件</string>
 </resources>

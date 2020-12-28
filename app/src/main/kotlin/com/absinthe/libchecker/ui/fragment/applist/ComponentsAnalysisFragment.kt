@@ -2,6 +2,8 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
@@ -12,6 +14,8 @@ import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
+import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.utils.Toasty
@@ -23,11 +27,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
+
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
 class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -91,8 +97,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 openLibDetailDialog(position)
             }
             setOnItemLongClickListener { _, _, position ->
-                ClipboardUtils.put(requireContext(), getItem(position).item.name)
-                Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
+                doOnLongClick(getItem(position).item.name)
                 true
             }
             setOnItemChildClickListener { _, view, position ->
@@ -106,6 +111,55 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             setEmptyView(emptyLayoutBinding.root)
         }
     }
+
+    private fun doOnLongClick(componentName: String) {
+        if (hasIntegration) {
+            val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
+            arrayAdapter.add(getString(android.R.string.copy))
+
+            if (integrationMonkeyKingBlockList == null) {
+                integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(requireContext(), viewModel.packageName)
+            }
+            val monkeyKingShouldBlock = integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
+            if (monkeyKingShouldBlock) {
+                arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
+            } else {
+                arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setAdapter(arrayAdapter) { _, which ->
+                    when (which) {
+                        0 -> {
+                            ClipboardUtils.put(requireContext(), componentName)
+                            Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
+                        }
+                        1 -> {
+                            if (MonkeyKingManager.isSupportInteraction) {
+                                MonkeyKingManager().apply {
+                                    addBlockedComponent(
+                                        requireContext(),
+                                        viewModel.packageName,
+                                        componentName,
+                                        type,
+                                        monkeyKingShouldBlock
+                                    )
+                                    integrationMonkeyKingBlockList = queryBlockedComponent(requireContext(), viewModel.packageName)
+                                }
+                            }
+                        }
+                        else -> { /*Do nothing*/
+                        }
+                    }
+                }
+                .show()
+        } else {
+            ClipboardUtils.put(requireContext(), componentName)
+            Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
+        }
+    }
+
+    private val hasIntegration = MonkeyKingManager.isSupportInteraction
 
     companion object {
         fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {

@@ -43,6 +43,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     )
     val itemsCountLiveData: MutableLiveData<Int> = MutableLiveData(0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
+    var packageName: String = ""
 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val context: Context = getApplication<LibCheckerApp>()

@@ -142,4 +142,8 @@
     <string name="album_restore_summary">Restore snapshots from backup file</string>
     <string name="album_click_to_choose">Click to Choose</string>
 
+    <!--  Integration  -->
+    <string name="integration_monkey_king_menu_block">Block this via \"MonkeyKing Purify\"</string>
+    <string name="integration_monkey_king_menu_unblock">Unblock this via \"MonkeyKing Purify\"</string>
+
 </resources>

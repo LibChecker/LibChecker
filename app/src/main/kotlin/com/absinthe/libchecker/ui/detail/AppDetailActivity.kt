@@ -106,6 +106,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
         }
 
         pkgName?.let { packageName ->
+            viewModel.packageName = packageName
             supportActionBar?.apply {
                 title = AppUtils.getAppName(packageName)
             }
