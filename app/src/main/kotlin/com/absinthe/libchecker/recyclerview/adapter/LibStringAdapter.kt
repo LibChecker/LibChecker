@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.valueUnsafe
@@ -28,10 +29,11 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
     }
 
     override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
+        val shouldHideSize = item.item.size == 0L && type != NATIVE
         holder.setText(R.id.tv_name, item.item.name)
-        holder.setGone(R.id.tv_lib_size, item.item.size == 0L)
+        holder.setGone(R.id.tv_lib_size, shouldHideSize)
 
-        if (item.item.size != 0L) {
+        if (!shouldHideSize) {
             holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item.size))
         }
 

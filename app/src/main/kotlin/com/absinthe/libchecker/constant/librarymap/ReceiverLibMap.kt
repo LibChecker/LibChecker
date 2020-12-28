@@ -20,6 +20,13 @@ object ReceiverLibMap : BaseMap() {
             )
         ),
         Pair(
+            "com.market.sdk.DownloadCompleteReceiver",
+            LibChip(
+                R.drawable.ic_lib_xiaomi,
+                "小米更新 SDK"
+            )
+        ),
+        Pair(
             "androidx.work.impl.utils.ForceStopRunnable\$BroadcastReceiver",
             LibChip(
                 R.drawable.ic_lib_jetpack,
