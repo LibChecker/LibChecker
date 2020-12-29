@@ -182,7 +182,7 @@ object PackageUtils {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
             val libList = entries.asSequence()
-                .filter { it.name.contains("lib/") && it.name.endsWith(".so") }
+                .filter { (it.name.contains("lib/") || it.name.contains("assets/")) && it.name.endsWith(".so") }
                 .distinctBy { it.name.split("/").last() }
                 .map { LibStringItem(it.name.split("/").last(), it.size) }
                 .toList()

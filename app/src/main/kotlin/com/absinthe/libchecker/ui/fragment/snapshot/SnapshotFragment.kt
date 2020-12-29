@@ -353,11 +353,4 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
         }
     }
-
-    override fun onResume() {
-        super.onResume()
-        if (AppItemRepository.shouldRefreshAppList) {
-            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
-        }
-    }
 }
