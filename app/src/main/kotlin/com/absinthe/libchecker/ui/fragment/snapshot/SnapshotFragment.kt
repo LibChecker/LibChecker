@@ -65,12 +65,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
     private var dropPrevious = false
+    private var shouldCompare = true
 
     private var shootBinder: IShootService? = null
     private val shootListener = object : OnShootOverListener.Stub() {
         override fun onShootFinished(timestamp: Long) {
             lifecycleScope.launch(Dispatchers.Main) {
                 viewModel.timestamp.value = timestamp
+                compareDiff()
+                shouldCompare = true
             }
         }
     }
@@ -141,6 +144,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         this@SnapshotFragment.dropPrevious = dropPrevious
                         shootBinder?.computeSnapshot(dropPrevious) ?: let {
                             requireContext().bindService(Intent(requireContext(), ShootService::class.java), shootServiceConnection, Service.BIND_AUTO_CREATE)
+                            shouldCompare = false
                         }
                         Analytics.trackEvent(
                             Constants.Event.SNAPSHOT_CLICK,
@@ -252,19 +256,21 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             })
             snapshotItems.observe(viewLifecycleOwner, {
-                viewModel.timestamp.value = GlobalValues.snapshotTimestamp
-                isSnapshotDatabaseItemsReady = true
+                if (shouldCompare) {
+                    viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+                    isSnapshotDatabaseItemsReady = true
 
-                computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+                    computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
 
-                if (isApplicationInfoItemsReady) {
-                    compareDiff(GlobalValues.snapshotTimestamp)
-                    isSnapshotDatabaseItemsReady = false
-                }
+                    if (isApplicationInfoItemsReady) {
+                        compareDiff(GlobalValues.snapshotTimestamp)
+                        isSnapshotDatabaseItemsReady = false
+                    }
 
-                if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
-                    viewModel.migrateFrom4To5()
-                    Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
+                    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
+                        viewModel.migrateFrom4To5()
+                        Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
+                    }
                 }
             })
             snapshotAppsCount.observe(viewLifecycleOwner, {
@@ -333,6 +339,23 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
 
         binding.vfContainer.displayedChild = child
+    }
+
+    private fun compareDiff() {
+        viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+        isSnapshotDatabaseItemsReady = true
+
+            viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+
+        if (isApplicationInfoItemsReady) {
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+            isSnapshotDatabaseItemsReady = false
+        }
+
+        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
+            viewModel.migrateFrom4To5()
+            Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
+        }
     }
 
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
