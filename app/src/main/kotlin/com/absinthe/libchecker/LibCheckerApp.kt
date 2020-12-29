@@ -3,9 +3,7 @@ package com.absinthe.libchecker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.app.GlobalLifecycleObserver
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.utils.Utility
@@ -31,7 +29,7 @@ class LibCheckerApp : Application() {
         DayNightDelegate.setApplicationContext(this)
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)
-        ProcessLifecycleOwner.get().lifecycle.addObserver(GlobalLifecycleObserver())
+//        ProcessLifecycleOwner.get().lifecycle.addObserver(GlobalLifecycleObserver())
     }
 
     override fun attachBaseContext(base: Context?) {

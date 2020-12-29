@@ -73,17 +73,21 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
         val preList: List<SnapshotItem>
+        val diffList = mutableListOf<SnapshotDiffItem>()
+
         withContext(Dispatchers.IO) {
             preList = repository.getSnapshots(preTimeStamp)
         }
         if (preList.isNullOrEmpty()) {
+            withContext(Dispatchers.Main) {
+                snapshotDiffItems.value = diffList
+            }
             return@launch
         }
 
         val context: Context = getApplication<LibCheckerApp>()
         val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value!!.toMutableList()
 
-        val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
 
         var packageInfo: PackageInfo

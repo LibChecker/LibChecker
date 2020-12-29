@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.database.sqlite.SQLiteBlobTooBigException
 import android.graphics.BitmapFactory
 import android.os.IBinder
 import android.os.RemoteCallbackList
@@ -29,7 +28,9 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
@@ -171,6 +172,11 @@ class ShootService : Service() {
                 exceptionInfoList.add(info)
                 continue
             }
+
+            if (dbList.size == 50) {
+                repository.insertSnapshots(dbList)
+                dbList.clear()
+            }
         }
 
         var info: ApplicationInfo
@@ -210,12 +216,8 @@ class ShootService : Service() {
             notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
         }
 
-        try {
-            repository.insertSnapshots(dbList)
-            repository.insert(TimeStampItem(ts))
-        } catch (e: SQLiteBlobTooBigException) {
-            loge(e.toString())
-        }
+        repository.insertSnapshots(dbList)
+        repository.insert(TimeStampItem(ts))
 
         if (dropPrevious) {
             repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
