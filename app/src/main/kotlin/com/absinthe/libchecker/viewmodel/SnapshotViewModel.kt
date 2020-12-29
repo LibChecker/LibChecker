@@ -387,12 +387,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), REMOVED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), REMOVED, NATIVE)
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), ADDED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), ADDED, NATIVE)
             )
         }
 

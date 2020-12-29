@@ -34,7 +34,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
         holder.setGone(R.id.tv_lib_size, shouldHideSize)
 
         if (!shouldHideSize) {
-            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item.size))
+            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item))
         }
 
         val libIcon = holder.getView<Chip>(R.id.chip)

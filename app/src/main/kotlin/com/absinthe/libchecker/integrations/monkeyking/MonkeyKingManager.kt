@@ -15,6 +15,7 @@ const val TYPE_PROVIDER = "provider"
 
 private const val URI_AUTHORIZATION = "content://com.ext.star.wars.cfg.InnerProvider/"
 private const val MONKEY_KING_APPLICATION_ID = "com.ext.star.wars"
+private const val FIRST_SUPPORT_VERSION_CODE = 308047
 
 class MonkeyKingManager {
 
@@ -61,6 +62,6 @@ class MonkeyKingManager {
     companion object {
         val isSupportInteraction =
             AppUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID)
-                    && AppUtils.getAppVersionCode(MONKEY_KING_APPLICATION_ID) >= 308047
+                    && AppUtils.getAppVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

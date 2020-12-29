@@ -159,14 +159,15 @@ object PackageUtils {
             list.asSequence()
                 .distinctBy { it.name }
                 .map { LibStringItem(it.name, it.length()) }
-                .toList()
-        } ?: emptyList()
+                .toMutableList()
+        } ?: mutableListOf()
 
         if (list.isEmpty()) {
-            return getSourceLibs(sourcePath)
+            list.addAll(getSourceLibs(sourcePath, "lib/"))
         }
+        list.addAll(getSourceLibs(sourcePath, "assets/", "/assets"))
 
-        return list
+        return list.distinctBy { it.name }
     }
 
     /**
@@ -174,7 +175,7 @@ object PackageUtils {
      * @param path Source path of the app
      * @return List of LibStringItem
      */
-    private fun getSourceLibs(path: String): List<LibStringItem> {
+    private fun getSourceLibs(path: String, childDir: String, source: String? = null): List<LibStringItem> {
         var zipFile: ZipFile? = null
 
         try {
@@ -182,9 +183,9 @@ object PackageUtils {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
             val libList = entries.asSequence()
-                .filter { it.name.contains("lib/") && it.name.endsWith(".so") }
+                .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
                 .distinctBy { it.name.split("/").last() }
-                .map { LibStringItem(it.name.split("/").last(), it.size) }
+                .map { LibStringItem(it.name.split("/").last(), it.size, source) }
                 .toList()
 
             if (libList.isEmpty()) {
@@ -507,11 +508,12 @@ object PackageUtils {
 
     /**
      * Format size number to string
-     * @param size Size of file
+     * @param item LibStringItem
      * @return String of size number (100KB)
      */
-    fun sizeToString(size: Long): String {
-        return "(${Formatter.formatFileSize(Utils.getApp(), size)})"
+    fun sizeToString(item: LibStringItem): String {
+        val source = item.source?.let { ", ${item.source}" } ?: ""
+        return "(${Formatter.formatFileSize(Utils.getApp(), item.size)}$source)"
     }
 
     /**
