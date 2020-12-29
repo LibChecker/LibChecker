@@ -7,7 +7,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.extensions.loge
 import com.blankj.utilcode.util.AppUtils
 import com.google.gson.Gson
-import java.lang.IllegalStateException
 
 const val TYPE_ACTIVITY = "activity"
 const val TYPE_SERVICE = "service"
@@ -34,9 +33,10 @@ class MonkeyKingManager {
     fun addBlockedComponent(context: Context, packageName: String,
                             componentName: String, @LibType type: Int,
                             shouldBlock: Boolean) {
+        val fullComponentName = if (componentName.startsWith(".")) { packageName + componentName } else { componentName }
         val shareCmpInfo = ShareCmpInfo(packageName, listOf( ShareCmpInfo.Component(
             type = getType(type),
-            name = componentName,
+            name = fullComponentName,
             block = shouldBlock
         ) ))
         val bundle = Bundle().apply {

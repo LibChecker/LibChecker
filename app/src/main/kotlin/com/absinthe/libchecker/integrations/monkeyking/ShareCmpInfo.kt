@@ -7,6 +7,7 @@ data class ShareCmpInfo(
     val pkg: String,
     val components: List<Component>
 ) {
+    @Keep
     data class Component(
         val type: String,
         val name: String,
