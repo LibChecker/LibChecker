@@ -1,0 +1,69 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.event.head_commit.message, '[skip ci]') }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Retrieve version
+        run: |
+          echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
+      - name: Build with Gradle
+        run: bash ./gradlew -PappVerName=${{ env.VERSION }} resguardRelease
+      - name: Sign Android release
+        if: success()
+        id: sign
+        uses: r0adkll/sign-android-release@v1.0.4
+        env:
+          BUILD_TOOLS_VERSION: "30.0.2"
+        with:
+          releaseDirectory: app/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Upload built apk
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          name: snapshot
+          path: ${{ steps.sign.outputs.signedReleaseFile }}
+      - name: Send commit to telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |+
+            New push to github!
+            *${{ github.event.head_commit.message }}* by ${{ github.event.head_commit.author.name }}
+            See commit detail [here](${{ github.event.head_commit.url }})
+            Snapshot apk is attached
+          document: ${{ github.workspace }}/${{ steps.sign.outputs.signedReleaseFile }}
+
+  skipped:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.event.head_commit.message, '[skip ci]') }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Send commit to telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |+
+            New push to github!
+            *${{ github.event.head_commit.message }}* by ${{ github.event.head_commit.author.name }}
+            See commit detail [here](${{ github.event.head_commit.url }})
+            This push skipped building
