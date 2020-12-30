@@ -1,8 +1,6 @@
 name: Android CI
 
-on:
-  push:
-    branches: [ master ]
+on: push
 
 jobs:
   build:
@@ -11,6 +9,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -19,7 +19,7 @@ jobs:
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
       - name: Build with Gradle
-        run: bash ./gradlew -PappVerName=${{ env.VERSION }} resguardRelease
+        run: bash ./gradlew -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
         if: success()
         id: sign
@@ -27,7 +27,7 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "30.0.2"
         with:
-          releaseDirectory: app/release
+          releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}

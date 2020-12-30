@@ -15,15 +15,6 @@ android {
     compileSdkVersion(30)
     buildToolsVersion = "30.0.3"
 
-    signingConfigs {
-        register("release") {
-            storeFile = file("android-key.jks")
-            storePassword = System.getenv("KSTOREPWD")
-            keyAlias = System.getenv("KEYALIAS")
-            keyPassword = System.getenv("KEYPWD")
-        }
-    }
-
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
     val baseVersionName = "1.10.5"
@@ -50,7 +41,6 @@ android {
             isMinifyEnabled = true
             isZipAlignEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -208,5 +198,7 @@ fun String.runCommand(workingDir: File = file("./")): String {
         .start()
 
     proc.waitFor(1, TimeUnit.MINUTES)
-    return proc.inputStream.bufferedReader().readText().trim()
+    val output = proc.inputStream.bufferedReader().readText().trim()
+    System.out.println("runCommand = $output")
+    return output
 }
