@@ -1,4 +1,5 @@
 import com.google.protobuf.gradle.*
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
     id("com.android.application")
@@ -68,6 +69,15 @@ android {
 
     packagingOptions {
         exclude("META-INF/atomicfu.kotlin_module")
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs
+            .map { it as BaseVariantOutputImpl }
+            .forEach { output ->
+                output.outputFileName = "LibChecker-${variant.versionName}.apk"
+            }
+        true
     }
 }
 

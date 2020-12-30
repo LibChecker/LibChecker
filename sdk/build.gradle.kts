@@ -9,7 +9,6 @@ android {
     buildToolsVersion = "30.0.3"
 
     defaultConfig {
-        applicationId = "com.absinthe.libchecker"
         minSdkVersion(23)
         targetSdkVersion(30)
         versionCode = 1
@@ -22,13 +21,8 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
-            applicationIdSuffix = ".debug"
-        }
         getByName("release") {
             isMinifyEnabled = true
-            isZipAlignEnabled = true
-            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
