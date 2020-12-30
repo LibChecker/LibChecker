@@ -35,6 +35,7 @@ android {
         versionCode = gitCommitCount
         versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs("en", "zh", "zh-rHK", "zh-rTW")
     }
 
     buildFeatures {
