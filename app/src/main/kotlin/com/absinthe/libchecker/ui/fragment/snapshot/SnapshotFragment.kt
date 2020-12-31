@@ -144,8 +144,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         this@SnapshotFragment.dropPrevious = dropPrevious
                         shootBinder?.computeSnapshot(dropPrevious) ?: let {
                             requireContext().bindService(Intent(requireContext(), ShootService::class.java), shootServiceConnection, Service.BIND_AUTO_CREATE)
-                            shouldCompare = false
                         }
+                        shouldCompare = false
                         Analytics.trackEvent(
                             Constants.Event.SNAPSHOT_CLICK,
                             EventProperties().set("Action", "Click to Save")

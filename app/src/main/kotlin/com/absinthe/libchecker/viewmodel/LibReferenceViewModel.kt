@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
@@ -68,8 +69,10 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
             }
         }
 
+        val filterList = list.takeIf { GlobalValues.isShowSystemApps.value != true }?.filter { !it.isSystem }
+
         withContext(Dispatchers.Main) {
-            libRefList.value = list
+            libRefList.value = filterList
         }
     }
 

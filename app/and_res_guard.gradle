@@ -3,8 +3,8 @@ apply plugin: 'AndResGuard'
 andResGuard {
     // mappingFile = file("./resource_mapping.txt")
     mappingFile = null
-    use7zip = true
-    useSign = true
+    use7zip = false
+    useSign = false
     // It will keep the origin path of your resources when it's true
     keepRoot = false
     // If set, name column in arsc those need to proguard will be kept to this value
