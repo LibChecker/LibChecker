@@ -82,6 +82,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                         list.find { it.packageName == data[pos].packageName }?.switchState = state
                     }
                 }
+                AppItemRepository.trackItemsChanged = true
             }
 
             setOnItemClickListener { _, view, position ->

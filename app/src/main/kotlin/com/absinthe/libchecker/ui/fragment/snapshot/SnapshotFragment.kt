@@ -317,6 +317,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (AppItemRepository.trackItemsChanged) {
+            AppItemRepository.trackItemsChanged = false
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+        }
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.recyclerview.layoutManager = getSuitableLayoutManager()

@@ -135,20 +135,19 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             // add a lot of colors
             val colors: ArrayList<Int> = ArrayList()
-            for (c in ColorTemplate.VORDIPLOM_COLORS) colors.add(c)
-            for (c in ColorTemplate.JOYFUL_COLORS) colors.add(c)
-            for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
+            for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(binding.chart))
-                setValueTextSize(11f)
-                setValueTextColor(Color.BLACK)
+                setValueTextSize(10f)
+                setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
 
             binding.chart.apply {
                 this.data = data
+                setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
                 highlightValues(null)
                 invalidate()
             }
@@ -196,18 +195,18 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             // add a lot of colors
             val colors: ArrayList<Int> = ArrayList()
             for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
-            for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(binding.chart))
-                setValueTextSize(11f)
+                setValueTextSize(10f)
                 setValueTextColor(Color.BLACK)
             }
 
             binding.chart.apply {
                 this.data = data
+                setEntryLabelColor(Color.BLACK)
                 highlightValues(null)
                 invalidate()
             }
@@ -260,17 +259,19 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             // add a lot of colors
             val colors: ArrayList<Int> = ArrayList()
             for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
+            for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(binding.chart))
-                setValueTextSize(11f)
-                setValueTextColor(Color.BLACK)
+                setValueTextSize(10f)
+                setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
 
             binding.chart.apply {
                 this.data = data
+                setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
                 highlightValues(null)
                 invalidate()
             }
