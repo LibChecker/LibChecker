@@ -331,11 +331,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 binding.extendedFab.hide()
             }
             binding.loading.resumeAnimation()
+            (requireActivity() as MainActivity).appBar?.setRaised(false)
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()
             }
             binding.loading.pauseAnimation()
+            binding.recyclerview.scrollToPosition(0)
         }
 
         binding.vfContainer.displayedChild = child

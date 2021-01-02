@@ -341,6 +341,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun flip(page: Int) {
+        if (viewModel.isInitingItems) {
+            return
+        }
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
         }

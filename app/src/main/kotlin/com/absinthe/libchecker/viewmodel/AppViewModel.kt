@@ -41,8 +41,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var shouldReturnTopOfList = false
+    var isInitingItems = false
 
-    private var isInitingItems = false
     private val repository: LCRepository
 
     init {
@@ -112,9 +112,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+        isInitingItems = false
         insert(lcItems)
 
-        isInitingItems = false
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
     }
