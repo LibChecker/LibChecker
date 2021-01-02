@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
+import android.content.pm.PackageInfo
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,7 +18,9 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.ui.fragment.BaseFragment
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -31,13 +35,15 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
+private const val TYPE_TARGET_API = 2
 
 class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
     OnChartValueSelectedListener,
     MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-    private var pieType = TYPE_ABI
     private val viewModel by activityViewModels<LibReferenceViewModel>()
+    private val legendList = mutableListOf<String>()
+    private var pieType = TYPE_ABI
 
     override fun initBinding(view: View): FragmentPieChartBinding =
         FragmentPieChartBinding.bind(view)
@@ -47,13 +53,13 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             dragDecelerationFrictionCoef = 0.95f
             description = null
             legend.apply {
-                verticalAlignment = Legend.LegendVerticalAlignment.TOP
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
                 horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
                 orientation = Legend.LegendOrientation.VERTICAL
                 textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
-                yOffset = 0f
+                yOffset = UiUtils.getNavBarHeight(requireActivity().contentResolver).toFloat()
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
@@ -79,10 +85,10 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     }
 
     private fun setData() {
-        if (pieType == TYPE_ABI) {
-            setAbiData()
-        } else if (pieType == TYPE_KOTLIN) {
-            setKotlinData()
+        when (pieType) {
+            TYPE_ABI -> setAbiData()
+            TYPE_KOTLIN -> setKotlinData()
+            TYPE_TARGET_API -> setTargetApiData()
         }
     }
 
@@ -94,7 +100,13 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        viewModel.dbItems.value?.let {
+        val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+            viewModel.dbItems.value
+        } else {
+            viewModel.dbItems.value?.filter { !it.isSystem }
+        }
+
+        filteredList?.let {
             val list = mutableListOf(0, 0, 0)
 
             for (item in it) {
@@ -110,6 +122,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             // NOTE: The order of the entries when being added to the entries array determines their position around the center of
             // the chart.
+            legendList.clear()
             for (i in parties.indices) {
                 entries.add(
                     PieEntry(
@@ -118,6 +131,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         ResourcesCompat.getDrawable(resources, R.drawable.ic_logo, null)
                     )
                 )
+                legendList.add(parties[i % parties.size])
             }
             val dataSet = PieDataSet(entries, "").apply {
                 setDrawIcons(false)
@@ -155,7 +169,13 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         )
         val entries: ArrayList<PieEntry> = ArrayList()
 
-        viewModel.dbItems.value?.let {
+        val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+            viewModel.dbItems.value
+        } else {
+            viewModel.dbItems.value?.filter { !it.isSystem }
+        }
+
+        filteredList?.let {
             val list = mutableListOf(0, 0)
 
             for (item in it) {
@@ -168,6 +188,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             // NOTE: The order of the entries when being added to the entries array determines their position around the center of
             // the chart.
+            legendList.clear()
             for (i in parties.indices) {
                 entries.add(
                     PieEntry(
@@ -176,6 +197,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                         ResourcesCompat.getDrawable(resources, R.drawable.ic_kotlin_logo, null)
                     )
                 )
+                legendList.add(parties[i % parties.size])
             }
             val dataSet = PieDataSet(entries, "").apply {
                 setDrawIcons(false)
@@ -188,6 +210,72 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             val colors: ArrayList<Int> = ArrayList()
             for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
             for (c in ColorTemplate.PASTEL_COLORS) colors.add(c)
+
+            dataSet.colors = colors
+            //dataSet.setSelectionShift(0f);
+            val data = PieData(dataSet).apply {
+                setValueFormatter(PercentFormatter(binding.chart))
+                setValueTextSize(11f)
+                setValueTextColor(Color.BLACK)
+            }
+
+            binding.chart.apply {
+                this.data = data
+                highlightValues(null)
+                invalidate()
+            }
+        }
+    }
+
+    private fun setTargetApiData() {
+        val parties = mutableListOf<String>()
+        OS_NAME_MAP.forEach { parties.add(it.value) }
+
+        val entries: ArrayList<PieEntry> = ArrayList()
+        var packageInfo: PackageInfo
+
+        val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+            viewModel.dbItems.value
+        } else {
+            viewModel.dbItems.value?.filter { !it.isSystem }
+        }
+
+        filteredList?.let {
+            val list = mutableListOf<Int>()
+            for (i in 0 until Build.VERSION_CODES.R) {
+                list.add(0)
+            }
+
+            for (item in it) {
+                packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                list[packageInfo.applicationInfo.targetSdkVersion - 1]++
+            }
+
+            // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+            // the chart.
+            legendList.clear()
+            for (i in parties.indices) {
+                if (list[i] > 0) {
+                    entries.add(
+                        PieEntry(
+                            list[i].toFloat(),
+                            "${parties[i % parties.size]}(${i+1})",
+                            ResourcesCompat.getDrawable(resources, R.drawable.ic_kotlin_logo, null)
+                        )
+                    )
+                    legendList.add(parties[i % parties.size])
+                }
+            }
+            val dataSet = PieDataSet(entries, "").apply {
+                setDrawIcons(false)
+                sliceSpace = 3f
+                iconsOffset = MPPointF(0f, 40f)
+                selectionShift = 5f
+            }
+
+            // add a lot of colors
+            val colors: ArrayList<Int> = ArrayList()
+            for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
@@ -222,52 +310,71 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             viewModel.dbItems.value?.filter { !it.isSystem }
         }
 
-        if (pieType == TYPE_ABI) {
-            when (h.x) {
-                0f -> {
-                    dialogTitle = String.format(
-                        getString(R.string.title_statistics_dialog),
-                        getString(R.string.string_64_bit)
-                    )
-                    filteredList?.filter { it.abi == ARMV8.toShort() }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
-                }
-                1f -> {
-                    dialogTitle = String.format(
-                        getString(R.string.title_statistics_dialog),
-                        getString(R.string.string_32_bit)
-                    )
-                    filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
-                }
-                2f -> {
-                    dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
-                    filteredList?.filter { it.abi == NO_LIBS.toShort() }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
+        when (pieType) {
+            TYPE_ABI -> {
+                when (legendList[h.x.toInt()]) {
+                    getString(R.string.string_64_bit) -> {
+                        dialogTitle = String.format(
+                            getString(R.string.title_statistics_dialog),
+                            getString(R.string.string_64_bit)
+                        )
+                        filteredList?.filter { it.abi == ARMV8.toShort() }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    getString(R.string.string_32_bit) -> {
+                        dialogTitle = String.format(
+                            getString(R.string.title_statistics_dialog),
+                            getString(R.string.string_32_bit)
+                        )
+                        filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    getString(R.string.no_libs) -> {
+                        dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
+                        filteredList?.filter { it.abi == NO_LIBS.toShort() }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
                 }
             }
-        } else if (pieType == TYPE_KOTLIN) {
-            when (h.x) {
-                0f -> {
-                    dialogTitle = getString(R.string.string_kotlin_used)
-                    filteredList?.filter { it.isKotlinUsed }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
+            TYPE_KOTLIN -> {
+                when (legendList[h.x.toInt()]) {
+                    getString(R.string.string_kotlin_used) -> {
+                        dialogTitle = getString(R.string.string_kotlin_used)
+                        filteredList?.filter { it.isKotlinUsed }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
+                    getString(R.string.string_kotlin_unused) -> {
+                        dialogTitle = getString(R.string.string_kotlin_unused)
+                        filteredList?.filter { !it.isKotlinUsed }
+                            ?.let { filter ->
+                                item = ArrayList(filter)
+                            }
+                    }
                 }
-                1f -> {
-                    dialogTitle = getString(R.string.string_kotlin_unused)
-                    filteredList?.filter { !it.isKotlinUsed }
-                        ?.let { filter ->
-                            item = ArrayList(filter)
-                        }
+            }
+            TYPE_TARGET_API -> {
+                var targetApi = 0
+                var packageInfo: PackageInfo
+
+                OS_NAME_MAP.forEach {
+                    if (it.value == legendList[h.x.toInt()]) {
+                        targetApi = it.key
+                        return@forEach
+                    }
                 }
+                dialogTitle = "Target API $targetApi"
+                filteredList?.filter {
+                    packageInfo = PackageUtils.getPackageInfo(it.packageName)
+                    packageInfo.applicationInfo.targetSdkVersion == targetApi
+                }?.let { filter -> item = ArrayList(filter) }
             }
         }
 
@@ -292,7 +399,45 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             R.id.btn_kotlin -> if (isChecked) {
                 pieType = TYPE_KOTLIN
             }
+            R.id.btn_target_api -> if (isChecked) {
+                pieType = TYPE_TARGET_API
+            }
         }
         setData()
+    }
+
+    private val OS_NAME_MAP by lazy {
+        hashMapOf(
+            1 to "1.0",
+            2 to "1.1",
+            3 to "Cupcake",
+            4 to "Donut",
+            5 to "Eclair",
+            6 to "Eclair",
+            7 to "Eclair",
+            8 to "Froyo",
+            9 to "Gingerbread",
+            10 to "Gingerbread",
+            11 to "Honeycomb",
+            12 to "Honeycomb",
+            13 to "Honeycomb",
+            14 to "Ice Cream Sandwich",
+            15 to "Ice Cream Sandwich",
+            16 to "Jelly Bean",
+            17 to "Jelly Bean",
+            18 to "Jelly Bean",
+            19 to "KitKat",
+            20 to "",
+            21 to "Lollipop",
+            22 to "Lollipop",
+            23 to "Marshmallow",
+            24 to "Nougat",
+            25 to "Nougat",
+            26 to "Oreo",
+            27 to "Oreo",
+            28 to "Pie",
+            29 to "Android10",
+            30 to "Android11"
+        )
     }
 }

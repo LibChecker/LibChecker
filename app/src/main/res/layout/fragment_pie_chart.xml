@@ -17,23 +17,29 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:selectionRequired="true"
-        app:singleSelection="true">
+        app:singleSelection="true"
+        tools:ignore="HardcodedText">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_abi"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ABI"
-            tools:ignore="HardcodedText" />
+            android:text="ABI" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_kotlin"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kotlin"
-            tools:ignore="HardcodedText" />
+            android:text="Kotlin" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_target_api"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Target API" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
