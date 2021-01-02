@@ -203,7 +203,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
             }
         }
-
+        
         withContext(Dispatchers.Main) {
             snapshotDiffItems.value = diffList
         }

@@ -529,12 +529,11 @@ object PackageUtils {
             val apkFile = ApkFile(File(path))
             var splits: List<String>
 
-            val primaryList = apkFile.dexClasses.asSequence()
+            val primaryList = apkFile.dexClasses
                 .map { it.packageName }
                 .filter { !it.startsWith(packageName) }
                 .map { item ->
                     splits = item.split(".")
-
                     when {
                         //Remove obfuscated classes
                         splits.any { it.length == 1 } -> LibStringItem("")
@@ -552,14 +551,14 @@ object PackageUtils {
                 .toMutableList()
 
             //Merge path deep level 3 classes
-            primaryList.asSequence().filter { it.name.split(".").size == 3 }.forEach {
+            primaryList.filter { it.name.split(".").size == 3 }.forEach {
                 primaryList.removeAll { item -> item.name.startsWith(it.name) }
                 primaryList.add(it)
             }
             //Merge path deep level 4 classes
             var pathLevel3Item: String
             var filter: List<LibStringItem>
-            primaryList.asSequence().filter { it.name.split(".").size == 4 }.forEach {
+            primaryList.filter { it.name.split(".").size == 4 }.forEach {
                 if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
                     return@forEach
                 }
