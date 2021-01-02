@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
 import android.util.Log
+import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -46,6 +47,26 @@ object LCAppUtils {
         } catch (e: Exception) {
             ColorDrawable(Color.TRANSPARENT)
         }
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.P)
+    fun atLeastP(): Boolean {
+        return Build.VERSION.SDK_INT >= 28
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
+    fun atLeastO(): Boolean {
+        return Build.VERSION.SDK_INT >= 26
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N_MR1)
+    fun atLeastNMR1(): Boolean {
+        return Build.VERSION.SDK_INT >= 25
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
+    fun atLeastN(): Boolean {
+        return Build.VERSION.SDK_INT >= 24
     }
 }
 

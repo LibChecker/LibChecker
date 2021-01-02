@@ -4,11 +4,11 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.text.format.Formatter
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
@@ -61,15 +61,15 @@ object PackageUtils {
      */
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
+        val pmFlag = if (LCAppUtils.atLeastN()) {
+            PackageManager.MATCH_DISABLED_COMPONENTS
+        } else {
+            PackageManager.GET_DISABLED_COMPONENTS
+        }
         val packageInfo = Utils.getApp().packageManager.getPackageInfo(
-            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag
+            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or pmFlag
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-            val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                PackageManager.MATCH_DISABLED_COMPONENTS
-            } else {
-                PackageManager.GET_DISABLED_COMPONENTS
-            }
             val info = Utils.getApp().packageManager.getPackageInfo(packageInfo.packageName, 0)
 
             return Utils.getApp().packageManager.getPackageArchiveInfo(info.applicationInfo.sourceDir, pmFlag or flag)?.apply {
@@ -104,7 +104,7 @@ object PackageUtils {
      * @return version code as Long Integer
      */
     fun getVersionCode(packageInfo: PackageInfo): Long {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        return if (LCAppUtils.atLeastP()) {
             packageInfo.longVersionCode
         } else {
             packageInfo.versionCode.toLong()
@@ -292,7 +292,7 @@ object PackageUtils {
      */
     private fun isKotlinUsedInClassDex(file: File): Boolean {
         return try {
-            ApkFile(file).dexClasses.any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
+            ApkFile(file).dexClasses.asSequence().any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
         } catch (e: Exception) {
             false
         }
@@ -305,7 +305,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<String> {
+    fun getComponentList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
         val flag = when (type) {
             SERVICE -> PackageManager.GET_SERVICES
             ACTIVITY -> PackageManager.GET_ACTIVITIES
@@ -328,7 +328,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    private fun getComponentList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<String> {
+    private fun getComponentList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
         val list: Array<out ComponentInfo>? = when (type) {
             SERVICE -> packageInfo.services
             ACTIVITY -> packageInfo.activities
@@ -337,16 +337,7 @@ object PackageUtils {
             else -> null
         }
 
-        return list?.asSequence()
-            ?.map {
-                if (isSimpleName) {
-                    it.name.removePrefix(packageInfo.packageName)
-                } else {
-                    it.name
-                }
-            }
-            ?.toList()
-            ?: emptyList()
+        return getComponentList(packageInfo.packageName, list, isSimpleName)
     }
 
     /**
@@ -356,16 +347,16 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
+    fun getComponentList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<StatefulComponent> {
         if (list.isNullOrEmpty()) {
             return emptyList()
         }
         return list.asSequence()
             .map {
                 if (isSimpleName) {
-                    it.name.removePrefix(packageName)
+                    StatefulComponent(it.name.removePrefix(packageName), it.enabled)
                 } else {
-                    it.name
+                    StatefulComponent(it.name, it.enabled)
                 }
             }
             .toList()
@@ -440,15 +431,16 @@ object PackageUtils {
 
         val fileList = file.listFiles() ?: return NO_LIBS
 
-        fileList.forEach {
-            when {
-                it.name.contains("arm64") -> abis.add(ARMV8)
-                it.name.contains("arm") -> abis.add(ARMV7)
-                it.name.contains("x86_64") -> abis.add(X86_64)
-                it.name.contains("x86") -> abis.add(X86)
-                else -> return NO_LIBS
+        fileList.asSequence()
+            .forEach {
+                when {
+                    it.name.contains("arm64") -> abis.add(ARMV8)
+                    it.name.contains("arm") -> abis.add(ARMV7)
+                    it.name.contains("x86_64") -> abis.add(X86_64)
+                    it.name.contains("x86") -> abis.add(X86)
+                    else -> return NO_LIBS
+                }
             }
-        }
 
         if (abis.contains(ARMV8)) {
             if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
@@ -560,14 +552,14 @@ object PackageUtils {
                 .toMutableList()
 
             //Merge path deep level 3 classes
-            primaryList.filter { it.name.split(".").size == 3 }.forEach {
+            primaryList.asSequence().filter { it.name.split(".").size == 3 }.forEach {
                 primaryList.removeAll { item -> item.name.startsWith(it.name) }
                 primaryList.add(it)
             }
             //Merge path deep level 4 classes
             var pathLevel3Item: String
             var filter: List<LibStringItem>
-            primaryList.filter { it.name.split(".").size == 4 }.forEach {
+            primaryList.asSequence().filter { it.name.split(".").size == 4 }.forEach {
                 if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
                     return@forEach
                 }

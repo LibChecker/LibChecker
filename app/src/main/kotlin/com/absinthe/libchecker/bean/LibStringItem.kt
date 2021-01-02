@@ -4,6 +4,8 @@ import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
+const val DISABLED = "DISABLED"
+
 @Parcelize
 data class LibStringItem(
     @SerializedName("name") val name: String,

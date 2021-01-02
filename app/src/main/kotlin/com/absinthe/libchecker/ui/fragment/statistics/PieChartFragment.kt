@@ -406,7 +406,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             17 to "Jelly Bean",
             18 to "Jelly Bean",
             19 to "KitKat",
-            20 to "",
+            20 to "KitKat",
             21 to "Lollipop",
             22 to "Lollipop",
             23 to "Marshmallow",

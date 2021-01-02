@@ -3,7 +3,6 @@ package com.absinthe.libchecker.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -14,11 +13,13 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.NativeLibDetailBean
 import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-    val componentsMap: HashMap<Int, MutableLiveData<List<String>>> = hashMapOf(
+    val componentsMap: HashMap<Int, MutableLiveData<List<StatefulComponent>>> = hashMapOf(
         SERVICE to MutableLiveData(),
         ACTIVITY to MutableLiveData(),
         RECEIVER to MutableLiveData(),
@@ -89,7 +90,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
 
-            val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val pmFlag = if (LCAppUtils.atLeastN()) {
                 PackageManager.MATCH_DISABLED_COMPONENTS
             } else {
                 PackageManager.GET_DISABLED_COMPONENTS

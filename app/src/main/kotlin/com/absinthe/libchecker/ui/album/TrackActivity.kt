@@ -165,7 +165,8 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
     override fun onQueryTextChange(newText: String): Boolean {
         adapter.setDiffNewData(
-            list.filter { it.label.contains(newText, true) || it.packageName.contains(newText) }
+            list.asSequence()
+                .filter { it.label.contains(newText, true) || it.packageName.contains(newText) }
                 .sortedByDescending { it.switchState }
                 .toMutableList()
         )

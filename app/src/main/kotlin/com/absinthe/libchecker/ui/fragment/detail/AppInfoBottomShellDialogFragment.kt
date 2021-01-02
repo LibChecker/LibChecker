@@ -18,6 +18,7 @@ import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -65,7 +66,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
             addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (LCAppUtils.atLeastN()) {
             mAdapter.setList(getResolveInfoList())
             mAdapter.setOnItemClickListener { _, _, position ->
                 val info = mAdapter.data[position]

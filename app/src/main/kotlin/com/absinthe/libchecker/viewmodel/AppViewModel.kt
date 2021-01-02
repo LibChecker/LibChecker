@@ -13,6 +13,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
@@ -309,7 +310,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         label: String
     ) {
         val map = HashMap<String, Int>()
-        var compLibList: List<String>
+        var compLibList: List<StatefulComponent>
         var count: Int
 
         for (item in appList) {
@@ -317,8 +318,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 compLibList = PackageUtils.getComponentList(item.packageName, type, false)
 
                 for (lib in compLibList) {
-                    count = map[lib] ?: 0
-                    map[lib] = count + 1
+                    count = map[lib.componentName] ?: 0
+                    map[lib.componentName] = count + 1
                 }
             } catch (e: Exception) {
                 continue

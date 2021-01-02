@@ -24,6 +24,7 @@ import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.blankj.utilcode.util.Utils
@@ -83,7 +84,7 @@ class ShootService : Service() {
             .setAutoCancel(false)
 
         notificationManager.apply {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (LCAppUtils.atLeastO()) {
                 val name = getString(R.string.channel_shoot)
                 val importance = NotificationManager.IMPORTANCE_DEFAULT
                 val mChannel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)

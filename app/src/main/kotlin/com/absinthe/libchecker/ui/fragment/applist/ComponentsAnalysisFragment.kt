@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.librarymap.BaseMap
@@ -61,7 +62,11 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         val map = BaseMap.getMap(adapter.type)
 
                         for (item in componentList) {
-                            list.add(LibStringItemChip(LibStringItem(item), map.getChip(item)))
+                            if (item.enabled) {
+                                list.add(LibStringItemChip(LibStringItem(item.componentName), map.getChip(item.componentName)))
+                            } else {
+                                list.add(LibStringItemChip(LibStringItem(name = item.componentName, source = DISABLED), map.getChip(item.componentName)))
+                            }
                         }
 
                         if (sortMode == MODE_SORT_BY_LIB) {
