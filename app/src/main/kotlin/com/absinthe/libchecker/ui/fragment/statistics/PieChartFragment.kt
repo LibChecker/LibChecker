@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants.ARMV5
@@ -20,7 +19,6 @@ import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -59,11 +57,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
-                yOffset = UiUtils.getNavBarHeight(requireActivity().contentResolver).toFloat()
+                yOffset = 32f
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
-            setEntryLabelColor(Color.BLACK)
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.textNormal))
+            setEntryLabelTextSize(11f)
             setNoDataText(getString(R.string.loading))
             setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
             setOnChartValueSelectedListener(this@PieChartFragment)
@@ -124,13 +123,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             // the chart.
             legendList.clear()
             for (i in parties.indices) {
-                entries.add(
-                    PieEntry(
-                        list[i].toFloat(),
-                        parties[i % parties.size],
-                        ResourcesCompat.getDrawable(resources, R.drawable.ic_logo, null)
-                    )
-                )
+                entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
                 legendList.add(parties[i % parties.size])
             }
             val dataSet = PieDataSet(entries, "").apply {
@@ -190,13 +183,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             // the chart.
             legendList.clear()
             for (i in parties.indices) {
-                entries.add(
-                    PieEntry(
-                        list[i].toFloat(),
-                        parties[i % parties.size],
-                        ResourcesCompat.getDrawable(resources, R.drawable.ic_kotlin_logo, null)
-                    )
-                )
+                entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
                 legendList.add(parties[i % parties.size])
             }
             val dataSet = PieDataSet(entries, "").apply {
@@ -246,9 +233,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 list.add(0)
             }
 
+            var targetApi: Int
             for (item in it) {
                 packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                list[packageInfo.applicationInfo.targetSdkVersion - 1]++
+                targetApi = packageInfo.applicationInfo.targetSdkVersion
+                if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R)
+                list[targetApi - 1]++
             }
 
             // NOTE: The order of the entries when being added to the entries array determines their position around the center of
@@ -256,14 +246,8 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             legendList.clear()
             for (i in parties.indices) {
                 if (list[i] > 0) {
-                    entries.add(
-                        PieEntry(
-                            list[i].toFloat(),
-                            "${parties[i % parties.size]}(${i+1})",
-                            ResourcesCompat.getDrawable(resources, R.drawable.ic_kotlin_logo, null)
-                        )
-                    )
-                    legendList.add(parties[i % parties.size])
+                    entries.add(PieEntry(list[i].toFloat(), "${parties[i % parties.size]}(${i+1})"))
+                    legendList.add((i+1).toString())
                 }
             }
             val dataSet = PieDataSet(entries, "").apply {
@@ -361,15 +345,9 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 }
             }
             TYPE_TARGET_API -> {
-                var targetApi = 0
+                val targetApi = legendList[h.x.toInt()].toInt()
                 var packageInfo: PackageInfo
 
-                OS_NAME_MAP.forEach {
-                    if (it.value == legendList[h.x.toInt()]) {
-                        targetApi = it.key
-                        return@forEach
-                    }
-                }
                 dialogTitle = "Target API $targetApi"
                 filteredList?.filter {
                     packageInfo = PackageUtils.getPackageInfo(it.packageName)
