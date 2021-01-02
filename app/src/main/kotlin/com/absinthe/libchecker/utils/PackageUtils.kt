@@ -303,7 +303,7 @@ object PackageUtils {
      * @param packageName Package name of the app
      * @param type Component type
      * @param isSimpleName Whether to show class name as a simple name
-     * @return List of String
+     * @return List of StatefulComponent
      */
     fun getComponentList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
         val flag = when (type) {
@@ -323,10 +323,33 @@ object PackageUtils {
 
     /**
      * Get components list of an app
-     * @param packageInfo PackageInfo
+     * @param packageName Package name of the app
      * @param type Component type
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
+     */
+    fun getComponentStringList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<String> {
+        val flag = when (type) {
+            SERVICE -> PackageManager.GET_SERVICES
+            ACTIVITY -> PackageManager.GET_ACTIVITIES
+            RECEIVER -> PackageManager.GET_RECEIVERS
+            PROVIDER -> PackageManager.GET_PROVIDERS
+            else -> 0
+        }
+
+        return try {
+            getComponentStringList(getPackageInfo(packageName, flag), type, isSimpleName)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
+     * Get components list of an app
+     * @param packageInfo PackageInfo
+     * @param type Component type
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of StatefulComponent
      */
     private fun getComponentList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
         val list: Array<out ComponentInfo>? = when (type) {
@@ -342,10 +365,29 @@ object PackageUtils {
 
     /**
      * Get components list of an app
+     * @param packageInfo PackageInfo
+     * @param type Component type
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of String
+     */
+    private fun getComponentStringList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<String> {
+        val list: Array<out ComponentInfo>? = when (type) {
+            SERVICE -> packageInfo.services
+            ACTIVITY -> packageInfo.activities
+            RECEIVER -> packageInfo.receivers
+            PROVIDER -> packageInfo.providers
+            else -> null
+        }
+
+        return getComponentStringList(packageInfo.packageName, list, isSimpleName)
+    }
+
+    /**
+     * Get components list of an app
      * @param packageName Package name of the app
      * @param list List of components(can be nullable)
      * @param isSimpleName Whether to show class name as a simple name
-     * @return List of String
+     * @return List of StatefulComponent
      */
     fun getComponentList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<StatefulComponent> {
         if (list.isNullOrEmpty()) {
@@ -357,6 +399,28 @@ object PackageUtils {
                     StatefulComponent(it.name.removePrefix(packageName), it.enabled)
                 } else {
                     StatefulComponent(it.name, it.enabled)
+                }
+            }
+            .toList()
+    }
+
+    /**
+     * Get components list of an app
+     * @param packageName Package name of the app
+     * @param list List of components(can be nullable)
+     * @param isSimpleName Whether to show class name as a simple name
+     * @return List of String
+     */
+    fun getComponentStringList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
+        if (list.isNullOrEmpty()) {
+            return emptyList()
+        }
+        return list.asSequence()
+            .map {
+                if (isSimpleName) {
+                    it.name.removePrefix(packageName)
+                } else {
+                    it.name
                 }
             }
             .toList()

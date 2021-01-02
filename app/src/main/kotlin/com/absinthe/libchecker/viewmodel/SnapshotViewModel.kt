@@ -18,6 +18,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -116,10 +117,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                     abiDiff = SnapshotDiffItem.DiffNode(dbItem.abi, PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()),
                                     targetApiDiff = SnapshotDiffItem.DiffNode(dbItem.targetApi, it.targetSdkVersion.toShort()),
                                     nativeLibsDiff = SnapshotDiffItem.DiffNode(dbItem.nativeLibs, gson.toJson(PackageUtils.getNativeDirLibs(it.sourceDir, it.nativeLibraryDir))),
-                                    servicesDiff = SnapshotDiffItem.DiffNode(dbItem.services, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false))),
-                                    activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false))),
-                                    receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false))),
-                                    providersDiff = SnapshotDiffItem.DiffNode(dbItem.providers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false))),
+                                    servicesDiff = SnapshotDiffItem.DiffNode(dbItem.services, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))),
+                                    activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))),
+                                    receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))),
+                                    providersDiff = SnapshotDiffItem.DiffNode(dbItem.providers, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, PROVIDER, false))),
                                     permissionsDiff = SnapshotDiffItem.DiffNode(dbItem.permissions, gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))),
                                     isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                                 )
@@ -178,16 +179,16 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                     gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir))
                                 ),
                                 SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false))
+                                    gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))
                                 ),
                                 SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false))
+                                    gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))
                                 ),
                                 SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false))
+                                    gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))
                                 ),
                                 SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false))
+                                    gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, PROVIDER, false))
                                 ),
                                 SnapshotDiffItem.DiffNode(
                                     gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))
@@ -203,7 +204,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
             }
         }
-        
+
+        logd("sasa",diffList.size.toString())
         withContext(Dispatchers.Main) {
             snapshotDiffItems.value = diffList
         }

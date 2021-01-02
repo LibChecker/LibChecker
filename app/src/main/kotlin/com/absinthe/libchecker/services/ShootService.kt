@@ -150,16 +150,16 @@ class ShootService : Service() {
                                 PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
                             ),
                             services = gson.toJson(
-                                PackageUtils.getComponentList(it.packageName, SERVICE, false)
+                                PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
                             ),
                             activities = gson.toJson(
-                                PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
+                                PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
                             ),
                             receivers = gson.toJson(
-                                PackageUtils.getComponentList(it.packageName, RECEIVER, false)
+                                PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
                             ),
                             providers = gson.toJson(
-                                PackageUtils.getComponentList(it.packageName, PROVIDER, false)
+                                PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                             ),
                             permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
                         )
@@ -199,10 +199,10 @@ class ShootService : Service() {
                             abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
                             nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)),
-                            services = gson.toJson(PackageUtils.getComponentList(it.packageName, SERVICE, false)),
-                            activities = gson.toJson(PackageUtils.getComponentList(it.packageName, ACTIVITY, false)),
-                            receivers = gson.toJson(PackageUtils.getComponentList(it.packageName, RECEIVER, false)),
-                            providers = gson.toJson(PackageUtils.getComponentList(it.packageName, PROVIDER, false)),
+                            services = gson.toJson(PackageUtils.getComponentStringList(it.packageName, SERVICE, false)),
+                            activities = gson.toJson(PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)),
+                            receivers = gson.toJson(PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)),
+                            providers = gson.toJson(PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)),
                             permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
                         )
                     )
