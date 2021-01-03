@@ -16,6 +16,11 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        dialog?.show()
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
