@@ -18,7 +18,6 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
@@ -205,7 +204,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        logd("sasa",diffList.size.toString())
         withContext(Dispatchers.Main) {
             snapshotDiffItems.value = diffList
         }
@@ -738,6 +736,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 action()
             }
             SnapshotList.newBuilder().build()
+        } finally {
+            inputStream.close()
         }
         val finalList = mutableListOf<SnapshotItem>()
         val timeStampSet = mutableSetOf<Long>()

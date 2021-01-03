@@ -134,6 +134,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        mAdapter.release()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.app_list_menu, menu)
         this.menu = menu

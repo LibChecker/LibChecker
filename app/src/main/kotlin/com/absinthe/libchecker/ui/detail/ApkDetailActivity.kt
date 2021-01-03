@@ -26,6 +26,7 @@ import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import me.zhanghai.android.appiconloader.AppIconLoader
 import java.io.File
+import java.io.InputStream
 
 class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
@@ -88,9 +89,10 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         tempFile = File(externalCacheDir, "temp.apk")
 
         val path = tempFile!!.path
+        var inputStream: InputStream? = null
 
         try {
-            val inputStream = contentResolver.openInputStream(uri)
+            inputStream = contentResolver.openInputStream(uri)
 
             FileIOUtils.writeFileFromIS(tempFile, inputStream)
 
@@ -116,7 +118,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             setLongClickCopiedToClipboard(text.toString())
                         }
                         tvVersion.apply {
-                            text = "${it.versionName}(${it.versionCode})"
+                            text = PackageUtils.getVersionString(it)
                             setLongClickCopiedToClipboard(text.toString())
                         }
                         tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
@@ -150,6 +152,8 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         } catch (e: Exception) {
             Toasty.show(this, R.string.toast_use_another_file_manager)
             finish()
+        } finally {
+            inputStream?.close()
         }
 
         val types = listOf(

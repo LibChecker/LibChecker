@@ -65,4 +65,8 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             itemView.transitionName = item.packageName
         }
     }
+
+    fun release() {
+        iconMap.forEach { it.value.recycle() }
+    }
 }

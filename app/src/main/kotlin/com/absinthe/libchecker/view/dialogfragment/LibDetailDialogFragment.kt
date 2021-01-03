@@ -6,7 +6,7 @@ import android.text.method.LinkMovementMethod
 import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
@@ -30,7 +30,8 @@ class LibDetailDialogFragment : DialogFragment() {
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
-    private val viewModel by viewModels<DetailViewModel>()
+    private val viewModel by activityViewModels<DetailViewModel>()
+    private var isStickyEventReceived = false
 
     private fun List<String>.toContributorsString(): String {
         return this.joinToString(separator = ", ")
@@ -65,8 +66,7 @@ class LibDetailDialogFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-
-        viewModel.detailBean.observe(requireActivity(), {
+        viewModel.detailBean.observe(this, {
             if (it != null) {
                 dialogViewBinding.apply {
                     tvLabelName.text = it.label
@@ -82,7 +82,11 @@ class LibDetailDialogFragment : DialogFragment() {
                     vfContainer.displayedChild = VF_CHILD_DETAIL
                 }
             } else {
-                dialogViewBinding.vfContainer.displayedChild = VF_CHILD_FAILED
+                if (isStickyEventReceived) {
+                    dialogViewBinding.vfContainer.displayedChild = VF_CHILD_FAILED
+                } else {
+                    isStickyEventReceived = true
+                }
             }
         })
         regexName?.let {
@@ -90,6 +94,11 @@ class LibDetailDialogFragment : DialogFragment() {
         } ?: let {
             viewModel.requestLibDetail(libName, type)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.detailBean.value = null
     }
 
     companion object {

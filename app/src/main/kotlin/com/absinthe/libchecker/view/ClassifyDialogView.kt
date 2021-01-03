@@ -53,4 +53,9 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
         addView(rvList)
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        adapter.release()
+    }
+
 }

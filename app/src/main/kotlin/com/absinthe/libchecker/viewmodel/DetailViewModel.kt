@@ -17,6 +17,7 @@ import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -141,14 +142,15 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(ApiManager.root)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private val request: NativeLibDetailRequest = retrofit.create(NativeLibDetailRequest::class.java)
+
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
-            val retrofit = Retrofit.Builder()
-                .baseUrl(ApiManager.root)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            val request = retrofit.create(NativeLibDetailRequest::class.java)
-
+            logd("requestLibDetail")
             var categoryDir = when (type) {
                 NATIVE -> "native-libs"
                 SERVICE -> "services-libs"

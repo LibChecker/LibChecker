@@ -13,6 +13,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                             packageInfo.applicationInfo.nativeLibraryDir
                         )
                     } catch (e: Exception) {
+                        loge(e.toString())
                         emptyList()
                     }
 
@@ -69,7 +71,11 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
             }
         }
 
-        val filterList = list.takeIf { GlobalValues.isShowSystemApps.value != true }?.filter { !it.isSystem }
+        val filterList = if (GlobalValues.isShowSystemApps.value == true) {
+            list
+        } else {
+            list.filter { !it.isSystem }
+        }
 
         withContext(Dispatchers.Main) {
             libRefList.value = filterList
