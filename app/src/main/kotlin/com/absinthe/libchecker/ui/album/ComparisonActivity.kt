@@ -58,6 +58,11 @@ class ComparisonActivity : BaseActivity() {
         initView()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.release()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             onBackPressed()

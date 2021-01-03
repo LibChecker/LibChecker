@@ -325,6 +325,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter.release()
+    }
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         binding.recyclerview.layoutManager = getSuitableLayoutManager()
