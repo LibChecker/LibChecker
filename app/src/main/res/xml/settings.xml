@@ -19,7 +19,7 @@
             app:title="@string/entry_animation"
             app:summary="@string/entry_animation_summary"
             app:icon="@drawable/ic_animation"
-            app:defaultValue="true"/>
+            app:defaultValue="false"/>
 
         <SwitchPreference
             app:key="apkAnalytics"

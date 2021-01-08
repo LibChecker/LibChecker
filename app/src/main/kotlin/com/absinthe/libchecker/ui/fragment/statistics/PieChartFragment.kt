@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
@@ -234,10 +236,15 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             var targetApi: Int
             for (item in it) {
-                packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                targetApi = packageInfo.applicationInfo.targetSdkVersion
-                if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R)
-                list[targetApi - 1]++
+                try {
+                    packageInfo = PackageUtils.getPackageInfo(item.packageName)
+                    targetApi = packageInfo.applicationInfo.targetSdkVersion
+                    if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R) {
+                        list[targetApi - 1]++
+                    }
+                } catch (e: PackageManager.NameNotFoundException) {
+                    loge(e.toString())
+                }
             }
 
             // NOTE: The order of the entries when being added to the entries array determines their position around the center of
