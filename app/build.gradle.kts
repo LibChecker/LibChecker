@@ -4,8 +4,8 @@ import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
     kotlin("kapt")
+    id("kotlin-parcelize")
     id("com.google.protobuf")
 }
 apply {
@@ -90,7 +90,7 @@ val protocVersion by extra("3.14.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.1.2")
@@ -208,7 +208,5 @@ fun String.runCommand(workingDir: File = file("./")): String {
         .start()
 
     proc.waitFor(1, TimeUnit.MINUTES)
-    val output = proc.inputStream.bufferedReader().readText().trim()
-    System.out.println("runCommand = $output")
-    return output
+    return proc.inputStream.bufferedReader().readText().trim()
 }

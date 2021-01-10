@@ -24,7 +24,6 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -66,7 +65,7 @@ class LibReferenceActivity : BaseActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 BaseMap.getMap(type).getChip(name)?.let {
                     withContext(Dispatchers.Main) {
-                        toolbar.title = it.name
+                        binding.toolbar.title = it.name
                     }
                 }
             }
