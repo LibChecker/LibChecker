@@ -54,7 +54,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.1.2")

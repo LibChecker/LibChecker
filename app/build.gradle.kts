@@ -85,7 +85,7 @@ configurations.all {
     exclude(group = "rikka.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.32.1")
+val grpcVersion by extra("1.34.1")
 val protocVersion by extra("3.14.0")
 
 dependencies {
@@ -125,7 +125,7 @@ dependencies {
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.5.0")
+    implementation("com.airbnb.android:lottie:3.6.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
