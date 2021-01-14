@@ -34,6 +34,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
+    val repository = LibCheckerApp.repository
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
@@ -141,6 +142,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 e.printStackTrace()
             }
         }
+
+    fun getRule(name: String) = repository.getRule(name)
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiManager.root)

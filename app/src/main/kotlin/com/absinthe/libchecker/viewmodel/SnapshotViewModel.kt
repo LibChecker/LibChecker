@@ -14,8 +14,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.loge
@@ -39,7 +37,7 @@ const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository: LCRepository
+    val repository = LibCheckerApp.repository
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
     val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
@@ -49,8 +47,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     private val gson: Gson
 
     init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
         snapshotItems = repository.allSnapshotItems
         gson = Gson()
     }

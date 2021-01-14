@@ -6,12 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.database.entity.*
 
-@Database(entities = [LCItem::class, SnapshotItem::class, TimeStampItem::class, TrackItem::class], version = 8, exportSchema = false)
+@Database(entities = [LCItem::class,
+    SnapshotItem::class, TimeStampItem::class,
+    TrackItem::class, RuleEntity::class], version = 9, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -34,7 +33,8 @@ abstract class LCDatabase : RoomDatabase() {
                     "lc_database"
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9
+                    )
                     .build()
                 INSTANCE = instance
                 return instance
@@ -105,6 +105,14 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE track_table (packageName TEXT NOT NULL, PRIMARY KEY(packageName))"
+                )
+            }
+        }
+
+        private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE rules_table (name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL, iconIndex INTEGER NOT NULL, isRegexRule INTEGER NOT NULL, PRIMARY KEY(name))"
                 )
             }
         }

@@ -1,11 +1,11 @@
 package com.absinthe.libchecker.ui.fragment
 
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.applist.EXTRA_TYPE
@@ -14,6 +14,9 @@ import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * <pre>
@@ -40,19 +43,23 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     }
 
     override fun sort() {
-        viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-            val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }.toMutableList())
-            MODE_SORT_BY_LIB
-        } else {
-            if (type == NATIVE) {
-                adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }.toMutableList())
+        lifecycleScope.launch(Dispatchers.IO) {
+            val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
+                viewModel.sortMode = MODE_SORT_BY_LIB
+                adapter.data.sortedByDescending { viewModel.getRule(it.item.name) != null }
             } else {
-                adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.name }.toMutableList())
+                viewModel.sortMode = MODE_SORT_BY_SIZE
+                if (type == NATIVE) {
+                    adapter.data.sortedByDescending { it.item.size }
+                } else {
+                    adapter.data.sortedByDescending { it.item.name }
+                }
             }
-            MODE_SORT_BY_SIZE
+            withContext(Dispatchers.Main) {
+                adapter.setDiffNewData(list.toMutableList())
+                GlobalValues.libSortMode.value = viewModel.sortMode
+                SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
+            }
         }
-        GlobalValues.libSortMode.value = viewModel.sortMode
-        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
     }
 }

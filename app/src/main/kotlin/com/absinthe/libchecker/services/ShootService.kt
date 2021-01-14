@@ -12,6 +12,7 @@ import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -19,15 +20,12 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
-import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -41,8 +39,7 @@ class ShootService : Service() {
     private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
     private val gson = Gson()
-    private val lcDao = LCDatabase.getDatabase(Utils.getApp()).lcDao()
-    private val repository = LCRepository(lcDao)
+    private val repository = LibCheckerApp.repository
     private val listenerList = RemoteCallbackList<OnShootOverListener>()
 
     private val binder = object : IShootService.Stub() {

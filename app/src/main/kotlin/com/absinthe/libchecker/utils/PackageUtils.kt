@@ -5,6 +5,7 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.text.format.Formatter
+import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
@@ -104,11 +105,7 @@ object PackageUtils {
      * @return version code as Long Integer
      */
     fun getVersionCode(packageInfo: PackageInfo): Long {
-        return if (LCAppUtils.atLeastP()) {
-            packageInfo.longVersionCode
-        } else {
-            packageInfo.versionCode.toLong()
-        }
+        return PackageInfoCompat.getLongVersionCode(packageInfo)
     }
 
     /**

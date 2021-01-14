@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.LCDatabase
+import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libraries.utils.utils.Utility
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
@@ -29,11 +31,16 @@ class LibCheckerApp : Application() {
         DayNightDelegate.setApplicationContext(this)
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)
+        repository = LCRepository(LCDatabase.getDatabase(this).lcDao())
 //        ProcessLifecycleOwner.get().lifecycle.addObserver(GlobalLifecycleObserver())
     }
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
         Global.loop()
+    }
+
+    companion object {
+        lateinit var repository: LCRepository
     }
 }

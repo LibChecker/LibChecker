@@ -10,11 +10,10 @@ import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.TrackListItem
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
@@ -36,8 +35,7 @@ import rikka.material.widget.BorderView
 class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: ActivityTrackBinding
-    private val lcDao by lazy { LCDatabase.getDatabase(application).lcDao() }
-    private val repository by lazy { LCRepository(lcDao) }
+    private val repository = LibCheckerApp.repository
     private val adapter = TrackAdapter()
     private val list = mutableListOf<TrackListItem>()
     private var menu: Menu? = null

@@ -28,3 +28,21 @@ message Snapshot {
   string providers = 15;
   string permissions = 16;
 }
+
+message CloudRulesBundle {
+  int32 version = 1;
+  int32 count = 2;
+  CloudRulesList rulesList = 3;
+}
+
+message CloudRulesList {
+  repeated CloudRule cloudRules = 1;
+}
+
+message CloudRule {
+  string name = 1;
+  string label = 2;
+  uint32 type = 3;
+  uint32 iconIndex = 4;
+  bool isRegexRule = 5;
+}

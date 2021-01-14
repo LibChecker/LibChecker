@@ -2,10 +2,7 @@ package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.database.entity.*
 
 @Dao
 interface LCDao {
@@ -79,4 +76,14 @@ interface LCDao {
 
     @Query("SELECT * from track_table")
     suspend fun getTrackItems(): List<TrackItem>
+
+    //Rules
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertRules(items: List<RuleEntity>)
+
+    @Query("DELETE FROM rules_table")
+    fun deleteAllRules()
+
+    @Query("SELECT * from rules_table WHERE name LIKE :name")
+    fun getRule(name: String): RuleEntity?
 }

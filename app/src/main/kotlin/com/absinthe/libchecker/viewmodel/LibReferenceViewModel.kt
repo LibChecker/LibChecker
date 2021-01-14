@@ -6,12 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.PackageUtils
@@ -23,11 +22,9 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
 
     val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
     val dbItems: LiveData<List<LCItem>>
-    private val repository: LCRepository
+    private val repository = LibCheckerApp.repository
 
     init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
         dbItems = repository.allDatabaseItems
     }
 

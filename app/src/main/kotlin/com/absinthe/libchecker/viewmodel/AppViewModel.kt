@@ -21,18 +21,19 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.constant.librarymap.NativeLibMap
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
+import java.io.InputStream
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
@@ -44,11 +45,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var shouldReturnTopOfList = false
     var isInitingItems = false
 
-    private val repository: LCRepository
+    private val repository = LibCheckerApp.repository
 
     init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
         dbItems = repository.allDatabaseItems
     }
 
@@ -58,6 +57,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val context: Context = getApplication<LibCheckerApp>()
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
+
+        insertPreinstallRules(context)
 
         isInitingItems = true
         repository.deleteAllItems()
@@ -585,5 +586,24 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.delete(item)
+    }
+
+    private fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        var inputStream: InputStream? = null
+        try {
+            inputStream = context.resources.assets.open("rules.lcr")
+            val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
+            val rulesList = mutableListOf<RuleEntity>()
+            rulesBundle.rulesList.cloudRulesList.forEach {
+                it?.let {
+                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex,it.isRegexRule))
+                }
+            }
+            repository.insertRules(rulesList)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            inputStream?.close()
+        }
     }
 }

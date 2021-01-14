@@ -111,9 +111,16 @@ dependencies {
 
     // Room components
     val roomVersion = "2.2.5"
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-runtime:$roomVersion") {
+        exclude(group = "org.xerial")
+    }
+    implementation("androidx.room:room-ktx:$roomVersion") {
+        exclude(group = "org.xerial")
+    }
+    kapt("androidx.room:room-compiler:$roomVersion") {
+        exclude(group = "org.xerial")
+    }
+    implementation("org.xerial:sqlite-jdbc:3.34.0")
 
     implementation("androidx.core:core-ktx:1.5.0-alpha05")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
@@ -130,7 +137,7 @@ dependencies {
     implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.1.0")
+    implementation("io.coil-kt:coil:1.1.1")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.0")
 
@@ -155,7 +162,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okio:okio:2.9.0")
+    implementation("com.squareup.okio:okio:2.10.0")
 
     // gRPC
     implementation("io.grpc:grpc-okhttp:$grpcVersion")

@@ -1,10 +1,7 @@
 package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.database.entity.*
 
 class LCRepository(private val lcDao: LCDao) {
 
@@ -80,5 +77,15 @@ class LCRepository(private val lcDao: LCDao) {
 
     fun deleteAllItems() {
         lcDao.deleteAllItems()
+    }
+
+    fun getRule(name: String) = lcDao.getRule(name)
+
+    suspend fun insertRules(rules: List<RuleEntity>) {
+        lcDao.insertRules(rules)
+    }
+
+    fun deleteAllRules() {
+        lcDao.deleteAllRules()
     }
 }

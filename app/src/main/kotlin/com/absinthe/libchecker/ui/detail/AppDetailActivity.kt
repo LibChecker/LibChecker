@@ -14,11 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
@@ -149,9 +148,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                     layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
 
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val lcDao = LCDatabase.getDatabase(application).lcDao()
-                        val repository = LCRepository(lcDao)
-                        val lcItem = repository.getItem(packageName)
+                        val lcItem = LibCheckerApp.repository.getItem(packageName)
 
                         val isSplitApk = lcItem?.isSplitApk ?: false
                         val isKotlinUsed = lcItem?.isKotlinUsed ?: false
