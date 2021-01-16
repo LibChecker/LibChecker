@@ -3,7 +3,7 @@ package com.absinthe.libchecker.api.bean
 import androidx.annotation.Keep
 
 @Keep
-data class NativeLibDetailBean(
+data class LibDetailBean(
     val label: String,
     val team: String,
     val iconUrl: String,

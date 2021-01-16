@@ -21,7 +21,7 @@
                 android:layout_width="@dimen/lottie_anim_size"
                 android:layout_height="@dimen/lottie_anim_size"
                 app:lottie_autoPlay="true"
-                app:lottie_fileName="anim_camera.json"
+                app:lottie_fileName="palette-pulse.json"
                 app:lottie_loop="true" />
 
         </LinearLayout>

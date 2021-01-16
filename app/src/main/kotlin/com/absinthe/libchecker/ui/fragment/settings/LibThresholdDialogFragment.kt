@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.view.dialogfragment
+package com.absinthe.libchecker.ui.fragment.settings
 
 import android.app.Dialog
 import android.os.Bundle

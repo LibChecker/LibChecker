@@ -18,12 +18,12 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils

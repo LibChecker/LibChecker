@@ -115,4 +115,6 @@
     <string name="noti_shoot_title">正在儲存目前快照</string>
     <string name="integration_monkey_king_menu_block">使用\"大聖淨化\"禁用此組件</string>
     <string name="integration_monkey_king_menu_unblock">使用\"大聖淨化\"解禁此組件</string>
+    <string name="cloud_rules">雲端規則</string>
+    <string name="cloud_rules_summary">在此更新最新的標記庫</string>
 </resources>

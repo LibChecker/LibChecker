@@ -28,7 +28,7 @@ import com.absinthe.libchecker.databinding.LayoutGetAppListDeniedBinding
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.fragment.SettingsFragment
+import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
@@ -93,7 +93,9 @@ class MainActivity : BaseActivity(), IListContainer {
         if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(packageManager, true)
         }
-        addOrRemoveMiuiAppsListMask()
+        if (XiaomiUtilities.isMIUI()) {
+            addOrRemoveMiuiAppsListMask()
+        }
     }
 
     override fun onPause() {

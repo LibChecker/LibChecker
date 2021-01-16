@@ -75,8 +75,9 @@ class ShootService : Service() {
             .setSmallIcon(R.drawable.ic_logo)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
             .setProgress(0, 0, true)
+            .setSilent(true)
             .setOngoing(true)
             .setAutoCancel(false)
 

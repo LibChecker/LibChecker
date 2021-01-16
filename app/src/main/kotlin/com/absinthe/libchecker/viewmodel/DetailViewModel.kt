@@ -10,8 +10,8 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.NativeLibDetailBean
-import com.absinthe.libchecker.api.request.NativeLibDetailRequest
+import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
@@ -32,7 +32,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
+    val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
     val repository = LibCheckerApp.repository
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
@@ -148,7 +148,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         .baseUrl(ApiManager.root)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-    private val request: NativeLibDetailRequest = retrofit.create(NativeLibDetailRequest::class.java)
+    private val request: LibDetailRequest = retrofit.create(LibDetailRequest::class.java)
 
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
@@ -166,16 +166,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            val detail = request.requestNativeLibDetail(categoryDir, libName)
-            detail.enqueue(object : Callback<NativeLibDetailBean> {
-                override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
+            val detail = request.requestLibDetail(categoryDir, libName)
+            detail.enqueue(object : Callback<LibDetailBean> {
+                override fun onFailure(call: Call<LibDetailBean>, t: Throwable) {
                     Log.e("DetailViewModel", t.message ?: "")
                     detailBean.value = null
                 }
 
                 override fun onResponse(
-                    call: Call<NativeLibDetailBean>,
-                    response: Response<NativeLibDetailBean>
+                    call: Call<LibDetailBean>,
+                    response: Response<LibDetailBean>
                 ) {
                     detailBean.value = response.body()
                 }

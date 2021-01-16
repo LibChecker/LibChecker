@@ -21,9 +21,9 @@ import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment
+package com.absinthe.libchecker.ui.fragment.settings
 
 import android.content.ActivityNotFoundException
 import android.content.ComponentName
@@ -21,10 +21,9 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -95,7 +94,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         }
         findPreference(Constants.PREF_CLOUD_RULES)?.apply {
             setOnPreferenceClickListener {
-                Toasty.show(requireContext(), "TODO")
+                CloudRulesDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 true
             }
         }
