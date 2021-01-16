@@ -30,6 +30,7 @@ object Constants {
     const val PREF_RATE = "rate"
     const val PREF_TELEGRAM = "tg"
     const val PREF_ANONYMOUS_ANALYTICS = "analytics"
+    const val PREF_CLOUD_RULES = "cloudRules"
 
     const val PREF_APP_SORT_MODE = "appSortMode"
     const val PREF_LIB_SORT_MODE = "libSortMode"

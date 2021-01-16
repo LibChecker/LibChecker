@@ -23,6 +23,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibThresholdDialogFragment
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.microsoft.appcenter.analytics.Analytics
@@ -89,6 +90,12 @@ class SettingsFragment : PreferenceFragment(), IListController {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.repo = newValue as String
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
+                true
+            }
+        }
+        findPreference(Constants.PREF_CLOUD_RULES)?.apply {
+            setOnPreferenceClickListener {
+                Toasty.show(requireContext(), "TODO")
                 true
             }
         }

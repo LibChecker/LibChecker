@@ -45,6 +45,12 @@
             app:entryValues="@array/list_repo_value"/>
 
         <Preference
+            app:key="cloudRules"
+            app:title="@string/cloud_rules"
+            app:summary="@string/cloud_rules_summary"
+            app:icon="@drawable/ic_cloud_rules"/>
+
+        <Preference
             app:key="libRefThreshold"
             app:title="@string/lib_ref_threshold"
             app:summary="@string/lib_ref_threshold_summary"
