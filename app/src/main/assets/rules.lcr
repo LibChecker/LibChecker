@@ -1,4 +1,4 @@
-���
+���
 !
 libxguardian.so信鸽推送 0
 
@@ -365,39 +365,39 @@ $
 Pangle SDK 
 
 libflexbox.soHippy 0
-0
-libAMapSDK_MAP_v(.*)\.so高德地图 SDK (
+@
+libAMapSDK_MAP_v(.*)\.so高德地图 SDK (2regex_amap_sdk
 5
 &libaot-Xamarin\.Android\.(.*)\.dll\.soXamarin <(
 !
 libcronet\.(.*)\.soCronet (
-'
+;
 libcocklogic-(.*)\.so
-百川 SDK (
-*
-libbdpush_V(.*)\.so百度云推送 	(
-$
-libjcore(.*)\.so极光推送 (
-#
-libtnet-(.*)\.solibtnet ����(
-+
-libsgavmpso-(.*)\.so阿里聚安全 (
-3
-libsgsecuritybodyso-(.*)\.so阿里聚安全 (
-3
-libsgsgmiddletierso-(.*)\.so阿里聚安全 (
-0
-libBaiduMapSDK_v(.*)\.so百度地图 SDK 	(
-5
-libBaiduMapSDK_base_v(.*)\.so百度地图 SDK 	(
-4
-libBaiduMapSDK_map_v(.*)\.so百度地图 SDK 	(
+百川 SDK (2regex_ali_baichuan
+<
+libbdpush_V(.*)\.so百度云推送 	(2regex_baidu_push
+1
+libjcore(.*)\.so极光推送 (2regex_jpush
+2
+libtnet-(.*)\.solibtnet ����(2regex_libtnet
+?
+libsgavmpso-(.*)\.so阿里聚安全 (2regex_ali_security
+G
+libsgsecuritybodyso-(.*)\.so阿里聚安全 (2regex_ali_security
+G
+libsgsgmiddletierso-(.*)\.so阿里聚安全 (2regex_ali_security
+A
+libBaiduMapSDK_v(.*)\.so百度地图 SDK 	(2regex_baidu_map
+F
+libBaiduMapSDK_base_v(.*)\.so百度地图 SDK 	(2regex_baidu_map
+E
+libBaiduMapSDK_map_v(.*)\.so百度地图 SDK 	(2regex_baidu_map
 /
 liblocSDK(.*)[0-9]a\.so百度地图 SDK 	(
-*
-libshell-super(.*)\.so腾讯乐固 0(
-&
-libshella-(.*)\.so腾讯乐固 0(
+>
+libshell-super(.*)\.so腾讯乐固 0(2regex_tencent_legu
+:
+libshella-(.*)\.so腾讯乐固 0(2regex_tencent_legu
 8
 *com.xiaomi.mipush.sdk.MessageHandleServiceMiPush >
 6
@@ -604,14 +604,14 @@ G
 3com.umeng.message.UmengMessageIntentReceiverService友盟推送 5
 Q
 @com.heytap.msp.push.service.CompatibleDataMessageCallbackService	OPPO Push &
-S
-Ccom.qihoo360.replugin.component.service.server.PluginPitService(.*)RePlugin(
-2
+c
+Ccom.qihoo360.replugin.component.service.server.PluginPitService(.*)RePlugin(2regex_replugin
+@
 com.ss.android.socialbase.(.*)
-Pangle SDK (
-4
+Pangle SDK (2regex_pangle
+B
  com.bytedance.sdk.openadsdk.(.*)
-Pangle SDK (
+Pangle SDK (2regex_pangle
 :
 )com.tencent.midas.wx.APMidasWXPayActivity	米大师 0
 C
@@ -784,23 +784,23 @@ $com.zhihu.matisse.ui.MatisseActivityMatisse @
 !com.alipay.sdk.app.H5AuthActivity支付宝 SDK 
 4
 cmb.pb.ui.PBKeyboardActivity招商银行 SDK 
-C
-3com.tencent.tinker.loader.hotplug.ActivityStubs(.*)Tinker 0(
-=
+Q
+3com.tencent.tinker.loader.hotplug.ActivityStubs(.*)Tinker 0(2regex_tinker
+K
 )com.bytedance.sdk.openadsdk.activity.(.*)
-Pangle SDK (
-@
+Pangle SDK (2regex_pangle
+N
 ,com.ss.android.socialbase.appdownloader.(.*)
-Pangle SDK (
-3
+Pangle SDK (2regex_pangle
+A
 com.ss.android.downloadlib.(.*)
-Pangle SDK (
--
+Pangle SDK (2regex_pangle
+@
 com.yxcorp.gifshow.ad(.*)
-Pangle SDK (
-5
+Pangle SDK (2regex_kuaishou_ad
+H
 !com.yxcorp.map.advertisement.(.*)
-Pangle SDK (
+Pangle SDK (2regex_kuaishou_ad
 C
  com.igexin.sdk.FlymePushReceiverMeizu Push(GeTui Proxy) ����
 J
@@ -1017,8 +1017,8 @@ R
 6com.google.firebase.perf.provider.FirebasePerfProviderFirebase Performance 
 G
 -com.tencent.android.tpush.XGVipPushKAProvider腾讯移动推送 2
-*
-com.qihoo360.replugin.(.*)RePlugin(
+:
+com.qihoo360.replugin.(.*)RePlugin(2regex_replugin
 =
 com.google.android.materialMaterial Design Components !
 +
@@ -1167,19 +1167,20 @@ C
 androidx.localbroadcastmanagerJetpack LocalBroadcastManager 
 )
 androidx.activityJetpack Activity 
-1
-kotlin.coroutines.(.*)Kotlin Coroutines A(
+?
+kotlin.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin
+@
+kotlinx.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin
+)
+kotlin.(.*)Kotlin A(2regex_kotlin
+,
+okhttp3.(.*)OKHttp3 /(2regex_okhttp3
 2
-kotlinx.coroutines.(.*)Kotlin Coroutines A(
-
-kotlin.(.*)Kotlin A(
-
-okhttp3.(.*)OKHttp3 /(
-!
-retrofit2.(.*)	Retrofit2 /(
-
-	okio.(.*)Okio /(
-&
-com.alipay.(.*)支付宝 SDK (
- 
-io.flutter.(.*)Flutter (
+retrofit2.(.*)	Retrofit2 /(2regex_retrofit2
+#
+	okio.(.*)Okio /(2
+regex_okio
+4
+com.alipay.(.*)支付宝 SDK (2regex_alipay
+/
+io.flutter.(.*)Flutter (2regex_flutter

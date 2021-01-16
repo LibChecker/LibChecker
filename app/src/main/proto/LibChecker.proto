@@ -45,4 +45,5 @@ message CloudRule {
   uint32 type = 3;
   uint32 iconIndex = 4;
   bool isRegexRule = 5;
+  string regexName = 6;
 }

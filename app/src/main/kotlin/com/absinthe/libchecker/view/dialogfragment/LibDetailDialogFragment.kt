@@ -49,7 +49,7 @@ class LibDetailDialogFragment : DialogFragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val iconIndex = viewModel.repository.getRule(libName)?.iconIndex ?: -1
                 withContext(Dispatchers.Main) {
-                    ivIcon.load(IconResMap.MAP[iconIndex] ?: R.drawable.ic_sdk_placeholder) {
+                    ivIcon.load(IconResMap.getIconRes(iconIndex)) {
                         crossfade(true)
                         placeholder(R.drawable.ic_logo)
                     }

@@ -79,7 +79,7 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.deleteAllItems()
     }
 
-    fun getRule(name: String) = lcDao.getRule(name)
+    suspend fun getRule(name: String) = lcDao.getRule(name)
 
     suspend fun insertRules(rules: List<RuleEntity>) {
         lcDao.insertRules(rules)
@@ -90,4 +90,6 @@ class LCRepository(private val lcDao: LCDao) {
     }
 
     suspend fun getAllRules() = lcDao.getAllRules()
+
+    suspend fun getRegexRules() = lcDao.getRegexRules()
 }

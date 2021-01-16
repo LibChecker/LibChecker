@@ -19,7 +19,6 @@ import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
@@ -29,6 +28,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -212,7 +212,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
                 val item = (adapter.data[position] as BaseSnapshotNode).item
                 val name = item.name
-                val regexName = BaseMap.getMap(item.itemType).findRegex(name)?.regexName
+                val regexName = LCAppUtils.findRuleRegex(name)?.regexName
                 LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
                     .apply {
                         show(supportFragmentManager, tag)

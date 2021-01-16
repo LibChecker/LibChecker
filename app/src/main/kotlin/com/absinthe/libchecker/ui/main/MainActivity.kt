@@ -79,7 +79,6 @@ class MainActivity : BaseActivity(), IListContainer {
         handleIntentFromShortcuts(intent)
         initAllApplicationInfoItems()
         initObserver()
-        initMap()
         clearApkCache()
     }
 
@@ -241,6 +240,7 @@ class MainActivity : BaseActivity(), IListContainer {
                 if (it.isNotEmpty()) {
                     isDatabaseFinishInit = true
                 }
+                initRegexRules()
             })
 
             if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {
@@ -259,15 +259,6 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
             })
         }
-    }
-
-    private fun initMap() = lifecycleScope.launch {
-        NativeLibMap
-        ServiceLibMap
-        ActivityLibMap
-        ReceiverLibMap
-        ProviderLibMap
-        DexLibMap
     }
 
     private fun clearApkCache() {

@@ -11,7 +11,9 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.constant.librarymap.IconResMap
+import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
@@ -19,6 +21,7 @@ import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -57,15 +60,21 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 if (componentList.isEmpty()) {
                     emptyLayoutBinding.text.text = getString(R.string.empty_list)
                 } else {
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         val list = mutableListOf<LibStringItemChip>()
-                        val map = BaseMap.getMap(adapter.type)
+                        var chip: LibChip?
+                        var rule: RuleEntity?
 
                         for (item in componentList) {
+                            rule = viewModel.repository.getRule(item.componentName)
+                            chip = null
+                            if (rule != null) {
+                                chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                            }
                             if (item.enabled) {
-                                list.add(LibStringItemChip(LibStringItem(item.componentName), map.getChip(item.componentName)))
+                                list.add(LibStringItemChip(LibStringItem(item.componentName), chip))
                             } else {
-                                list.add(LibStringItemChip(LibStringItem(name = item.componentName, source = DISABLED), map.getChip(item.componentName)))
+                                list.add(LibStringItemChip(LibStringItem(name = item.componentName, source = DISABLED), chip))
                             }
                         }
 
@@ -89,7 +98,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = BaseMap.getMap(adapter.type).findRegex(name)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name)?.regexName
 
             LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
         }

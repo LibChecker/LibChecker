@@ -3,7 +3,6 @@ package com.absinthe.libchecker.utils
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.protocol.CloudRulesList
@@ -17,10 +16,8 @@ object RuleGenerator {
         val newRules = mutableListOf<CloudRule>()
         val ruleBuilder: CloudRule.Builder = CloudRule.newBuilder()
         val rulesListBuilder: CloudRulesList.Builder = CloudRulesList.newBuilder()
-        var cloudRule: CloudRule
 
         rules.forEach {
-            logd("sasa", it.name)
             ruleBuilder.apply {
                 name = it.name
                 label = it.label
@@ -35,11 +32,11 @@ object RuleGenerator {
                         -1
                     }
                 }
+                regexName = BaseMap.getMap(it.type).getChip(it.name)?.regexName?:""
             }
 
             newRules.add(ruleBuilder.build())
         }
-        logd("sasa", "size = ${rules.size}")
 
         rulesListBuilder.addAllCloudRules(newRules)
         bundleBuilder.rulesList = rulesListBuilder.build()

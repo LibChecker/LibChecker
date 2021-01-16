@@ -18,8 +18,7 @@ import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.RuleEntity
@@ -28,12 +27,14 @@ import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.protocol.CloudRulesBundle
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 import java.io.InputStream
+import java.util.regex.Pattern
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
@@ -249,7 +250,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.Default) {
+    private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.IO) {
         val map = HashMap<String, Int>()
         var libList: List<LibStringItem>
         var count: Int
@@ -269,7 +270,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val properties: MutableMap<String, String> = HashMap()
 
             for (entry in map) {
-                if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
+                if (entry.value > 3 && repository.getRule(entry.key) == null) {
                     properties.clear()
                     properties["Library name"] = entry.key
                     properties["Library count"] = entry.value.toString()
@@ -303,7 +304,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun collectComponentPopularLibraries(
+    private suspend fun collectComponentPopularLibraries(
         appList: List<ApplicationInfo>,
         @LibType type: Int,
         label: String
@@ -325,11 +326,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        val libMap = BaseMap.getMap(type)
         val properties: MutableMap<String, String> = HashMap()
 
         for (entry in map) {
-            if (entry.value > 3 && repository.getRule(entry.key) != null && libMap.findRegex(entry.key) == null) {
+            if (entry.value > 3 && repository.getRule(entry.key) != null && LCAppUtils.findRuleRegex(entry.key) == null) {
                 properties.clear()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
@@ -550,9 +550,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         var chip: LibChip?
+        var rule: RuleEntity?
         for (entry in map) {
             if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
-                chip = BaseMap.getMap(entry.value.type).getChip(entry.key)
+                rule = repository.getRule(entry.key)
+                chip = null
+                rule?.let {
+                    chip = LibChip(iconRes = IconResMap.getIconRes(it.iconIndex), name = it.label, regexName = it.regexName)
+                }
                 refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
             }
         }
@@ -596,7 +601,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val rulesList = mutableListOf<RuleEntity>()
             rulesBundle.rulesList.cloudRulesList.forEach {
                 it?.let {
-                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex,it.isRegexRule))
+                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
                 }
             }
             repository.insertRules(rulesList)
@@ -604,6 +609,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             e.printStackTrace()
         } finally {
             inputStream?.close()
+        }
+    }
+
+    fun initRegexRules() = viewModelScope.launch(Dispatchers.IO) {
+        val list = repository.getRegexRules()
+        list.forEach {
+            AppItemRepository.rulesRegexList.put(Pattern.compile(it.name), it)
         }
     }
 }

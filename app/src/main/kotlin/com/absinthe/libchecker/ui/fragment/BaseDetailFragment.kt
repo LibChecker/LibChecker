@@ -44,9 +44,10 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
 
     override fun sort() {
         lifecycleScope.launch(Dispatchers.IO) {
+            val rules = viewModel.repository.getAllRules()
             val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
                 viewModel.sortMode = MODE_SORT_BY_LIB
-                adapter.data.sortedByDescending { viewModel.getRule(it.item.name) != null }
+                adapter.data.sortedByDescending { rules.find { find -> it.item.name == find.name } != null }
             } else {
                 viewModel.sortMode = MODE_SORT_BY_SIZE
                 if (type == NATIVE) {

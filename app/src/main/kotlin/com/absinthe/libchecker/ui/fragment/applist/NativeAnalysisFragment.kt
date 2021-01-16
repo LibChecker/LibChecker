@@ -8,7 +8,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutDexEmptyListBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
@@ -16,6 +15,7 @@ import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -76,7 +76,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = BaseMap.getMap(type).findRegex(name)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name)?.regexName
             LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
         }
 

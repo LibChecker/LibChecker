@@ -4,6 +4,7 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.LibChip
 import java.util.regex.Pattern
 
+@Deprecated("Use CloudRule instead")
 abstract class BaseMap {
 
     abstract fun getMap(): HashMap<String, LibChip>

@@ -69,13 +69,13 @@ class BackupActivity : BaseActivity() {
             data?.data?.let {
                 try {
                     contentResolver.openOutputStream(it)?.let { os ->
-//                        viewModel.backup(os)
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val rules = LibCheckerApp.repository.getAllRules()
-
-                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION))
-                            os.close()
-                        }
+                        viewModel.backup(os)
+//                        lifecycleScope.launch(Dispatchers.IO) {
+//                            val rules = LibCheckerApp.repository.getAllRules()
+//
+//                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION))
+//                            os.close()
+//                        }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -130,7 +130,7 @@ class BackupActivity : BaseActivity() {
             }
         }
 
-        override fun onCreateItemDecoration(): DividerDecoration? {
+        override fun onCreateItemDecoration(): DividerDecoration {
             return CategoryDivideDividerDecoration()
         }
 

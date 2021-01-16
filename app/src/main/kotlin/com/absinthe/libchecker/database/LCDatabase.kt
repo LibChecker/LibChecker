@@ -10,7 +10,7 @@ import com.absinthe.libchecker.database.entity.*
 
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
-    TrackItem::class, RuleEntity::class], version = 9, exportSchema = false)
+    TrackItem::class, RuleEntity::class], version = 10, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -33,7 +33,7 @@ abstract class LCDatabase : RoomDatabase() {
                     "lc_database"
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9
+                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10
                     )
                     .build()
                 INSTANCE = instance
@@ -113,6 +113,14 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "CREATE TABLE rules_table (name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL, iconIndex INTEGER NOT NULL, isRegexRule INTEGER NOT NULL, PRIMARY KEY(name))"
+                )
+            }
+        }
+
+        private val MIGRATION_9_10: Migration = object : Migration(9, 10) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE rules_table ADD COLUMN regexName TEXT"
                 )
             }
         }

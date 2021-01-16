@@ -6,19 +6,25 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
+import androidx.lifecycle.lifecycleScope
 import coil.load
+import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_NATIVE_PROVIDER = 2
 
@@ -53,17 +59,23 @@ class SnapshotNativeProvider : BaseNodeProvider() {
 
         val chip = helper.getView<Chip>(R.id.chip)
 
-        BaseMap.getMap(snapshotItem.itemType).getChip(snapshotItem.name)?.let {
-            chip.apply {
-                setChipIconResource(it.iconRes)
-                text = it.name
-                chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
-                visibility = View.VISIBLE
+        (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            val rule = LibCheckerApp.repository.getRule(snapshotItem.name)
 
-                if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                    chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_black_1000))
-                }
+            withContext(Dispatchers.Main) {
+                rule?.let {
+                    chip.apply {
+                        setChipIconResource(IconResMap.getIconRes(it.iconIndex))
+                        text = it.label
+                        chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+                        visibility = View.VISIBLE
+
+                        if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+                            chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_black_1000))
+                        }
+                    }
+                } ?: let { chip.isGone = true }
             }
-        } ?: let { chip.isGone = true }
+        }
     }
 }

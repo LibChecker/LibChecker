@@ -85,8 +85,11 @@ interface LCDao {
     fun deleteAllRules()
 
     @Query("SELECT * from rules_table WHERE name LIKE :name")
-    fun getRule(name: String): RuleEntity?
+    suspend fun getRule(name: String): RuleEntity?
 
     @Query("SELECT * from rules_table")
     suspend fun getAllRules(): List<RuleEntity>
+
+    @Query("SELECT * from rules_table WHERE isRegexRule = 1")
+    suspend fun getRegexRules(): List<RuleEntity>
 }

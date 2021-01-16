@@ -15,10 +15,9 @@ import com.absinthe.libchecker.api.request.NativeLibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.DexLibMap
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.extensions.logd
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -143,7 +142,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    fun getRule(name: String) = repository.getRule(name)
+    suspend fun getRule(name: String) = repository.getRule(name)
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiManager.root)
@@ -183,15 +182,20 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private fun getNativeChipList(sourcePath: String, nativePath: String): List<LibStringItemChip> {
+    private suspend fun getNativeChipList(sourcePath: String, nativePath: String): List<LibStringItemChip> {
         val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
+        var chip: LibChip?
 
         if (list.isEmpty()) {
             return chipList
         } else {
             list.forEach {
-                chipList.add(LibStringItemChip(it, NativeLibMap.getChip(it.name)))
+                chip = null
+                repository.getRule(it.name)?.let { rule ->
+                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                }
+                chipList.add(LibStringItemChip(it, chip))
             }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
@@ -202,16 +206,21 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         return chipList
     }
 
-    private fun getDexChipList(packageName: String): List<LibStringItemChip> {
-        loge("getDexChipList")
+    private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
+        logd("getDexChipList")
         val list = PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
+        var chip: LibChip?
 
         if (list.isEmpty()) {
             return chipList
         } else {
             list.forEach {
-                chipList.add(LibStringItemChip(it, DexLibMap.getChip(it.name)))
+                chip = null
+                repository.getRule(it.name)?.let { rule ->
+                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                }
+                chipList.add(LibStringItemChip(it, chip))
             }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.name }

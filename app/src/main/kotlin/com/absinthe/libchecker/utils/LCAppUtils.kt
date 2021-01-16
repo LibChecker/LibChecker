@@ -16,6 +16,8 @@ import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.loge
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.Utils
@@ -88,6 +90,15 @@ object LCAppUtils {
             loge("getFromAssets", e)
             return null
         }
+    }
+
+    fun findRuleRegex(string: String): RuleEntity? {
+        AppItemRepository.rulesRegexList.forEach {
+            if (it.key.matcher(string).matches()) {
+                return it.value
+            }
+        }
+        return null
     }
 }
 

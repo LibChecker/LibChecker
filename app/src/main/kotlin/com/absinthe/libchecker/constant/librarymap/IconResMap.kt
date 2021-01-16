@@ -3,7 +3,7 @@ package com.absinthe.libchecker.constant.librarymap
 import com.absinthe.libchecker.R
 
 object IconResMap {
-    val MAP = hashMapOf(
+    private val MAP = hashMapOf(
         -1 to R.drawable.ic_sdk_placeholder,
         0 to R.drawable.ic_lib_360,
         1 to R.drawable.ic_lib_airbnb,
@@ -82,4 +82,6 @@ object IconResMap {
         }
         return 0
     }
+
+    fun getIconRes(index: Int) = MAP[index] ?: MAP[-1]!!
 }
