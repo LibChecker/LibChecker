@@ -171,7 +171,7 @@ class ShootService : Service() {
                 continue
             }
 
-            if (dbList.size >= 50) {
+            if (dbList.size >= 20) {
                 repository.insertSnapshots(dbList)
                 dbList.clear()
             }

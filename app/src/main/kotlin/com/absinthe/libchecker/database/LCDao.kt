@@ -86,4 +86,7 @@ interface LCDao {
 
     @Query("SELECT * from rules_table WHERE name LIKE :name")
     fun getRule(name: String): RuleEntity?
+
+    @Query("SELECT * from rules_table")
+    suspend fun getAllRules(): List<RuleEntity>
 }

@@ -58,8 +58,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        insertPreinstallRules(context)
-
         isInitingItems = true
         repository.deleteAllItems()
 
@@ -331,7 +329,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val properties: MutableMap<String, String> = HashMap()
 
         for (entry in map) {
-            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null) {
+            if (entry.value > 3 && repository.getRule(entry.key) != null && libMap.findRegex(entry.key) == null) {
                 properties.clear()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
@@ -588,7 +586,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         repository.delete(item)
     }
 
-    private fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+    fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
+
+    fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         var inputStream: InputStream? = null
         try {
             inputStream = context.resources.assets.open("rules.lcr")

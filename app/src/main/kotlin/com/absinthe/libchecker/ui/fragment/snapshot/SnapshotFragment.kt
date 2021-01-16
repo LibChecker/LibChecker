@@ -360,7 +360,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         viewModel.timestamp.value = GlobalValues.snapshotTimestamp
         isSnapshotDatabaseItemsReady = true
 
-            viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+        viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
 
         if (isApplicationInfoItemsReady) {
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)

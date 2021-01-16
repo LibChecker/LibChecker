@@ -4,6 +4,7 @@ import com.absinthe.libchecker.R
 
 object IconResMap {
     val MAP = hashMapOf(
+        -1 to R.drawable.ic_sdk_placeholder,
         0 to R.drawable.ic_lib_360,
         1 to R.drawable.ic_lib_airbnb,
         2 to R.drawable.ic_lib_ali_security,

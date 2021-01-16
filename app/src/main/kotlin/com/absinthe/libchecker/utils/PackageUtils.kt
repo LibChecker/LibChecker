@@ -92,11 +92,7 @@ object PackageUtils {
             throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
         }
 
-        return try {
-            Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_SHARED_LIBRARY_FILES) ?: emptyList()
-        } catch (e: Exception) {
-            throw Exception()
-        }
+        return Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_META_DATA) ?: emptyList()
     }
 
     /**

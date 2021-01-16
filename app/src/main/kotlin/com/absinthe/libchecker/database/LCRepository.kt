@@ -88,4 +88,6 @@ class LCRepository(private val lcDao: LCDao) {
     fun deleteAllRules() {
         lcDao.deleteAllRules()
     }
+
+    suspend fun getAllRules() = lcDao.getAllRules()
 }

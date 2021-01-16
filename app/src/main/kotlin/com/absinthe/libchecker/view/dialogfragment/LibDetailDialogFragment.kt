@@ -7,14 +7,18 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.constant.librarymap.BaseMap
+import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.databinding.LayoutDialogLibDetailBinding
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
@@ -42,9 +46,14 @@ class LibDetailDialogFragment : DialogFragment() {
         dialogViewBinding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
-            ivIcon.load(BaseMap.getMap(type).getMap()[libName]?.iconRes ?: R.drawable.ic_logo) {
-                crossfade(true)
-                placeholder(R.drawable.ic_logo)
+            lifecycleScope.launch(Dispatchers.IO) {
+                val iconIndex = viewModel.repository.getRule(libName)?.iconIndex ?: -1
+                withContext(Dispatchers.Main) {
+                    ivIcon.load(IconResMap.MAP[iconIndex] ?: R.drawable.ic_sdk_placeholder) {
+                        crossfade(true)
+                        placeholder(R.drawable.ic_logo)
+                    }
+                }
             }
             tvCreateIssue.apply {
                 isClickable = true

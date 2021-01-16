@@ -1,4 +1,4 @@
-¯²ç
+­Àé
 !
 libxguardian.soä¿¡é¸½æ¨é€ 0
 
@@ -34,8 +34,8 @@ Pangle SDK
 libImgRecognition.soDuMix 	
 
 libfb.soFacebook SDK 
-"
-libgpuimage-library.soGPUImage
+(
+libgpuimage-library.soGPUImage ÿÿÿÿ
 
 libwebpimage.soFresco 
 #
@@ -89,8 +89,8 @@ libmain.soUnity 7
 librsjni_androidx.soRenderScript 
 '
 libreactnativeblob.soReact Native )
-
-libdexjni.soæ¢†æ¢†å®‰å…¨
+"
+libdexjni.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 
 	libapp.soFlutter 
 
@@ -98,24 +98,24 @@ libmain.soUnity 7
 
 libcrashsdk.so
 å²³é¹° SDK 
-
-libhyphenate.so	ç¯ä¿¡ IM
+"
+libhyphenate.so	ç¯ä¿¡ IM ÿÿÿÿ
  
 libmibraindec.so
 å°çˆ± SDK =
-
-libA3AEECD8.soMSA SDK
+
+libA3AEECD8.soMSA SDK ÿÿÿÿ
 
 libijkffmpeg.so	IJKPlayer 
 
 )
 libsgsgmiddletier.soé˜¿é‡Œèšå®‰å…¨ 
-
-lib39285EFA.soMSA SDK
+
+lib39285EFA.soMSA SDK ÿÿÿÿ
 *
 libconnectionbase.soå°ç±³æ¸¸æˆ SDK >
-
-libsecsdk.soMSA SDK
+
+libsecsdk.soMSA SDK ÿÿÿÿ
  
 libarcore_sdk_jni.soARCore 
 #
@@ -134,15 +134,15 @@ libmain.soUnity 7
 
 libapssdk.so
 é«˜å¾· SDK 
-
-libarcore_sdk_c.soViroCore
+$
+libarcore_sdk_c.soViroCore ÿÿÿÿ
 '
 libtxmapengine.soè…¾è®¯åœ°å›¾ SDK 3
-
+"
 
-libbmob.soBmob åç«¯äº‘
-
-libSecShell.soæ¢†æ¢†å®‰å…¨
+libbmob.soBmob åç«¯äº‘ ÿÿÿÿ
+$
+libSecShell.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 
 libbuffer_pg.so
 Pangle SDK 
@@ -160,10 +160,10 @@ libwind.so
 libRongIMLib.so	èäº‘ IM +
 
 libbitmaps.soFresco 
-
-libJni_wgs2gcj.sowgs2gcj
-+
- libbugsnag-plugin-android-anr.soBugsnag
+"
+libJni_wgs2gcj.sowgs2gcj ÿÿÿÿ
+1
+ libbugsnag-plugin-android-anr.soBugsnag ÿÿÿÿ
 
 librealm-jni.sorealm *
 
@@ -174,14 +174,14 @@ libwind.so
 libchrome.so	libchrome 
 !
 libglog_init.soReact Native )
-
-libopenssl.soOpenSSL
-2
-libpl_droidsonroids_gif.soandroid-gif-drawable
+
+libopenssl.soOpenSSL ÿÿÿÿ
+8
+libpl_droidsonroids_gif.soandroid-gif-drawable ÿÿÿÿ
 %
 libCtaApiLib.soæå…‰è®¤è¯ SDK 
-
-libgetuiext3.soä¸ªæ¨
+
+libgetuiext3.soä¸ªæ¨ ÿÿÿÿ
 
 libunity.soUnity 7
 
@@ -204,15 +204,15 @@ libmmkv.soMMKV 0
 libweexjssr.soWeex 
 
 libBaiduSpeechSDK.soDuMix 	
-"
-libSecShell-x86.soæ¢†æ¢†å®‰å…¨
+(
+libSecShell-x86.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 +
 libliteavsdk.soè…¾è®¯äº‘çŸ­è§†é¢‘ SDK 2
 
 libijksdl.so	IJKPlayer 
 
-
-libbugsnag-ndk.soBugsnag
+"
+libbugsnag-ndk.soBugsnag ÿÿÿÿ
 
 libgcanvas.soGCanvas 
 
@@ -271,12 +271,12 @@ libwcdb.soWCDB 0
 libstatic-webp.soFresco 
 
 libbdEASRAndroid.soDuMix 	
-
-libpingpp.soPing++
+
+libpingpp.soPing++ ÿÿÿÿ
 
 libxamarin-app.soXamarin <
-
-libDexHelper.soæ¢†æ¢†å®‰å…¨
+%
+libDexHelper.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 
 	libyuv.solibYUV 
 $
@@ -299,14 +299,14 @@ $
 libframesequence.soFrameSequence 
 #
 libmono-btls-shared.soXamarin <
-
-libfreetype.soFreeType
+ 
+libfreetype.soFreeType ÿÿÿÿ
 
 libtdjni.soTDLib B
 
 libmemchunk.soFresco 
-#
-libDexHelper-x86.soæ¢†æ¢†å®‰å…¨
+)
+libDexHelper-x86.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 /
 libmtanativecrash_v2.soè…¾è®¯ç§»åŠ¨åˆ†æ 0
 "
@@ -316,8 +316,8 @@ $
 å¾®åš SDK ;
 
 libWeexEagle.soWeex 
-
-libmp3lame.soLAME
+
+libmp3lame.soLAME ÿÿÿÿ
 )
 libqalmsfboot.soè…¾è®¯äº‘é€šä¿¡ SDK 2
 "
@@ -328,9 +328,9 @@ $
 libmono-native.soXamarin <
 
 libgojni.soGolang 
-
+
 
-libepic.soEpic
+libepic.soEpic ÿÿÿÿ
 
 librsjni.soRenderScript 
 
@@ -358,8 +358,8 @@ $
  
 libmibrainsdk.so
 å°çˆ± SDK =
-
-libsecexe.soæ¢†æ¢†å®‰å…¨
+"
+libsecexe.soæ¢†æ¢†å®‰å…¨ ÿÿÿÿ
 
 	libnms.so
 Pangle SDK 
@@ -378,10 +378,8 @@ Pangle SDK
 libbdpush_V(.*)\.soç™¾åº¦äº‘æ¨é€ 	(
 $
 libjcore(.*)\.soæå…‰æ¨é€ (
-
-libtnet-(.*)\.solibtnet(
-+
-libsgavmpso-(.*)\.soé˜¿é‡Œèšå®‰å…¨ (
+#
+libtnet-(.*)\.solibtnet ÿÿÿÿ(
 +
 libsgavmpso-(.*)\.soé˜¿é‡Œèšå®‰å…¨ (
 3
@@ -459,8 +457,8 @@ G
 VirtualAPK 
 H
 4com.umeng.message.UmengMessageCallbackHandlerServiceå‹ç›Ÿæ¨é€ 5
-d
-Pcom.liulishuo.filedownloader.services.FileDownloadService$SeparateProcessServiceFileDownloader
+j
+Pcom.liulishuo.filedownloader.services.FileDownloadService$SeparateProcessServiceFileDownloader ÿÿÿÿ
 L
 2com.taobao.agoo.TaobaoMessageIntentReceiverServiceé˜¿é‡Œç§»åŠ¨æ¨é€ 
 A
@@ -551,8 +549,8 @@ E
 C
 1com.bytedance.tea.crash.upload.CrashUploadService
 Pangle SDK 
-J
-5com.blankj.utilcode.util.MessengerUtils$ServerServiceAndroidUtilCode
+P
+5com.blankj.utilcode.util.MessengerUtils$ServerServiceAndroidUtilCode ÿÿÿÿ
 I
 1com.google.android.gms.analytics.AnalyticsServiceGoogle Analytics 
 ,
@@ -584,16 +582,16 @@ C
 5com.tencent.tinker.lib.service.TinkerPatchForeServiceTinker 0
 Q
 5androidx.work.impl.foreground.SystemForegroundServiceJetpack Work Manager 
-&
-com.igexin.sdk.PushServiceä¸ªæ¨
+,
+com.igexin.sdk.PushServiceä¸ªæ¨ ÿÿÿÿ
 :
 &cn.jpush.android.service.DaemonServiceæå…‰æ¨é€ 
-A
-.com.yanzhenjie.permission.bridge.BridgeServiceAndPermission
+G
+.com.yanzhenjie.permission.bridge.BridgeServiceAndPermission ÿÿÿÿ
 .
 com.heytap.mcssdk.PushService	OPPO Push &
-f
-Rcom.liulishuo.filedownloader.services.FileDownloadService$SharedMainProcessServiceFileDownloader
+l
+Rcom.liulishuo.filedownloader.services.FileDownloadService$SharedMainProcessServiceFileDownloader ÿÿÿÿ
 G
 -com.tencent.android.tpush.rpc.XGRemoteServiceè…¾è®¯ç§»åŠ¨æ¨é€ 2
 1
@@ -634,14 +632,14 @@ J
 HMS Update 
 8
  com.qq.e.ads.LandscapeADActivityè…¾è®¯å¹¿å‘Š SDK 1
-$
-com.igexin.sdk.GActivityä¸ªæ¨
+*
+com.igexin.sdk.GActivityä¸ªæ¨ ÿÿÿÿ
 5
  com.alipay.sdk.app.H5PayActivityæ”¯ä»˜å® SDK 
 :
 )com.vivo.push.sdk.LinkProxyClientActivity	vivo Push 9
-@
-+com.blankj.utilcode.util.UtilsTransActivityAndroidUtilCode
+F
++com.blankj.utilcode.util.UtilsTransActivityAndroidUtilCode ÿÿÿÿ
 -
 "com.tencent.smtt.sdk.VideoActivityTBS 0
 /
@@ -666,12 +664,12 @@ M
 +com.cmic.sso.sdk.activity.LoginAuthActivityæå…‰è®¤è¯ 
 9
 %com.google.android.gms.ads.AdActivityGoogle AdMob 
-O
-:pub.devrel.easypermissions.AppSettingsDialogHolderActivityEasyPermissions
+U
+:pub.devrel.easypermissions.AppSettingsDialogHolderActivityEasyPermissions ÿÿÿÿ
 M
 7com.huawei.openalliance.ad.activity.PPSLauncherActivityHUAWEI Ads SDK 
-?
-,com.yanzhenjie.permission.PermissionActivityAndPermission
+E
+,com.yanzhenjie.permission.PermissionActivityAndPermission ÿÿÿÿ
 H
 8com.huawei.android.hms.agent.hwid.HMSSignInAgentActivityHMS Core 
 4
@@ -695,8 +693,8 @@ B
 *com.qq.e.ads.RewardvideoPortraitADActivityè…¾è®¯å¹¿å‘Š SDK 1
 1
 com.facebook.FacebookActivityFacebook SDK 
-?
--com.soundcloud.android.crop.CropImageActivityandroid-crop
+E
+-com.soundcloud.android.crop.CropImageActivityandroid-crop ÿÿÿÿ
 =
 .net.openid.appauth.RedirectUriReceiverActivityAppAuth 
 6
@@ -705,27 +703,27 @@ B
  cn.jpush.android.ui.PushActivityæå…‰æ¨é€ 
 9
 $com.alipay.sdk.app.PayResultActivityæ”¯ä»˜å® SDK 
-L
-7com.blankj.utilcode.util.UtilsTransActivity4MainProcessAndroidUtilCode
+R
+7com.blankj.utilcode.util.UtilsTransActivity4MainProcessAndroidUtilCode ÿÿÿÿ
 /
 com.unionpay.UPPayWapActivity
 é“¶è” SDK 6
 E
 1com.facebook.react.devsupport.DevSettingsActivityReact Native )
-'
-com.igexin.sdk.PushActivityä¸ªæ¨
-B
-/com.yanzhenjie.permission.bridge.BridgeActivityAndPermission
+-
+com.igexin.sdk.PushActivityä¸ªæ¨ ÿÿÿÿ
+H
+/com.yanzhenjie.permission.bridge.BridgeActivityAndPermission ÿÿÿÿ
 A
 2net.openid.appauth.AuthorizationManagementActivityAppAuth 
 M
 -com.xiaomi.account.openauth.AuthorizeActivityå°ç±³è´¦å·å¼€æ”¾å¹³å° >
 N
 3com.google.android.gms.common.api.GoogleApiActivityGoogle Play Service '
-4
-(com.pingplusplus.android.PaymentActivityPing++
-,
-com.bestpay.app.H5PayActivity	ç¿¼æ”¯ä»˜
+:
+(com.pingplusplus.android.PaymentActivityPing++ ÿÿÿÿ
+2
+com.bestpay.app.H5PayActivity	ç¿¼æ”¯ä»˜ ÿÿÿÿ
 :
 com.baidu.mobads.AppActivityç§»åŠ¨åº”ç”¨æ¨å¹¿ SDK 	
 D
@@ -746,8 +744,8 @@ S
 Borg.hapjs.features.channel.transparentactivity.TransparentActivity	å¿«åº”ç”¨ 
 2
 com.facebook.CustomTabActivityFacebook SDK 
-+
- com.yalantis.ucrop.UCropActivityuCrop
+1
+ com.yalantis.ucrop.UCropActivityuCrop ÿÿÿÿ
 H
 7com.tencent.midas.proxyactivity.APMidasPayProxyActivity	ç±³å¤§å¸ˆ 0
 3
@@ -780,8 +778,8 @@ $com.zhihu.matisse.ui.MatisseActivityMatisse @
 "cn.jpush.android.ui.PopWinActivityæå…‰æ¨é€ 
 3
 &com.unity3d.player.UnityPlayerActivityUnity 7
-9
-.com.yalantis.ucrop.PictureMultiCuttingActivityuCrop
+?
+.com.yalantis.ucrop.PictureMultiCuttingActivityuCrop ÿÿÿÿ
 6
 !com.alipay.sdk.app.H5AuthActivityæ”¯ä»˜å® SDK 
 4
@@ -803,8 +801,8 @@ Pangle SDK (
 5
 !com.yxcorp.map.advertisement.(.*)
 Pangle SDK (
-=
- com.igexin.sdk.FlymePushReceiverMeizu Push(GeTui Proxy)
+C
+ com.igexin.sdk.FlymePushReceiverMeizu Push(GeTui Proxy) ÿÿÿÿ
 J
 2com.google.android.gms.analytics.AnalyticsReceiverGoogle Analytics 
 B
@@ -828,12 +826,10 @@ S
 'com.market.sdk.DownloadCompleteReceiverå°ç±³æ›´æ–° SDK >
 E
 2com.evernote.android.job.v14.PlatformAlarmReceiverAndroid-Job 
-1
-%com.taobao.weex.WXGlobalEventReceiverWeex 
 E
 7com.xiaomi.push.service.receivers.NetworkStatusReceiverMiPush >
-'
-com.igexin.sdk.PushReceiverä¸ªæ¨
+-
+com.igexin.sdk.PushReceiverä¸ªæ¨ ÿÿÿÿ
 ?
 ,com.huawei.hms.support.api.push.PushReceiverHUAWEI Push 
 N
@@ -860,8 +856,8 @@ K
 com.taobao.accs.EventReceiveré˜¿é‡Œç§»åŠ¨æ¨é€ 
 H
 4com.umeng.message.NotificationProxyBroadcastReceiverå‹ç›Ÿæ¨é€ 5
-0
-$com.igexin.download.DownloadReceiverä¸ªæ¨
+6
+$com.igexin.download.DownloadReceiverä¸ªæ¨ ÿÿÿÿ
 L
 -org.android.agoo.vivo.PushMessageReceiverImplvivo Push(Aliyun Proxy) 
 J
@@ -881,8 +877,8 @@ X
 <androidx.work.impl.utils.ForceStopRunnable$BroadcastReceiverJetpack Work Manager 
 x
 hcom.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiverFirebase 
-?
-!com.igexin.sdk.HmsPushSubReceiverHUAWEI Push(GeTui Proxy)
+E
+!com.igexin.sdk.HmsPushSubReceiverHUAWEI Push(GeTui Proxy) ÿÿÿÿ
 @
 -com.huawei.android.pushagent.PushBootReceiverHUAWEI Push 
 K
@@ -907,8 +903,8 @@ B
 .com.xiaomi.push.service.receivers.PingReceiverMiPush >
 A
 .com.huawei.android.pushagent.PushEventReceiverHUAWEI Push 
-8
-com.igexin.sdk.MiuiPushReceiverMiPush(GeTui Proxy)
+>
+com.igexin.sdk.MiuiPushReceiverMiPush(GeTui Proxy) ÿÿÿÿ
 =
 #com.taobao.agoo.AgooCommondReceiveré˜¿é‡Œç§»åŠ¨æ¨é€ 
 Q
@@ -919,13 +915,13 @@ c
 Gandroidx.work.impl.background.systemalarm.ConstraintProxyUpdateReceiverJetpack Work Manager 
 X
 @com.sensorsdata.analytics.android.sdk.SensorsDataContentProviderç¥ç­–åˆ†æ SDK ,
-;
+A
 +com.liulishuo.okdownload.OkDownloadProvider
-OkDownload
+OkDownload ÿÿÿÿ
 9
 com.tencent.mid.api.MidProviderè…¾è®¯ç§»åŠ¨åˆ†æ 0
-1
-$com.squareup.picasso.PicassoProviderPicasso
+7
+$com.squareup.picasso.PicassoProviderPicasso ÿÿÿÿ
 <
 *com.bytedance.sdk.openadsdk.TTFileProvider
 Pangle SDK 
@@ -939,8 +935,8 @@ E
 )androidx.work.impl.WorkManagerInitializerJetpack Work Manager 
 B
 'androidx.startup.InitializationProviderJetpack App Startup 
-5
- me.jessyan.autosize.InitProviderAndroidAutoSize
+;
+ me.jessyan.autosize.InitProviderAndroidAutoSize ÿÿÿÿ
 L
 3androidx.lifecycle.ProcessLifecycleOwnerInitializerJetpack Lifecycle 
 ]
@@ -952,12 +948,12 @@ G
 F
 4com.bytedance.sdk.openadsdk.multipro.TTMultiProvider
 Pangle SDK 
-7
-#cn.bmob.v3.util.BmobContentProviderBmob åç«¯äº‘
+=
+#cn.bmob.v3.util.BmobContentProviderBmob åç«¯äº‘ ÿÿÿÿ
 B
 $com.baidu.mobads.openad.FileProviderç§»åŠ¨åº”ç”¨æ¨å¹¿ SDK 	
->
-0cn.sharesdk.framework.utils.ShareSDKFileProviderShareSDK
+D
+0cn.sharesdk.framework.utils.ShareSDKFileProviderShareSDK ÿÿÿÿ
 I
 7com.huawei.updatesdk.fileprovider.UpdateSdkFileProvider
 HMS Update 
@@ -970,8 +966,8 @@ $com.facebook.FacebookContentProviderFacebook SDK 
 ?
 -com.qiyukf.nim.uikit.provider.UnicornProvider
 ä¸ƒé±¼ SDK $
-4
-&com.just.agentweb.AgentWebFileProviderAgentWeb
+:
+&com.just.agentweb.AgentWebFileProviderAgentWeb ÿÿÿÿ
 ;
 .com.tencent.bugly.beta.utils.BuglyFileProviderBugly 
 P
@@ -979,10 +975,10 @@ P
 ?
 -com.huawei.hms.update.provider.UpdateProvider
 HMS Update 
-9
-&com.yanzhenjie.permission.FileProviderAndPermission
-0
-$com.igexin.download.DownloadProviderä¸ªæ¨
+?
+&com.yanzhenjie.permission.FileProviderAndPermission ÿÿÿÿ
+6
+$com.igexin.download.DownloadProviderä¸ªæ¨ ÿÿÿÿ
 D
 )com.netease.nimlib.ipc.NIMContentProviderç½‘æ˜“äº‘é€šä¿¡ SDK $
 >
@@ -997,8 +993,8 @@ A
 1com.google.firebase.provider.FirebaseInitProviderFirebase 
 <
 (cn.jpush.android.service.Downloadrovideræå…‰æ¨é€ 
-?
-*com.blankj.utilcode.util.UtilsFileProviderAndroidUtilCode
+E
+*com.blankj.utilcode.util.UtilsFileProviderAndroidUtilCode ÿÿÿÿ
 @
 2com.qihoo360.mobilesafe.svcmanager.ServiceProviderRePlugin
 K
@@ -1015,8 +1011,8 @@ E
 ,com.huawei.hms.support.api.push.PushProviderHUAWEI Push 
 N
 8com.huawei.openalliance.ad.download.DownloadFileProviderHUAWEI Ads SDK 
-I
-4com.blankj.utilcode.util.Utils$FileProvider4UtilCodeAndroidUtilCode
+O
+4com.blankj.utilcode.util.Utils$FileProvider4UtilCodeAndroidUtilCode ÿÿÿÿ
 R
 6com.google.firebase.perf.provider.FirebasePerfProviderFirebase Performance 
 G
@@ -1046,8 +1042,8 @@ G
 com.xiaomi.pushMiPush >
 +
 androidx.appcompatJetpack AppCompat 
-&
-butterknife.internalButter Knife
+,
+butterknife.internalButter Knife ÿÿÿÿ
 1
 androidx.recyclerviewJetpack RecyclerView 
 '
@@ -1068,8 +1064,8 @@ G
 android.support.v7Support Library 
 
 com.xiaomi.xmpushMiPush >
-#
-org.greenbot.greendaoGreenDAO
+)
+org.greenbot.greendaoGreenDAO ÿÿÿÿ
 -
 androidx.collectionJetpack Collection 
 /
@@ -1099,14 +1095,14 @@ App Center #
 androidx.roomJetpack Room 
 9
 androidx.constraintlayoutJetpack ConstraintLayout 
-#
-org.greenbot.eventbusEventBus
+)
+org.greenbot.eventbusEventBus ÿÿÿÿ
 ;
 androidx.coordinatorlayoutJetpack CoordinatorLayout 
 
 com.xiaomi.mipushMiPush >
-
-com.bumptech.glideGlide
+#
+com.bumptech.glideGlide ÿÿÿÿ
 -
 androidx.customviewJetpack CustomView 
  
@@ -1124,8 +1120,8 @@ App Center #
 com.airbnb.lottieLottie 
 #
 androidx.printJetpack Print 
-%
-butterknife.runtimeButter Knife
++
+butterknife.runtimeButter Knife ÿÿÿÿ
 !
 com.facebook.frescoFresco 
 )

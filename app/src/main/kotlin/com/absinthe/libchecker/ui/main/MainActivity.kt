@@ -243,6 +243,12 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
             })
 
+            if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {
+                deleteAllRules()
+                insertPreinstallRules(this@MainActivity)
+                Once.markDone(OnceTag.FIRST_INSERT_RULES)
+            }
+
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems()
             }

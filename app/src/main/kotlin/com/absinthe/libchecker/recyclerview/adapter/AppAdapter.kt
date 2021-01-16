@@ -4,6 +4,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
@@ -38,10 +39,13 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                     }
                 } ?: let {
                     GlobalScope.launch(Dispatchers.IO) {
+                        val applicationInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
                         val bitmap = try {
-                            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                            iconLoader.loadIcon(applicationInfo)
                         } catch (e: PackageManager.NameNotFoundException) {
                             null
+                        } catch (e: SecurityException) {
+                            applicationInfo.loadIcon(context.packageManager).toBitmap()
                         }
                         withContext(Dispatchers.Main) {
                             findViewWithTag<ImageView>(item.packageName)?.let {

@@ -10,10 +10,10 @@ import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -63,9 +63,9 @@ class LibReferenceActivity : BaseActivity() {
             })
 
             lifecycleScope.launch(Dispatchers.IO) {
-                BaseMap.getMap(type).getChip(name)?.let {
+                LibCheckerApp.repository.getRule(name)?.let {
                     withContext(Dispatchers.Main) {
-                        binding.toolbar.title = it.name
+                        binding.toolbar.title = it.label
                     }
                 }
             }

@@ -9,15 +9,21 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.RULES_VERSION
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.RuleGenerator
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import moe.shizuku.preference.PreferenceFragment
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
@@ -63,7 +69,13 @@ class BackupActivity : BaseActivity() {
             data?.data?.let {
                 try {
                     contentResolver.openOutputStream(it)?.let { os ->
-                        viewModel.backup(os)
+//                        viewModel.backup(os)
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val rules = LibCheckerApp.repository.getAllRules()
+
+                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION))
+                            os.close()
+                        }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
