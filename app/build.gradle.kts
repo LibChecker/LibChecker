@@ -111,16 +111,10 @@ dependencies {
 
     // Room components
     val roomVersion = "2.2.5"
-    implementation("androidx.room:room-runtime:$roomVersion") {
-        exclude(group = "org.xerial")
-    }
-    implementation("androidx.room:room-ktx:$roomVersion") {
-        exclude(group = "org.xerial")
-    }
-    kapt("androidx.room:room-compiler:$roomVersion") {
-        exclude(group = "org.xerial")
-    }
-    implementation("org.xerial:sqlite-jdbc:3.34.0")
+    implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    //implementation("org.xerial:sqlite-jdbc:3.34.0")
 
     implementation("androidx.core:core-ktx:1.5.0-beta01")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")

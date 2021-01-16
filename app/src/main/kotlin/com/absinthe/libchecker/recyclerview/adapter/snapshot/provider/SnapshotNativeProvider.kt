@@ -9,7 +9,6 @@ import androidx.core.view.isGone
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BaseActivity
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
@@ -18,6 +17,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -60,7 +60,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         val chip = helper.getView<Chip>(R.id.chip)
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            val rule = LibCheckerApp.repository.getRule(snapshotItem.name)
+            val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name)
 
             withContext(Dispatchers.Main) {
                 rule?.let {

@@ -11,6 +11,7 @@ import android.os.MessageQueue
 import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.SPRING
@@ -99,6 +100,10 @@ object LCAppUtils {
             }
         }
         return null
+    }
+
+    suspend fun getRuleWithRegex(name: String): RuleEntity? {
+        return LibCheckerApp.repository.getRule(name) ?: findRuleRegex(name)
     }
 }
 

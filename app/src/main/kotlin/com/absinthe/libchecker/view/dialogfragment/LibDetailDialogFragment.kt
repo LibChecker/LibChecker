@@ -15,6 +15,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.databinding.LayoutDialogLibDetailBinding
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class LibDetailDialogFragment : DialogFragment() {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
             lifecycleScope.launch(Dispatchers.IO) {
-                val iconIndex = viewModel.repository.getRule(libName)?.iconIndex ?: -1
+                val iconIndex = LCAppUtils.getRuleWithRegex(libName)?.iconIndex ?: -1
                 withContext(Dispatchers.Main) {
                     ivIcon.load(IconResMap.getIconRes(iconIndex)) {
                         crossfade(true)
@@ -98,10 +99,10 @@ class LibDetailDialogFragment : DialogFragment() {
                 }
             }
         })
-        regexName?.let {
-            viewModel.requestLibDetail(it, type, true)
-        } ?: let {
+        if (regexName.isNullOrEmpty()) {
             viewModel.requestLibDetail(libName, type)
+        } else {
+            viewModel.requestLibDetail(regexName!!, type, true)
         }
     }
 

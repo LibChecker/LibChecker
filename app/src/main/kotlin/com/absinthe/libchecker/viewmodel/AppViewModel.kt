@@ -270,7 +270,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val properties: MutableMap<String, String> = HashMap()
 
             for (entry in map) {
-                if (entry.value > 3 && repository.getRule(entry.key) == null) {
+                if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key) == null) {
                     properties.clear()
                     properties["Library name"] = entry.key
                     properties["Library count"] = entry.value.toString()
@@ -329,7 +329,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val properties: MutableMap<String, String> = HashMap()
 
         for (entry in map) {
-            if (entry.value > 3 && repository.getRule(entry.key) != null && LCAppUtils.findRuleRegex(entry.key) == null) {
+            if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key) == null) {
                 properties.clear()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
@@ -553,7 +553,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var rule: RuleEntity?
         for (entry in map) {
             if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
-                rule = repository.getRule(entry.key)
+                rule = LCAppUtils.getRuleWithRegex(entry.key)
                 chip = null
                 rule?.let {
                     chip = LibChip(iconRes = IconResMap.getIconRes(it.iconIndex), name = it.label, regexName = it.regexName)

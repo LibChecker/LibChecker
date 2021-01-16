@@ -142,7 +142,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    suspend fun getRule(name: String) = repository.getRule(name)
+    suspend fun getRule(name: String) = LCAppUtils.getRuleWithRegex(name)
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiManager.root)
@@ -192,7 +192,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             list.forEach {
                 chip = null
-                repository.getRule(it.name)?.let { rule ->
+                LCAppUtils.getRuleWithRegex(it.name)?.let { rule ->
                     chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
                 }
                 chipList.add(LibStringItemChip(it, chip))
@@ -217,7 +217,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             list.forEach {
                 chip = null
-                repository.getRule(it.name)?.let { rule ->
+                LCAppUtils.getRuleWithRegex(it.name)?.let { rule ->
                     chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
                 }
                 chipList.add(LibStringItemChip(it, chip))

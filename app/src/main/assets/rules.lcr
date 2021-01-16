@@ -1,4 +1,4 @@
-���
+���
 !
 libxguardian.so信鸽推送 0
 
@@ -367,10 +367,10 @@ Pangle SDK
 libflexbox.soHippy 0
 @
 libAMapSDK_MAP_v(.*)\.so高德地图 SDK (2regex_amap_sdk
-5
-&libaot-Xamarin\.Android\.(.*)\.dll\.soXamarin <(
-!
-libcronet\.(.*)\.soCronet (
+D
+&libaot-Xamarin\.Android\.(.*)\.dll\.soXamarin <(2regex_xamarin
+/
+libcronet\.(.*)\.soCronet (2regex_cronet
 ;
 libcocklogic-(.*)\.so
 百川 SDK (2regex_ali_baichuan
@@ -392,8 +392,8 @@ F
 libBaiduMapSDK_base_v(.*)\.so百度地图 SDK 	(2regex_baidu_map
 E
 libBaiduMapSDK_map_v(.*)\.so百度地图 SDK 	(2regex_baidu_map
-/
-liblocSDK(.*)[0-9]a\.so百度地图 SDK 	(
+@
+liblocSDK(.*)[0-9]a\.so百度地图 SDK 	(2regex_baidu_map
 >
 libshell-super(.*)\.so腾讯乐固 0(2regex_tencent_legu
 :
@@ -795,12 +795,12 @@ Pangle SDK (2regex_pangle
 A
 com.ss.android.downloadlib.(.*)
 Pangle SDK (2regex_pangle
-@
+;
 com.yxcorp.gifshow.ad(.*)
-Pangle SDK (2regex_kuaishou_ad
-H
+Pangle SDK (2regex_pangle
+C
 !com.yxcorp.map.advertisement.(.*)
-Pangle SDK (2regex_kuaishou_ad
+Pangle SDK (2regex_pangle
 C
  com.igexin.sdk.FlymePushReceiverMeizu Push(GeTui Proxy) ����
 J
@@ -1167,10 +1167,10 @@ C
 androidx.localbroadcastmanagerJetpack LocalBroadcastManager 
 )
 androidx.activityJetpack Activity 
-?
-kotlin.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin
-@
-kotlinx.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin
+J
+kotlin.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin_coroutines
+K
+kotlinx.coroutines.(.*)Kotlin Coroutines A(2regex_kotlin_coroutines
 )
 kotlin.(.*)Kotlin A(2regex_kotlin
 ,

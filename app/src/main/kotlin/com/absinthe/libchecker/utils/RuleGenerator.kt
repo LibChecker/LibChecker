@@ -1,7 +1,5 @@
 package com.absinthe.libchecker.utils
 
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
@@ -23,16 +21,8 @@ object RuleGenerator {
                 label = it.label
                 type = it.type
                 isRegexRule = it.isRegexRule
-                iconIndex = if (it.iconIndex != 0) {
-                    it.iconIndex
-                } else {
-                    if (BaseMap.getMap(it.type).getChip(it.name)!!.iconRes == R.drawable.ic_lib_360) {
-                        0
-                    } else {
-                        -1
-                    }
-                }
-                regexName = BaseMap.getMap(it.type).getChip(it.name)?.regexName?:""
+                iconIndex = it.iconIndex
+                regexName = it.regexName ?: ""
             }
 
             newRules.add(ruleBuilder.build())

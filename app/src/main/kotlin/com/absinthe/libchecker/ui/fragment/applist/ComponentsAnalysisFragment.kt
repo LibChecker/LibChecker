@@ -66,7 +66,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         var rule: RuleEntity?
 
                         for (item in componentList) {
-                            rule = viewModel.repository.getRule(item.componentName)
+                            rule = LCAppUtils.getRuleWithRegex(item.componentName)
                             chip = null
                             if (rule != null) {
                                 chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
