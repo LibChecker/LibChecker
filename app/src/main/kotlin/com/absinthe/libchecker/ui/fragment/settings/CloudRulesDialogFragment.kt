@@ -1,18 +1,25 @@
 package com.absinthe.libchecker.ui.fragment.settings
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.RULES_VERSION
+import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
-import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,10 +48,10 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launchWhenResumed {
-            request.requestCloudRuleBundle().enqueue(object : Callback<CloudRuleInfo> {
+            request.requestCloudRuleInfo().enqueue(object : Callback<CloudRuleInfo> {
                 override fun onResponse(call: Call<CloudRuleInfo>, response: Response<CloudRuleInfo>) {
                     response.body()?.let {
-                        binding.tvLocalRulesVersion.text = RULES_VERSION.toString()
+                        binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
                         binding.tvRemoteRulesVersion.text = it.version.toString()
                         if (RULES_VERSION < it.version) {
                             binding.btnUpdate.isEnabled = true
@@ -54,7 +61,32 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 override fun onFailure(call: Call<CloudRuleInfo>, t: Throwable) {
-                    loge("CloudRulesDialogFragment", t)
+                    Log.e("CloudRulesDialog", t.toString())
+                }
+
+            })
+        }
+        binding.btnUpdate.setOnClickListener {
+            request.requestRulesBundle().enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    response.body()?.let {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val builder = CloudRulesBundle.parseFrom(it.byteStream())
+                            val rulesList = mutableListOf<RuleEntity>()
+                            builder.rulesList.cloudRulesList.forEach {
+                                it?.let {
+                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                                }
+                            }
+                            LibCheckerApp.repository.deleteAllRules()
+                            LibCheckerApp.repository.insertRules(rulesList)
+                            GlobalValues.localRulesVersion = builder.version
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    Log.e("CloudRulesDialog", t.toString())
                 }
 
             })

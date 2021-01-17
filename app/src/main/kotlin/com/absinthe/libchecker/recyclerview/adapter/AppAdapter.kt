@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.view.ViewGroup
@@ -39,13 +40,14 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                     }
                 } ?: let {
                     GlobalScope.launch(Dispatchers.IO) {
-                        val applicationInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
+                        var applicationInfo: ApplicationInfo? = null
                         val bitmap = try {
+                            applicationInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
                             iconLoader.loadIcon(applicationInfo)
                         } catch (e: PackageManager.NameNotFoundException) {
                             null
                         } catch (e: SecurityException) {
-                            applicationInfo.loadIcon(context.packageManager).toBitmap()
+                            applicationInfo?.loadIcon(context.packageManager)?.toBitmap()
                         }
                         withContext(Dispatchers.Main) {
                             findViewWithTag<ImageView>(item.packageName)?.let {

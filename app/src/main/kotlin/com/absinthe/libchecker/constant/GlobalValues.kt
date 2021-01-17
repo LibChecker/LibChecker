@@ -32,6 +32,13 @@ object GlobalValues {
             getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
         }
 
+    var localRulesVersion: Int = RULES_VERSION
+        get() = getPreferences().getInt(Constants.PREF_LOCAL_RULES_VERSION, RULES_VERSION)
+        set(value) {
+            field = value
+            getPreferences().edit { putInt(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
+        }
+
     val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
 
     val isShowSystemApps: MutableLiveData<Boolean> =

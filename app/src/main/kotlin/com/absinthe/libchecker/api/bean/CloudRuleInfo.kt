@@ -5,6 +5,5 @@ import androidx.annotation.Keep
 @Keep
 data class CloudRuleInfo(
     val version: Int,
-    val count: Int,
-    val md5: String
+    val count: Int
 )

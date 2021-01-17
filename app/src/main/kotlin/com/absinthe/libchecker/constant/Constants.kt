@@ -39,6 +39,8 @@ object Constants {
     const val PREF_LOCAL_BACKUP = "localBackup"
     const val PREF_LOCAL_RESTORE = "localRestore"
 
+    const val PREF_LOCAL_RULES_VERSION = "localRulesVersion"
+
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_DEFAULT = 1
 
