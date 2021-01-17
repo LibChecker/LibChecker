@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.ui.snapshot
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
 import android.view.*
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -33,8 +32,6 @@ class AlbumActivity : BaseActivity() {
     private lateinit var binding: ActivityAlbumBinding
     private val viewModel by viewModels<SnapshotViewModel>()
     private val itemClickObserver = MutableLiveData<Boolean>()
-    private val handlerThread = HandlerThread("Album")
-    private val handler by lazy { Handler(handlerThread.looper) }
     private var isEasterEggAdded = false
     private var longClickCount = 0
 
@@ -46,12 +43,6 @@ class AlbumActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initView()
-        handlerThread.start()
-    }
-
-    override fun onDestroy() {
-        handlerThread.quitSafely()
-        super.onDestroy()
     }
 
     private fun initView() {
@@ -72,7 +63,15 @@ class AlbumActivity : BaseActivity() {
                     AlertDialog.Builder(this@AlbumActivity)
                         .setTitle(R.string.dialog_title_select_to_delete)
                         .setItems(charList.toTypedArray()) { _, which ->
-                            handler.post {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                val progressDialog: ProgressDialog
+                                withContext(Dispatchers.Main) {
+                                    progressDialog = ProgressDialog(this@AlbumActivity).apply {
+                                        setMessage(getString(R.string.album_dialog_delete_snapshot_message))
+                                        setCancelable(false)
+                                    }
+                                    progressDialog.show()
+                                }
                                 viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
                                 timeStampList = viewModel.repository.getTimeStamps()
                                 charList.removeAt(which)
@@ -80,6 +79,9 @@ class AlbumActivity : BaseActivity() {
                                     0L
                                 } else {
                                     timeStampList[0].timestamp
+                                }
+                                withContext(Dispatchers.Main) {
+                                    progressDialog.dismiss()
                                 }
                             }
                         }

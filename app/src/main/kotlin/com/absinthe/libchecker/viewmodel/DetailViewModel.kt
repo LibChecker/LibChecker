@@ -142,8 +142,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-    suspend fun getRule(name: String) = LCAppUtils.getRuleWithRegex(name)
-
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiManager.root)
         .addConverterFactory(GsonConverterFactory.create())

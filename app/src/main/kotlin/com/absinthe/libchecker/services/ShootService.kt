@@ -30,6 +30,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
@@ -172,7 +174,7 @@ class ShootService : Service() {
                 continue
             }
 
-            if (dbList.size >= 20) {
+            if (dbList.size >= 50) {
                 repository.insertSnapshots(dbList)
                 dbList.clear()
             }
@@ -222,9 +224,21 @@ class ShootService : Service() {
             repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
         }
 
+        builder.setProgress(0, 0, false)
+            .setOngoing(false)
+            .setContentTitle(getString(R.string.noti_shoot_title_saved))
+            .setContentText(getFormatDateString(ts))
+        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+
         GlobalValues.snapshotTimestamp = ts
         notifyFinished(ts)
         stopForeground(true)
         stopSelf()
+    }
+
+    private fun getFormatDateString(timestamp: Long): String {
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+        val date = Date(timestamp)
+        return simpleDateFormat.format(date)
     }
 }

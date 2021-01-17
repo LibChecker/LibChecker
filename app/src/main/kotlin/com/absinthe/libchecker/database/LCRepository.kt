@@ -66,8 +66,24 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.delete(item)
     }
 
-    fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
-        lcDao.deleteSnapshots(timestamp)
+    suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
+        val list = getSnapshots(timestamp)
+        var count = 0;
+        val chunk = mutableListOf<SnapshotItem>()
+
+        list.forEach {
+            chunk.add(it)
+            count++
+
+            if (count == 50) {
+                lcDao.deleteSnapshots(chunk)
+                chunk.clear()
+                count = 0;
+            }
+        }
+
+        lcDao.deleteSnapshots(chunk)
+        chunk.clear()
         lcDao.delete(TimeStampItem(timestamp))
     }
 

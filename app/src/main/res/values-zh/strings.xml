@@ -117,4 +117,9 @@
     <string name="integration_monkey_king_menu_unblock">使用\"大圣净化\"解禁此组件</string>
     <string name="cloud_rules">云端规则</string>
     <string name="cloud_rules_summary">在此更新最新的标记库</string>
+    <string name="album_dialog_delete_snapshot_message">处理中…</string>
+    <string name="noti_shoot_title_saved">快照已保存</string>
+    <string name="rules_local_repo_version">本地规则库版本</string>
+    <string name="rules_remote_repo_version">远端规则库版本</string>
+    <string name="rules_btn_update">更新</string>
 </resources>

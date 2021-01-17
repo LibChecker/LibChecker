@@ -41,7 +41,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="libnative.so" />
 
-        <com.absinthe.libraries.view.AlwaysMarqueeTextView
+        <TextView
             android:id="@+id/tv_lib_size"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

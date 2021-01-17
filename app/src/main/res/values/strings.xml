@@ -9,6 +9,7 @@
     <string name="loading">Loading…</string>
     <string name="channel_shoot">Save snapshots</string>
     <string name="noti_shoot_title">Saving current snapshot</string>
+    <string name="noti_shoot_title_saved">Snapshot saved</string>
 
     <!--  App list  -->
     <string name="menu_search">Search</string>
@@ -143,9 +144,15 @@
     <string name="album_restore">Restore</string>
     <string name="album_restore_summary">Restore snapshots from backup file</string>
     <string name="album_click_to_choose">Click to Choose</string>
+    <string name="album_dialog_delete_snapshot_message">Processing…</string>
 
     <!--  Integration  -->
     <string name="integration_monkey_king_menu_block">Block this via \"MonkeyKing Purify\"</string>
     <string name="integration_monkey_king_menu_unblock">Unblock this via \"MonkeyKing Purify\"</string>
+
+    <!--  Cloud rules  -->
+    <string name="rules_local_repo_version">Local repo version</string>
+    <string name="rules_remote_repo_version">Remote repo version</string>
+    <string name="rules_btn_update">Update</string>
 
 </resources>

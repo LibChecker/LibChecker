@@ -248,7 +248,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             timestamp.observe(viewLifecycleOwner, {
                 if (it != 0L) {
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
-                    flip(VF_LOADING)
                 } else {
                     dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
                     snapshotDiffItems.value = emptyList()

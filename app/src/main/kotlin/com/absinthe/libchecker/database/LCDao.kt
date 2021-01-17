@@ -57,6 +57,9 @@ interface LCDao {
     @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
     fun deleteSnapshots(timestamp: Long)
 
+    @Delete
+    fun deleteSnapshots(list: List<SnapshotItem>)
+
     //TimeStamp Table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: TimeStampItem)

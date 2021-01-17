@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -10,6 +11,7 @@
         layout="@layout/layout_bottom_sheet_header" />
 
     <ViewFlipper
+        android:id="@+id/vf_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -20,6 +22,76 @@
             app:lottie_autoPlay="true"
             app:lottie_fileName="gray-down-arrow.json"
             app:lottie_loop="true" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingVertical="48dp">
+
+            <TextView
+                android:id="@+id/tv_local_rules_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="48dp"
+                android:textAppearance="?attr/textAppearanceHeadline3"
+                app:layout_constraintBottom_toBottomOf="@id/arrow"
+                app:layout_constraintEnd_toStartOf="@id/arrow"
+                app:layout_constraintTop_toTopOf="@id/arrow"
+                tools:text="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:text="@string/rules_local_repo_version"
+                app:layout_constraintEnd_toEndOf="@id/tv_local_rules_version"
+                app:layout_constraintStart_toStartOf="@id/tv_local_rules_version"
+                app:layout_constraintTop_toBottomOf="@id/tv_local_rules_version" />
+
+            <ImageView
+                android:id="@+id/arrow"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/ic_arrow_right"
+                android:importantForAccessibility="no"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_remote_rules_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:textAppearance="?attr/textAppearanceHeadline3"
+                app:layout_constraintBottom_toBottomOf="@id/arrow"
+                app:layout_constraintStart_toEndOf="@id/arrow"
+                app:layout_constraintTop_toTopOf="@id/arrow"
+                tools:text="2" />
+
+            <TextView
+                android:id="@+id/tv_remote_repo_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:text="@string/rules_remote_repo_version"
+                app:layout_constraintEnd_toEndOf="@id/tv_remote_rules_version"
+                app:layout_constraintStart_toStartOf="@id/tv_remote_rules_version"
+                app:layout_constraintTop_toBottomOf="@id/tv_remote_rules_version" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_update"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:enabled="false"
+                android:text="@string/rules_btn_update"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_remote_repo_title" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </ViewFlipper>
 
