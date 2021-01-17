@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
@@ -27,6 +28,15 @@ object RuleGenerator {
 
             newRules.add(ruleBuilder.build())
         }
+        ruleBuilder.apply {
+            name = "androidx.work.impl.background.systemalarm.SystemAlarmService"
+            label = "Jetpack Work Manager"
+            type = SERVICE
+            isRegexRule = false
+            iconIndex = 28
+            regexName = ""
+        }
+        newRules.add(ruleBuilder.build())
 
         rulesListBuilder.addAllCloudRules(newRules)
         bundleBuilder.rulesList = rulesListBuilder.build()

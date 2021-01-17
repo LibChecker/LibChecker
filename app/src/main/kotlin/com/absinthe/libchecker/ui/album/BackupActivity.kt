@@ -73,7 +73,7 @@ class BackupActivity : BaseActivity() {
 //                        lifecycleScope.launch(Dispatchers.IO) {
 //                            val rules = LibCheckerApp.repository.getAllRules()
 //
-//                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION))
+//                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION+1))
 //                            os.close()
 //                        }
                     }

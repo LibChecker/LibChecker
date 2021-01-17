@@ -12,13 +12,13 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.RULES_VERSION
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -53,7 +53,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment() {
                     response.body()?.let {
                         binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
                         binding.tvRemoteRulesVersion.text = it.version.toString()
-                        if (RULES_VERSION < it.version) {
+                        if (GlobalValues.localRulesVersion < it.version) {
                             binding.btnUpdate.isEnabled = true
                         }
                         binding.vfContainer.displayedChild = 1
@@ -81,6 +81,10 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment() {
                             LibCheckerApp.repository.deleteAllRules()
                             LibCheckerApp.repository.insertRules(rulesList)
                             GlobalValues.localRulesVersion = builder.version
+                            withContext(Dispatchers.Main) {
+                                binding.tvLocalRulesVersion.text = builder.version.toString()
+                                binding.btnUpdate.isEnabled = false
+                            }
                         }
                     }
                 }

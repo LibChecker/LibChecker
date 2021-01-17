@@ -605,6 +605,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             repository.insertRules(rulesList)
+            GlobalValues.localRulesVersion = rulesBundle.version
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
