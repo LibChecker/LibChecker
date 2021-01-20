@@ -134,9 +134,9 @@ object PackageUtils {
      */
     fun getTargetApiString(packageInfo: PackageInfo): String {
         return try {
-            "API ${packageInfo.applicationInfo.targetSdkVersion}"
+            "Target API ${packageInfo.applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
-            "API ?"
+            "Target API ?"
         }
     }
 

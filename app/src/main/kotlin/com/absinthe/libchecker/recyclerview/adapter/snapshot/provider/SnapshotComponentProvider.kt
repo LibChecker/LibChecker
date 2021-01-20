@@ -64,7 +64,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
         val chip = helper.getView<Chip>(R.id.chip)
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name)
+            val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, snapshotItem.itemType)
 
             withContext(Dispatchers.Main) {
                 rule?.let {

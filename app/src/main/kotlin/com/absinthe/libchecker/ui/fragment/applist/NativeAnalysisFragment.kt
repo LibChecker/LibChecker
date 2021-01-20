@@ -76,7 +76,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = LCAppUtils.findRuleRegex(name)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
             LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
         }
 

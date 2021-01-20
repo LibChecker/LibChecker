@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.REMOVED
@@ -60,7 +61,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
         val chip = helper.getView<Chip>(R.id.chip)
 
         (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
-            val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name)
+            val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, NATIVE)
 
             withContext(Dispatchers.Main) {
                 rule?.let {

@@ -13,10 +13,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.AUTUMN
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.loge
@@ -93,17 +90,17 @@ object LCAppUtils {
         }
     }
 
-    fun findRuleRegex(string: String): RuleEntity? {
+    fun findRuleRegex(string: String, @LibType type: Int): RuleEntity? {
         AppItemRepository.rulesRegexList.forEach {
-            if (it.key.matcher(string).matches()) {
+            if (it.key.matcher(string).matches() && it.value.type == type) {
                 return it.value
             }
         }
         return null
     }
 
-    suspend fun getRuleWithRegex(name: String): RuleEntity? {
-        return LibCheckerApp.repository.getRule(name) ?: findRuleRegex(name)
+    suspend fun getRuleWithRegex(name: String, @LibType type: Int): RuleEntity? {
+        return LibCheckerApp.repository.getRule(name) ?: findRuleRegex(name, type)
     }
 }
 

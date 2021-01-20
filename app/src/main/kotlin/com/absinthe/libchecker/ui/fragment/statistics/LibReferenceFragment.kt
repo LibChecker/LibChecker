@@ -89,7 +89,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 if (view.id == R.id.iv_icon) {
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
-                    val regexName = LCAppUtils.findRuleRegex(name)?.regexName
+                    val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }

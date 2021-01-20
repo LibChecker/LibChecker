@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
@@ -21,6 +24,7 @@ import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -121,12 +125,15 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             text = PackageUtils.getVersionString(it)
                             setLongClickCopiedToClipboard(text.toString())
                         }
-                        tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
 
                         val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
-
-                        layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                        layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
+                        val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageInfo)}")
+                        ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                            val span = CenterAlignImageSpan(it)
+                            spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
+                        }
+                        tvAbiAndApi.text = spanString
                     } catch (e: Exception) {
                         loge(e.toString())
                         finish()

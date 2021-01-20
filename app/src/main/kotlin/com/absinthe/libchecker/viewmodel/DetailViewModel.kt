@@ -190,7 +190,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             list.forEach {
                 chip = null
-                LCAppUtils.getRuleWithRegex(it.name)?.let { rule ->
+                LCAppUtils.getRuleWithRegex(it.name, NATIVE)?.let { rule ->
                     chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
                 }
                 chipList.add(LibStringItemChip(it, chip))
@@ -215,7 +215,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             list.forEach {
                 chip = null
-                LCAppUtils.getRuleWithRegex(it.name)?.let { rule ->
+                LCAppUtils.getRuleWithRegex(it.name, DEX)?.let { rule ->
                     chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
                 }
                 chipList.add(LibStringItemChip(it, chip))

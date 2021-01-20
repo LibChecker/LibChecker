@@ -85,7 +85,7 @@ configurations.all {
     exclude(group = "rikka.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.34.1")
+val grpcVersion by extra("1.35.0")
 val protocVersion by extra("3.14.0")
 
 dependencies {
@@ -110,7 +110,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
 
     // Room components
-    val roomVersion = "2.2.5"
+    val roomVersion = "2.2.6"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")

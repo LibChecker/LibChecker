@@ -14,6 +14,7 @@ import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +73,8 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment() {
                     response.body()?.let {
                         lifecycleScope.launch(Dispatchers.IO) {
                             val builder = CloudRulesBundle.parseFrom(it.byteStream())
+                            logd("CloudRulesDialog", "version = ${builder.version}")
+                            logd("CloudRulesDialog", "count = ${builder.count}")
                             val rulesList = mutableListOf<RuleEntity>()
                             builder.rulesList.cloudRulesList.forEach {
                                 it?.let {

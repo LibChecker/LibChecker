@@ -1,7 +1,8 @@
 package com.absinthe.libchecker.utils
 
-import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.protocol.CloudRulesList
@@ -29,14 +30,14 @@ object RuleGenerator {
             newRules.add(ruleBuilder.build())
         }
         ruleBuilder.apply {
-            name = "androidx.work.impl.background.systemalarm.SystemAlarmService"
-            label = "Jetpack Work Manager"
-            type = SERVICE
+            name = "libmediainfo.so"
+            label = "MediaInfoLib"
+            type = NATIVE
             isRegexRule = false
-            iconIndex = 28
+            iconIndex = -1
             regexName = ""
         }
-        newRules.add(ruleBuilder.build())
+        logd("RuleGenerator",newRules.size.toString())
 
         rulesListBuilder.addAllCloudRules(newRules)
         bundleBuilder.rulesList = rulesListBuilder.build()

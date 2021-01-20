@@ -15,6 +15,7 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.RULES_VERSION
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.main.MainActivity
@@ -73,7 +74,7 @@ class BackupActivity : BaseActivity() {
 //                        lifecycleScope.launch(Dispatchers.IO) {
 //                            val rules = LibCheckerApp.repository.getAllRules()
 //
-//                            os.write(RuleGenerator.generateRulesByteArray(rules, RULES_VERSION+1))
+//                            os.write(RuleGenerator.generateRulesByteArray(rules, GlobalValues.localRulesVersion+1))
 //                            os.close()
 //                        }
                     }

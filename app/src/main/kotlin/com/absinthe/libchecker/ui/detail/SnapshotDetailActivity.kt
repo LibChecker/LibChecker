@@ -149,7 +149,7 @@ class SnapshotDetailActivity : BaseActivity() {
                 isNewOrDeleted,
                 "%s (%s)"
             )
-            tvTargetApi.text = getDiffString(entity.targetApiDiff, isNewOrDeleted, "API %s")
+            tvTargetApi.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
         }
 
         viewModel.snapshotDetailItems.observe(this, { details ->
@@ -212,7 +212,7 @@ class SnapshotDetailActivity : BaseActivity() {
 
                 val item = (adapter.data[position] as BaseSnapshotNode).item
                 val name = item.name
-                val regexName = LCAppUtils.findRuleRegex(name)?.regexName
+                val regexName = LCAppUtils.findRuleRegex(name, item.itemType)?.regexName
                 LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
                     .apply {
                         show(supportFragmentManager, tag)

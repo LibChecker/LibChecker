@@ -63,7 +63,7 @@ class LibReferenceActivity : BaseActivity() {
             })
 
             lifecycleScope.launch(Dispatchers.IO) {
-                LCAppUtils.getRuleWithRegex(name)?.let {
+                LCAppUtils.getRuleWithRegex(name, type)?.let {
                     withContext(Dispatchers.Main) {
                         binding.toolbar.title = it.label
                     }

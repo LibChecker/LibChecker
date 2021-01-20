@@ -66,7 +66,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         var rule: RuleEntity?
 
                         for (item in componentList) {
-                            rule = LCAppUtils.getRuleWithRegex(item.componentName)
+                            rule = LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
                             chip = null
                             if (rule != null) {
                                 chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
@@ -98,7 +98,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = LCAppUtils.findRuleRegex(name)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
 
             LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
         }

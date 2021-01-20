@@ -2,12 +2,15 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -27,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.tabs.TabLayoutMediator
@@ -36,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
@@ -136,16 +141,20 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                         text = PackageUtils.getVersionString(packageInfo)
                         setLongClickCopiedToClipboard(text.toString())
                     }
-                    tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
                     val abi = PackageUtils.getAbi(
                         packageInfo.applicationInfo.sourceDir,
                         packageInfo.applicationInfo.nativeLibraryDir,
                         isApk = false
                     )
+                    val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageInfo)}")
+                    ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                        val span = CenterAlignImageSpan(it)
+                        spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
+                    }
 
-                    layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                    layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
+                    tvAbiAndApi.text = spanString
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         val lcItem = LibCheckerApp.repository.getItem(packageName)

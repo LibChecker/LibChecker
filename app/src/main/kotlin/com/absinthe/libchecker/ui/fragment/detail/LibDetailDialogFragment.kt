@@ -48,7 +48,7 @@ class LibDetailDialogFragment : DialogFragment() {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
             lifecycleScope.launch(Dispatchers.IO) {
-                val iconIndex = LCAppUtils.getRuleWithRegex(libName)?.iconIndex ?: -1
+                val iconIndex = LCAppUtils.getRuleWithRegex(libName, type)?.iconIndex ?: -1
                 withContext(Dispatchers.Main) {
                     ivIcon.load(IconResMap.getIconRes(iconIndex)) {
                         crossfade(true)
