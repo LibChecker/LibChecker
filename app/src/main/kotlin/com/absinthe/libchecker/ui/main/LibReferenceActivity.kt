@@ -114,6 +114,7 @@ class LibReferenceActivity : BaseActivity() {
                         appBar?.setRaised(!top)
                     }
                 paddingBottomCompat = UiUtils.getNavBarHeight(contentResolver)
+                setHasFixedSize(true)
                 addPaddingTop(BarUtils.getStatusBarHeight())
             }
             vfContainer.apply {

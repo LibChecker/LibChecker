@@ -86,7 +86,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed-medium"
-                    android:gravity="center_vertical"
                     android:textColor="@android:color/darker_gray"
                     android:textSize="12sp"
                     android:transitionName="abi_and_api"

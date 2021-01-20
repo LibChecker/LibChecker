@@ -2,6 +2,10 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.view.ViewGroup
 import android.widget.ImageButton
 import coil.load
@@ -13,6 +17,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
+
 
 @Xml(layouts = ["item_lib_reference"])
 class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
@@ -40,7 +45,10 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
             holder.setText(R.id.tv_label_name, it.name)
         } ?: let {
             holder.getView<ImageButton>(R.id.iv_icon).load(R.drawable.ic_question)
-            holder.setText(R.id.tv_label_name, R.string.not_marked_lib)
+            val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
+            val colorSpanit = StyleSpan(Typeface.ITALIC)
+            spannableString.setSpan(colorSpanit, 0, spannableString.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+            holder.setText(R.id.tv_label_name, spannableString)
         }
 
         holder.setText(R.id.tv_count, item.referredCount.toString())

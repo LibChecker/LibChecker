@@ -103,6 +103,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
+                setHasFixedSize(true)
                 addPaddingTop(BarUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
                 FastScrollerBuilder(this).useMd2Style().build()

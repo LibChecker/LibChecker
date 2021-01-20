@@ -3,13 +3,17 @@ package com.absinthe.libchecker.recyclerview.adapter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
@@ -66,8 +70,15 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             setText(R.id.tv_app_name, item.label)
             setText(R.id.tv_package_name, item.packageName)
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))
-            setText(R.id.tv_abi, PackageUtils.getAbiString(item.abi.toInt()))
-            getView<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abi.toInt()))
+
+            val spanString = SpannableString("  ${PackageUtils.getAbiString(item.abi.toInt())}, ${PackageUtils.getTargetApiString(PackageUtils.getPackageInfo(item.packageName))}")
+            ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
+                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                val span = CenterAlignImageSpan(it)
+                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+            }
+
+            setText(R.id.tv_abi_and_api, spanString)
             itemView.transitionName = item.packageName
         }
     }

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.MenuItem
@@ -151,7 +152,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                     ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
                         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                         val span = CenterAlignImageSpan(it)
-                        spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
+                        spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                     }
 
                     tvAbiAndApi.text = spanString

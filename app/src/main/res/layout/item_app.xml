@@ -32,10 +32,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_abi"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/iv_icon"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -44,6 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
                 android:textColor="@color/textNormal"
                 android:textSize="16sp"
                 android:transitionName="app_name"
@@ -54,6 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
+                android:maxLines="1"
                 android:textColor="@color/textNormal"
                 android:textSize="14sp"
                 android:transitionName="package_name"
@@ -64,35 +65,24 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
+                android:maxLines="1"
                 android:textColor="@android:color/darker_gray"
                 android:textSize="12sp"
                 android:transitionName="version_name"
                 tools:text="1.2.0(120)" />
 
+            <TextView
+                android:id="@+id/tv_abi_and_api"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed-medium"
+                android:maxLines="1"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="12sp"
+                android:transitionName="abi_and_api"
+                tools:text="arm64-v8, Target API 30" />
+
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/iv_abi_type"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:contentDescription="ABI icon"
-            android:src="@drawable/ic_64bit"
-            app:layout_constraintBottom_toTopOf="@id/tv_abi"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="HardcodedText" />
-
-        <TextView
-            android:id="@+id/tv_abi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-condensed-medium"
-            android:textSize="11sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_abi_type"
-            tools:ignore="SmallSp"
-            tools:text="arm64-v8a" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
