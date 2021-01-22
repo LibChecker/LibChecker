@@ -21,6 +21,8 @@ import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libraries.utils.extensions.addPaddingBottom
+import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
@@ -50,6 +52,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         FragmentPieChartBinding.bind(view)
 
     override fun init() {
+        binding.root.addPaddingBottom(56.dp + UiUtils.getNavBarHeight(requireActivity().contentResolver))
         binding.chart.apply {
             dragDecelerationFrictionCoef = 0.95f
             description = null
@@ -60,7 +63,6 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
-                yOffset = 32f + UiUtils.getNavBarHeight(requireActivity().contentResolver)
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
