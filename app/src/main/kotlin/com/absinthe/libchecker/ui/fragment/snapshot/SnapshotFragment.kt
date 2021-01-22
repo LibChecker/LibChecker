@@ -180,6 +180,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
+                borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->

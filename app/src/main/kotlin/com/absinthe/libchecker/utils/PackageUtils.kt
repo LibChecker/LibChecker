@@ -132,9 +132,9 @@ object PackageUtils {
      * @param packageInfo PackageInfo
      * @return version code as String
      */
-    fun getTargetApiString(packageInfo: PackageInfo): String {
+    fun getTargetApiString(packageName: String): String {
         return try {
-            "Target API ${packageInfo.applicationInfo.targetSdkVersion}"
+            "Target API ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "Target API ?"
         }

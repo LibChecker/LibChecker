@@ -98,6 +98,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         binding.apply {
             recyclerview.apply {
                 adapter = mAdapter
+                borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->

@@ -21,12 +21,10 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.BarUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
@@ -176,7 +174,7 @@ class AboutActivity : AbsAboutActivity() {
 
     private fun initView() {
         UiUtils.setSystemBarStyle(window)
-        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).addPaddingTop(BarUtils.getStatusBarHeight())
+        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
     private fun getAcknowledgementHtmlString(list: List<String>): String {

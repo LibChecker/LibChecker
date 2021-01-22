@@ -33,10 +33,13 @@ import moe.shizuku.preference.SimpleMenuPreference
 import moe.shizuku.preference.SwitchPreference
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
+import rikka.material.widget.BorderViewDelegate
 import rikka.recyclerview.addVerticalPadding
 import rikka.recyclerview.fixEdgeEffect
 
 class SettingsFragment : PreferenceFragment(), IListController {
+
+    private lateinit var borderViewDelegate: BorderViewDelegate
 
     companion object {
         init {
@@ -180,6 +183,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
             (requireActivity() as IListContainer).controller = this
             requireActivity().invalidateOptionsMenu()
         }
+        scheduleAppbarRaisingStatus()
     }
 
     override fun onCreateItemDecoration(): DividerDecoration {
@@ -198,7 +202,8 @@ class SettingsFragment : PreferenceFragment(), IListController {
             lp.leftMargin = lp.rightMargin
         }
 
-        recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
+        borderViewDelegate = recyclerView.borderViewDelegate
+        borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
 
         lifecycleScope.launchWhenResumed {
             recyclerView.smoothScrollToPosition(0)
@@ -209,5 +214,13 @@ class SettingsFragment : PreferenceFragment(), IListController {
 
     override fun onReturnTop() {
         //Do nothing
+    }
+
+    override fun getAppBar() = (activity as MainActivity?)?.appBar
+
+    override fun getBorderViewDelegate() = borderViewDelegate
+
+    override fun scheduleAppbarRaisingStatus() {
+        getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
     }
 }
