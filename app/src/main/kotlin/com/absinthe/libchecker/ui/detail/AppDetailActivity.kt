@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.MenuItem
@@ -17,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
@@ -26,6 +24,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
@@ -45,7 +44,7 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
-class AppDetailActivity : BaseActivity(), IDetailContainer {
+class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
@@ -53,6 +52,8 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
     private var currentItemsCount = -1
 
     override var currentFragment: Sortable? = null
+
+    override fun requirePackageName() = pkgName
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true

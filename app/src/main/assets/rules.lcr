@@ -1,4 +1,4 @@
-­ðí
+­Îù
 !
 libxguardian.soä¿¡é¸½æŽ¨é€ 0
 
@@ -1184,3 +1184,45 @@ regex_okio
 com.alipay.(.*)æ”¯ä»˜å® SDK (2regex_alipay
 /
 io.flutter.(.*)Flutter (2regex_flutter
+%
+libmediainfo.soMediaInfoLib ÿÿÿÿ
+
+
+libSDL2.solibSDL ÿÿÿÿ
+?
+libtmessages.(.*)\.soTelegram APIs B(2regex_telegram_apis
+)
+libtersafe2.soè…¾è®¯äº‘æ‰‹æ¸¸å®‰å…¨ 2
+
+libumeng-spy.so	U-App SDK 5
+@
+com.lody.virtual.(.*)
+VirtualApp ÿÿÿÿ(2regex_virtual_app
+@
+com.lody.virtual.(.*)
+VirtualApp ÿÿÿÿ(2regex_virtual_app
+@
+*com.lody.virtual.client.stub.DaemonService
+VirtualApp ÿÿÿÿ
+g
+Kandroidx.work.impl.background.systemalarm.ConstraintProxy$NetworkStateProxyJetpack Work Manager 
+h
+Landroidx.work.impl.background.systemalarm.ConstraintProxy$StorageNotLowProxyJetpack Work Manager 
+h
+Landroidx.work.impl.background.systemalarm.ConstraintProxy$BatteryNotLowProxyJetpack Work Manager 
+j
+Nandroidx.work.impl.background.systemalarm.ConstraintProxy$BatteryChargingProxyJetpack Work Manager 
+\
+Acom.google.android.play.core.common.PlayCoreDialogWrapperActivityGoogle Play Service '
+c
+Hcom.google.android.play.core.missingsplits.PlayCoreMissingSplitsActivityGoogle Play Service '
+m
+Rcom.google.android.libraries.phenotype.registration.PhenotypeMetadataHolderServiceGoogle Play Service '
+o
+Tcom.google.android.libraries.phenotype.client.stable.AccountRemovedBroadcastReceiverGoogle Play Service '
+z
+_com.google.android.libraries.phenotype.client.stable.PhenotypeUpdateBackgroundBroadcastReceiverGoogle Play Service '
+7
+com.market.sdk.LazyFileProviderå°ç±³æ›´æ–° SDK >
+F
+.com.xiaomi.market.sdk.DownloadCompleteReceiverå°ç±³æ›´æ–° SDK >

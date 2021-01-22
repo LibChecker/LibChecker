@@ -21,6 +21,7 @@ import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.PieData
@@ -59,7 +60,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
-                yOffset = 32f
+                yOffset = 32f + UiUtils.getNavBarHeight(requireActivity().contentResolver)
             }
             setUsePercentValues(true)
             setExtraOffsets(5f, 10f, 5f, 5f)
