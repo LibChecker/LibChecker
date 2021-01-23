@@ -2,6 +2,7 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
@@ -66,7 +67,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             info?.let {
                 list.addAll(
-                    getNativeChipList(info.sourceDir, info.nativeLibraryDir ?: "")
+                    getNativeChipList(info)
                 )
             }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -180,8 +181,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private suspend fun getNativeChipList(sourcePath: String, nativePath: String): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
+    private suspend fun getNativeChipList(info: ApplicationInfo): List<LibStringItemChip> {
+        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 
@@ -190,7 +191,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } else {
             list.forEach {
                 chip = null
-                LCAppUtils.getRuleWithRegex(it.name, NATIVE)?.let { rule ->
+                LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
                     chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
                 }
                 chipList.add(LibStringItemChip(it, chip))

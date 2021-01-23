@@ -35,6 +35,7 @@ import java.util.*
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
+private const val SHOOT_SUCCESS_NOTIFICATION_ID = 2
 
 class ShootService : Service() {
 
@@ -228,7 +229,7 @@ class ShootService : Service() {
             .setOngoing(false)
             .setContentTitle(getString(R.string.noti_shoot_title_saved))
             .setContentText(getFormatDateString(ts))
-        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+        notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
 
         GlobalValues.snapshotTimestamp = ts
         notifyFinished(ts)

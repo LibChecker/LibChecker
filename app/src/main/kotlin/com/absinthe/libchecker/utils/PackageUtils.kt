@@ -582,6 +582,24 @@ object PackageUtils {
         return "(${Formatter.formatFileSize(Utils.getApp(), item.size)}$source)"
     }
 
+    fun hasDexClass(packageName: String, dexClassPrefix: String, isApk: Boolean = false): Boolean {
+        try {
+            val path = if (isApk) {
+                packageName
+            } else {
+                getPackageInfo(packageName).applicationInfo.sourceDir
+            }
+
+            if (path.isNullOrEmpty()) {
+                return false
+            }
+            val apkFile = ApkFile(File(path))
+            return apkFile.dexClasses.any { it.packageName.startsWith(dexClassPrefix) }
+        } catch (e: Exception) {
+            return false
+        }
+    }
+
     /**
      * Get part of DEX classes of an app
      * @param packageName Package name

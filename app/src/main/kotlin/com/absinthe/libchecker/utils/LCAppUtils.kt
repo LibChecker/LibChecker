@@ -99,8 +99,37 @@ object LCAppUtils {
         return null
     }
 
-    suspend fun getRuleWithRegex(name: String, @LibType type: Int): RuleEntity? {
-        return LibCheckerApp.repository.getRule(name) ?: findRuleRegex(name, type)
+    suspend fun getRuleWithDexChecking(name: String, packageName: String? = null): RuleEntity? {
+        val ruleEntity = LibCheckerApp.repository.getRule(name) ?: return null
+        if (ruleEntity.type == NATIVE) {
+            if (packageName == null) {
+                return ruleEntity
+            }
+            val isApk = packageName.endsWith("/temp.apk")
+            when(ruleEntity.name) {
+                "libjiagu.so" -> {
+                    return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util", isApk)) {
+                        ruleEntity
+                    } else {
+                        null
+                    }
+                }
+                "libapp.so" -> {
+                    return if (PackageUtils.hasDexClass(packageName, "io.flutter", isApk)) {
+                        ruleEntity
+                    } else {
+                        null
+                    }
+                }
+                else -> return ruleEntity
+            }
+        } else {
+            return ruleEntity
+        }
+    }
+
+    suspend fun getRuleWithRegex(name: String, @LibType type: Int, packageName: String? = null): RuleEntity? {
+        return getRuleWithDexChecking(name, packageName) ?: findRuleRegex(name, type)
     }
 }
 
