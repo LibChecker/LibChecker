@@ -70,6 +70,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: MiuiOpsException) {
                 emptyList()
             } catch (e: Exception) {
+                logd(e.toString())
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
             }

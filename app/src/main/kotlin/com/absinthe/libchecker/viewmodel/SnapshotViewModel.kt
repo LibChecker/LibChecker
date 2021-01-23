@@ -769,22 +769,4 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val date = Date(timestamp)
         return simpleDateFormat.format(date)
     }
-
-    fun migrateFrom4To5() = viewModelScope.launch(Dispatchers.IO) {
-        val ts = GlobalValues.snapshotTimestamp
-
-        snapshotItems.value?.let {
-            if (it.isNotEmpty()) {
-                val list = it
-
-                list.forEach { item ->
-                    item.timeStamp = ts
-                }
-
-                repository.update(list.toList())
-            }
-        }
-
-        insertTimeStamp(ts)
-    }
 }

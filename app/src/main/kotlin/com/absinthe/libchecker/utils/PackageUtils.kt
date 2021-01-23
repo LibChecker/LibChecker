@@ -433,32 +433,49 @@ object PackageUtils {
         val file = File(path)
         val zipFile = ZipFile(file)
         val entries = zipFile.entries()
+        val apkFile = ApkFile(file)
 
         try {
-            while (entries.hasMoreElements()) {
-                elementName = entries.nextElement().name
+            if (apkFile.manifestXml.contains("use32bitAbi=\"true\"", true)) {
+                abi = when {
+                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
+                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86
+                    else -> NO_LIBS
+                }
+            } else if (apkFile.manifestXml.contains("multiArch=\"true\"", true)) {
+                abi = when {
+                    GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) -> ARMV8
+                    GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) -> X86_64
+                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
+                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86
+                    else -> NO_LIBS
+                }
+            } else {
+                while (entries.hasMoreElements()) {
+                    elementName = entries.nextElement().name
 
-                if (elementName.contains("lib/")) {
-                    if (elementName.contains(ARMV8_STRING)) {
-                        if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
-                            abi = ARMV8
-                        }
-                        break
-                    } else if (elementName.contains(ARMV7_STRING)) {
-                        if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
-                            abi = ARMV7
-                        }
-                    } else if (elementName.contains(ARMV5_STRING)) {
-                        if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) && abi != ARMV7) {
-                            abi = ARMV5
-                        }
-                    } else if (elementName.contains(X86_64_STRING)) {
-                        if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
-                            abi = X86_64
-                        }
-                    } else if (elementName.contains(X86_STRING)) {
-                        if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") } && abi != X86_64) {
-                            abi = X86
+                    if (elementName.contains("lib/")) {
+                        if (elementName.contains(ARMV8_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
+                                abi = ARMV8
+                            }
+                            break
+                        } else if (elementName.contains(ARMV7_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
+                                abi = ARMV7
+                            }
+                        } else if (elementName.contains(ARMV5_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) && abi != ARMV7) {
+                                abi = ARMV5
+                            }
+                        } else if (elementName.contains(X86_64_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
+                                abi = X86_64
+                            }
+                        } else if (elementName.contains(X86_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") } && abi != X86_64) {
+                                abi = X86
+                            }
                         }
                     }
                 }

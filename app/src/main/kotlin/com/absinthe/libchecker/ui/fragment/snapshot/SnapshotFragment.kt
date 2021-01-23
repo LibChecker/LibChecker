@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
@@ -48,7 +47,6 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -267,10 +265,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         isSnapshotDatabaseItemsReady = false
                     }
 
-                    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
-                        viewModel.migrateFrom4To5()
-                        Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
-                    }
                 }
             })
             snapshotAppsCount.observe(viewLifecycleOwner, {
@@ -365,11 +359,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         if (isApplicationInfoItemsReady) {
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)
             isSnapshotDatabaseItemsReady = false
-        }
-
-        if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
-            viewModel.migrateFrom4To5()
-            Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
         }
     }
 

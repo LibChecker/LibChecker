@@ -44,7 +44,7 @@ object GlobalValues {
     val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
     val isShowEntryAnimation: MutableLiveData<Boolean> =
-        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true))
+        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, false))
     val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
     val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =

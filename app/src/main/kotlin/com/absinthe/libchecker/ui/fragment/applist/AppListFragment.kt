@@ -235,6 +235,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     })
                 }
             })
+
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                reloadAppsFlag.value = true
+                Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+            }
+
             dbItems.observe(viewLifecycleOwner, {
                 if (it.isNullOrEmpty()) {
                     return@observe
