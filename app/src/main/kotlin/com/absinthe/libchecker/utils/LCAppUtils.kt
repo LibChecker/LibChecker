@@ -17,8 +17,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.loge
-import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.Utils
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
@@ -37,7 +35,7 @@ object LCAppUtils {
     }
 
     fun setTitle(): String {
-        val sb = StringBuilder(Utils.getApp().getString(R.string.app_name))
+        val sb = StringBuilder(LibCheckerApp.context.getString(R.string.app_name))
 
         if (SimpleDateFormat("MMdd", Locale.getDefault()).format(Date()) == "1225") {
             sb.append("\uD83C\uDF84")
@@ -47,7 +45,9 @@ object LCAppUtils {
 
     fun getAppIcon(packageName: String): Drawable {
         return try {
-            AppUtils.getAppIcon(packageName)
+            val pm = LibCheckerApp.context.packageManager
+            val pi = pm.getPackageInfo(packageName, 0)
+            pi?.applicationInfo?.loadIcon(pm)!!
         } catch (e: Exception) {
             ColorDrawable(Color.TRANSPARENT)
         }

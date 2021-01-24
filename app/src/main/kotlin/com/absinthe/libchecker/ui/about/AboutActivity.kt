@@ -21,10 +21,10 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
@@ -92,7 +92,7 @@ class AboutActivity : AbsAboutActivity() {
 
     override fun onItemsCreated(items: MutableList<Any>) {
 
-        val hasInstallCoolApk = AppUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
 
         items.apply {
             add(Category("What's this"))

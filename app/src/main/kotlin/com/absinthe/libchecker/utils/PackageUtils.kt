@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.text.format.Formatter
 import androidx.core.content.pm.PackageInfoCompat
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
@@ -28,8 +29,6 @@ import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
-import com.blankj.utilcode.util.PermissionUtils
-import com.blankj.utilcode.util.Utils
 import net.dongliu.apk.parser.ApkFile
 import java.io.BufferedReader
 import java.io.File
@@ -67,13 +66,13 @@ object PackageUtils {
         } else {
             PackageManager.GET_DISABLED_COMPONENTS
         }
-        val packageInfo = Utils.getApp().packageManager.getPackageInfo(
+        val packageInfo = LibCheckerApp.context.packageManager.getPackageInfo(
             packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or pmFlag
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-            val info = Utils.getApp().packageManager.getPackageInfo(packageInfo.packageName, 0)
+            val info = LibCheckerApp.context.packageManager.getPackageInfo(packageInfo.packageName, 0)
 
-            return Utils.getApp().packageManager.getPackageArchiveInfo(info.applicationInfo.sourceDir, pmFlag or flag)?.apply {
+            return LibCheckerApp.context.packageManager.getPackageArchiveInfo(info.applicationInfo.sourceDir, pmFlag or flag)?.apply {
                 applicationInfo.sourceDir = info.applicationInfo.sourceDir
                 applicationInfo.nativeLibraryDir = info.applicationInfo.nativeLibraryDir
             } ?: throw PackageManager.NameNotFoundException()
@@ -92,7 +91,7 @@ object PackageUtils {
             throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
         }
 
-        return Utils.getApp().packageManager?.getInstalledApplications(PackageManager.GET_META_DATA) ?: emptyList()
+        return LibCheckerApp.context.packageManager?.getInstalledApplications(PackageManager.GET_META_DATA) ?: emptyList()
     }
 
     /**
@@ -102,6 +101,15 @@ object PackageUtils {
      */
     fun getVersionCode(packageInfo: PackageInfo): Long {
         return PackageInfoCompat.getLongVersionCode(packageInfo)
+    }
+
+    /**
+     * Get version code of an app
+     * @param packageName packageName
+     * @return version code as Long Integer
+     */
+    fun getVersionCode(packageName: String): Long {
+        return PackageInfoCompat.getLongVersionCode(getPackageInfo(packageName))
     }
 
     /**
@@ -542,8 +550,8 @@ object PackageUtils {
         ARMV5 to ARMV5_STRING,
         X86_64 to X86_64_STRING,
         X86 to X86_STRING,
-        NO_LIBS to Utils.getApp().getString(R.string.no_libs),
-        ERROR to Utils.getApp().getString(R.string.cannot_read)
+        NO_LIBS to LibCheckerApp.context.getString(R.string.no_libs),
+        ERROR to LibCheckerApp.context.getString(R.string.cannot_read)
     )
 
     /**
@@ -552,7 +560,7 @@ object PackageUtils {
      * @return ABI string
      */
     fun getAbiString(abi: Int): String {
-        return ABI_STRING_MAP[abi] ?: Utils.getApp().getString(R.string.unknown)
+        return ABI_STRING_MAP[abi] ?: LibCheckerApp.context.getString(R.string.unknown)
     }
 
     private val ABI_BADGE_MAP = hashMapOf(
@@ -579,7 +587,7 @@ object PackageUtils {
      */
     fun sizeToString(item: LibStringItem): String {
         val source = item.source?.let { ", ${item.source}" } ?: ""
-        return "(${Formatter.formatFileSize(Utils.getApp(), item.size)}$source)"
+        return "(${Formatter.formatFileSize(LibCheckerApp.context, item.size)}$source)"
     }
 
     fun hasDexClass(packageName: String, dexClassPrefix: String, isApk: Boolean = false): Boolean {
@@ -676,14 +684,36 @@ object PackageUtils {
      * @return Permissions list
      */
     fun getPermissionsList(packageName: String): List<String> {
-        return PermissionUtils.getPermissions(packageName)
+        val pm = LibCheckerApp.context.packageManager
+        return try {
+            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+        } catch (e: PackageManager.NameNotFoundException) {
+            emptyList()
+        }
     }
 
+    /**
+     * Judge that whether the device ships an Intel CPU
+     * @return true if it ships an Intel CPU
+     */
     fun isIntelCpu(): Boolean {
         return try {
             BufferedReader(FileReader("/proc/cpuinfo"))
                 .readLine().contains("Intel")
         } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Judge that whether an app is installed
+     * @return true if it is installed
+     */
+    fun isAppInstalled(pkgName: String): Boolean {
+        val pm = LibCheckerApp.context.packageManager
+        return try {
+            pm.getApplicationInfo(pkgName, 0).enabled
+        } catch (e: PackageManager.NameNotFoundException) {
             false
         }
     }

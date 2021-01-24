@@ -23,7 +23,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.extensions.logd
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -62,7 +61,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                     appBar?.setRaised(!top)
                 }
-            addPaddingTop(BarUtils.getStatusBarHeight())
+            addPaddingTop(UiUtils.getStatusBarHeight())
             addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
             FastScrollerBuilder(this).useMd2Style().build()
         }

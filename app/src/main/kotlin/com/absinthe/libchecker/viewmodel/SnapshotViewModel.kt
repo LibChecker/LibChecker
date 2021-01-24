@@ -21,7 +21,6 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.protobuf.InvalidProtocolBufferException
@@ -484,7 +483,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun sizeToString(size: Long): String {
-        return "${Formatter.formatFileSize(Utils.getApp(), size)} ($size Bytes)"
+        return "${Formatter.formatFileSize(LibCheckerApp.context, size)} ($size Bytes)"
     }
 
     data class CompareDiffNode(

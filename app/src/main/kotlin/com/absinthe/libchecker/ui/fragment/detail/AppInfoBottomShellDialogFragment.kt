@@ -37,7 +37,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = LayoutBottomSheetAppInfoBinding.inflate(inflater)
         initView(binding)
         return binding.root

@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.extensions.loge
-import com.blankj.utilcode.util.AppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.google.gson.Gson
 
 const val TYPE_ACTIVITY = "activity"
@@ -61,7 +61,7 @@ class MonkeyKingManager {
 
     companion object {
         val isSupportInteraction =
-            AppUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID)
-                    && AppUtils.getAppVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+            PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID)
+                    && PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

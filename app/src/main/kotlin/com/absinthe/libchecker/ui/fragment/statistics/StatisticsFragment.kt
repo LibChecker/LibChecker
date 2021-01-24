@@ -7,7 +7,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.FragmentStatisticsBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.blankj.utilcode.util.BarUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.tabs.TabLayoutMediator
 
 class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.fragment_statistics) {
@@ -17,7 +17,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
     override fun init() {
         setHasOptionsMenu(true)
 
-        binding.root.addPaddingTop(BarUtils.getStatusBarHeight())
+        binding.root.addPaddingTop(UiUtils.getStatusBarHeight())
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 2

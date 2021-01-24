@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.extensions.setSystemPadding
 import com.absinthe.libchecker.ui.app.AppActivity
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.libraries.utils.utils.UiUtils.setSystemBarStyle
-import com.blankj.utilcode.util.BarUtils
 
 @SuppressLint("Registered")
 abstract class BaseActivity : AppActivity() {
@@ -28,7 +28,7 @@ abstract class BaseActivity : AppActivity() {
         window.decorView.post { setSystemBarStyle(window) }
 
         if (isPaddingToolbar) {
-            root?.paddingTopCompat = BarUtils.getStatusBarHeight()
+            root?.paddingTopCompat = UiUtils.getStatusBarHeight()
         }
     }
 

@@ -43,7 +43,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -105,7 +104,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingTop(UiUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
                 FastScrollerBuilder(this).useMd2Style().build()
             }

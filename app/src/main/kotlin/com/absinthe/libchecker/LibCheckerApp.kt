@@ -20,6 +20,7 @@ class LibCheckerApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        context = this
         if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
             AppCenter.start(
                 this, Constants.APP_CENTER_SECRET,
@@ -42,5 +43,6 @@ class LibCheckerApp : Application() {
 
     companion object {
         lateinit var repository: LCRepository
+        lateinit var context: Context
     }
 }

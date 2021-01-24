@@ -22,7 +22,6 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -115,7 +114,7 @@ class LibReferenceActivity : BaseActivity() {
                     }
                 paddingBottomCompat = UiUtils.getNavBarHeight(contentResolver)
                 setHasFixedSize(true)
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingTop(UiUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(

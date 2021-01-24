@@ -6,16 +6,16 @@ import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
 
-    private val preferences: SharedPreferences = Utils.getApp()
+    private val preferences: SharedPreferences = LibCheckerApp.context
         .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
 
     private fun getPreferences(): SharedPreferences {

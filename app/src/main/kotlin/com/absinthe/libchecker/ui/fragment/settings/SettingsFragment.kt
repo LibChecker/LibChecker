@@ -24,6 +24,7 @@ import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -145,7 +146,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         }
         findPreference(Constants.PREF_RATE)?.apply {
             setOnPreferenceClickListener {
-                val hasInstallCoolApk = com.blankj.utilcode.util.AppUtils.isAppInstalled("com.coolapk.market")
+                val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
                 val marketUrl = if (hasInstallCoolApk) {
                     URLManager.COOLAPK_APP_PAGE
                 } else {

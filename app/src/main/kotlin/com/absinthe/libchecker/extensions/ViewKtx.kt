@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Toasty
-import com.blankj.utilcode.util.BarUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
 fun View.setLongClickCopiedToClipboard(text: String) {
@@ -61,5 +61,5 @@ fun View.addPaddingBottom(padding: Int) {
 fun ViewGroup.setSystemPadding() {
     val isOrientationLandscape = context.isOrientationLandscape
     fitsSystemWindows = isOrientationLandscape
-    setPadding(0, if (isOrientationLandscape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+    setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
 }

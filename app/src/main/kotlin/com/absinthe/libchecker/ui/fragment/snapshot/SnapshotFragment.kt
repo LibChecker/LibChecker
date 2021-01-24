@@ -44,7 +44,6 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -203,7 +202,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingTop(UiUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
             }
             vfContainer.apply {
