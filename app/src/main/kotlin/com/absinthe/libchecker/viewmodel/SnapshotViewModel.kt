@@ -79,6 +79,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val context: Context = getApplication<LibCheckerApp>()
         val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value?.toMutableList() ?: mutableListOf()
+        val removeList = mutableListOf<ApplicationInfo>()
 
         val packageManager = context.packageManager
 
@@ -123,10 +124,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             diffList.add(snapshotDiffItem)
                         }
 
-                        appList.remove(it)
+                        removeList.add(it)
                     } catch (e: Exception) {
                         loge(e.toString())
-                        appList.remove(it)
+                        removeList.add(it)
                     }
                 } ?: run {
                     diffList.add(
@@ -150,6 +151,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 }
             }
+
+            removeList.forEach { appList.remove(it) }
+            removeList.clear()
 
             for (info in appList) {
                 try {
@@ -211,6 +215,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         val diffList = mutableListOf<SnapshotDiffItem>()
+        val remoteList = mutableListOf<SnapshotItem>()
 
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
@@ -245,7 +250,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                         diffList.add(snapshotDiffItem)
                     }
-                    currList.remove(it)
+                    remoteList.add(it)
                 } ?: run {
                     diffList.add(
                         SnapshotDiffItem(
@@ -268,6 +273,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 }
             }
+            
+            remoteList.forEach { currList.remove(it) }
+            remoteList.clear()
 
             for (info in currList) {
                 diffList.add(
