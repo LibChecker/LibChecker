@@ -128,7 +128,6 @@ dependencies {
     implementation("com.drakeet.multitype:multitype:4.2.0")
     implementation("com.airbnb.android:lottie:3.6.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.1.1")

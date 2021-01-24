@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.SpannableString
@@ -32,7 +33,6 @@ import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragme
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -114,7 +114,11 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         pkgName?.let { packageName ->
             viewModel.packageName = packageName
             supportActionBar?.apply {
-                title = AppUtils.getAppName(packageName)
+                title = try {
+                    PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
+                } catch (e: PackageManager.NameNotFoundException) {
+                    getString(R.string.detail_label)
+                }
             }
             binding.apply {
                 try {
@@ -132,7 +136,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         }
                     }
                     tvAppName.apply {
-                        text = AppUtils.getAppName(packageName)
+                        text = PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
                         setLongClickCopiedToClipboard(text.toString())
                     }
                     tvPackageName.apply {

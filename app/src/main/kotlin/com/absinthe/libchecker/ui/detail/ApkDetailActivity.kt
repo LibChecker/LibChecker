@@ -22,11 +22,11 @@ import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.FileIOUtils
 import com.google.android.material.tabs.TabLayoutMediator
 import me.zhanghai.android.appiconloader.AppIconLoader
 import java.io.File
@@ -98,7 +98,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         try {
             inputStream = contentResolver.openInputStream(uri)
 
-            FileIOUtils.writeFileFromIS(tempFile, inputStream)
+            FileUtils.writeFileFromIS(tempFile!!, inputStream)
 
             val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
             packageInfo?.let {

@@ -22,7 +22,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.extensions.logd
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -104,7 +103,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     .asSequence()
                     .map {
                         TrackListItem(
-                            label = AppUtils.getAppName(it.packageName),
+                            label = it.loadLabel(packageManager).toString(),
                             packageName = it.packageName,
                             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
                         )
