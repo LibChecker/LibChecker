@@ -273,7 +273,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 }
             }
-            
+
             remoteList.forEach { currList.remove(it) }
             remoteList.clear()
 
