@@ -51,6 +51,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val context: Context = getApplication<LibCheckerApp>()
         val list = ArrayList<LibStringItemChip>()
+        logd("sasa","path=$packageName")
 
         try {
             val info = if (packageName.endsWith("/temp.apk")) {
@@ -182,7 +183,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
 
     private suspend fun getNativeChipList(info: ApplicationInfo): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir).toMutableList()
+        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir ?: "").toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 

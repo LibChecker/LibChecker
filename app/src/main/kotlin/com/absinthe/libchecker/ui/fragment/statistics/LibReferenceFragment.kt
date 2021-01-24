@@ -24,6 +24,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -213,7 +214,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     ignoreCase = true
                 ) ?: false
             }
+            adapter.hightlightText = newText
             adapter.setDiffNewData(filter.toMutableList())
+            doOnMainThreadIdle({
+                adapter.notifyDataSetChanged()
+            })
 
             if (newText.equals("Easter Egg", true)) {
                 Toasty.show(requireContext(), "🥚")

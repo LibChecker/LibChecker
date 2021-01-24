@@ -58,13 +58,13 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        (findPreference(Constants.PREF_ENTRY_ANIMATION) as SwitchPreference).apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.isShowEntryAnimation.value = newValue as Boolean
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ENTRY_ANIMATION", newValue))
-                true
-            }
-        }
+//        (findPreference(Constants.PREF_ENTRY_ANIMATION) as SwitchPreference).apply {
+//            setOnPreferenceChangeListener { _, newValue ->
+//                GlobalValues.isShowEntryAnimation.value = newValue as Boolean
+//                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ENTRY_ANIMATION", newValue))
+//                true
+//            }
+//        }
         (findPreference(Constants.PREF_APK_ANALYTICS) as SwitchPreference).apply {
             setOnPreferenceChangeListener { _, newValue ->
                 val flag = if (newValue as Boolean) {

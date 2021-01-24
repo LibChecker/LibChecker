@@ -3,7 +3,10 @@ package com.absinthe.libchecker.recyclerview.adapter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -29,6 +32,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     private val iconLoader by lazy { AppIconLoader(context.resources.getDimensionPixelSize(R.dimen.app_icon_size), false, context) }
     private val iconMap = mutableMapOf<String, Bitmap>()
+    var hightlightText: String = ""
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
@@ -39,9 +43,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             getView<ImageView>(R.id.iv_icon).apply {
                 tag = item.packageName
                 iconMap[item.packageName]?.let {
-                    load(it) {
-                        crossfade(true)
-                    }
+                    load(it)
                 } ?: let {
                     GlobalScope.launch(Dispatchers.IO) {
                         var applicationInfo: ApplicationInfo? = null
@@ -67,8 +69,33 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                 }
             }
 
-            setText(R.id.tv_app_name, item.label)
-            setText(R.id.tv_package_name, item.packageName)
+            if (hightlightText.isNotBlank() && item.label.contains(hightlightText, true)) {
+                val builder = SpannableStringBuilder()
+                val spannableString = SpannableString(item.label)
+                val start = item.label.indexOf(hightlightText, 0, true)
+                spannableString.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+                    start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                )
+                builder.append(spannableString)
+                setText(R.id.tv_app_name, builder)
+            } else {
+                setText(R.id.tv_app_name, item.label)
+            }
+            if (hightlightText.isNotBlank() && item.packageName.contains(hightlightText, true)) {
+                val builder = SpannableStringBuilder()
+                val spannableString = SpannableString(item.packageName)
+                val start = item.packageName.indexOf(hightlightText, 0, true)
+                spannableString.setSpan(
+                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+                    start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                )
+                builder.append(spannableString)
+                setText(R.id.tv_package_name, builder)
+            } else {
+                setText(R.id.tv_package_name, item.packageName)
+            }
+
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))
 
             val spanString = SpannableString("  ${PackageUtils.getAbiString(item.abi.toInt())}, ${PackageUtils.getTargetApiString(item.packageName)}")
@@ -81,6 +108,10 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             setText(R.id.tv_abi_and_api, spanString)
             itemView.transitionName = item.packageName
         }
+    }
+
+    override fun getItemId(position: Int): Long {
+        return data[position].hashCode().toLong()
     }
 
     fun release() {

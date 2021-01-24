@@ -20,6 +20,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -51,6 +52,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
+
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -92,6 +94,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             }
             setDiffCallback(AppListDiffUtil())
+            setHasStableIds(true)
         }
 
         binding.apply {
@@ -181,7 +184,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
             }
+            mAdapter.hightlightText = newText
             updateItems(filter)
+            doOnMainThreadIdle({
+                mAdapter.notifyDataSetChanged()
+            })
 
             if (newText.equals("Easter Egg", true)) {
                 Toasty.show(requireContext(), "🥚")

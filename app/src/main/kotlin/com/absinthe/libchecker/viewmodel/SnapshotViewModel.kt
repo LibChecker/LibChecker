@@ -192,7 +192,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         )
                     )
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    loge(e.toString())
                     continue
                 }
             }

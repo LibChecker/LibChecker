@@ -137,12 +137,25 @@ object PackageUtils {
 
     /**
      * Get target api string of an app ( API 30 )
-     * @param packageInfo PackageInfo
+     * @param packageName PackageName
      * @return version code as String
      */
     fun getTargetApiString(packageName: String): String {
         return try {
             "Target API ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
+        } catch (e: PackageManager.NameNotFoundException) {
+            "Target API ?"
+        }
+    }
+
+    /**
+     * Get target api string of an app ( API 30 )
+     * @param packageInfo PackageInfo
+     * @return version code as String
+     */
+    fun getTargetApiString(packageInfo: PackageInfo): String {
+        return try {
+            "Target API ${packageInfo.applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "Target API ?"
         }
