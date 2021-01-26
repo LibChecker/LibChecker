@@ -55,7 +55,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         binding.root.addPaddingBottom(56.dp + UiUtils.getNavBarHeight(requireActivity().contentResolver))
         binding.chart.apply {
             dragDecelerationFrictionCoef = 0.95f
-            description = null
+            description.isEnabled = false
             legend.apply {
                 verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
                 horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
@@ -65,7 +65,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 yEntrySpace = 0f
             }
             setUsePercentValues(true)
-            setExtraOffsets(5f, 10f, 5f, 5f)
+            setExtraOffsets(5f, 10f, 5f, 0f)
             setEntryLabelColor(ContextCompat.getColor(context, R.color.textNormal))
             setEntryLabelTextSize(11f)
             setNoDataText(getString(R.string.loading))
@@ -136,6 +136,10 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 sliceSpace = 3f
                 iconsOffset = MPPointF(0f, 40f)
                 selectionShift = 5f
+                valueLinePart1OffsetPercentage = 80f
+                valueLinePart1Length = 0.2f
+                valueLinePart2Length = 0.4f
+                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
             // add a lot of colors
@@ -195,6 +199,10 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 sliceSpace = 3f
                 iconsOffset = MPPointF(0f, 40f)
                 selectionShift = 5f
+                valueLinePart1OffsetPercentage = 80f
+                valueLinePart1Length = 0.2f
+                valueLinePart2Length = 0.4f
+                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
             // add a lot of colors
@@ -264,6 +272,10 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 sliceSpace = 3f
                 iconsOffset = MPPointF(0f, 40f)
                 selectionShift = 5f
+                valueLinePart1OffsetPercentage = 80f
+                valueLinePart1Length = 0.2f
+                valueLinePart2Length = 0.4f
+                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
             // add a lot of colors

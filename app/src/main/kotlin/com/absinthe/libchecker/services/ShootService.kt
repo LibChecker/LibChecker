@@ -27,6 +27,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class ShootService : Service() {
 
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
-            GlobalScope.launch { this@ShootService.computeSnapshots(dropPrevious) }
+            GlobalScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
         }
 
         override fun registerOnShootOverListener(listener: OnShootOverListener?) {
