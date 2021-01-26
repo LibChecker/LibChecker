@@ -7,11 +7,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -20,9 +16,9 @@ import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import com.absinthe.libraries.utils.utils.UiUtils
 
 /**
@@ -32,15 +28,15 @@ import com.absinthe.libraries.utils.utils.UiUtils
  * </pre>
  */
 
-class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
+class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBottomSheetAppInfoBinding>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val binding = LayoutBottomSheetAppInfoBinding.inflate(inflater)
+    override fun initBinding(): LayoutBottomSheetAppInfoBinding = LayoutBottomSheetAppInfoBinding.inflate(layoutInflater)
+
+    override fun init() {
         initView(binding)
-        return binding.root
     }
 
     private fun initView(binding: LayoutBottomSheetAppInfoBinding) {

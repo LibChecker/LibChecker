@@ -10,8 +10,8 @@
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 495,
-      "versionName": "2.0.0-alpha02.r495.b2b8d41",
+      "versionCode": 501,
+      "versionName": "2.0.0-alpha03.r501.4a09cc2",
       "outputFile": "app-release.apk"
     }
   ]

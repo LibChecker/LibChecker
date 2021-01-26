@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
@@ -21,7 +22,6 @@ import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
-import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.components.Legend
@@ -52,20 +52,23 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         FragmentPieChartBinding.bind(view)
 
     override fun init() {
-        binding.root.addPaddingBottom(56.dp + UiUtils.getNavBarHeight(requireActivity().contentResolver))
         binding.chart.apply {
+            layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT).apply {
+                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(requireActivity().contentResolver))
+            }
             dragDecelerationFrictionCoef = 0.95f
             description.isEnabled = false
             legend.apply {
                 verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                horizontalAlignment = Legend.LegendHorizontalAlignment.RIGHT
-                orientation = Legend.LegendOrientation.VERTICAL
+                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                orientation = Legend.LegendOrientation.HORIZONTAL
                 textColor = ContextCompat.getColor(context, R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
+                isWordWrapEnabled = true
             }
             setUsePercentValues(true)
-            setExtraOffsets(5f, 10f, 5f, 0f)
+            setExtraOffsets(24f, 0f, 24f, 0f)
             setEntryLabelColor(ContextCompat.getColor(context, R.color.textNormal))
             setEntryLabelTextSize(11f)
             setNoDataText(getString(R.string.loading))
@@ -136,10 +139,6 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 sliceSpace = 3f
                 iconsOffset = MPPointF(0f, 40f)
                 selectionShift = 5f
-                valueLinePart1OffsetPercentage = 80f
-                valueLinePart1Length = 0.2f
-                valueLinePart2Length = 0.4f
-                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
             // add a lot of colors
@@ -199,10 +198,6 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 sliceSpace = 3f
                 iconsOffset = MPPointF(0f, 40f)
                 selectionShift = 5f
-                valueLinePart1OffsetPercentage = 80f
-                valueLinePart1Length = 0.2f
-                valueLinePart2Length = 0.4f
-                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
             // add a lot of colors

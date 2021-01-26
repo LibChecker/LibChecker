@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/normal_padding"
+    android:paddingTop="@dimen/normal_padding"
     tools:context=".ui.fragment.statistics.StatisticsFragment">
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/buttons_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingHorizontal="@dimen/normal_padding"
         app:layout_constraintTop_toTopOf="parent"
         app:selectionRequired="true"
         app:singleSelection="true">

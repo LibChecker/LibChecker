@@ -109,6 +109,7 @@ class ShootService : Service() {
     }
 
     private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+        notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
         val ts = System.currentTimeMillis()
 
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
@@ -168,8 +169,6 @@ class ShootService : Service() {
                     )
                 }
                 count++
-                builder.setProgress(size, count, false)
-                notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
             } catch (e: Exception) {
                 loge(e.toString())
                 exceptionInfoList.add(info)
@@ -177,6 +176,8 @@ class ShootService : Service() {
             }
 
             if (dbList.size >= 50) {
+                builder.setProgress(size, count, false)
+                notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
                 repository.insertSnapshots(dbList)
                 dbList.clear()
             }
@@ -215,10 +216,10 @@ class ShootService : Service() {
                 continue
             }
             count++
-            builder.setProgress(size, count, false)
-            notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
         }
 
+        builder.setProgress(size, count, false)
+        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
         repository.insertSnapshots(dbList)
         repository.insert(TimeStampItem(ts))
 

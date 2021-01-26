@@ -31,7 +31,10 @@ const val VF_CHILD_FAILED = 2
 
 class LibDetailDialogFragment : DialogFragment() {
 
-    private lateinit var dialogViewBinding: LayoutDialogLibDetailBinding
+    private var _binding: LayoutDialogLibDetailBinding? = null
+    private val binding: LayoutDialogLibDetailBinding
+    get() = _binding!!
+
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
@@ -43,8 +46,8 @@ class LibDetailDialogFragment : DialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        dialogViewBinding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
-        dialogViewBinding.apply {
+        _binding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
+        binding.apply {
             vfContainer.displayedChild = VF_CHILD_LOADING
             tvLibName.text = libName
             lifecycleScope.launch(Dispatchers.IO) {
@@ -70,7 +73,7 @@ class LibDetailDialogFragment : DialogFragment() {
         }
 
         return AlertDialog.Builder(requireContext())
-            .setView(dialogViewBinding.root)
+            .setView(binding.root)
             .create()
     }
 
@@ -78,7 +81,7 @@ class LibDetailDialogFragment : DialogFragment() {
         super.onStart()
         viewModel.detailBean.observe(this, {
             if (it != null) {
-                dialogViewBinding.apply {
+                binding.apply {
                     tvLabelName.text = it.label
                     tvTeamName.text = it.team
                     tvContributorName.text = it.contributors.toContributorsString()
@@ -93,7 +96,7 @@ class LibDetailDialogFragment : DialogFragment() {
                 }
             } else {
                 if (isStickyEventReceived) {
-                    dialogViewBinding.vfContainer.displayedChild = VF_CHILD_FAILED
+                    binding.vfContainer.displayedChild = VF_CHILD_FAILED
                 } else {
                     isStickyEventReceived = true
                 }
@@ -106,9 +109,10 @@ class LibDetailDialogFragment : DialogFragment() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         viewModel.detailBean.value = null
+        _binding = null
     }
 
     companion object {
