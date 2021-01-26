@@ -697,10 +697,11 @@ object PackageUtils {
      * @return Permissions list
      */
     fun getPermissionsList(packageName: String): List<String> {
-        val pm = LibCheckerApp.context.packageManager
         return try {
-            pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+            getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
         } catch (e: PackageManager.NameNotFoundException) {
+            emptyList()
+        } catch (e: NullPointerException) {
             emptyList()
         }
     }
