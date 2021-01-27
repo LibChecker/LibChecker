@@ -739,6 +739,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
         val finalList = mutableListOf<SnapshotItem>()
         val timeStampSet = mutableSetOf<Long>()
+        var count = 0
 
         list.snapshotsList.forEach {
             if (it != null) {
@@ -764,10 +765,19 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         it.permissions
                     )
                 )
+                count++
+            }
+
+            if (count == 50) {
+                repository.insertSnapshots(finalList)
+                finalList.clear()
+                count = 0
             }
         }
 
         repository.insertSnapshots(finalList)
+        finalList.clear()
+        count = 0
         timeStampSet.forEach { insertTimeStamp(it) }
     }
 
