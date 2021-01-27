@@ -270,6 +270,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 valueLinePart1OffsetPercentage = 80f
                 valueLinePart1Length = 0.2f
                 valueLinePart2Length = 0.4f
+                valueLineColor = ContextCompat.getColor(requireContext(), R.color.textNormal)
                 yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
             }
 
@@ -364,12 +365,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             }
             TYPE_TARGET_API -> {
                 val targetApi = legendList[h.x.toInt()].toInt()
-                var packageInfo: PackageInfo
+                var packageInfo: PackageInfo?
 
                 dialogTitle = "Target API $targetApi"
                 filteredList?.filter {
-                    packageInfo = PackageUtils.getPackageInfo(it.packageName)
-                    packageInfo.applicationInfo.targetSdkVersion == targetApi
+                    packageInfo = try { PackageUtils.getPackageInfo(it.packageName) } catch (e: PackageManager.NameNotFoundException) { null }
+                    packageInfo?.applicationInfo?.targetSdkVersion == targetApi
                 }?.let { filter -> item = ArrayList(filter) }
             }
         }
