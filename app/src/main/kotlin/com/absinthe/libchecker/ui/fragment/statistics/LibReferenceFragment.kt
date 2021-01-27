@@ -4,8 +4,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
@@ -15,6 +17,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.logd
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -40,15 +44,18 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
     private var isListReady = false
     private var menu: Menu? = null
     private var category = NATIVE
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
 
     override fun init() {
         setHasOptionsMenu(true)
 
+        layoutManager = LinearLayoutManager(requireContext())
         binding.apply {
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter
+                layoutManager = this@LibReferenceFragment.layoutManager
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
                 FastScrollerBuilder(this).useMd2Style().build()
             }
@@ -214,10 +221,20 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     ignoreCase = true
                 ) ?: false
             }
-            adapter.hightlightText = newText
+            adapter.highlightText = newText
             adapter.setDiffNewData(filter.toMutableList())
             doOnMainThreadIdle({
-                adapter.notifyDataSetChanged()
+                val first = layoutManager.findFirstVisibleItemPosition()
+                val last = layoutManager.findLastVisibleItemPosition()
+
+                for (i in first..last) {
+                    (adapter.getViewByPosition(i, R.id.tv_label_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                    (adapter.getViewByPosition(i, R.id.tv_lib_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                }
             })
 
             if (newText.equals("Easter Egg", true)) {

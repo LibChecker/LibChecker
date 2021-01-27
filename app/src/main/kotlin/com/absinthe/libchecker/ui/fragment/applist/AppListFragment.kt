@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -20,7 +21,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -29,6 +29,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
@@ -65,6 +66,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private var hasRequestChanges = false
     private var isListReady = false
     private var menu: Menu? = null
+    private lateinit var layoutManager: RecyclerView.LayoutManager
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -184,10 +186,34 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
             }
-            mAdapter.hightlightText = newText
+            mAdapter.highlightText = newText
             updateItems(filter)
             doOnMainThreadIdle({
-                mAdapter.notifyDataSetChanged()
+                val first: Int
+                val last: Int
+                when(layoutManager) {
+                    is LinearLayoutManager -> {
+                        first = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                    }
+                    is StaggeredGridLayoutManager -> {
+                        first = (layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
+                        last = (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last()
+                    }
+                    else -> {
+                        first = 0
+                        last = 0
+                    }
+                }
+
+                for (i in first..last) {
+                    (mAdapter.getViewByPosition(i, R.id.tv_app_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                    (mAdapter.getViewByPosition(i, R.id.tv_package_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                }
             })
 
             if (newText.equals("Easter Egg", true)) {
@@ -354,11 +380,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
-        return when (resources.configuration.orientation) {
+        layoutManager = when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
             Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
+        return layoutManager
     }
 
     private fun flip(page: Int) {

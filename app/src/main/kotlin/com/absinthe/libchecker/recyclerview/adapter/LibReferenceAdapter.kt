@@ -3,19 +3,17 @@ package com.absinthe.libchecker.recyclerview.adapter
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Typeface
-import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.Spanned
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
 import android.widget.ImageButton
-import androidx.core.content.ContextCompat
+import android.widget.TextView
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -26,7 +24,7 @@ import com.zhangyue.we.x2c.ano.Xml
 @Xml(layouts = ["item_lib_reference"])
 class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
 
-    var hightlightText: String = ""
+    var highlightText: String = ""
 
     init {
         addChildClickViewIds(R.id.iv_icon)
@@ -37,16 +35,8 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
     }
 
     override fun convert(holder: BaseViewHolder, item: LibReference) {
-        if (hightlightText.isNotBlank() && item.libName.contains(hightlightText, true)) {
-            val builder = SpannableStringBuilder()
-            val spannableString = SpannableString(item.libName)
-            val start = item.libName.indexOf(hightlightText, 0, true)
-            spannableString.setSpan(
-                ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-                start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-            )
-            builder.append(spannableString)
-            holder.setText(R.id.tv_lib_name, builder)
+        if (highlightText.isNotBlank()) {
+            holder.getView<TextView>(R.id.tv_lib_name).tintHighlightText(highlightText, item.libName)
         } else {
             holder.setText(R.id.tv_lib_name, item.libName)
         }
@@ -60,16 +50,8 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
                 }
             }
 
-            if (hightlightText.isNotBlank() && it.name.contains(hightlightText, true)) {
-                val builder = SpannableStringBuilder()
-                val spannableString = SpannableString(it.name)
-                val start = it.name.indexOf(hightlightText, 0, true)
-                spannableString.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-                    start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-                )
-                builder.append(spannableString)
-                holder.setText(R.id.tv_label_name, builder)
+            if (highlightText.isNotBlank()) {
+                holder.getView<TextView>(R.id.tv_label_name).tintHighlightText(highlightText, it.name)
             } else {
                 holder.setText(R.id.tv_label_name, it.name)
             }

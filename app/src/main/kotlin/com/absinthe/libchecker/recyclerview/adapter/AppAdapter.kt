@@ -3,18 +3,17 @@ package com.absinthe.libchecker.recyclerview.adapter
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -32,7 +31,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     private val iconLoader by lazy { AppIconLoader(context.resources.getDimensionPixelSize(R.dimen.app_icon_size), false, context) }
     private val iconMap = mutableMapOf<String, Bitmap>()
-    var hightlightText: String = ""
+    var highlightText: String = ""
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
@@ -69,29 +68,13 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                 }
             }
 
-            if (hightlightText.isNotBlank() && item.label.contains(hightlightText, true)) {
-                val builder = SpannableStringBuilder()
-                val spannableString = SpannableString(item.label)
-                val start = item.label.indexOf(hightlightText, 0, true)
-                spannableString.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-                    start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-                )
-                builder.append(spannableString)
-                setText(R.id.tv_app_name, builder)
+            if (highlightText.isNotBlank()) {
+                getView<TextView>(R.id.tv_app_name).tintHighlightText(highlightText, item.label)
             } else {
                 setText(R.id.tv_app_name, item.label)
             }
-            if (hightlightText.isNotBlank() && item.packageName.contains(hightlightText, true)) {
-                val builder = SpannableStringBuilder()
-                val spannableString = SpannableString(item.packageName)
-                val start = item.packageName.indexOf(hightlightText, 0, true)
-                spannableString.setSpan(
-                    ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-                    start, start + hightlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-                )
-                builder.append(spannableString)
-                setText(R.id.tv_package_name, builder)
+            if (highlightText.isNotBlank()) {
+                getView<TextView>(R.id.tv_package_name).tintHighlightText(highlightText, item.packageName)
             } else {
                 setText(R.id.tv_package_name, item.packageName)
             }

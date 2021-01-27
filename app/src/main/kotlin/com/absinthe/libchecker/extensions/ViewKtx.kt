@@ -1,8 +1,14 @@
 package com.absinthe.libchecker.extensions
 
 import android.content.res.Resources
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -62,4 +68,20 @@ fun ViewGroup.setSystemPadding() {
     val isOrientationLandscape = context.isOrientationLandscape
     fitsSystemWindows = isOrientationLandscape
     setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
+}
+
+fun TextView.tintHighlightText(highlightText: String, rawText: String) {
+    if (!text.contains(highlightText, true)) {
+        text = rawText
+        return
+    }
+    val builder = SpannableStringBuilder()
+    val spannableString = SpannableString(text.toString())
+    val start = text.indexOf(highlightText, 0, true)
+    spannableString.setSpan(
+        ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+        start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+    )
+    builder.append(spannableString)
+    text = builder
 }

@@ -75,15 +75,7 @@ class ShootService : Service() {
     }
 
     private fun showNotification() {
-        builder.setContentTitle(getString(R.string.noti_shoot_title))
-            .setSmallIcon(R.drawable.ic_logo)
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setProgress(0, 0, true)
-            .setSilent(true)
-            .setOngoing(true)
-            .setAutoCancel(false)
+        initBuilder()
 
         notificationManager.apply {
             if (LCAppUtils.atLeastO()) {
@@ -110,8 +102,9 @@ class ShootService : Service() {
 
     private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
         notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
-        val ts = System.currentTimeMillis()
+        initBuilder()
 
+        val ts = System.currentTimeMillis()
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
         if (appList.isNullOrEmpty()) {
@@ -243,5 +236,17 @@ class ShootService : Service() {
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
         val date = Date(timestamp)
         return simpleDateFormat.format(date)
+    }
+
+    private fun initBuilder() {
+        builder.setContentTitle(getString(R.string.noti_shoot_title))
+            .setSmallIcon(R.drawable.ic_logo)
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+            .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setProgress(0, 0, true)
+            .setSilent(true)
+            .setOngoing(true)
+            .setAutoCancel(false)
     }
 }
