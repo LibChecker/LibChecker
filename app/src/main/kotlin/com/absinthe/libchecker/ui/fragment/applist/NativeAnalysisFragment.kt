@@ -63,6 +63,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
 
                 if (!isListReady) {
                     viewModel.itemsCountLiveData.value = it.size
+                    viewModel.itemsCountList[type] = it.size
                     isListReady = true
                 }
             }

@@ -35,10 +35,6 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
         super.onVisibilityChanged(visible)
         if (visible) {
             (requireActivity() as IDetailContainer).currentFragment = this
-
-            if (isListReady) {
-                viewModel.itemsCountLiveData.value = adapter.data.size
-            }
         }
     }
 
@@ -63,4 +59,6 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
             }
         }
     }
+
+    fun getItemsCount() = adapter.itemCount
 }

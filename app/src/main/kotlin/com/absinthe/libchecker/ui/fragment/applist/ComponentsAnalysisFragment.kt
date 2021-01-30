@@ -91,6 +91,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 }
                 if (!isListReady) {
                     viewModel.itemsCountLiveData.value = componentList.size
+                    viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }
             })

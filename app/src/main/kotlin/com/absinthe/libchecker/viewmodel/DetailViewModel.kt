@@ -45,6 +45,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         PROVIDER to MutableLiveData()
     )
     val itemsCountLiveData: MutableLiveData<Int> = MutableLiveData(0)
+    val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
 

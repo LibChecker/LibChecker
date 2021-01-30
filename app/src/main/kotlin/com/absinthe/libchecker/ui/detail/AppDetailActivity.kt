@@ -33,6 +33,7 @@ import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragme
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -235,6 +236,19 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
                 }
             }
+            binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val count = viewModel.itemsCountList[tab.position]
+                    if (currentItemsCount != count) {
+                        binding.tsComponentCount.setText(count.toString())
+                        currentItemsCount = count
+                    }
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) { }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) { }
+            })
 
             val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
                 tab.text = tabTitles[position]
