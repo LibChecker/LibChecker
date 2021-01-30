@@ -190,28 +190,26 @@ object PackageUtils {
      * @return List of LibStringItem
      */
     private fun getSourceLibs(path: String, childDir: String, source: String? = null): List<LibStringItem> {
-        var zipFile: ZipFile? = null
-
         try {
             val file = File(path)
-            zipFile = ZipFile(file)
-            val entries = zipFile.entries()
-            val libList = entries.asSequence()
-                .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
-                .distinctBy { it.name.split("/").last() }
-                .map { LibStringItem(it.name.split("/").last(), it.size, source) }
-                .toList()
+            val zipFile = ZipFile(file)
+            zipFile.use {
+                val entries = zipFile.entries()
+                val libList = entries.asSequence()
+                    .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
+                    .distinctBy { it.name.split("/").last() }
+                    .map { LibStringItem(it.name.split("/").last(), it.size, source) }
+                    .toList()
 
-            if (libList.isEmpty()) {
-                return getSplitLibs(path)
+                if (libList.isEmpty()) {
+                    return getSplitLibs(path)
+                }
+
+                return libList
             }
-
-            return libList
         } catch (e: Exception) {
             loge(e.toString())
             return emptyList()
-        } finally {
-            zipFile?.close()
         }
     }
 
@@ -280,22 +278,20 @@ object PackageUtils {
      * @return true if it uses Kotlin language
      */
     fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
-        var zipFile: ZipFile? = null
-
         return try {
             val path = packageInfo.applicationInfo.sourceDir
             val file = File(path)
-            zipFile = ZipFile(file)
+            val zipFile = ZipFile(file)
 
-            if (zipFile.entries().asSequence().any { it.name.startsWith("kotlin/") || it.name.startsWith("META-INF/services/kotlin") }) {
-                true
-            } else {
-                isKotlinUsedInClassDex(file)
+            zipFile.use {
+                if (zipFile.entries().asSequence().any { it.name.startsWith("kotlin/") || it.name.startsWith("META-INF/services/kotlin") }) {
+                    true
+                } else {
+                    isKotlinUsedInClassDex(file)
+                }
             }
         } catch (e: Exception) {
             false
-        } finally {
-            zipFile?.close()
         }
     }
 
@@ -306,7 +302,9 @@ object PackageUtils {
      */
     private fun isKotlinUsedInClassDex(file: File): Boolean {
         return try {
-            ApkFile(file).dexClasses.asSequence().any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
+            ApkFile(file).use { apkFile ->
+                apkFile.dexClasses.asSequence().any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
+            }
         } catch (e: Exception) {
             false
         }
@@ -452,11 +450,14 @@ object PackageUtils {
         var elementName: String
 
         val file = File(path)
-        val zipFile = ZipFile(file)
-        val entries = zipFile.entries()
-        val apkFile = ApkFile(file)
+        var zipFile: ZipFile? = null
+        var apkFile: ApkFile? = null
 
         try {
+            zipFile = ZipFile(file)
+            val entries = zipFile.entries()
+            apkFile = ApkFile(file)
+
             if (apkFile.manifestXml.contains("use32bitAbi=\"true\"", true)) {
                 abi = when {
                     GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
@@ -511,7 +512,8 @@ object PackageUtils {
             loge(e.toString())
             return ERROR
         } finally {
-            zipFile.close()
+            zipFile?.close()
+            apkFile?.close()
         }
     }
 
@@ -614,8 +616,9 @@ object PackageUtils {
             if (path.isNullOrEmpty()) {
                 return false
             }
-            val apkFile = ApkFile(File(path))
-            return apkFile.dexClasses.any { it.packageName.startsWith(dexClassPrefix) }
+            ApkFile(File(path)).use { apkFile ->
+                return apkFile.dexClasses.any { it.packageName.startsWith(dexClassPrefix) }
+            }
         } catch (e: Exception) {
             return false
         }
@@ -639,52 +642,53 @@ object PackageUtils {
             if (path.isNullOrEmpty()) {
                 return emptyList()
             }
-            val apkFile = ApkFile(File(path))
             var splits: List<String>
 
-            val primaryList = apkFile.dexClasses
-                .map { it.packageName }
-                .filter { !it.startsWith(packageName) }
-                .map { item ->
-                    splits = item.split(".")
-                    when {
-                        //Remove obfuscated classes
-                        splits.any { it.length == 1 } -> LibStringItem("")
-                        //Merge AndroidX classes
-                        splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
-                        //Filter classes which paths deep level greater than 4
-                        else -> LibStringItem(splits.subList(0, splits.size.coerceAtMost(4)).joinToString(separator = "."))
+            ApkFile(File(path)).use { apkFile ->
+                val primaryList = apkFile.dexClasses
+                    .map { it.packageName }
+                    .filter { !it.startsWith(packageName) }
+                    .map { item ->
+                        splits = item.split(".")
+                        when {
+                            //Remove obfuscated classes
+                            splits.any { it.length == 1 } -> LibStringItem("")
+                            //Merge AndroidX classes
+                            splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
+                            //Filter classes which paths deep level greater than 4
+                            else -> LibStringItem(splits.subList(0, splits.size.coerceAtMost(4)).joinToString(separator = "."))
+                        }
+                    }
+                    .toSet()
+                    .filter {
+                        it.name.length > 11 && it.name.contains(".") &&
+                                (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
+                    }    //Remove obfuscated classes
+                    .toMutableList()
+
+                //Merge path deep level 3 classes
+                primaryList.filter { it.name.split(".").size == 3 }.forEach {
+                    primaryList.removeAll { item -> item.name.startsWith(it.name) }
+                    primaryList.add(it)
+                }
+                //Merge path deep level 4 classes
+                var pathLevel3Item: String
+                var filter: List<LibStringItem>
+                primaryList.filter { it.name.split(".").size == 4 }.forEach {
+                    if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
+                        return@forEach
+                    }
+
+                    pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
+                    filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
+
+                    if (filter.isNotEmpty()) {
+                        primaryList.removeAll(filter)
+                        primaryList.add(LibStringItem(pathLevel3Item))
                     }
                 }
-                .toSet()
-                .filter {
-                    it.name.length > 11 && it.name.contains(".") &&
-                            (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
-                }    //Remove obfuscated classes
-                .toMutableList()
-
-            //Merge path deep level 3 classes
-            primaryList.filter { it.name.split(".").size == 3 }.forEach {
-                primaryList.removeAll { item -> item.name.startsWith(it.name) }
-                primaryList.add(it)
+                return primaryList
             }
-            //Merge path deep level 4 classes
-            var pathLevel3Item: String
-            var filter: List<LibStringItem>
-            primaryList.filter { it.name.split(".").size == 4 }.forEach {
-                if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
-                    return@forEach
-                }
-
-                pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
-                filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
-
-                if (filter.isNotEmpty()) {
-                    primaryList.removeAll(filter)
-                    primaryList.add(LibStringItem(pathLevel3Item))
-                }
-            }
-            return primaryList
         } catch (e: Exception) {
             loge(e.toString())
             return emptyList()
@@ -712,8 +716,9 @@ object PackageUtils {
      */
     fun isIntelCpu(): Boolean {
         return try {
-            BufferedReader(FileReader("/proc/cpuinfo"))
-                .readLine().contains("Intel")
+            BufferedReader(FileReader("/proc/cpuinfo")).use {
+                it.readLine().contains("Intel")
+            }
         } catch (e: Exception) {
             false
         }
