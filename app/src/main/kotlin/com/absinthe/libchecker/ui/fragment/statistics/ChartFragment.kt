@@ -57,7 +57,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     override fun init() {
         chartView = generatePieChartView()
-        (binding.root as LinearLayout).addView(chartView, -1)
+        binding.root.addView(chartView, -1)
 
         binding.buttonsGroup.apply {
             addOnButtonCheckedListener(this@ChartFragment)
@@ -83,10 +83,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun setAbiData() {
         if (chartView.parent != null) {
-            (binding.root as LinearLayout).removeView(chartView)
+            binding.root.removeView(chartView)
         }
         chartView = generatePieChartView()
-        (binding.root as LinearLayout).addView(chartView, -1)
+        binding.root.addView(chartView, -1)
 
         val parties = listOf(
             resources.getString(R.string.string_64_bit),
@@ -136,7 +136,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
-                setValueFormatter(PercentFormatter(binding.chart))
+                setValueFormatter(PercentFormatter(chartView as PieChart))
                 setValueTextSize(10f)
                 setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
@@ -152,10 +152,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun setKotlinData() {
         if (chartView.parent != null) {
-            (binding.root as LinearLayout).removeView(chartView)
+            binding.root.removeView(chartView)
         }
         chartView = generatePieChartView()
-        (binding.root as LinearLayout).addView(chartView, -1)
+        binding.root.addView(chartView, -1)
 
         val parties = listOf(
             resources.getString(R.string.string_kotlin_used),
@@ -201,7 +201,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
-                setValueFormatter(PercentFormatter(binding.chart))
+                setValueFormatter(PercentFormatter(chartView as PieChart))
                 setValueTextSize(10f)
                 setValueTextColor(Color.BLACK)
             }
@@ -217,10 +217,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun setTargetApiData() {
         if (chartView.parent != null) {
-            (binding.root as LinearLayout).removeView(chartView)
+            binding.root.removeView(chartView)
         }
         chartView = generateBarChartView()
-        (binding.root as LinearLayout).addView(chartView, -1)
+        binding.root.addView(chartView, -1)
 
         val parties = mutableListOf<String>()
         OS_NAME_MAP.forEach { parties.add(it.value) }
