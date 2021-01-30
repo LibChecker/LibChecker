@@ -26,7 +26,7 @@
     <string name="toolbar_rate">评分</string>
     <string name="rules_repo_title">规则仓库</string>
     <string name="tab_lib_reference_statistics">库引用统计</string>
-    <string name="tab_pie_chart">饼状图</string>
+    <string name="tab_chart">图表</string>
     <string name="not_marked_lib">未标记的库</string>
     <string name="entry_animation_summary">在打开和关闭详情页面时播放动画</string>
     <string name="entry_animation">入场动画</string>

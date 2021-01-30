@@ -6,8 +6,10 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
@@ -21,14 +23,16 @@ import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.IntegerFormatter
+import com.absinthe.libchecker.view.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
@@ -40,45 +44,23 @@ private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
 private const val TYPE_TARGET_API = 2
 
-class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
+class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
     OnChartValueSelectedListener,
     MaterialButtonToggleGroup.OnButtonCheckedListener {
 
     private val viewModel by activityViewModels<LibReferenceViewModel>()
     private val legendList = mutableListOf<String>()
-    private var pieType = TYPE_ABI
+    private var chartType = TYPE_ABI
+    private lateinit var chartView: ViewGroup
 
-    override fun initBinding(view: View): FragmentPieChartBinding =
-        FragmentPieChartBinding.bind(view)
+    override fun initBinding(view: View): FragmentPieChartBinding = FragmentPieChartBinding.bind(view)
 
     override fun init() {
-        binding.chart.apply {
-            layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT).apply {
-                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(requireActivity().contentResolver))
-            }
-            dragDecelerationFrictionCoef = 0.95f
-            description.isEnabled = false
-            legend.apply {
-                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                orientation = Legend.LegendOrientation.HORIZONTAL
-                textColor = ContextCompat.getColor(context, R.color.textNormal)
-                xEntrySpace = 7f
-                yEntrySpace = 0f
-                isWordWrapEnabled = true
-            }
-            setUsePercentValues(true)
-            setExtraOffsets(24f, 0f, 24f, 0f)
-            setEntryLabelColor(ContextCompat.getColor(context, R.color.textNormal))
-            setEntryLabelTextSize(11f)
-            setNoDataText(getString(R.string.loading))
-            setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
-            setOnChartValueSelectedListener(this@PieChartFragment)
-            setHoleColor(Color.TRANSPARENT)
-        }
+        chartView = generatePieChartView()
+        (binding.root as LinearLayout).addView(chartView, -1)
 
         binding.buttonsGroup.apply {
-            addOnButtonCheckedListener(this@PieChartFragment)
+            addOnButtonCheckedListener(this@ChartFragment)
             check(R.id.btn_abi)
         }
 
@@ -92,7 +74,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     }
 
     private fun setData() {
-        when (pieType) {
+        when (chartType) {
             TYPE_ABI -> setAbiData()
             TYPE_KOTLIN -> setKotlinData()
             TYPE_TARGET_API -> setTargetApiData()
@@ -100,6 +82,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     }
 
     private fun setAbiData() {
+        if (chartView.parent != null) {
+            (binding.root as LinearLayout).removeView(chartView)
+        }
+        chartView = generatePieChartView()
+        (binding.root as LinearLayout).addView(chartView, -1)
+
         val parties = listOf(
             resources.getString(R.string.string_64_bit),
             resources.getString(R.string.string_32_bit),
@@ -153,7 +141,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
 
-            binding.chart.apply {
+            (chartView as PieChart).apply {
                 this.data = data
                 setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
                 highlightValues(null)
@@ -163,6 +151,12 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     }
 
     private fun setKotlinData() {
+        if (chartView.parent != null) {
+            (binding.root as LinearLayout).removeView(chartView)
+        }
+        chartView = generatePieChartView()
+        (binding.root as LinearLayout).addView(chartView, -1)
+
         val parties = listOf(
             resources.getString(R.string.string_kotlin_used),
             resources.getString(R.string.string_kotlin_unused)
@@ -212,7 +206,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 setValueTextColor(Color.BLACK)
             }
 
-            binding.chart.apply {
+            (chartView as PieChart).apply {
                 this.data = data
                 setEntryLabelColor(Color.BLACK)
                 highlightValues(null)
@@ -222,10 +216,16 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     }
 
     private fun setTargetApiData() {
+        if (chartView.parent != null) {
+            (binding.root as LinearLayout).removeView(chartView)
+        }
+        chartView = generateBarChartView()
+        (binding.root as LinearLayout).addView(chartView, -1)
+
         val parties = mutableListOf<String>()
         OS_NAME_MAP.forEach { parties.add(it.value) }
 
-        val entries: ArrayList<PieEntry> = ArrayList()
+        val entries: ArrayList<BarEntry> = ArrayList()
         var packageInfo: PackageInfo
 
         val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
@@ -258,20 +258,15 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             legendList.clear()
             for (i in parties.indices) {
                 if (list[i] > 0) {
-                    entries.add(PieEntry(list[i].toFloat(), "${parties[i % parties.size]}(${i+1})"))
+                    entries.add(BarEntry((i+1).toFloat(), list[i].toFloat()))
                     legendList.add((i+1).toString())
+                } else {
+                    legendList.add("0")
                 }
             }
-            val dataSet = PieDataSet(entries, "").apply {
+            val dataSet = BarDataSet(entries, "").apply {
                 setDrawIcons(false)
-                sliceSpace = 3f
-                iconsOffset = MPPointF(0f, 40f)
-                selectionShift = 5f
-                valueLinePart1OffsetPercentage = 80f
-                valueLinePart1Length = 0.2f
-                valueLinePart2Length = 0.4f
-                valueLineColor = ContextCompat.getColor(requireContext(), R.color.textNormal)
-                yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+                valueFormatter = IntegerFormatter()
             }
 
             // add a lot of colors
@@ -281,15 +276,13 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
 
             dataSet.colors = colors
             //dataSet.setSelectionShift(0f);
-            val data = PieData(dataSet).apply {
-                setValueFormatter(PercentFormatter(binding.chart))
+            val data = BarData(dataSet).apply {
                 setValueTextSize(10f)
                 setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
 
-            binding.chart.apply {
+            (chartView as BarChart).apply {
                 this.data = data
-                setEntryLabelColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
                 highlightValues(null)
                 invalidate()
             }
@@ -304,6 +297,8 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
         if (e == null) return
         if (h == null) return
 
+        chartView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+
         var dialogTitle = ""
         var item: List<LCItem> = emptyList()
 
@@ -313,7 +308,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
             viewModel.dbItems.value?.filter { !it.isSystem }
         }
 
-        when (pieType) {
+        when (chartType) {
             TYPE_ABI -> {
                 when (legendList[h.x.toInt()]) {
                     getString(R.string.string_64_bit) -> {
@@ -364,7 +359,7 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
                 }
             }
             TYPE_TARGET_API -> {
-                val targetApi = legendList[h.x.toInt()].toInt()
+                val targetApi = legendList[h.x.toInt() - 1].toInt()
                 var packageInfo: PackageInfo?
 
                 dialogTitle = "Target API $targetApi"
@@ -391,16 +386,93 @@ class PieChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment
     ) {
         when (checkedId) {
             R.id.btn_abi -> if (isChecked) {
-                pieType = TYPE_ABI
+                chartType = TYPE_ABI
             }
             R.id.btn_kotlin -> if (isChecked) {
-                pieType = TYPE_KOTLIN
+                chartType = TYPE_KOTLIN
             }
             R.id.btn_target_api -> if (isChecked) {
-                pieType = TYPE_TARGET_API
+                chartType = TYPE_TARGET_API
             }
         }
         setData()
+    }
+
+    private fun generatePieChartView(): PieChart {
+        return PieChart(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
+                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().contentResolver))
+            }
+            dragDecelerationFrictionCoef = 0.95f
+            description.isEnabled = false
+            legend.apply {
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                xEntrySpace = 7f
+                yEntrySpace = 0f
+                isWordWrapEnabled = true
+            }
+            setUsePercentValues(true)
+            setExtraOffsets(24f, 0f, 24f, 0f)
+            setEntryLabelColor(ContextCompat.getColor(context, R.color.textNormal))
+            setEntryLabelTextSize(11f)
+            setNoDataText(getString(R.string.loading))
+            setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
+            setOnChartValueSelectedListener(this@ChartFragment)
+            setHoleColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun generateBarChartView(): BarChart {
+        return BarChart(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
+                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().contentResolver))
+            }
+            description.isEnabled = false
+            setDrawBorders(false)
+            setDrawGridBackground(false)
+            legend.apply {
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                xEntrySpace = 7f
+                yEntrySpace = 0f
+                isWordWrapEnabled = true
+            }
+            xAxis.apply {
+                valueFormatter = OsVersionAxisFormatter()
+                position = XAxis.XAxisPosition.BOTTOM_INSIDE
+                setDrawGridLines(false)
+                granularity = 1f
+                textSize = 10f
+                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+            }
+            axisLeft.apply {
+                valueFormatter = IntegerFormatter()
+                setDrawGridLines(false)
+                setDrawZeroLine(false)
+                spaceBottom = 6f
+                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+            }
+            axisRight.apply {
+                valueFormatter = IntegerFormatter()
+                setDrawGridLines(false)
+                setDrawZeroLine(false)
+                spaceBottom = 6f
+                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+            }
+            setMaxVisibleValueCount(Build.VERSION_CODES.R)
+            setDrawGridBackground(false)
+            setDrawBorders(false)
+            setDrawMarkers(false)
+            setExtraOffsets(24f, 0f, 24f, 0f)
+            setNoDataText(getString(R.string.loading))
+            setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
+            setOnChartValueSelectedListener(this@ChartFragment)
+        }
     }
 
     private val OS_NAME_MAP by lazy {

@@ -26,7 +26,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> LibReferenceFragment()
-                    else -> PieChartFragment()
+                    else -> ChartFragment()
                 }
             }
         }
@@ -34,7 +34,7 @@ class StatisticsFragment : BaseFragment<FragmentStatisticsBinding>(R.layout.frag
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
             when (position) {
                 0 -> tab.text = getText(R.string.tab_lib_reference_statistics)
-                else -> tab.text = getText(R.string.tab_pie_chart)
+                else -> tab.text = getText(R.string.tab_chart)
             }
         }
         mediator.attach()

@@ -10,5 +10,4 @@ object AppItemRepository {
     var trackItemsChanged = false
     var shouldRefreshAppList = false
     var rulesRegexList = mutableMapOf<Pattern, RuleEntity>()
-    var isRegexRuleInitializing = false
 }

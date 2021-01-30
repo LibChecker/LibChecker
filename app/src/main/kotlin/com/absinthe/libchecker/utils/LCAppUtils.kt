@@ -91,12 +91,11 @@ object LCAppUtils {
     }
 
     fun findRuleRegex(string: String, @LibType type: Int): RuleEntity? {
-        if (AppItemRepository.isRegexRuleInitializing) {
-            return null
-        }
-        AppItemRepository.rulesRegexList.forEach {
-            if (it.key.matcher(string).matches() && it.value.type == type) {
-                return it.value
+        val iterator = AppItemRepository.rulesRegexList.entries.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key.matcher(string).matches() && entry.value.type == type) {
+                return entry.value
             }
         }
         return null

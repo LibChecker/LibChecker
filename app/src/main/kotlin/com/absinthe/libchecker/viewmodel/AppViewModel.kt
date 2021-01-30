@@ -615,11 +615,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun initRegexRules() = viewModelScope.launch(Dispatchers.IO) {
-        AppItemRepository.isRegexRuleInitializing = true
         val list = repository.getRegexRules()
         list.forEach {
             AppItemRepository.rulesRegexList[Pattern.compile(it.name)] = it
         }
-        AppItemRepository.isRegexRuleInitializing = false
     }
 }

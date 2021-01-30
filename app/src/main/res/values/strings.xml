@@ -31,7 +31,7 @@
     <!-- Statistics   -->
     <string name="title_statistics_dialog">Apps with %s ABI</string>
     <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
-    <string name="tab_pie_chart">Pie chart</string>
+    <string name="tab_chart">Chart</string>
     <string name="tab_lib_reference_statistics">Lib reference</string>
     <string name="not_marked_lib">Not marked library</string>
 

@@ -21,7 +21,7 @@
     <string name="menu_sort_default">預設順序</string>
     <string name="title_statistics_dialog">%s架构的 Apps</string>
     <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
-    <string name="tab_pie_chart">餅狀圖</string>
+    <string name="tab_chart">圖表</string>
     <string name="tab_lib_reference_statistics">庫引用統計</string>
     <string name="not_marked_lib">未標示的庫</string>
     <string name="ref_category_all">全部</string>
