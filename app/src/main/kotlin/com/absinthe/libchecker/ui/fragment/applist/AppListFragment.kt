@@ -286,7 +286,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
 
                 if (!hasRequestChanges) {
-                    viewModel.requestChange(requireActivity().packageManager)
+                    viewModel.requestChange()
                     hasRequestChanges = true
 
                     if (isFirstLaunch) {
@@ -407,7 +407,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             returnTopOfList()
         } else {
             flip(VF_LOADING)
-            viewModel.requestChange(requireActivity().packageManager, true)
+            viewModel.requestChange(true)
         }
     }
 }

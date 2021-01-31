@@ -121,13 +121,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         logd("Init all items END, $timeRecorder")
     }
 
-    fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
+    fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         if (isInitingItems) {
             logd("Request change isInitingItems return")
             return@launch
         }
 
-        requestChangeImpl(packageManager, needRefresh)
+        requestChangeImpl(LibCheckerApp.context.packageManager, needRefresh)
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {

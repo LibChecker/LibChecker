@@ -92,7 +92,7 @@ class MainActivity : BaseActivity(), IListContainer {
         super.onResume()
         registerPackageBroadcast()
         if (GlobalValues.shouldRequestChange.value == true) {
-            appViewModel.requestChange(packageManager, true)
+            appViewModel.requestChange(true)
         }
         if (XiaomiUtilities.isMIUI()) {
             addOrRemoveMiuiAppsListMask()
@@ -188,7 +188,7 @@ class MainActivity : BaseActivity(), IListContainer {
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             appViewModel.shouldReturnTopOfList = true
-            appViewModel.requestChange(packageManager, true)
+            appViewModel.requestChange(true)
         }
     }
 

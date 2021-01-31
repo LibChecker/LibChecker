@@ -29,6 +29,7 @@ import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
@@ -50,6 +51,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private val viewModel by activityViewModels<LibReferenceViewModel>()
     private val legendList = mutableListOf<String>()
+    private val existApiList = mutableListOf<Int>()
     private var chartType = TYPE_ABI
     private lateinit var chartView: ViewGroup
 
@@ -216,12 +218,6 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     }
 
     private fun setTargetApiData() {
-        if (chartView.parent != null) {
-            binding.root.removeView(chartView)
-        }
-        chartView = generateBarChartView()
-        binding.root.addView(chartView, -1)
-
         val parties = mutableListOf<String>()
         OS_NAME_MAP.forEach { parties.add(it.value) }
 
@@ -235,10 +231,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
 
         filteredList?.let {
-            val list = mutableListOf<Int>()
-            for (i in 0 until Build.VERSION_CODES.R) {
-                list.add(0)
-            }
+            val list = IntArray(Build.VERSION_CODES.R, { 0 })
 
             var targetApi: Int
             for (item in it) {
@@ -252,16 +245,28 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                     loge(e.toString())
                 }
             }
+            existApiList.clear()
+            val iterator = list.iterator().withIndex()
+            while (iterator.hasNext()) {
+                val entry = iterator.next()
+                if (entry.value != 0) {
+                    existApiList.add(entry.index + 1)
+                }
+            }
+
+            if (chartView.parent != null) {
+                binding.root.removeView(chartView)
+            }
+            chartView = generateBarChartView()
+            binding.root.addView(chartView, -1)
 
             // NOTE: The order of the entries when being added to the entries array determines their position around the center of
             // the chart.
             legendList.clear()
             for (i in parties.indices) {
                 if (list[i] > 0) {
-                    entries.add(BarEntry((i+1).toFloat(), list[i].toFloat()))
+                    entries.add(BarEntry(existApiList.indexOf(i+1).toFloat(), list[i].toFloat()))
                     legendList.add((i+1).toString())
-                } else {
-                    legendList.add("0")
                 }
             }
             val dataSet = BarDataSet(entries, "").apply {
@@ -281,7 +286,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))
             }
 
-            (chartView as BarChart).apply {
+            (chartView as HorizontalBarChart).apply {
                 this.data = data
                 highlightValues(null)
                 invalidate()
@@ -359,7 +364,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 }
             }
             TYPE_TARGET_API -> {
-                val targetApi = legendList[h.x.toInt() - 1].toInt()
+                val targetApi = legendList[h.x.toInt()].toInt()
                 var packageInfo: PackageInfo?
 
                 dialogTitle = "Target API $targetApi"
@@ -425,27 +430,22 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
     }
 
-    private fun generateBarChartView(): BarChart {
-        return BarChart(requireContext()).apply {
+    private fun generateBarChartView(): HorizontalBarChart {
+        return HorizontalBarChart(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
                 setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().contentResolver))
             }
             description.isEnabled = false
+            legend.isEnabled = false
             setDrawBorders(false)
             setDrawGridBackground(false)
-            legend.apply {
-                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
-                horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
-                orientation = Legend.LegendOrientation.HORIZONTAL
-                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
-                xEntrySpace = 7f
-                yEntrySpace = 0f
-                isWordWrapEnabled = true
-            }
+            setFitBars(true)
             xAxis.apply {
-                valueFormatter = OsVersionAxisFormatter()
-                position = XAxis.XAxisPosition.BOTTOM_INSIDE
+                valueFormatter = OsVersionAxisFormatter(existApiList)
+                position = XAxis.XAxisPosition.BOTTOM
                 setDrawGridLines(false)
+                setDrawLabels(true)
+                setLabelCount(existApiList.size, false)
                 granularity = 1f
                 textSize = 10f
                 textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
@@ -454,21 +454,19 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 valueFormatter = IntegerFormatter()
                 setDrawGridLines(false)
                 setDrawZeroLine(false)
-                spaceBottom = 6f
                 textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
             }
             axisRight.apply {
                 valueFormatter = IntegerFormatter()
                 setDrawGridLines(false)
                 setDrawZeroLine(false)
-                spaceBottom = 6f
                 textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
             }
             setMaxVisibleValueCount(Build.VERSION_CODES.R)
             setDrawGridBackground(false)
             setDrawBorders(false)
             setDrawMarkers(false)
-            setExtraOffsets(24f, 0f, 24f, 0f)
+            setExtraOffsets(12f, 0f, 24f, 0f)
             setNoDataText(getString(R.string.loading))
             setNoDataTextColor(ContextCompat.getColor(context, R.color.textNormal))
             setOnChartValueSelectedListener(this@ChartFragment)
