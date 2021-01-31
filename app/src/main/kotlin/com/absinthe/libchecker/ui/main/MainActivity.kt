@@ -80,6 +80,7 @@ class MainActivity : BaseActivity(), IListContainer {
         initAllApplicationInfoItems()
         initObserver()
         clearApkCache()
+        appViewModel.initRegexRules()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -242,7 +243,6 @@ class MainActivity : BaseActivity(), IListContainer {
                 if (it.isNotEmpty()) {
                     isDatabaseFinishInit = true
                 }
-                initRegexRules()
             })
 
             if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {

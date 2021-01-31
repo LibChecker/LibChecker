@@ -17,7 +17,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -225,7 +224,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             adapter.setDiffNewData(filter.toMutableList())
             doOnMainThreadIdle({
                 val first = layoutManager.findFirstVisibleItemPosition()
-                val last = layoutManager.findLastVisibleItemPosition()
+                val last = layoutManager.findLastVisibleItemPosition() + 3
 
                 for (i in first..last) {
                     (adapter.getViewByPosition(i, R.id.tv_label_name) as? TextView)?.apply {

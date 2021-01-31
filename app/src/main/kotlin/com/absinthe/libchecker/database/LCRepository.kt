@@ -1,16 +1,19 @@
 package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.*
 
 class LCRepository(private val lcDao: LCDao) {
 
     val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
-    val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshots()
+    val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
 
     fun getItem(packageName: String): LCItem? {
         return lcDao.getItem(packageName)
     }
+
+    suspend fun getSnapshots() = lcDao.getSnapshots()
 
     suspend fun getSnapshots(timestamp: Long) = lcDao.getSnapshots(timestamp)
 

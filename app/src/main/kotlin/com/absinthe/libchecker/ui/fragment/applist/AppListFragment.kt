@@ -194,11 +194,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 when(layoutManager) {
                     is LinearLayoutManager -> {
                         first = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                        last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                        last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition() + 3
                     }
                     is StaggeredGridLayoutManager -> {
                         first = (layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
-                        last = (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last()
+                        last = (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last() + 3
                     }
                     else -> {
                         first = 0

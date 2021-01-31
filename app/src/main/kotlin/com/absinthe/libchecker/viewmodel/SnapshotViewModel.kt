@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
@@ -37,18 +36,13 @@ const val CURRENT_SNAPSHOT = -1L
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
     val repository = LibCheckerApp.repository
+    val allSnapshots = repository.allSnapshotItems
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
-    val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
     val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
 
-    private val gson: Gson
-
-    init {
-        snapshotItems = repository.allSnapshotItems
-        gson = Gson()
-    }
+    private val gson by lazy { Gson() }
 
     fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
         val count = repository.getSnapshots(timeStamp).size
@@ -690,7 +684,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun backup(os: OutputStream) = viewModelScope.launch(Dispatchers.IO) {
         val builder: SnapshotList.Builder = SnapshotList.newBuilder()
-        val backupList = repository.allSnapshotItems.value!!
+        val backupList = repository.getSnapshots()
 
         val snapshotList = mutableListOf<Snapshot>()
         val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()

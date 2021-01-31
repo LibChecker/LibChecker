@@ -249,7 +249,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     flip(VF_LIST)
                 }
             })
-            snapshotItems.observe(viewLifecycleOwner, {
+            allSnapshots.observe(viewLifecycleOwner, {
                 if (shouldCompare) {
                     viewModel.timestamp.value = GlobalValues.snapshotTimestamp
                     isSnapshotDatabaseItemsReady = true

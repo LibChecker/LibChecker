@@ -9,22 +9,15 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BaseActivity
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.RULES_VERSION
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.RuleGenerator
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import moe.shizuku.preference.PreferenceFragment
 import rikka.material.widget.BorderRecyclerView
 import rikka.material.widget.BorderView
@@ -105,17 +98,15 @@ class BackupActivity : BaseActivity() {
 
             findPreference(Constants.PREF_LOCAL_BACKUP)?.apply {
                 setOnPreferenceClickListener {
-                    viewModel.snapshotItems.observe(viewLifecycleOwner, {
-                        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-                        val date = Date()
-                        val formatted = simpleDateFormat.format(date)
+                    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
+                    val date = Date()
+                    val formatted = simpleDateFormat.format(date)
 
-                        if (StorageUtils.isExternalStorageWritable) {
-                            StorageUtils.createFile(requireActivity() as BaseActivity, "*/*",
-                                "LibChecker-Snapshot-Backups-$formatted.lcss"
-                            )
-                        }
-                    })
+                    if (StorageUtils.isExternalStorageWritable) {
+                        StorageUtils.createFile(requireActivity() as BaseActivity, "*/*",
+                            "LibChecker-Snapshot-Backups-$formatted.lcss"
+                        )
+                    }
                     true
                 }
             }

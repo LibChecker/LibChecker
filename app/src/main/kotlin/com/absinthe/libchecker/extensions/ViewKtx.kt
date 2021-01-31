@@ -71,17 +71,16 @@ fun ViewGroup.setSystemPadding() {
 }
 
 fun TextView.tintHighlightText(highlightText: String, rawText: String) {
-    if (!text.contains(highlightText, true)) {
-        text = rawText
-        return
+    text = rawText
+    if (text.contains(highlightText, true)) {
+        val builder = SpannableStringBuilder()
+        val spannableString = SpannableString(text.toString())
+        val start = text.indexOf(highlightText, 0, true)
+        spannableString.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+            start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        builder.append(spannableString)
+        text = builder
     }
-    val builder = SpannableStringBuilder()
-    val spannableString = SpannableString(text.toString())
-    val start = text.indexOf(highlightText, 0, true)
-    spannableString.setSpan(
-        ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-        start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-    )
-    builder.append(spannableString)
-    text = builder
 }

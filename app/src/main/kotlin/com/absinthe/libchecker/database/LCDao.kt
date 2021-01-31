@@ -31,10 +31,13 @@ interface LCDao {
 
     //Snapshot Table
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
-    fun getSnapshots(): LiveData<List<SnapshotItem>>
+    suspend fun getSnapshots(): List<SnapshotItem>
 
     @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
     suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
+
+    @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+    fun getSnapshotsLiveData(timestamp: Long): LiveData<List<SnapshotItem>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: SnapshotItem)
