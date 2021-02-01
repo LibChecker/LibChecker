@@ -13,6 +13,7 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,12 +49,10 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                         emptyList()
                     }
 
-                    for (native in natives) {
-                        if (native.name == name) {
-                            list.add(item)
-                            break
-                        }
+                    if (!LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
+                        continue
                     }
+                    natives.find { it.name == name }?.run { list.add(item) }
                 }
             } else {
                 for (item in items) {

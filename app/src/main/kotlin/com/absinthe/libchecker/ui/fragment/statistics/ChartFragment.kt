@@ -28,7 +28,6 @@ import com.absinthe.libchecker.view.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend

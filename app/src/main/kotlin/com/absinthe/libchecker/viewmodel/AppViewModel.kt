@@ -386,8 +386,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         for (lib in libList) {
                             count = map[lib.name]?.count ?: 0
-                            map[lib.name] =
-                                RefCountType(count + 1, NATIVE)
+                            map[lib.name] = RefCountType(count + 1, NATIVE)
                         }
                     } catch (e: Exception) {
                         loge(e.toString())

@@ -133,6 +133,14 @@ object LCAppUtils {
     suspend fun getRuleWithRegex(name: String, @LibType type: Int, packageName: String? = null): RuleEntity? {
         return getRuleWithDexChecking(name, packageName) ?: findRuleRegex(name, type)
     }
+
+    fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
+        return when(nativeLib) {
+            "libjiagu.so" -> { PackageUtils.hasDexClass(packageName, "com.qihoo.util", false) }
+            "libapp.so" -> { PackageUtils.hasDexClass(packageName, "io.flutter", false) }
+            else -> true
+        }
+    }
 }
 
 /**
