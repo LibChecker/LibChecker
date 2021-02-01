@@ -132,7 +132,7 @@ class ComparisonActivity : BaseActivity() {
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, paddingBottom + UiUtils.getNavBarHeight(contentResolver)
+                    0, 0, 16.dp, paddingBottom + UiUtils.getNavBarHeight(windowManager)
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
@@ -165,7 +165,7 @@ class ComparisonActivity : BaseActivity() {
                     )
                 }
                 addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(windowManager))
             }
             vfContainer.apply {
                 setInAnimation(this@ComparisonActivity, R.anim.anim_fade_in)

@@ -126,7 +126,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().contentResolver)
+                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().windowManager)
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
@@ -200,7 +200,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     )
                 }
                 addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

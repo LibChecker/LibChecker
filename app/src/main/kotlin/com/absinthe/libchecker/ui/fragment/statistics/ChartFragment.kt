@@ -405,7 +405,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     private fun generatePieChartView(): PieChart {
         return PieChart(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
-                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().contentResolver))
+                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().windowManager))
             }
             dragDecelerationFrictionCoef = 0.95f
             description.isEnabled = false
@@ -432,7 +432,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     private fun generateBarChartView(): HorizontalBarChart {
         return HorizontalBarChart(requireContext()).apply {
             layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
-                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().contentResolver))
+                setMargins(0, 0, 0, 56.dp + UiUtils.getNavBarHeight(this@ChartFragment.requireActivity().windowManager))
             }
             description.isEnabled = false
             legend.isEnabled = false

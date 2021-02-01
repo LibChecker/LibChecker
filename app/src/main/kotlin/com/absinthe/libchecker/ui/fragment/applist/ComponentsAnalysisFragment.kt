@@ -51,7 +51,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         DividerItemDecoration.VERTICAL
                     )
                 )
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
             }
         }
 

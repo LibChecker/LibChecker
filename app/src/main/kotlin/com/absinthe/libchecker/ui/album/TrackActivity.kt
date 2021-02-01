@@ -61,7 +61,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     appBar?.setRaised(!top)
                 }
             addPaddingTop(UiUtils.getStatusBarHeight())
-            addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
+            addPaddingBottom(UiUtils.getNavBarHeight(windowManager))
             FastScrollerBuilder(this).useMd2Style().build()
         }
         adapter.apply {
