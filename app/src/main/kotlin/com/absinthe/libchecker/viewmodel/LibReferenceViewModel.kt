@@ -6,12 +6,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,11 +23,9 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
 
     val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
     val dbItems: LiveData<List<LCItem>>
-    private val repository: LCRepository
+    private val repository = LibCheckerApp.repository
 
     init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
         dbItems = repository.allDatabaseItems
     }
 
@@ -45,20 +45,19 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                             packageInfo.applicationInfo.nativeLibraryDir
                         )
                     } catch (e: Exception) {
+                        loge(e.toString())
                         emptyList()
                     }
 
-                    for (native in natives) {
-                        if (native.name == name) {
-                            list.add(item)
-                            break
-                        }
+                    if (!LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
+                        continue
                     }
+                    natives.find { it.name == name }?.run { list.add(item) }
                 }
             } else {
                 for (item in items) {
                     try {
-                        if (PackageUtils.getComponentList(item.packageName, type, false).contains(name)) {
+                        if (PackageUtils.getComponentStringList(item.packageName, type, false).contains(name)) {
                             list.add(item)
                         }
                     } catch (e: Exception) {
@@ -68,8 +67,14 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
             }
         }
 
+        val filterList = if (GlobalValues.isShowSystemApps.value == true) {
+            list
+        } else {
+            list.filter { !it.isSystem }
+        }
+
         withContext(Dispatchers.Main) {
-            libRefList.value = list
+            libRefList.value = filterList
         }
     }
 

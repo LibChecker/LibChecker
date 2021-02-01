@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.snapshot
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -63,6 +64,14 @@ class AlbumActivity : BaseActivity() {
                         .setTitle(R.string.dialog_title_select_to_delete)
                         .setItems(charList.toTypedArray()) { _, which ->
                             lifecycleScope.launch(Dispatchers.IO) {
+                                val progressDialog: ProgressDialog
+                                withContext(Dispatchers.Main) {
+                                    progressDialog = ProgressDialog(this@AlbumActivity).apply {
+                                        setMessage(getString(R.string.album_dialog_delete_snapshot_message))
+                                        setCancelable(false)
+                                    }
+                                    progressDialog.show()
+                                }
                                 viewModel.repository.deleteSnapshotsAndTimeStamp(timeStampList[which].timestamp)
                                 timeStampList = viewModel.repository.getTimeStamps()
                                 charList.removeAt(which)
@@ -70,6 +79,9 @@ class AlbumActivity : BaseActivity() {
                                     0L
                                 } else {
                                     timeStampList[0].timestamp
+                                }
+                                withContext(Dispatchers.Main) {
+                                    progressDialog.dismiss()
                                 }
                             }
                         }

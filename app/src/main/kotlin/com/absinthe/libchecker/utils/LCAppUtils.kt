@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -8,14 +9,16 @@ import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
 import android.util.Log
+import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.AUTUMN
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
-import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.Utils
+import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.extensions.loge
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -32,7 +35,7 @@ object LCAppUtils {
     }
 
     fun setTitle(): String {
-        val sb = StringBuilder(Utils.getApp().getString(R.string.app_name))
+        val sb = StringBuilder(LibCheckerApp.context.getString(R.string.app_name))
 
         if (SimpleDateFormat("MMdd", Locale.getDefault()).format(Date()) == "1225") {
             sb.append("\uD83C\uDF84")
@@ -42,9 +45,100 @@ object LCAppUtils {
 
     fun getAppIcon(packageName: String): Drawable {
         return try {
-            AppUtils.getAppIcon(packageName)
+            val pm = LibCheckerApp.context.packageManager
+            val pi = pm.getPackageInfo(packageName, 0)
+            pi?.applicationInfo?.loadIcon(pm)!!
         } catch (e: Exception) {
             ColorDrawable(Color.TRANSPARENT)
+        }
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.P)
+    fun atLeastP(): Boolean {
+        return Build.VERSION.SDK_INT >= 28
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
+    fun atLeastO(): Boolean {
+        return Build.VERSION.SDK_INT >= 26
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N_MR1)
+    fun atLeastNMR1(): Boolean {
+        return Build.VERSION.SDK_INT >= 25
+    }
+
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
+    fun atLeastN(): Boolean {
+        return Build.VERSION.SDK_INT >= 24
+    }
+
+    fun getFromAssets(context: Context, fileName: String): String? {
+        try {
+            val inputReader = InputStreamReader(context.resources.assets.open(fileName))
+            val bufReader = BufferedReader(inputReader)
+            val result = StringBuilder()
+            var line: String
+
+            while (bufReader.readLine().also { line = it } != null) {
+                result.append(line)
+            }
+            return result.toString()
+        } catch (e: Exception) {
+            loge("getFromAssets", e)
+            return null
+        }
+    }
+
+    fun findRuleRegex(string: String, @LibType type: Int): RuleEntity? {
+        val iterator = AppItemRepository.rulesRegexList.entries.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key.matcher(string).matches() && entry.value.type == type) {
+                return entry.value
+            }
+        }
+        return null
+    }
+
+    suspend fun getRuleWithDexChecking(name: String, packageName: String? = null): RuleEntity? {
+        val ruleEntity = LibCheckerApp.repository.getRule(name) ?: return null
+        if (ruleEntity.type == NATIVE) {
+            if (packageName == null) {
+                return ruleEntity
+            }
+            val isApk = packageName.endsWith("/temp.apk")
+            when(ruleEntity.name) {
+                "libjiagu.so" -> {
+                    return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util", isApk)) {
+                        ruleEntity
+                    } else {
+                        null
+                    }
+                }
+                "libapp.so" -> {
+                    return if (PackageUtils.hasDexClass(packageName, "io.flutter", isApk)) {
+                        ruleEntity
+                    } else {
+                        null
+                    }
+                }
+                else -> return ruleEntity
+            }
+        } else {
+            return ruleEntity
+        }
+    }
+
+    suspend fun getRuleWithRegex(name: String, @LibType type: Int, packageName: String? = null): RuleEntity? {
+        return getRuleWithDexChecking(name, packageName) ?: findRuleRegex(name, type)
+    }
+
+    fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
+        return when(nativeLib) {
+            "libjiagu.so" -> { PackageUtils.hasDexClass(packageName, "com.qihoo.util", false) }
+            "libapp.so" -> { PackageUtils.hasDexClass(packageName, "io.flutter", false) }
+            else -> true
         }
     }
 }

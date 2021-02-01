@@ -26,7 +26,7 @@
     <string name="toolbar_rate">评分</string>
     <string name="rules_repo_title">规则仓库</string>
     <string name="tab_lib_reference_statistics">库引用统计</string>
-    <string name="tab_pie_chart">饼状图</string>
+    <string name="tab_chart">图表</string>
     <string name="not_marked_lib">未标记的库</string>
     <string name="entry_animation_summary">在打开和关闭详情页面时播放动画</string>
     <string name="entry_animation">入场动画</string>
@@ -111,4 +111,15 @@
     <string name="anonymous_statistics">匿名统计</string>
     <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
     <string name="library_declaration">LibChecker 中的所有标记库信息均来自于其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
+    <string name="channel_shoot">保存快照</string>
+    <string name="noti_shoot_title">正在保存当前快照</string>
+    <string name="integration_monkey_king_menu_block">使用\"大圣净化\"禁用此组件</string>
+    <string name="integration_monkey_king_menu_unblock">使用\"大圣净化\"解禁此组件</string>
+    <string name="cloud_rules">云端规则</string>
+    <string name="cloud_rules_summary">在此更新最新的标记库</string>
+    <string name="album_dialog_delete_snapshot_message">处理中…</string>
+    <string name="noti_shoot_title_saved">快照已保存</string>
+    <string name="rules_local_repo_version">本地规则库版本</string>
+    <string name="rules_remote_repo_version">远端规则库版本</string>
+    <string name="rules_btn_update">更新</string>
 </resources>

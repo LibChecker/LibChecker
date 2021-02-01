@@ -30,7 +30,6 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,6 +55,11 @@ class ComparisonActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         initView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.release()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -160,7 +164,7 @@ class ComparisonActivity : BaseActivity() {
                         )
                     )
                 }
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingTop(UiUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
             }
             vfContainer.apply {

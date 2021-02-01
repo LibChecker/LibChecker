@@ -12,7 +12,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:contentDescription="ABI icon"
-        android:src="@drawable/ic_64bit"
+        android:src="@drawable/ic_abi_label_64bit"
         tools:ignore="HardcodedText" />
 
     <TextView

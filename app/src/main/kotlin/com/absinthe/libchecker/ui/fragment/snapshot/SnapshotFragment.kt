@@ -1,9 +1,13 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
 import android.app.ActivityOptions
+import android.app.Service
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
+import android.os.IBinder
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -17,18 +21,17 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
-import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
+import com.absinthe.libchecker.services.IShootService
+import com.absinthe.libchecker.services.OnShootOverListener
+import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -38,10 +41,8 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,6 +58,32 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     private val adapter = SnapshotAdapter()
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
+    private var dropPrevious = false
+    private var shouldCompare = true
+
+    private var shootBinder: IShootService? = null
+    private val shootListener = object : OnShootOverListener.Stub() {
+        override fun onShootFinished(timestamp: Long) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                viewModel.timestamp.value = timestamp
+                compareDiff()
+                shouldCompare = true
+            }
+        }
+    }
+    private val shootServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            shootBinder = service as? IShootService
+            shootBinder?.apply {
+                registerOnShootOverListener(shootListener)
+                computeSnapshot(dropPrevious)
+            }
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            shootBinder = null
+        }
+    }
 
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
@@ -108,7 +135,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
                     fun computeNewSnapshot(dropPrevious: Boolean = false) {
                         flip(VF_LOADING)
-                        viewModel.computeSnapshots(dropPrevious)
+                        this@SnapshotFragment.dropPrevious = dropPrevious
+                        shootBinder?.computeSnapshot(dropPrevious) ?: let {
+                            requireContext().bindService(Intent(requireContext(), ShootService::class.java), shootServiceConnection, Service.BIND_AUTO_CREATE)
+                        }
+                        shouldCompare = false
                         Analytics.trackEvent(
                             Constants.Event.SNAPSHOT_CLICK,
                             EventProperties().set("Action", "Click to Save")
@@ -143,6 +174,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
             recyclerview.apply {
                 adapter = this@SnapshotFragment.adapter
+                borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
@@ -167,7 +199,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                addPaddingTop(UiUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
             }
             vfContainer.apply {
@@ -211,27 +243,24 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             timestamp.observe(viewLifecycleOwner, {
                 if (it != 0L) {
                     dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
-                    flip(VF_LOADING)
                 } else {
                     dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
                     snapshotDiffItems.value = emptyList()
                     flip(VF_LIST)
                 }
             })
-            snapshotItems.observe(viewLifecycleOwner, {
-                viewModel.timestamp.value = GlobalValues.snapshotTimestamp
-                isSnapshotDatabaseItemsReady = true
+            allSnapshots.observe(viewLifecycleOwner, {
+                if (shouldCompare) {
+                    viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+                    isSnapshotDatabaseItemsReady = true
 
-                computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+                    computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
 
-                if (isApplicationInfoItemsReady) {
-                    compareDiff(GlobalValues.snapshotTimestamp)
-                    isSnapshotDatabaseItemsReady = false
-                }
+                    if (isApplicationInfoItemsReady) {
+                        compareDiff(GlobalValues.snapshotTimestamp)
+                        isSnapshotDatabaseItemsReady = false
+                    }
 
-                if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.MIGRATION_DATABASE_4_5)) {
-                    viewModel.migrateFrom4To5()
-                    Once.markDone(OnceTag.MIGRATION_DATABASE_4_5)
                 }
             })
             snapshotAppsCount.observe(viewLifecycleOwner, {
@@ -268,6 +297,27 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             )
         }
+
+        lifecycleScope.launchWhenResumed {
+            delay(2000)
+
+            withContext(Dispatchers.Main) {
+                binding.extendedFab.shrink()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (AppItemRepository.trackItemsChanged) {
+            AppItemRepository.trackItemsChanged = false
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        adapter.release()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
@@ -284,14 +334,28 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 binding.extendedFab.hide()
             }
             binding.loading.resumeAnimation()
+            (requireActivity() as MainActivity).appBar?.setRaised(false)
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()
             }
             binding.loading.pauseAnimation()
+            binding.recyclerview.scrollToPosition(0)
         }
 
         binding.vfContainer.displayedChild = child
+    }
+
+    private fun compareDiff() {
+        viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+        isSnapshotDatabaseItemsReady = true
+
+        viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+
+        if (isApplicationInfoItemsReady) {
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+            isSnapshotDatabaseItemsReady = false
+        }
     }
 
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
@@ -310,13 +374,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (AppItemRepository.shouldRefreshAppList) {
-            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }
 }

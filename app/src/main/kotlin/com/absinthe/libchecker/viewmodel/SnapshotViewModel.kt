@@ -4,10 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.database.sqlite.SQLiteBlobTooBigException
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
@@ -15,8 +13,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.loge
@@ -24,12 +20,10 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.Utils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
@@ -41,142 +35,20 @@ const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository: LCRepository
+    val repository = LibCheckerApp.repository
+    val allSnapshots = repository.allSnapshotItems
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
-    val snapshotItems: LiveData<List<SnapshotItem>>
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
     val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
 
-    private val gson: Gson
-
-    init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
-        snapshotItems = repository.allSnapshotItems
-        gson = Gson()
-    }
+    private val gson by lazy { Gson() }
 
     fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
         val count = repository.getSnapshots(timeStamp).size
 
         withContext(Dispatchers.Main) {
             snapshotAppsCount.value = count
-        }
-    }
-
-    fun computeSnapshots(dropPrevious: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        val ts = System.currentTimeMillis()
-
-        val context: Context = getApplication<LibCheckerApp>()
-        var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
-
-        if (appList.isNullOrEmpty()) {
-            do {
-                appList = try {
-                    PackageUtils.getInstallApplications()
-                } catch (e: Exception) {
-                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                    null
-                }
-            } while (appList == null)
-        }
-
-        val dbList = mutableListOf<SnapshotItem>()
-        val exceptionInfoList = mutableListOf<ApplicationInfo>()
-
-        withContext(Dispatchers.Default) {
-            for (info in appList) {
-                try {
-                    PackageUtils.getPackageInfo(info.packageName).let {
-                        dbList.add(
-                            SnapshotItem(
-                                id = null,
-                                packageName = it.packageName,
-                                timeStamp = ts,
-                                label = info.loadLabel(context.packageManager).toString(),
-                                versionName = it.versionName ?: "null",
-                                versionCode = PackageUtils.getVersionCode(it),
-                                installedTime = it.firstInstallTime,
-                                lastUpdatedTime = it.lastUpdateTime,
-                                isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
-                                targetApi = info.targetSdkVersion.toShort(),
-                                nativeLibs = gson.toJson(
-                                    PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
-                                ),
-                                services = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, SERVICE, false)
-                                ),
-                                activities = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, ACTIVITY, false)
-                                ),
-                                receivers = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, RECEIVER, false)
-                                ),
-                                providers = gson.toJson(
-                                    PackageUtils.getComponentList(it.packageName, PROVIDER, false)
-                                ),
-                                permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
-                            )
-                        )
-                    }
-                } catch (e: Exception) {
-                    loge(e.toString())
-                    exceptionInfoList.add(info)
-                    continue
-                }
-            }
-
-            var info: ApplicationInfo
-            while (exceptionInfoList.isNotEmpty()) {
-                try {
-                    info = exceptionInfoList[0]
-                    PackageUtils.getPackageInfo(info.packageName).let {
-                        dbList.add(
-                            SnapshotItem(
-                                id = null,
-                                packageName = it.packageName,
-                                timeStamp = ts,
-                                label = info.loadLabel(context.packageManager).toString(),
-                                versionName = it.versionName ?: "null",
-                                versionCode = PackageUtils.getVersionCode(it),
-                                installedTime = it.firstInstallTime,
-                                lastUpdatedTime = it.lastUpdateTime,
-                                isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
-                                targetApi = info.targetSdkVersion.toShort(),
-                                nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)),
-                                services = gson.toJson(PackageUtils.getComponentList(it.packageName, SERVICE, false)),
-                                activities = gson.toJson(PackageUtils.getComponentList(it.packageName, ACTIVITY, false)),
-                                receivers = gson.toJson(PackageUtils.getComponentList(it.packageName, RECEIVER, false)),
-                                providers = gson.toJson(PackageUtils.getComponentList(it.packageName, PROVIDER, false)),
-                                permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
-                            )
-                        )
-                    }
-                    exceptionInfoList.removeAt(0)
-                } catch (e: Exception) {
-                    exceptionInfoList.removeAt(0)
-                    continue
-                }
-            }
-        }
-
-        try {
-            insertSnapshots(dbList)
-            insertTimeStamp(ts)
-        } catch (e: SQLiteBlobTooBigException) {
-            loge(e.toString())
-        }
-
-        if (dropPrevious) {
-            repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
-        }
-
-        withContext(Dispatchers.Main) {
-            GlobalValues.snapshotTimestamp = ts
-            timestamp.value = ts
         }
     }
 
@@ -189,18 +61,20 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-        val preList: List<SnapshotItem>
-        withContext(Dispatchers.IO) {
-            preList = repository.getSnapshots(preTimeStamp)
-        }
+        val preList = repository.getSnapshots(preTimeStamp)
+        val diffList = mutableListOf<SnapshotDiffItem>()
+
         if (preList.isNullOrEmpty()) {
+            withContext(Dispatchers.Main) {
+                snapshotDiffItems.value = diffList
+            }
             return@launch
         }
 
         val context: Context = getApplication<LibCheckerApp>()
-        val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value!!.toMutableList()
+        val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value?.toMutableList() ?: mutableListOf()
+        val removeList = mutableListOf<ApplicationInfo>()
 
-        val diffList = mutableListOf<SnapshotDiffItem>()
         val packageManager = context.packageManager
 
         var packageInfo: PackageInfo
@@ -208,111 +82,112 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
 
-        withContext(Dispatchers.IO) {
-            val allTrackItems = repository.getTrackItems()
+        val allTrackItems = repository.getTrackItems()
 
-            preList.let { dbItems ->
-                for (dbItem in dbItems) {
-                    appList.find { it.packageName == dbItem.packageName }?.let {
-                        try {
-                            packageInfo = PackageUtils.getPackageInfo(it)
-                            versionCode = PackageUtils.getVersionCode(packageInfo)
-
-                            if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime ||
-                                    allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }) {
-                                snapshotDiffItem = SnapshotDiffItem(
-                                    packageName = packageInfo.packageName,
-                                    updateTime = packageInfo.lastUpdateTime,
-                                    labelDiff = SnapshotDiffItem.DiffNode(dbItem.label, it.loadLabel(packageManager).toString()),
-                                    versionNameDiff = SnapshotDiffItem.DiffNode(dbItem.versionName, packageInfo.versionName),
-                                    versionCodeDiff = SnapshotDiffItem.DiffNode(dbItem.versionCode, versionCode),
-                                    abiDiff = SnapshotDiffItem.DiffNode(dbItem.abi, PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()),
-                                    targetApiDiff = SnapshotDiffItem.DiffNode(dbItem.targetApi, it.targetSdkVersion.toShort()),
-                                    nativeLibsDiff = SnapshotDiffItem.DiffNode(dbItem.nativeLibs, gson.toJson(PackageUtils.getNativeDirLibs(it.sourceDir, it.nativeLibraryDir))),
-                                    servicesDiff = SnapshotDiffItem.DiffNode(dbItem.services, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false))),
-                                    activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false))),
-                                    receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false))),
-                                    providersDiff = SnapshotDiffItem.DiffNode(dbItem.providers, gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false))),
-                                    permissionsDiff = SnapshotDiffItem.DiffNode(dbItem.permissions, gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))),
-                                    isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
-                                )
-                                compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
-                                snapshotDiffItem.added = compareDiffNode.added
-                                snapshotDiffItem.removed = compareDiffNode.removed
-                                snapshotDiffItem.changed = compareDiffNode.changed
-                                snapshotDiffItem.moved = compareDiffNode.moved
-
-                                diffList.add(snapshotDiffItem)
-                            }
-
-                            appList.remove(it)
-                        } catch (e: Exception) {
-                            loge(e.toString())
-                            appList.remove(it)
-                        }
-                    } ?: run {
-                        diffList.add(
-                            SnapshotDiffItem(
-                                dbItem.packageName,
-                                dbItem.lastUpdatedTime,
-                                SnapshotDiffItem.DiffNode(dbItem.label),
-                                SnapshotDiffItem.DiffNode(dbItem.versionName),
-                                SnapshotDiffItem.DiffNode(dbItem.versionCode),
-                                SnapshotDiffItem.DiffNode(dbItem.abi),
-                                SnapshotDiffItem.DiffNode(dbItem.targetApi),
-                                SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
-                                SnapshotDiffItem.DiffNode(dbItem.services),
-                                SnapshotDiffItem.DiffNode(dbItem.activities),
-                                SnapshotDiffItem.DiffNode(dbItem.receivers),
-                                SnapshotDiffItem.DiffNode(dbItem.providers),
-                                SnapshotDiffItem.DiffNode(dbItem.permissions),
-                                deleted = true,
-                                isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
-                            )
-                        )
-                    }
-                }
-
-                for (info in appList) {
+        preList.let { dbItems ->
+            for (dbItem in dbItems) {
+                appList.find { it.packageName == dbItem.packageName }?.let {
                     try {
-                        packageInfo = PackageUtils.getPackageInfo(info)
+                        packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                        diffList.add(
-                            SnapshotDiffItem(
-                                packageInfo.packageName,
-                                packageInfo.lastUpdateTime,
-                                SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
-                                SnapshotDiffItem.DiffNode(packageInfo.versionName),
-                                SnapshotDiffItem.DiffNode(versionCode),
-                                SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()),
-                                SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir))
-                                ),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, SERVICE, false))
-                                ),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, ACTIVITY, false))
-                                ),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, RECEIVER, false))
-                                ),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getComponentList(packageInfo.packageName, PROVIDER, false))
-                                ),
-                                SnapshotDiffItem.DiffNode(
-                                    gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))
-                                ),
-                                newInstalled = true,
-                                isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
+                        if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime ||
+                            allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }) {
+                            snapshotDiffItem = SnapshotDiffItem(
+                                packageName = packageInfo.packageName,
+                                updateTime = packageInfo.lastUpdateTime,
+                                labelDiff = SnapshotDiffItem.DiffNode(dbItem.label, it.loadLabel(packageManager).toString()),
+                                versionNameDiff = SnapshotDiffItem.DiffNode(dbItem.versionName, packageInfo.versionName),
+                                versionCodeDiff = SnapshotDiffItem.DiffNode(dbItem.versionCode, versionCode),
+                                abiDiff = SnapshotDiffItem.DiffNode(dbItem.abi, PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()),
+                                targetApiDiff = SnapshotDiffItem.DiffNode(dbItem.targetApi, it.targetSdkVersion.toShort()),
+                                nativeLibsDiff = SnapshotDiffItem.DiffNode(dbItem.nativeLibs, gson.toJson(PackageUtils.getNativeDirLibs(it.sourceDir, it.nativeLibraryDir))),
+                                servicesDiff = SnapshotDiffItem.DiffNode(dbItem.services, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))),
+                                activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))),
+                                receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))),
+                                providersDiff = SnapshotDiffItem.DiffNode(dbItem.providers, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, PROVIDER, false))),
+                                permissionsDiff = SnapshotDiffItem.DiffNode(dbItem.permissions, gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))),
+                                isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                             )
-                        )
+                            compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
+                            snapshotDiffItem.added = compareDiffNode.added
+                            snapshotDiffItem.removed = compareDiffNode.removed
+                            snapshotDiffItem.changed = compareDiffNode.changed
+                            snapshotDiffItem.moved = compareDiffNode.moved
+
+                            diffList.add(snapshotDiffItem)
+                        }
+
+                        removeList.add(it)
                     } catch (e: Exception) {
-                        e.printStackTrace()
-                        continue
+                        loge(e.toString())
+                        removeList.add(it)
                     }
+                } ?: run {
+                    diffList.add(
+                        SnapshotDiffItem(
+                            dbItem.packageName,
+                            dbItem.lastUpdatedTime,
+                            SnapshotDiffItem.DiffNode(dbItem.label),
+                            SnapshotDiffItem.DiffNode(dbItem.versionName),
+                            SnapshotDiffItem.DiffNode(dbItem.versionCode),
+                            SnapshotDiffItem.DiffNode(dbItem.abi),
+                            SnapshotDiffItem.DiffNode(dbItem.targetApi),
+                            SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
+                            SnapshotDiffItem.DiffNode(dbItem.services),
+                            SnapshotDiffItem.DiffNode(dbItem.activities),
+                            SnapshotDiffItem.DiffNode(dbItem.receivers),
+                            SnapshotDiffItem.DiffNode(dbItem.providers),
+                            SnapshotDiffItem.DiffNode(dbItem.permissions),
+                            deleted = true,
+                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
+                        )
+                    )
+                }
+            }
+
+            removeList.forEach { appList.remove(it) }
+            removeList.clear()
+
+            for (info in appList) {
+                try {
+                    packageInfo = PackageUtils.getPackageInfo(info)
+                    versionCode = PackageUtils.getVersionCode(packageInfo)
+
+                    diffList.add(
+                        SnapshotDiffItem(
+                            packageInfo.packageName,
+                            packageInfo.lastUpdateTime,
+                            SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
+                            SnapshotDiffItem.DiffNode(packageInfo.versionName),
+                            SnapshotDiffItem.DiffNode(versionCode),
+                            SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()),
+                            SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir))
+                            ),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))
+                            ),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))
+                            ),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))
+                            ),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, PROVIDER, false))
+                            ),
+                            SnapshotDiffItem.DiffNode(
+                                gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))
+                            ),
+                            newInstalled = true,
+                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
+                        )
+                    )
+                } catch (e: Exception) {
+                    loge(e.toString())
+                    continue
                 }
             }
         }
@@ -334,6 +209,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         val diffList = mutableListOf<SnapshotDiffItem>()
+        val remoteList = mutableListOf<SnapshotItem>()
 
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
@@ -368,7 +244,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                         diffList.add(snapshotDiffItem)
                     }
-                    currList.remove(it)
+                    remoteList.add(it)
                 } ?: run {
                     diffList.add(
                         SnapshotDiffItem(
@@ -391,6 +267,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 }
             }
+
+            remoteList.forEach { currList.remove(it) }
+            remoteList.clear()
 
             for (info in currList) {
                 diffList.add(
@@ -469,10 +348,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    private fun insertSnapshots(items: List<SnapshotItem>) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertSnapshots(items)
-    }
-
     private fun insertTimeStamp(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {
         if (timestamp == 0L) {
             return@launch
@@ -508,12 +383,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), REMOVED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), REMOVED, NATIVE)
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item.size), ADDED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), ADDED, NATIVE)
             )
         }
 
@@ -610,7 +485,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     private fun sizeToString(size: Long): String {
-        return "${Formatter.formatFileSize(Utils.getApp(), size)} ($size Bytes)"
+        return "${Formatter.formatFileSize(LibCheckerApp.context, size)} ($size Bytes)"
     }
 
     data class CompareDiffNode(
@@ -809,7 +684,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     fun backup(os: OutputStream) = viewModelScope.launch(Dispatchers.IO) {
         val builder: SnapshotList.Builder = SnapshotList.newBuilder()
-        val backupList = repository.allSnapshotItems.value!!
+        val backupList = repository.getSnapshots()
 
         val snapshotList = mutableListOf<Snapshot>()
         val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
@@ -853,9 +728,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 action()
             }
             SnapshotList.newBuilder().build()
+        } finally {
+            inputStream.close()
         }
         val finalList = mutableListOf<SnapshotItem>()
         val timeStampSet = mutableSetOf<Long>()
+        var count = 0
 
         list.snapshotsList.forEach {
             if (it != null) {
@@ -881,10 +759,19 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         it.permissions
                     )
                 )
+                count++
+            }
+
+            if (count == 50) {
+                repository.insertSnapshots(finalList)
+                finalList.clear()
+                count = 0
             }
         }
 
         repository.insertSnapshots(finalList)
+        finalList.clear()
+        count = 0
         timeStampSet.forEach { insertTimeStamp(it) }
     }
 
@@ -892,23 +779,5 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
         val date = Date(timestamp)
         return simpleDateFormat.format(date)
-    }
-
-    fun migrateFrom4To5() = viewModelScope.launch(Dispatchers.IO) {
-        val ts = GlobalValues.snapshotTimestamp
-
-        snapshotItems.value?.let {
-            if (it.isNotEmpty()) {
-                val list = it
-
-                list.forEach { item ->
-                    item.timeStamp = ts
-                }
-
-                repository.update(list.toList())
-            }
-        }
-
-        insertTimeStamp(ts)
     }
 }

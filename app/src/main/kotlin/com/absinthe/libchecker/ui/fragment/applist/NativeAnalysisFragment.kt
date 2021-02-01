@@ -2,30 +2,22 @@ package com.absinthe.libchecker.ui.fragment.applist
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.databinding.LayoutDexEmptyListBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.detail.IDetailContainer
-import com.absinthe.libchecker.ui.fragment.BaseFragment
-import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
-import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
@@ -33,15 +25,11 @@ import rikka.core.util.ClipboardUtils
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
 
-class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native), Sortable {
+class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
-    private val viewModel by activityViewModels<DetailViewModel>()
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
     private val dexEmptyLayoutBinding by lazy { LayoutDexEmptyListBinding.inflate(layoutInflater) }
-    private val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
-    private val adapter by lazy { LibStringAdapter(arguments?.getInt(EXTRA_TYPE) ?: NATIVE) }
-    private var isListReady = false
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
@@ -75,6 +63,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
                 if (!isListReady) {
                     viewModel.itemsCountLiveData.value = it.size
+                    viewModel.itemsCountList[type] = it.size
                     isListReady = true
                 }
             }
@@ -88,7 +77,7 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
 
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
-            val regexName = BaseMap.getMap(type).findRegex(name)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
             LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
         }
 
@@ -131,28 +120,6 @@ class NativeAnalysisFragment : BaseFragment<FragmentLibNativeBinding>(R.layout.f
         } else {
             viewModel.initSoAnalysisData(packageName)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as IDetailContainer).currentFragment = this
-
-        if (isListReady) {
-            viewModel.itemsCountLiveData.value = adapter.data.size
-        }
-    }
-
-    override fun sort() {
-        viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-            val map = BaseMap.getMap(adapter.type)
-            adapter.setDiffNewData(adapter.data.sortedByDescending { map.contains(it.item.name) }.toMutableList())
-            MODE_SORT_BY_LIB
-        } else {
-            adapter.setDiffNewData(adapter.data.sortedByDescending { it.item.size }.toMutableList())
-            MODE_SORT_BY_SIZE
-        }
-        GlobalValues.libSortMode.value = viewModel.sortMode
-        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, viewModel.sortMode)
     }
 
     companion object {

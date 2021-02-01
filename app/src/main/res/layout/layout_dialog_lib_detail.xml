@@ -227,12 +227,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/normal_padding"
-                android:drawableStart="@drawable/ic_github"
                 android:drawablePadding="5dp"
                 android:gravity="center_vertical"
                 android:text="@string/create_an_issue"
                 android:textAppearance="?attr/textAppearanceSubtitle2"
-                android:textColorLink="@color/textNormal" />
+                android:textColorLink="@color/textNormal"
+                app:drawableStartCompat="@drawable/ic_github" />
 
         </LinearLayout>
 

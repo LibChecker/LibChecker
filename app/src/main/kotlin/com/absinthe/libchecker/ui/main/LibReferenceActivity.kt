@@ -13,18 +13,16 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,13 +62,18 @@ class LibReferenceActivity : BaseActivity() {
             })
 
             lifecycleScope.launch(Dispatchers.IO) {
-                BaseMap.getMap(type).getChip(name)?.let {
+                LCAppUtils.getRuleWithRegex(name, type)?.let {
                     withContext(Dispatchers.Main) {
-                        toolbar.title = it.name
+                        binding.toolbar.title = it.label
                     }
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.release()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -110,7 +113,8 @@ class LibReferenceActivity : BaseActivity() {
                         appBar?.setRaised(!top)
                     }
                 paddingBottomCompat = UiUtils.getNavBarHeight(contentResolver)
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                setHasFixedSize(true)
+                addPaddingTop(UiUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(

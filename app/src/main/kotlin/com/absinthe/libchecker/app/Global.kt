@@ -4,8 +4,8 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.extensions.logw
-import com.blankj.utilcode.util.Utils
 
 object Global {
 
@@ -33,7 +33,7 @@ object Global {
             logw(e.toString())
         } else if (stack.contains("ClipboardService")) {
             logw(e.toString())
-            Toast.makeText(Utils.getApp(), "Cannot access to ClipboardService", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LibCheckerApp.context, "Cannot access to ClipboardService", Toast.LENGTH_SHORT).show()
         } else {
             throw e
         }

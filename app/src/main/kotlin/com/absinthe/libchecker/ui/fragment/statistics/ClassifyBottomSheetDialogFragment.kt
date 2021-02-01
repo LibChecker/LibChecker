@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
-import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetNoBindingDialogFragment
 import com.absinthe.libchecker.view.ClassifyDialogView
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
-class ClassifyBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
+class ClassifyBottomSheetDialogFragment : BaseBottomSheetNoBindingDialogFragment() {
 
     var item: ArrayList<LCItem> = ArrayList()
     private val dialogView by lazy { ClassifyDialogView(requireContext()) }

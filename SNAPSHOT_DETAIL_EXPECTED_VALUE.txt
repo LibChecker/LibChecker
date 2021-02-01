@@ -1,0 +1,14 @@
+Activity:
+Sample count: 8841
+Count 1: 0.2375
+Count 2: 0.1357
+Count 3: 0.0998
+Count 4: 0.0519
+Count 5: 0.0529
+Count 6: 0.0408
+Count 7: 0.0278
+Count 8: 0.0286
+Count 9: 0.0194
+Count 10: 0.0214
+Others(Count 20+): 0.1922
+Expected value: 3.88

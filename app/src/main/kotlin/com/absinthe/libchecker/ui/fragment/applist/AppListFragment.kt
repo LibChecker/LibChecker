@@ -10,6 +10,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -28,6 +29,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
@@ -43,7 +45,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.BarUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -52,6 +53,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
+
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -64,6 +66,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private var hasRequestChanges = false
     private var isListReady = false
     private var menu: Menu? = null
+    private lateinit var layoutManager: RecyclerView.LayoutManager
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -93,17 +96,20 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             }
             setDiffCallback(AppListDiffUtil())
+            setHasStableIds(true)
         }
 
         binding.apply {
             recyclerview.apply {
                 adapter = mAdapter
+                borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
-                addPaddingTop(BarUtils.getStatusBarHeight())
+                setHasFixedSize(true)
+                addPaddingTop(UiUtils.getStatusBarHeight())
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
                 FastScrollerBuilder(this).useMd2Style().build()
             }
@@ -132,6 +138,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             }
         }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        mAdapter.release()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -175,7 +186,35 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
             }
+            mAdapter.highlightText = newText
             updateItems(filter)
+            doOnMainThreadIdle({
+                val first: Int
+                val last: Int
+                when(layoutManager) {
+                    is LinearLayoutManager -> {
+                        first = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                        last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition() + 3
+                    }
+                    is StaggeredGridLayoutManager -> {
+                        first = (layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
+                        last = (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last() + 3
+                    }
+                    else -> {
+                        first = 0
+                        last = 0
+                    }
+                }
+
+                for (i in first..last) {
+                    (mAdapter.getViewByPosition(i, R.id.tv_app_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                    (mAdapter.getViewByPosition(i, R.id.tv_package_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                }
+            })
 
             if (newText.equals("Easter Egg", true)) {
                 Toasty.show(requireContext(), "🥚")
@@ -228,6 +267,14 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     })
                 }
             })
+
+            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                binding.tvFirstTip.isVisible = true
+                flip(VF_LOADING)
+                initItems()
+                Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+            }
+
             dbItems.observe(viewLifecycleOwner, {
                 if (it.isNullOrEmpty()) {
                     return@observe
@@ -239,7 +286,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
 
                 if (!hasRequestChanges) {
-                    viewModel.requestChange(requireActivity().packageManager)
+                    viewModel.requestChange()
                     hasRequestChanges = true
 
                     if (isFirstLaunch) {
@@ -284,10 +331,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun updateItems(newItems: List<LCItem>) {
-        if (newItems.isEmpty()) {
-            return
-        }
-
         val list = mAdapter.data
         val filterList = mutableListOf<LCItem>()
 
@@ -312,7 +355,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     flip(VF_LIST)
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.recyclerview.scrollState == RecyclerView.SCROLL_STATE_IDLE
+                        && binding.recyclerview.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
                     ) {
                         if (viewModel.shouldReturnTopOfList) {
                             viewModel.shouldReturnTopOfList = false
@@ -337,14 +380,18 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
-        return when (resources.configuration.orientation) {
+        layoutManager = when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
             Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
+        return layoutManager
     }
 
     private fun flip(page: Int) {
+        if (viewModel.isInitingItems) {
+            return
+        }
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
         }
@@ -360,7 +407,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             returnTopOfList()
         } else {
             flip(VF_LOADING)
-            viewModel.requestChange(requireActivity().packageManager, true)
+            viewModel.requestChange(true)
         }
     }
 }

@@ -28,16 +28,16 @@ import com.absinthe.libchecker.databinding.LayoutGetAppListDeniedBinding
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.fragment.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
+import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
-import com.blankj.utilcode.util.FileUtils
 import com.google.android.material.animation.AnimationUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
@@ -79,8 +79,8 @@ class MainActivity : BaseActivity(), IListContainer {
         handleIntentFromShortcuts(intent)
         initAllApplicationInfoItems()
         initObserver()
-        initMap()
         clearApkCache()
+        appViewModel.initRegexRules()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -92,9 +92,11 @@ class MainActivity : BaseActivity(), IListContainer {
         super.onResume()
         registerPackageBroadcast()
         if (GlobalValues.shouldRequestChange.value == true) {
-            appViewModel.requestChange(packageManager, true)
+            appViewModel.requestChange(true)
         }
-        addOrRemoveMiuiAppsListMask()
+        if (XiaomiUtilities.isMIUI()) {
+            addOrRemoveMiuiAppsListMask()
+        }
     }
 
     override fun onPause() {
@@ -185,7 +187,8 @@ class MainActivity : BaseActivity(), IListContainer {
 
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            appViewModel.requestChange(packageManager, true)
+            appViewModel.shouldReturnTopOfList = true
+            appViewModel.requestChange(true)
         }
     }
 
@@ -242,6 +245,12 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
             })
 
+            if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {
+                deleteAllRules()
+                insertPreinstallRules(this@MainActivity)
+                Once.markDone(OnceTag.FIRST_INSERT_RULES)
+            }
+
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems()
             }
@@ -252,15 +261,6 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
             })
         }
-    }
-
-    private fun initMap() = lifecycleScope.launch {
-        NativeLibMap
-        ServiceLibMap
-        ActivityLibMap
-        ReceiverLibMap
-        ProviderLibMap
-        DexLibMap
     }
 
     private fun clearApkCache() {

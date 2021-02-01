@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.ui.fragment
 
+import rikka.material.app.AppBar
+import rikka.material.widget.BorderViewDelegate
+
 /**
  * <pre>
  * author : Absinthe
@@ -8,4 +11,7 @@ package com.absinthe.libchecker.ui.fragment
  */
 interface IListController {
     fun onReturnTop()
+    fun getAppBar(): AppBar?
+    fun getBorderViewDelegate(): BorderViewDelegate?
+    fun scheduleAppbarRaisingStatus()
 }

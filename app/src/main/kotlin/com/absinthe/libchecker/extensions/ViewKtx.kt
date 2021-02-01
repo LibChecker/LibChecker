@@ -1,11 +1,17 @@
 package com.absinthe.libchecker.extensions
 
 import android.content.res.Resources
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Toasty
-import com.blankj.utilcode.util.BarUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
 fun View.setLongClickCopiedToClipboard(text: String) {
@@ -61,5 +67,20 @@ fun View.addPaddingBottom(padding: Int) {
 fun ViewGroup.setSystemPadding() {
     val isOrientationLandscape = context.isOrientationLandscape
     fitsSystemWindows = isOrientationLandscape
-    setPadding(0, if (isOrientationLandscape) 0 else BarUtils.getStatusBarHeight(), 0, 0)
+    setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
+}
+
+fun TextView.tintHighlightText(highlightText: String, rawText: String) {
+    text = rawText
+    if (text.contains(highlightText, true)) {
+        val builder = SpannableStringBuilder()
+        val spannableString = SpannableString(text.toString())
+        val start = text.indexOf(highlightText, 0, true)
+        spannableString.setSpan(
+            ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+            start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        builder.append(spannableString)
+        text = builder
+    }
 }

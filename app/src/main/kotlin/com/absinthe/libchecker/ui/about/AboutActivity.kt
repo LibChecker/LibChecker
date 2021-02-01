@@ -21,12 +21,10 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.BarUtils
 import com.drakeet.about.*
 import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
@@ -94,7 +92,7 @@ class AboutActivity : AbsAboutActivity() {
 
     override fun onItemsCreated(items: MutableList<Any>) {
 
-        val hasInstallCoolApk = AppUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
 
         items.apply {
             add(Category("What's this"))
@@ -117,7 +115,8 @@ class AboutActivity : AbsAboutActivity() {
                 "https://lottiefiles.com/22122-fanimation",
                 "https://lottiefiles.com/21836-blast-off",
                 "https://lottiefiles.com/1309-smiley-stack",
-                "https://lottiefiles.com/7907-3d-camera",
+                "https://lottiefiles.com/43517-psycho-analysis",
+                "https://lottiefiles.com/44836-gray-down-arrow",
                 "https://chojugiga.com/2017/09/05/da4choju53_0031/"
             )
             add(Category("Acknowledgement"))
@@ -141,7 +140,6 @@ class AboutActivity : AbsAboutActivity() {
             add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
             add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
             add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
-            add(License("AndroidUtilCode", "Blankj", License.APACHE_2, "https://github.com/Blankj/AndroidUtilCode"))
             add(License("OkHttp", "Square", License.APACHE_2, "https://github.com/square/okhttp"))
             add(License("Retrofit", "Square", License.APACHE_2, "https://github.com/square/retrofit"))
             add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
@@ -175,7 +173,7 @@ class AboutActivity : AbsAboutActivity() {
 
     private fun initView() {
         UiUtils.setSystemBarStyle(window)
-        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).addPaddingTop(BarUtils.getStatusBarHeight())
+        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
     private fun getAcknowledgementHtmlString(list: List<String>): String {

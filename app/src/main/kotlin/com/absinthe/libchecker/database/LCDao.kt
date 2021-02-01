@@ -2,10 +2,7 @@ package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.database.entity.*
 
 @Dao
 interface LCDao {
@@ -34,10 +31,13 @@ interface LCDao {
 
     //Snapshot Table
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
-    fun getSnapshots(): LiveData<List<SnapshotItem>>
+    suspend fun getSnapshots(): List<SnapshotItem>
 
     @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
     suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
+
+    @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
+    fun getSnapshotsLiveData(timestamp: Long): LiveData<List<SnapshotItem>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: SnapshotItem)
@@ -60,6 +60,9 @@ interface LCDao {
     @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
     fun deleteSnapshots(timestamp: Long)
 
+    @Delete
+    fun deleteSnapshots(list: List<SnapshotItem>)
+
     //TimeStamp Table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: TimeStampItem)
@@ -79,4 +82,20 @@ interface LCDao {
 
     @Query("SELECT * from track_table")
     suspend fun getTrackItems(): List<TrackItem>
+
+    //Rules
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertRules(items: List<RuleEntity>)
+
+    @Query("DELETE FROM rules_table")
+    fun deleteAllRules()
+
+    @Query("SELECT * from rules_table WHERE name LIKE :name")
+    suspend fun getRule(name: String): RuleEntity?
+
+    @Query("SELECT * from rules_table")
+    suspend fun getAllRules(): List<RuleEntity>
+
+    @Query("SELECT * from rules_table WHERE isRegexRule = 1")
+    suspend fun getRegexRules(): List<RuleEntity>
 }

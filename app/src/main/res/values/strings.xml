@@ -7,6 +7,9 @@
     <string name="title_settings">Settings</string>
     <string name="title_album">Album</string>
     <string name="loading">Loading…</string>
+    <string name="channel_shoot">Save snapshots</string>
+    <string name="noti_shoot_title">Saving current snapshot</string>
+    <string name="noti_shoot_title_saved">Snapshot saved</string>
 
     <!--  App list  -->
     <string name="menu_search">Search</string>
@@ -28,7 +31,7 @@
     <!-- Statistics   -->
     <string name="title_statistics_dialog">Apps with %s ABI</string>
     <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
-    <string name="tab_pie_chart">Pie chart</string>
+    <string name="tab_chart">Chart</string>
     <string name="tab_lib_reference_statistics">Lib reference</string>
     <string name="not_marked_lib">Not marked library</string>
 
@@ -68,6 +71,7 @@
     <string name="help_docs">Help Docs</string>
     <string name="join_telegram_group">Communication</string>
     <string name="anonymous_statistics">Anonymous statistics</string>
+    <string name="cloud_rules">Cloud rules</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
@@ -78,6 +82,7 @@
     <string name="help_docs_summary">Learn how to use LibChecker</string>
     <string name="join_telegram_group_summary">Join our Telegram group</string>
     <string name="anonymous_statistics_summary">We use Microsoft AppCenter to anonymously send the most commonly used marked libraries and some usage habits data to make LibChecker more practical</string>
+    <string name="cloud_rules_summary">Update the latest marked library rules here</string>
 
     <!--  Detail  -->
     <string name="detail_label">View App Details</string>
@@ -139,5 +144,15 @@
     <string name="album_restore">Restore</string>
     <string name="album_restore_summary">Restore snapshots from backup file</string>
     <string name="album_click_to_choose">Click to Choose</string>
+    <string name="album_dialog_delete_snapshot_message">Processing…</string>
+
+    <!--  Integration  -->
+    <string name="integration_monkey_king_menu_block">Block this via \"MonkeyKing Purify\"</string>
+    <string name="integration_monkey_king_menu_unblock">Unblock this via \"MonkeyKing Purify\"</string>
+
+    <!--  Cloud rules  -->
+    <string name="rules_local_repo_version">Local repo version</string>
+    <string name="rules_remote_repo_version">Remote repo version</string>
+    <string name="rules_btn_update">Update</string>
 
 </resources>

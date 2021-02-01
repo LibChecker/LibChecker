@@ -1,19 +1,19 @@
 package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.SnapshotItem
-import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.database.entity.TrackItem
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.entity.*
 
 class LCRepository(private val lcDao: LCDao) {
 
     val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
-    val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshots()
+    val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
 
     fun getItem(packageName: String): LCItem? {
         return lcDao.getItem(packageName)
     }
+
+    suspend fun getSnapshots() = lcDao.getSnapshots()
 
     suspend fun getSnapshots(timestamp: Long) = lcDao.getSnapshots(timestamp)
 
@@ -69,8 +69,24 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.delete(item)
     }
 
-    fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
-        lcDao.deleteSnapshots(timestamp)
+    suspend fun deleteSnapshotsAndTimeStamp(timestamp: Long) {
+        val list = getSnapshots(timestamp)
+        var count = 0;
+        val chunk = mutableListOf<SnapshotItem>()
+
+        list.forEach {
+            chunk.add(it)
+            count++
+
+            if (count == 50) {
+                lcDao.deleteSnapshots(chunk)
+                chunk.clear()
+                count = 0;
+            }
+        }
+
+        lcDao.deleteSnapshots(chunk)
+        chunk.clear()
         lcDao.delete(TimeStampItem(timestamp))
     }
 
@@ -81,4 +97,18 @@ class LCRepository(private val lcDao: LCDao) {
     fun deleteAllItems() {
         lcDao.deleteAllItems()
     }
+
+    suspend fun getRule(name: String) = lcDao.getRule(name)
+
+    suspend fun insertRules(rules: List<RuleEntity>) {
+        lcDao.insertRules(rules)
+    }
+
+    fun deleteAllRules() {
+        lcDao.deleteAllRules()
+    }
+
+    suspend fun getAllRules() = lcDao.getAllRules()
+
+    suspend fun getRegexRules() = lcDao.getRegexRules()
 }

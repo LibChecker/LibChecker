@@ -2,9 +2,9 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.pm.ResolveInfo
 import android.widget.ImageView
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.blankj.utilcode.util.AppUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -21,7 +21,7 @@ class AppInfoAdapter :BaseQuickAdapter<ResolveInfo, BaseViewHolder>(R.layout.lay
         holder.getView<ImageView>(R.id.icon).apply {
             background = LCAppUtils.getAppIcon(item.activityInfo.packageName)
         }
-        holder.setText(R.id.tv_name, AppUtils.getAppName(item.activityInfo.packageName))
+        holder.setText(R.id.tv_name, item.activityInfo.loadLabel(LibCheckerApp.context.packageManager))
     }
 
 }

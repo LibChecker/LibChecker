@@ -46,11 +46,17 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
+            setHasFixedSize(true)
             addPaddingBottom(UiUtils.getNavBarHeight(context.contentResolver))
             FastScrollerBuilder(this).useMd2Style().build()
         }
 
         addView(rvList)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        adapter.release()
     }
 
 }

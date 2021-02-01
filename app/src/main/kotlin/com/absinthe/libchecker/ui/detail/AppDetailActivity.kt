@@ -1,35 +1,39 @@
 package com.absinthe.libchecker.ui.detail
 
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.AppUtils
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -38,9 +42,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 
+
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 
-class AppDetailActivity : BaseActivity(), IDetailContainer {
+class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
@@ -48,6 +53,8 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
     private var currentItemsCount = -1
 
     override var currentFragment: Sortable? = null
+
+    override fun requirePackageName() = pkgName
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -106,8 +113,13 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
         }
 
         pkgName?.let { packageName ->
+            viewModel.packageName = packageName
             supportActionBar?.apply {
-                title = AppUtils.getAppName(packageName)
+                title = try {
+                    PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
+                } catch (e: PackageManager.NameNotFoundException) {
+                    getString(R.string.detail_label)
+                }
             }
             binding.apply {
                 try {
@@ -125,7 +137,7 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                         }
                     }
                     tvAppName.apply {
-                        text = AppUtils.getAppName(packageName)
+                        text = PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
                         setLongClickCopiedToClipboard(text.toString())
                     }
                     tvPackageName.apply {
@@ -136,21 +148,23 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                         text = PackageUtils.getVersionString(packageInfo)
                         setLongClickCopiedToClipboard(text.toString())
                     }
-                    tvTargetApi.text = PackageUtils.getTargetApiString(packageInfo)
 
                     val abi = PackageUtils.getAbi(
                         packageInfo.applicationInfo.sourceDir,
                         packageInfo.applicationInfo.nativeLibraryDir,
                         isApk = false
                     )
+                    val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageName)}")
+                    ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                        val span = CenterAlignImageSpan(it)
+                        spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                    }
 
-                    layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                    layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
+                    tvAbiAndApi.text = spanString
 
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val lcDao = LCDatabase.getDatabase(application).lcDao()
-                        val repository = LCRepository(lcDao)
-                        val lcItem = repository.getItem(packageName)
+                        val lcItem = LibCheckerApp.repository.getItem(packageName)
 
                         val isSplitApk = lcItem?.isSplitApk ?: false
                         val isKotlinUsed = lcItem?.isKotlinUsed ?: false
@@ -222,6 +236,19 @@ class AppDetailActivity : BaseActivity(), IDetailContainer {
                     }
                 }
             }
+            binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val count = viewModel.itemsCountList[tab.position]
+                    if (currentItemsCount != count) {
+                        binding.tsComponentCount.setText(count.toString())
+                        currentItemsCount = count
+                    }
+                }
+
+                override fun onTabUnselected(tab: TabLayout.Tab?) { }
+
+                override fun onTabReselected(tab: TabLayout.Tab?) { }
+            })
 
             val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
                 tab.text = tabTitles[position]

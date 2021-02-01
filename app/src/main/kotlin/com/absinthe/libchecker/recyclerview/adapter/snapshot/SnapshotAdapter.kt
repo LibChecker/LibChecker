@@ -2,6 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -22,6 +23,10 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val ARROW = "→"
@@ -31,20 +36,42 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
     private val iconSize by lazy { context.resources.getDimensionPixelSize(R.dimen.app_icon_size) }
     private val iconLoader by lazy { AppIconLoader(iconSize, false,context) }
+    private val iconMap = mutableMapOf<String, Bitmap>()
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_snapshot, parent, false))
     }
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
-        val iconBitmap = try {
-            iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
-        } catch (e: Exception) {
-            ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
-                setTint(ContextCompat.getColor(context, R.color.textNormal))
-            }?.toBitmap(iconSize, iconSize)
+        holder.getView<ImageView>(R.id.iv_icon).apply {
+            tag = item.packageName
+            iconMap[item.packageName]?.let {
+                load(it) {
+                    crossfade(true)
+                }
+            } ?: let {
+                GlobalScope.launch(Dispatchers.IO) {
+                    val bitmap = try {
+                        iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
+                            setTint(ContextCompat.getColor(context, R.color.textNormal))
+                        }?.toBitmap(iconSize, iconSize)
+                    }
+                    withContext(Dispatchers.Main) {
+                        findViewWithTag<ImageView>(item.packageName)?.let {
+                            load(bitmap) {
+                                crossfade(true)
+                            }
+                        }
+                    }
+                    if (bitmap != null) {
+                        iconMap[item.packageName] = bitmap
+                    }
+                }
+            }
         }
-        holder.getView<ImageView>(R.id.iv_icon).load(iconBitmap)
+
         holder.getView<View>(R.id.view_red_mask).isVisible = item.deleted
 
         var isNewOrDeleted = false
@@ -136,6 +163,10 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
             holder.getView<TextView>(R.id.tv_arrow).isGone = true
             holder.getView<LinearLayout>(R.id.layout_abi_badge_new).isGone = true
         }
+    }
+
+    fun release() {
+        iconMap.forEach { it.value.recycle() }
     }
 
     private fun <T> getDiffString(diff: SnapshotDiffItem.DiffNode<T>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {

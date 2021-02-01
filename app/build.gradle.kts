@@ -1,10 +1,11 @@
 import com.google.protobuf.gradle.*
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
     kotlin("kapt")
+    id("kotlin-parcelize")
     id("com.google.protobuf")
 }
 apply {
@@ -13,28 +14,20 @@ apply {
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.2"
-
-    signingConfigs {
-        register("release") {
-            storeFile = file("android-key.jks")
-            storePassword = System.getenv("KSTOREPWD")
-            keyAlias = System.getenv("KEYALIAS")
-            keyPassword = System.getenv("KEYPWD")
-        }
-    }
+    buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "1.10.5"
+    val baseVersionName = "2.0.0-beta01"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
-        minSdkVersion(21)
+        minSdkVersion(23)
         targetSdkVersion(30)
         versionCode = gitCommitCount
         versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs("en", "zh", "zh-rHK", "zh-rTW")
     }
 
     buildFeatures {
@@ -49,7 +42,6 @@ android {
             isMinifyEnabled = true
             isZipAlignEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -78,23 +70,32 @@ android {
     packagingOptions {
         exclude("META-INF/atomicfu.kotlin_module")
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs
+            .map { it as BaseVariantOutputImpl }
+            .forEach { output ->
+                output.outputFileName = "LibChecker-${variant.versionName}.apk"
+            }
+        true
+    }
 }
 
 configurations.all {
     exclude(group = "rikka.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.32.1")
+val grpcVersion by extra("1.35.0")
 val protocVersion by extra("3.14.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.1.0")
+    implementation("com.absinthe.libraries.utils:utils:1.1.3")
 
-    val appCenterSdkVersion = "3.3.1"
+    val appCenterSdkVersion = "4.1.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
@@ -109,29 +110,29 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
 
     // Room components
-    val roomVersion = "2.2.5"
+    val roomVersion = "2.2.6"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+    //implementation("org.xerial:sqlite-jdbc:3.34.0")
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha05")
+    implementation("androidx.core:core-ktx:1.5.0-beta01")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha06")
-    implementation("androidx.browser:browser:1.2.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-beta01")
+    implementation("androidx.browser:browser:1.3.0")
 
     implementation("com.google.android.material:material:1.2.1")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.4.4")
+    implementation("com.airbnb.android:lottie:3.6.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.blankj:utilcodex:1.30.4")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.1.0")
+    implementation("io.coil-kt:coil:1.1.1")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
-    implementation("me.zhanghai.android.appiconloader:appiconloader:1.2.0")
+    implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.0")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")
@@ -154,7 +155,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okio:okio:2.9.0")
+    implementation("com.squareup.okio:okio:2.10.0")
 
     // gRPC
     implementation("io.grpc:grpc-okhttp:$grpcVersion")
@@ -163,7 +164,7 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     testImplementation("junit:junit:4.13.1")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.5")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.6")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

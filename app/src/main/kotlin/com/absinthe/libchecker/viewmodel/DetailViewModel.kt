@@ -2,8 +2,8 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -11,14 +11,16 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.NativeLibDetailBean
-import com.absinthe.libchecker.api.request.NativeLibDetailRequest
+import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.DexLibMap
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
-import com.absinthe.libchecker.extensions.loge
+import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.constant.librarymap.IconResMap
+import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,22 +33,26 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
-    val detailBean: MutableLiveData<NativeLibDetailBean?> = MutableLiveData()
+    val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
+    val repository = LibCheckerApp.repository
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-    val componentsMap: HashMap<Int, MutableLiveData<List<String>>> = hashMapOf(
+    val componentsMap: HashMap<Int, MutableLiveData<List<StatefulComponent>>> = hashMapOf(
         SERVICE to MutableLiveData(),
         ACTIVITY to MutableLiveData(),
         RECEIVER to MutableLiveData(),
         PROVIDER to MutableLiveData()
     )
     val itemsCountLiveData: MutableLiveData<Int> = MutableLiveData(0)
+    val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
+    var packageName: String = ""
 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val context: Context = getApplication<LibCheckerApp>()
         val list = ArrayList<LibStringItemChip>()
+        logd("sasa","path=$packageName")
 
         try {
             val info = if (packageName.endsWith("/temp.apk")) {
@@ -63,7 +69,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             info?.let {
                 list.addAll(
-                    getNativeChipList(info.sourceDir, info.nativeLibraryDir ?: "")
+                    getNativeChipList(info)
                 )
             }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -88,7 +94,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
 
-            val pmFlag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            val pmFlag = if (LCAppUtils.atLeastN()) {
                 PackageManager.MATCH_DISABLED_COMPONENTS
             } else {
                 PackageManager.GET_DISABLED_COMPONENTS
@@ -139,14 +145,15 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl(ApiManager.root)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private val request: LibDetailRequest = retrofit.create(LibDetailRequest::class.java)
+
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
-            val retrofit = Retrofit.Builder()
-                .baseUrl(ApiManager.root)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-            val request = retrofit.create(NativeLibDetailRequest::class.java)
-
+            logd("requestLibDetail")
             var categoryDir = when (type) {
                 NATIVE -> "native-libs"
                 SERVICE -> "services-libs"
@@ -160,31 +167,36 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            val detail = request.requestNativeLibDetail(categoryDir, libName)
-            detail.enqueue(object : Callback<NativeLibDetailBean> {
-                override fun onFailure(call: Call<NativeLibDetailBean>, t: Throwable) {
+            val detail = request.requestLibDetail(categoryDir, libName)
+            detail.enqueue(object : Callback<LibDetailBean> {
+                override fun onFailure(call: Call<LibDetailBean>, t: Throwable) {
                     Log.e("DetailViewModel", t.message ?: "")
                     detailBean.value = null
                 }
 
                 override fun onResponse(
-                    call: Call<NativeLibDetailBean>,
-                    response: Response<NativeLibDetailBean>
+                    call: Call<LibDetailBean>,
+                    response: Response<LibDetailBean>
                 ) {
                     detailBean.value = response.body()
                 }
             })
         }
 
-    private fun getNativeChipList(sourcePath: String, nativePath: String): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(sourcePath, nativePath).toMutableList()
+    private suspend fun getNativeChipList(info: ApplicationInfo): List<LibStringItemChip> {
+        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir ?: "").toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
+        var chip: LibChip?
 
         if (list.isEmpty()) {
             return chipList
         } else {
             list.forEach {
-                chipList.add(LibStringItemChip(it, NativeLibMap.getChip(it.name)))
+                chip = null
+                LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
+                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                }
+                chipList.add(LibStringItemChip(it, chip))
             }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
@@ -195,16 +207,21 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         return chipList
     }
 
-    private fun getDexChipList(packageName: String): List<LibStringItemChip> {
-        loge("getDexChipList")
+    private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
+        logd("getDexChipList")
         val list = PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
+        var chip: LibChip?
 
         if (list.isEmpty()) {
             return chipList
         } else {
             list.forEach {
-                chipList.add(LibStringItemChip(it, DexLibMap.getChip(it.name)))
+                chip = null
+                LCAppUtils.getRuleWithRegex(it.name, DEX)?.let { rule ->
+                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                }
+                chipList.add(LibStringItemChip(it, chip))
             }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.name }

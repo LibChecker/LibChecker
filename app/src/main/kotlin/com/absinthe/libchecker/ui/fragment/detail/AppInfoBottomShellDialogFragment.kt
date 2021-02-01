@@ -5,11 +5,9 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
+import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -18,11 +16,10 @@ import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.BaseBottomSheetDialogFragment
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.blankj.utilcode.util.AppUtils
-import com.blankj.utilcode.util.IntentUtils
 
 /**
  * <pre>
@@ -31,21 +28,21 @@ import com.blankj.utilcode.util.IntentUtils
  * </pre>
  */
 
-class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
+class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBottomSheetAppInfoBinding>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = LayoutBottomSheetAppInfoBinding.inflate(inflater)
+    override fun initBinding(): LayoutBottomSheetAppInfoBinding = LayoutBottomSheetAppInfoBinding.inflate(layoutInflater)
+
+    override fun init() {
         initView(binding)
-        return binding.root
     }
 
     private fun initView(binding: LayoutBottomSheetAppInfoBinding) {
         binding.infoLaunch.setOnClickListener {
             try {
-                startActivity(IntentUtils.getLaunchAppIntent(packageName))
+                startLaunchAppActivity(packageName)
             } catch (e: ActivityNotFoundException) {
                 Toasty.show(requireContext(), R.string.toast_cant_open_app)
             } catch (e: NullPointerException) {
@@ -55,7 +52,11 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
         binding.infoSettings.setOnClickListener {
-            AppUtils.launchAppDetailsSettings(packageName)
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
             dismiss()
         }
         binding.rvList.apply {
@@ -65,7 +66,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
             addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (LCAppUtils.atLeastN()) {
             mAdapter.setList(getResolveInfoList())
             mAdapter.setOnItemClickListener { _, _, position ->
                 val info = mAdapter.data[position]
@@ -83,5 +84,24 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment() {
         return requireContext().packageManager.queryIntentActivities(
             Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
         ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
+    }
+
+    private fun startLaunchAppActivity(packageName: String?) {
+        if (packageName == null) {
+            return
+        }
+        val launcherActivity: String
+        val intent = Intent(Intent.ACTION_MAIN, null)
+        intent.addCategory(Intent.CATEGORY_LAUNCHER)
+        intent.setPackage(packageName)
+        val pm = requireActivity().packageManager
+        val info = pm.queryIntentActivities(intent, 0)
+        launcherActivity = if (info.size == 0) "" else info[0].activityInfo.name
+        val launchIntent = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+            setClassName(packageName, launcherActivity)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        startActivity(launchIntent)
     }
 }

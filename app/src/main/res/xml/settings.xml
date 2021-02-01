@@ -14,12 +14,12 @@
             app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
-        <SwitchPreference
-            app:key="entryAnimation"
-            app:title="@string/entry_animation"
-            app:summary="@string/entry_animation_summary"
-            app:icon="@drawable/ic_animation"
-            app:defaultValue="true"/>
+<!--        <SwitchPreference-->
+<!--            app:key="entryAnimation"-->
+<!--            app:title="@string/entry_animation"-->
+<!--            app:summary="@string/entry_animation_summary"-->
+<!--            app:icon="@drawable/ic_animation"-->
+<!--            app:defaultValue="false"/>-->
 
         <SwitchPreference
             app:key="apkAnalytics"
@@ -43,6 +43,12 @@
             app:defaultValue="gitee"
             app:entries="@array/list_repo"
             app:entryValues="@array/list_repo_value"/>
+
+        <Preference
+            app:key="cloudRules"
+            app:title="@string/cloud_rules"
+            app:summary="@string/cloud_rules_summary"
+            app:icon="@drawable/ic_cloud_rules"/>
 
         <Preference
             app:key="libRefThreshold"

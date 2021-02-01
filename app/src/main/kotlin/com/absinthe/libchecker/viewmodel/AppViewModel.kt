@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,25 +13,28 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.constant.librarymap.BaseMap
-import com.absinthe.libchecker.constant.librarymap.NativeLibMap
+import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.protocol.CloudRulesBundle
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
+import java.io.InputStream
+import java.util.regex.Pattern
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
@@ -42,13 +44,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var shouldReturnTopOfList = false
+    var isInitingItems = false
 
-    private var isInitingItems = false
-    private val repository: LCRepository
+    private val repository = LibCheckerApp.repository
 
     init {
-        val lcDao = LCDatabase.getDatabase(application).lcDao()
-        repository = LCRepository(lcDao)
         dbItems = repository.allDatabaseItems
     }
 
@@ -70,6 +70,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: MiuiOpsException) {
                 emptyList()
             } catch (e: Exception) {
+                logd(e.toString())
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
             }
@@ -113,28 +114,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
+        isInitingItems = false
         insert(lcItems)
 
-        isInitingItems = false
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
     }
 
-    fun requestChange(packageManager: PackageManager, needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
+    fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         if (isInitingItems) {
             logd("Request change isInitingItems return")
             return@launch
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestChangeImpl(packageManager, needRefresh)
-        } else {
-            try {
-                requestChangeImpl(packageManager, needRefresh)
-            } catch (e: VerifyError) {
-                e.printStackTrace()
-            }
-        }
+        requestChangeImpl(LibCheckerApp.context.packageManager, needRefresh)
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
@@ -236,6 +229,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             GlobalScope.launch(Dispatchers.Main) {
+                if (GlobalValues.shouldRequestChange.value == true) {
+                    shouldReturnTopOfList = true
+                }
                 GlobalValues.shouldRequestChange.value = false
                 AppItemRepository.shouldRefreshAppList = true
             }
@@ -255,7 +251,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.Default) {
+    private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.IO) {
         val map = HashMap<String, Int>()
         var libList: List<LibStringItem>
         var count: Int
@@ -275,7 +271,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             val properties: MutableMap<String, String> = HashMap()
 
             for (entry in map) {
-                if (entry.value > 3 && !NativeLibMap.getMap().containsKey(entry.key)) {
+                if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
                     properties.clear()
                     properties["Library name"] = entry.key
                     properties["Library count"] = entry.value.toString()
@@ -309,13 +305,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun collectComponentPopularLibraries(
+    private suspend fun collectComponentPopularLibraries(
         appList: List<ApplicationInfo>,
         @LibType type: Int,
         label: String
     ) {
         val map = HashMap<String, Int>()
-        var compLibList: List<String>
+        var compLibList: List<StatefulComponent>
         var count: Int
 
         for (item in appList) {
@@ -323,19 +319,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 compLibList = PackageUtils.getComponentList(item.packageName, type, false)
 
                 for (lib in compLibList) {
-                    count = map[lib] ?: 0
-                    map[lib] = count + 1
+                    count = map[lib.componentName] ?: 0
+                    map[lib.componentName] = count + 1
                 }
             } catch (e: Exception) {
                 continue
             }
         }
 
-        val libMap = BaseMap.getMap(type)
         val properties: MutableMap<String, String> = HashMap()
 
         for (entry in map) {
-            if (entry.value > 3 && !libMap.getMap().containsKey(entry.key) && libMap.findRegex(entry.key) == null) {
+            if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, type) == null) {
                 properties.clear()
                 properties["Library name"] = entry.key
                 properties["Library count"] = entry.value.toString()
@@ -391,8 +386,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         for (lib in libList) {
                             count = map[lib.name]?.count ?: 0
-                            map[lib.name] =
-                                RefCountType(count + 1, NATIVE)
+                            map[lib.name] = RefCountType(count + 1, NATIVE)
                         }
                     } catch (e: Exception) {
                         loge(e.toString())
@@ -556,9 +550,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         var chip: LibChip?
+        var rule: RuleEntity?
         for (entry in map) {
             if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
-                chip = BaseMap.getMap(entry.value.type).getChip(entry.key)
+                rule = LCAppUtils.getRuleWithRegex(entry.key, entry.value.type)
+                chip = null
+                rule?.let {
+                    chip = LibChip(iconRes = IconResMap.getIconRes(it.iconIndex), name = it.label, regexName = it.regexName)
+                }
                 refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
             }
         }
@@ -590,5 +589,34 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.delete(item)
+    }
+
+    fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
+
+    fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        var inputStream: InputStream? = null
+        try {
+            inputStream = context.resources.assets.open("rules.lcr")
+            val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
+            val rulesList = mutableListOf<RuleEntity>()
+            rulesBundle.rulesList.cloudRulesList.forEach {
+                it?.let {
+                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                }
+            }
+            repository.insertRules(rulesList)
+            GlobalValues.localRulesVersion = rulesBundle.version
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            inputStream?.close()
+        }
+    }
+
+    fun initRegexRules() = viewModelScope.launch(Dispatchers.IO) {
+        val list = repository.getRegexRules()
+        list.forEach {
+            AppItemRepository.rulesRegexList[Pattern.compile(it.name)] = it
+        }
     }
 }

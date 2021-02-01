@@ -4,26 +4,30 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.BaseMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.EXTRA_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.dialogfragment.LibDetailDialogFragment
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -38,14 +42,19 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
     private var isListReady = false
     private var menu: Menu? = null
-    private var category = NATIVE
+    private var category = GlobalValues.currentLibRefType
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
 
     override fun init() {
+        setHasOptionsMenu(true)
+
+        layoutManager = LinearLayoutManager(requireContext())
         binding.apply {
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter
+                layoutManager = this@LibReferenceFragment.layoutManager
                 addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
                 FastScrollerBuilder(this).useMd2Style().build()
             }
@@ -87,7 +96,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 if (view.id == R.id.iv_icon) {
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
-                    val regexName = BaseMap.getMap(ref.type).findRegex(name)?.regexName
+                    val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }
@@ -169,12 +178,12 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.ref_category_all -> category = ALL
-            R.id.ref_category_native -> category = NATIVE
-            R.id.ref_category_service -> category = SERVICE
-            R.id.ref_category_activity -> category = ACTIVITY
-            R.id.ref_category_br -> category = RECEIVER
-            R.id.ref_category_cp -> category = PROVIDER
+            R.id.ref_category_all -> doSaveLibRefType(ALL)
+            R.id.ref_category_native -> doSaveLibRefType(NATIVE)
+            R.id.ref_category_service -> doSaveLibRefType(SERVICE)
+            R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
+            R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
+            R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
             R.id.ref_category_dex -> category = DEX
         }
 
@@ -188,6 +197,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             )
         )
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun doSaveLibRefType(@LibType type: Int) {
+        category = type
+        GlobalValues.currentLibRefType = type
     }
 
     private fun computeRef() {
@@ -211,7 +225,21 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     ignoreCase = true
                 ) ?: false
             }
+            adapter.highlightText = newText
             adapter.setDiffNewData(filter.toMutableList())
+            doOnMainThreadIdle({
+                val first = layoutManager.findFirstVisibleItemPosition()
+                val last = layoutManager.findLastVisibleItemPosition() + 3
+
+                for (i in first..last) {
+                    (adapter.getViewByPosition(i, R.id.tv_label_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                    (adapter.getViewByPosition(i, R.id.tv_lib_name) as? TextView)?.apply {
+                        tintHighlightText(newText, text.toString())
+                    }
+                }
+            })
 
             if (newText.equals("Easter Egg", true)) {
                 Toasty.show(requireContext(), "🥚")

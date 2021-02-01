@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/normal_padding">
-
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/chart"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    android:orientation="vertical"
+    android:paddingTop="@dimen/normal_padding">
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/buttons_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        android:paddingHorizontal="@dimen/normal_padding"
         app:selectionRequired="true"
-        app:singleSelection="true">
+        app:singleSelection="true"
+        tools:ignore="HardcodedText">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_abi"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ABI"
-            tools:ignore="HardcodedText" />
+            android:text="ABI" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_kotlin"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kotlin"
-            tools:ignore="HardcodedText" />
+            android:text="Kotlin" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_target_api"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Target API" />
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

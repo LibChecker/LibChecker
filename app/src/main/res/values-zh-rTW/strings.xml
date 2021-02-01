@@ -21,7 +21,7 @@
     <string name="menu_sort_default">預設順序</string>
     <string name="title_statistics_dialog">%s架构的 Apps</string>
     <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
-    <string name="tab_pie_chart">餅狀圖</string>
+    <string name="tab_chart">圖表</string>
     <string name="tab_lib_reference_statistics">庫引用統計</string>
     <string name="not_marked_lib">未標示的庫</string>
     <string name="ref_category_all">全部</string>
@@ -111,4 +111,15 @@
     <string name="anonymous_statistics_summary">我們使用 Microsoft AppCenter 來匿名發送最常被人們使用的標記庫和一些使用習慣數據來使得 LibChecker 變得更加實用</string>
     <string name="anonymous_statistics">匿名統計</string>
     <string name="library_declaration">LibChecker 中的所有標記庫信息均來自於其所屬的 SDK 的開發文檔或代碼倉庫，如果信息有有誤，請聯繫：absinthe@absinthe.life</string>
+    <string name="channel_shoot">儲存快照</string>
+    <string name="noti_shoot_title">正在儲存目前快照</string>
+    <string name="integration_monkey_king_menu_block">使用\"大聖淨化\"禁用此組件</string>
+    <string name="integration_monkey_king_menu_unblock">使用\"大聖淨化\"解禁此組件</string>
+    <string name="cloud_rules">雲端規則</string>
+    <string name="cloud_rules_summary">在此更新最新的標記庫</string>
+    <string name="album_dialog_delete_snapshot_message">處理中…</string>
+    <string name="noti_shoot_title_saved">快照已儲存</string>
+    <string name="rules_local_repo_version">本地規則庫版本</string>
+    <string name="rules_remote_repo_version">遠端規則庫版本</string>
+    <string name="rules_btn_update">更新</string>
 </resources>

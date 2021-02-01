@@ -2,14 +2,13 @@ package com.absinthe.libchecker.utils
 
 import android.content.Context
 import androidx.core.content.edit
-import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.constant.SP_NAME
-import com.blankj.utilcode.util.Utils
 
 object SPUtils {
 
     private val sp by lazy {
-        Utils.getApp().getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
+        LibCheckerApp.context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     }
 
     fun putString(key: String, value: String) {

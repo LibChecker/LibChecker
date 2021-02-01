@@ -64,6 +64,12 @@ class BackupActivity : BaseActivity() {
                 try {
                     contentResolver.openOutputStream(it)?.let { os ->
                         viewModel.backup(os)
+//                        lifecycleScope.launch(Dispatchers.IO) {
+//                            val rules = LibCheckerApp.repository.getAllRules()
+//
+//                            os.write(RuleGenerator.generateRulesByteArray(rules, GlobalValues.localRulesVersion+1))
+//                            os.close()
+//                        }
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -92,17 +98,15 @@ class BackupActivity : BaseActivity() {
 
             findPreference(Constants.PREF_LOCAL_BACKUP)?.apply {
                 setOnPreferenceClickListener {
-                    viewModel.snapshotItems.observe(viewLifecycleOwner, {
-                        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
-                        val date = Date()
-                        val formatted = simpleDateFormat.format(date)
+                    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
+                    val date = Date()
+                    val formatted = simpleDateFormat.format(date)
 
-                        if (StorageUtils.isExternalStorageWritable) {
-                            StorageUtils.createFile(requireActivity() as BaseActivity, "*/*",
-                                "LibChecker-Snapshot-Backups-$formatted.lcss"
-                            )
-                        }
-                    })
+                    if (StorageUtils.isExternalStorageWritable) {
+                        StorageUtils.createFile(requireActivity() as BaseActivity, "*/*",
+                            "LibChecker-Snapshot-Backups-$formatted.lcss"
+                        )
+                    }
                     true
                 }
             }
@@ -118,7 +122,7 @@ class BackupActivity : BaseActivity() {
             }
         }
 
-        override fun onCreateItemDecoration(): DividerDecoration? {
+        override fun onCreateItemDecoration(): DividerDecoration {
             return CategoryDivideDividerDecoration()
         }
 

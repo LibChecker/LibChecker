@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.absinthe.libchecker",
+  "variantName": "processReleaseResources",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "versionCode": 508,
+      "versionName": "2.0.0-alpha03.r508.2c3f97d",
+      "outputFile": "app-release.apk"
+    }
+  ]
+}

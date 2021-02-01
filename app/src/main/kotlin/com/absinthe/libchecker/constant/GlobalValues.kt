@@ -6,16 +6,17 @@ import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.blankj.utilcode.util.Utils
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
 
-    private val preferences: SharedPreferences = Utils.getApp()
+    private val preferences: SharedPreferences = LibCheckerApp.context
         .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
 
     private fun getPreferences(): SharedPreferences {
@@ -32,12 +33,26 @@ object GlobalValues {
             getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
         }
 
+    var localRulesVersion: Int = RULES_VERSION
+        get() = getPreferences().getInt(Constants.PREF_LOCAL_RULES_VERSION, RULES_VERSION)
+        set(value) {
+            field = value
+            getPreferences().edit { putInt(Constants.PREF_LOCAL_RULES_VERSION, value) }
+        }
+
+    var currentLibRefType: Int = NATIVE
+        get() = getPreferences().getInt(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
+        set(value) {
+            field = value
+            getPreferences().edit { putInt(Constants.CURRENT_LIB_REF_TYPE, value) }
+        }
+
     val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
 
     val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
-    val isShowEntryAnimation: MutableLiveData<Boolean> =
-        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, true))
+    val isShowEntryAnimation: MutableLiveData<Boolean> = MutableLiveData(false)
+//        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, false))
     val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
     val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =

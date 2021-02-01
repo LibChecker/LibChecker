@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ImageSpan
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
@@ -19,13 +22,16 @@ import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import com.blankj.utilcode.util.FileIOUtils
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import me.zhanghai.android.appiconloader.AppIconLoader
 import java.io.File
+import java.io.InputStream
 
 class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
@@ -88,11 +94,12 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         tempFile = File(externalCacheDir, "temp.apk")
 
         val path = tempFile!!.path
+        var inputStream: InputStream? = null
 
         try {
-            val inputStream = contentResolver.openInputStream(uri)
+            inputStream = contentResolver.openInputStream(uri)
 
-            FileIOUtils.writeFileFromIS(tempFile, inputStream)
+            FileUtils.writeFileFromIS(tempFile!!, inputStream)
 
             val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
             packageInfo?.let {
@@ -116,15 +123,18 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             setLongClickCopiedToClipboard(text.toString())
                         }
                         tvVersion.apply {
-                            text = "${it.versionName}(${it.versionCode})"
+                            text = PackageUtils.getVersionString(it)
                             setLongClickCopiedToClipboard(text.toString())
                         }
-                        tvTargetApi.text = "API ${it.applicationInfo.targetSdkVersion}"
 
                         val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
-
-                        layoutAbi.tvAbi.text = PackageUtils.getAbiString(abi)
-                        layoutAbi.ivAbiType.load(PackageUtils.getAbiBadgeResource(abi))
+                        val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageInfo)}")
+                        ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                            val span = CenterAlignImageSpan(it)
+                            spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
+                        }
+                        tvAbiAndApi.text = spanString
                     } catch (e: Exception) {
                         loge(e.toString())
                         finish()
@@ -150,6 +160,8 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         } catch (e: Exception) {
             Toasty.show(this, R.string.toast_use_another_file_manager)
             finish()
+        } finally {
+            inputStream?.close()
         }
 
         val types = listOf(
@@ -177,6 +189,19 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                 }
             }
         }
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                val count = viewModel.itemsCountList[tab.position]
+                if (currentItemsCount != count) {
+                    binding.tsComponentCount.setText(count.toString())
+                    currentItemsCount = count
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) { }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) { }
+        })
 
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
             tab.text = tabTitles[position]
