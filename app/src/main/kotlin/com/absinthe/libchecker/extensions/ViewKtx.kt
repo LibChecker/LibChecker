@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -84,3 +85,5 @@ fun TextView.tintHighlightText(highlightText: String, rawText: String) {
         text = builder
     }
 }
+
+fun DialogFragment.isShowing() = this.dialog != null && this.dialog!!.isShowing && !this.isRemoving

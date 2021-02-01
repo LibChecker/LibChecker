@@ -37,7 +37,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@NativeAnalysisFragment.adapter
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
                 if (type == DEX) {
                     addItemDecoration(
                         DividerItemDecoration(

@@ -63,7 +63,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+            addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
         }
 
         if (LCAppUtils.atLeastN()) {

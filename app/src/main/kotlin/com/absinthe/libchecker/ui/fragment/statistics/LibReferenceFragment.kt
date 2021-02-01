@@ -55,7 +55,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter
                 layoutManager = this@LibReferenceFragment.layoutManager
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {

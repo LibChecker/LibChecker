@@ -112,7 +112,7 @@ class LibReferenceActivity : BaseActivity() {
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         appBar?.setRaised(!top)
                     }
-                paddingBottomCompat = UiUtils.getNavBarHeight(contentResolver)
+                paddingBottomCompat = UiUtils.getNavBarHeight(windowManager)
                 setHasFixedSize(true)
                 addPaddingTop(UiUtils.getStatusBarHeight())
             }

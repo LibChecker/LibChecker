@@ -167,8 +167,13 @@ object PackageUtils {
      * @param nativePath Native library path of the app
      * @return List of LibStringItem
      */
-    fun getNativeDirLibs(sourcePath: String, nativePath: String): List<LibStringItem> {
-        val file = File(nativePath)
+    fun getNativeDirLibs(sourcePath: String, nativePath: String, is32bit: Boolean = false): List<LibStringItem> {
+        val realNativePath = if (is32bit) {
+            nativePath.substring(0, nativePath.lastIndexOf("/")) + "/arm"
+        } else {
+            nativePath
+        }
+        val file = File(realNativePath)
         val list = file.listFiles()?.let { list ->
             list.asSequence()
                 .distinctBy { it.name }

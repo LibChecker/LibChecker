@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.valueUnsafe
@@ -47,7 +48,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
             setHasFixedSize(true)
-            addPaddingBottom(UiUtils.getNavBarHeight(context.contentResolver))
+            addPaddingBottom(UiUtils.getNavBarHeight((context as BaseActivity).windowManager))
             FastScrollerBuilder(this).useMd2Style().build()
         }
 

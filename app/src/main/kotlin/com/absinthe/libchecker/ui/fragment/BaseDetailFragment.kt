@@ -12,6 +12,7 @@ import com.absinthe.libchecker.ui.fragment.applist.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
             val rules = viewModel.repository.getAllRules()
             val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
                 viewModel.sortMode = MODE_SORT_BY_LIB
-                adapter.data.sortedByDescending { rules.find { find -> it.item.name == find.name } != null }
+                adapter.data.sortedByDescending { rules.any { find -> it.item.name == find.name } || LCAppUtils.findRuleRegex(it.item.name, type) != null }
             } else {
                 viewModel.sortMode = MODE_SORT_BY_SIZE
                 if (type == NATIVE) {

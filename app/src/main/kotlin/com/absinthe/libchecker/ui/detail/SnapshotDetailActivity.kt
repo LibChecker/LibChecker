@@ -123,7 +123,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                addPaddingBottom(UiUtils.getNavBarHeight(contentResolver))
+                addPaddingBottom(UiUtils.getNavBarHeight(windowManager))
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 
