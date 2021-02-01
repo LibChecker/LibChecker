@@ -20,6 +20,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.extensions.isShowing
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
@@ -52,6 +53,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     private val legendList = mutableListOf<String>()
     private val existApiList = mutableListOf<Int>()
     private var chartType = TYPE_ABI
+    private var mDialog: ClassifyBottomSheetDialogFragment? = null
     private lateinit var chartView: ViewGroup
 
     override fun initBinding(view: View): FragmentPieChartBinding = FragmentPieChartBinding.bind(view)
@@ -300,6 +302,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     override fun onValueSelected(e: Entry?, h: Highlight?) {
         if (e == null) return
         if (h == null) return
+        if (mDialog != null && mDialog!!.isShowing()) return
 
         chartView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
 
@@ -374,13 +377,19 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             }
         }
 
-        val dialog = ClassifyBottomSheetDialogFragment().apply {
+        mDialog = ClassifyBottomSheetDialogFragment().apply {
             arguments = Bundle().apply {
                 putString(EXTRA_TITLE, dialogTitle)
             }
+            setOnDismissListener(object :ClassifyBottomSheetDialogFragment.OnDismissListener {
+                override fun onDismiss() {
+                    mDialog = null
+                }
+            })
         }
-        dialog.show(requireActivity().supportFragmentManager, tag)
-        dialog.item = ArrayList(item)
+        mDialog!!.show(requireActivity().supportFragmentManager, tag)
+        mDialog!!.item = ArrayList(item)
+
     }
 
     override fun onButtonChecked(

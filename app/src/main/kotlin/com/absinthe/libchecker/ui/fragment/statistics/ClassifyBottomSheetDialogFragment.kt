@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,8 +18,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetNoBindingDialogFragment
     var item: ArrayList<LCItem> = ArrayList()
     private val dialogView by lazy { ClassifyDialogView(requireContext()) }
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
+    private var mListener: OnDismissListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<LCItem>(
                 EXTRA_ITEM_LIST
@@ -39,5 +41,19 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetNoBindingDialogFragment
         outState.putParcelableArrayList(EXTRA_ITEM_LIST, item)
         outState.putString(EXTRA_TITLE, dialogTitle)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        mListener?.onDismiss()
+        mListener = null
+    }
+
+    fun setOnDismissListener(listener: OnDismissListener) {
+        mListener = listener
+    }
+
+    interface OnDismissListener {
+        fun onDismiss()
     }
 }
