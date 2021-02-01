@@ -42,7 +42,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
     private var isListReady = false
     private var menu: Menu? = null
-    private var category = NATIVE
+    private var category = GlobalValues.currentLibRefType
     private lateinit var layoutManager: LinearLayoutManager
 
     override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
@@ -178,12 +178,12 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.ref_category_all -> category = ALL
-            R.id.ref_category_native -> category = NATIVE
-            R.id.ref_category_service -> category = SERVICE
-            R.id.ref_category_activity -> category = ACTIVITY
-            R.id.ref_category_br -> category = RECEIVER
-            R.id.ref_category_cp -> category = PROVIDER
+            R.id.ref_category_all -> doSaveLibRefType(ALL)
+            R.id.ref_category_native -> doSaveLibRefType(NATIVE)
+            R.id.ref_category_service -> doSaveLibRefType(SERVICE)
+            R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
+            R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
+            R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
             R.id.ref_category_dex -> category = DEX
         }
 
@@ -197,6 +197,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             )
         )
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun doSaveLibRefType(@LibType type: Int) {
+        category = type
+        GlobalValues.currentLibRefType = type
     }
 
     private fun computeRef() {

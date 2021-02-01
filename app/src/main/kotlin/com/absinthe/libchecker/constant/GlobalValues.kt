@@ -7,6 +7,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -37,6 +38,13 @@ object GlobalValues {
         set(value) {
             field = value
             getPreferences().edit { putInt(Constants.PREF_LOCAL_RULES_VERSION, value) }
+        }
+
+    var currentLibRefType: Int = NATIVE
+        get() = getPreferences().getInt(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
+        set(value) {
+            field = value
+            getPreferences().edit { putInt(Constants.CURRENT_LIB_REF_TYPE, value) }
         }
 
     val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)

@@ -44,6 +44,8 @@ object Constants {
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_DEFAULT = 1
 
+    const val CURRENT_LIB_REF_TYPE = "currentLibRefType"
+
     const val REPO_GITHUB = "github"
     const val REPO_GITEE = "gitee"
 
