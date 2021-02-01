@@ -48,11 +48,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
+    var is32bit = false
 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val context: Context = getApplication<LibCheckerApp>()
         val list = ArrayList<LibStringItemChip>()
-        logd("sasa","path=$packageName")
 
         try {
             val info = if (packageName.endsWith("/temp.apk")) {
@@ -69,7 +69,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             info?.let {
                 list.addAll(
-                    getNativeChipList(info)
+                    getNativeChipList(info, is32bit)
                 )
             }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -183,8 +183,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private suspend fun getNativeChipList(info: ApplicationInfo): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir ?: "").toMutableList()
+    private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean): List<LibStringItemChip> {
+        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir ?: "", is32bit).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 
