@@ -25,7 +25,10 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
-import com.absinthe.libchecker.extensions.*
+import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -126,7 +129,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         binding.apply {
             extendedFab.apply {
                 (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 70.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().windowManager)
+                    0, 0, 16.dp, 80.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().windowManager)
                 )
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {

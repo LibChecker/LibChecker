@@ -21,7 +21,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.constant.librarymap.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.databinding.LayoutGetAppListDeniedBinding
@@ -54,12 +53,8 @@ const val PAGE_TRANSFORM_DURATION = 300L
 class MainActivity : BaseActivity(), IListContainer {
 
     private lateinit var binding: ActivityMainBinding
-
     private var clickBottomItemFlag = false
-    private var isDatabaseFinishInit = false
-
     private val appViewModel by viewModels<AppViewModel>()
-
     override var controller: IListController? = null
 
     override fun setViewBinding(): ViewGroup {
@@ -239,12 +234,6 @@ class MainActivity : BaseActivity(), IListContainer {
 
     private fun initObserver() {
         appViewModel.apply {
-            dbItems.observe(this@MainActivity, {
-                if (it.isNotEmpty()) {
-                    isDatabaseFinishInit = true
-                }
-            })
-
             if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {
                 deleteAllRules()
                 insertPreinstallRules(this@MainActivity)

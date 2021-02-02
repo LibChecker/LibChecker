@@ -25,7 +25,7 @@ android {
         minSdkVersion(23)
         targetSdkVersion(30)
         versionCode = gitCommitCount
-        versionName = "${baseVersionName}.r${gitCommitCount}.${gitCommitId}"
+        versionName = "${baseVersionName}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resConfigs("en", "zh", "zh-rHK", "zh-rTW")
     }

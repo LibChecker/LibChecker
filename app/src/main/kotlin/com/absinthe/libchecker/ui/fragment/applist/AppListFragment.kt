@@ -5,10 +5,11 @@ import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
@@ -28,7 +29,6 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -269,21 +269,21 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
 
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
-                binding.tvFirstTip.isVisible = true
-                flip(VF_LOADING)
-                initItems()
+                if (!isInitializngItems) {
+                    binding.tvFirstTip.isVisible = true
+                    flip(VF_LOADING)
+                    initItems()
+                }
                 Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+            } else {
+                initialized = true
             }
 
             dbItems.observe(viewLifecycleOwner, {
-                if (it.isNullOrEmpty()) {
+                if (it.isNullOrEmpty() || !initialized) {
                     return@observe
                 }
-                lifecycleScope.launch(Dispatchers.IO) {
-                    withContext(Dispatchers.Main) {
-                        updateItems(it)
-                    }
-                }
+                updateItems(it)
 
                 if (!hasRequestChanges) {
                     viewModel.requestChange()
@@ -389,7 +389,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun flip(page: Int) {
-        if (viewModel.isInitingItems) {
+        if (viewModel.isInitializngItems) {
             return
         }
         if (binding.vfContainer.displayedChild != page) {

@@ -43,8 +43,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
+    var initialized = false
     var shouldReturnTopOfList = false
-    var isInitingItems = false
+    var isInitializngItems = false
 
     private val repository = LibCheckerApp.repository
 
@@ -59,7 +60,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        isInitingItems = true
+        initialized = false
+        isInitializngItems = true
         repository.deleteAllItems()
 
         var appList: List<ApplicationInfo>?
@@ -84,6 +86,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var isKotlinType: Boolean
 
         var lcItem: LCItem
+        var count = 0
 
         for (info in appList) {
             try {
@@ -108,21 +111,30 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 )
 
                 lcItems.add(lcItem)
+                count++
             } catch (e: Throwable) {
                 e.printStackTrace()
                 continue
             }
+
+            if (count == 50) {
+                insert(lcItems)
+                lcItems.clear()
+                count = 0
+            }
         }
 
-        isInitingItems = false
+        initialized = true
+        isInitializngItems = false
         insert(lcItems)
+        lcItems.clear()
 
         timeRecorder.end()
         logd("Init all items END, $timeRecorder")
     }
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        if (isInitingItems) {
+        if (isInitializngItems) {
             logd("Request change isInitingItems return")
             return@launch
         }
@@ -575,21 +587,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun insert(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(item)
-    }
+    private suspend fun insert(item: LCItem) = repository.insert(item)
 
-    private fun insert(list: List<LCItem>) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(list)
-    }
+    private suspend fun insert(list: List<LCItem>) = repository.insert(list)
 
-    private fun update(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.update(item)
-    }
+    private suspend fun update(item: LCItem) = repository.update(item)
 
-    private fun delete(item: LCItem) = viewModelScope.launch(Dispatchers.IO) {
-        repository.delete(item)
-    }
+    private suspend fun delete(item: LCItem) = repository.delete(item)
 
     fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
 

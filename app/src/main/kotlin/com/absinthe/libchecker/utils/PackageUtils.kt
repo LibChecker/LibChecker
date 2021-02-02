@@ -522,6 +522,8 @@ object PackageUtils {
         }
     }
 
+    fun is32bit(abi: Int): Boolean = abi == ARMV7 || abi == ARMV5 || abi == X86
+
     /**
      * Get ABI type of an app from native path
      * @param nativePath Native path of the app

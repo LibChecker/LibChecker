@@ -177,9 +177,11 @@ class ShootService : Service() {
         }
 
         var info: ApplicationInfo
+        var abiValue: Int
         while (exceptionInfoList.isNotEmpty()) {
             try {
                 info = exceptionInfoList[0]
+                abiValue = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
@@ -192,9 +194,9 @@ class ShootService : Service() {
                             installedTime = it.firstInstallTime,
                             lastUpdatedTime = it.lastUpdateTime,
                             isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                            abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                            abi = abiValue.toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
-                            nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)),
+                            nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir, PackageUtils.is32bit(abiValue))),
                             services = gson.toJson(PackageUtils.getComponentStringList(it.packageName, SERVICE, false)),
                             activities = gson.toJson(PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)),
                             receivers = gson.toJson(PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)),

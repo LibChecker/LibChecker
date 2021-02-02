@@ -20,7 +20,6 @@ import coil.load
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.finishCompat
@@ -155,9 +154,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         packageInfo.applicationInfo.nativeLibraryDir,
                         isApk = false
                     )
-                    if (abi == Constants.ARMV7 || abi == Constants.ARMV5 || abi == Constants.X86) {
-                        viewModel.is32bit = true
-                    }
+                    viewModel.is32bit = PackageUtils.is32bit(abi)
                     val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageName)}")
                     ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
                         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
