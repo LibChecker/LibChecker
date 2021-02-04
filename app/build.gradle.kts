@@ -18,7 +18,7 @@ android {
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "2.0.0-beta01"
+    val baseVersionName = "2.0.0-beta02"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"

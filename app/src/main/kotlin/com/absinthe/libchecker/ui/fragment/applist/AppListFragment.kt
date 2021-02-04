@@ -18,7 +18,6 @@ import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -48,9 +47,6 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.material.widget.BorderView
 
@@ -60,9 +56,9 @@ const val VF_LIST = 1
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
-    private val isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
+    private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var hasRequestChanges = false
     private var isListReady = false
     private var menu: Menu? = null
@@ -259,8 +255,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private fun initObserver() {
         viewModel.apply {
             reloadAppsFlag.observe(viewLifecycleOwner, {
-                if (isListReady && it) {
+                if (it && !isInitializngItems) {
                     binding.tvFirstTip.isVisible = true
+                    Once.clearDone(OnceTag.FIRST_LAUNCH)
+                    isFirstLaunch = true
                     doOnMainThreadIdle({
                         flip(VF_LOADING)
                         initItems()
