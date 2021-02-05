@@ -122,4 +122,5 @@
     <string name="rules_local_repo_version">本地规则库版本</string>
     <string name="rules_remote_repo_version">远端规则库版本</string>
     <string name="rules_btn_update">更新</string>
+    <string name="integration_anywhere_menu_editor">在\"Anywhere- 编辑器\"中打开</string>
 </resources>

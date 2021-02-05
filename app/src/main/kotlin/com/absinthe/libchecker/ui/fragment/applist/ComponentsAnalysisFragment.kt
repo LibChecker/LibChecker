@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItem
@@ -17,6 +18,7 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
@@ -132,14 +134,21 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
             arrayAdapter.add(getString(android.R.string.copy))
 
+            //MonkeyKing Purify
             if (integrationMonkeyKingBlockList == null) {
                 integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(requireContext(), viewModel.packageName)
             }
             val monkeyKingShouldBlock = integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
-            if (monkeyKingShouldBlock) {
-                arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
-            } else {
-                arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+            if (MonkeyKingManager.isSupportInteraction) {
+                if (monkeyKingShouldBlock) {
+                    arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
+                } else {
+                    arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+                }
+            }
+            //Anywhere-
+            if (AnywhereManager.isSupportInteraction && type == ACTIVITY) {
+                arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
             }
 
             AlertDialog.Builder(requireContext())
@@ -163,6 +172,9 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                                 }
                             }
                         }
+                        2 -> {
+                            AnywhereManager().launchActivityEditor(requireActivity(), viewModel.packageName, componentName)
+                        }
                         else -> { /*Do nothing*/
                         }
                     }
@@ -174,7 +186,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         }
     }
 
-    private val hasIntegration = MonkeyKingManager.isSupportInteraction
+    private val hasIntegration = MonkeyKingManager.isSupportInteraction ||
+            (AnywhereManager.isSupportInteraction && type == ACTIVITY)
 
     companion object {
         fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
