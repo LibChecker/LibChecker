@@ -513,7 +513,7 @@ object PackageUtils {
             } else {
                 abi
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             loge(e.toString())
             return ERROR
         } finally {
