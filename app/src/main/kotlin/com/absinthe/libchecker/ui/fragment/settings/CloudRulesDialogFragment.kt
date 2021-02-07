@@ -32,6 +32,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     private val request: CloudRuleBundleRequest = retrofit.create(CloudRuleBundleRequest::class.java)
+    private var bundlesCount: Int = 1
 
     override fun initBinding(): LayoutCloudRuleDialogBinding = LayoutCloudRuleDialogBinding.inflate(layoutInflater)
 
@@ -42,35 +43,9 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
             setOutAnimation(activity, R.anim.anim_fade_out)
         }
         binding.btnUpdate.setOnClickListener {
-            request.requestRulesBundle().enqueue(object : Callback<ResponseBody> {
-                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                    response.body()?.let {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            val builder = CloudRulesBundle.parseFrom(it.byteStream())
-                            logd("CloudRulesDialog", "version = ${builder.version}")
-                            logd("CloudRulesDialog", "count = ${builder.count}")
-                            val rulesList = mutableListOf<RuleEntity>()
-                            builder.rulesList.cloudRulesList.forEach {
-                                it?.let {
-                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-                                }
-                            }
-                            LibCheckerApp.repository.deleteAllRules()
-                            LibCheckerApp.repository.insertRules(rulesList)
-                            GlobalValues.localRulesVersion = builder.version
-                            withContext(Dispatchers.Main) {
-                                binding.tvLocalRulesVersion.text = builder.version.toString()
-                                binding.btnUpdate.isEnabled = false
-                            }
-                        }
-                    }
-                }
-
-                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.e("CloudRulesDialog", t.toString())
-                }
-
-            })
+            for (i in 1..bundlesCount) {
+                requestBundle(i)
+            }
         }
     }
 
@@ -86,6 +61,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                             binding.btnUpdate.isEnabled = true
                         }
                         binding.vfContainer.displayedChild = 1
+                        bundlesCount = it.bundles
                     }
                 }
 
@@ -95,5 +71,36 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
 
             })
         }
+    }
+
+    private fun requestBundle(bundleCount: Int) {
+        request.requestRulesBundle(bundleCount).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                response.body()?.let { rb ->
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val builder = CloudRulesBundle.parseFrom(rb.byteStream())
+                        logd("CloudRulesDialog", "version = ${builder.version}")
+                        logd("CloudRulesDialog", "count = ${builder.count}")
+                        val rulesList = mutableListOf<RuleEntity>()
+                        builder.rulesList.cloudRulesList.forEach { rule ->
+                            rule?.let {
+                                rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                            }
+                        }
+                        LibCheckerApp.repository.insertRules(rulesList)
+                        withContext(Dispatchers.Main) {
+                            binding.tvLocalRulesVersion.text = builder.version.toString()
+                            binding.btnUpdate.isEnabled = false
+                            GlobalValues.localRulesVersion = builder.version
+                        }
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                Log.e("CloudRulesDialog", t.toString())
+            }
+
+        })
     }
 }
