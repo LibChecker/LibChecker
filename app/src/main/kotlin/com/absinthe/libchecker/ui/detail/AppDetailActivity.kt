@@ -26,10 +26,10 @@ import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.Sortable
-import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomShellDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.*
+import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -50,9 +50,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val viewModel by viewModels<DetailViewModel>()
-    private var currentItemsCount = -1
 
-    override var currentFragment: Sortable? = null
+    override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
     override fun requirePackageName() = pkgName
 
@@ -172,8 +171,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
                         withContext(Dispatchers.Main) {
                             if (isSplitApk || isKotlinUsed) {
-                                binding.chipGroup.isVisible = true
-                                binding.chipAppBundle.apply {
+                                chipGroup.isVisible = true
+                                chipAppBundle.apply {
                                     isVisible = isSplitApk
                                     setOnClickListener {
                                         AlertDialog.Builder(this@AppDetailActivity)
@@ -184,7 +183,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                             .show()
                                     }
                                 }
-                                binding.chipKotlinUsed.apply {
+                                chipKotlinUsed.apply {
                                     isVisible = isKotlinUsed
                                     setOnClickListener {
                                         AlertDialog.Builder(this@AppDetailActivity)
@@ -196,7 +195,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                     }
                                 }
                             } else {
-                                binding.chipGroup.isVisible = false
+                                chipGroup.isVisible = false
                             }
                         }
                     }
@@ -206,7 +205,13 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 }
 
                 ibSort.setOnClickListener {
-                    currentFragment?.sort()
+                    lifecycleScope.launch {
+                        detailFragmentManager.sortAll()
+                        withContext(Dispatchers.Main) {
+                            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) { MODE_SORT_BY_SIZE } else { MODE_SORT_BY_LIB }
+                            detailFragmentManager.changeSortMode(viewModel.sortMode)
+                        }
+                    }
                 }
             }
 
@@ -231,7 +236,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
                             types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
-                            types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(pkgName!!, DEX)
+                            types.indexOf(DEX) -> DexAnalysisFragment.newInstance(pkgName!!, DEX)
                             else -> ComponentsAnalysisFragment.newInstance(types[position])
                         }
                     }
@@ -240,9 +245,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
             binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     val count = viewModel.itemsCountList[tab.position]
-                    if (currentItemsCount != count) {
+                    if (detailFragmentManager.currentItemsCount != count) {
                         binding.tsComponentCount.setText(count.toString())
-                        currentItemsCount = count
+                        detailFragmentManager.currentItemsCount = count
                     }
                 }
 
@@ -257,9 +262,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
             mediator.attach()
 
             viewModel.itemsCountLiveData.observe(this, {
-                if (currentItemsCount != it) {
-                    binding.tsComponentCount.setText(it.toString())
-                    currentItemsCount = it
+                if (detailFragmentManager.currentItemsCount != it.count && binding.tabLayout.selectedTabPosition == it.locate) {
+                    binding.tsComponentCount.setText(it.count.toString())
+                    detailFragmentManager.currentItemsCount = it.count
                 }
             })
 

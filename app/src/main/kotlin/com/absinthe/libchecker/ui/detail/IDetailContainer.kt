@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
-import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 
 /**
  * <pre>
@@ -9,5 +9,5 @@ import com.absinthe.libchecker.ui.fragment.applist.Sortable
  * </pre>
  */
 interface IDetailContainer {
-    var currentFragment: Sortable?
+    var detailFragmentManager: DetailFragmentManager
 }

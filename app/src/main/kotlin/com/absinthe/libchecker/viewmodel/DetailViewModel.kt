@@ -19,7 +19,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.extensions.logd
-import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
+import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +45,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         RECEIVER to MutableLiveData(),
         PROVIDER to MutableLiveData()
     )
-    val itemsCountLiveData: MutableLiveData<Int> = MutableLiveData(0)
+    val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
     val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""

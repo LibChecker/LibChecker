@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment.applist
+package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.os.Bundle
 import android.view.View
@@ -24,6 +24,8 @@ import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
+import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -92,7 +94,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                     }
                 }
                 if (!isListReady) {
-                    viewModel.itemsCountLiveData.value = componentList.size
+                    viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = componentList.size)
                     viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }

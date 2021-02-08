@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.ui.fragment.applist.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 

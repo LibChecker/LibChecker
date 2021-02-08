@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
@@ -19,9 +20,10 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.ui.fragment.applist.ComponentsAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.NativeAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.applist.Sortable
+import com.absinthe.libchecker.ui.fragment.detail.*
+import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -29,6 +31,9 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import java.io.File
 import java.io.InputStream
@@ -37,11 +42,10 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private var tempFile: File? = null
-    private var currentItemsCount = -1
 
     private val viewModel by viewModels<DetailViewModel>()
 
-    override var currentFragment: Sortable? = null
+    override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -129,9 +133,9 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
                         val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
                         val spanString = SpannableString("  ${PackageUtils.getAbiString(abi)}, ${PackageUtils.getTargetApiString(packageInfo)}")
-                        ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
-                            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                            val span = CenterAlignImageSpan(it)
+                        ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { label ->
+                            label.setBounds(0, 0, label.intrinsicWidth, label.intrinsicHeight)
+                            val span = CenterAlignImageSpan(label)
                             spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
                         }
                         tvAbiAndApi.text = spanString
@@ -141,14 +145,20 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                     }
 
                     ibSort.setOnClickListener {
-                        currentFragment?.sort()
+                        lifecycleScope.launch {
+                            detailFragmentManager.sortAll()
+                            withContext(Dispatchers.Main) {
+                                viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) { MODE_SORT_BY_SIZE } else { MODE_SORT_BY_LIB }
+                                detailFragmentManager.changeSortMode(viewModel.sortMode)
+                            }
+                        }
                     }
                 }
 
-                viewModel.itemsCountLiveData.observe(this, { count ->
-                    if (currentItemsCount != count) {
-                        binding.tsComponentCount.setText(count.toString())
-                        currentItemsCount = count
+                viewModel.itemsCountLiveData.observe(this, { locatedCount ->
+                    if (detailFragmentManager.currentItemsCount != locatedCount.count && binding.tabLayout.selectedTabPosition == locatedCount.locate) {
+                        binding.tsComponentCount.setText(locatedCount.count.toString())
+                        detailFragmentManager.currentItemsCount = locatedCount.count
                     }
                 })
 
@@ -184,7 +194,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path, NATIVE)
-                    types.indexOf(DEX) -> NativeAnalysisFragment.newInstance(path, DEX)
+                    types.indexOf(DEX) -> DexAnalysisFragment.newInstance(path, DEX)
                     else -> ComponentsAnalysisFragment.newInstance(types[position])
                 }
             }
@@ -192,9 +202,9 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
             override fun onTabSelected(tab: TabLayout.Tab) {
                 val count = viewModel.itemsCountList[tab.position]
-                if (currentItemsCount != count) {
+                if (detailFragmentManager.currentItemsCount != count) {
                     binding.tsComponentCount.setText(count.toString())
-                    currentItemsCount = count
+                    detailFragmentManager.currentItemsCount = count
                 }
             }
 

@@ -208,7 +208,7 @@
                     android:id="@+id/ts_component_count"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:paddingVertical="8dp"
+                    android:padding="8dp"
                     app:layout_constraintStart_toEndOf="@id/tv_items" />
 
                 <ImageButton
