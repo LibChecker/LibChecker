@@ -148,6 +148,19 @@ object PackageUtils {
         }
     }
 
+    /**
+     * Get target api string of an app ( API 30 )
+     * @param packageInfo PackageInfo
+     * @return version code as String
+     */
+    fun getTargetApiString(packageInfo: PackageInfo): String {
+        return try {
+            "Target API ${packageInfo.applicationInfo.targetSdkVersion}"
+        } catch (e: PackageManager.NameNotFoundException) {
+            "Target API ?"
+        }
+    }
+
     fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion"
 
     /**

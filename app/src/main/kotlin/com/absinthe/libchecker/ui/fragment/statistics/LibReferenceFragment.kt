@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.widget.TextView
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.get
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -42,6 +44,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
     private var isListReady = false
     private var menu: Menu? = null
+    private var popup: PopupMenu? = null
     private var category = GlobalValues.currentLibRefType
     private lateinit var layoutManager: LinearLayoutManager
 
@@ -141,6 +144,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
+    override fun onPause() {
+        super.onPause()
+        popup?.dismiss()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putParcelableArrayList(EXTRA_ITEM_LIST, ArrayList(adapter.data))
         super.onSaveInstanceState(outState)
@@ -170,25 +178,37 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             }
         }
 
-        menu.findItem(R.id.ref_category_dex).apply {
-            isVisible = BuildConfig.DEBUG
-        }
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.ref_category_all -> doSaveLibRefType(ALL)
-            R.id.ref_category_native -> doSaveLibRefType(NATIVE)
-            R.id.ref_category_service -> doSaveLibRefType(SERVICE)
-            R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
-            R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
-            R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
-            R.id.ref_category_dex -> category = DEX
-        }
+        if (item.itemId == R.id.filter) {
+            popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.filter)).apply {
+                menuInflater.inflate(R.menu.lib_ref_type_menu, menu)
 
-        if (item.itemId != R.id.search) {
-            computeRef()
+                menu.findItem(R.id.ref_category_dex)?.apply {
+                    isVisible = BuildConfig.DEBUG
+                }
+
+                menu[getMenuIndex(category)].isChecked = true
+                setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.ref_category_all -> doSaveLibRefType(ALL)
+                        R.id.ref_category_native -> doSaveLibRefType(NATIVE)
+                        R.id.ref_category_service -> doSaveLibRefType(SERVICE)
+                        R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
+                        R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
+                        R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
+                        R.id.ref_category_dex -> category = DEX
+                    }
+                    computeRef()
+                    true
+                }
+                setOnDismissListener {
+                    popup = null
+                }
+            }
+            popup?.show()
         }
         Analytics.trackEvent(
             Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
@@ -256,5 +276,16 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 smoothScrollToPosition(0)
             }
         }
+    }
+
+    private fun getMenuIndex(@LibType type: Int) = when(type) {
+        ALL -> 0
+        NATIVE -> 1
+        SERVICE -> 2
+        ACTIVITY -> 3
+        RECEIVER -> 4
+        PROVIDER -> 5
+        DEX -> 6
+        else -> 0
     }
 }

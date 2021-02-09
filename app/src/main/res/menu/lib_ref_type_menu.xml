@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/ref_category_all"
+            android:title="@string/ref_category_all" />
+        <item
+            android:id="@+id/ref_category_native"
+            android:title="@string/ref_category_native" />
+        <item
+            android:id="@+id/ref_category_service"
+            android:title="@string/ref_category_service" />
+        <item
+            android:id="@+id/ref_category_activity"
+            android:title="@string/ref_category_activity" />
+        <item
+            android:id="@+id/ref_category_br"
+            android:title="@string/ref_category_br" />
+        <item
+            android:id="@+id/ref_category_cp"
+            android:title="@string/ref_category_cp" />
+        <item
+            android:id="@+id/ref_category_dex"
+            android:title="@string/ref_category_dex" />
+    </group>
+</menu>

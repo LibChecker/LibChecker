@@ -237,8 +237,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         (menu as MenuBuilder).setOptionalIconsVisible(true)
                     }
 
-                    menu[GlobalValues.appSortMode.value
-                        ?: Constants.SORT_MODE_DEFAULT].isChecked = true
+                    menu[GlobalValues.appSortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked = true
                     setOnMenuItemClickListener { menuItem ->
                         val mode = when (menuItem.itemId) {
                             R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
@@ -253,9 +252,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     setOnDismissListener {
                         popup = null
                     }
-
-                    show()
                 }
+                popup?.show()
             }
         }
 
@@ -323,6 +321,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                                     { it.label })
                             )
                             Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.lastUpdatedTime }
+                            Constants.SORT_MODE_TARGET_API_DESC -> list.sortByDescending { it.targetApi }
+
                         }
                         updateItems(list)
                     }

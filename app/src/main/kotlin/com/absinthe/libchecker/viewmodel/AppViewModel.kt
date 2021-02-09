@@ -591,6 +591,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun cancelComputingLibReference() {
         computeLibReferenceJob?.cancel()
+        computeLibReferenceJob = null
     }
 
     fun refreshRef() {

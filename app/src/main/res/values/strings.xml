@@ -14,6 +14,7 @@
     <!--  App list  -->
     <string name="menu_search">Search</string>
     <string name="menu_sort">Sort</string>
+    <string name="menu_filter">Filter</string>
     <string name="search_hint">Search…</string>
     <string name="string_64_bit">64bit</string>
     <string name="string_32_bit">32bit</string>

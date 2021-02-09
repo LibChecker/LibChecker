@@ -12,32 +12,9 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
-        android:id="@+id/ref_category_all"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_all" />
-    <item
-        android:id="@+id/ref_category_native"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_native" />
-    <item
-        android:id="@+id/ref_category_service"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_service" />
-    <item
-        android:id="@+id/ref_category_activity"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_activity" />
-    <item
-        android:id="@+id/ref_category_br"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_br" />
-    <item
-        android:id="@+id/ref_category_cp"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_cp" />
-    <item
-        android:id="@+id/ref_category_dex"
-        android:icon="@drawable/ic_sort"
-        android:title="@string/ref_category_dex" />
+        android:id="@+id/filter"
+        android:icon="@drawable/ic_filter_list"
+        android:title="@string/menu_filter"
+        app:showAsAction="always" />
 
 </menu>
