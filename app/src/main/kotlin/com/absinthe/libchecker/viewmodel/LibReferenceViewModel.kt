@@ -49,10 +49,11 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                         emptyList()
                     }
 
-                    if (!LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
-                        continue
+                    natives.find { it.name == name }?.run {
+                        if (LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
+                            list.add(item)
+                        }
                     }
-                    natives.find { it.name == name }?.run { list.add(item) }
                 }
             } else {
                 for (item in items) {
