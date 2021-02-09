@@ -30,12 +30,15 @@ interface LCDao {
     fun deleteAllItems()
 
     //Snapshot Table
+    @Transaction
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
     suspend fun getSnapshots(): List<SnapshotItem>
 
+    @Transaction
     @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
     suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
 
+    @Transaction
     @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
     fun getSnapshotsLiveData(timestamp: Long): LiveData<List<SnapshotItem>>
 
@@ -54,12 +57,15 @@ interface LCDao {
     @Delete
     suspend fun delete(item: SnapshotItem)
 
+    @Transaction
     @Query("DELETE FROM snapshot_table")
     fun deleteAllSnapshots()
 
+    @Transaction
     @Query("DELETE FROM snapshot_table WHERE timeStamp = :timestamp")
     fun deleteSnapshots(timestamp: Long)
 
+    @Transaction
     @Delete
     fun deleteSnapshots(list: List<SnapshotItem>)
 
