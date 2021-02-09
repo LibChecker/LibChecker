@@ -36,9 +36,18 @@ object LCAppUtils {
 
     fun setTitle(): String {
         val sb = StringBuilder(LibCheckerApp.context.getString(R.string.app_name))
+        val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
-        if (SimpleDateFormat("MMdd", Locale.getDefault()).format(Date()) == "1225") {
-            sb.append("\uD83C\uDF84")
+        when {
+            date.endsWith("1225") -> {
+                sb.append("\uD83C\uDF84")
+            }
+            date == "20210211" -> {
+                sb.append("\uD83C\uDFEE")
+            }
+            date == "20210212" -> {
+                sb.append("\uD83D\uDC2E")
+            }
         }
         return sb.toString()
     }

@@ -210,6 +210,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             binding.lottie.resumeAnimation()
         }
 
+        viewModel.cancelComputingLibReference()
         viewModel.computeLibReference(category)
     }
 
