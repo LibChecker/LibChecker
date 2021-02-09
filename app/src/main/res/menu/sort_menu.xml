@@ -6,7 +6,13 @@
         <item
             android:id="@+id/sort_by_update_time_desc"
             android:title="@string/menu_sort_by_time_desc"
-            android:icon="@drawable/ic_sort" />
+            android:icon="@drawable/ic_time" />
+
+        <item
+            android:id="@+id/sort_by_target_api_desc"
+            android:title="@string/menu_sort_by_target_api_desc"
+            android:icon="@drawable/ic_level" />
+
         <item
             android:id="@+id/sort_default"
             android:title="@string/menu_sort_default"

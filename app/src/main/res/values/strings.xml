@@ -26,6 +26,7 @@
     <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
 
     <string name="menu_sort_by_time_desc">Descending by update time</string>
+    <string name="menu_sort_by_target_api_desc">Descending by Target API</string>
     <string name="menu_sort_default">Default order</string>
 
     <!-- Statistics   -->

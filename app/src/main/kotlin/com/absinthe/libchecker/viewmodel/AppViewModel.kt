@@ -107,7 +107,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     isSystemType,
                     abiType.toShort(),
                     PackageUtils.isSplitsApk(packageInfo),
-                    isKotlinType
+                    isKotlinType,
+                    packageInfo.applicationInfo.targetSdkVersion.toShort()
                 )
 
                 lcItems.add(lcItem)
@@ -187,7 +188,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                     (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                                     abi.toShort(),
                                     PackageUtils.isSplitsApk(packageInfo),
-                                    PackageUtils.isKotlinUsed(packageInfo)
+                                    PackageUtils.isKotlinUsed(packageInfo),
+                                    packageInfo.applicationInfo.targetSdkVersion.toShort()
                                 )
                             } while (abi == ERROR)
                             update(lcItem)
@@ -217,7 +219,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                         PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
                         PackageUtils.isSplitsApk(packageInfo),
-                        PackageUtils.isKotlinUsed(packageInfo)
+                        PackageUtils.isKotlinUsed(packageInfo),
+                        packageInfo.applicationInfo.targetSdkVersion.toShort()
                     )
                     do {
                         abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
@@ -231,7 +234,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                             (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                             abi.toShort(),
                             PackageUtils.isSplitsApk(packageInfo),
-                            PackageUtils.isKotlinUsed(packageInfo)
+                            PackageUtils.isKotlinUsed(packageInfo),
+                            packageInfo.applicationInfo.targetSdkVersion.toShort()
                         )
                     } while (abi == ERROR)
 

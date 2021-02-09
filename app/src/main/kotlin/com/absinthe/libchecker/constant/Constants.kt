@@ -43,6 +43,7 @@ object Constants {
 
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_DEFAULT = 1
+    const val SORT_MODE_TARGET_API_DESC = 2
 
     const val CURRENT_LIB_REF_TYPE = "currentLibRefType"
 

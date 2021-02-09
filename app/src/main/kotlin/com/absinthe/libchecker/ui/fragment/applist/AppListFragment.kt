@@ -62,6 +62,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private var hasRequestChanges = false
     private var isListReady = false
     private var menu: Menu? = null
+    private var popup: PopupMenu? = null
     private lateinit var layoutManager: RecyclerView.LayoutManager
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
@@ -134,6 +135,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        popup?.dismiss()
     }
 
     override fun onDetach() {
@@ -224,28 +230,32 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.sort -> {
-                val popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort))
-                popup.menuInflater.inflate(R.menu.sort_menu, popup.menu)
+                popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort)).apply {
+                    menuInflater.inflate(R.menu.sort_menu, menu)
 
-                if (popup.menu is MenuBuilder) {
-                    (popup.menu as MenuBuilder).setOptionalIconsVisible(true)
-                }
-
-                popup.menu[GlobalValues.appSortMode.value
-                    ?: Constants.SORT_MODE_DEFAULT].isChecked =
-                    true
-                popup.setOnMenuItemClickListener { menuItem ->
-                    val mode = when (menuItem.itemId) {
-                        R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
-                        R.id.sort_default -> Constants.SORT_MODE_DEFAULT
-                        else -> Constants.SORT_MODE_DEFAULT
+                    if (menu is MenuBuilder) {
+                        (menu as MenuBuilder).setOptionalIconsVisible(true)
                     }
-                    GlobalValues.appSortMode.value = mode
-                    SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
-                    true
-                }
 
-                popup.show()
+                    menu[GlobalValues.appSortMode.value
+                        ?: Constants.SORT_MODE_DEFAULT].isChecked = true
+                    setOnMenuItemClickListener { menuItem ->
+                        val mode = when (menuItem.itemId) {
+                            R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
+                            R.id.sort_by_target_api_desc -> Constants.SORT_MODE_TARGET_API_DESC
+                            R.id.sort_default -> Constants.SORT_MODE_DEFAULT
+                            else -> Constants.SORT_MODE_DEFAULT
+                        }
+                        GlobalValues.appSortMode.value = mode
+                        SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
+                        true
+                    }
+                    setOnDismissListener {
+                        popup = null
+                    }
+
+                    show()
+                }
             }
         }
 
@@ -343,6 +353,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         when (GlobalValues.appSortMode.value) {
             Constants.SORT_MODE_DEFAULT -> filterList.sortWith(compareBy({ it.abi }, { it.label }))
             Constants.SORT_MODE_UPDATE_TIME_DESC -> filterList.sortByDescending { it.lastUpdatedTime }
+            Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
         }
 
         mAdapter.setDiffNewData(filterList)
