@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -20,12 +19,14 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import moe.shizuku.preference.ListPreference
@@ -195,6 +196,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
         recyclerView.addVerticalPadding(0, 8)
+        recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 
         val lp = recyclerView.layoutParams
@@ -205,10 +207,6 @@ class SettingsFragment : PreferenceFragment(), IListController {
 
         borderViewDelegate = recyclerView.borderViewDelegate
         borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
-
-        lifecycleScope.launchWhenResumed {
-            recyclerView.smoothScrollToPosition(0)
-        }
 
         return recyclerView
     }

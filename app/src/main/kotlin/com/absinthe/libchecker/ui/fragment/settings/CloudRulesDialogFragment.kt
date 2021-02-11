@@ -54,14 +54,17 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
         lifecycleScope.launchWhenResumed {
             request.requestCloudRuleInfo().enqueue(object : Callback<CloudRuleInfo> {
                 override fun onResponse(call: Call<CloudRuleInfo>, response: Response<CloudRuleInfo>) {
-                    response.body()?.let {
-                        binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
-                        binding.tvRemoteRulesVersion.text = it.version.toString()
-                        if (GlobalValues.localRulesVersion < it.version) {
-                            binding.btnUpdate.isEnabled = true
+                    val body = response.body()
+                    body?.let {
+                        lifecycleScope.launch(Dispatchers.Main) {
+                            binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
+                            binding.tvRemoteRulesVersion.text = it.version.toString()
+                            if (GlobalValues.localRulesVersion < it.version) {
+                                binding.btnUpdate.isEnabled = true
+                            }
+                            binding.vfContainer.displayedChild = 1
+                            bundlesCount = it.bundles
                         }
-                        binding.vfContainer.displayedChild = 1
-                        bundlesCount = it.bundles
                     }
                 }
 

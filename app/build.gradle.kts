@@ -93,17 +93,17 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.1.5")
+    implementation("com.absinthe.libraries.utils:utils:1.1.7")
 
     val appCenterSdkVersion = "4.1.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation("androidx.fragment:fragment-ktx:1.3.0")
     implementation("androidx.appcompat:appcompat:1.2.0")
 
     // Lifecycle
-    val lifecycleVersion = "2.2.0"
+    val lifecycleVersion = "2.3.0"
     implementation("androidx.lifecycle:lifecycle-common-java8:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVersion}")
