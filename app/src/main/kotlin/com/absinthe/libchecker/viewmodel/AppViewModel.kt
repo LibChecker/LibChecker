@@ -611,12 +611,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
 
     fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        deleteAllRules()
         insertPreinstallRules(context, 1)
         insertPreinstallRules(context, 2)
     }
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     private suspend fun insertPreinstallRules(context: Context, bundleCount: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.IO) {
             var inputStream: InputStream? = null
             try {
                 inputStream = context.resources.assets.open("rules.lcr.$bundleCount")
