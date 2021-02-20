@@ -8,6 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.absinthe.libchecker.R
+import java.lang.ref.WeakReference
 
 /**
  * <pre>
@@ -35,7 +36,8 @@ object Toasty {
 
     @SuppressLint("InflateParams")
     private fun show(context: Context, message: String, duration: Int) {
-        val view = LayoutInflater.from(context).inflate(R.layout.layout_toast, null)
+        val weakCtx = WeakReference(context)
+        val view = LayoutInflater.from(weakCtx.get()).inflate(R.layout.layout_toast, null)
 
         view.findViewById<TextView>(R.id.message).apply {
             text = message

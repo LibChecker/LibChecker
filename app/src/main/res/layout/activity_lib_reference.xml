@@ -53,7 +53,8 @@
             app:borderBottomStyle="never"
             app:borderTopDrawable="@null"
             app:borderTopStyle="whenTop"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_lib_reference" />
 
     </ViewFlipper>
 

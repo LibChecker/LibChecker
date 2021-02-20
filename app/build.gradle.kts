@@ -86,7 +86,7 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.35.0")
-val protocVersion by extra("3.14.0")
+val protocVersion by extra("3.15.1")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -126,7 +126,7 @@ dependencies {
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.6.0")
+    implementation("com.airbnb.android:lottie:3.6.1")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
@@ -163,7 +163,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:$grpcVersion")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-    testImplementation("junit:junit:4.13.1")
+    testImplementation("junit:junit:4.13.2")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.6")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")

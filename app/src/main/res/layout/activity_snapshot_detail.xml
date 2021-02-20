@@ -119,7 +119,8 @@
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:padding="@dimen/normal_padding"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_snapshot" />
 
     </LinearLayout>
 

@@ -232,14 +232,14 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
 
         filteredList?.let {
-            val list = IntArray(Build.VERSION_CODES.R, { 0 })
+            val list = IntArray(Build.VERSION_CODES.R+1) { 0 }
 
             var targetApi: Int
             for (item in it) {
                 try {
                     packageInfo = PackageUtils.getPackageInfo(item.packageName)
                     targetApi = packageInfo.applicationInfo.targetSdkVersion
-                    if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R) {
+                    if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R+1) {
                         list[targetApi - 1]++
                     }
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -470,7 +470,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 setDrawZeroLine(false)
                 textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
             }
-            setMaxVisibleValueCount(Build.VERSION_CODES.R)
+            setMaxVisibleValueCount(Build.VERSION_CODES.R+1)
             setDrawGridBackground(false)
             setDrawBorders(false)
             setDrawMarkers(false)
