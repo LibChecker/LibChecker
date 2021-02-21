@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
+import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -39,17 +40,19 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
-    val componentsMap: HashMap<Int, MutableLiveData<List<StatefulComponent>>> = hashMapOf(
-        SERVICE to MutableLiveData(),
-        ACTIVITY to MutableLiveData(),
-        RECEIVER to MutableLiveData(),
-        PROVIDER to MutableLiveData()
-    )
+    val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
     val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
     val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
     var is32bit = false
+
+    init {
+        componentsMap.put(SERVICE, MutableLiveData())
+        componentsMap.put(ACTIVITY, MutableLiveData())
+        componentsMap.put(RECEIVER, MutableLiveData())
+        componentsMap.put(PROVIDER, MutableLiveData())
+    }
 
     fun initSoAnalysisData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
         val context: Context = getApplication<LibCheckerApp>()

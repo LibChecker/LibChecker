@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.animation.ObjectAnimator
+import android.util.SparseArray
 import android.view.View
 import android.widget.ImageView
 import androidx.lifecycle.lifecycleScope
@@ -24,7 +25,7 @@ const val SNAPSHOT_TITLE_PROVIDER = 1
 
 class SnapshotTitleProvider : BaseNodeProvider() {
 
-    private val countMap = mutableMapOf<Int, List<Int>>()
+    private val countMap = SparseArray<List<Int>>()
     override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
     override val layoutId: Int = R.layout.item_snapshot_title
 
@@ -64,7 +65,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
                     countList[diffNode.item.diffType]++
                 }
 
-                countMap[node.type] = countList
+                countMap.put(node.type, countList)
 
                 for (i in countList.indices) {
                     if (countList[i] != 0) {
