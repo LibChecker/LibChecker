@@ -232,14 +232,14 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
 
         filteredList?.let {
-            val list = IntArray(Build.VERSION_CODES.R+1) { 0 }
+            val list = IntArray(Build.VERSION_CODES.R + 1) { 0 }
 
             var targetApi: Int
             for (item in it) {
                 try {
                     packageInfo = PackageUtils.getPackageInfo(item.packageName)
                     targetApi = packageInfo.applicationInfo.targetSdkVersion
-                    if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R+1) {
+                    if (targetApi > 0 && targetApi <= Build.VERSION_CODES.R + 1) {
                         list[targetApi - 1]++
                     }
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -266,8 +266,8 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             legendList.clear()
             for (i in parties.indices) {
                 if (list[i] > 0) {
-                    entries.add(BarEntry(existApiList.indexOf(i+1).toFloat(), list[i].toFloat()))
-                    legendList.add((i+1).toString())
+                    entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
+                    legendList.add((i + 1).toString())
                 }
             }
             val dataSet = BarDataSet(entries, "").apply {
@@ -371,7 +371,11 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
                 dialogTitle = "Target API $targetApi"
                 filteredList?.filter {
-                    packageInfo = try { PackageUtils.getPackageInfo(it.packageName) } catch (e: PackageManager.NameNotFoundException) { null }
+                    packageInfo = try {
+                        PackageUtils.getPackageInfo(it.packageName)
+                    } catch (e: PackageManager.NameNotFoundException) {
+                        null
+                    }
                     packageInfo?.applicationInfo?.targetSdkVersion == targetApi
                 }?.let { filter -> item = ArrayList(filter) }
             }
@@ -381,7 +385,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             arguments = Bundle().apply {
                 putString(EXTRA_TITLE, dialogTitle)
             }
-            setOnDismissListener(object :ClassifyBottomSheetDialogFragment.OnDismissListener {
+            setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
                 override fun onDismiss() {
                     mDialog = null
                 }
@@ -470,7 +474,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 setDrawZeroLine(false)
                 textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
             }
-            setMaxVisibleValueCount(Build.VERSION_CODES.R+1)
+            setMaxVisibleValueCount(Build.VERSION_CODES.R + 1)
             setDrawGridBackground(false)
             setDrawBorders(false)
             setDrawMarkers(false)
@@ -512,7 +516,8 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             27 to "Oreo",
             28 to "Pie",
             29 to "Android10",
-            30 to "Android11"
+            30 to "Android11",
+            31 to "S"
         )
     }
 }

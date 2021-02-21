@@ -13,12 +13,12 @@ apply {
 }
 
 android {
-    compileSdkVersion(30)
-    buildToolsVersion = "30.0.3"
+    compileSdkVersion("android-S")
+    buildToolsVersion = "31.0.0 rc1"
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "2.0.0"
+    val baseVersionName = "2.0.1"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
