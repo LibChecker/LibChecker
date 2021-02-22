@@ -91,10 +91,6 @@ class LibReferenceActivity : BaseActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        finish()
-    }
-
     private fun initView() {
         binding.apply {
             root.apply {
@@ -126,6 +122,7 @@ class LibReferenceActivity : BaseActivity() {
                     R.anim.anim_fade_out
                 )
                 displayedChild = 0
+                (root as ViewGroup).bringChildToFront(appbar)
             }
             lottie.apply {
                 imageAssetsFolder = "/"
