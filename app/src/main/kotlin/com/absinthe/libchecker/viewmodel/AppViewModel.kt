@@ -45,7 +45,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
     var initialized = false
-    var shouldReturnTopOfList = false
     var isInitializngItems = false
 
     private val repository = LibCheckerApp.repository
@@ -250,9 +249,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
             GlobalScope.launch(Dispatchers.Main) {
-                if (GlobalValues.shouldRequestChange.value == true) {
-                    shouldReturnTopOfList = true
-                }
                 GlobalValues.shouldRequestChange.value = false
                 AppItemRepository.shouldRefreshAppList = true
             }

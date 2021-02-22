@@ -64,6 +64,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private lateinit var layoutManager: RecyclerView.LayoutManager
+    private var topListPackageName: String? = null
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -124,9 +125,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onResume() {
         super.onResume()
 
-        if (!binding.recyclerview.canScrollVertically(-1)) {
-            viewModel.shouldReturnTopOfList = true
-        }
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
                 viewModel.dbItems.value?.let {
@@ -357,8 +355,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
 
         mAdapter.setDiffNewData(filterList)
+        if (filterList.isNotEmpty()) {
+            topListPackageName = filterList.first().packageName
+        }
 
-        if (list != newItems) {
+        if (list.isEmpty() || (list.isNotEmpty() && list.first().packageName != topListPackageName)) {
             doOnMainThreadIdle({
                 try {
                     flip(VF_LIST)
@@ -366,10 +367,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
                         && binding.recyclerview.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
                     ) {
-                        if (viewModel.shouldReturnTopOfList) {
-                            viewModel.shouldReturnTopOfList = false
-                            returnTopOfList()
-                        }
+                        returnTopOfList()
                     }
 
                     menu?.findItem(R.id.search)?.isVisible = true
