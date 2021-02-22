@@ -30,6 +30,7 @@ import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
@@ -137,6 +138,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         if (isInitializngItems) {
             logd("Request change isInitingItems return")
+            return@launch
+        }
+        if (XiaomiUtilities.isMIUI() && !XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
+            logd("Request change OP_GET_INSTALLED_APPS return")
             return@launch
         }
 

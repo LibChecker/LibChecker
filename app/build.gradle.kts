@@ -13,8 +13,8 @@ apply {
 }
 
 android {
-    compileSdkVersion("android-S")
-    buildToolsVersion = "31.0.0 rc1"
+    compileSdkVersion(30)
+    buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
