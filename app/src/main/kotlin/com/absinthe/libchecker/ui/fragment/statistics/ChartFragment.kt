@@ -304,7 +304,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         if (h == null) return
         if (mDialog != null && mDialog!!.isShowing()) return
 
-        chartView.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
 
         var dialogTitle = ""
         var item: List<LCItem> = emptyList()
