@@ -76,9 +76,10 @@ object IconResMap {
             put(64, R.drawable.ic_lib_zhihu)
             put(65, R.drawable.ic_kotlin_logo)
             put(66, R.drawable.ic_telegram)
+            put(67, R.drawable.ic_lib_ffmpeg)
         }
     }
 
     fun getResIndex(res: Int) = MAP.keyAt(MAP.indexOfValue(res))
-    fun getIconRes(index: Int) = MAP[index]
+    fun getIconRes(index: Int) = MAP.get(index, -1)
 }

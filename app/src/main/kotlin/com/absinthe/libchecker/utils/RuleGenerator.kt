@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.protocol.CloudRule
@@ -8,16 +9,26 @@ import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.protocol.CloudRulesList
 
 object RuleGenerator {
-    fun generateRulesByteArray(rules: List<RuleEntity>, version: Int): ByteArray {
+    fun generateRulesByteArray(): ByteArray {
         val bundleBuilder: CloudRulesBundle.Builder = CloudRulesBundle.newBuilder()
-        bundleBuilder.version = version
-        bundleBuilder.count = rules.size
+
+        val inputStream = LibCheckerApp.context.resources.assets.open("rules.lcr.1")
+        val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
+        val rulesList = mutableListOf<RuleEntity>()
+        rulesBundle.rulesList.cloudRulesList.forEach {
+            it?.let {
+                rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+            }
+        }
+
+        bundleBuilder.version = GlobalValues.localRulesVersion + 1
+        bundleBuilder.count = rulesList.size
 
         val newRules = mutableListOf<CloudRule>()
         val ruleBuilder: CloudRule.Builder = CloudRule.newBuilder()
         val rulesListBuilder: CloudRulesList.Builder = CloudRulesList.newBuilder()
 
-        rules.forEach {
+        rulesList.forEach {
             ruleBuilder.apply {
                 name = it.name
                 label = it.label
@@ -29,14 +40,16 @@ object RuleGenerator {
 
             newRules.add(ruleBuilder.build())
         }
-        ruleBuilder.apply {
-            name = "libmediainfo.so"
-            label = "MediaInfoLib"
-            type = NATIVE
-            isRegexRule = false
-            iconIndex = -1
-            regexName = ""
-        }
+//        ruleBuilder.apply {
+//            name = "libhpplayae.so"
+//            label = "乐播 SDK"
+//            type = NATIVE
+//            isRegexRule = false
+//            iconIndex = -1
+//            regexName = ""
+//        }
+//        newRules.add(ruleBuilder.build())
+
         logd("RuleGenerator",newRules.size.toString())
 
         rulesListBuilder.addAllCloudRules(newRules)
