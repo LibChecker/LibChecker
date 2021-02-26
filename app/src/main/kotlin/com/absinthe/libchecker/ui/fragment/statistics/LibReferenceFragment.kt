@@ -189,6 +189,9 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 menu.findItem(R.id.ref_category_dex)?.apply {
                     isVisible = BuildConfig.DEBUG
                 }
+                menu.findItem(R.id.ref_category_not_marked)?.apply {
+                    isVisible = BuildConfig.DEBUG
+                }
 
                 menu[getMenuIndex(category)].isChecked = true
                 setOnMenuItemClickListener { menuItem ->
@@ -199,7 +202,8 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                         R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
                         R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
                         R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
-                        R.id.ref_category_dex -> category = DEX
+                        R.id.ref_category_dex -> doSaveLibRefType(DEX)
+                        R.id.ref_category_not_marked -> doSaveLibRefType(NOT_MARKED)
                     }
                     computeRef()
                     true

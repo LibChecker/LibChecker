@@ -65,9 +65,7 @@ class BackupActivity : BaseActivity() {
                     contentResolver.openOutputStream(it)?.let { os ->
                         viewModel.backup(os)
 //                        lifecycleScope.launch(Dispatchers.IO) {
-//                            val rules = LibCheckerApp.repository.getAllRules()
-//
-//                            os.write(RuleGenerator.generateRulesByteArray(rules, GlobalValues.localRulesVersion+1))
+//                            os.write(RuleGenerator.generateRulesByteArray())
 //                            os.close()
 //                        }
                     }

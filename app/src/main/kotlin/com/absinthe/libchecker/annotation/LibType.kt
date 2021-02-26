@@ -8,6 +8,7 @@ import androidx.annotation.IntDef
  * time : 2020/08/04
  * </pre>
  */
+const val NOT_MARKED = -2
 const val ALL = -1
 const val NATIVE = 0
 const val SERVICE = 1

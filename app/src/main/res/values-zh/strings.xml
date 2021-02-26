@@ -125,4 +125,5 @@
     <string name="integration_anywhere_menu_editor">在\"Anywhere- 编辑器\"中打开</string>
     <string name="menu_sort_by_target_api_desc">按 Target API 降序</string>
     <string name="menu_filter">过滤</string>
+    <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
 </resources>

@@ -106,6 +106,7 @@
     <string name="toast_use_another_file_manager">Please use another File Manager to open the APK</string>
     <string name="toast_cant_open_app">Can\'t open this app</string>
     <string name="toast_package_name_null">Package name is null</string>
+    <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again.</string>
 
     <!--  Snapshot  -->
     <string name="snapshot_none" translatable="false">None</string>

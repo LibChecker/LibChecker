@@ -388,9 +388,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             var libList: List<LibStringItem>
             var packageInfo: PackageInfo
             var count: Int
+            var onlyShowNotMarked = false
 
             when (type) {
-                ALL -> {
+                ALL, NOT_MARKED -> {
+                    if (type == NOT_MARKED) {
+                        onlyShowNotMarked = true
+                    }
                     for (item in appList) {
 
                         if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
@@ -578,7 +582,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     rule?.let {
                         chip = LibChip(iconRes = IconResMap.getIconRes(it.iconIndex), name = it.label, regexName = it.regexName)
                     }
-                    refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
+                    if (!onlyShowNotMarked) {
+                        refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
+                    } else {
+                        if (rule == null) {
+                            refList.add(LibReference(entry.key, chip, entry.value.count, entry.value.type))
+                        }
+                    }
                 }
             }
 
@@ -633,7 +643,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 repository.insertRules(rulesList)
                 GlobalValues.localRulesVersion = rulesBundle.version
             } catch (e: Exception) {
-                e.printStackTrace()
+                loge(e.toString())
             } finally {
                 inputStream?.close()
             }

@@ -13,8 +13,10 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
 import com.absinthe.libchecker.extensions.logd
+import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.Toasty
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,16 +87,23 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                         logd("CloudRulesDialog", "version = ${builder.version}")
                         logd("CloudRulesDialog", "count = ${builder.count}")
                         val rulesList = mutableListOf<RuleEntity>()
-                        builder.rulesList.cloudRulesList.forEach { rule ->
-                            rule?.let {
-                                rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                        try {
+                            builder.rulesList.cloudRulesList.forEach { rule ->
+                                rule?.let {
+                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                                }
                             }
-                        }
-                        LibCheckerApp.repository.insertRules(rulesList)
-                        withContext(Dispatchers.Main) {
-                            binding.tvLocalRulesVersion.text = builder.version.toString()
-                            binding.btnUpdate.isEnabled = false
-                            GlobalValues.localRulesVersion = builder.version
+                            LibCheckerApp.repository.insertRules(rulesList)
+                            withContext(Dispatchers.Main) {
+                                binding.tvLocalRulesVersion.text = builder.version.toString()
+                                binding.btnUpdate.isEnabled = false
+                                GlobalValues.localRulesVersion = builder.version
+                            }
+                        } catch (e: Exception) {
+                            loge(e.toString())
+                            withContext(Dispatchers.Main) {
+                                Toasty.show(requireContext(), R.string.toast_cloud_rules_update_error)
+                            }
                         }
                     }
                 }

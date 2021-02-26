@@ -12,7 +12,7 @@ object RuleGenerator {
     fun generateRulesByteArray(): ByteArray {
         val bundleBuilder: CloudRulesBundle.Builder = CloudRulesBundle.newBuilder()
 
-        val inputStream = LibCheckerApp.context.resources.assets.open("rules.lcr.1")
+        val inputStream = LibCheckerApp.context.resources.assets.open("rules.lcr.2")
         val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
         val rulesList = mutableListOf<RuleEntity>()
         rulesBundle.rulesList.cloudRulesList.forEach {
@@ -41,11 +41,11 @@ object RuleGenerator {
             newRules.add(ruleBuilder.build())
         }
 //        ruleBuilder.apply {
-//            name = "libhpplayae.so"
-//            label = "乐播 SDK"
+//            name = "libfolly_futures.so"
+//            label = "React Native"
 //            type = NATIVE
 //            isRegexRule = false
-//            iconIndex = -1
+//            iconIndex = 41
 //            regexName = ""
 //        }
 //        newRules.add(ruleBuilder.build())
