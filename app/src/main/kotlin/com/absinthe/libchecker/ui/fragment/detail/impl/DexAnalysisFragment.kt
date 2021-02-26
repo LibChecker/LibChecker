@@ -16,8 +16,8 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
@@ -31,7 +31,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@DexAnalysisFragment.adapter
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
+                post { addPaddingBottom(SystemBarManager.navigationBarSize) }
             }
         }
 

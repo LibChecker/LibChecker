@@ -8,14 +8,15 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libraries.utils.utils.UiUtils
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class ClassifyDialogView(context: Context) : LinearLayout(context) {
@@ -24,6 +25,8 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        paddingTopCompat = 16.dp
+        clipToPadding = false
 
         adapter.setOnItemClickListener { _, view, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
@@ -47,8 +50,9 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
+            overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             setHasFixedSize(true)
-            addPaddingBottom(UiUtils.getNavBarHeight((context as BaseActivity).windowManager))
+            addPaddingBottom(SystemBarManager.navigationBarSize)
             FastScrollerBuilder(this).useMd2Style().build()
         }
 

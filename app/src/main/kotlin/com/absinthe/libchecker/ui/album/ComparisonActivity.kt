@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +27,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
@@ -131,9 +131,11 @@ class ComparisonActivity : BaseActivity() {
 
         binding.apply {
             extendedFab.apply {
-                (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, paddingBottom + UiUtils.getNavBarHeight(windowManager)
-                )
+                post {
+                    (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
+                        0, 0, 16.dp, paddingBottom + SystemBarManager.navigationBarSize
+                    )
+                }
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
                         return@setOnClickListener
@@ -164,8 +166,10 @@ class ComparisonActivity : BaseActivity() {
                         )
                     )
                 }
-                addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight(windowManager))
+                post {
+                    addPaddingTop(UiUtils.getStatusBarHeight())
+                    addPaddingBottom(SystemBarManager.navigationBarSize)
+                }
             }
             vfContainer.apply {
                 setInAnimation(this@ComparisonActivity, R.anim.anim_fade_in)

@@ -12,6 +12,8 @@ import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.CloudRulesBundle
@@ -39,6 +41,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
     override fun initBinding(): LayoutCloudRuleDialogBinding = LayoutCloudRuleDialogBinding.inflate(layoutInflater)
 
     override fun init() {
+        binding.root.addPaddingTop(16.dp)
         binding.header.tvTitle.text = getString(R.string.cloud_rules)
         binding.vfContainer.apply {
             setInAnimation(activity, R.anim.anim_fade_in)

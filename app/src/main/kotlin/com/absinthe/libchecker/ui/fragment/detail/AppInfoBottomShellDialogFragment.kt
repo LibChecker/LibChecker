@@ -14,12 +14,15 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingBottom
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libraries.utils.utils.UiUtils
+import com.absinthe.libraries.utils.manager.SystemBarManager
 
 /**
  * <pre>
@@ -40,6 +43,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
     }
 
     private fun initView(binding: LayoutBottomSheetAppInfoBinding) {
+        binding.root.addPaddingTop(16.dp)
         binding.infoLaunch.setOnClickListener {
             try {
                 startLaunchAppActivity(packageName)
@@ -63,7 +67,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
+            post { addPaddingBottom(SystemBarManager.navigationBarSize) }
         }
 
         if (LCAppUtils.atLeastN()) {

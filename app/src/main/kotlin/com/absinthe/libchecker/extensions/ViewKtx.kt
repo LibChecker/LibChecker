@@ -12,6 +12,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libraries.utils.extensions.addPaddingBottom
+import com.absinthe.libraries.utils.extensions.addPaddingEnd
+import com.absinthe.libraries.utils.extensions.addPaddingStart
+import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
@@ -32,7 +36,7 @@ var View.paddingStartCompat: Int
     get() = paddingStart
 
 fun View.addPaddingStart(padding: Int) {
-    setPadding(paddingStart + padding, paddingTop, paddingEnd, paddingBottom)
+    addPaddingStart(padding)
 }
 
 var View.paddingTopCompat: Int
@@ -42,7 +46,7 @@ var View.paddingTopCompat: Int
     get() = paddingTop
 
 fun View.addPaddingTop(padding: Int) {
-    setPadding(paddingStart, paddingTop + padding, paddingEnd, paddingBottom)
+    addPaddingTop(padding)
 }
 
 var View.paddingEndCompat: Int
@@ -52,7 +56,7 @@ var View.paddingEndCompat: Int
     get() = paddingEnd
 
 fun View.addPaddingEnd(padding: Int) {
-    setPadding(paddingStart, paddingTop, paddingEnd + padding, paddingBottom)
+    addPaddingEnd(padding)
 }
 
 var View.paddingBottomCompat: Int
@@ -62,7 +66,7 @@ var View.paddingBottomCompat: Int
     get() = paddingBottom
 
 fun View.addPaddingBottom(padding: Int) {
-    setPadding(paddingStart, paddingTop, paddingEnd, paddingBottom + padding)
+    addPaddingBottom(padding)
 }
 
 fun ViewGroup.setSystemPadding() {

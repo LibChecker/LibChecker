@@ -20,6 +20,8 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libraries.utils.extensions.paddingBottomCompat
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -108,9 +110,11 @@ class LibReferenceActivity : BaseActivity() {
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                         appBar?.setRaised(!top)
                     }
-                paddingBottomCompat = UiUtils.getNavBarHeight(windowManager)
                 setHasFixedSize(true)
-                addPaddingTop(UiUtils.getStatusBarHeight())
+                post {
+                    addPaddingTop(UiUtils.getStatusBarHeight())
+                    paddingBottomCompat = SystemBarManager.navigationBarSize
+                }
             }
             vfContainer.apply {
                 setInAnimation(

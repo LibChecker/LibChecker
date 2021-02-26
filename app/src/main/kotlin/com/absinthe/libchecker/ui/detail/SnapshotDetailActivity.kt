@@ -33,8 +33,8 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
@@ -123,7 +123,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                addPaddingBottom(UiUtils.getNavBarHeight(windowManager))
+                post { addPaddingBottom(SystemBarManager.navigationBarSize) }
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 

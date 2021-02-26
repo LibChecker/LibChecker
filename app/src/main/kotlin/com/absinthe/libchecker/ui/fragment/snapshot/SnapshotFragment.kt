@@ -9,8 +9,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -42,6 +42,7 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -128,9 +129,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         binding.apply {
             extendedFab.apply {
-                (layoutParams as ConstraintLayout.LayoutParams).setMargins(
-                    0, 0, 16.dp, 80.dp + paddingBottom + UiUtils.getNavBarHeight(requireActivity().windowManager)
-                )
+                post {
+                    (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
+                        0, 0, 16.dp, 80.dp + paddingBottom + SystemBarManager.navigationBarSize
+                    )
+                }
                 setOnClickListener {
                     if (AntiShakeUtils.isInvalidClick(it)) {
                         return@setOnClickListener
@@ -202,8 +205,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
+                post {
+                    addPaddingTop(UiUtils.getStatusBarHeight())
+                    addPaddingBottom(SystemBarManager.navigationBarSize)
+                }
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

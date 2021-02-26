@@ -42,6 +42,7 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingTop
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -108,7 +109,11 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 setHasFixedSize(true)
                 addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
+
+                binding.root.rootView.post {
+                    addPaddingBottom(SystemBarManager.navigationBarSize)
+                }
+
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
@@ -191,7 +196,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             doOnMainThreadIdle({
                 val first: Int
                 val last: Int
-                when(layoutManager) {
+                when (layoutManager) {
                     is LinearLayoutManager -> {
                         first = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
                         last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition() + 3

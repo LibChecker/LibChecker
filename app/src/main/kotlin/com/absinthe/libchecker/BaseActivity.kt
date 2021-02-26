@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.extensions.setSystemPadding
 import com.absinthe.libchecker.ui.app.AppActivity
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.libraries.utils.utils.UiUtils.setSystemBarStyle
 
@@ -30,6 +31,8 @@ abstract class BaseActivity : AppActivity() {
         if (isPaddingToolbar) {
             root?.paddingTopCompat = UiUtils.getStatusBarHeight()
         }
+
+        SystemBarManager.measureSystemBar(window)
     }
 
     private fun setViewBindingImpl(root: ViewGroup) {

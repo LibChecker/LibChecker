@@ -28,8 +28,8 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,7 +55,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         DividerItemDecoration.VERTICAL
                     )
                 )
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
+                post { addPaddingBottom(SystemBarManager.navigationBarSize) }
             }
         }
 

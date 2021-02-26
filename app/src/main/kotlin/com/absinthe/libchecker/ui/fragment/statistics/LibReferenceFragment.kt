@@ -31,8 +31,8 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -58,8 +58,8 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             rvList.apply {
                 adapter = this@LibReferenceFragment.adapter
                 layoutManager = this@LibReferenceFragment.layoutManager
-                addPaddingBottom(UiUtils.getNavBarHeight(requireActivity().windowManager))
                 FastScrollerBuilder(this).useMd2Style().build()
+                post { addPaddingBottom(SystemBarManager.navigationBarSize) }
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
