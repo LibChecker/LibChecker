@@ -116,10 +116,10 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     //implementation("org.xerial:sqlite-jdbc:3.34.0")
 
-    implementation("androidx.core:core-ktx:1.5.0-beta01")
+    implementation("androidx.core:core-ktx:1.5.0-beta02")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-beta01")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-beta02")
     implementation("androidx.browser:browser:1.3.0")
 
     implementation("com.google.android.material:material:1.3.0")
