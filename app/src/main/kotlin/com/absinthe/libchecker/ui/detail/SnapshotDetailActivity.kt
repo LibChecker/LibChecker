@@ -19,6 +19,7 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -32,8 +33,6 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import com.absinthe.libraries.utils.extensions.addPaddingBottom
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.google.android.material.transition.platform.MaterialContainerTransform
@@ -123,7 +122,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                post { addPaddingBottom(SystemBarManager.navigationBarSize) }
+                addSystemBarPaddingAsync(addStatusBarPadding = false, addNavigationBarPadding = true)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 

@@ -14,16 +14,16 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.extensions.*
+import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.isOrientationLandscape
+import com.absinthe.libchecker.extensions.paddingTopCompat
+import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
-import com.absinthe.libraries.utils.extensions.paddingBottomCompat
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -111,10 +111,7 @@ class LibReferenceActivity : BaseActivity() {
                         appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                post {
-                    addPaddingTop(UiUtils.getStatusBarHeight())
-                    paddingBottomCompat = SystemBarManager.navigationBarSize
-                }
+                addSystemBarPaddingAsync()
             }
             vfContainer.apply {
                 setInAnimation(

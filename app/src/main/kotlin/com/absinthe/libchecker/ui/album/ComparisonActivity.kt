@@ -18,8 +18,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
-import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
@@ -29,7 +28,6 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -166,10 +164,7 @@ class ComparisonActivity : BaseActivity() {
                         )
                     )
                 }
-                post {
-                    addPaddingTop(UiUtils.getStatusBarHeight())
-                    addPaddingBottom(SystemBarManager.navigationBarSize)
-                }
+                addSystemBarPaddingAsync()
             }
             vfContainer.apply {
                 setInAnimation(this@ComparisonActivity, R.anim.anim_fade_in)

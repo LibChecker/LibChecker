@@ -16,13 +16,10 @@ import com.absinthe.libchecker.bean.TrackListItem
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
+import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
-import com.absinthe.libraries.utils.extensions.addPaddingBottom
-import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.extensions.logd
-import com.absinthe.libraries.utils.manager.SystemBarManager
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -61,10 +58,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                     appBar?.setRaised(!top)
                 }
-            post {
-                addPaddingTop(UiUtils.getStatusBarHeight())
-                addPaddingBottom(SystemBarManager.navigationBarSize)
-            }
+            addSystemBarPaddingAsync()
             FastScrollerBuilder(this).useMd2Style().build()
         }
         adapter.apply {

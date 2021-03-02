@@ -13,16 +13,14 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
-import com.absinthe.libchecker.extensions.addPaddingBottom
 import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libraries.utils.manager.SystemBarManager
 
 /**
  * <pre>
@@ -67,7 +65,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            post { addPaddingBottom(SystemBarManager.navigationBarSize) }
+            addSystemBarPaddingAsync(addStatusBarPadding = false)
         }
 
         if (LCAppUtils.atLeastN()) {
