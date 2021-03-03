@@ -41,9 +41,7 @@ import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -107,7 +105,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                binding.root.rootView.addSystemBarPaddingAsync()
+                addSystemBarPaddingAsync()
 
                 FastScrollerBuilder(this).useMd2Style().build()
             }

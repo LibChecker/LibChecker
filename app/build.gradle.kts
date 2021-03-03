@@ -1,5 +1,5 @@
-import com.google.protobuf.gradle.*
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import com.google.protobuf.gradle.*
 
 plugins {
     id("com.android.application")
@@ -18,7 +18,7 @@ android {
 
     val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
     val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
-    val baseVersionName = "2.0.2"
+    val baseVersionName = "2.0.3"
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
