@@ -87,10 +87,11 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                 response.body()?.let { rb ->
                     lifecycleScope.launch(Dispatchers.IO) {
                         val builder = CloudRulesBundle.parseFrom(rb.byteStream())
-                        logd("CloudRulesDialog", "version = ${builder.version}")
-                        logd("CloudRulesDialog", "count = ${builder.count}")
-                        val rulesList = mutableListOf<RuleEntity>()
+
                         try {
+                            logd("CloudRulesDialog", "version = ${builder.version}")
+                            logd("CloudRulesDialog", "count = ${builder.count}")
+                            val rulesList = mutableListOf<RuleEntity>()
                             builder.rulesList.cloudRulesList.forEach { rule ->
                                 rule?.let {
                                     rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
