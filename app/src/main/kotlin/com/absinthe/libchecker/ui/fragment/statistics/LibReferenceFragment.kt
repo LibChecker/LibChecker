@@ -102,6 +102,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }
+            setEmptyView(R.layout.layout_empty_list)
         }
 
         viewModel.apply {

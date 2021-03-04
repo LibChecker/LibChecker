@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.about
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -33,6 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+private const val RENGE_CHECKER = "RengeChecker"
+
 class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
@@ -43,7 +44,6 @@ class AboutActivity : AbsAboutActivity() {
         Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ABOUT", "Entered"))
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
         icon.load(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
@@ -51,7 +51,7 @@ class AboutActivity : AbsAboutActivity() {
         
         val rebornCoroutine = lifecycleScope.launch(Dispatchers.Default) {
             delay(300)
-            shouldShowEasterEggCount = if (slogan.text == "RengeChecker") 11 else 1
+            shouldShowEasterEggCount = if (slogan.text == RENGE_CHECKER) 11 else 1
         }
         icon.setOnClickListener {       
             if (shouldShowEasterEggCount < 10) {
@@ -59,7 +59,7 @@ class AboutActivity : AbsAboutActivity() {
                 shouldShowEasterEggCount++
                 rebornCoroutine.start()
             } else if (shouldShowEasterEggCount == 10) {
-                slogan.text = "RengeChecker"
+                slogan.text = RENGE_CHECKER
                 rebornCoroutine.cancel()
                 shouldShowEasterEggCount++
                 Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 10 hits"))
@@ -172,7 +172,7 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     private fun initView() {
-        UiUtils.setSystemBarStyle(window)
+        window.decorView.post { UiUtils.setSystemBarStyle(window, false) }
         findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
