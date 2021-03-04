@@ -76,4 +76,6 @@ object GlobalValues {
     } else {
         Build.SUPPORTED_ABIS.toList()
     }
+
+    var debugMode: Boolean = false
 }

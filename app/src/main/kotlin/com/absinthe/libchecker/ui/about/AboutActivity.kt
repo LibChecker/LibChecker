@@ -25,7 +25,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.drakeet.about.*
-import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -173,7 +172,6 @@ class AboutActivity : AbsAboutActivity() {
 
     private fun initView() {
         window.decorView.post { UiUtils.setSystemBarStyle(window, false) }
-        findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
     }
 
     private fun getAcknowledgementHtmlString(list: List<String>): String {

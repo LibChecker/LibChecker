@@ -32,6 +32,7 @@ class AlbumItemView : MaterialCardView {
         background = null
         isClickable = true
         isFocusable = true
+        isFocusableInTouchMode = true
     }
 
     override fun performClick(): Boolean {

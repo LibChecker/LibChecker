@@ -1,0 +1,3 @@
+<resources>
+    <string name="application_id" translatable="false">com.absinthe.libchecker.debug</string>
+</resources>

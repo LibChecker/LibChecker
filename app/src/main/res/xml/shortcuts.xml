@@ -11,7 +11,7 @@
         <intent
             android:action="com.absinthe.libchecker.intent.action.START_APP_LIST"
             android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker" />
+            android:targetPackage="@string/application_id" />
     </shortcut>
 
     <shortcut
@@ -22,7 +22,7 @@
         <intent
             android:action="com.absinthe.libchecker.intent.action.START_STATISTICS"
             android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker" />
+            android:targetPackage="@string/application_id" />
     </shortcut>
 
     <shortcut
@@ -33,7 +33,7 @@
         <intent
             android:action="com.absinthe.libchecker.intent.action.START_SNAPSHOT"
             android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker" />
+            android:targetPackage="@string/application_id" />
     </shortcut>
 
 </shortcuts>

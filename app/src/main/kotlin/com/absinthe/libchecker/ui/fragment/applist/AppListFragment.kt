@@ -218,6 +218,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 Toasty.show(requireContext(), "🥚")
                 Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
             }
+            if (newText == Constants.COMMAND_DEBUG_MODE) {
+                GlobalValues.debugMode = true
+                Toasty.show(requireActivity(), "DEBUG MODE")
+            }
         }
         return false
     }

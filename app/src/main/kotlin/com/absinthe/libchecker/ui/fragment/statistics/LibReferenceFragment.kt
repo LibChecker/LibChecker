@@ -187,10 +187,10 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 menuInflater.inflate(R.menu.lib_ref_type_menu, menu)
 
                 menu.findItem(R.id.ref_category_dex)?.apply {
-                    isVisible = BuildConfig.DEBUG
+                    isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
                 }
                 menu.findItem(R.id.ref_category_not_marked)?.apply {
-                    isVisible = BuildConfig.DEBUG
+                    isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
                 }
 
                 menu[getMenuIndex(category)].isChecked = true

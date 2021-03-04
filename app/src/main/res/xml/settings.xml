@@ -75,7 +75,7 @@
             app:icon="@drawable/ic_logo_setting">
 
             <intent
-                android:targetPackage="com.absinthe.libchecker"
+                android:targetPackage="@string/application_id"
                 android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"/>
 
         </Preference>

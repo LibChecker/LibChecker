@@ -59,6 +59,8 @@ object Constants {
     const val REQUEST_CODE_BACKUP = 1001
     const val REQUEST_CODE_RESTORE_BACKUP = 1002
 
+    const val COMMAND_DEBUG_MODE = "/debugMode"
+
     object Event {
         const val LAUNCH_ACTION = "Launch Action"
         const val SNAPSHOT_CLICK = "Snapshot Click"
