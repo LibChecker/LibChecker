@@ -90,7 +90,7 @@ interface LCDao {
     suspend fun getTrackItems(): List<TrackItem>
 
     //Rules
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRules(items: List<RuleEntity>)
 
     @Query("DELETE FROM rules_table")
