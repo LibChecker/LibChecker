@@ -12,6 +12,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -29,17 +32,14 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import moe.shizuku.preference.ListPreference
-import moe.shizuku.preference.PreferenceFragment
-import moe.shizuku.preference.SimpleMenuPreference
-import moe.shizuku.preference.SwitchPreference
-import rikka.material.widget.BorderRecyclerView
-import rikka.material.widget.BorderView
-import rikka.material.widget.BorderViewDelegate
+import rikka.preference.SimpleMenuPreference
 import rikka.recyclerview.addVerticalPadding
 import rikka.recyclerview.fixEdgeEffect
+import rikka.widget.borderview.BorderRecyclerView
+import rikka.widget.borderview.BorderView
+import rikka.widget.borderview.BorderViewDelegate
 
-class SettingsFragment : PreferenceFragment(), IListController {
+class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     private lateinit var borderViewDelegate: BorderViewDelegate
 
@@ -52,7 +52,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
 
-        (findPreference(Constants.PREF_SHOW_SYSTEM_APPS) as SwitchPreference).apply {
+        (findPreference<SwitchPreferenceCompat>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isShowSystemApps.value = newValue as Boolean
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue))
@@ -66,7 +66,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
 //                true
 //            }
 //        }
-        (findPreference(Constants.PREF_APK_ANALYTICS) as SwitchPreference).apply {
+        (findPreference<SwitchPreferenceCompat>(Constants.PREF_APK_ANALYTICS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 val flag = if (newValue as Boolean) {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED
@@ -82,7 +82,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        (findPreference(Constants.PREF_COLORFUL_ICON) as SwitchPreference).apply {
+        (findPreference<SwitchPreferenceCompat>(Constants.PREF_COLORFUL_ICON))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
                 AppItemRepository.allApplicationInfoItems.value = AppItemRepository.allApplicationInfoItems.value
@@ -90,26 +90,26 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        (findPreference(Constants.PREF_RULES_REPO) as ListPreference).apply {
+        (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.repo = newValue as String
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
                 true
             }
         }
-        findPreference(Constants.PREF_CLOUD_RULES)?.apply {
+        findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
             setOnPreferenceClickListener {
                 CloudRulesDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 true
             }
         }
-        findPreference(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
+        findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
             setOnPreferenceClickListener {
                 LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
                 true
             }
         }
-        findPreference(Constants.PREF_RELOAD_APPS)?.apply {
+        findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.apply {
             setOnPreferenceClickListener {
                 AlertDialog.Builder(requireContext())
                     .setTitle(R.string.dialog_title_reload_apps)
@@ -126,10 +126,10 @@ class SettingsFragment : PreferenceFragment(), IListController {
             }
         }
 
-        findPreference(Constants.PREF_ABOUT)?.apply {
+        findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
             summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
         }
-        findPreference(Constants.PREF_HELP)?.apply {
+        findPreference<Preference>(Constants.PREF_HELP)?.apply {
             setOnPreferenceClickListener {
                 try {
                     CustomTabsIntent.Builder().build().apply {
@@ -145,7 +145,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        findPreference(Constants.PREF_RATE)?.apply {
+        findPreference<Preference>(Constants.PREF_RATE)?.apply {
             setOnPreferenceClickListener {
                 val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
                 val marketUrl = if (hasInstallCoolApk) {
@@ -163,7 +163,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        findPreference(Constants.PREF_TELEGRAM)?.apply {
+        findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
             setOnPreferenceClickListener {
                 startActivity(Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri()).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -171,7 +171,7 @@ class SettingsFragment : PreferenceFragment(), IListController {
                 true
             }
         }
-        (findPreference(Constants.PREF_ANONYMOUS_ANALYTICS) as SwitchPreference).apply {
+        (findPreference<SwitchPreferenceCompat>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
                 true
@@ -186,10 +186,6 @@ class SettingsFragment : PreferenceFragment(), IListController {
             requireActivity().invalidateOptionsMenu()
         }
         scheduleAppbarRaisingStatus()
-    }
-
-    override fun onCreateItemDecoration(): DividerDecoration {
-        return CategoryDivideDividerDecoration()
     }
 
     override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {

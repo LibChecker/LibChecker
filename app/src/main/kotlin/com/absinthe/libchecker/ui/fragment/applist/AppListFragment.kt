@@ -46,7 +46,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import rikka.material.widget.BorderView
+import rikka.widget.borderview.BorderView
 
 
 const val VF_LOADING = 0

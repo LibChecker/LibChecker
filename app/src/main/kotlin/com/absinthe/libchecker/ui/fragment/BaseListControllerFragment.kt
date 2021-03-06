@@ -3,7 +3,7 @@ package com.absinthe.libchecker.ui.fragment
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
-import rikka.material.widget.BorderViewDelegate
+import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), IListController {
 

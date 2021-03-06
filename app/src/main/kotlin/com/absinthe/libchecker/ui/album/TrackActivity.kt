@@ -26,7 +26,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import rikka.material.widget.BorderView
+import rikka.widget.borderview.BorderView
 
 class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 

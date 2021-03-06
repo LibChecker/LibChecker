@@ -28,7 +28,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import rikka.material.widget.BorderView
+import rikka.widget.borderview.BorderView
 
 const val EXTRA_NAME = "NAME"
 const val EXTRA_TYPE = "TYPE"

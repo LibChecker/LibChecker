@@ -31,7 +31,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import rikka.material.widget.BorderView
+import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
 const val VF_LIST = 1

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.ui.fragment
 
 import rikka.material.app.AppBar
-import rikka.material.widget.BorderViewDelegate
+import rikka.widget.borderview.BorderViewDelegate
 
 /**
  * <pre>

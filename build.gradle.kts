@@ -2,9 +2,6 @@
 
 buildscript {
     repositories {
-//        maven("https://maven.aliyun.com/repository/central")
-//        maven("https://maven.aliyun.com/repository/public")
-//        maven("https://maven.aliyun.com/repository/google")
         google()
         jcenter()
         mavenCentral()
@@ -22,16 +19,11 @@ buildscript {
 
 allprojects {
     repositories {
-//        maven("https://maven.aliyun.com/repository/central")
-//        maven("https://maven.aliyun.com/repository/public")
-//        maven("https://maven.aliyun.com/repository/google")
         google()
         jcenter()
         mavenCentral()
         maven("https://jitpack.io")
         maven("https://dl.bintray.com/absinthe/libraries")
-        maven("https://dl.bintray.com/rikkaw/Libraries")
-        maven("https://dl.bintray.com/rikkaw/MaterialPreference")
     }
 }
 

@@ -69,6 +69,7 @@ android {
 
     packagingOptions {
         exclude("META-INF/atomicfu.kotlin_module")
+        exclude("META-INF/core-ktx_release.kotlin_module")
     }
 
     applicationVariants.all { variant ->
@@ -82,7 +83,7 @@ android {
 }
 
 configurations.all {
-    exclude(group = "rikka.appcompat", module = "appcompat")
+    exclude(group = "dev.rikka.rikkax.appcompat", module = "appcompat")
 }
 
 val grpcVersion by extra("1.35.0")
@@ -116,11 +117,12 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     //implementation("org.xerial:sqlite-jdbc:3.34.0")
 
-    implementation("androidx.core:core-ktx:1.5.0-beta02")
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0-beta02")
     implementation("androidx.browser:browser:1.3.0")
+    implementation("androidx.core:core-ktx:1.5.0-beta02")
+    implementation("androidx.preference:preference-ktx:1.1.1")
 
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
@@ -139,13 +141,11 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
 //    implementation("rikka.appcompat:appcompat:1.2.0-rc01")
-    implementation("rikka.core:core:1.2.3")
-    implementation("rikka.material:material:1.4.3")
-    implementation("rikka.recyclerview:recyclerview-utils:1.1.0")
-
-    val rikkaPreference = "4.2.0-alpha03"
-    implementation("moe.shizuku.preference:preference-appcompat:$rikkaPreference")
-    implementation("moe.shizuku.preference:preference-simplemenu-appcompat:$rikkaPreference")
+    implementation("dev.rikka.rikkax.core:core:1.3.0")
+    implementation("dev.rikka.rikkax.material:material:1.6.0")
+    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
+    implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
+    implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.1")
 
     //XML layout to Java code
     implementation("com.zhangyue.we:x2c-lib:1.0.6")

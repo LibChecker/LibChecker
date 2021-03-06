@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.fragment.app.activityViewModels
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -18,10 +20,9 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import moe.shizuku.preference.PreferenceFragment
-import rikka.material.widget.BorderRecyclerView
-import rikka.material.widget.BorderView
 import rikka.recyclerview.fixEdgeEffect
+import rikka.widget.borderview.BorderRecyclerView
+import rikka.widget.borderview.BorderView
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -88,13 +89,13 @@ class BackupActivity : BaseActivity() {
         }
     }
 
-    class BackupFragment : PreferenceFragment() {
+    class BackupFragment : PreferenceFragmentCompat() {
         private val viewModel by activityViewModels<SnapshotViewModel>()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.album_backup, rootKey)
 
-            findPreference(Constants.PREF_LOCAL_BACKUP)?.apply {
+            findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
                 setOnPreferenceClickListener {
                     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
                     val date = Date()
@@ -108,7 +109,7 @@ class BackupActivity : BaseActivity() {
                     true
                 }
             }
-            findPreference(Constants.PREF_LOCAL_RESTORE)?.apply {
+            findPreference<Preference>(Constants.PREF_LOCAL_RESTORE)?.apply {
                 setOnPreferenceClickListener {
                     val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
                         addCategory(Intent.CATEGORY_OPENABLE)
@@ -118,10 +119,6 @@ class BackupActivity : BaseActivity() {
                     true
                 }
             }
-        }
-
-        override fun onCreateItemDecoration(): DividerDecoration {
-            return CategoryDivideDividerDecoration()
         }
 
         override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {

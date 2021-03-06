@@ -1,41 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--suppress ALL -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <moe.shizuku.preference.PreferenceCategory
+    <PreferenceCategory
         app:key="normalCategory"
         app:title="@string/pref_group_normal">
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="showSystemApps"
             app:title="@string/show_system_apps"
             app:summary="@string/show_system_apps_summary"
             app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
-<!--        <SwitchPreference-->
+<!--        <SwitchPreferenceCompat-->
 <!--            app:key="entryAnimation"-->
 <!--            app:title="@string/entry_animation"-->
 <!--            app:summary="@string/entry_animation_summary"-->
 <!--            app:icon="@drawable/ic_animation"-->
 <!--            app:defaultValue="false"/>-->
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="apkAnalytics"
             app:title="@string/apk_analytics"
             app:summary="@string/apk_analytics_summary"
             app:icon="@drawable/ic_apk_analytics"
             app:defaultValue="true"/>
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="colorfulIcon"
             app:title="@string/colorful_icon"
             app:summary="@string/colorful_icon_summary"
             app:icon="@drawable/ic_color_palette"
             app:defaultValue="true"/>
 
-        <SimpleMenuPreference
+        <rikka.preference.SimpleMenuPreference
             app:key="rulesRepository"
             app:title="@string/rules_repo_title"
             app:summary="%s"
@@ -62,9 +61,9 @@
             app:summary="@string/reload_apps_summary"
             app:icon="@drawable/ic_refresh"/>
 
-    </moe.shizuku.preference.PreferenceCategory>
+    </PreferenceCategory>
 
-    <moe.shizuku.preference.PreferenceCategory
+    <PreferenceCategory
         app:key="othersCategory"
         app:title="@string/pref_group_others">
 
@@ -104,13 +103,13 @@
 
         </Preference>
 
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:key="analytics"
             app:title="@string/anonymous_statistics"
             app:summary="@string/anonymous_statistics_summary"
             app:icon="@drawable/ic_appcenter"
             app:defaultValue="true"/>
 
-    </moe.shizuku.preference.PreferenceCategory>
+    </PreferenceCategory>
 
 </PreferenceScreen>
