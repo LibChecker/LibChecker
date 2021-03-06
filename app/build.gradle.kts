@@ -73,6 +73,7 @@ android {
         excludes += "kotlin/**"
         excludes += "org/**"
         excludes += "**.properties"
+        excludes += "DebugProbesKt.bin"
     }
 
     applicationVariants.all { variant ->
@@ -89,12 +90,12 @@ configurations.all {
     exclude(group = "dev.rikka.rikkax.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.35.0")
-val protocVersion by extra("3.15.1")
+val grpcVersion by extra("1.36.0")
+val protocVersion by extra("3.15.5")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3-native-mt")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.2.0")

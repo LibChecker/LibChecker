@@ -22,12 +22,17 @@ class LibReferenceThresholdView(context: Context) : ConstraintLayout(context) {
         slider.id = View.generateViewId()
         count.id = View.generateViewId()
 
+        slider.addOnChangeListener { _, value, _ ->
+            count.text = value.toInt().toString()
+        }
+
         addView(slider, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
             topToTop = this@LibReferenceThresholdView.id
         })
         addView(count, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
             topToBottom = slider.id
             startToStart = this@LibReferenceThresholdView.id
+            endToEnd = this@LibReferenceThresholdView.id
         })
     }
 }
