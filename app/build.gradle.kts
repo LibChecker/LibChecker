@@ -68,8 +68,11 @@ android {
     }
 
     packagingOptions {
-        exclude("META-INF/atomicfu.kotlin_module")
-        exclude("META-INF/core-ktx_release.kotlin_module")
+        excludes += "META-INF/**"
+        excludes += "okhttp3/**"
+        excludes += "kotlin/**"
+        excludes += "org/**"
+        excludes += "**.properties"
     }
 
     applicationVariants.all { variant ->
