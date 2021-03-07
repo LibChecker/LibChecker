@@ -32,7 +32,7 @@ andResGuard {
      * Optional: if finalApkBackupPath is null, AndResGuard will overwrite final apk
      * to the path which assemble[Task] write to
      **/
-    finalApkBackupPath = "${project.rootDir}/app/release/app-release.apk"
+    finalApkBackupPath = null
 
     /**
      * Optional: Specifies the name of the message digest algorithm to user when digesting the entries of JAR file

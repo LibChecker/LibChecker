@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.settings
 
 import android.content.Context
+import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +16,9 @@ class LibReferenceThresholdView(context: Context) : ConstraintLayout(context) {
         stepSize = 1f
         value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
     }
-    val count: TextView = TextView(context)
+    val count: TextView = TextView(context).apply {
+        setTypeface(null, Typeface.BOLD)
+    }
 
     init {
         id = View.generateViewId()
