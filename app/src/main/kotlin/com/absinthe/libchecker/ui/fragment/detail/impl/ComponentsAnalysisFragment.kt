@@ -40,6 +40,9 @@ const val EXTRA_TYPE = "EXTRA_TYPE"
 class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
     private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private val hasIntegration by lazy {
+        MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY)
+    }
     private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
@@ -186,9 +189,6 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
         }
     }
-
-    private val hasIntegration = MonkeyKingManager.isSupportInteraction ||
-            (AnywhereManager.isSupportInteraction && type == ACTIVITY)
 
     companion object {
         fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
