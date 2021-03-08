@@ -465,13 +465,25 @@ object PackageUtils {
             val entries = zipFile.entries()
             apkFile = ApkFile(file)
 
-            if (apkFile.manifestXml.contains("use32bitAbi=\"true\"", true)) {
+            val use32bitAbi = try {
+                apkFile.manifestXml.contains("use32bitAbi=\"true\"", true)
+            } catch (e: Exception) {
+                false
+            }
+
+            val multiArch = try {
+                apkFile.manifestXml.contains("multiArch=\"true\"", true)
+            } catch (e: Exception) {
+                false
+            }
+
+            if (use32bitAbi) {
                 abi = when {
                     GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
                     GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86
                     else -> NO_LIBS
                 }
-            } else if (apkFile.manifestXml.contains("multiArch=\"true\"", true)) {
+            } else if (multiArch) {
                 abi = when {
                     GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) -> ARMV8
                     GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) -> X86_64
@@ -516,7 +528,7 @@ object PackageUtils {
                 abi
             }
         } catch (e: Throwable) {
-            loge(e.toString())
+            loge("PackageUtils", e)
             return ERROR
         } finally {
             zipFile?.close()
