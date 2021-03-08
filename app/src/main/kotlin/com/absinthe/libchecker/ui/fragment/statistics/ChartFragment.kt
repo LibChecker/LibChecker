@@ -21,7 +21,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.extensions.isShowing
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.IntegerFormatter
@@ -40,6 +39,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.button.MaterialButtonToggleGroup
+import timber.log.Timber
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
@@ -243,7 +243,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                         list[targetApi - 1]++
                     }
                 } catch (e: PackageManager.NameNotFoundException) {
-                    loge(e.toString())
+                    Timber.e(e)
                 }
             }
             existApiList.clear()

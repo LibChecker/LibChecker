@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
+import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
@@ -8,12 +9,12 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.*
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
-class SnapshotDetailAdapter : BaseNodeAdapter() {
+class SnapshotDetailAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeAdapter() {
 
     init {
-        addNodeProvider(SnapshotTitleProvider())
-        addNodeProvider(SnapshotNativeProvider())
-        addNodeProvider(SnapshotComponentProvider())
+        addNodeProvider(SnapshotTitleProvider(lifecycleScope))
+        addNodeProvider(SnapshotNativeProvider(lifecycleScope))
+        addNodeProvider(SnapshotComponentProvider(lifecycleScope))
         addChildClickViewIds(R.id.chip)
     }
 
@@ -22,7 +23,7 @@ class SnapshotDetailAdapter : BaseNodeAdapter() {
             is SnapshotTitleNode -> SNAPSHOT_TITLE_PROVIDER
             is SnapshotNativeNode -> SNAPSHOT_NATIVE_PROVIDER
             is SnapshotComponentNode -> SNAPSHOT_COMPONENT_PROVIDER
-            else -> -1
+            else -> throw IllegalArgumentException("wrong snapshot provider item type")
         }
     }
 

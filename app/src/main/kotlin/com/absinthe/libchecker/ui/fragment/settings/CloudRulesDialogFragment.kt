@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.settings
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.LibCheckerApp
@@ -14,8 +13,6 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.logd
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.Toasty
@@ -28,6 +25,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 
 class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDialogBinding>() {
 
@@ -74,7 +72,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                 }
 
                 override fun onFailure(call: Call<CloudRuleInfo>, t: Throwable) {
-                    Log.e("CloudRulesDialog", t.toString())
+                    Timber.e(t)
                 }
 
             })
@@ -89,8 +87,9 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                         val builder = CloudRulesBundle.parseFrom(rb.byteStream())
 
                         try {
-                            logd("CloudRulesDialog", "version = ${builder.version}")
-                            logd("CloudRulesDialog", "count = ${builder.count}")
+                            Timber.d("version = ${builder?.version}")
+                            Timber.d("count = ${builder?.count}")
+
                             val rulesList = mutableListOf<RuleEntity>()
                             builder.rulesList.cloudRulesList.forEach { rule ->
                                 rule?.let {
@@ -104,7 +103,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                                 GlobalValues.localRulesVersion = builder.version
                             }
                         } catch (e: Exception) {
-                            loge(e.toString())
+                            Timber.e(e)
                             withContext(Dispatchers.Main) {
                                 Toasty.show(requireContext(), R.string.toast_cloud_rules_update_error)
                             }
@@ -114,7 +113,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
             }
 
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Log.e("CloudRulesDialog", t.toString())
+                Timber.e(t)
             }
 
         })

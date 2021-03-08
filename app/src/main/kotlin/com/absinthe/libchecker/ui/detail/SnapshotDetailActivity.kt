@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
@@ -48,7 +49,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
     private lateinit var binding: ActivitySnapshotDetailBinding
     private lateinit var entity: SnapshotDiffItem
 
-    private val adapter = SnapshotDetailAdapter()
+    private val adapter by lazy { SnapshotDetailAdapter(lifecycleScope) }
     private val viewModel by viewModels<SnapshotViewModel>()
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 

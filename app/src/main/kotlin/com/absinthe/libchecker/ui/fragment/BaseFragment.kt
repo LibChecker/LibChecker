@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.extensions.logd
+import timber.log.Timber
 
 abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId) {
 
@@ -25,7 +25,7 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
     abstract fun init()
 
     open fun onVisibilityChanged(visible: Boolean) {
-        logd("==> onVisibilityChanged = $visible")
+        Timber.d("==> onVisibilityChanged = $visible")
     }
 
     override fun onDestroyView() {

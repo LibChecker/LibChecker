@@ -18,7 +18,6 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
@@ -35,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 
@@ -140,7 +140,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         }
                         tvAbiAndApi.text = spanString
                     } catch (e: Exception) {
-                        loge(e.toString())
+                        Timber.e(e)
                         finish()
                     }
 
@@ -164,7 +164,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
                 viewModel.initComponentsData(path)
             } ?: run {
-                loge("empty")
+                Timber.e("PackageInfo is null")
                 finish()
             }
         } catch (e: Exception) {

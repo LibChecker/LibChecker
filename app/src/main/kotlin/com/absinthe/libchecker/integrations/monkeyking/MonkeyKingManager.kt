@@ -4,9 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.PackageUtils
 import com.google.gson.Gson
+import timber.log.Timber
 
 const val TYPE_ACTIVITY = "activity"
 const val TYPE_SERVICE = "service"
@@ -46,8 +46,10 @@ class MonkeyKingManager {
         val uri = Uri.parse(URI_AUTHORIZATION)
         try {
             context.contentResolver.call(uri, "blocks", packageName, bundle)
-        } catch (e: Throwable) {
-            loge(e.toString())
+        } catch (e: NullPointerException) {
+            Timber.e(e)
+        } catch (e: IllegalArgumentException) {
+            Timber.e(e)
         }
     }
 

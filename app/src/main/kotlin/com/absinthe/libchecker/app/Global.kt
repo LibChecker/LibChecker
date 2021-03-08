@@ -5,7 +5,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.extensions.logw
+import timber.log.Timber
 
 object Global {
 
@@ -30,9 +30,9 @@ object Global {
         if (stack.contains("Service.startForeground()") ||
             stack.contains("com.swift.sandhook")
         ) {
-            logw(e.toString())
+            Timber.w(e)
         } else if (stack.contains("ClipboardService")) {
-            logw(e.toString())
+            Timber.w(e)
             Toast.makeText(LibCheckerApp.context, "Cannot access to ClipboardService", Toast.LENGTH_SHORT).show()
         } else {
             throw e

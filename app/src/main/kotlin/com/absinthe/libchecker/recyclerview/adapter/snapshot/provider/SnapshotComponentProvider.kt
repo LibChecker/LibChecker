@@ -6,9 +6,8 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
@@ -29,7 +28,7 @@ import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_COMPONENT_PROVIDER = 3
 
-class SnapshotComponentProvider : BaseNodeProvider() {
+class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
 
     override val itemViewType: Int = SNAPSHOT_COMPONENT_PROVIDER
 
@@ -63,7 +62,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
 
         val chip = helper.getView<Chip>(R.id.chip)
 
-        (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, snapshotItem.itemType)
 
             withContext(Dispatchers.Main) {

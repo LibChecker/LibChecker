@@ -15,7 +15,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -26,6 +25,7 @@ import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
@@ -120,7 +120,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                         removeList.add(it)
                     } catch (e: Exception) {
-                        loge(e.toString())
+                        Timber.e(e)
                         removeList.add(it)
                     }
                 } ?: run {
@@ -186,7 +186,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         )
                     )
                 } catch (e: Exception) {
-                    loge(e.toString())
+                    Timber.e(e)
                     continue
                 }
             }
@@ -690,7 +690,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
 
         backupList.forEach {
-            loge(it.packageName)
+            Timber.d("backup step: packageName = ${it.packageName}")
             snapshotBuilder.apply {
                 packageName = it.packageName
                 setTimeStamp(timeStamp)

@@ -16,7 +16,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.extensions.loge
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
@@ -94,7 +94,7 @@ object LCAppUtils {
             }
             return result.toString()
         } catch (e: Exception) {
-            loge("getFromAssets", e)
+            Timber.e(e, "getFromAssets")
             return null
         }
     }

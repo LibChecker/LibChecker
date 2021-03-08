@@ -3,10 +3,10 @@ package com.absinthe.libchecker.utils
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.protocol.CloudRulesList
+import timber.log.Timber
 
 object RuleGenerator {
     fun generateRulesByteArray(): ByteArray {
@@ -50,7 +50,7 @@ object RuleGenerator {
 //        }
 //        newRules.add(ruleBuilder.build())
 
-        logd("RuleGenerator",newRules.size.toString())
+        Timber.d("RuleGenerator",newRules.size.toString())
 
         rulesListBuilder.addAllCloudRules(newRules)
         bundleBuilder.rulesList = rulesListBuilder.build()

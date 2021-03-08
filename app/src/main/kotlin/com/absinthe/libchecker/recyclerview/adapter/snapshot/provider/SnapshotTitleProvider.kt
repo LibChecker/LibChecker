@@ -4,10 +4,9 @@ import android.animation.ObjectAnimator
 import android.util.SparseArray
 import android.view.View
 import android.widget.ImageView
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailCountAdapter
@@ -23,7 +22,7 @@ import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_TITLE_PROVIDER = 1
 
-class SnapshotTitleProvider : BaseNodeProvider() {
+class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
 
     private val countMap = SparseArray<List<Int>>()
     override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
@@ -59,7 +58,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
 
             countAdapter.setList(finalList)
         } ?: let {
-            (context as BaseActivity).lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch(Dispatchers.IO) {
                 @Suppress("UNCHECKED_CAST")
                 (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
                     countList[diffNode.item.diffType]++

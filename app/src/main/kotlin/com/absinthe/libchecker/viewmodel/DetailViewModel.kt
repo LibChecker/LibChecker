@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
-import android.util.Log
 import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -19,7 +18,6 @@ import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.extensions.logd
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -32,6 +30,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -157,7 +156,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
-            logd("requestLibDetail")
+            Timber.d("requestLibDetail")
             var categoryDir = when (type) {
                 NATIVE -> "native-libs"
                 SERVICE -> "services-libs"
@@ -174,7 +173,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             val detail = request.requestLibDetail(categoryDir, libName)
             detail.enqueue(object : Callback<LibDetailBean> {
                 override fun onFailure(call: Call<LibDetailBean>, t: Throwable) {
-                    Log.e("DetailViewModel", t.message ?: "")
+                    Timber.e(t, "DetailViewModel")
                     detailBean.value = null
                 }
 
@@ -212,7 +211,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
-        logd("getDexChipList")
+        Timber.d("getDexChipList")
         val list = PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?

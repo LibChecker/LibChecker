@@ -22,7 +22,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
@@ -31,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -48,14 +48,17 @@ class ShootService : Service() {
 
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
+            Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
             GlobalScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
         }
 
         override fun registerOnShootOverListener(listener: OnShootOverListener?) {
+            Timber.i("registerOnShootOverListener $listener")
             listener?.let { listenerList.register(listener) }
         }
 
         override fun unregisterOnShootOverListener(listener: OnShootOverListener?) {
+            Timber.i("unregisterOnShootOverListener $listener")
             listenerList.unregister(listener)
         }
     }
@@ -89,18 +92,21 @@ class ShootService : Service() {
     }
 
     private fun notifyFinished(timestamp: Long) {
+        Timber.i("notifyFinished start")
         val count = listenerList.beginBroadcast()
         for (i in 0 until count) {
             try {
+                Timber.i("notifyFinished $i")
                 listenerList.getBroadcastItem(i).onShootFinished(timestamp)
             } catch (e: RemoteException) {
-                loge(e.toString())
+                Timber.e(e)
             }
         }
         listenerList.finishBroadcast()
     }
 
     private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+        Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
         notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
         initBuilder()
 
@@ -163,7 +169,7 @@ class ShootService : Service() {
                 }
                 count++
             } catch (e: Exception) {
-                loge(e.toString())
+                Timber.e(e)
                 exceptionInfoList.add(info)
                 continue
             }
@@ -219,6 +225,7 @@ class ShootService : Service() {
         repository.insert(TimeStampItem(ts))
 
         if (dropPrevious) {
+            Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
             repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
         }
 
@@ -232,6 +239,7 @@ class ShootService : Service() {
         notifyFinished(ts)
         stopForeground(true)
         stopSelf()
+        Timber.i("computeSnapshots end")
     }
 
     private fun getFormatDateString(timestamp: Long): String {

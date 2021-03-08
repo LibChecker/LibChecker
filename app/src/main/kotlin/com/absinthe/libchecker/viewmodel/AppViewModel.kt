@@ -23,8 +23,6 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
-import com.absinthe.libchecker.extensions.logd
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -34,6 +32,7 @@ import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
+import timber.log.Timber
 import java.io.InputStream
 import java.util.regex.Pattern
 
@@ -54,7 +53,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun initItems() = viewModelScope.launch(Dispatchers.IO) {
-        logd("Init all items START")
+        Timber.d("initItems: START")
 
         val context: Context = getApplication<LibCheckerApp>()
         val timeRecorder = TimeRecorder()
@@ -72,7 +71,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: MiuiOpsException) {
                 emptyList()
             } catch (e: Exception) {
-                logd(e.toString())
+                Timber.w(e)
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
             }
@@ -131,16 +130,16 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         lcItems.clear()
 
         timeRecorder.end()
-        logd("Init all items END, $timeRecorder")
+        Timber.d("initItems: END, $timeRecorder")
     }
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         if (isInitializngItems) {
-            logd("Request change isInitingItems return")
+            Timber.d("Request change isInitializngItems returns")
             return@launch
         }
         if (XiaomiUtilities.isMIUI() && !XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
-            logd("Request change OP_GET_INSTALLED_APPS return")
+            Timber.d("Request change OP_GET_INSTALLED_APPS returns")
             return@launch
         }
 
@@ -148,7 +147,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
-        logd("Request change START")
+        Timber.d("Request change: START")
         val timeRecorder = TimeRecorder()
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
 
@@ -161,6 +160,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 } catch (e: MiuiOpsException) {
                     mutableListOf()
                 } catch (e: Exception) {
+                    Timber.w(e)
                     delay(GET_INSTALL_APPS_RETRY_PERIOD)
                     null
                 }
@@ -204,6 +204,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         delete(dbItem)
                     }
                 } catch (e: Exception) {
+                    Timber.e(e)
                     continue
                 }
             }
@@ -245,6 +246,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                     insert(lcItem)
                 } catch (e: Exception) {
+                    Timber.e(e)
                     continue
                 }
             }
@@ -259,7 +261,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         timeRecorder.end()
-        logd("Request change END, $timeRecorder")
+        Timber.d("Request change: END, $timeRecorder")
 
         delay(10000)
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
@@ -318,7 +320,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 "Provider"
             )
         } catch (ignore: Exception) {
-
+            Timber.e(ignore, "collectPopularLibraries failed")
         }
     }
 
@@ -340,6 +342,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     map[lib.componentName] = count + 1
                 }
             } catch (e: Exception) {
+                Timber.e(e)
                 continue
             }
         }
@@ -373,8 +376,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     appList = try {
                         PackageUtils.getInstallApplications()
                     } catch (e: MiuiOpsException) {
+                        Timber.e(e)
                         emptyList()
                     } catch (e: Exception) {
+                        Timber.e(e)
                         delay(GET_INSTALL_APPS_RETRY_PERIOD)
                         null
                     }
@@ -413,7 +418,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 map[lib.name] = RefCountType(count + 1, NATIVE)
                             }
                         } catch (e: Exception) {
-                            loge(e.toString())
+                            Timber.e(e)
                         }
 
                         try {
@@ -449,7 +454,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -472,7 +477,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 map[lib.name] = RefCountType(count + 1, NATIVE)
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -492,7 +497,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -512,7 +517,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -532,7 +537,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -552,7 +557,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                                 }
                             }
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Timber.e(e)
                         }
                     }
                 }
@@ -643,7 +648,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 repository.insertRules(rulesList)
                 GlobalValues.localRulesVersion = rulesBundle.version
             } catch (e: Exception) {
-                loge(e.toString())
+                Timber.e(e)
             } finally {
                 inputStream?.close()
             }

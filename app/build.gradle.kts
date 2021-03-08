@@ -139,6 +139,7 @@ dependencies {
     implementation("io.coil-kt:coil:1.1.1")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.0")
+    implementation("com.jakewharton.timber:timber:4.7.1")
 
     //Serilization
     implementation("com.google.code.gson:gson:2.8.6")

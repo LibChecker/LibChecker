@@ -12,12 +12,12 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -45,7 +45,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                             packageInfo.applicationInfo.nativeLibraryDir
                         )
                     } catch (e: Exception) {
-                        loge(e.toString())
+                        Timber.e(e)
                         emptyList()
                     }
 

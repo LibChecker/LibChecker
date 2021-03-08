@@ -26,10 +26,10 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.exception.MiuiOpsException
-import com.absinthe.libchecker.extensions.loge
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import net.dongliu.apk.parser.ApkFile
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
@@ -215,7 +215,7 @@ object PackageUtils {
                 return libList
             }
         } catch (e: Exception) {
-            loge(e.toString())
+            Timber.e(e)
             return emptyList()
         }
     }
@@ -528,7 +528,7 @@ object PackageUtils {
                 abi
             }
         } catch (e: Throwable) {
-            loge("PackageUtils", e)
+            Timber.e(e)
             return ERROR
         } finally {
             zipFile?.close()
@@ -711,7 +711,7 @@ object PackageUtils {
                 return primaryList
             }
         } catch (e: Exception) {
-            loge(e.toString())
+            Timber.e(e)
             return emptyList()
         }
     }
