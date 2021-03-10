@@ -9,7 +9,7 @@ class ThreadAwareDebugTree : DebugTree() {
 
         newTag?.let {
             val threadName = Thread.currentThread().name
-            newTag = "<$threadName> $tag"
+            newTag = "<LC_DEBUG><$threadName> $tag"
         }
 
         super.log(priority, newTag, message, t)

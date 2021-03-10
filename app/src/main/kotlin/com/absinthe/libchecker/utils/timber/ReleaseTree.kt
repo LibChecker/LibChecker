@@ -15,6 +15,6 @@ class ReleaseTree : Timber.DebugTree() {
         if (!isLoggable(tag, priority)) {
             return
         }
-        super.log(priority, tag, message, t)
+        super.log(priority, "<LC_REL>$tag", message, t)
     }
 }
