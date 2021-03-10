@@ -24,7 +24,6 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -79,18 +78,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             e.printStackTrace()
         }
 
-        withContext(Dispatchers.Main) {
-            nativeLibItems.value = list
-        }
+        nativeLibItems.postValue(list)
     }
 
     fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-        val chipList = mutableListOf<LibStringItemChip>()
-        chipList.addAll(getDexChipList(packageName))
-
-        withContext(Dispatchers.Main) {
-            dexLibItems.value = chipList
-        }
+        dexLibItems.postValue(getDexChipList(packageName))
     }
 
     fun initComponentsData(packageName: String) =
@@ -121,12 +113,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
                         val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
 
-                        withContext(Dispatchers.Main) {
-                            componentsMap[SERVICE]?.value = services
-                            componentsMap[ACTIVITY]?.value = activities
-                            componentsMap[RECEIVER]?.value = receivers
-                            componentsMap[PROVIDER]?.value = providers
-                        }
+                        componentsMap[SERVICE]?.postValue(services)
+                        componentsMap[ACTIVITY]?.postValue(activities)
+                        componentsMap[RECEIVER]?.postValue(receivers)
+                        componentsMap[PROVIDER]?.postValue(providers)
                     }
                 } else {
                     PackageUtils.getPackageInfo(packageName).let {
@@ -135,12 +125,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                         val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
                         val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
 
-                        withContext(Dispatchers.Main) {
-                            componentsMap[SERVICE]?.value = services
-                            componentsMap[ACTIVITY]?.value = activities
-                            componentsMap[RECEIVER]?.value = receivers
-                            componentsMap[PROVIDER]?.value = providers
-                        }
+                        componentsMap[SERVICE]?.postValue(services)
+                        componentsMap[ACTIVITY]?.postValue(activities)
+                        componentsMap[RECEIVER]?.postValue(receivers)
+                        componentsMap[PROVIDER]?.postValue(providers)
                     }
                 }
             } catch (e: Exception) {

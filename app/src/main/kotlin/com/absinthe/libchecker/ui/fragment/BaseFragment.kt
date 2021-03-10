@@ -17,6 +17,7 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("==> onViewCreated")
         _binding = initBinding(view)
         init()
     }
@@ -29,17 +30,20 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
     }
 
     override fun onDestroyView() {
+        Timber.d("==> onDestroyView")
         _binding = null
         super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
+        Timber.d("==> onResume")
         onVisibilityChanged(true)
     }
 
     override fun onPause() {
         super.onPause()
+        Timber.d("==> onPause")
         onVisibilityChanged(false)
     }
 

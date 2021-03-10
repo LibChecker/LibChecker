@@ -16,7 +16,6 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
@@ -74,9 +73,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
             list.filter { !it.isSystem }
         }
 
-        withContext(Dispatchers.Main) {
-            libRefList.value = filterList
-        }
+        libRefList.postValue(filterList)
     }
 
 }

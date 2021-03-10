@@ -106,7 +106,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 setHasFixedSize(true)
                 addSystemBarPaddingAsync()
-
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {

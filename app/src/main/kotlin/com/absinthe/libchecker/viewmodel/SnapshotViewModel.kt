@@ -45,11 +45,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     private val gson by lazy { Gson() }
 
     fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-        val count = repository.getSnapshots(timeStamp).size
-
-        withContext(Dispatchers.Main) {
-            snapshotAppsCount.value = count
-        }
+        snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
     }
 
     fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch(Dispatchers.IO) {
@@ -65,9 +61,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val diffList = mutableListOf<SnapshotDiffItem>()
 
         if (preList.isNullOrEmpty()) {
-            withContext(Dispatchers.Main) {
-                snapshotDiffItems.value = diffList
-            }
+            snapshotDiffItems.postValue(diffList)
             return@launch
         }
 
@@ -192,9 +186,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        withContext(Dispatchers.Main) {
-            snapshotDiffItems.value = diffList
-        }
+        snapshotDiffItems.postValue(diffList)
     }
 
     private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
@@ -294,9 +286,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             }
         }
 
-        withContext(Dispatchers.Main) {
-            snapshotDiffItems.value = diffList
-        }
+        snapshotDiffItems.postValue(diffList)
     }
 
     fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
@@ -343,9 +333,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             )
         )
 
-        withContext(Dispatchers.Main) {
-            snapshotDetailItems.value = list
-        }
+        snapshotDetailItems.postValue(list)
     }
 
     private fun insertTimeStamp(timestamp: Long) = viewModelScope.launch(Dispatchers.IO) {

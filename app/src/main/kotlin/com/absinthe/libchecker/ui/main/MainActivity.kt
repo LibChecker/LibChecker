@@ -225,9 +225,7 @@ class MainActivity : BaseActivity(), IListContainer {
                 }
             } while (appList == null)
 
-            withContext(Dispatchers.Main) {
-                AppItemRepository.allApplicationInfoItems.value = appList
-            }
+            AppItemRepository.allApplicationInfoItems.postValue(appList)
         }
     }
 

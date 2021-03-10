@@ -250,14 +250,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     continue
                 }
             }
-            GlobalScope.launch(Dispatchers.Main) {
-                GlobalValues.shouldRequestChange.value = false
-                AppItemRepository.shouldRefreshAppList = true
-            }
-        } ?: let {
-            GlobalScope.launch(Dispatchers.Main) {
-                GlobalValues.shouldRequestChange.value = true
-            }
+            GlobalValues.shouldRequestChange.postValue(false)
+            AppItemRepository.shouldRefreshAppList = true
+        } ?: run {
+            GlobalValues.shouldRequestChange.postValue(true)
         }
 
         timeRecorder.end()
@@ -598,10 +594,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             refList.sortByDescending { it.referredCount }
-
-            withContext(Dispatchers.Main) {
-                libReference.value = refList
-            }
+            libReference.postValue(refList)
         }
     }
 
