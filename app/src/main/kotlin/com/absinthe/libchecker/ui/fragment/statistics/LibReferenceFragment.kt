@@ -18,7 +18,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -58,7 +58,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 adapter = this@LibReferenceFragment.adapter
                 layoutManager = this@LibReferenceFragment.layoutManager
                 FastScrollerBuilder(this).useMd2Style().build()
-                addSystemBarPaddingAsync(addStatusBarPadding = false)
+                addSystemBarPadding(addStatusBarPadding = false)
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

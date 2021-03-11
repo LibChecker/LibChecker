@@ -14,7 +14,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.isOrientationLandscape
 import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
@@ -28,6 +28,7 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
 const val EXTRA_NAME = "NAME"
@@ -111,7 +112,8 @@ class LibReferenceActivity : BaseActivity() {
                         appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                addSystemBarPaddingAsync()
+                addSystemBarPadding()
+                FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
                 setInAnimation(

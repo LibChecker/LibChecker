@@ -9,10 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
-import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.paddingTopCompat
-import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -51,7 +48,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             adapter = this@ClassifyDialogView.adapter
             overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             setHasFixedSize(true)
-            addSystemBarPaddingAsync(addStatusBarPadding = false)
+            addSystemBarPadding(addStatusBarPadding = false)
             FastScrollerBuilder(this).useMd2Style().build()
         }
 

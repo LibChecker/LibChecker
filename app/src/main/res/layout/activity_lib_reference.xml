@@ -27,13 +27,14 @@
         android:id="@+id/vf_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null">
+        android:background="@null"
+        android:clipChildren="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:background="@null">
+            android:background="@null"
+            android:gravity="center">
 
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/lottie"
@@ -50,8 +51,7 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:paddingTop="?actionBarSize"
-            android:scrollbarStyle="insideOverlay"
-            android:scrollbars="vertical"
+            android:scrollbars="none"
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
             app:borderTopVisibility="whenTop"

@@ -25,7 +25,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
@@ -203,7 +203,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addSystemBarPaddingAsync()
+                addSystemBarPadding()
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)

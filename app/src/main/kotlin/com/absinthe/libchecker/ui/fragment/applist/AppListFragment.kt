@@ -28,7 +28,8 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -105,7 +106,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                addSystemBarPaddingAsync()
+                addSystemBarPadding()
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {

@@ -14,7 +14,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -65,7 +65,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            addSystemBarPaddingAsync(addStatusBarPadding = false)
+            addSystemBarPadding(addStatusBarPadding = false)
         }
 
         if (LCAppUtils.atLeastN()) {

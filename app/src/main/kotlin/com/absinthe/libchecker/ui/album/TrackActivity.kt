@@ -16,7 +16,7 @@ import com.absinthe.libchecker.bean.TrackListItem
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libraries.utils.extensions.logd
@@ -58,7 +58,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                     appBar?.setRaised(!top)
                 }
-            addSystemBarPaddingAsync()
+            addSystemBarPadding()
             FastScrollerBuilder(this).useMd2Style().build()
         }
         adapter.apply {
@@ -79,8 +79,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             }
 
             setOnItemClickListener { _, view, position ->
-                view.findViewById<SwitchMaterial>(R.id.track_switch).apply {
-                    isChecked = !isChecked
+                with(view.findViewById<SwitchMaterial>(R.id.track_switch)) {
                     doSaveItemState(position, isChecked)
                 }
             }

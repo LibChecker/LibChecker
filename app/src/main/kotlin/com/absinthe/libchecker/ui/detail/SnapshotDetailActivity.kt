@@ -20,7 +20,7 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -123,7 +123,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         binding.apply {
             rvList.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                addSystemBarPaddingAsync(addStatusBarPadding = false, addNavigationBarPadding = true)
+                addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             }
 

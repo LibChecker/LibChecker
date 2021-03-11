@@ -8,7 +8,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.databinding.LayoutDexEmptyListBinding
-import com.absinthe.libchecker.extensions.addSystemBarPaddingAsync
+import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -30,7 +30,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@DexAnalysisFragment.adapter
-                addSystemBarPaddingAsync(addStatusBarPadding = false)
+                addSystemBarPadding(addStatusBarPadding = false)
             }
         }
 

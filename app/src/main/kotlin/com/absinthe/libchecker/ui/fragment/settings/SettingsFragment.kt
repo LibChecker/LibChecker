@@ -194,6 +194,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         recyclerView.addVerticalPadding(0, 8)
         recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+        recyclerView.isVerticalScrollBarEnabled = false
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {
