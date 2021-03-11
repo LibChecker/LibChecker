@@ -42,10 +42,8 @@ import com.google.android.material.transition.platform.MaterialContainerTransfor
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
@@ -97,10 +95,6 @@ class MainActivity : BaseActivity(), IListContainer {
     override fun onPause() {
         super.onPause()
         unregisterPackageBroadcast()
-    }
-
-    override fun onBackPressed() {
-        finish()
     }
 
     fun showNavigationView() {

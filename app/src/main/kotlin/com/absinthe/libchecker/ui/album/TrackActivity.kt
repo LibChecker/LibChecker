@@ -79,7 +79,8 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             }
 
             setOnItemClickListener { _, view, position ->
-                with(view.findViewById<SwitchMaterial>(R.id.track_switch)) {
+                view.findViewById<SwitchMaterial>(R.id.track_switch).apply {
+                    isChecked = !isChecked
                     doSaveItemState(position, isChecked)
                 }
             }

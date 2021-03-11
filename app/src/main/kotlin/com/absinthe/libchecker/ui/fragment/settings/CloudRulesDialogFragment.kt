@@ -60,13 +60,20 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                     val body = response.body()
                     body?.let {
                         lifecycleScope.launch(Dispatchers.Main) {
-                            binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
-                            binding.tvRemoteRulesVersion.text = it.version.toString()
-                            if (GlobalValues.localRulesVersion < it.version) {
-                                binding.btnUpdate.isEnabled = true
+                            try {
+                                binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
+                                binding.tvRemoteRulesVersion.text = it.version.toString()
+                                if (GlobalValues.localRulesVersion < it.version) {
+                                    binding.btnUpdate.isEnabled = true
+                                }
+                                binding.vfContainer.displayedChild = 1
+                                bundlesCount = it.bundles
+                            } catch (e: Exception) {
+                                Timber.e(e)
+                                withContext(Dispatchers.Main) {
+                                    Toasty.show(requireContext(), R.string.toast_cloud_rules_update_error)
+                                }
                             }
-                            binding.vfContainer.displayedChild = 1
-                            bundlesCount = it.bundles
                         }
                     }
                 }
