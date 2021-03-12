@@ -2,9 +2,11 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
@@ -39,6 +41,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
         if (item.item.source == DISABLED) {
             val sp = SpannableString(item.item.name)
             sp.setSpan(StrikethroughSpan(), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sp.setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             holder.setText(R.id.tv_name, sp)
         } else {
             holder.setText(R.id.tv_name, item.item.name)

@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import android.content.ComponentName
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -198,21 +199,14 @@ object PackageUtils {
      */
     private fun getSourceLibs(path: String, childDir: String, source: String? = null): List<LibStringItem> {
         try {
-            val file = File(path)
-            val zipFile = ZipFile(file)
-            zipFile.use {
-                val entries = zipFile.entries()
-                val libList = entries.asSequence()
+            ZipFile(File(path)).use { zipFile ->
+                return zipFile.entries()
+                    .asSequence()
                     .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
                     .distinctBy { it.name.split("/").last() }
                     .map { LibStringItem(it.name.split("/").last(), it.size, source) }
                     .toList()
-
-                if (libList.isEmpty()) {
-                    return getSplitLibs(path)
-                }
-
-                return libList
+                    .ifEmpty { getSplitLibs(path) }
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -412,12 +406,17 @@ object PackageUtils {
         if (list.isNullOrEmpty()) {
             return emptyList()
         }
+        var state: Int
+        var isEnabled: Boolean
         return list.asSequence()
             .map {
+                state = LibCheckerApp.context.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
+                isEnabled = state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED || state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+
                 if (isSimpleName) {
-                    StatefulComponent(it.name.removePrefix(packageName), it.enabled)
+                    StatefulComponent(it.name.removePrefix(packageName), isEnabled)
                 } else {
-                    StatefulComponent(it.name, it.enabled)
+                    StatefulComponent(it.name, isEnabled)
                 }
             }
             .toList()
