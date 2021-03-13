@@ -26,6 +26,8 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
+    override fun getRecyclerView() = binding.list
+
     override fun init() {
         binding.apply {
             list.apply {

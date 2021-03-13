@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -46,6 +47,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
+
+    override fun getRecyclerView() = binding.list
 
     override fun init() {
         binding.apply {

@@ -24,8 +24,8 @@ import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_TYPE
+import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -89,8 +89,8 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
                 val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
                     val item = this@LibReferenceFragment.adapter.data[position]
-                    putExtra(EXTRA_NAME, item.libName)
-                    putExtra(EXTRA_TYPE, item.type)
+                    putExtra(EXTRA_REF_NAME, item.libName)
+                    putExtra(EXTRA_REF_TYPE, item.type)
                 }
                 startActivity(intent)
             }

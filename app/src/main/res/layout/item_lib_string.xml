@@ -9,6 +9,7 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:minHeight="40dp"
+    android:paddingHorizontal="@dimen/normal_padding"
     android:paddingVertical="4dp">
 
     <TextView

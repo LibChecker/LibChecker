@@ -31,14 +31,16 @@ import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-const val EXTRA_NAME = "NAME"
-const val EXTRA_TYPE = "TYPE"
+const val EXTRA_REF_NAME = "REF_NAME"
+const val EXTRA_REF_TYPE = "REF_TYPE"
 
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
     private val adapter = AppAdapter()
     private val viewModel by viewModels<LibReferenceViewModel>()
+    private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
+    private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityLibReferenceBinding.inflate(layoutInflater)
@@ -53,25 +55,20 @@ class LibReferenceActivity : BaseActivity() {
         setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
-        val name = intent.extras?.getString(EXTRA_NAME)
-        val type = intent.extras?.getInt(EXTRA_TYPE) ?: NATIVE
-
-        if (name == null) {
-            finish()
-        } else {
+        refName?.let { name ->
             initView()
             viewModel.dbItems.observe(this, {
-                viewModel.setData(name, type)
+                viewModel.setData(name, refType)
             })
 
             lifecycleScope.launch(Dispatchers.IO) {
-                LCAppUtils.getRuleWithRegex(name, type)?.let {
+                LCAppUtils.getRuleWithRegex(name, refType)?.let {
                     withContext(Dispatchers.Main) {
                         binding.toolbar.title = it.label
                     }
                 }
             }
-        }
+        } ?: finish()
     }
 
     override fun onDestroy() {
@@ -155,6 +152,8 @@ class LibReferenceActivity : BaseActivity() {
             val intent = Intent(this, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
                     putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
+                    putString(EXTRA_REF_NAME, refName)
+                    putInt(EXTRA_REF_TYPE, refType)
                 })
             }
 

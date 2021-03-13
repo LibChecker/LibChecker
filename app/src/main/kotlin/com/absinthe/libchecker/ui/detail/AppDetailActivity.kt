@@ -30,7 +30,10 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
@@ -49,6 +52,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
+    private val refName by lazy { intent.getStringExtra(EXTRA_REF_NAME) }
+    private val refType by lazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
     private val viewModel by viewModels<DetailViewModel>()
 
     override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
@@ -65,6 +70,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         initTransition()
         super.onCreate(savedInstanceState)
         initView()
+        resolveReferenceExtras()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -249,6 +255,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         binding.tsComponentCount.setText(count.toString())
                         detailFragmentManager.currentItemsCount = count
                     }
+                    detailFragmentManager.selectedPosition = tab.position
                 }
 
                 override fun onTabUnselected(tab: TabLayout.Tab?) { }
@@ -270,5 +277,19 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
             viewModel.initComponentsData(packageName)
         } ?: supportFinishAfterTransition()
+    }
+
+    private fun resolveReferenceExtras() {
+        if (pkgName == null || refName == null || refType == ALL) {
+            return
+        }
+        navigateToReferenceComponentPosition(pkgName!!, refName!!)
+    }
+
+    private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
+        binding.viewpager.currentItem = refType
+        doOnMainThreadIdle({
+            detailFragmentManager.navigateToComponent(refName.removePrefix(packageName))
+        })
     }
 }

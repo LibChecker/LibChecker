@@ -31,6 +31,8 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNative
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
+import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -220,6 +222,20 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
                         show(supportFragmentManager, tag)
                     }
             }
+        }
+        adapter.setOnItemClickListener { _, view, position ->
+            if (AntiShakeUtils.isInvalidClick(view)) {
+                return@setOnItemClickListener
+            }
+
+            val item = (adapter.data[position] as BaseSnapshotNode).item
+            startActivity(Intent(this, AppDetailActivity::class.java).apply {
+                putExtras(Bundle().apply {
+                    putString(EXTRA_PACKAGE_NAME, entity.packageName)
+                    putString(EXTRA_REF_NAME, item.name)
+                    putInt(EXTRA_REF_TYPE, item.itemType)
+                })
+            })
         }
     }
 

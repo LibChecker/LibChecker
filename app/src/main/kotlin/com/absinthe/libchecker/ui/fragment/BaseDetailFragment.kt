@@ -2,6 +2,9 @@ package com.absinthe.libchecker.ui.fragment
 
 import android.content.Context
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
@@ -14,10 +17,11 @@ import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
  * <pre>
- * author : bozhen.zhao
+ * author : Absinthe
  * time : 2020/11/27
  * </pre>
  */
@@ -27,6 +31,8 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by lazy { LibStringAdapter(type) }
     protected var isListReady = false
+
+    abstract fun getRecyclerView(): RecyclerView
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -61,4 +67,35 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     }
 
     fun getItemsCount() = adapter.itemCount
+
+    fun navigateToComponent(component: String) {
+        val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
+        if (componentPosition == -1) {
+            return
+        }
+
+        val first: Int
+        val last: Int
+        when (getRecyclerView().layoutManager) {
+            is LinearLayoutManager -> {
+                first = (getRecyclerView().layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                last = (getRecyclerView().layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+            }
+            is StaggeredGridLayoutManager -> {
+                first = (getRecyclerView().layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
+                last = (getRecyclerView().layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last()
+            }
+            else -> {
+                first = 0
+                last = 0
+            }
+        }
+        val navigateScrollOffset = ((last - first + 1) / 2)
+
+        Timber.d("navigateToComponent: componentPosition = $componentPosition, navigateScrollOffset = $navigateScrollOffset")
+        getRecyclerView().scrollToPosition((componentPosition + navigateScrollOffset).coerceAtMost(adapter.itemCount - 1))
+        adapter.setHighlightBackgroundItem(componentPosition)
+        adapter.notifyDataSetChanged()
+    }
+
 }

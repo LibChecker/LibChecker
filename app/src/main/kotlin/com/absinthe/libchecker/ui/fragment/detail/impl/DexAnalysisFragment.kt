@@ -26,6 +26,8 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
+    override fun getRecyclerView() = binding.list
+
     override fun init() {
         binding.apply {
             list.apply {

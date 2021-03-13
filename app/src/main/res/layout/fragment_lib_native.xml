@@ -12,7 +12,7 @@
         android:clipToPadding="false"
         android:descendantFocusability="beforeDescendants"
         android:overScrollMode="never"
-        android:padding="@dimen/normal_padding"
+        android:paddingTop="@dimen/normal_padding"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/item_lib_string" />
 

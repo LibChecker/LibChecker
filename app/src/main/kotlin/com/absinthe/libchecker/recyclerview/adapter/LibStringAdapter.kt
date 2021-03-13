@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
@@ -25,9 +28,12 @@ import com.google.android.material.chip.Chip
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
 
+private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
 @Xml(layouts = ["item_lib_string"])
 class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
+
+    private var highlightPosition: Int = -1
 
     init {
         addChildClickViewIds(R.id.chip)
@@ -55,6 +61,24 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
             holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item))
         }
 
+        if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
+            if (holder.itemView.background is TransitionDrawable) {
+                (holder.itemView.background as TransitionDrawable).reverseTransition(HIGHLIGHT_TRANSITION_DURATION)
+            }
+            holder.itemView.background = null
+        } else {
+            val drawable = TransitionDrawable(
+                listOf(
+                    ColorDrawable(Color.TRANSPARENT),
+                    ColorDrawable(ContextCompat.getColor(context, R.color.highlightComponent))
+                ).toTypedArray()
+            )
+            holder.itemView.background = drawable
+            if (holder.itemView.background is TransitionDrawable) {
+                (holder.itemView.background as TransitionDrawable).startTransition(HIGHLIGHT_TRANSITION_DURATION)
+            }
+        }
+
         val libIcon = holder.getView<Chip>(R.id.chip)
 
         item.chip?.let {
@@ -76,5 +100,12 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 }
             }
         } ?: let { libIcon.visibility = View.GONE }
+    }
+
+    fun setHighlightBackgroundItem(position: Int) {
+        if (position < 0) {
+            return
+        }
+        highlightPosition = position
     }
 }

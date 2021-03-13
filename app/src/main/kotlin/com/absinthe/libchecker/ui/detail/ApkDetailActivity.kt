@@ -206,6 +206,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                     binding.tsComponentCount.setText(count.toString())
                     detailFragmentManager.currentItemsCount = count
                 }
+                detailFragmentManager.selectedPosition = tab.position
             }
 
             override fun onTabUnselected(tab: TabLayout.Tab?) { }

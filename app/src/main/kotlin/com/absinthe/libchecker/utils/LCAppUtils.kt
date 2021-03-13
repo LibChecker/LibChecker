@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
-import android.util.Log
 import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.LibCheckerApp
@@ -170,7 +169,7 @@ fun doOnMainThreadIdle(action: () -> Unit, timeout: Long? = null) {
                 queue.removeIdleHandler(idleHandler)
                 action()
                 if (BuildConfig.DEBUG) {
-                    Log.d("doOnMainThreadIdle", "${timeout}ms timeout!")
+                    Timber.d("doOnMainThreadIdle: ${timeout}ms timeout!")
                 }
             }, timeout)
         }

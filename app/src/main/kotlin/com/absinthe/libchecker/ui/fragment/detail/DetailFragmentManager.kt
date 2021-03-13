@@ -45,4 +45,8 @@ class DetailFragmentManager {
         GlobalValues.libSortMode.value = mode
         SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, mode)
     }
+
+    fun navigateToComponent(component: String) {
+        currentFragment?.navigateToComponent(component)
+    }
 }
