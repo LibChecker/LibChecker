@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
@@ -227,8 +228,16 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
             if (AntiShakeUtils.isInvalidClick(view)) {
                 return@setOnItemClickListener
             }
+            if (adapter.data[position] is SnapshotTitleNode) {
+                adapter.expandOrCollapse(position)
+                return@setOnItemClickListener
+            }
 
             val item = (adapter.data[position] as BaseSnapshotNode).item
+            if (item.diffType == REMOVED) {
+                return@setOnItemClickListener
+            }
+
             startActivity(Intent(this, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
                     putString(EXTRA_PACKAGE_NAME, entity.packageName)

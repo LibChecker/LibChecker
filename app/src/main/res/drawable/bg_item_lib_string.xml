@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<transition xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- The drawables used here can be solid colors, gradients, shapes, images, etc. -->
-    <item android:drawable="@null" />
-    <item android:drawable="@color/highlightComponent" />
-</transition>
