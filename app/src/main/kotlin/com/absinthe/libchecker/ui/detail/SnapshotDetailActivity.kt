@@ -225,11 +225,11 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
             }
         }
         adapter.setOnItemClickListener { _, view, position ->
-            if (AntiShakeUtils.isInvalidClick(view)) {
-                return@setOnItemClickListener
-            }
             if (adapter.data[position] is SnapshotTitleNode) {
                 adapter.expandOrCollapse(position)
+                return@setOnItemClickListener
+            }
+            if (AntiShakeUtils.isInvalidClick(view)) {
                 return@setOnItemClickListener
             }
 
