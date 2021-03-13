@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.content.res.ColorStateList
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.Typeface
@@ -9,6 +10,7 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -62,10 +64,14 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 visibility = View.VISIBLE
 
                 if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                    val icon = chipIcon
-                    icon?.let {
-                        it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-                        chipIcon = it
+                    if (it.iconRes == R.drawable.ic_sdk_placeholder) {
+                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                    } else {
+                        val icon = chipIcon
+                        icon?.let {
+                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            chipIcon = it
+                        }
                     }
                 }
             }

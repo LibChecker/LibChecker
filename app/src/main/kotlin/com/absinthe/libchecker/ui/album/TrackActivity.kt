@@ -51,7 +51,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.recyclerview.apply {
+        binding.list.apply {
             adapter = this@TrackActivity.adapter
             layoutManager = LinearLayoutManager(this@TrackActivity)
             borderVisibilityChangedListener =

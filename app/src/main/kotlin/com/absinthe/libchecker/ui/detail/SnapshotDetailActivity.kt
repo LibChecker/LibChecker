@@ -121,7 +121,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         }
 
         binding.apply {
-            rvList.apply {
+            list.apply {
                 adapter = this@SnapshotDetailActivity.adapter
                 addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false

@@ -5,6 +5,7 @@ import com.absinthe.libchecker.R
 
 object IconResMap {
     private val MAP = SparseIntArray()
+    private val SINGLE_COLOR_ICON_SET: Set<Int>
 
     init {
         MAP.apply {
@@ -78,8 +79,17 @@ object IconResMap {
             put(66, R.drawable.ic_telegram)
             put(67, R.drawable.ic_lib_ffmpeg)
         }
+
+        SINGLE_COLOR_ICON_SET = setOf(
+            -1, 1, 2, 3, 4, 5, 6, 9, 10, 11, 13, 14, 15, 16, 17,
+            25, 27, 30, 31, 40, 42, 43, 44, 46, 47, 48, 50, 51,
+            52, 53, 54, 55, 56, 59, 63, 64, 66, 67
+        )
     }
 
     fun getResIndex(res: Int) = MAP.keyAt(MAP.indexOfValue(res))
+
     fun getIconRes(index: Int) = MAP.get(index, -1)
+
+    fun isSingleColorIcon(index: Int) = SINGLE_COLOR_ICON_SET.contains(index)
 }

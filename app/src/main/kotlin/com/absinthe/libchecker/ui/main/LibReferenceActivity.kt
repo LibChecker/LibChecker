@@ -105,7 +105,7 @@ class LibReferenceActivity : BaseActivity() {
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             (root as ViewGroup).bringChildToFront(appbar)
 
-            rvList.apply {
+            list.apply {
                 adapter = this@LibReferenceActivity.adapter
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->

@@ -24,7 +24,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/material_black_1000"
+            app:tint="@android:color/black"
             tools:src="@drawable/ic_changed" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:fontFamily="sans-serif-medium"
-            android:textColor="@color/material_black_1000"
+            android:textColor="@android:color/black"
             android:textSize="14sp"
             app:layout_constraintBottom_toTopOf="@id/tv_lib_size"
             app:layout_constraintEnd_toEndOf="parent"
@@ -46,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
-            android:textColor="@color/material_black_1000"
+            android:textColor="@android:color/black"
             android:textSize="12sp"
             app:layout_constraintBottom_toTopOf="@id/chip"
             app:layout_constraintEnd_toEndOf="parent"
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/material_black_1000"
+            android:textColor="@android:color/black"
             android:visibility="gone"
             app:chipStrokeColor="#20000000"
             app:chipStrokeWidth="1dp"

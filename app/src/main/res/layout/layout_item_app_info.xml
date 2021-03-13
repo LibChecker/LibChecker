@@ -18,7 +18,7 @@
         android:scaleType="centerInside"
         tools:backgroundTint="@color/material_purple_300"
         tools:src="@drawable/ic_launch"
-        tools:tint="@color/material_white_1000" />
+        tools:tint="@android:color/white" />
 
     <TextView
         android:id="@+id/tv_name"

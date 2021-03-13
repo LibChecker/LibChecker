@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textAppearance="?attr/textAppearanceBody2"
-            android:textColor="@color/material_black_1000"
+            android:textColor="@android:color/black"
             tools:text="This is a test Toast" />
 
     </FrameLayout>

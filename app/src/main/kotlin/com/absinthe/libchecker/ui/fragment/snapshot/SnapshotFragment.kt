@@ -176,7 +176,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
                 isVisible = false
             }
-            recyclerview.apply {
+            list.apply {
                 adapter = this@SnapshotFragment.adapter
                 borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
@@ -290,7 +290,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
                         doOnMainThreadIdle({
                             if ((requireActivity() as MainActivity).controller is SnapshotFragment
-                                && !binding.recyclerview.canScrollVertically(-1)
+                                && !binding.list.canScrollVertically(-1)
                             ) {
                                 (requireActivity() as MainActivity).showNavigationView()
                                 binding.extendedFab.show()
@@ -325,7 +325,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.recyclerview.layoutManager = getSuitableLayoutManager()
+        binding.list.layoutManager = getSuitableLayoutManager()
     }
 
     private fun flip(child: Int) {
@@ -343,7 +343,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 binding.extendedFab.show()
             }
             binding.loading.pauseAnimation()
-            binding.recyclerview.scrollToPosition(0)
+            binding.list.scrollToPosition(0)
         }
 
         binding.vfContainer.displayedChild = child
@@ -373,7 +373,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     }
 
     override fun onReturnTop() {
-        binding.recyclerview.apply {
+        binding.list.apply {
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }

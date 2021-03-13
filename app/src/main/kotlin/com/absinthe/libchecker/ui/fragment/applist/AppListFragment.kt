@@ -96,7 +96,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
 
         binding.apply {
-            recyclerview.apply {
+            list.apply {
                 adapter = mAdapter
                 borderDelegate = borderViewDelegate
                 layoutManager = getSuitableLayoutManager()
@@ -165,7 +165,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        binding.recyclerview.layoutManager = getSuitableLayoutManager()
+        binding.list.layoutManager = getSuitableLayoutManager()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -361,7 +361,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     flip(VF_LIST)
 
                     if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.recyclerview.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
+                        && binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
                     ) {
                         returnTopOfList()
                     }
@@ -375,7 +375,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun returnTopOfList() {
-        binding.recyclerview.apply {
+        binding.list.apply {
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }
@@ -406,7 +406,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     override fun onReturnTop() {
-        if (binding.recyclerview.canScrollVertically(-1)) {
+        if (binding.list.canScrollVertically(-1)) {
             returnTopOfList()
         } else {
             flip(VF_LOADING)

@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <com.absinthe.libchecker.view.detail.ComponentRecyclerView
-        android:id="@+id/list"
+        android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"

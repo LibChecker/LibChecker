@@ -54,7 +54,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
         layoutManager = LinearLayoutManager(requireContext())
         binding.apply {
-            rvList.apply {
+            list.apply {
                 adapter = this@LibReferenceFragment.adapter
                 layoutManager = this@LibReferenceFragment.layoutManager
                 FastScrollerBuilder(this).useMd2Style().build()
@@ -275,7 +275,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
     }
 
     override fun onReturnTop() {
-        binding.rvList.apply {
+        binding.list.apply {
             if (canScrollVertically(-1)) {
                 smoothScrollToPosition(0)
             }
