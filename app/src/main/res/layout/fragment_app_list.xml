@@ -25,14 +25,11 @@
                 app:lottie_fileName="app_list_loading.json"
                 app:lottie_loop="true" />
 
-            <TextView
-                android:id="@+id/tv_first_tip"
-                android:layout_width="wrap_content"
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progress_indicator"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/app_list_first_tip"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:textSize="18sp" />
+                app:trackCornerRadius="3dp" />
 
         </LinearLayout>
 

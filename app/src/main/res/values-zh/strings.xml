@@ -55,7 +55,6 @@
     <string name="snapshot_empty_list_title">没有变更</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
-    <string name="app_list_first_tip">第一次加载需要一些时间</string>
     <string name="loading">加载中…</string>
     <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
     <string name="string_kotlin_used">使用了 Kotlin</string>

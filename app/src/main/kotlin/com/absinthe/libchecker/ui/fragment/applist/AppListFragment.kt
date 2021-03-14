@@ -22,6 +22,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.STATUS_END
+import com.absinthe.libchecker.annotation.STATUS_NOT_START
+import com.absinthe.libchecker.annotation.STATUS_START
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -37,6 +40,7 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -57,12 +61,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter = AppAdapter()
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
-    private var hasRequestChanges = false
     private var isListReady = false
     private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private lateinit var layoutManager: RecyclerView.LayoutManager
-    private var topListPackageName: String? = null
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
@@ -112,7 +114,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            tvFirstTip.isVisible = isFirstLaunch
+            progressIndicator.isVisible = isFirstLaunch
             loading.enableMergePathsForKitKatAndAbove(true)
         }
 
@@ -257,8 +259,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private fun initObserver() {
         viewModel.apply {
             reloadAppsFlag.observe(viewLifecycleOwner, {
-                if (it && !isInitializngItems) {
-                    binding.tvFirstTip.isVisible = true
+                if (it && appListStatusLiveData.value == STATUS_NOT_START) {
+                    binding.progressIndicator.isVisible = true
                     Once.clearDone(OnceTag.FIRST_LAUNCH)
                     isFirstLaunch = true
                     doOnMainThreadIdle({
@@ -269,30 +271,39 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
 
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
-                if (!isInitializngItems) {
-                    binding.tvFirstTip.isVisible = true
+                if (appListStatusLiveData.value == STATUS_NOT_START) {
+                    binding.progressIndicator.isVisible = true
                     flip(VF_LOADING)
                     initItems()
                 }
                 Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-            } else {
-                initialized = true
             }
 
             dbItems.observe(viewLifecycleOwner, {
-                if (it.isNullOrEmpty() || !initialized) {
+                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START) {
                     return@observe
                 }
                 updateItems(it)
-
-                if (!hasRequestChanges) {
+            })
+            appListStatusLiveData.observe(viewLifecycleOwner, { status ->
+                if (status == STATUS_END) {
+                    dbItems.value?.let { updateItems(it) }
                     viewModel.requestChange()
-                    hasRequestChanges = true
 
                     if (isFirstLaunch) {
-                        binding.tvFirstTip.isGone = true
+                        binding.progressIndicator.apply {
+                            isGone = true
+                            progress = 0
+                        }
                         Once.markDone(OnceTag.FIRST_LAUNCH)
                     }
+                }
+            })
+            initProgressLiveData.observe(viewLifecycleOwner, {
+                if (LCAppUtils.atLeastN()) {
+                    binding.progressIndicator.setProgress(it, true)
+                } else {
+                    binding.progressIndicator.progress = it
                 }
             })
         }
@@ -333,7 +344,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun updateItems(newItems: List<LCItem>) {
-        val list = mAdapter.data
         val filterList = mutableListOf<LCItem>()
 
         GlobalValues.isShowSystemApps.value?.let { isShowSystem ->
@@ -351,27 +361,19 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
 
         mAdapter.setDiffNewData(filterList)
-        if (filterList.isNotEmpty()) {
-            topListPackageName = filterList.first().packageName
-        }
 
-        if (list.isEmpty() || (list.isNotEmpty() && list.first().packageName != topListPackageName)) {
-            doOnMainThreadIdle({
-                try {
-                    flip(VF_LIST)
+        doOnMainThreadIdle({
+            flip(VF_LIST)
 
-                    if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
-                        && binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
-                    ) {
-                        returnTopOfList()
-                    }
+            if (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC
+                && binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
+            ) {
+                returnTopOfList()
+            }
 
-                    menu?.findItem(R.id.search)?.isVisible = true
-                    isListReady = true
-                } catch (ignore: Exception) {
-                }
-            })
-        }
+            menu?.findItem(R.id.search)?.isVisible = true
+            isListReady = true
+        })
     }
 
     private fun returnTopOfList() {
@@ -392,7 +394,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun flip(page: Int) {
-        if (viewModel.isInitializngItems) {
+        if (viewModel.appListStatusLiveData.value == STATUS_START) {
             return
         }
         if (binding.vfContainer.displayedChild != page) {

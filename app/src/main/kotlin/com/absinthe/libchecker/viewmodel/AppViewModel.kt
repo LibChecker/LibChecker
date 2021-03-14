@@ -42,9 +42,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
-    val reloadAppsFlag: MutableLiveData<Boolean> = MutableLiveData(false)
-    var initialized = false
-    var isInitializngItems = false
+    val reloadAppsFlag = MutableLiveData(false)
+    val initProgressLiveData = MutableLiveData(0)
+    val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
 
     private val repository = LibCheckerApp.repository
 
@@ -59,11 +59,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        initialized = false
-        isInitializngItems = true
+        appListStatusLiveData.postValue(STATUS_START)
         repository.deleteAllItems()
+        initProgressLiveData.postValue(0)
 
         var appList: List<ApplicationInfo>?
+        var appNumbers = 0
 
         do {
             appList = try {
@@ -74,6 +75,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 Timber.w(e)
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
+            }?.apply {
+                AppItemRepository.allApplicationInfoItems.postValue(this)
+                appNumbers = this.size
             }
         } while (appList == null)
 
@@ -86,14 +90,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         var lcItem: LCItem
         var count = 0
+        var progressCount = 0
 
         for (info in appList) {
             try {
                 packageInfo = PackageUtils.getPackageInfo(info)
                 versionCode = PackageUtils.getVersionCode(packageInfo)
                 abiType = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                isSystemType =
-                    (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+                isSystemType = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
                 lcItem = LCItem(
@@ -112,8 +116,11 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                 lcItems.add(lcItem)
                 count++
+                progressCount++
+                Timber.d("progress: $progressCount / $appNumbers")
+                initProgressLiveData.postValue(progressCount * 100 / appNumbers)
             } catch (e: Throwable) {
-                e.printStackTrace()
+                Timber.e(e, "initItems")
                 continue
             }
 
@@ -124,17 +131,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        initialized = true
-        isInitializngItems = false
         insert(lcItems)
         lcItems.clear()
+        appListStatusLiveData.postValue(STATUS_END)
 
         timeRecorder.end()
         Timber.d("initItems: END, $timeRecorder")
+        appListStatusLiveData.postValue(STATUS_NOT_START)
     }
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        if (isInitializngItems) {
+        if (appListStatusLiveData.value == STATUS_START) {
             Timber.d("Request change isInitializngItems returns")
             return@launch
         }
@@ -152,6 +159,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
 
         timeRecorder.start()
+        appListStatusLiveData.postValue(STATUS_START)
 
         if (appList.isNullOrEmpty() || needRefresh) {
             do {
@@ -256,11 +264,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             GlobalValues.shouldRequestChange.postValue(true)
         }
 
+        appListStatusLiveData.postValue(STATUS_END)
         timeRecorder.end()
         Timber.d("Request change: END, $timeRecorder")
+        appListStatusLiveData.postValue(STATUS_NOT_START)
 
-        delay(10000)
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+            delay(10000)
             collectPopularLibraries(appList.toList())
             Once.markDone(OnceTag.HAS_COLLECT_LIB)
         }

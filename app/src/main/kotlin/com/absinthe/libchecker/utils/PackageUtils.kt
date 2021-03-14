@@ -92,7 +92,8 @@ object PackageUtils {
             throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
         }
 
-        return LibCheckerApp.context.packageManager?.getInstalledApplications(PackageManager.GET_META_DATA) ?: emptyList()
+        val flag = if (LCAppUtils.atLeastN()) PackageManager.MATCH_UNINSTALLED_PACKAGES else PackageManager.GET_UNINSTALLED_PACKAGES
+        return LibCheckerApp.context.packageManager?.getInstalledApplications(flag) ?: emptyList()
     }
 
     /**

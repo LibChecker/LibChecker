@@ -16,7 +16,6 @@
     <string name="cannot_read">無法獲取</string>
     <string name="unknown">不明</string>
     <string name="empty_list">空清單</string>
-    <string name="app_list_first_tip">第一次載入需要一些時間</string>
     <string name="menu_sort_by_time_desc">按升級時間降序</string>
     <string name="menu_sort_default">預設順序</string>
     <string name="title_statistics_dialog">%s架构的 Apps</string>
