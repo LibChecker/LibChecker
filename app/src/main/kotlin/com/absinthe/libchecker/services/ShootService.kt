@@ -2,6 +2,7 @@ package com.absinthe.libchecker.services
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -22,6 +23,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
@@ -249,11 +251,17 @@ class ShootService : Service() {
     }
 
     private fun initBuilder() {
+        val pi = PendingIntent.getActivity(
+            this, 0, Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
         builder.setContentTitle(getString(R.string.noti_shoot_title))
             .setSmallIcon(R.drawable.ic_logo)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))
             .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setContentIntent(pi)
             .setProgress(0, 0, true)
             .setSilent(true)
             .setOngoing(true)
