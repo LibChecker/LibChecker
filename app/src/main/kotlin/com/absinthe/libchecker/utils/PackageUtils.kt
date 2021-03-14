@@ -28,6 +28,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.java.FreezeUtils
+import com.absinthe.libchecker.java.ManifestReader
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
@@ -229,7 +230,7 @@ object PackageUtils {
             var next: ZipEntry
 
             for (file in it) {
-                if (file.name.startsWith("split_config.arm")) {
+                if (file.name.startsWith("split_config.arm") || file.name.startsWith("split_config.x86")) {
                     try {
                         zipFile = ZipFile(file)
                         entries = zipFile.entries()
@@ -286,7 +287,9 @@ object PackageUtils {
             val zipFile = ZipFile(file)
 
             zipFile.use {
-                if (zipFile.entries().asSequence().any { it.name.startsWith("kotlin/") || it.name.startsWith("META-INF/services/kotlin") }) {
+                if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+                    it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
+                    it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null) {
                     true
                 } else {
                     isKotlinUsedInClassDex(file)
@@ -445,6 +448,9 @@ object PackageUtils {
             .toList()
     }
 
+    private const val use32bitAbiString = "use32bitAbi"
+    private const val multiArchString = "multiArch"
+
     /**
      * Get ABI type of an app
      * @param path Source path of the app
@@ -458,24 +464,14 @@ object PackageUtils {
 
         val file = File(path)
         var zipFile: ZipFile? = null
-        var apkFile: ApkFile? = null
 
         try {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
-            apkFile = ApkFile(file)
+            val demands = ManifestReader.getManifestPropertities(file, listOf(use32bitAbiString, multiArchString).toTypedArray())
 
-            val use32bitAbi = try {
-                apkFile.manifestXml.contains("use32bitAbi=\"true\"", true)
-            } catch (e: Exception) {
-                false
-            }
-
-            val multiArch = try {
-                apkFile.manifestXml.contains("multiArch=\"true\"", true)
-            } catch (e: Exception) {
-                false
-            }
+            val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
+            val multiArch = demands[multiArchString] as? Boolean ?: false
 
             if (use32bitAbi) {
                 abi = when {
@@ -532,7 +528,6 @@ object PackageUtils {
             return ERROR
         } finally {
             zipFile?.close()
-            apkFile?.close()
         }
     }
 
