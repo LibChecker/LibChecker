@@ -284,6 +284,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     return@observe
                 }
                 updateItems(it)
+                viewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
                 if (status == STATUS_END) {
