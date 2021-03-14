@@ -91,7 +91,7 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.36.0")
-val protocVersion by extra("3.15.5")
+val protocVersion by extra("3.15.6")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -104,7 +104,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.0")
+    implementation("androidx.fragment:fragment-ktx:1.3.1")
     implementation("androidx.appcompat:appcompat:1.2.0")
 
     // Lifecycle
@@ -125,7 +125,7 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0-beta02")
     implementation("androidx.browser:browser:1.3.0")
-    implementation("androidx.core:core-ktx:1.5.0-beta02")
+    implementation("androidx.core:core-ktx:1.5.0-beta03")
     implementation("androidx.preference:preference-ktx:1.1.1")
 
     implementation("com.google.android.material:material:1.3.0")
@@ -150,7 +150,7 @@ dependencies {
     implementation("dev.rikka.rikkax.material:material:1.6.0")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
-    implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.1")
+    implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
 
     //XML layout to Java code
     implementation("com.zhangyue.we:x2c-lib:1.0.6")
