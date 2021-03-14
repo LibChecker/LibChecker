@@ -47,6 +47,7 @@ class ClassifyDialogView(context: Context) : LinearLayout(context) {
             layoutManager = LinearLayoutManager(context)
             adapter = this@ClassifyDialogView.adapter
             overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+            isVerticalScrollBarEnabled = false
             setHasFixedSize(true)
             addSystemBarPadding(addStatusBarPadding = false)
             FastScrollerBuilder(this).useMd2Style().build()
