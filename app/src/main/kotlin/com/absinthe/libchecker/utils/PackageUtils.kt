@@ -19,6 +19,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV7_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
+import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
@@ -481,10 +482,10 @@ object PackageUtils {
                 }
             } else if (multiArch) {
                 abi = when {
-                    GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) -> ARMV8
-                    GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) -> X86_64
-                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
-                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86
+                    GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) -> ARMV8 + MULTI_ARCH
+                    GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) -> X86_64 + MULTI_ARCH
+                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7 + MULTI_ARCH
+                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86 + MULTI_ARCH
                     else -> NO_LIBS
                 }
             } else {
@@ -582,7 +583,12 @@ object PackageUtils {
         X86_64 to X86_64_STRING,
         X86 to X86_STRING,
         NO_LIBS to LibCheckerApp.context.getString(R.string.no_libs),
-        ERROR to LibCheckerApp.context.getString(R.string.cannot_read)
+        ERROR to LibCheckerApp.context.getString(R.string.cannot_read),
+        ARMV8 + MULTI_ARCH to "$ARMV8_STRING, multiArch",
+        ARMV7 + MULTI_ARCH to "$ARMV7_STRING, multiArch",
+        ARMV5 + MULTI_ARCH to "$ARMV5_STRING, multiArch",
+        X86_64 + MULTI_ARCH to "$X86_64_STRING, multiArch",
+        X86 + MULTI_ARCH to "$X86_STRING, multiArch",
     )
 
     /**
@@ -590,7 +596,10 @@ object PackageUtils {
      * @param abi ABI type
      * @return ABI string
      */
-    fun getAbiString(abi: Int): String {
+    fun getAbiString(abi: Int, showExtraInfo: Boolean): String {
+        if (!showExtraInfo && abi >= MULTI_ARCH) {
+            return ABI_STRING_MAP[abi - MULTI_ARCH] ?: LibCheckerApp.context.getString(R.string.unknown)
+        }
         return ABI_STRING_MAP[abi] ?: LibCheckerApp.context.getString(R.string.unknown)
     }
 
@@ -599,7 +608,12 @@ object PackageUtils {
         X86_64 to R.drawable.ic_abi_label_64bit,
         ARMV7 to R.drawable.ic_abi_label_32bit,
         ARMV5 to R.drawable.ic_abi_label_32bit,
-        X86 to R.drawable.ic_abi_label_32bit
+        X86 to R.drawable.ic_abi_label_32bit,
+        ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+        X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
+        ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+        ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+        X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit
     )
 
     /**

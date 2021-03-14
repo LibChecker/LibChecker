@@ -11,6 +11,7 @@ object Constants {
     const val NO_LIBS = 3
     const val X86 = 4
     const val X86_64 = 5
+    const val MULTI_ARCH = 10
 
     const val ARMV8_STRING = "arm64-v8a"
     const val ARMV7_STRING = "armeabi-v7a"

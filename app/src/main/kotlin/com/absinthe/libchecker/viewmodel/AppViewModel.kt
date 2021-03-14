@@ -117,7 +117,6 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                 lcItems.add(lcItem)
                 count++
                 progressCount++
-                Timber.d("progress: $progressCount / $appNumbers")
                 initProgressLiveData.postValue(progressCount * 100 / appNumbers)
             } catch (e: Throwable) {
                 Timber.e(e, "initItems")

@@ -149,7 +149,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         holder.setText(R.id.tv_package_name, item.packageName)
         holder.setText(R.id.tv_version, getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)"))
         holder.setText(R.id.tv_target_api, getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s"))
-        holder.setText(R.id.tv_abi, PackageUtils.getAbiString(item.abiDiff.old.toInt()))
+        holder.setText(R.id.tv_abi, PackageUtils.getAbiString(item.abiDiff.old.toInt(), false))
         holder.getView<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))
 
         if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
@@ -157,7 +157,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
             val abiBadgeNewLayout = holder.getView<LinearLayout>(R.id.layout_abi_badge_new)
             abiBadgeNewLayout.isVisible = true
-            abiBadgeNewLayout.findViewById<TextView>(R.id.tv_abi).text = PackageUtils.getAbiString(item.abiDiff.new.toInt())
+            abiBadgeNewLayout.findViewById<TextView>(R.id.tv_abi).text = PackageUtils.getAbiString(item.abiDiff.new.toInt(), false)
             abiBadgeNewLayout.findViewById<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))
         } else {
             holder.getView<TextView>(R.id.tv_arrow).isGone = true

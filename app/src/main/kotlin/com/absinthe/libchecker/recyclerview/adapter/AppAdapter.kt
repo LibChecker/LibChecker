@@ -81,7 +81,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
             setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))
 
-            val spanString = SpannableString("  ${PackageUtils.getAbiString(item.abi.toInt())}, ${PackageUtils.getTargetApiString(item.targetApi)}")
+            val spanString = SpannableString("  ${PackageUtils.getAbiString(item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}")
             ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
                 it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                 val span = CenterAlignImageSpan(it)
