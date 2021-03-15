@@ -14,7 +14,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
-import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
@@ -45,6 +44,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val reloadAppsFlag = MutableLiveData(false)
     val initProgressLiveData = MutableLiveData(0)
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
+    var hasRequestedChange = false
 
     private val repository = LibCheckerApp.repository
 
@@ -187,22 +187,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
-                            do {
-                                abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
-                                lcItem = LCItem(
-                                    it.packageName,
-                                    it.loadLabel(packageManager).toString(),
-                                    packageInfo.versionName ?: "null",
-                                    versionCode,
-                                    packageInfo.firstInstallTime,
-                                    packageInfo.lastUpdateTime,
-                                    (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                                    abi.toShort(),
-                                    PackageUtils.isSplitsApk(packageInfo),
-                                    PackageUtils.isKotlinUsed(packageInfo),
-                                    packageInfo.applicationInfo.targetSdkVersion.toShort()
-                                )
-                            } while (abi == ERROR)
+                            abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
+                            lcItem = LCItem(
+                                it.packageName,
+                                it.loadLabel(packageManager).toString(),
+                                packageInfo.versionName ?: "null",
+                                versionCode,
+                                packageInfo.firstInstallTime,
+                                packageInfo.lastUpdateTime,
+                                (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                                abi.toShort(),
+                                PackageUtils.isSplitsApk(packageInfo),
+                                PackageUtils.isKotlinUsed(packageInfo),
+                                packageInfo.applicationInfo.targetSdkVersion.toShort()
+                            )
                             update(lcItem)
                         }
 
@@ -234,22 +232,20 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         PackageUtils.isKotlinUsed(packageInfo),
                         packageInfo.applicationInfo.targetSdkVersion.toShort()
                     )
-                    do {
-                        abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
-                        lcItem = LCItem(
-                            info.packageName,
-                            info.loadLabel(packageManager).toString(),
-                            packageInfo.versionName ?: "null",
-                            versionCode,
-                            packageInfo.firstInstallTime,
-                            packageInfo.lastUpdateTime,
-                            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                            abi.toShort(),
-                            PackageUtils.isSplitsApk(packageInfo),
-                            PackageUtils.isKotlinUsed(packageInfo),
-                            packageInfo.applicationInfo.targetSdkVersion.toShort()
-                        )
-                    } while (abi == ERROR)
+                    abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                    lcItem = LCItem(
+                        info.packageName,
+                        info.loadLabel(packageManager).toString(),
+                        packageInfo.versionName ?: "null",
+                        versionCode,
+                        packageInfo.firstInstallTime,
+                        packageInfo.lastUpdateTime,
+                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                        abi.toShort(),
+                        PackageUtils.isSplitsApk(packageInfo),
+                        PackageUtils.isKotlinUsed(packageInfo),
+                        packageInfo.applicationInfo.targetSdkVersion.toShort()
+                    )
 
                     insert(lcItem)
                 } catch (e: Exception) {

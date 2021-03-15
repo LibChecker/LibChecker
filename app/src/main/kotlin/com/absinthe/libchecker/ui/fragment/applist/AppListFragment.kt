@@ -289,7 +289,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
                 if (status == STATUS_END) {
                     dbItems.value?.let { updateItems(it) }
-                    viewModel.requestChange()
+                    if (!viewModel.hasRequestedChange) {
+                        viewModel.requestChange()
+                        viewModel.hasRequestedChange = true
+                    }
 
                     if (isFirstLaunch) {
                         binding.progressIndicator.apply {

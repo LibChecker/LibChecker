@@ -83,6 +83,8 @@ class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : B
                             }
                         } else if (IconResMap.isSingleColorIcon(it.iconIndex)) {
                             chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.black))
+                        } else {
+                            setChipIconResource(IconResMap.getIconRes(it.iconIndex))
                         }
                     }
                 } ?: let { chip.isGone = true }
