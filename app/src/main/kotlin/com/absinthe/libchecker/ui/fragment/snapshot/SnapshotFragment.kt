@@ -32,13 +32,14 @@ import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.services.IShootService
-import com.absinthe.libchecker.services.OnShootOverListener
+import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -64,12 +65,22 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     private var shouldCompare = true
 
     private var shootBinder: IShootService? = null
-    private val shootListener = object : OnShootOverListener.Stub() {
+    private val shootListener = object : OnShootListener.Stub() {
         override fun onShootFinished(timestamp: Long) {
             lifecycleScope.launch(Dispatchers.Main) {
                 viewModel.timestamp.value = timestamp
                 compareDiff()
                 shouldCompare = true
+            }
+        }
+
+        override fun onProgressUpdated(progress: Int) {
+            lifecycleScope.launch(Dispatchers.Main) {
+                if (LCAppUtils.atLeastN()) {
+                    binding.progressIndicator.setProgress(progress, true)
+                } else {
+                    binding.progressIndicator.progress = progress
+                }
             }
         }
     }

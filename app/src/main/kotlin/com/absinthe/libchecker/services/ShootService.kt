@@ -46,7 +46,7 @@ class ShootService : Service() {
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
     private val gson = Gson()
     private val repository = LibCheckerApp.repository
-    private val listenerList = RemoteCallbackList<OnShootOverListener>()
+    private val listenerList = RemoteCallbackList<OnShootListener>()
 
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
@@ -54,12 +54,12 @@ class ShootService : Service() {
             GlobalScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
         }
 
-        override fun registerOnShootOverListener(listener: OnShootOverListener?) {
+        override fun registerOnShootOverListener(listener: OnShootListener?) {
             Timber.i("registerOnShootOverListener $listener")
             listener?.let { listenerList.register(listener) }
         }
 
-        override fun unregisterOnShootOverListener(listener: OnShootOverListener?) {
+        override fun unregisterOnShootOverListener(listener: OnShootListener?) {
             Timber.i("unregisterOnShootOverListener $listener")
             listenerList.unregister(listener)
         }
@@ -100,6 +100,18 @@ class ShootService : Service() {
             try {
                 Timber.i("notifyFinished $i")
                 listenerList.getBroadcastItem(i).onShootFinished(timestamp)
+            } catch (e: RemoteException) {
+                Timber.e(e)
+            }
+        }
+        listenerList.finishBroadcast()
+    }
+
+    private fun notifyProgress(progress: Int) {
+        val count = listenerList.beginBroadcast()
+        for (i in 0 until count) {
+            try {
+                listenerList.getBroadcastItem(i).onProgressUpdated(progress)
             } catch (e: RemoteException) {
                 Timber.e(e)
             }
@@ -170,6 +182,7 @@ class ShootService : Service() {
                     )
                 }
                 count++
+                notifyProgress(count * 100 / size)
             } catch (e: Exception) {
                 Timber.e(e)
                 exceptionInfoList.add(info)
@@ -219,6 +232,7 @@ class ShootService : Service() {
                 continue
             }
             count++
+            notifyProgress(count * 100 / size)
         }
 
         builder.setProgress(size, count, false)

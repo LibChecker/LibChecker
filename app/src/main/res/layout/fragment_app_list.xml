@@ -27,9 +27,9 @@
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/progress_indicator"
+                style="@style/GeneralProgressIndicator"
                 android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                app:trackCornerRadius="3dp" />
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

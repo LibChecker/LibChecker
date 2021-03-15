@@ -60,4 +60,9 @@
         <item name="android:windowExitAnimation">@anim/anim_bottom_sheet_slide_down</item>
     </style>
 
+    <style name="GeneralProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+        <item name="android:width">200dp</item>
+        <item name="trackCornerRadius">3dp</item>
+    </style>
+
 </resources>
