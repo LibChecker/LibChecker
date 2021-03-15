@@ -19,7 +19,7 @@ jobs:
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
       - name: Build with Gradle
-        run: bash ./gradlew -PappVerName=${{ env.VERSION }} resguardRelease
+        run: bash ./gradlew -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
         if: success()
         id: sign
