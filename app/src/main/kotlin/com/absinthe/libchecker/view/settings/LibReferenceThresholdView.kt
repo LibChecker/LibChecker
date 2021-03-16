@@ -17,6 +17,7 @@ class LibReferenceThresholdView(context: Context) : ConstraintLayout(context) {
         value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
     }
     val count: TextView = TextView(context).apply {
+        textSize = 16f
         setTypeface(null, Typeface.BOLD)
     }
 

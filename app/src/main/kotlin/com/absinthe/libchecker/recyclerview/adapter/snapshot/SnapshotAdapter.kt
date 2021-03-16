@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -28,6 +29,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+import kotlin.math.abs
 
 const val ARROW = "→"
 
@@ -152,7 +154,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         holder.setText(R.id.tv_abi, PackageUtils.getAbiString(item.abiDiff.old.toInt(), false))
         holder.getView<ImageView>(R.id.iv_abi_type).load(PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))
 
-        if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
+        if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new && abs(item.abiDiff.old - item.abiDiff.new) != Constants.MULTI_ARCH) {
             holder.getView<TextView>(R.id.tv_arrow).isVisible = true
 
             val abiBadgeNewLayout = holder.getView<LinearLayout>(R.id.layout_abi_badge_new)

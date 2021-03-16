@@ -234,7 +234,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
             }
 
             val item = (adapter.data[position] as BaseSnapshotNode).item
-            if (item.diffType == REMOVED) {
+            if (item.diffType == REMOVED || item.itemType == PERMISSION) {
                 return@setOnItemClickListener
             }
 
@@ -254,13 +254,9 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         if (list.isEmpty()) return returnList
 
         if (list[0].itemType == NATIVE) {
-            for (item in list) {
-                returnList.add(SnapshotNativeNode(item))
-            }
+            list.forEach { returnList.add(SnapshotNativeNode(it)) }
         } else {
-            for (item in list) {
-                returnList.add(SnapshotComponentNode(item))
-            }
+            list.forEach { returnList.add(SnapshotComponentNode(it)) }
         }
 
         return returnList
@@ -272,10 +268,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         format: String = "%s"
     ): String {
         return if (diff.old != diff.new && !isNewOrDeleted) {
-            "${String.format(format, diff.old.toString())} $ARROW ${String.format(
-                format,
-                diff.new.toString()
-            )}"
+            "${String.format(format, diff.old.toString())} $ARROW ${String.format(format, diff.new.toString())}"
         } else {
             String.format(format, diff.old.toString())
         }
@@ -288,11 +281,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         format: String = "%s"
     ): String {
         return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-            "${String.format(
-                format,
-                diff1.old.toString(),
-                diff2.old.toString()
-            )} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+            "${String.format(format, diff1.old.toString(), diff2.old.toString())} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
         } else {
             String.format(format, diff1.old.toString(), diff2.old.toString())
         }
