@@ -27,6 +27,7 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
+import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -124,6 +125,8 @@ class ShootService : Service() {
         notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
         initBuilder()
 
+        val timer = TimeRecorder()
+        timer.start()
         val ts = System.currentTimeMillis()
         var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
@@ -250,6 +253,9 @@ class ShootService : Service() {
             .setContentTitle(getString(R.string.noti_shoot_title_saved))
             .setContentText(getFormatDateString(ts))
         notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
+
+        timer.end()
+        Timber.d("computeSnapshots: $timer")
 
         GlobalValues.snapshotTimestamp = ts
         notifyFinished(ts)

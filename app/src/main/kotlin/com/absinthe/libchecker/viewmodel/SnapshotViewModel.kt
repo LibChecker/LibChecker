@@ -19,6 +19,7 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.protobuf.InvalidProtocolBufferException
@@ -50,29 +51,31 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch(Dispatchers.IO) {
+        val timer = TimeRecorder().apply { start() }
         if (currTimeStamp == CURRENT_SNAPSHOT) {
             compareDiffWithApplicationList(preTimeStamp)
         } else {
             compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
         }
+        timer.end()
+        Timber.d("compareDiff: $timer")
     }
 
-    private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) {
         val preList = repository.getSnapshots(preTimeStamp)
         val diffList = mutableListOf<SnapshotDiffItem>()
 
         if (preList.isNullOrEmpty()) {
             snapshotDiffItems.postValue(diffList)
-            return@launch
+            return
         }
 
         val context: Context = getApplication<LibCheckerApp>()
+        val packageManager = context.packageManager
         val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value?.toMutableList() ?: mutableListOf()
-        val removeList = mutableListOf<ApplicationInfo>()
+        val appMap = mutableMapOf<String, ApplicationInfo>()
         val size = appList.size
         var count = 0
-
-        val packageManager = context.packageManager
 
         var packageInfo: PackageInfo
         var versionCode: Long
@@ -80,10 +83,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         var snapshotDiffItem: SnapshotDiffItem
 
         val allTrackItems = repository.getTrackItems()
+        appList.forEach { appMap[it.packageName] = it }
+        appList.clear()
 
         preList.let { dbItems ->
             for (dbItem in dbItems) {
-                appList.find { it.packageName == dbItem.packageName }?.let {
+                appMap[dbItem.packageName]?.let {
                     try {
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
@@ -114,13 +119,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                             diffList.add(snapshotDiffItem)
                         }
-
-                        removeList.add(it)
-                        count++
-                        comparingProgressLiveData.postValue(count * 100 / size)
                     } catch (e: Exception) {
                         Timber.e(e)
-                        removeList.add(it)
+                    } finally {
+                        appMap.remove(it.packageName)
                         count++
                         comparingProgressLiveData.postValue(count * 100 / size)
                     }
@@ -147,10 +149,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 }
             }
 
-            removeList.forEach { appList.remove(it) }
-            removeList.clear()
-
-            for (info in appList) {
+            appMap.forEach { entry ->
+                val info = entry.value
                 try {
                     packageInfo = PackageUtils.getPackageInfo(info)
                     versionCode = PackageUtils.getVersionCode(packageInfo)
@@ -188,113 +188,109 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 } catch (e: Exception) {
                     Timber.e(e)
+                } finally {
                     count++
                     comparingProgressLiveData.postValue(count * 100 / size)
-                    continue
                 }
-                count++
-                comparingProgressLiveData.postValue(count * 100 / size)
             }
         }
 
         snapshotDiffItems.postValue(diffList)
     }
 
-    private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
+    private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
         val preList = repository.getSnapshots(preTimeStamp)
         if (preList.isNullOrEmpty()) {
-            return@launch
+            return
         }
 
         val currList = repository.getSnapshots(currTimeStamp).toMutableList()
         if (currList.isNullOrEmpty()) {
-            return@launch
+            return
         }
 
+        val currMap = mutableMapOf<String, SnapshotItem>()
         val diffList = mutableListOf<SnapshotDiffItem>()
-        val remoteList = mutableListOf<SnapshotItem>()
 
         var compareDiffNode: CompareDiffNode
         var snapshotDiffItem: SnapshotDiffItem
 
-        withContext(Dispatchers.IO) {
-            val allTrackItems = repository.getTrackItems()
+        val allTrackItems = repository.getTrackItems()
 
-            for (preItem in preList) {
-                currList.find { it.packageName == preItem.packageName }?.let {
-                    if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
-                        snapshotDiffItem = SnapshotDiffItem(
-                            packageName = it.packageName,
-                            updateTime = it.lastUpdatedTime,
-                            labelDiff = SnapshotDiffItem.DiffNode(preItem.label, it.label),
-                            versionNameDiff = SnapshotDiffItem.DiffNode(preItem.versionName, it.versionName),
-                            versionCodeDiff = SnapshotDiffItem.DiffNode(preItem.versionCode, it.versionCode),
-                            abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, it.abi),
-                            targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, it.targetApi),
-                            nativeLibsDiff = SnapshotDiffItem.DiffNode(preItem.nativeLibs, it.nativeLibs),
-                            servicesDiff = SnapshotDiffItem.DiffNode(preItem.services, it.services),
-                            activitiesDiff = SnapshotDiffItem.DiffNode(preItem.activities, it.activities),
-                            receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, it.receivers),
-                            providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, it.providers),
-                            permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions),
-                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
-                        )
-                        compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
-                        snapshotDiffItem.added = compareDiffNode.added
-                        snapshotDiffItem.removed = compareDiffNode.removed
-                        snapshotDiffItem.changed = compareDiffNode.changed
-                        snapshotDiffItem.moved = compareDiffNode.moved
+        currList.forEach { currMap[it.packageName] = it }
 
-                        diffList.add(snapshotDiffItem)
-                    }
-                    remoteList.add(it)
-                } ?: run {
-                    diffList.add(
-                        SnapshotDiffItem(
-                            preItem.packageName,
-                            preItem.lastUpdatedTime,
-                            SnapshotDiffItem.DiffNode(preItem.label),
-                            SnapshotDiffItem.DiffNode(preItem.versionName),
-                            SnapshotDiffItem.DiffNode(preItem.versionCode),
-                            SnapshotDiffItem.DiffNode(preItem.abi),
-                            SnapshotDiffItem.DiffNode(preItem.targetApi),
-                            SnapshotDiffItem.DiffNode(preItem.nativeLibs),
-                            SnapshotDiffItem.DiffNode(preItem.services),
-                            SnapshotDiffItem.DiffNode(preItem.activities),
-                            SnapshotDiffItem.DiffNode(preItem.receivers),
-                            SnapshotDiffItem.DiffNode(preItem.providers),
-                            SnapshotDiffItem.DiffNode(preItem.permissions),
-                            deleted = true,
-                            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
-                        )
+        for (preItem in preList) {
+            currMap[preItem.packageName]?.let {
+                if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
+                    snapshotDiffItem = SnapshotDiffItem(
+                        packageName = it.packageName,
+                        updateTime = it.lastUpdatedTime,
+                        labelDiff = SnapshotDiffItem.DiffNode(preItem.label, it.label),
+                        versionNameDiff = SnapshotDiffItem.DiffNode(preItem.versionName, it.versionName),
+                        versionCodeDiff = SnapshotDiffItem.DiffNode(preItem.versionCode, it.versionCode),
+                        abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, it.abi),
+                        targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, it.targetApi),
+                        nativeLibsDiff = SnapshotDiffItem.DiffNode(preItem.nativeLibs, it.nativeLibs),
+                        servicesDiff = SnapshotDiffItem.DiffNode(preItem.services, it.services),
+                        activitiesDiff = SnapshotDiffItem.DiffNode(preItem.activities, it.activities),
+                        receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, it.receivers),
+                        providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, it.providers),
+                        permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions),
+                        isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                     )
+                    compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
+                    snapshotDiffItem.added = compareDiffNode.added
+                    snapshotDiffItem.removed = compareDiffNode.removed
+                    snapshotDiffItem.changed = compareDiffNode.changed
+                    snapshotDiffItem.moved = compareDiffNode.moved
+
+                    diffList.add(snapshotDiffItem)
                 }
-            }
-
-            remoteList.forEach { currList.remove(it) }
-            remoteList.clear()
-
-            for (info in currList) {
+                currMap.remove(it.packageName)
+            } ?: run {
                 diffList.add(
                     SnapshotDiffItem(
-                        info.packageName,
-                        info.lastUpdatedTime,
-                        SnapshotDiffItem.DiffNode(info.label),
-                        SnapshotDiffItem.DiffNode(info.versionName),
-                        SnapshotDiffItem.DiffNode(info.versionCode),
-                        SnapshotDiffItem.DiffNode(info.abi),
-                        SnapshotDiffItem.DiffNode(info.targetApi),
-                        SnapshotDiffItem.DiffNode(info.nativeLibs),
-                        SnapshotDiffItem.DiffNode(info.services),
-                        SnapshotDiffItem.DiffNode(info.activities),
-                        SnapshotDiffItem.DiffNode(info.receivers),
-                        SnapshotDiffItem.DiffNode(info.providers),
-                        SnapshotDiffItem.DiffNode(info.permissions),
-                        newInstalled = true,
-                        isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
+                        preItem.packageName,
+                        preItem.lastUpdatedTime,
+                        SnapshotDiffItem.DiffNode(preItem.label),
+                        SnapshotDiffItem.DiffNode(preItem.versionName),
+                        SnapshotDiffItem.DiffNode(preItem.versionCode),
+                        SnapshotDiffItem.DiffNode(preItem.abi),
+                        SnapshotDiffItem.DiffNode(preItem.targetApi),
+                        SnapshotDiffItem.DiffNode(preItem.nativeLibs),
+                        SnapshotDiffItem.DiffNode(preItem.services),
+                        SnapshotDiffItem.DiffNode(preItem.activities),
+                        SnapshotDiffItem.DiffNode(preItem.receivers),
+                        SnapshotDiffItem.DiffNode(preItem.providers),
+                        SnapshotDiffItem.DiffNode(preItem.permissions),
+                        deleted = true,
+                        isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
                     )
                 )
             }
+        }
+
+        currMap.forEach {
+            val info = it.value
+            diffList.add(
+                SnapshotDiffItem(
+                    info.packageName,
+                    info.lastUpdatedTime,
+                    SnapshotDiffItem.DiffNode(info.label),
+                    SnapshotDiffItem.DiffNode(info.versionName),
+                    SnapshotDiffItem.DiffNode(info.versionCode),
+                    SnapshotDiffItem.DiffNode(info.abi),
+                    SnapshotDiffItem.DiffNode(info.targetApi),
+                    SnapshotDiffItem.DiffNode(info.nativeLibs),
+                    SnapshotDiffItem.DiffNode(info.services),
+                    SnapshotDiffItem.DiffNode(info.activities),
+                    SnapshotDiffItem.DiffNode(info.receivers),
+                    SnapshotDiffItem.DiffNode(info.providers),
+                    SnapshotDiffItem.DiffNode(info.permissions),
+                    newInstalled = true,
+                    isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
+                )
+            )
         }
 
         snapshotDiffItems.postValue(diffList)
