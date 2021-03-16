@@ -310,6 +310,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     }
                 }
             )
+            comparingProgressLiveData.observe(viewLifecycleOwner, {
+                if (LCAppUtils.atLeastN()) {
+                    binding.progressIndicator.setProgress(it, true)
+                } else {
+                    binding.progressIndicator.progress = it
+                }
+            })
         }
 
         lifecycleScope.launchWhenResumed {

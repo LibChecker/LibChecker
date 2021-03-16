@@ -41,6 +41,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
     val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
+    val comparingProgressLiveData = MutableLiveData(0)
 
     private val gson by lazy { Gson() }
 
@@ -68,6 +69,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val context: Context = getApplication<LibCheckerApp>()
         val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value?.toMutableList() ?: mutableListOf()
         val removeList = mutableListOf<ApplicationInfo>()
+        val size = appList.size
+        var count = 0
 
         val packageManager = context.packageManager
 
@@ -113,9 +116,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         }
 
                         removeList.add(it)
+                        count++
+                        comparingProgressLiveData.postValue(count * 100 / size)
                     } catch (e: Exception) {
                         Timber.e(e)
                         removeList.add(it)
+                        count++
+                        comparingProgressLiveData.postValue(count * 100 / size)
                     }
                 } ?: run {
                     diffList.add(
@@ -181,8 +188,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     )
                 } catch (e: Exception) {
                     Timber.e(e)
+                    count++
+                    comparingProgressLiveData.postValue(count * 100 / size)
                     continue
                 }
+                count++
+                comparingProgressLiveData.postValue(count * 100 / size)
             }
         }
 
