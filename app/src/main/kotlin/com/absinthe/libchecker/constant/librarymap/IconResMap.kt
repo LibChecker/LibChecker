@@ -78,6 +78,7 @@ object IconResMap {
             put(65, R.drawable.ic_kotlin_logo)
             put(66, R.drawable.ic_telegram)
             put(67, R.drawable.ic_lib_ffmpeg)
+            put(68, R.drawable.ic_lib_vlc)
         }
 
         SINGLE_COLOR_ICON_SET = setOf(
@@ -89,7 +90,7 @@ object IconResMap {
 
     fun getResIndex(res: Int) = MAP.keyAt(MAP.indexOfValue(res))
 
-    fun getIconRes(index: Int) = MAP.get(index, -1)
+    fun getIconRes(index: Int) = MAP.get(index, R.drawable.ic_sdk_placeholder)
 
     fun isSingleColorIcon(index: Int) = SINGLE_COLOR_ICON_SET.contains(index)
 }

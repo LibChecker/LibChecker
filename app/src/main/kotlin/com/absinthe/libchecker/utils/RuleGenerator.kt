@@ -6,7 +6,6 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.protocol.CloudRule
 import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.protocol.CloudRulesList
-import timber.log.Timber
 
 object RuleGenerator {
     fun generateRulesByteArray(): ByteArray {
@@ -49,8 +48,6 @@ object RuleGenerator {
 //            regexName = ""
 //        }
 //        newRules.add(ruleBuilder.build())
-
-        Timber.d("RuleGenerator",newRules.size.toString())
 
         rulesListBuilder.addAllCloudRules(newRules)
         bundleBuilder.rulesList = rulesListBuilder.build()
