@@ -20,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-condensed-medium"
+        android:gravity="center"
         android:textSize="9sp"
         tools:ignore="SmallSp"
         tools:text="armeabi-v7a" />
