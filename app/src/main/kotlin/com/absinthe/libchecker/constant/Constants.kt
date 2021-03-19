@@ -41,6 +41,7 @@ object Constants {
     const val PREF_LOCAL_RESTORE = "localRestore"
 
     const val PREF_LOCAL_RULES_VERSION = "localRulesVersion"
+    const val PREF_LOCALE = "locale"
 
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_TARGET_API_DESC = 1

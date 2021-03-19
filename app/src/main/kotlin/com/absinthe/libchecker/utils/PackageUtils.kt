@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -576,31 +577,35 @@ object PackageUtils {
         return NO_LIBS
     }
 
-    private val ABI_STRING_MAP = hashMapOf(
-        ARMV8 to ARMV8_STRING,
-        ARMV7 to ARMV7_STRING,
-        ARMV5 to ARMV5_STRING,
-        X86_64 to X86_64_STRING,
-        X86 to X86_STRING,
-        NO_LIBS to LibCheckerApp.context.getString(R.string.no_libs),
-        ERROR to LibCheckerApp.context.getString(R.string.cannot_read),
-        ARMV8 + MULTI_ARCH to "$ARMV8_STRING, multiArch",
-        ARMV7 + MULTI_ARCH to "$ARMV7_STRING, multiArch",
-        ARMV5 + MULTI_ARCH to "$ARMV5_STRING, multiArch",
-        X86_64 + MULTI_ARCH to "$X86_64_STRING, multiArch",
-        X86 + MULTI_ARCH to "$X86_STRING, multiArch",
+    private val ABI_STRING_RES_MAP = hashMapOf(
+        ARMV8 to listOf(R.string.arm64_v8a),
+        ARMV7 to listOf(R.string.armeabi_v7a),
+        ARMV5 to listOf(R.string.armeabi),
+        X86_64 to listOf(R.string.x86_64),
+        X86 to listOf(R.string.x86),
+        NO_LIBS to listOf(R.string.no_libs),
+        ERROR to listOf(R.string.cannot_read),
+        ARMV8 + MULTI_ARCH to listOf(R.string.arm64_v8a, R.string.multiArch),
+        ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
+        ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
+        X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
+        X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
     )
 
     /**
      * Get ABI string from ABI type
+     * @param context Context
      * @param abi ABI type
+     * @param showExtraInfo show "multiArch" etc. if is true
      * @return ABI string
      */
-    fun getAbiString(abi: Int, showExtraInfo: Boolean): String {
-        if (!showExtraInfo && abi >= MULTI_ARCH) {
-            return ABI_STRING_MAP[abi - MULTI_ARCH] ?: LibCheckerApp.context.getString(R.string.unknown)
+    fun getAbiString(context: Context, abi: Int, showExtraInfo: Boolean): String {
+        val resList = if (!showExtraInfo && abi >= MULTI_ARCH) {
+            ABI_STRING_RES_MAP[abi - MULTI_ARCH] ?: listOf(R.string.unknown)
+        } else {
+            ABI_STRING_RES_MAP[abi] ?: listOf(R.string.unknown)
         }
-        return ABI_STRING_MAP[abi] ?: LibCheckerApp.context.getString(R.string.unknown)
+        return resList.joinToString { context.getString(it) }
     }
 
     private val ABI_BADGE_MAP = hashMapOf(

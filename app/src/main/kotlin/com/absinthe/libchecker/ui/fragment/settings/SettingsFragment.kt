@@ -5,12 +5,14 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -32,12 +34,14 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
 import rikka.recyclerview.addVerticalPadding
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
+import java.util.*
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
@@ -97,6 +101,21 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 true
             }
         }
+        val languagePreference = (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                if (newValue is String) {
+                    val locale: Locale = if ("SYSTEM" == newValue) {
+                        LocaleDelegate.systemLocale
+                    } else {
+                        Locale.forLanguageTag(newValue)
+                    }
+                    LocaleDelegate.defaultLocale = locale
+                    GlobalValues.locale = locale
+                    activity?.recreate()
+                }
+                true
+            }
+        }!!
         findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
             setOnPreferenceClickListener {
                 CloudRulesDialogFragment().show(requireActivity().supportFragmentManager, tag)
@@ -176,6 +195,38 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
                 true
             }
+        }
+
+        val tag = languagePreference.value
+        val index = listOf(*languagePreference.entryValues).indexOf(tag)
+        val localeName: MutableList<String> = ArrayList()
+        val localeNameUser: MutableList<String> = ArrayList()
+        val userLocale = GlobalValues.locale
+        for (i in 1 until languagePreference.entries.size) {
+            val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
+            localeName.add(if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(locale))
+            localeNameUser.add(if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(userLocale) else locale.getDisplayName(userLocale))
+        }
+
+        for (i in 1 until languagePreference.entries.size) {
+            if (index != i) {
+                languagePreference.entries[i] = HtmlCompat.fromHtml(
+                    String.format(
+                        "%s - %s",
+                        localeName[i - 1],
+                        localeNameUser[i - 1]
+                    ), HtmlCompat.FROM_HTML_MODE_LEGACY
+                )
+            } else {
+                languagePreference.entries[i] = localeNameUser[i - 1]
+            }
+        }
+
+        if (TextUtils.isEmpty(tag) || "SYSTEM" == tag) {
+            languagePreference.summary = getString(R.string.follow_system)
+        } else if (index != -1) {
+            val name = localeNameUser[index - 1]
+            languagePreference.summary = name
         }
     }
 

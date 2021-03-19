@@ -9,7 +9,7 @@
     <string name="loading">Loading…</string>
     <string name="channel_shoot">Save snapshots</string>
     <string name="noti_shoot_title">Saving current snapshot</string>
-    <string name="noti_shoot_title_saved">Snapshot saved</string>
+    <string name="noti_shoot_title_saved">A snapshot has saved</string>
 
     <!--  App list  -->
     <string name="menu_search">Search</string>
@@ -51,11 +51,11 @@
     <!--  About  -->
     <string name="settings_about">About</string>
     <string name="settings_rate_us">Rate us</string>
-    <string name="settings_rate_us_summary">This can make us discover by more people</string>
+    <string name="settings_rate_us_summary">This can make us found by more people</string>
     <string name="settings_about_summary">This is LibChecker!</string>
     <string name="about_info">This app is used to view the third-party libraries used by applications in your device.</string>
     <string name="toolbar_rate">Rate</string>
-    <string name="resource_declaration">Part of the resources in the application are comes from: </string>
+    <string name="resource_declaration">Part of the resources in the application comes from: </string>
     <string name="library_declaration">All marked libraries information in LibChecker comes from the development documentation or code repository of the SDK to which it belongs. If the information is incorrect, please contact: absinthe@absinthe.life</string>
 
     <!--  Settings  -->
@@ -68,11 +68,12 @@
     <string name="colorful_icon">Colorful Icon</string>
     <string name="rules_repo_title">Rules Repo</string>
     <string name="lib_ref_threshold">Library Reference Threshold</string>
+    <string name="languages">Languages</string>
     <string name="reload_apps">Reload Apps List</string>
     <string name="help_docs">Help Docs</string>
     <string name="join_telegram_group">Communication</string>
-    <string name="anonymous_statistics">Anonymous statistics</string>
-    <string name="cloud_rules">Cloud rules</string>
+    <string name="anonymous_statistics">Anonymous Statistics</string>
+    <string name="cloud_rules">Cloud Rules</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
     <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
@@ -91,7 +92,7 @@
     <string name="create_an_issue">Assist us to supplement the information</string>
     <string name="app_bundle" translatable="false">App Bundles</string>
     <string name="app_bundle_details">The Android App Bundle is Android\'s new, official publishing format that offers a more efficient way to build and release your app. The Android App Bundle lets you more easily deliver a great experience in a smaller app size, which can improve install success and reduce uninstalls. It\'s easy to switch. You don\'t need to refactor your code to start benefiting from a smaller app. And once you\'ve switched, you\'ll benefit from modular app development and customizable feature delivery.</string>
-    <string name="kotlin_used" translatable="false">Kotlin used</string>
+    <string name="kotlin_used">Kotlin used</string>
     <string name="kotlin_details">Kotlin is a cross-platform, statically typed, general-purpose programming language with type inference. Kotlin is designed to interoperate fully with Java, and the JVM version of Kotlin\'s standard library depends on the Java Class Library, but type inference allows its syntax to be more concise.</string>
     <string name="kotlin_string" translatable="false">Kotlin</string>
     <string name="items_count">Items count: </string>
@@ -142,16 +143,16 @@
     <string name="album_item_track_title">Track</string>
     <string name="album_item_track_subtitle">Select applications to force a comparison change</string>
     <string name="album_backup">Backup</string>
-    <string name="album_backup_summary">Back up all snapshots</string>
+    <string name="album_backup_summary">Backup all snapshots</string>
     <string name="album_restore">Restore</string>
     <string name="album_restore_summary">Restore snapshots from backup file</string>
     <string name="album_click_to_choose">Click to Choose</string>
     <string name="album_dialog_delete_snapshot_message">Processing…</string>
 
     <!--  Integration  -->
-    <string name="integration_monkey_king_menu_block">Block this via \"MonkeyKing Purify\"</string>
-    <string name="integration_monkey_king_menu_unblock">Unblock this via \"MonkeyKing Purify\"</string>
-    <string name="integration_anywhere_menu_editor">Open in \"Anywhere- Editor\"</string>
+    <string name="integration_monkey_king_menu_block">Block it via \"MonkeyKing Purify\"</string>
+    <string name="integration_monkey_king_menu_unblock">Unblock it via \"MonkeyKing Purify\"</string>
+    <string name="integration_anywhere_menu_editor">Open it in \"Anywhere- Editor\"</string>
 
     <!--  Cloud rules  -->
     <string name="rules_local_repo_version">Local repo version</string>

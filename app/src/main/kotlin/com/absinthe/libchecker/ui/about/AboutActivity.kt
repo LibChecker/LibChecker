@@ -109,6 +109,9 @@ class AboutActivity : AbsAboutActivity() {
             add(Category("Other Works"))
             addAll(Absinthe.getAboutPageRecommendedApps(this@AboutActivity, BuildConfig.APPLICATION_ID))
 
+            add(Category("Contribution"))
+            add(Contributor(0/*TODO*/, "Telegram @tommynok", "Russian Translation", "https://t.me/tommynok"))
+
             val list = listOf(
                 "https://www.iconfont.cn/",
                 "https://lottiefiles.com/22122-fanimation",

@@ -125,4 +125,6 @@
     <string name="menu_sort_by_target_api_desc">按 Target API 降序</string>
     <string name="menu_filter">過濾</string>
     <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
+    <string name="kotlin_used">使用了 Kotlin</string>
+    <string name="languages">語言</string>
 </resources>

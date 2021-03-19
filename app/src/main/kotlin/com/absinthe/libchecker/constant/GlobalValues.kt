@@ -11,6 +11,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import java.util.*
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
@@ -52,7 +53,8 @@ object GlobalValues {
     val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
     val isShowEntryAnimation: MutableLiveData<Boolean> = MutableLiveData(false)
-//        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, false))
+
+    //        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, false))
     val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
     val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
@@ -78,4 +80,17 @@ object GlobalValues {
     }
 
     var debugMode: Boolean = false
+
+    var locale: Locale = Locale.getDefault()
+        get() {
+            val tag = getPreferences().getString(Constants.PREF_LOCALE, null)
+            if (tag.isNullOrEmpty() || "SYSTEM" == tag) {
+                return Locale.getDefault()
+            }
+            return Locale.forLanguageTag(tag)
+        }
+        set(value) {
+            field = value
+            getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
+        }
 }

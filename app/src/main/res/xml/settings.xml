@@ -43,6 +43,15 @@
             app:entries="@array/list_repo"
             app:entryValues="@array/list_repo_value"/>
 
+        <rikka.preference.SimpleMenuPreference
+            app:key="locale"
+            app:title="@string/languages"
+            app:summary="%s"
+            app:icon="@drawable/ic_language"
+            app:defaultValue="SYSTEM"
+            app:entries="@array/language"
+            app:entryValues="@array/language_value"/>
+
         <Preference
             app:key="cloudRules"
             app:title="@string/cloud_rules"
