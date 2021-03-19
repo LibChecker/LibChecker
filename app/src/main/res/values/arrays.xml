@@ -20,7 +20,7 @@
 
     <string-array name="language_value" translatable="false">
         <item>SYSTEM</item>
-        <item>en</item>
+        <item>en-US</item>
         <item>zh-CN</item>
         <item>zh-TW</item>
         <item>ru-RU</item>
