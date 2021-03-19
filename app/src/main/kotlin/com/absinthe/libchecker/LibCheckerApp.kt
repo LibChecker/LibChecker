@@ -41,6 +41,7 @@ class LibCheckerApp : Application() {
 
         Utility.init(this)
         LocaleDelegate.defaultLocale = GlobalValues.locale
+        Timber.d("GlobalValues.locale = ${GlobalValues.locale}")
         DayNightDelegate.setApplicationContext(this)
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)
