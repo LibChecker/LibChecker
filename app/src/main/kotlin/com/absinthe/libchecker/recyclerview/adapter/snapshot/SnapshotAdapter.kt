@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -15,61 +14,46 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.zhangyue.we.x2c.X2C
 import com.zhangyue.we.x2c.ano.Xml
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import me.zhanghai.android.appiconloader.AppIconLoader
 import kotlin.math.abs
 
 const val ARROW = "→"
 
 @Xml(layouts = ["item_snapshot"])
-class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
-    private val iconSize by lazy { context.resources.getDimensionPixelSize(R.dimen.app_icon_size) }
-    private val iconLoader by lazy { AppIconLoader(iconSize, false,context) }
-    private val iconMap = mutableMapOf<String, Bitmap>()
+    private var loadIconJob: Job? = null
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(X2C.inflate(context, R.layout.item_snapshot, parent, false))
     }
 
     override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
-        holder.getView<ImageView>(R.id.iv_icon).apply {
-            tag = item.packageName
-            iconMap[item.packageName]?.let {
-                load(it) {
-                    crossfade(true)
-                }
-            } ?: let {
-                GlobalScope.launch(Dispatchers.IO) {
-                    val bitmap = try {
-                        iconLoader.loadIcon(PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo)
-                    } catch (e: PackageManager.NameNotFoundException) {
-                        ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
-                            setTint(ContextCompat.getColor(context, R.color.textNormal))
-                        }?.toBitmap(iconSize, iconSize)
-                    }
-                    withContext(Dispatchers.Main) {
-                        findViewWithTag<ImageView>(item.packageName)?.let {
-                            load(bitmap) {
-                                crossfade(true)
-                            }
-                        }
-                    }
-                    if (bitmap != null) {
-                        iconMap[item.packageName] = bitmap
-                    }
+        holder.getView<ImageView>(R.id.iv_icon).let { icon ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val ai = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
+                    val drawable = ai.loadIcon(context.packageManager)
+                    icon.post { icon.setImageDrawable(drawable) }
+                    loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+                } catch (e: PackageManager.NameNotFoundException) {
+                    ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
+                        setTint(ContextCompat.getColor(context, R.color.textNormal))
+                    }?.toBitmap(40.dp, 40.dp)
                 }
             }
         }
@@ -168,7 +152,9 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
     }
 
     fun release() {
-        iconMap.forEach { it.value.recycle() }
+        if (loadIconJob?.isActive == true) {
+            loadIconJob?.cancel()
+        }
     }
 
     private fun <T> getDiffString(diff: SnapshotDiffItem.DiffNode<T>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {

@@ -81,10 +81,5 @@ class AppItemView(context: Context) : MaterialCardView(context) {
             versionInfo.layout(appName.left, packageName.bottom)
             abiInfo.layout(appName.left, versionInfo.bottom)
         }
-
-        override fun onDetachedFromWindow() {
-            super.onDetachedFromWindow()
-            icon.setImageBitmap(null)
-        }
     }
 }

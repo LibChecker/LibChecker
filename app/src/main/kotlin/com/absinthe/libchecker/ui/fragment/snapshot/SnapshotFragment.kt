@@ -55,7 +55,7 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
-    private val adapter = SnapshotAdapter()
+    private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
     private var dropPrevious = false

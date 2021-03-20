@@ -61,6 +61,11 @@ object LCAppUtils {
         }
     }
 
+    @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
+    fun atLeastR(): Boolean {
+        return Build.VERSION.SDK_INT >= 30
+    }
+
     @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.P)
     fun atLeastP(): Boolean {
         return Build.VERSION.SDK_INT >= 28
