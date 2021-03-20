@@ -1,9 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
@@ -11,7 +8,6 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
@@ -19,46 +15,46 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.detail.ComponentLibItemView
+import com.absinthe.libchecker.view.detail.NativeLibItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import com.google.android.material.chip.Chip
-import com.zhangyue.we.x2c.X2C
-import com.zhangyue.we.x2c.ano.Xml
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
-@Xml(layouts = ["item_lib_string"])
 class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
 
     private var highlightPosition: Int = -1
 
-    init {
-        addChildClickViewIds(R.id.chip)
-    }
-
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(X2C.inflate(context, R.layout.item_lib_string, parent, false))
+        return when (type) {
+            NATIVE -> createBaseViewHolder(NativeLibItemView(context))
+            else -> createBaseViewHolder(ComponentLibItemView(context))
+        }
     }
 
     override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
-        val shouldHideSize = item.item.size == 0L && type != NATIVE
-
-        if (item.item.source == DISABLED) {
+        val itemName = if (item.item.source == DISABLED) {
             val sp = SpannableString(item.item.name)
             sp.setSpan(StrikethroughSpan(), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sp.setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            holder.setText(R.id.tv_name, sp)
+            sp
         } else {
-            holder.setText(R.id.tv_name, item.item.name)
+            item.item.name
         }
 
-        holder.setGone(R.id.tv_lib_size, shouldHideSize)
-
-        if (!shouldHideSize) {
-            holder.setText(R.id.tv_lib_size, PackageUtils.sizeToString(item.item))
+        if (type == NATIVE) {
+            (holder.itemView as NativeLibItemView).apply {
+                libName.text = itemName
+                libSize.text = PackageUtils.sizeToString(item.item)
+                setChip(item.chip)
+            }
+        } else {
+            (holder.itemView as ComponentLibItemView).apply {
+                libName.text = itemName
+                setChip(item.chip)
+            }
         }
 
         if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
@@ -78,28 +74,6 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 (holder.itemView.background as TransitionDrawable).startTransition(HIGHLIGHT_TRANSITION_DURATION)
             }
         }
-
-        val libIcon = holder.getView<Chip>(R.id.chip)
-
-        item.chip?.let {
-            libIcon.apply {
-                setChipIconResource(it.iconRes)
-                text = it.name
-                visibility = View.VISIBLE
-
-                if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                    if (it.iconRes == R.drawable.ic_sdk_placeholder) {
-                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
-                    } else {
-                        val icon = chipIcon
-                        icon?.let {
-                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-                            chipIcon = it
-                        }
-                    }
-                }
-            }
-        } ?: let { libIcon.visibility = View.GONE }
     }
 
     fun setHighlightBackgroundItem(position: Int) {

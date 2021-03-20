@@ -3,6 +3,7 @@ package com.absinthe.libchecker.view.detail
 import android.content.Context
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.widget.TextSwitcher
@@ -36,8 +37,8 @@ class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
                 LayoutParams.MATCH_PARENT,
                 LayoutParams.MATCH_PARENT
             )
-            textSize = 16f
             gravity = Gravity.START or Gravity.CENTER
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
             setTypeface(null, Typeface.BOLD)
             setTextColor(ContextCompat.getColor(context, R.color.textNormal))
         }

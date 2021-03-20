@@ -23,8 +23,8 @@ import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.extensions.isShowing
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.view.IntegerFormatter
-import com.absinthe.libchecker.view.OsVersionAxisFormatter
+import com.absinthe.libchecker.view.statistics.IntegerFormatter
+import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.manager.SystemBarManager

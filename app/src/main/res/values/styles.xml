@@ -65,4 +65,15 @@
         <item name="trackCornerRadius">3dp</item>
     </style>
 
+    <style name="DetailNativeLibItemName" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/textNormal</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DetailNativeLibItemSize" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
 </resources>

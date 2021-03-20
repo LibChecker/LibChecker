@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.statistics
 
 import android.app.ActivityOptions
 import android.content.Context

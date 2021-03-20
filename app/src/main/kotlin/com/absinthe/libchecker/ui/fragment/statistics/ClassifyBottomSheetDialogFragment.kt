@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetNoBindingDialogFragment
-import com.absinthe.libchecker.view.ClassifyDialogView
+import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
