@@ -5,46 +5,52 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.text.SpannableString
 import android.text.style.ImageSpan
+import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import com.zhangyue.we.x2c.X2C
-import com.zhangyue.we.x2c.ano.Xml
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 
-@Xml(layouts = ["item_app"])
-class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
+class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
     private val iconLoader by lazy { AppIconLoader(context.resources.getDimensionPixelSize(R.dimen.app_icon_size), false, context) }
     private val iconMap = mutableMapOf<String, Bitmap>()
     var highlightText: String = ""
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(X2C.inflate(context, R.layout.item_app, parent, false))
+        return createBaseViewHolder(
+            AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+                layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
+                    it.setMargins(margin, margin, margin, margin)
+                }
+            }
+        )
     }
 
     override fun convert(holder: BaseViewHolder, item: LCItem) {
-        holder.apply {
-            getView<ImageView>(R.id.iv_icon).apply {
+        (holder.itemView as AppItemView).container.apply {
+            icon.apply {
                 tag = item.packageName
                 iconMap[item.packageName]?.let {
                     load(it)
                 } ?: let {
-                    GlobalScope.launch(Dispatchers.IO) {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         var applicationInfo: ApplicationInfo? = null
                         val bitmap = try {
                             applicationInfo = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
@@ -69,17 +75,17 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
             }
 
             if (highlightText.isNotBlank()) {
-                getView<TextView>(R.id.tv_app_name).tintHighlightText(highlightText, item.label)
+                appName.tintHighlightText(highlightText, item.label)
             } else {
-                setText(R.id.tv_app_name, item.label)
+                appName.text = item.label
             }
             if (highlightText.isNotBlank()) {
-                getView<TextView>(R.id.tv_package_name).tintHighlightText(highlightText, item.packageName)
+                packageName.tintHighlightText(highlightText, item.packageName)
             } else {
-                setText(R.id.tv_package_name, item.packageName)
+                packageName.text = item.packageName
             }
 
-            setText(R.id.tv_version, PackageUtils.getVersionString(item.versionName, item.versionCode))
+            versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 
             val spanString = SpannableString("  ${PackageUtils.getAbiString(context, item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}")
             ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
@@ -88,8 +94,7 @@ class AppAdapter : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
                 spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
             }
 
-            setText(R.id.tv_abi_and_api, spanString)
-            itemView.transitionName = item.packageName
+            abiInfo.text = spanString
         }
     }
 

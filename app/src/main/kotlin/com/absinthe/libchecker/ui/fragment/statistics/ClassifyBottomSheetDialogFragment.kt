@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetNoBindingDialogFragment
@@ -16,7 +17,7 @@ const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetNoBindingDialogFragment() {
 
     var item: ArrayList<LCItem> = ArrayList()
-    private val dialogView by lazy { ClassifyDialogView(requireContext()) }
+    private val dialogView by lazy { ClassifyDialogView(requireContext(), lifecycleScope) }
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
     private var mListener: OnDismissListener? = null
 

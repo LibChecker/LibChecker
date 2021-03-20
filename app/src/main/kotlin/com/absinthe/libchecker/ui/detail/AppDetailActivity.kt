@@ -20,11 +20,8 @@ import coil.load
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.extensions.finishCompat
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
@@ -75,17 +72,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            finishCompat()
+            finish()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-            supportFinishAfterTransition()
-        } else {
-            super.onBackPressed()
-        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

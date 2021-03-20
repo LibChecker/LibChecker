@@ -20,7 +20,6 @@ object Constants {
     const val X86_64_STRING = "x86_64"
 
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
-    const val PREF_ENTRY_ANIMATION = "entryAnimation"
     const val PREF_APK_ANALYTICS = "apkAnalytics"
     const val PREF_RULES_REPO = "rulesRepository"
     const val PREF_COLORFUL_ICON = "colorfulIcon"

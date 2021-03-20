@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.main
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -17,7 +16,6 @@ import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.isOrientationLandscape
 import com.absinthe.libchecker.extensions.paddingTopCompat
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -37,7 +35,7 @@ const val EXTRA_REF_TYPE = "REF_TYPE"
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
-    private val adapter = AppAdapter()
+    private val adapter by lazy { AppAdapter(lifecycleScope) }
     private val viewModel by viewModels<LibReferenceViewModel>()
     private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
     private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
@@ -156,16 +154,7 @@ class LibReferenceActivity : BaseActivity() {
                     putInt(EXTRA_REF_TYPE, refType)
                 })
             }
-
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                this, view, view.transitionName
-            )
-
-            if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                startActivity(intent, options.toBundle())
-            } else {
-                startActivity(intent)
-            }
+            startActivity(intent)
         }
     }
 }

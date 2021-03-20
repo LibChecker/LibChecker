@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.applist
 
 import android.annotation.SuppressLint
-import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
@@ -18,6 +17,7 @@ import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -58,7 +58,7 @@ const val VF_LIST = 1
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
     private val viewModel by activityViewModels<AppViewModel>()
-    private val mAdapter = AppAdapter()
+    private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var isListReady = false
     private var menu: Menu? = null
@@ -81,16 +81,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         putString(EXTRA_PACKAGE_NAME, mAdapter.getItem(position).packageName)
                     })
                 }
-
-                val options = ActivityOptions.makeSceneTransitionAnimation(
-                    requireActivity(), view, view.transitionName
-                )
-
-                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                    startActivity(intent, options.toBundle())
-                } else {
-                    startActivity(intent)
-                }
+                startActivity(intent)
             }
             setDiffCallback(AppListDiffUtil())
             setHasStableIds(true)

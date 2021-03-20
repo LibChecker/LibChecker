@@ -13,13 +13,6 @@
             app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="entryAnimation"-->
-<!--            app:title="@string/entry_animation"-->
-<!--            app:summary="@string/entry_animation_summary"-->
-<!--            app:icon="@drawable/ic_animation"-->
-<!--            app:defaultValue="false"/>-->
-
         <SwitchPreferenceCompat
             app:key="apkAnalytics"
             app:title="@string/apk_analytics"

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.album
 
-import android.app.ActivityOptions
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -15,12 +14,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
@@ -189,15 +186,7 @@ class ComparisonActivity : BaseActivity() {
                     })
                 }
 
-                val options = ActivityOptions.makeSceneTransitionAnimation(
-                    this@ComparisonActivity, view, view.transitionName
-                )
-
-                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                    startActivity(intent, options.toBundle())
-                } else {
-                    startActivity(intent)
-                }
+                startActivity(intent)
             }
         }
 

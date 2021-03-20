@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
-import android.app.ActivityOptions
 import android.app.Service
 import android.content.ComponentName
 import android.content.Intent
@@ -27,7 +26,6 @@ import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -235,16 +233,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         putSerializable(EXTRA_ENTITY, getItem(position))
                     })
                 }
-
-                val options = ActivityOptions.makeSceneTransitionAnimation(
-                    requireActivity(), view, view.transitionName
-                )
-
-                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                    startActivity(intent, options.toBundle())
-                } else {
-                    startActivity(intent)
-                }
+                startActivity(intent)
             }
         }
 

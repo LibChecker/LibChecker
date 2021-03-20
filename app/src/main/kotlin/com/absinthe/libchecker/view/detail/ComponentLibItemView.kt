@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
@@ -27,10 +29,12 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
         setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     }
 
-    val libName = AppCompatTextView(ContextThemeWrapper(context, R.style.DetailNativeLibItemName)).apply {
+    val libName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
             it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
         }
+        setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         addView(this)
     }
 
@@ -70,7 +74,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
-        val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.paddingEnd - chipWidth
+        val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
         libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
         setMeasuredDimension(measuredWidth, (libName.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(40.dp))
     }

@@ -15,8 +15,8 @@ class ToastView(context: Context) : AViewGroup(context) {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         maxWidth = 300.dp
         gravity = Gravity.CENTER
-        setTextColor(Color.BLACK)
         setTextAppearance(android.R.style.TextAppearance_Material_Body2)
+        setTextColor(Color.BLACK)
         val padding = 12.dp
         setPadding(padding, padding, padding, padding)
         setBackgroundResource(R.drawable.bg_toast)

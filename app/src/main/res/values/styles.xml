@@ -65,15 +65,25 @@
         <item name="trackCornerRadius">3dp</item>
     </style>
 
-    <style name="DetailNativeLibItemName" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif-medium</item>
-        <item name="android:textColor">@color/textNormal</item>
-        <item name="android:textSize">14sp</item>
+    <style name="TextView.SansSerif" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif</item>
     </style>
 
-    <style name="DetailNativeLibItemSize" parent="Widget.MaterialComponents.TextView">
+    <style name="TextView.SansSerifMedium" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="TextView.SansSerifCondensed" parent="Widget.MaterialComponents.TextView">
         <item name="fontFamily">sans-serif-condensed</item>
-        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextView.SansSerifCondensedMedium" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif-condensed-medium</item>
+    </style>
+
+    <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">3dp</item>
+        <item name="cardElevation">1dp</item>
     </style>
 
 </resources>

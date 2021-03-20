@@ -19,11 +19,8 @@ import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
-import com.absinthe.libchecker.extensions.finishCompat
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
@@ -77,17 +74,9 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-            supportFinishAfterTransition()
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
-            finishCompat()
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }
