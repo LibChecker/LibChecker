@@ -39,7 +39,6 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -76,11 +75,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         override fun onProgressUpdated(progress: Int) {
             lifecycleScope.launch(Dispatchers.Main) {
-                if (LCAppUtils.atLeastN()) {
-                    binding.progressIndicator.setProgress(progress, true)
-                } else {
-                    binding.progressIndicator.progress = progress
-                }
+                binding.progressIndicator.setProgressCompat(progress, true)
             }
         }
     }
@@ -311,11 +306,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             )
             comparingProgressLiveData.observe(viewLifecycleOwner, {
-                if (LCAppUtils.atLeastN()) {
-                    binding.progressIndicator.setProgress(it, true)
-                } else {
-                    binding.progressIndicator.progress = it
-                }
+                binding.progressIndicator.setProgressCompat(it, true)
             })
         }
 

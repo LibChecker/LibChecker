@@ -40,7 +40,6 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -304,11 +303,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             })
             initProgressLiveData.observe(viewLifecycleOwner, {
-                if (LCAppUtils.atLeastN()) {
-                    binding.progressIndicator.setProgress(it, true)
-                } else {
-                    binding.progressIndicator.progress = it
-                }
+                binding.progressIndicator.setProgressCompat(it, true)
             })
         }
 
