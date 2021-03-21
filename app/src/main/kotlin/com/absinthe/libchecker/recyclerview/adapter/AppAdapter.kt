@@ -42,7 +42,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
         (holder.itemView as AppItemView).container.apply {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    val ai = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
+                    val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
                     val drawable = ai.loadIcon(context.packageManager)
                     icon.post { icon.setImageDrawable(drawable) }
                     loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)

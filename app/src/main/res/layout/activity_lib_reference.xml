@@ -55,8 +55,7 @@
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
             app:borderTopVisibility="whenTop"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_lib_reference" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </ViewFlipper>
 

@@ -95,7 +95,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 startActivity(intent)
             }
             setOnItemChildClickListener { _, view, position ->
-                if (view.id == R.id.iv_icon) {
+                if (view.id == android.R.id.icon) {
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
                     val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName

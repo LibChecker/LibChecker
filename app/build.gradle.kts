@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.google.protobuf.gradle.*
+import java.nio.file.Paths
 
 plugins {
     id("com.android.application")
@@ -73,16 +74,61 @@ android {
         excludes += "kotlin/**"
         excludes += "org/**"
         excludes += "**.properties"
-        excludes += "DebugProbesKt.bin"
+        excludes += "**.bin"
     }
 
-    applicationVariants.all { variant ->
-        variant.outputs
-            .map { it as BaseVariantOutputImpl }
-            .forEach { output ->
-                output.outputFileName = "LibChecker-${variant.versionName}.apk"
-            }
-        true
+    dependenciesInfo.includeInApk = false
+
+    applicationVariants.all {
+        outputs.map { it as BaseVariantOutputImpl }.forEach { output ->
+            output.outputFileName = "LibChecker-${versionName}-${versionCode}-${buildType.name}.apk"
+        }
+    }
+}
+
+val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
+    val aapt2 = Paths.get(
+        project.android.sdkDirectory.path,
+        "build-tools",
+        project.android.buildToolsVersion,
+        "aapt2"
+    )
+    val mapping = Paths.get(
+        project.buildDir.path,
+        "outputs",
+        "mapping",
+        "release",
+        "shortening.txt"
+    )
+    val zip = Paths.get(
+        project.buildDir.path,
+        "intermediates",
+        "shrunk_processed_res",
+        "release",
+        "resources-release-stripped.ap_"
+    )
+    val optimized = File("${zip}.opt")
+    val cmd = exec {
+        commandLine(
+            aapt2, "optimize",
+            "--collapse-resource-names",
+            "--enable-sparse-encoding",
+            "--shorten-resource-paths",
+            "--resource-path-shortening-map", mapping,
+            "-o", optimized,
+            zip
+        )
+        isIgnoreExitValue = false
+    }
+    if (cmd.exitValue == 0) {
+        delete(zip)
+        optimized.renameTo(zip.toFile())
+    }
+}
+
+tasks.whenTaskAdded {
+    if (name == "shrinkReleaseRes") {
+        finalizedBy(optimizeReleaseRes)
     }
 }
 
