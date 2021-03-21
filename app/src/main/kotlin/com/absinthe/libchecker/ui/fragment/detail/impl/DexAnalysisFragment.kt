@@ -73,12 +73,6 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
                 Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
                 true
             }
-            setOnItemChildClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemChildClickListener
-                }
-                openLibDetailDialog(position)
-            }
             setDiffCallback(LibStringDiffUtil())
 
             dexEmptyLayoutBinding.text.text = getString(R.string.loading)

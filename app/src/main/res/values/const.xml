@@ -1,3 +1,9 @@
 <resources>
     <string name="application_id" translatable="false">com.absinthe.libchecker</string>
+    <string name="arm64_v8a" translatable="false">arm64-v8a</string>
+    <string name="armeabi_v7a" translatable="false">armeabi-v7a</string>
+    <string name="armeabi" translatable="false">armeabi</string>
+    <string name="x86" translatable="false">x86</string>
+    <string name="x86_64" translatable="false">x86_64</string>
+    <string name="multiArch" translatable="false">multiArch</string>
 </resources>

@@ -41,7 +41,7 @@
                     tools:background="@drawable/pic_splash"
                     tools:ignore="HardcodedText" />
 
-                <com.absinthe.libchecker.view.AlwaysMarqueeTextView
+                <com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
                     android:id="@+id/tv_app_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

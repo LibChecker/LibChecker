@@ -19,7 +19,6 @@ import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
-import com.absinthe.libraries.utils.extensions.logd
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -32,7 +31,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
     private lateinit var binding: ActivityTrackBinding
     private val repository = LibCheckerApp.repository
-    private val adapter = TrackAdapter()
+    private val adapter by lazy { TrackAdapter(lifecycleScope) }
     private val list = mutableListOf<TrackListItem>()
     private var menu: Menu? = null
     private var isListReady = false
@@ -79,13 +78,13 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             }
 
             setOnItemClickListener { _, view, position ->
-                view.findViewById<SwitchMaterial>(R.id.track_switch).apply {
+                view.findViewById<SwitchMaterial>(android.R.id.toggle).apply {
                     isChecked = !isChecked
                     doSaveItemState(position, isChecked)
                 }
             }
             setOnItemChildClickListener { _, view, position ->
-                if (view.id == R.id.track_switch) {
+                if (view.id == android.R.id.toggle) {
                     doSaveItemState(position, (view as SwitchMaterial).isChecked)
                 }
             }
@@ -95,7 +94,6 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
         AppItemRepository.allApplicationInfoItems.observe(this, { appList ->
             lifecycleScope.launch(Dispatchers.IO) {
                 val trackedList = repository.getTrackItems()
-                logd(trackedList.toString())
                 list.addAll(appList
                     .asSequence()
                     .map {
@@ -121,6 +119,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
 
     override fun onDestroy() {
         super.onDestroy()
+        adapter.release()
         AppItemRepository.allApplicationInfoItems.removeObservers(this)
     }
 

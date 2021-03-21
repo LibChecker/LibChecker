@@ -38,6 +38,11 @@ jobs:
         with:
           name: snapshot
           path: ${{ steps.sign.outputs.signedReleaseFile }}
+      - name: Upload mappings
+        uses: actions/upload-artifact@v2
+        with:
+          name: mappings
+          path: "app/build/outputs/mapping/release"
       - name: Send commit to telegram
         uses: appleboy/telegram-action@master
         with:

@@ -3,11 +3,9 @@ package com.absinthe.libchecker.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
-import android.view.LayoutInflater
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.StringRes
-import com.absinthe.libchecker.R
+import com.absinthe.libchecker.view.app.ToastView
 import java.lang.ref.WeakReference
 
 /**
@@ -36,17 +34,16 @@ object Toasty {
 
     @SuppressLint("InflateParams")
     private fun show(context: Context, message: String, duration: Int) {
-        val weakCtx = WeakReference(context)
-        val view = LayoutInflater.from(weakCtx.get()).inflate(R.layout.layout_toast, null)
+        WeakReference(context).get()?.let {
+            val view = ToastView(it).apply {
+                this.message.text = message
+            }
 
-        view.findViewById<TextView>(R.id.message).apply {
-            text = message
+            Toast(it).apply {
+                setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
+                this.duration = duration
+                this.view = view
+            }.show()
         }
-
-        Toast(context).apply {
-            setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
-            this.duration = duration
-            this.view = view
-        }.show()
     }
 }

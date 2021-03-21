@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
 import android.os.RemoteCallbackList
@@ -45,6 +46,7 @@ class ShootService : Service() {
 
     private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
+    private val configuration by lazy { Configuration(resources.configuration).apply { setLocale(GlobalValues.locale) } }
     private val gson = Gson()
     private val repository = LibCheckerApp.repository
     private val listenerList = RemoteCallbackList<OnShootListener>()
@@ -72,6 +74,7 @@ class ShootService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
         showNotification()
     }
 
@@ -85,7 +88,7 @@ class ShootService : Service() {
 
         notificationManager.apply {
             if (LCAppUtils.atLeastO()) {
-                val name = getString(R.string.channel_shoot)
+                val name = createConfigurationContext(configuration).resources.getString(R.string.channel_shoot)
                 val importance = NotificationManager.IMPORTANCE_DEFAULT
                 val mChannel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
                 createNotificationChannel(mChannel)
@@ -250,7 +253,7 @@ class ShootService : Service() {
 
         builder.setProgress(0, 0, false)
             .setOngoing(false)
-            .setContentTitle(getString(R.string.noti_shoot_title_saved))
+            .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
             .setContentText(getFormatDateString(ts))
         notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
 
@@ -276,7 +279,7 @@ class ShootService : Service() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }, PendingIntent.FLAG_IMMUTABLE
         )
-        builder.setContentTitle(getString(R.string.noti_shoot_title))
+        builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
             .setSmallIcon(R.drawable.ic_logo)
             .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
             .setColor(ContextCompat.getColor(this, R.color.colorPrimary))

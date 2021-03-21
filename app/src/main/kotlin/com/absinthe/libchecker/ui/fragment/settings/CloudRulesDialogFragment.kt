@@ -70,8 +70,10 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                                 bundlesCount = it.bundles
                             } catch (e: Exception) {
                                 Timber.e(e)
-                                withContext(Dispatchers.Main) {
-                                    Toasty.show(requireContext(), R.string.toast_cloud_rules_update_error)
+                                context?.let {
+                                    withContext(Dispatchers.Main) {
+                                        Toasty.show(it, R.string.toast_cloud_rules_update_error)
+                                    }
                                 }
                             }
                         }
@@ -111,8 +113,10 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                             }
                         } catch (e: Exception) {
                             Timber.e(e)
-                            withContext(Dispatchers.Main) {
-                                Toasty.show(requireContext(), R.string.toast_cloud_rules_update_error)
+                            context?.let {
+                                withContext(Dispatchers.Main) {
+                                    Toasty.show(it, R.string.toast_cloud_rules_update_error)
+                                }
                             }
                         }
                     }

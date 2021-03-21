@@ -19,10 +19,11 @@
 
         <TextView
             android:id="@+id/tv_snapshot_timestamp_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:text="@string/snapshot_current_timestamp"
+            app:layout_constraintEnd_toStartOf="@id/ll_indicator"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,11 +51,12 @@
 
         <TextView
             android:id="@+id/tv_snapshot_apps_count_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:fontFamily="sans-serif"
             android:text="@string/snapshot_apps_count"
+            app:layout_constraintEnd_toStartOf="@id/ll_indicator"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_snapshot_timestamp_text" />
 
@@ -68,45 +70,48 @@
             app:layout_constraintTop_toBottomOf="@id/tv_snapshot_apps_count_title"
             tools:text="117" />
 
-        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
-            android:id="@+id/indicator_added"
+        <LinearLayout
+            android:id="@+id/ll_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:icon="@drawable/ic_add"
-            app:indicator="@color/material_green_300"
+            android:gravity="end"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:text="@string/snapshot_indicator_added" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
-            android:id="@+id/indicator_removed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_remove"
-            app:indicator="@color/material_red_300"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/indicator_added"
-            app:text="@string/snapshot_indicator_removed" />
+            <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+                android:id="@+id/indicator_added"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_add"
+                app:indicator="@color/material_green_300"
+                app:text="@string/snapshot_indicator_added" />
 
-        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
-            android:id="@+id/indicator_changed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_changed"
-            app:indicator="@color/material_yellow_300"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/indicator_removed"
-            app:text="@string/snapshot_indicator_changed" />
+            <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+                android:id="@+id/indicator_removed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_remove"
+                app:indicator="@color/material_red_300"
+                app:text="@string/snapshot_indicator_removed" />
 
-        <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
-            android:id="@+id/indicator_moved"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_move"
-            app:indicator="@color/material_blue_300"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/indicator_changed"
-            app:text="@string/snapshot_indicator_moved" />
+            <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+                android:id="@+id/indicator_changed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_changed"
+                app:indicator="@color/material_yellow_300"
+                app:text="@string/snapshot_indicator_changed" />
+
+            <com.absinthe.libchecker.view.snapshot.SnapshotClassIndicatorView
+                android:id="@+id/indicator_moved"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_move"
+                app:indicator="@color/material_blue_300"
+                app:text="@string/snapshot_indicator_moved" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -124,12 +124,6 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 doOnLongClick(getItem(position).item.name)
                 true
             }
-            setOnItemChildClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemChildClickListener
-                }
-                openLibDetailDialog(position)
-            }
             setDiffCallback(LibStringDiffUtil())
             emptyLayoutBinding.text.text = getString(R.string.loading)
             setEmptyView(emptyLayoutBinding.root)

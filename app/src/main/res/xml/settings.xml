@@ -13,13 +13,6 @@
             app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
-<!--        <SwitchPreferenceCompat-->
-<!--            app:key="entryAnimation"-->
-<!--            app:title="@string/entry_animation"-->
-<!--            app:summary="@string/entry_animation_summary"-->
-<!--            app:icon="@drawable/ic_animation"-->
-<!--            app:defaultValue="false"/>-->
-
         <SwitchPreferenceCompat
             app:key="apkAnalytics"
             app:title="@string/apk_analytics"
@@ -42,6 +35,15 @@
             app:defaultValue="gitee"
             app:entries="@array/list_repo"
             app:entryValues="@array/list_repo_value"/>
+
+        <rikka.preference.SimpleMenuPreference
+            app:key="locale"
+            app:title="@string/languages"
+            app:summary="%s"
+            app:icon="@drawable/ic_language"
+            app:defaultValue="SYSTEM"
+            app:entries="@array/language"
+            app:entryValues="@array/language_value"/>
 
         <Preference
             app:key="cloudRules"

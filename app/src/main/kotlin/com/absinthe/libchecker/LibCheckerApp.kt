@@ -17,6 +17,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
 import jonathanfinerty.once.Once
 import rikka.material.app.DayNightDelegate
+import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
 class LibCheckerApp : Application() {
@@ -39,6 +40,8 @@ class LibCheckerApp : Application() {
         }
 
         Utility.init(this)
+        LocaleDelegate.defaultLocale = GlobalValues.locale
+        Timber.d("GlobalValues.locale = ${GlobalValues.locale}")
         DayNightDelegate.setApplicationContext(this)
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)

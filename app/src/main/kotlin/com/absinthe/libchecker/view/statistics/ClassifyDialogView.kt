@@ -1,45 +1,36 @@
-package com.absinthe.libchecker.view
+package com.absinthe.libchecker.view.statistics
 
-import android.app.ActivityOptions
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
-class ClassifyDialogView(context: Context) : LinearLayout(context) {
+@SuppressLint("ViewConstructor")
+class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) : LinearLayout(context) {
 
-    var adapter = AppAdapter()
+    val adapter by lazy { AppAdapter(lifecycleScope) }
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         paddingTopCompat = 16.dp
         clipToPadding = false
 
-        adapter.setOnItemClickListener { _, view, position ->
+        adapter.setOnItemClickListener { _, _, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
                     putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
                 })
             }
-
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                (context as AppCompatActivity), view, view.transitionName
-            )
-
-            if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                context.startActivity(intent, options.toBundle())
-            } else {
-                context.startActivity(intent)
-            }
+            context.startActivity(intent)
         }
 
         val rvList = RecyclerView(context).apply {

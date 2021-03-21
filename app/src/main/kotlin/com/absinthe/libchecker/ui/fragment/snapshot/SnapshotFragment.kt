@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
-import android.app.ActivityOptions
 import android.app.Service
 import android.content.ComponentName
 import android.content.Intent
@@ -27,7 +26,6 @@ import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -39,7 +37,6 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -58,7 +55,7 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
-    private val adapter = SnapshotAdapter()
+    private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
     private var dropPrevious = false
@@ -76,11 +73,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         override fun onProgressUpdated(progress: Int) {
             lifecycleScope.launch(Dispatchers.Main) {
-                if (LCAppUtils.atLeastN()) {
-                    binding.progressIndicator.setProgress(progress, true)
-                } else {
-                    binding.progressIndicator.progress = progress
-                }
+                binding.progressIndicator.setProgressCompat(progress, true)
             }
         }
     }
@@ -240,16 +233,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         putSerializable(EXTRA_ENTITY, getItem(position))
                     })
                 }
-
-                val options = ActivityOptions.makeSceneTransitionAnimation(
-                    requireActivity(), view, view.transitionName
-                )
-
-                if (GlobalValues.isShowEntryAnimation.valueUnsafe) {
-                    startActivity(intent, options.toBundle())
-                } else {
-                    startActivity(intent)
-                }
+                startActivity(intent)
             }
         }
 
@@ -311,11 +295,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             )
             comparingProgressLiveData.observe(viewLifecycleOwner, {
-                if (LCAppUtils.atLeastN()) {
-                    binding.progressIndicator.setProgress(it, true)
-                } else {
-                    binding.progressIndicator.progress = it
-                }
+                binding.progressIndicator.setProgressCompat(it, true)
             })
         }
 

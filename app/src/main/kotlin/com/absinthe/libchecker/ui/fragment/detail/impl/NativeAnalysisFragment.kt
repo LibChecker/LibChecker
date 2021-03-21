@@ -73,12 +73,6 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
                 Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
                 true
             }
-            setOnItemChildClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemChildClickListener
-                }
-                openLibDetailDialog(position)
-            }
             setDiffCallback(LibStringDiffUtil())
 
             emptyLayoutBinding.text.text = getString(R.string.loading)

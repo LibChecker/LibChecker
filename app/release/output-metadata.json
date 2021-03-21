@@ -10,9 +10,9 @@
     {
       "type": "SINGLE",
       "filters": [],
-      "versionCode": 554,
-      "versionName": "2.0.2.d16303c",
-      "outputFile": "app-release.apk"
+      "versionCode": 601,
+      "versionName": "2.0.7.8016482",
+      "outputFile": "LibChecker-2.0.7.8016482-601-release.apk"
     }
   ]
 }

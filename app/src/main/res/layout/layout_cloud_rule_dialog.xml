@@ -42,9 +42,10 @@
                 tools:text="1" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed-medium"
+                android:gravity="center"
                 android:text="@string/rules_local_repo_version"
                 app:layout_constraintEnd_toEndOf="@id/tv_local_rules_version"
                 app:layout_constraintStart_toStartOf="@id/tv_local_rules_version"
@@ -74,9 +75,10 @@
 
             <TextView
                 android:id="@+id/tv_remote_repo_title"
-                android:layout_width="wrap_content"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed-medium"
+                android:gravity="center"
                 android:text="@string/rules_remote_repo_version"
                 app:layout_constraintEnd_toEndOf="@id/tv_remote_rules_version"
                 app:layout_constraintStart_toStartOf="@id/tv_remote_rules_version"
