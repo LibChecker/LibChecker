@@ -295,7 +295,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 }
             )
             comparingProgressLiveData.observe(viewLifecycleOwner, {
-                binding.progressIndicator.setProgressCompat(it, true)
+                binding.progressIndicator.setProgressCompat(it, it != 1)
             })
         }
 

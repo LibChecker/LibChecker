@@ -25,8 +25,8 @@
     <string name="uncharted_territory">Неизученная территория</string>
     <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
 
-    <string name="menu_sort_by_time_desc">По убыванию по времени обновления</string>
-    <string name="menu_sort_by_target_api_desc">По убыванию по целевой API</string>
+    <string name="menu_sort_by_time_desc">По времени обновления ↓</string>
+    <string name="menu_sort_by_target_api_desc">По целевой API ↓</string>
     <string name="menu_sort_default">По умолчанию</string>
 
     <!-- Statistics   -->
@@ -50,7 +50,7 @@
     <!--  About  -->
     <string name="settings_about">О приложении</string>
     <string name="settings_rate_us">Оценить приложение</string>
-    <string name="settings_rate_us_summary">Это может сделать нас открытыми для большего числа людей</string>
+    <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
     <string name="settings_about_summary">Это LibChecker!</string>
     <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
     <string name="toolbar_rate">Оценка</string>
@@ -79,7 +79,7 @@
     <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
     <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
     <string name="reload_apps_summary">Попробуйте, если список приложений отображается неправильно</string>
-    <string name="help_docs_summary">Узнайте, как использовать LibChecker</string>
+    <string name="help_docs_summary">Ознакомтесь, как использовать LibChecker</string>
     <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
     <string name="anonymous_statistics_summary">Мы используем Microsoft AppCenter для анонимной отправки наиболее часто используемых помеченных библиотек и некоторых данных о привычках использования, чтобы сделать LibChecker более практичным.</string>
     <string name="cloud_rules_summary">Обновите последние отмеченные правила библиотеки здесь</string>
@@ -113,14 +113,14 @@
     <string name="snapshot_indicator_changed">Изменено</string>
     <string name="snapshot_indicator_moved">Перемещено</string>
     <string name="snapshot_empty_list_title">Нет изменений</string>
-    <string name="snapshot_empty_list_subtitle">Кажется, что нет никаких изменений в компонентах приложения, но много чего могло произойти внутри.</string>
+    <string name="snapshot_empty_list_subtitle">Кажется, что нет никаких изменений в компонентах приложения, но внутри приложения могли произойти значительные изменения.</string>
     <string name="snapshot_detail_new_install_title">Это приложение недавно установлено</string>
     <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
 
     <!--  Dialog  -->
     <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>
     <string name="dialog_subtitle_reload_apps">Это может занять несколько секунд</string>
-    <string name="dialog_title_change_timestamp">Change time node</string>
+    <string name="dialog_title_change_timestamp">Выбор временного узла</string>
     <string name="dialog_title_keep_previous_snapshot">Внимание</string>
     <string name="dialog_message_keep_previous_snapshot">Вы хотите сохранить предыдущий снимок?</string>
     <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
@@ -153,6 +153,6 @@
     <string name="rules_local_repo_version">Версия локального репозитория</string>
     <string name="rules_remote_repo_version">Версия удаленного репозитория</string>
     <string name="rules_btn_update">Обновить</string>
-    <string name="languages">Языки</string>
+    <string name="languages">Язык</string>
 
 </resources>

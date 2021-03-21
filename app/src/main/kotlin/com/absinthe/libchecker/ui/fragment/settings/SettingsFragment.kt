@@ -41,6 +41,7 @@ import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
+import timber.log.Timber
 import java.util.*
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
@@ -63,13 +64,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 true
             }
         }
-//        (findPreference(Constants.PREF_ENTRY_ANIMATION) as SwitchPreference).apply {
-//            setOnPreferenceChangeListener { _, newValue ->
-//                GlobalValues.isShowEntryAnimation.value = newValue as Boolean
-//                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ENTRY_ANIMATION", newValue))
-//                true
-//            }
-//        }
         (findPreference<SwitchPreferenceCompat>(Constants.PREF_APK_ANALYTICS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 val flag = if (newValue as Boolean) {
@@ -110,6 +104,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                         Locale.forLanguageTag(newValue)
                     }
                     LocaleDelegate.defaultLocale = locale
+                    Timber.d("Locale = $locale")
                     activity?.recreate()
                 }
                 true
