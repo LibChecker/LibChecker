@@ -85,6 +85,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
                     holder.itemView.backgroundTintList = null
                     versionInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
                     targetApiInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+                    abiInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
                 }
             }
 

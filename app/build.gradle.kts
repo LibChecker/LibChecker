@@ -198,10 +198,6 @@ dependencies {
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
 
-    //XML layout to Java code
-    implementation("com.zhangyue.we:x2c-lib:1.0.6")
-    annotationProcessor("com.zhangyue.we:x2c-apt:1.1.2")
-
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
