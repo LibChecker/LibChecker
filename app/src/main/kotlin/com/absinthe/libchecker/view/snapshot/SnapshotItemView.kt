@@ -99,7 +99,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
-            redMask?.autoMeasure()
             val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
             appName.measure(textWidth.toExactlyMeasureSpec(), appName.defaultHeightMeasureSpec(this))
             packageName.measure(textWidth.toExactlyMeasureSpec(), packageName.defaultHeightMeasureSpec(this))
@@ -116,7 +115,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
                                 abiInfo.measuredHeight +
                                 paddingBottom)
             )
-            stateIndicator.autoMeasure()
+            stateIndicator.measure((measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec(), stateIndicator.defaultHeightMeasureSpec(this))
+            redMask?.autoMeasure()
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -126,7 +126,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             versionInfo.layout(appName.left, packageName.bottom)
             targetApiInfo.layout(appName.left, versionInfo.bottom)
             abiInfo.layout(appName.left, targetApiInfo.bottom)
-            stateIndicator.layout(paddingEnd, 0, fromRight = true)
+            stateIndicator.layout(paddingEnd, (measuredHeight - stateIndicator.measuredHeight) / 2, fromRight = true)
             redMask?.layout(0, 0)
         }
     }
