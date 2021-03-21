@@ -115,7 +115,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
                                 abiInfo.measuredHeight +
                                 paddingBottom)
             )
-            stateIndicator.measure((measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec(), stateIndicator.defaultHeightMeasureSpec(this))
+            stateIndicator.measure(stateIndicator.defaultWidthMeasureSpec(this), (measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec())
             redMask?.autoMeasure()
         }
 
