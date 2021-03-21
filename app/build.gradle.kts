@@ -126,11 +126,12 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
     }
 }
 
-tasks.whenTaskAdded {
-    if (name == "shrinkReleaseRes") {
-        finalizedBy(optimizeReleaseRes)
-    }
-}
+// Disable it because it crashes on API 23
+//tasks.whenTaskAdded {
+//    if (name == "shrinkReleaseRes") {
+//        finalizedBy(optimizeReleaseRes)
+//    }
+//}
 
 configurations.all {
     exclude(group = "dev.rikka.rikkax.appcompat", module = "appcompat")
@@ -146,7 +147,7 @@ dependencies {
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.2.0")
 
-    val appCenterSdkVersion = "4.1.0"
+    val appCenterSdkVersion = "4.1.1"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
@@ -192,7 +193,7 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
 //    implementation("rikka.appcompat:appcompat:1.2.0-rc01")
-    implementation("dev.rikka.rikkax.core:core:1.3.0")
+    implementation("dev.rikka.rikkax.core:core:1.3.1")
     implementation("dev.rikka.rikkax.material:material:1.6.0")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")

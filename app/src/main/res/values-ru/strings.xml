@@ -12,9 +12,9 @@
     <string name="noti_shoot_title_saved">Снимок сохранен</string>
 
     <!--  App list  -->
-    <string name="menu_search">Search</string>
-    <string name="menu_sort">Sort</string>
-    <string name="menu_filter">Filter</string>
+    <string name="menu_search">Поиск</string>
+    <string name="menu_sort">Сортировка</string>
+    <string name="menu_filter">Фильтр</string>
     <string name="search_hint">Поиск…</string>
     <string name="string_64_bit">64bit</string>
     <string name="string_32_bit">32bit</string>
@@ -30,10 +30,10 @@
     <string name="menu_sort_default">По умолчанию</string>
 
     <!-- Statistics   -->
-    <string name="title_statistics_dialog">Apps with %s ABI</string>
+    <string name="title_statistics_dialog">Приложения с %s ABI</string>
     <string name="title_statistics_dialog_no_native_libs">Приложения без нативных библиотек</string>
     <string name="tab_chart">Диаграмма</string>
-    <string name="tab_lib_reference_statistics">Lib reference</string>
+    <string name="tab_lib_reference_statistics">Ссылка на библиотеку</string>
     <string name="not_marked_lib">Не отмеченная библиотека</string>
 
     <string name="ref_category_all">Все</string>
@@ -42,7 +42,7 @@
     <string name="ref_category_activity">Активити</string>
     <string name="ref_category_br">Широковещательные приемники</string>
     <string name="ref_category_cp">Поставщики контента</string>
-    <string name="ref_category_perm">Permissions</string>
+    <string name="ref_category_perm">Разрешения</string>
 
     <string name="string_kotlin_used">Используется Kotlin</string>
     <string name="string_kotlin_unused">Kotlin не используется</string>
@@ -53,7 +53,7 @@
     <string name="settings_rate_us_summary">Это может сделать нас открытыми для большего числа людей</string>
     <string name="settings_about_summary">Это LibChecker!</string>
     <string name="about_info">Это приложение используется для просмотра сторонних библиотек, используемых приложениями на вашем устройстве.</string>
-    <string name="toolbar_rate">Rate</string>
+    <string name="toolbar_rate">Оценка</string>
     <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
     <string name="library_declaration">Вся информация о отмеченных библиотеках в LibChecker берется из документации для разработчиков или из репозитория кода SDK, которому он принадлежит. Если информация неверна, пожалуйста, обращайтесь: absinthe@absinthe.life</string>
 
@@ -66,7 +66,7 @@
     <string name="apk_analytics">Анализирование АРК</string>
     <string name="colorful_icon">Цветные значки</string>
     <string name="rules_repo_title">Репозиторий правил</string>
-    <string name="lib_ref_threshold">Library Reference Threshold</string>
+    <string name="lib_ref_threshold">Порог числа ссылок на библиотеку</string>
     <string name="reload_apps">Обновить список приложений</string>
     <string name="help_docs">Справочная документация</string>
     <string name="join_telegram_group">Связь</string>
@@ -77,7 +77,7 @@
     <string name="entry_animation_summary">Воспроизведение анимации при открытии и закрытии страницы сведений</string>
     <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
     <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
-    <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
+    <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
     <string name="reload_apps_summary">Попробуйте, если список приложений отображается неправильно</string>
     <string name="help_docs_summary">Узнайте, как использовать LibChecker</string>
     <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
@@ -88,9 +88,9 @@
     <string name="detail_label">Просмотр сведений о приложении</string>
     <string name="not_found">Не найдено</string>
     <string name="create_an_issue">Помогите нам дополнить информацию</string>
-    <string name="app_bundle_details">The Android App Bundle is Android\'s new, official publishing format that offers a more efficient way to build and release your app. The Android App Bundle lets you more easily deliver a great experience in a smaller app size, which can improve install success and reduce uninstalls. It\'s easy to switch. You don\'t need to refactor your code to start benefiting from a smaller app. And once you\'ve switched, you\'ll benefit from modular app development and customizable feature delivery.</string>
+    <string name="app_bundle_details">"Android App Bundle - это новый официальный формат публикации приложений в ОС Android, который предлагает более эффективный способ создания и выпуска вашего приложения. Android App Bundle позволяет выпускать приложения меньшего размера, что может повысить успешность установки и сократить количество удалений. Переключиться на App Bundle легко. Вам не нужно проводить рефакторинг кода, чтобы получить пользу от небольшого размера приложения. И после перехода вы получите выгоду от разработки модульных приложений и настраиваемой доставки функций."</string>
     <string name="kotlin_used" translatable="false">Используется Kotlin</string>
-    <string name="kotlin_details">Kotlin is a cross-platform, statically typed, general-purpose programming language with type inference. Kotlin is designed to interoperate fully with Java, and the JVM version of Kotlin\'s standard library depends on the Java Class Library, but type inference allows its syntax to be more concise.</string>
+    <string name="kotlin_details">"Kotlin - это кроссплатформенный язык программирования общего назначения со статической типизацией и выводом типов. Kotlin разработан для полного взаимодействия с Java, а версия JVM стандартной библиотеки Kotlin зависит от библиотеки классов Java, но вывод типа позволяет его синтаксису быть более лаконичным."</string>
     <string name="items_count">Кол-во пунктов: </string>
     <string name="further_operation">Дополнительные опции</string>
     <string name="app_info_launch">Запустить</string>
@@ -98,7 +98,7 @@
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
-    <string name="toast_not_existing_market">There\'s not existing any app market</string>
+    <string name="toast_not_existing_market">"Нет магазина приложений"</string>
     <string name="toast_use_another_file_manager">Пожалуйста, используйте другой файловый менеджер, чтобы открыть APK</string>
     <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
     <string name="toast_package_name_null">Имя пакета не указано</string>
@@ -125,7 +125,7 @@
     <string name="dialog_message_keep_previous_snapshot">Вы хотите сохранить предыдущий снимок?</string>
     <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
     <string name="btn_keep">Оставить</string>
-    <string name="btn_drop">Drop</string>
+    <string name="btn_drop">Удалить</string>
 
     <!--  Album  -->
     <string name="album_compare">Сравнить</string>
@@ -145,9 +145,9 @@
     <string name="album_dialog_delete_snapshot_message">Обработка…</string>
 
     <!--  Integration  -->
-    <string name="integration_monkey_king_menu_block">Block it via \"MonkeyKing Purify\"</string>
-    <string name="integration_monkey_king_menu_unblock">Unblock it via \"MonkeyKing Purify\"</string>
-    <string name="integration_anywhere_menu_editor">Open it in \"Anywhere- Editor\"</string>
+    <string name="integration_monkey_king_menu_block">Заблокировать с помощью \"MonkeyKing Purify\"</string>
+    <string name="integration_monkey_king_menu_unblock">Разблокировать с помощью \"MonkeyKing Purify\"</string>
+    <string name="integration_anywhere_menu_editor">Открыть в \"Anywhere- Editor\"</string>
 
     <!--  Cloud rules  -->
     <string name="rules_local_repo_version">Версия локального репозитория</string>
