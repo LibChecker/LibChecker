@@ -7,7 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
-import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -16,12 +15,13 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
 class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
-    private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private val emptyView by lazy { EmptyListView(requireContext()) }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
@@ -39,7 +39,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
         viewModel.apply {
             val observer = Observer<List<LibStringItemChip>> {
                 if (it.isEmpty()) {
-                    emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                    emptyView.text.text = getString(R.string.empty_list)
                 } else {
                     adapter.setDiffNewData(it.toMutableList())
                 }
@@ -75,8 +75,8 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
             }
             setDiffCallback(LibStringDiffUtil())
 
-            emptyLayoutBinding.text.text = getString(R.string.loading)
-            setEmptyView(emptyLayoutBinding.root)
+            emptyView.text.text = getString(R.string.loading)
+            setEmptyView(emptyView)
         }
         viewModel.initSoAnalysisData(packageName)
     }

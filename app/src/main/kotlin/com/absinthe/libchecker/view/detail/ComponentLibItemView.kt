@@ -80,7 +80,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        libName.layout(paddingStart, paddingTop)
+        libName.layout(paddingStart, (measuredHeight - libName.measuredHeight) / 2)
         chip?.let { it.layout(paddingEnd, (measuredHeight - it.measuredHeight) / 2, fromRight = true) }
     }
 }

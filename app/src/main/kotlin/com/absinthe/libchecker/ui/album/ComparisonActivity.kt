@@ -22,6 +22,7 @@ import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
+import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -173,7 +174,7 @@ class ComparisonActivity : BaseActivity() {
 
         adapter.apply {
             headerWithEmptyEnable = true
-            setEmptyView(R.layout.layout_snapshot_empty_view)
+            setEmptyView(SnapshotEmptyView(this@ComparisonActivity))
             setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {

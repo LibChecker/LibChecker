@@ -117,7 +117,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
                 viewModel.dbItems.value?.let {
-                    updateItems(it, true)
+                    updateItems(it)
                     AppItemRepository.shouldRefreshAppList = false
                 }
             }
@@ -171,7 +171,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         it.packageName.contains(newText, ignoreCase = true)
             }
             mAdapter.highlightText = newText
-            updateItems(filter, false)
+            updateItems(filter)
             doOnMainThreadIdle({
                 val first: Int
                 val last: Int
@@ -273,12 +273,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START) {
                     return@observe
                 }
-                updateItems(it, true)
+                updateItems(it)
                 viewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
                 if (status == STATUS_END) {
-                    dbItems.value?.let { updateItems(it, true) }
+                    dbItems.value?.let { updateItems(it) }
                     if (!viewModel.hasRequestedChange) {
                         viewModel.requestChange()
                         viewModel.hasRequestedChange = true
@@ -301,7 +301,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, {
                 if (isListReady) {
-                    updateItems(viewModel.dbItems.value!!, false)
+                    updateItems(viewModel.dbItems.value!!)
                 }
             })
             appSortMode.observe(viewLifecycleOwner, { mode ->
@@ -319,7 +319,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                             Constants.SORT_MODE_TARGET_API_DESC -> list.sortByDescending { it.targetApi }
 
                         }
-                        updateItems(list, true)
+                        updateItems(list)
                     }
                 }
             })
@@ -333,7 +333,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
     }
 
-    private fun updateItems(newItems: List<LCItem>, shouldReturnTop: Boolean) {
+    private fun updateItems(newItems: List<LCItem>) {
         val filterList = mutableListOf<LCItem>()
 
         GlobalValues.isShowSystemApps.value?.let { isShowSystem ->
@@ -355,7 +355,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         doOnMainThreadIdle({
             flip(VF_LIST)
 
-            if (shouldReturnTop &&
+            if (!binding.list.canScrollVertically(-1) &&
                 GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC &&
                 binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
             ) {

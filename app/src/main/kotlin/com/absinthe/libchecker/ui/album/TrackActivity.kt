@@ -19,6 +19,7 @@ import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -111,7 +112,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     adapter.setList(list)
                     menu?.findItem(R.id.search)?.isVisible = true
                     isListReady = true
-                    adapter.setEmptyView(R.layout.layout_empty_list)
+                    adapter.setEmptyView(EmptyListView(this@TrackActivity))
                 }
             }
         })

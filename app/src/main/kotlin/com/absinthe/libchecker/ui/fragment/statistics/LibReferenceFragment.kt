@@ -30,6 +30,7 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -102,7 +103,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }
-            setEmptyView(R.layout.layout_empty_list)
+            setEmptyView(EmptyListView(requireContext()))
         }
 
         viewModel.apply {

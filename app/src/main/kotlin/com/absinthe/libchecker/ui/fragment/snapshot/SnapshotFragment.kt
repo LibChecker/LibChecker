@@ -10,7 +10,6 @@ import android.os.IBinder
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -23,7 +22,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
-import com.absinthe.libchecker.databinding.LayoutSnapshotEmptyViewBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
@@ -38,6 +36,7 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -218,9 +217,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         adapter.apply {
             headerWithEmptyEnable = true
-            val emptyViewBinding = LayoutSnapshotEmptyViewBinding.inflate(layoutInflater)
-            emptyViewBinding.tvSubtitle.isGone = true
-            setEmptyView(emptyViewBinding.root)
+            setEmptyView(SnapshotEmptyView(requireContext()))
             setHeaderView(dashboardBinding.root)
             setDiffCallback(SnapshotDiffUtil())
             setOnItemClickListener { _, view, position ->

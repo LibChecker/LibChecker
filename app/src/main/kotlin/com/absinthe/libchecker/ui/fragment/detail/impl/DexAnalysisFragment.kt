@@ -7,7 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.databinding.LayoutDexEmptyListBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -16,13 +15,14 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.DexListEmptyView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val dexEmptyLayoutBinding by lazy { LayoutDexEmptyListBinding.inflate(layoutInflater) }
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
+    private val emptyView by lazy { DexListEmptyView(requireContext()) }
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
 
@@ -39,7 +39,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         viewModel.apply {
             val observer = Observer<List<LibStringItemChip>> {
                 if (it.isEmpty()) {
-                    dexEmptyLayoutBinding.text.text = getString(R.string.uncharted_territory)
+                    emptyView.text.text = getString(R.string.uncharted_territory)
                 } else {
                     adapter.setDiffNewData(it.toMutableList())
                 }
@@ -75,8 +75,8 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
             }
             setDiffCallback(LibStringDiffUtil())
 
-            dexEmptyLayoutBinding.text.text = getString(R.string.loading)
-            setEmptyView(dexEmptyLayoutBinding.root)
+            emptyView.text.text = getString(R.string.loading)
+            setEmptyView(emptyView)
         }
         viewModel.initDexData(packageName)
     }

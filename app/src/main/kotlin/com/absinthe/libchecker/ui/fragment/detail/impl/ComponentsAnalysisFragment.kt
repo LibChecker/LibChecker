@@ -6,7 +6,6 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -17,7 +16,6 @@ import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.databinding.LayoutEmptyListBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
@@ -29,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,7 +39,7 @@ const val EXTRA_TYPE = "EXTRA_TYPE"
 
 class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val emptyLayoutBinding by lazy { LayoutEmptyListBinding.inflate(layoutInflater) }
+    private val emptyView by lazy { EmptyListView(requireContext()) }
     private val hasIntegration by lazy {
         MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY)
     }
@@ -67,7 +66,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         viewModel.apply {
             componentsMap[adapter.type]?.observe(viewLifecycleOwner, { componentList ->
                 if (componentList.isEmpty()) {
-                    emptyLayoutBinding.text.text = getString(R.string.empty_list)
+                    emptyView.text.text = getString(R.string.empty_list)
                 } else {
                     lifecycleScope.launch(Dispatchers.IO) {
                         val list = mutableListOf<LibStringItemChip>()
@@ -125,8 +124,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 true
             }
             setDiffCallback(LibStringDiffUtil())
-            emptyLayoutBinding.text.text = getString(R.string.loading)
-            setEmptyView(emptyLayoutBinding.root)
+            emptyView.text.text = getString(R.string.loading)
+            setEmptyView(emptyView)
         }
     }
 

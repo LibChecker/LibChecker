@@ -13,6 +13,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.REMOVED
@@ -27,12 +28,14 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
+import com.absinthe.libchecker.view.snapshot.SnapshotDetailNewInstallView
+import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
@@ -44,7 +47,7 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
+class SnapshotDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySnapshotDetailBinding
     private lateinit var entity: SnapshotDiffItem
@@ -52,8 +55,6 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
     private val adapter by lazy { SnapshotDetailAdapter(lifecycleScope) }
     private val viewModel by viewModels<SnapshotViewModel>()
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
-
-    override fun requirePackageName() = _entity?.packageName
 
     override fun setViewBinding(): ViewGroup {
         isPaddingToolbar = true
@@ -193,9 +194,9 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity() {
 
         adapter.setEmptyView(
             when {
-                entity.newInstalled -> R.layout.layout_snapshot_detail_new_install
-                entity.deleted -> R.layout.layout_snapshot_detail_deleted
-                else -> R.layout.layout_snapshot_empty_view
+                entity.newInstalled -> SnapshotDetailNewInstallView(this)
+                entity.deleted -> SnapshotDetailDeletedView(this)
+                else -> SnapshotEmptyView(this)
             }
         )
         adapter.setOnItemChildClickListener { _, view, position ->

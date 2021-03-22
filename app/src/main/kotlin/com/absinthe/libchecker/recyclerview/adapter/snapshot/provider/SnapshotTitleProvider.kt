@@ -3,16 +3,17 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 import android.animation.ObjectAnimator
 import android.util.SparseArray
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailCountAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotDetailCountNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.view.snapshot.SnapshotDetailTitleView
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -24,16 +25,21 @@ const val SNAPSHOT_TITLE_PROVIDER = 1
 
 class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
 
-    private val countMap = SparseArray<List<Int>>()
     override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
-    override val layoutId: Int = R.layout.item_snapshot_title
+    override val layoutId: Int = 0
+
+    private val countMap = SparseArray<List<Int>>()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return BaseViewHolder(SnapshotDetailTitleView(context))
+    }
 
     override fun convert(helper: BaseViewHolder, item: BaseNode) {
+        val itemView = helper.itemView as SnapshotDetailTitleView
         val node = item as SnapshotTitleNode
         val countAdapter = SnapshotDetailCountAdapter()
         val countList = mutableListOf(0, 0, 0, 0)
         val finalList = mutableListOf<SnapshotDetailCountNode>()
-        val ivArrow = helper.getView<ImageView>(R.id.iv_arrow)
 
         val titleRes = when(node.type) {
             NATIVE -> R.string.ref_category_native
@@ -43,10 +49,13 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
             PROVIDER -> R.string.ref_category_cp
             else -> R.string.ref_category_perm
         }
-        helper.setText(R.id.tv_title, context.getString(titleRes))
-        helper.getView<RecyclerView>(R.id.rv_count).apply {
+        itemView.title.text = context.getString(titleRes)
+        itemView.list.apply {
             adapter = countAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            if (parent == null) {
+                itemView.addView(this)
+            }
         }
 
         countMap[node.type]?.let {
@@ -78,7 +87,7 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
             }
         }
 
-        onExpansionToggled(ivArrow, node.isExpanded)
+        onExpansionToggled(itemView.arrow, node.isExpanded)
     }
 
     override fun onClick(helper: BaseViewHolder, view: View, data: BaseNode, position: Int) {
