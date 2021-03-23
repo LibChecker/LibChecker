@@ -6,21 +6,21 @@
         app:key="normalCategory"
         app:title="@string/pref_group_normal">
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             app:key="showSystemApps"
             app:title="@string/show_system_apps"
             app:summary="@string/show_system_apps_summary"
             app:icon="@drawable/ic_android_outline"
             app:defaultValue="false"/>
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             app:key="apkAnalytics"
             app:title="@string/apk_analytics"
             app:summary="@string/apk_analytics_summary"
             app:icon="@drawable/ic_apk_analytics"
             app:defaultValue="true"/>
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             app:key="colorfulIcon"
             app:title="@string/colorful_icon"
             app:summary="@string/colorful_icon_summary"
@@ -105,7 +105,7 @@
 
         </Preference>
 
-        <SwitchPreferenceCompat
+        <SwitchPreference
             app:key="analytics"
             app:title="@string/anonymous_statistics"
             app:summary="@string/anonymous_statistics_summary"

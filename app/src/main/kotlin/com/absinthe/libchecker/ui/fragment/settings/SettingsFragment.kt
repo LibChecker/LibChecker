@@ -16,7 +16,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.SwitchPreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -57,14 +57,14 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings, rootKey)
 
-        (findPreference<SwitchPreferenceCompat>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
+        (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isShowSystemApps.value = newValue as Boolean
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue))
                 true
             }
         }
-        (findPreference<SwitchPreferenceCompat>(Constants.PREF_APK_ANALYTICS))?.apply {
+        (findPreference<SwitchPreference>(Constants.PREF_APK_ANALYTICS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 val flag = if (newValue as Boolean) {
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED
@@ -80,7 +80,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 true
             }
         }
-        (findPreference<SwitchPreferenceCompat>(Constants.PREF_COLORFUL_ICON))?.apply {
+        (findPreference<SwitchPreference>(Constants.PREF_COLORFUL_ICON))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
                 AppItemRepository.allApplicationInfoItems.value = AppItemRepository.allApplicationInfoItems.value
@@ -184,7 +184,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 true
             }
         }
-        (findPreference<SwitchPreferenceCompat>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
+        (findPreference<SwitchPreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
                 true
