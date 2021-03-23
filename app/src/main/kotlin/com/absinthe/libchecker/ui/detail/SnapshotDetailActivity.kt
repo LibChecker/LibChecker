@@ -22,16 +22,16 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailNewInstallView
@@ -118,6 +118,7 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+                addItemDecoration(VerticalSpacesItemDecoration(4.dp))
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled
@@ -199,21 +200,6 @@ class SnapshotDetailActivity : BaseActivity() {
                 else -> SnapshotEmptyView(this)
             }
         )
-        adapter.setOnItemChildClickListener { _, view, position ->
-            if (view.id == R.id.chip) {
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemChildClickListener
-                }
-
-                val item = (adapter.data[position] as BaseSnapshotNode).item
-                val name = item.name
-                val regexName = LCAppUtils.findRuleRegex(name, item.itemType)?.regexName
-                LibDetailDialogFragment.newInstance(name, item.itemType, regexName)
-                    .apply {
-                        show(supportFragmentManager, tag)
-                    }
-            }
-        }
         adapter.setOnItemClickListener { _, view, position ->
             if (adapter.data[position] is SnapshotTitleNode) {
                 adapter.expandOrCollapse(position)

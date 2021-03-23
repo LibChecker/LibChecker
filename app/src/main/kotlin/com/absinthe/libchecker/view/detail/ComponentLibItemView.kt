@@ -51,21 +51,23 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
                 chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
                     isClickable = false
                     layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                    text = libChip.name
-                    setChipIconResource(libChip.iconRes)
+                    addView(this)
+                }
+            }
+            chip!!.apply {
+                text = libChip.name
+                setChipIconResource(libChip.iconRes)
 
-                    if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                        if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-                            chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
-                        } else {
-                            val icon = chipIcon
-                            icon?.let {
-                                it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-                                chipIcon = it
-                            }
+                if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+                    if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
+                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                    } else {
+                        val icon = chipIcon
+                        icon?.let {
+                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            chipIcon = it
                         }
                     }
-                    addView(this)
                 }
             }
         }

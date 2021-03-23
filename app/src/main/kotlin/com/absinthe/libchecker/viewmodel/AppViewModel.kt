@@ -186,7 +186,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                        if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime) {
+                        if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime
+                            || (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)) {
                             abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
                             lcItem = LCItem(
                                 it.packageName,
