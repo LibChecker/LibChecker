@@ -105,7 +105,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
             progressIndicator.isVisible = isFirstLaunch
-            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         initObserver()

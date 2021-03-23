@@ -45,6 +45,14 @@ abstract class AViewGroup(context: Context) : ViewGroup(context) {
         )
     }
 
+    protected fun View.toHorizontalCenter(parentView: ViewGroup): Int {
+        return (parentView.measuredWidth - measuredWidth) / 2
+    }
+
+    protected fun View.toVerticalCenter(parentView: ViewGroup): Int {
+        return (parentView.measuredHeight - measuredHeight) / 2
+    }
+
     protected fun View.layout(x: Int, y: Int, fromRight: Boolean = false) {
         if (!fromRight) {
             layout(x, y, x + measuredWidth, y + measuredHeight)

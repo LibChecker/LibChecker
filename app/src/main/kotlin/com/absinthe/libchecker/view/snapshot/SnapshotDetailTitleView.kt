@@ -53,8 +53,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        arrow.layout(arrow.marginStart, (measuredHeight - arrow.measuredHeight) / 2)
-        title.layout(arrow.right, (measuredHeight - title.measuredHeight) / 2)
-        list.layout(title.right, (measuredHeight - list.measuredHeight) / 2)
+        arrow.layout(arrow.marginStart, arrow.toVerticalCenter(this))
+        title.layout(arrow.right, title.toVerticalCenter(this))
+        list.layout(title.right, list.toVerticalCenter(this))
     }
 }

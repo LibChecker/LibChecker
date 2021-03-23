@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.view.detail
 
 import android.content.Context
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class DexListEmptyView(context: Context) : AViewGroup(context) {
@@ -22,7 +22,7 @@ class DexListEmptyView(context: Context) : AViewGroup(context) {
     val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         text = context.getString(R.string.loading)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 24f)
+        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
         addView(this)
     }
 
@@ -34,7 +34,7 @@ class DexListEmptyView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        image.layout((measuredWidth - image.measuredWidth) / 2, measuredWidth / 4)
-        text.layout((measuredWidth - text.measuredWidth) / 2, image.bottom)
+        image.layout(image.toHorizontalCenter(this), measuredWidth / 4)
+        text.layout(text.toHorizontalCenter(this), image.bottom)
     }
 }

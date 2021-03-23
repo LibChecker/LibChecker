@@ -77,7 +77,6 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 }
 
                 setAnimation(assetName)
-                enableMergePathsForKitKatAndAbove(true)
             }
         }
 

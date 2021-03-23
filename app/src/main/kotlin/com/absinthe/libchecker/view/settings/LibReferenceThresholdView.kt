@@ -41,6 +41,6 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         slider.layout(0, 0)
-        count.let { it.layout((measuredWidth - it.measuredWidth) / 2, slider.measuredHeight) }
+        count.let { it.layout(it.toHorizontalCenter(this), slider.measuredHeight) }
     }
 }

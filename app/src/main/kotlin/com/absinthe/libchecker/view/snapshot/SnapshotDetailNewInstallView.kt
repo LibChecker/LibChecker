@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
-import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
@@ -23,7 +23,7 @@ class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
             it.topMargin = 16.dp
         }
         text = context.getString(R.string.snapshot_detail_new_install_title)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
+        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
         addView(this)
     }
 
@@ -35,7 +35,7 @@ class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        image.layout((measuredWidth - image.measuredWidth) / 2, measuredWidth / 2)
-        text.layout((measuredWidth - text.measuredWidth) / 2, image.bottom + text.marginTop)
+        image.layout(image.toHorizontalCenter(this), measuredWidth / 2)
+        text.layout(text.toHorizontalCenter(this), image.bottom + text.marginTop)
     }
 }

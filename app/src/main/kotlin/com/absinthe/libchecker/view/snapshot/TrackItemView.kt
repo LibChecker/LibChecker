@@ -68,8 +68,8 @@ class TrackItemView(context: Context) : MaterialCardView(context) {
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            icon.layout(paddingStart, (measuredHeight - icon.measuredHeight) / 2)
-            switch.layout(paddingEnd, (measuredHeight - switch.measuredHeight) / 2, fromRight = true)
+            icon.layout(paddingStart, icon.toVerticalCenter(this))
+            switch.layout(paddingEnd, switch.toVerticalCenter(this), fromRight = true)
             appName.layout(icon.right + appName.marginStart, paddingTop)
             packageName.layout(appName.left, appName.bottom)
         }

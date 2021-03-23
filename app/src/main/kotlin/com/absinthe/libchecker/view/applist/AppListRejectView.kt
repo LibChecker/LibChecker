@@ -1,29 +1,37 @@
-package com.absinthe.libchecker.view.snapshot
+package com.absinthe.libchecker.view.applist
 
 import android.content.Context
-import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.ImageView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getDrawableByAttr
 import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class SnapshotEmptyView(context: Context) : AViewGroup(context) {
+class AppListRejectView(context: Context) : AViewGroup(context) {
 
-    private val image = ImageView(context).apply {
+    init {
+        isClickable = true
+        isFocusable = true
+        background = context.getDrawableByAttr(com.google.android.material.R.attr.colorSurface)
+    }
+
+    private val image = AppCompatImageView(context).apply {
         layoutParams = LayoutParams(200.dp, 200.dp)
-        setImageResource(R.drawable.ic_natural_food)
+        setImageResource(R.drawable.ic_deny)
         addView(this)
     }
 
-    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.topMargin = 16.dp
+    private val text = AppCompatTextView(context).apply {
+        layoutParams = LayoutParams(300.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            it.topMargin = 20.dp
         }
-        text = context.getString(R.string.snapshot_empty_list_title)
-        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
+        gravity = Gravity.CENTER
+        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+        text = context.getString(R.string.get_app_list_denied_tip)
         addView(this)
     }
 

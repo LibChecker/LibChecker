@@ -169,7 +169,6 @@ class ComparisonActivity : BaseActivity() {
                 setOutAnimation(this@ComparisonActivity, R.anim.anim_fade_out)
                 displayedChild = VF_LIST
             }
-            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         adapter.apply {

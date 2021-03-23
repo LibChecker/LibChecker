@@ -89,6 +89,6 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         libName.layout(paddingStart, paddingTop)
         libSize.layout(libName.left, libName.bottom)
-        chip?.let { it.layout(paddingEnd, (measuredHeight - it.measuredHeight) / 2, fromRight = true) }
+        chip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
     }
 }

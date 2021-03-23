@@ -96,6 +96,26 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
 
         dashboardBinding.apply {
+//            indicatorAdded.apply {
+//                text.text = getString(R.string.snapshot_indicator_added)
+//                icon.setImageResource(R.drawable.ic_add)
+//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_green_300))
+//            }
+//            indicatorRemoved.apply {
+//                text.text = getString(R.string.snapshot_indicator_removed)
+//                icon.setImageResource(R.drawable.ic_remove)
+//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_red_300))
+//            }
+//            indicatorChanged.apply {
+//                text.text = getString(R.string.snapshot_indicator_changed)
+//                icon.setImageResource(R.drawable.ic_changed)
+//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_yellow_300))
+//            }
+//            indicatorMoved.apply {
+//                text.text = getString(R.string.snapshot_indicator_moved)
+//                icon.setImageResource(R.drawable.ic_move)
+//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_blue_300))
+//            }
             root.setOnClickListener {
                 startActivity(Intent(requireContext(), AlbumActivity::class.java))
             }
@@ -212,7 +232,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            loading.enableMergePathsForKitKatAndAbove(true)
         }
 
         adapter.apply {

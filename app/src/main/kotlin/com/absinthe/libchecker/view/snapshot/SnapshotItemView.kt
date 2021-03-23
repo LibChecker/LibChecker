@@ -120,13 +120,13 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            icon.layout(paddingStart, (measuredHeight - icon.measuredHeight) / 2)
+            icon.layout(paddingStart, icon.toVerticalCenter(this))
             appName.layout(icon.right + appName.marginStart, paddingTop)
             packageName.layout(appName.left, appName.bottom)
             versionInfo.layout(appName.left, packageName.bottom)
             targetApiInfo.layout(appName.left, versionInfo.bottom)
             abiInfo.layout(appName.left, targetApiInfo.bottom)
-            stateIndicator.layout(paddingEnd, (measuredHeight - stateIndicator.measuredHeight) / 2, fromRight = true)
+            stateIndicator.layout(paddingEnd, stateIndicator.toVerticalCenter(this), fromRight = true)
             redMask?.layout(0, 0)
         }
     }

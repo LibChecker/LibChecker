@@ -37,7 +37,7 @@ class ToastView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        icon.let { it.layout((measuredWidth - it.measuredWidth) / 2, 0) }
+        icon.let { it.layout(it.toHorizontalCenter(this), 0) }
         message.layout(0, icon.measuredHeight / 2)
     }
 }

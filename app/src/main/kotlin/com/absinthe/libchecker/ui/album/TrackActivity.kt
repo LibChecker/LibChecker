@@ -20,6 +20,7 @@ import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libchecker.view.detail.EmptyListView
+import com.absinthe.libchecker.view.snapshot.TrackLoadingView
 import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -89,7 +90,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     doSaveItemState(position, (view as SwitchMaterial).isChecked)
                 }
             }
-            setEmptyView(R.layout.layout_track_loading)
+            setEmptyView(TrackLoadingView(this@TrackActivity))
         }
 
         AppItemRepository.allApplicationInfoItems.observe(this, { appList ->

@@ -12,6 +12,7 @@ import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -58,8 +59,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
 
         val count = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 34f)
-            letterSpacing = 0.00735294118f
+            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline4))
             addView(this)
         }
 
@@ -77,10 +77,10 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            icon.layout(paddingStart, (measuredHeight - icon.measuredHeight) / 2)
+            icon.layout(paddingStart, icon.toVerticalCenter(this))
             labelName.layout(icon.right + labelName.marginLeft, paddingTop)
             libName.layout(labelName.left, labelName.bottom)
-            count.layout(paddingEnd, (measuredHeight - count.measuredHeight) / 2, fromRight = true)
+            count.layout(paddingEnd, count.toVerticalCenter(this), fromRight = true)
         }
     }
 }

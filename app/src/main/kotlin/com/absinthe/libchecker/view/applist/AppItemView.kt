@@ -83,7 +83,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            icon.layout(paddingStart, (measuredHeight - icon.measuredHeight) / 2)
+            icon.layout(paddingStart, icon.toVerticalCenter(this))
             appName.layout(icon.right + appName.marginStart, paddingTop)
             packageName.layout(appName.left, appName.bottom)
             versionInfo.layout(appName.left, packageName.bottom)
