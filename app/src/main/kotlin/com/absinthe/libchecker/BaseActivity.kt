@@ -1,6 +1,5 @@
 package com.absinthe.libchecker
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.ViewGroup
 import com.absinthe.libchecker.extensions.paddingTopCompat
@@ -10,7 +9,6 @@ import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.libraries.utils.utils.UiUtils.setSystemBarStyle
 
-@SuppressLint("Registered")
 abstract class BaseActivity : AppActivity() {
 
     protected var root: ViewGroup? = null

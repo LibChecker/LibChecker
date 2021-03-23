@@ -134,7 +134,7 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
 //}
 
 configurations.all {
-    exclude(group = "dev.rikka.rikkax.appcompat", module = "appcompat")
+    exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
 val grpcVersion by extra("1.36.0")
@@ -152,7 +152,6 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
     implementation("androidx.fragment:fragment-ktx:1.3.1")
-    implementation("androidx.appcompat:appcompat:1.2.0")
 
     // Lifecycle
     val lifecycleVersion = "2.3.0"
@@ -192,7 +191,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
-//    implementation("rikka.appcompat:appcompat:1.2.0-rc01")
+    implementation ("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
     implementation("dev.rikka.rikkax.core:core:1.3.1")
     implementation("dev.rikka.rikkax.material:material:1.6.0")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
@@ -200,7 +199,7 @@ dependencies {
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
 
     //Network
-    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okio:okio:2.10.0")
