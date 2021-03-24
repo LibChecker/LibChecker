@@ -73,16 +73,35 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
         }
     }
 
+    private var shouldBreakLines = false
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        val chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
+        var chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
+
+        if (chipWidth > (measuredWidth * 4 / 7)) {
+            chipWidth = 0
+            shouldBreakLines = true
+        }
+
         val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
         libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-        setMeasuredDimension(measuredWidth, (libName.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(40.dp))
+        val height = if (shouldBreakLines) {
+            libName.measuredHeight + paddingTop + paddingBottom + (chip?.measuredHeight ?: 0)
+        } else {
+            libName.measuredHeight + paddingTop + paddingBottom
+        }.coerceAtLeast(40.dp)
+        setMeasuredDimension(measuredWidth, height)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        libName.layout(paddingStart, libName.toVerticalCenter(this))
-        chip?.let { it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true) }
+        libName.layout(paddingStart, paddingTop)
+        chip?.let {
+            if (shouldBreakLines) {
+                it.layout(libName.left, libName.bottom)
+            } else {
+                it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true)
+            }
+        }
     }
 }

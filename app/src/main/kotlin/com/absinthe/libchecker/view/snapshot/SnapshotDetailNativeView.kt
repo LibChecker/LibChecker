@@ -7,7 +7,6 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView

@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
-import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +22,7 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
+import timber.log.Timber
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,7 +71,7 @@ class BackupActivity : BaseActivity() {
 //                        }
                     }
                 } catch (e: IOException) {
-                    e.printStackTrace()
+                    Timber.e(e)
                 }
             }
         } else if (requestCode == Constants.REQUEST_CODE_RESTORE_BACKUP && resultCode == Activity.RESULT_OK) {
@@ -83,14 +83,13 @@ class BackupActivity : BaseActivity() {
                         }
                     }
                 } catch (e: IOException) {
-                    e.printStackTrace()
+                    Timber.e(e)
                 }
             }
         }
     }
 
     class BackupFragment : PreferenceFragmentCompat() {
-        private val viewModel by activityViewModels<SnapshotViewModel>()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.album_backup, rootKey)

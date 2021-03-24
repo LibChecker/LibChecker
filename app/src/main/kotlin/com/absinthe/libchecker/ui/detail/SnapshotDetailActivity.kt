@@ -116,9 +116,9 @@ class SnapshotDetailActivity : BaseActivity() {
         binding.apply {
             list.apply {
                 adapter = this@SnapshotDetailActivity.adapter
-                addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+                addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled

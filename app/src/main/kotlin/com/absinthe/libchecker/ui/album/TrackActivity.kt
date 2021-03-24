@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Checkable
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,8 +21,8 @@ import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libchecker.view.detail.EmptyListView
+import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView
-import com.google.android.material.switchmaterial.SwitchMaterial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -80,14 +81,14 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             }
 
             setOnItemClickListener { _, view, position ->
-                view.findViewById<SwitchMaterial>(android.R.id.toggle).apply {
+                (view as TrackItemView).container.switch.apply {
                     isChecked = !isChecked
                     doSaveItemState(position, isChecked)
                 }
             }
             setOnItemChildClickListener { _, view, position ->
                 if (view.id == android.R.id.toggle) {
-                    doSaveItemState(position, (view as SwitchMaterial).isChecked)
+                    doSaveItemState(position, (view as Checkable).isChecked)
                 }
             }
             setEmptyView(TrackLoadingView(this@TrackActivity))

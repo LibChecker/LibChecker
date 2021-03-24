@@ -13,7 +13,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.checkbox.MaterialCheckBox
 
 class TrackItemView(context: Context) : MaterialCardView(context) {
 
@@ -50,10 +50,14 @@ class TrackItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val switch = SwitchMaterial(context).apply {
+        val switch = MaterialCheckBox(context).apply {
             id = android.R.id.toggle
             layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            addView(this)
+            background = null
+        }
+
+        init {
+            addView(switch)
         }
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -32,6 +33,12 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@DexAnalysisFragment.adapter
+                addItemDecoration(
+                    DividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
+                    )
+                )
                 addSystemBarPadding(addStatusBarPadding = false)
             }
         }
