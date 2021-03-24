@@ -41,8 +41,6 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val ai = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
-                    val drawable = ai.loadIcon(context.packageManager)
-                    icon.post { icon.setImageDrawable(drawable) }
                     loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
                 } catch (e: PackageManager.NameNotFoundException) {
                     val bitmap = ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {

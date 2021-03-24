@@ -1,10 +1,8 @@
 package com.absinthe.libchecker.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
-import android.graphics.drawable.AdaptiveIconDrawable
 import android.widget.ImageView
 import androidx.collection.LruCache
 import com.absinthe.libchecker.R
@@ -69,15 +67,14 @@ object AppIconCache : CoroutineScope {
         lruCache.remove(Triple(packageName, userId, size))
     }
 
-    @SuppressLint("NewApi")
-    fun getOrLoadBitmap(context: Context, info: ApplicationInfo, userId: Int, size: Int): Bitmap? {
+    fun getOrLoadBitmap(context: Context, info: ApplicationInfo, userId: Int, size: Int): Bitmap {
         val cachedBitmap = get(info.packageName, userId, size)
         if (cachedBitmap != null) {
             return cachedBitmap
         }
         var loader = appIconLoaders[size]
         if (loader == null) {
-            val shrinkNonAdaptiveIcons = LCAppUtils.atLeastR() && context.applicationInfo.loadIcon(context.packageManager) is AdaptiveIconDrawable
+            val shrinkNonAdaptiveIcons = false
             loader = AppIconLoader(size, shrinkNonAdaptiveIcons, context)
             appIconLoaders[size] = loader
         }
@@ -112,7 +109,7 @@ object AppIconCache : CoroutineScope {
             if (bitmap != null) {
                 view.setImageBitmap(bitmap)
             } else {
-                view.setImageDrawable(null)
+                view.setImageDrawable(info.loadIcon(context.packageManager))
             }
         }
     }

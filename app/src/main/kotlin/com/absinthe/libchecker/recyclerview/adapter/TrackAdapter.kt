@@ -41,8 +41,6 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapt
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-                    val drawable = ai.loadIcon(context.packageManager)
-                    icon.post { icon.setImageDrawable(drawable) }
                     loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
                 } catch (e: PackageManager.NameNotFoundException) {
                     Timber.e(e)
