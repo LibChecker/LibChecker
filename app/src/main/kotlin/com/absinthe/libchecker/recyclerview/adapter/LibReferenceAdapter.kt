@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.extensions.px
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
@@ -30,7 +30,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
         return createBaseViewHolder(
             LibReferenceItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                    val margin = R.dimen.main_card_margin.px
+                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
                     it.setMargins(margin, margin, margin, margin)
                 }
             }

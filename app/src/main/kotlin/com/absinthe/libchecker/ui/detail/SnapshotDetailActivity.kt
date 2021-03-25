@@ -23,7 +23,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.extensions.px
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
@@ -125,7 +124,7 @@ class SnapshotDetailActivity : BaseActivity() {
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
             ivAppIcon.apply {
-                val appIconLoader = AppIconLoader(R.dimen.lib_detail_icon_size.px, false, this@SnapshotDetailActivity)
+                val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@SnapshotDetailActivity)
                 val icon = try {
                     appIconLoader.loadIcon(PackageUtils.getPackageInfo(entity.packageName, PackageManager.GET_META_DATA).applicationInfo)
                 } catch (e: PackageManager.NameNotFoundException) {

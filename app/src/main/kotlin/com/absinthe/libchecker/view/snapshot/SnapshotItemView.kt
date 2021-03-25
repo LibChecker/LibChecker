@@ -10,13 +10,14 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
 class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     val container = SnapshotItemContainerView(context).apply {
-        val padding = R.dimen.main_card_padding.px
+        val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
         setPadding(padding, padding, padding, padding)
         clipToPadding = false
     }
@@ -28,7 +29,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
 
         val icon = AppCompatImageView(context).apply {
-            val iconSize = R.dimen.app_icon_size.px
+            val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
             layoutParams = LayoutParams(iconSize, iconSize)
             addView(this)
         }

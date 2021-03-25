@@ -2,6 +2,7 @@ package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
@@ -9,7 +10,7 @@ import com.airbnb.lottie.LottieDrawable
 class TrackLoadingView(context: Context) : AViewGroup(context) {
 
     private val anim = LottieAnimationView(context).apply {
-        val size = R.dimen.lottie_anim_size.px
+        val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)
         layoutParams = LayoutParams(size, size)
         imageAssetsFolder = "/"
         repeatCount = LottieDrawable.INFINITE

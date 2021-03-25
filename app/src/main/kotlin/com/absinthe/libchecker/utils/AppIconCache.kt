@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.collection.LruCache
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.px
 import kotlinx.coroutines.*
 import me.zhanghai.android.appiconloader.AppIconLoader
 import java.util.concurrent.Executor
@@ -89,7 +88,7 @@ object AppIconCache : CoroutineScope {
                             info: ApplicationInfo, userId: Int,
                             view: ImageView): Job {
         return launch {
-            val size = view.measuredWidth.let { if (it > 0) it else R.dimen.app_icon_size.px }
+            val size = view.measuredWidth.let { if (it > 0) it else context.resources.getDimensionPixelSize(R.dimen.app_icon_size) }
             val cachedBitmap = get(info.packageName, userId, size)
             if (cachedBitmap != null) {
                 view.setImageBitmap(cachedBitmap)

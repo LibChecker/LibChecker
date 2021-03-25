@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -18,7 +19,7 @@ import com.google.android.material.card.MaterialCardView
 class LibReferenceItemView(context: Context) : MaterialCardView(context) {
 
     val container = LibReferenceItemContainerView(context).apply {
-        val padding = R.dimen.main_card_padding.px
+        val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
         setPadding(padding, padding, padding, padding)
     }
 
@@ -30,7 +31,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
 
         val icon = AppCompatImageButton(context).apply {
             id = android.R.id.icon
-            val iconSize = R.dimen.lib_reference_icon_size.px
+            val iconSize = context.getDimensionPixelSize(R.dimen.lib_reference_icon_size)
             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
             setBackgroundResource(R.drawable.bg_gray_circle)
             addView(this)

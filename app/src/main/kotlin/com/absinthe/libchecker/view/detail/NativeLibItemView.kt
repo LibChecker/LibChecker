@@ -13,6 +13,7 @@ import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.chip.Chip
@@ -23,14 +24,14 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
         isClickable = true
         isFocusable = true
         clipToPadding = false
-        val horizontalPadding = R.dimen.normal_padding.px
+        val horizontalPadding = context.getDimensionPixelSize(R.dimen.normal_padding)
         val verticalPadding = 4.dp
         setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     }
 
     val libName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.marginEnd = R.dimen.normal_padding.px
+            it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
         }
         setTextColor(ContextCompat.getColor(context, R.color.textNormal))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
