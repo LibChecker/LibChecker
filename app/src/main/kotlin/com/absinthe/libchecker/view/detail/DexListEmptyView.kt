@@ -6,14 +6,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class DexListEmptyView(context: Context) : AViewGroup(context) {
 
     private val image = ImageView(context).apply {
-        val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)
+        val size = R.dimen.lottie_anim_size.px
         layoutParams = LayoutParams(size, size)
         setImageResource(R.drawable.ic_dex_empty_list_placeholder)
         addView(this)

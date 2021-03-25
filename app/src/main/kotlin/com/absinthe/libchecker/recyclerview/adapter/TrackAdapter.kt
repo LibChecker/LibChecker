@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.TrackListItem
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.extensions.px
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.snapshot.TrackItemView
@@ -29,7 +29,7 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapt
         return createBaseViewHolder(
             TrackItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
+                    val margin = R.dimen.main_card_margin.px
                     it.setMargins(margin, margin, margin, margin)
                 }
             }

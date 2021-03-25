@@ -30,6 +30,7 @@ fun View.setLongClickCopiedToClipboard(text: String) {
 }
 
 val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
+val Int.px: Int get() = Resources.getSystem().getDimensionPixelSize(this)
 
 var View.paddingStartCompat: Int
     set(value) {

@@ -10,7 +10,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -18,7 +17,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 class TrackItemView(context: Context) : MaterialCardView(context) {
 
     val container = TrackItemContainerView(context).apply {
-        val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
+        val padding = R.dimen.main_card_padding.px
         setPadding(padding, padding, padding, padding)
     }
 
@@ -29,7 +28,7 @@ class TrackItemView(context: Context) : MaterialCardView(context) {
     class TrackItemContainerView(context: Context) : AViewGroup(context) {
 
         val icon = AppCompatImageView(context).apply {
-            val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
+            val iconSize = R.dimen.app_icon_size.px
             layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
             addView(this)
         }

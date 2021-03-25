@@ -21,6 +21,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.extensions.px
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.*
@@ -119,7 +120,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 try {
                     val packageInfo = PackageUtils.getPackageInfo(packageName)
                     ivAppIcon.apply {
-                        val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
+                        val appIconLoader = AppIconLoader(R.dimen.lib_detail_icon_size.px, false, this@AppDetailActivity)
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
                             AppInfoBottomShellDialogFragment().apply {

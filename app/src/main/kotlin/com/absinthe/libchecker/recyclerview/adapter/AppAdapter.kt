@@ -9,7 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.extensions.px
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
@@ -31,7 +31,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
         return createBaseViewHolder(
             AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
                 layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
+                    val margin = R.dimen.main_card_margin.px
                     it.setMargins(margin, margin, margin, margin)
                 }
             }

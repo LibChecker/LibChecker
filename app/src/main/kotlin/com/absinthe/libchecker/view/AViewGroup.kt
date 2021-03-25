@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.marginBottom
@@ -62,6 +63,7 @@ abstract class AViewGroup(context: Context) : ViewGroup(context) {
     }
 
     protected val Int.dp: Int get() = (this * resources.displayMetrics.density + 0.5f).toInt()
+    val Int.px: Int get() = Resources.getSystem().getDimensionPixelSize(this)
     protected val View.measuredWidthWithMargins get() = (measuredWidth + marginLeft + marginRight)
     protected val View.measuredHeightWithMargins get() = (measuredHeight + marginTop + marginBottom)
 
