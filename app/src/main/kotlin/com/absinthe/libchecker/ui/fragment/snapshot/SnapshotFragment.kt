@@ -72,7 +72,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         override fun onProgressUpdated(progress: Int) {
             lifecycleScope.launch(Dispatchers.Main) {
-                binding.progressIndicator.setProgressCompat(progress, true)
+                try {
+                    binding.progressIndicator.setProgressCompat(progress, true)
+                } catch (e: NullPointerException) {
+
+                }
             }
         }
     }
