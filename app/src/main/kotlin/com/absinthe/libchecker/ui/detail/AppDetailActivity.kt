@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.SpannableString
@@ -36,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+import timber.log.Timber
 
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
@@ -172,16 +174,23 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             }
                         }
                     }
+                } catch (e: PackageManager.NameNotFoundException) {
+                    ivAppIcon.load(R.drawable.ic_app_list)
+                    ivAppIcon.imageTintList = ColorStateList.valueOf(getColor(R.color.textNormal))
                 } catch (e: Exception) {
-                    e.printStackTrace()
-                    supportFinishAfterTransition()
+                    Timber.e(e)
+                    finish()
                 }
 
                 ibSort.setOnClickListener {
                     lifecycleScope.launch {
                         detailFragmentManager.sortAll()
                         withContext(Dispatchers.Main) {
-                            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) { MODE_SORT_BY_SIZE } else { MODE_SORT_BY_LIB }
+                            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+                                MODE_SORT_BY_SIZE
+                            } else {
+                                MODE_SORT_BY_LIB
+                            }
                             detailFragmentManager.changeSortMode(viewModel.sortMode)
                         }
                     }
@@ -215,7 +224,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
                 }
             }
-            binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     val count = viewModel.itemsCountList[tab.position]
                     if (detailFragmentManager.currentItemsCount != count) {
@@ -225,9 +234,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     detailFragmentManager.selectedPosition = tab.position
                 }
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) { }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-                override fun onTabReselected(tab: TabLayout.Tab?) { }
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
             })
 
             val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->

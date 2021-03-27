@@ -12,15 +12,15 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.databinding.LayoutBottomSheetAppInfoBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
 
 /**
  * <pre>
@@ -29,20 +29,20 @@ import com.absinthe.libchecker.utils.Toasty
  * </pre>
  */
 
-class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBottomSheetAppInfoBinding>() {
+class AppInfoBottomShellDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
 
-    override fun initBinding(): LayoutBottomSheetAppInfoBinding = LayoutBottomSheetAppInfoBinding.inflate(layoutInflater)
+    override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
 
     override fun init() {
-        initView(binding)
+        initView(root)
     }
 
-    private fun initView(binding: LayoutBottomSheetAppInfoBinding) {
-        binding.root.addPaddingTop(16.dp)
-        binding.infoLaunch.setOnClickListener {
+    private fun initView(root: AppInfoBottomSheetView) {
+        root.addPaddingTop(16.dp)
+        root.launch.setOnClickListener {
             try {
                 startLaunchAppActivity(packageName)
             } catch (e: ActivityNotFoundException) {
@@ -53,7 +53,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
                 dismiss()
             }
         }
-        binding.infoSettings.setOnClickListener {
+        root.setting.setOnClickListener {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.parse("package:$packageName")
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -61,7 +61,7 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetDialogFragment<LayoutBot
             startActivity(intent)
             dismiss()
         }
-        binding.rvList.apply {
+        root.list.apply {
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)

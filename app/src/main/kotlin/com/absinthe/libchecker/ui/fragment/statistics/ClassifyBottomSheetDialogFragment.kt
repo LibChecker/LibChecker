@@ -7,35 +7,47 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.databinding.LayoutBottomSheetHeaderBinding
-import com.absinthe.libchecker.ui.fragment.BaseBottomSheetNoBindingDialogFragment
+import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
 const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
-class ClassifyBottomSheetDialogFragment : BaseBottomSheetNoBindingDialogFragment() {
+class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
     var item: ArrayList<LCItem> = ArrayList()
-    private val dialogView by lazy { ClassifyDialogView(requireContext(), lifecycleScope) }
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
     private var mListener: OnDismissListener? = null
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
+
+    override fun init() {
+        val header = BottomSheetHeaderView(requireContext()).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = 8.dp
+                it.bottomMargin = 24.dp
+            }
+            title.text = dialogTitle
+        }
+        root.adapter.setHeaderView(header)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<LCItem>(
                 EXTRA_ITEM_LIST
             )?.toList()?.let {
-                dialogView.adapter.setList(it)
+                root.adapter.setList(it)
                 item = it as ArrayList<LCItem>
             }
         } else {
-            dialogView.adapter.setList(item)
+            root.adapter.setList(item)
         }
-        val header = LayoutBottomSheetHeaderBinding.inflate(layoutInflater)
-        header.tvTitle.text = dialogTitle
-        dialogView.adapter.setHeaderView(header.root)
-        return dialogView
+
+        return view
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

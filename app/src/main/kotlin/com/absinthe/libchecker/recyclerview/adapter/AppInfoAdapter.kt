@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
 import android.content.pm.ResolveInfo
-import android.widget.ImageView
-import com.absinthe.libchecker.R
+import android.view.ViewGroup
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.view.detail.AppInfoItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -13,14 +13,17 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
  * time : 2020/10/25
  * </pre>
  */
-class AppInfoAdapter :BaseQuickAdapter<ResolveInfo, BaseViewHolder>(R.layout.layout_item_app_info) {
+class AppInfoAdapter :BaseQuickAdapter<ResolveInfo, BaseViewHolder>(0) {
+
+    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+        return BaseViewHolder(AppInfoItemView(context))
+    }
 
     override fun convert(holder: BaseViewHolder, item: ResolveInfo) {
-
-        holder.getView<ImageView>(R.id.icon).apply {
-            background = LCAppUtils.getAppIcon(item.activityInfo.packageName)
+        (holder.itemView as AppInfoItemView).apply {
+            setIconBackground(LCAppUtils.getAppIcon(item.activityInfo.packageName))
+            setText(item.activityInfo.loadLabel(context.packageManager))
         }
-        holder.setText(R.id.tv_name, item.activityInfo.loadLabel(context.packageManager))
     }
 
 }

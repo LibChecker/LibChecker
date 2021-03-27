@@ -1,12 +1,26 @@
 package com.absinthe.libchecker.ui.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-open class BaseBottomSheetNoBindingDialogFragment : BottomSheetDialogFragment() {
+abstract class BaseBottomSheetViewDialogFragment<T: View> : BottomSheetDialogFragment() {
+
+    private var _root: T? = null
+    val root get() = _root!!
+
+    abstract fun initRootView(): T
+    abstract fun init()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _root = initRootView()
+        init()
+        return _root
+    }
 
     override fun onStart() {
         super.onStart()
@@ -21,4 +35,8 @@ open class BaseBottomSheetNoBindingDialogFragment : BottomSheetDialogFragment() 
         dialog?.window?.attributes?.windowAnimations = R.style.DialogAnimation
     }
 
+    override fun onDestroyView() {
+        _root = null
+        super.onDestroyView()
+    }
 }
