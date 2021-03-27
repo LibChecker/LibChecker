@@ -29,6 +29,11 @@ android {
         versionName = "${baseVersionName}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resConfigs("en", "zh-rCN", "zh-rTW", "ru")
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.incremental"] = "true"
+            }
+        }
     }
 
     buildFeatures {

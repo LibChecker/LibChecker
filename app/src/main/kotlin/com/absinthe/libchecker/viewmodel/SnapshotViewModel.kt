@@ -685,10 +685,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val snapshotBuilder: Snapshot.Builder = Snapshot.newBuilder()
 
         backupList.forEach {
-            Timber.d("backup step: packageName = ${it.packageName}")
             snapshotBuilder.apply {
                 packageName = it.packageName
-                setTimeStamp(timeStamp)
+                timeStamp = it.timeStamp
                 label = it.label
                 versionName = it.versionName
                 versionCode = it.versionCode
