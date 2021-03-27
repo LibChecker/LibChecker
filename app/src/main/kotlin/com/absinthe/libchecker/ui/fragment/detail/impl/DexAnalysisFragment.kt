@@ -48,7 +48,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
                 if (it.isEmpty()) {
                     emptyView.text.text = getString(R.string.uncharted_territory)
                 } else {
-                    adapter.setDiffNewData(it.toMutableList())
+                    adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
                 }
 
                 if (!isListReady) {

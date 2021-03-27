@@ -113,7 +113,6 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
             aapt2, "optimize",
             "--collapse-resource-names",
             "--enable-sparse-encoding",
-            "--shorten-resource-paths",
             "--resource-path-shortening-map", mapping,
             "-o", optimized,
             zip
@@ -126,12 +125,11 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
     }
 }
 
-// Disable it because it crashes on API 23
-//tasks.whenTaskAdded {
-//    if (name == "shrinkReleaseRes") {
-//        finalizedBy(optimizeReleaseRes)
-//    }
-//}
+tasks.whenTaskAdded {
+    if (name == "shrinkReleaseRes") {
+        finalizedBy(optimizeReleaseRes)
+    }
+}
 
 configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")

@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.about
 
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
@@ -30,12 +31,17 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import rikka.material.app.LocaleDelegate
 
 private const val RENGE_CHECKER = "RengeChecker"
 
 class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase)
+        newBase?.apply { resources.configuration.setLocale(LocaleDelegate.defaultLocale) }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -172,6 +178,7 @@ class AboutActivity : AbsAboutActivity() {
     }
 
     private fun initView() {
+        window.decorView.fitsSystemWindows = false
         window.decorView.post { UiUtils.setSystemBarStyle(window, false) }
     }
 

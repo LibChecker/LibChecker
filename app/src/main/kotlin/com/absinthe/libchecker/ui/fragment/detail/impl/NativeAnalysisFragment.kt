@@ -41,7 +41,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
                 if (it.isEmpty()) {
                     emptyView.text.text = getString(R.string.empty_list)
                 } else {
-                    adapter.setDiffNewData(it.toMutableList())
+                    adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
                 }
 
                 if (!isListReady) {

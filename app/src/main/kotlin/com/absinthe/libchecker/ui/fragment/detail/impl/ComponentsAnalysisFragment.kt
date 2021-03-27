@@ -93,7 +93,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         }
 
                         withContext(Dispatchers.Main) {
-                            adapter.setDiffNewData(list)
+                            adapter.setDiffNewData(list, navigateToComponentTask)
                         }
                     }
                 }

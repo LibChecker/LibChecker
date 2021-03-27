@@ -47,6 +47,6 @@ class DetailFragmentManager {
     }
 
     fun navigateToComponent(component: String) {
-        currentFragment?.navigateToComponent(component)
+        currentFragment?.setNavigatingToComponentTask(component)
     }
 }

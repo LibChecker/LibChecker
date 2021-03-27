@@ -50,7 +50,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
             if (chip == null) {
                 chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
                     isClickable = false
-                    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40.dp)
                     addView(this)
                 }
             }
@@ -82,6 +82,8 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
         if (chipWidth > (measuredWidth * 4 / 7)) {
             chipWidth = 0
             shouldBreakLines = true
+        } else {
+            shouldBreakLines = false
         }
 
         val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
@@ -95,11 +97,12 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        libName.layout(paddingStart, paddingTop)
-        chip?.let {
-            if (shouldBreakLines) {
-                it.layout(libName.left, libName.bottom)
-            } else {
+        if (shouldBreakLines) {
+            libName.layout(paddingStart, paddingTop)
+            chip?.layout(libName.left, libName.bottom)
+        } else {
+            libName.layout(paddingStart, libName.toVerticalCenter(this))
+            chip?.let {
                 it.layout(paddingEnd, it.toVerticalCenter(this), fromRight = true)
             }
         }

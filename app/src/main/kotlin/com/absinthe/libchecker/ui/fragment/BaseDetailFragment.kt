@@ -31,6 +31,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by lazy { LibStringAdapter(type) }
     protected var isListReady = false
+    protected var navigateToComponentTask: Runnable? = null
 
     abstract fun getRecyclerView(): RecyclerView
 
@@ -68,7 +69,11 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
 
     fun getItemsCount() = adapter.itemCount
 
-    fun navigateToComponent(component: String) {
+    fun setNavigatingToComponentTask(component: String) {
+        navigateToComponentTask = Runnable { navigateToComponentImpl(component) }
+    }
+
+    private fun navigateToComponentImpl(component: String) {
         val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
         if (componentPosition == -1) {
             return

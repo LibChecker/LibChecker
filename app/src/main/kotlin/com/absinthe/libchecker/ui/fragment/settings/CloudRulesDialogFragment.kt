@@ -111,7 +111,7 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                                 binding.btnUpdate.isEnabled = false
                                 GlobalValues.localRulesVersion = builder.version
                             }
-                        } catch (e: Exception) {
+                        } catch (e: Throwable) {
                             Timber.e(e)
                             context?.let {
                                 withContext(Dispatchers.Main) {
