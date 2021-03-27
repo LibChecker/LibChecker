@@ -98,13 +98,6 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
         project.android.buildToolsVersion,
         "aapt2"
     )
-    val mapping = Paths.get(
-        project.buildDir.path,
-        "outputs",
-        "mapping",
-        "release",
-        "shortening.txt"
-    )
     val zip = Paths.get(
         project.buildDir.path,
         "intermediates",
@@ -117,8 +110,8 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
         commandLine(
             aapt2, "optimize",
             "--collapse-resource-names",
-            "--enable-sparse-encoding",
-            "--resource-path-shortening-map", mapping,
+            "--shorten-resource-paths",
+            "--resources-config-path", "aapt2-resources.cfg",
             "-o", optimized,
             zip
         )

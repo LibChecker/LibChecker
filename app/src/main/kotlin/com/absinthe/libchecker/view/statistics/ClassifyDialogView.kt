@@ -39,6 +39,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
             adapter = this@ClassifyDialogView.adapter
             overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             isVerticalScrollBarEnabled = false
+            clipToPadding = false
             setHasFixedSize(true)
             addSystemBarPadding(addStatusBarPadding = false)
             FastScrollerBuilder(this).useMd2Style().build()
