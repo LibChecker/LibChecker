@@ -1,10 +1,12 @@
 package com.absinthe.libchecker.ui.album
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.preference.Preference
@@ -59,8 +61,12 @@ class BackupActivity : BaseActivity() {
 
         private val viewModel by viewModels<SnapshotViewModel>()
 
-        private val backupResultLauncher by lazy {
-            registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+        private lateinit var backupResultLauncher: ActivityResultLauncher<String>
+        private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
+
+        override fun onAttach(context: Context) {
+            super.onAttach(context)
+            backupResultLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument()) {
                 it?.let {
                     try {
                         requireActivity().contentResolver.openOutputStream(it)?.let { os ->
@@ -75,9 +81,7 @@ class BackupActivity : BaseActivity() {
                     }
                 }
             }
-        }
-        private val restoreResultLauncher by lazy {
-            registerForActivityResult(ActivityResultContracts.GetContent()) {
+            restoreResultLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
                 it?.let {
                     try {
                         requireActivity().contentResolver.openInputStream(it)?.let { inputStream ->
