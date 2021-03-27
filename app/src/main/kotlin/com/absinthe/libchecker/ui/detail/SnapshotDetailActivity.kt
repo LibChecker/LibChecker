@@ -6,9 +6,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -39,8 +37,6 @@ import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import me.zhanghai.android.appiconloader.AppIconLoader
@@ -63,7 +59,6 @@ class SnapshotDetailActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        initTransition()
         super.onCreate(savedInstanceState)
 
         if (_entity != null) {
@@ -85,22 +80,6 @@ class SnapshotDetailActivity : BaseActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         setRootPadding()
-    }
-
-    private fun initTransition() {
-        window.apply {
-            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-            sharedElementEnterTransition = MaterialContainerTransform().apply {
-                addTarget(android.R.id.content)
-                duration = 300L
-            }
-            sharedElementReturnTransition = MaterialContainerTransform().apply {
-                addTarget(android.R.id.content)
-                duration = 250L
-            }
-        }
-        findViewById<View>(android.R.id.content).transitionName = "app_card_container"
-        setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
     }
 
     @SuppressLint("SetTextI18n")

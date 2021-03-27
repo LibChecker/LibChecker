@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
-import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
@@ -22,7 +21,6 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -46,11 +44,6 @@ class LibReferenceActivity : BaseActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.apply {
-            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-            sharedElementsUseOverlay = false
-        }
-        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
         refName?.let { name ->

@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
-import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
-import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
@@ -133,25 +131,9 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
         })
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        if (savedInstanceState != null) {
-            savedInstanceState.getParcelableArrayList<LibReference>(
-                EXTRA_ITEM_LIST
-            )?.toList()?.let {
-                adapter.setList(it)
-            }
-        }
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
     override fun onPause() {
         super.onPause()
         popup?.dismiss()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        outState.putParcelableArrayList(EXTRA_ITEM_LIST, ArrayList(adapter.data))
-        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

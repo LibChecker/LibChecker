@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -34,8 +32,6 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.google.android.material.transition.platform.MaterialContainerTransform
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,7 +59,6 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        initTransition()
         super.onCreate(savedInstanceState)
         initView()
         resolveReferenceExtras()
@@ -79,22 +74,6 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         setRootPadding()
-    }
-
-    private fun initTransition() {
-        window.apply {
-            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-            sharedElementEnterTransition = MaterialContainerTransform().apply {
-                addTarget(android.R.id.content)
-                duration = 300L
-            }
-            sharedElementReturnTransition = MaterialContainerTransform().apply {
-                addTarget(android.R.id.content)
-                duration = 250L
-            }
-        }
-        findViewById<View>(android.R.id.content).transitionName = pkgName
-        setEnterSharedElementCallback(MaterialContainerTransformSharedElementCallback())
     }
 
     private fun initView() {

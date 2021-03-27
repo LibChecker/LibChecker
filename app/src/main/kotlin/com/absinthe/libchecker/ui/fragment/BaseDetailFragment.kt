@@ -80,26 +80,17 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
             return
         }
 
-        val first: Int
-        val last: Int
-        when (getRecyclerView().layoutManager) {
-            is LinearLayoutManager -> {
-                first = (getRecyclerView().layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                last = (getRecyclerView().layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
-            }
-            is StaggeredGridLayoutManager -> {
-                first = (getRecyclerView().layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
-                last = (getRecyclerView().layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last()
-            }
-            else -> {
-                first = 0
-                last = 0
+        Timber.d("navigateToComponent: componentPosition = $componentPosition")
+        getRecyclerView().scrollToPosition(componentPosition.coerceAtMost(adapter.itemCount - 1))
+
+        with(getRecyclerView().layoutManager) {
+            if (this is LinearLayoutManager) {
+                scrollToPositionWithOffset(componentPosition, 0)
+            } else if (this is StaggeredGridLayoutManager) {
+                scrollToPositionWithOffset(componentPosition, 0)
             }
         }
-        val navigateScrollOffset = ((last - first + 1) / 2)
 
-        Timber.d("navigateToComponent: componentPosition = $componentPosition, navigateScrollOffset = $navigateScrollOffset")
-        getRecyclerView().scrollToPosition((componentPosition + navigateScrollOffset).coerceAtMost(adapter.itemCount - 1))
         adapter.setHighlightBackgroundItem(componentPosition)
         adapter.notifyDataSetChanged()
     }

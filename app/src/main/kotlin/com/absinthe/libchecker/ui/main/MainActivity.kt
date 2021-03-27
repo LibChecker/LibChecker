@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.ViewGroup
-import android.view.Window
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
@@ -37,7 +36,6 @@ import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.google.android.material.animation.AnimationUtils
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -68,11 +66,6 @@ class MainActivity : BaseActivity(), IListContainer {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        window.apply {
-            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
-            sharedElementsUseOverlay = false
-        }
-        setExitSharedElementCallback(MaterialContainerTransformSharedElementCallback())
         super.onCreate(savedInstanceState)
 
         initView()
