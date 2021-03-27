@@ -38,9 +38,10 @@ private const val RENGE_CHECKER = "RengeChecker"
 class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
+
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(newBase)
         newBase?.apply { resources.configuration.setLocale(LocaleDelegate.defaultLocale) }
+        super.attachBaseContext(newBase)
     }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {

@@ -56,7 +56,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
             if (chip == null) {
                 chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
                     isClickable = false
-                    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
                     text = libChip.name
                     setChipIconResource(libChip.iconRes)
 

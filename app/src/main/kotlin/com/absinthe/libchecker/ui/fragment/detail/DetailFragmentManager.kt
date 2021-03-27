@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.fragment.detail
 
 import android.util.SparseArray
 import androidx.core.util.valueIterator
+import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -46,7 +47,18 @@ class DetailFragmentManager {
         SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, mode)
     }
 
-    fun navigateToComponent(component: String) {
-        currentFragment?.setNavigatingToComponentTask(component)
+    fun navigateToComponent(@LibType refType: Int, component: String) {
+        navType = refType
+        navComponent = component
+    }
+
+    companion object {
+        var navType: Int = -1
+        var navComponent: String? = null
+
+        fun resetNavigationParams() {
+            navType = -1
+            navComponent = null
+        }
     }
 }

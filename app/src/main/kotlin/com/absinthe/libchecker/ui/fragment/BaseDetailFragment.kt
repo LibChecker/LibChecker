@@ -9,6 +9,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.IDetailContainer
+import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.impl.EXTRA_TYPE
@@ -40,6 +41,10 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
         if (context is IDetailContainer) {
             context.detailFragmentManager.register(type, this)
         }
+        if (DetailFragmentManager.navType == type) {
+            DetailFragmentManager.navComponent?.let { navigateToComponentTask = Runnable { navigateToComponentImpl(it) } }
+            DetailFragmentManager.resetNavigationParams()
+        }
     }
 
     override fun onDetach() {
@@ -68,10 +73,6 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     }
 
     fun getItemsCount() = adapter.itemCount
-
-    fun setNavigatingToComponentTask(component: String) {
-        navigateToComponentTask = Runnable { navigateToComponentImpl(component) }
-    }
 
     private fun navigateToComponentImpl(component: String) {
         val componentPosition = adapter.data.indexOfFirst { it.item.name == component }

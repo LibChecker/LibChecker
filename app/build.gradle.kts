@@ -135,7 +135,7 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.36.0")
+val grpcVersion by extra("1.36.1")
 val protocVersion by extra("3.15.6")
 
 dependencies {
@@ -190,8 +190,8 @@ dependencies {
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
     implementation ("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
-    implementation("dev.rikka.rikkax.core:core:1.3.1")
-    implementation("dev.rikka.rikkax.material:material:1.6.0")
+    implementation("dev.rikka.rikkax.core:core:1.3.2")
+    implementation("dev.rikka.rikkax.material:material:1.6.4")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
@@ -209,7 +209,7 @@ dependencies {
     implementation("javax.annotation:javax.annotation-api:1.3.2")
 
     testImplementation("junit:junit:4.13.2")
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.6")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }

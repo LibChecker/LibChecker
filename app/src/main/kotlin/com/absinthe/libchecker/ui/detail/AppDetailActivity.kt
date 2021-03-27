@@ -30,7 +30,6 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
@@ -277,8 +276,6 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
         binding.viewpager.currentItem = refType
-        doOnMainThreadIdle({
-            detailFragmentManager.navigateToComponent(refName.removePrefix(packageName))
-        })
+        detailFragmentManager.navigateToComponent(refType, refName.removePrefix(packageName))
     }
 }
