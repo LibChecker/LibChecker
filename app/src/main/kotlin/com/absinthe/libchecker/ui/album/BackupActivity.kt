@@ -1,13 +1,12 @@
 package com.absinthe.libchecker.ui.album
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.viewModels
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.viewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -30,7 +29,6 @@ import java.util.*
 class BackupActivity : BaseActivity() {
 
     private lateinit var binding: ActivityBackupBinding
-    private val viewModel by viewModels<SnapshotViewModel>()
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityBackupBinding.inflate(layoutInflater)
@@ -57,39 +55,42 @@ class BackupActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    class BackupFragment : PreferenceFragmentCompat() {
 
-        if (requestCode == Constants.REQUEST_CODE_BACKUP && resultCode == Activity.RESULT_OK) {
-            data?.data?.let {
-                try {
-                    contentResolver.openOutputStream(it)?.let { os ->
-                        viewModel.backup(os)
-//                        lifecycleScope.launch(Dispatchers.IO) {
-//                            os.write(RuleGenerator.generateRulesByteArray())
-//                            os.close()
-//                        }
-                    }
-                } catch (e: IOException) {
-                    Timber.e(e)
-                }
-            }
-        } else if (requestCode == Constants.REQUEST_CODE_RESTORE_BACKUP && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { intentData ->
-                try {
-                    contentResolver.openInputStream(intentData)?.let { inputStream ->
-                        viewModel.restore(inputStream) {
-                            Toasty.show(this, "Backup file error")
+        private val viewModel by viewModels<SnapshotViewModel>()
+
+        private val backupResultLauncher by lazy {
+            registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+                it?.let {
+                    try {
+                        requireActivity().contentResolver.openOutputStream(it)?.let { os ->
+                            viewModel.backup(os)
+//                            lifecycleScope.launch(Dispatchers.IO) {
+//                                os.write(RuleGenerator.generateRulesByteArray())
+//                                os.close()
+//                            }
                         }
+                    } catch (e: IOException) {
+                        Timber.e(e)
                     }
-                } catch (e: IOException) {
-                    Timber.e(e)
                 }
             }
         }
-    }
-
-    class BackupFragment : PreferenceFragmentCompat() {
+        private val restoreResultLauncher by lazy {
+            registerForActivityResult(ActivityResultContracts.GetContent()) {
+                it?.let {
+                    try {
+                        requireActivity().contentResolver.openInputStream(it)?.let { inputStream ->
+                            viewModel.restore(inputStream) {
+                                Toasty.show(requireContext(), "Backup file error")
+                            }
+                        }
+                    } catch (e: IOException) {
+                        Timber.e(e)
+                    }
+                }
+            }
+        }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.album_backup, rootKey)
@@ -101,20 +102,16 @@ class BackupActivity : BaseActivity() {
                     val formatted = simpleDateFormat.format(date)
 
                     if (StorageUtils.isExternalStorageWritable) {
-                        StorageUtils.createFile(requireActivity() as BaseActivity, "*/*",
-                            "LibChecker-Snapshot-Backups-$formatted.lcss"
-                        )
+                        backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
+                    } else {
+                        Toasty.show(requireContext(), "External storage is not writable")
                     }
                     true
                 }
             }
             findPreference<Preference>(Constants.PREF_LOCAL_RESTORE)?.apply {
                 setOnPreferenceClickListener {
-                    val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "*/*"
-                    }
-                    requireActivity().startActivityForResult(intent, Constants.REQUEST_CODE_RESTORE_BACKUP)
+                    restoreResultLauncher.launch("*/*")
                     true
                 }
             }

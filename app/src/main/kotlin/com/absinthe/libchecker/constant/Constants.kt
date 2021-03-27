@@ -57,9 +57,6 @@ object Constants {
 
     const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
 
-    const val REQUEST_CODE_BACKUP = 1001
-    const val REQUEST_CODE_RESTORE_BACKUP = 1002
-
     const val COMMAND_DEBUG_MODE = "/debugMode"
 
     object Event {

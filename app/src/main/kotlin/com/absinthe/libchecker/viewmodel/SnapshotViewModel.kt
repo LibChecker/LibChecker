@@ -715,59 +715,60 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         os.close()
     }
 
-    fun restore(inputStream: InputStream, action: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        val list: SnapshotList = try {
-            SnapshotList.parseFrom(inputStream)
-        } catch (e: InvalidProtocolBufferException) {
-            withContext(Dispatchers.Main) {
-                action()
+    fun restore(inputStream: InputStream, failedAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        inputStream.use {
+            val list: SnapshotList = try {
+                SnapshotList.parseFrom(inputStream)
+            } catch (e: InvalidProtocolBufferException) {
+                withContext(Dispatchers.Main) {
+                    failedAction()
+                }
+                SnapshotList.newBuilder().build()
             }
-            SnapshotList.newBuilder().build()
-        } finally {
-            inputStream.close()
-        }
-        val finalList = mutableListOf<SnapshotItem>()
-        val timeStampSet = mutableSetOf<Long>()
-        var count = 0
+            val finalList = mutableListOf<SnapshotItem>()
+            val timeStampSet = mutableSetOf<Long>()
+            var count = 0
 
-        list.snapshotsList.forEach {
-            if (it != null) {
-                timeStampSet.add(it.timeStamp)
-                finalList.add(
-                    SnapshotItem(
-                        null,
-                        it.packageName,
-                        it.timeStamp,
-                        it.label,
-                        it.versionName,
-                        it.versionCode,
-                        it.installedTime,
-                        it.lastUpdatedTime,
-                        it.isSystem,
-                        it.abi.toShort(),
-                        it.targetApi.toShort(),
-                        it.nativeLibs,
-                        it.services,
-                        it.activities,
-                        it.receivers,
-                        it.providers,
-                        it.permissions
+            list.snapshotsList.forEach {
+                if (it != null) {
+                    timeStampSet.add(it.timeStamp)
+                    finalList.add(
+                        SnapshotItem(
+                            null,
+                            it.packageName,
+                            it.timeStamp,
+                            it.label,
+                            it.versionName,
+                            it.versionCode,
+                            it.installedTime,
+                            it.lastUpdatedTime,
+                            it.isSystem,
+                            it.abi.toShort(),
+                            it.targetApi.toShort(),
+                            it.nativeLibs,
+                            it.services,
+                            it.activities,
+                            it.receivers,
+                            it.providers,
+                            it.permissions
+                        )
                     )
-                )
-                count++
+                    count++
+                }
+
+                if (count == 50) {
+                    repository.insertSnapshots(finalList)
+                    finalList.clear()
+                    count = 0
+                }
             }
 
-            if (count == 50) {
-                repository.insertSnapshots(finalList)
-                finalList.clear()
-                count = 0
-            }
+            repository.insertSnapshots(finalList)
+            finalList.clear()
+            count = 0
+            timeStampSet.forEach { insertTimeStamp(it) }
+            timeStampSet.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
         }
-
-        repository.insertSnapshots(finalList)
-        finalList.clear()
-        count = 0
-        timeStampSet.forEach { insertTimeStamp(it) }
     }
 
     fun getFormatDateString(timestamp: Long): String {
