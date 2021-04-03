@@ -28,7 +28,7 @@ android {
         versionCode = gitCommitCount
         versionName = "${baseVersionName}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs("en", "zh-rCN", "zh-rTW", "ru")
+        resConfigs("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["room.incremental"] = "true"

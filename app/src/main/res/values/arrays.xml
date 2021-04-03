@@ -16,6 +16,7 @@
         <item>zh-Hans</item>
         <item>zh-Hant</item>
         <item>ru</item>
+        <item>uk</item>
     </string-array>
 
     <string-array name="language_value" translatable="false">
@@ -24,5 +25,6 @@
         <item>zh-CN</item>
         <item>zh-TW</item>
         <item>ru-RU</item>
+        <item>uk-UA</item>
     </string-array>
 </resources>
