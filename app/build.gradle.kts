@@ -147,10 +147,10 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.1")
+    implementation("androidx.fragment:fragment-ktx:1.3.2")
     implementation("androidx.activity:activity-ktx:1.2.2")
     // Lifecycle
-    val lifecycleVersion = "2.3.0"
+    val lifecycleVersion = "2.3.1"
     implementation("androidx.lifecycle:lifecycle-common-java8:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVersion}")
@@ -167,14 +167,14 @@ dependencies {
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-beta02")
-    implementation("androidx.core:core-ktx:1.5.0-beta03")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-rc01")
+    implementation("androidx.core:core-ktx:1.6.0-alpha01")
 
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
-    implementation("com.airbnb.android:lottie:3.6.1")
+    implementation("com.airbnb.android:lottie:3.7.0")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")

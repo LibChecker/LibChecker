@@ -10,12 +10,13 @@ import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.databinding.LayoutCloudRuleDialogBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.protocol.CloudRulesBundle
-import com.absinthe.libchecker.ui.fragment.BaseBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,7 +28,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
-class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDialogBinding>() {
+class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(ApiManager.root)
@@ -36,16 +37,12 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
     private val request: CloudRuleBundleRequest = retrofit.create(CloudRuleBundleRequest::class.java)
     private var bundlesCount: Int = 1
 
-    override fun initBinding(): LayoutCloudRuleDialogBinding = LayoutCloudRuleDialogBinding.inflate(layoutInflater)
+    override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
+    override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
     override fun init() {
-        binding.root.addPaddingTop(16.dp)
-        binding.header.tvTitle.text = getString(R.string.cloud_rules)
-        binding.vfContainer.apply {
-            setInAnimation(activity, R.anim.anim_fade_in)
-            setOutAnimation(activity, R.anim.anim_fade_out)
-        }
-        binding.btnUpdate.setOnClickListener {
+        root.addPaddingTop(16.dp)
+        root.cloudRulesContentView.updateButton.setOnClickListener {
             for (i in 1..bundlesCount) {
                 requestBundle(i)
             }
@@ -61,12 +58,12 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                     body?.let {
                         lifecycleScope.launch(Dispatchers.Main) {
                             try {
-                                binding.tvLocalRulesVersion.text = GlobalValues.localRulesVersion.toString()
-                                binding.tvRemoteRulesVersion.text = it.version.toString()
+                                root.cloudRulesContentView.localVersion.version.text = GlobalValues.localRulesVersion.toString()
+                                root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
                                 if (GlobalValues.localRulesVersion < it.version) {
-                                    binding.btnUpdate.isEnabled = true
+                                    root.cloudRulesContentView.updateButton.isEnabled = true
                                 }
-                                binding.vfContainer.displayedChild = 1
+                                root.viewFlipper.displayedChild = 1
                                 bundlesCount = it.bundles
                             } catch (e: Exception) {
                                 Timber.e(e)
@@ -107,8 +104,8 @@ class CloudRulesDialogFragment : BaseBottomSheetDialogFragment<LayoutCloudRuleDi
                             }
                             LibCheckerApp.repository.insertRules(rulesList)
                             withContext(Dispatchers.Main) {
-                                binding.tvLocalRulesVersion.text = builder.version.toString()
-                                binding.btnUpdate.isEnabled = false
+                                root.cloudRulesContentView.localVersion.version.text = builder.version.toString()
+                                root.cloudRulesContentView.updateButton.isEnabled = false
                                 GlobalValues.localRulesVersion = builder.version
                             }
                         } catch (e: Throwable) {

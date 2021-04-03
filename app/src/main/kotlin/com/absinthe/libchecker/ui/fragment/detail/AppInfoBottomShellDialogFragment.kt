@@ -12,14 +12,13 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.addSystemBarPadding
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
 
 /**
@@ -35,13 +34,12 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     private val mAdapter = AppInfoAdapter()
 
     override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
-
+    override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
     override fun init() {
         initView(root)
     }
 
     private fun initView(root: AppInfoBottomSheetView) {
-        root.addPaddingTop(16.dp)
         root.launch.setOnClickListener {
             try {
                 startLaunchAppActivity(packageName)

@@ -6,7 +6,7 @@
         android:width="36dp"
         android:height="4dp" />
 
-    <solid android:color="#CCDFDFDF" />
+    <solid android:color="#CC444444" />
 
     <corners
         android:bottomLeftRadius="@dimen/dialog_handler_radius"

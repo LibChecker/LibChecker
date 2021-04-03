@@ -8,8 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libchecker.view.app.IHeaderView
 
-class AppInfoBottomSheetView(context: Context) : AViewGroup(context) {
+class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
     private val header = BottomSheetHeaderView(context).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -40,7 +41,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context) {
 
     init {
         val padding = 24.dp
-        setPadding(padding, padding, padding, padding)
+        setPadding(padding, 16.dp, padding, padding)
         addView(header)
         addView(launch)
         addView(setting)
@@ -62,5 +63,9 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context) {
         launch.layout(paddingStart, header.bottom + launch.marginTop)
         setting.layout(launch.right, launch.top)
         list.layout(paddingStart, launch.bottom)
+    }
+
+    override fun getHeaderView(): BottomSheetHeaderView {
+        return header
     }
 }

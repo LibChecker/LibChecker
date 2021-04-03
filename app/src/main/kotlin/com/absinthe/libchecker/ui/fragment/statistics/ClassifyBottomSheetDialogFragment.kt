@@ -20,18 +20,20 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     var item: ArrayList<LCItem> = ArrayList()
     private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
     private var mListener: OnDismissListener? = null
+    private lateinit var headerView: BottomSheetHeaderView
 
     override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
+    override fun getHeaderView(): BottomSheetHeaderView = headerView
 
     override fun init() {
-        val header = BottomSheetHeaderView(requireContext()).apply {
+        headerView = BottomSheetHeaderView(requireContext()).apply {
             layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
                 it.topMargin = 8.dp
                 it.bottomMargin = 24.dp
             }
             title.text = dialogTitle
         }
-        root.adapter.setHeaderView(header)
+        root.adapter.setHeaderView(headerView)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

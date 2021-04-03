@@ -19,7 +19,7 @@
 
     <dimen name="toast_radius">24dp</dimen>
     <dimen name="snapshot_detail_count_radius">36dp</dimen>
-    <dimen name="dialog_handler_radius">4dp</dimen>
+    <dimen name="dialog_handler_radius">2dp</dimen>
 
     <dimen name="condense_abi_badge_width">60dp</dimen>
 

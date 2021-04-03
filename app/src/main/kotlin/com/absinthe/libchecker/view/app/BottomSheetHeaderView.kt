@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.app
 
 import android.content.Context
+import android.graphics.drawable.TransitionDrawable
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
@@ -14,7 +15,7 @@ import com.absinthe.libchecker.view.AViewGroup
 class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
 
     private val handler = View(context).apply {
-        layoutParams = LayoutParams(32.dp, 4.dp)
+        layoutParams = LayoutParams(36.dp, 4.dp)
         setBackgroundResource(R.drawable.bg_dialog_handler)
         addView(this)
     }
@@ -40,5 +41,16 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         handler.layout(handler.toHorizontalCenter(this), 0)
         title.layout(0, handler.bottom + title.marginTop)
+    }
+
+    fun onHandlerActivated(activated: Boolean) {
+        val handlerArray = if (activated) {
+            arrayOf(context.getDrawable(R.drawable.bg_dialog_handler), context.getDrawable(R.drawable.bg_dialog_handler_activated))
+        } else {
+            arrayOf(context.getDrawable(R.drawable.bg_dialog_handler_activated), context.getDrawable(R.drawable.bg_dialog_handler))
+        }
+        val transitionDrawable = TransitionDrawable(handlerArray)
+        handler.background = transitionDrawable
+        transitionDrawable.startTransition(150)
     }
 }

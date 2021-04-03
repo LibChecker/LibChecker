@@ -60,7 +60,7 @@ dependencies {
     implementation("com.absinthe.libraries.utils:utils:1.1.5")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core-ktx:1.5.0-beta03")
+    implementation("androidx.core:core-ktx:1.6.0-alpha01")
 
     testImplementation("junit:junit:4.13.2")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
