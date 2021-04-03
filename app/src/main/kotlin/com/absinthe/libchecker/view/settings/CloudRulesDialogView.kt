@@ -43,7 +43,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     }
 
     val cloudRulesContentView = CloudRulesContentView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     init {
@@ -57,7 +57,6 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         header.autoMeasure()
         viewFlipper.autoMeasure()
-        loadingAnim.autoMeasure()
         setMeasuredDimension(measuredWidth, header.measuredHeight + viewFlipper.measuredHeight)
     }
 

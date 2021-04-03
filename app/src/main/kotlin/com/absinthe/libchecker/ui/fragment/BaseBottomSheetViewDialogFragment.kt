@@ -51,7 +51,6 @@ abstract class BaseBottomSheetViewDialogFragment<T: View> : BottomSheetDialogFra
     override fun onStop() {
         super.onStop()
         behavior.removeBottomSheetCallback(bottomSheetCallback)
-        dismiss()
     }
 
     override fun onDestroyView() {

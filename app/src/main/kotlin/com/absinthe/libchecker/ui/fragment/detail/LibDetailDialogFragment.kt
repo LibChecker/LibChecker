@@ -1,21 +1,22 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.app.Dialog
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.databinding.LayoutDialogLibDetailBinding
+import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
+import com.absinthe.libchecker.view.detail.VF_CONTENT
+import com.absinthe.libchecker.view.detail.VF_LOADING
+import com.absinthe.libchecker.view.detail.VF_NOT_FOUND
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,15 +26,7 @@ const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
 const val EXTRA_REGEX_NAME = "EXTRA_REGEX_NAME"
 
-const val VF_CHILD_DETAIL = 0
-const val VF_CHILD_LOADING = 1
-const val VF_CHILD_FAILED = 2
-
-class LibDetailDialogFragment : DialogFragment() {
-
-    private var _binding: LayoutDialogLibDetailBinding? = null
-    private val binding: LayoutDialogLibDetailBinding
-    get() = _binding!!
+class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBottomSheetView>() {
 
     private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
@@ -41,62 +34,52 @@ class LibDetailDialogFragment : DialogFragment() {
     private val viewModel by activityViewModels<DetailViewModel>()
     private var isStickyEventReceived = false
 
-    private fun List<String>.toContributorsString(): String {
-        return this.joinToString(separator = ", ")
-    }
+    override fun initRootView(): LibDetailBottomSheetView = LibDetailBottomSheetView(requireContext())
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = LayoutDialogLibDetailBinding.inflate(layoutInflater)
-        binding.apply {
-            vfContainer.displayedChild = VF_CHILD_LOADING
-            tvLibName.text = libName
+    override fun init() {
+        root.apply {
+            viewFlipper.displayedChild = VF_LOADING
+            title.text = libName
             lifecycleScope.launch(Dispatchers.IO) {
                 val iconIndex = LCAppUtils.getRuleWithRegex(libName, type)?.iconIndex ?: -1
                 withContext(Dispatchers.Main) {
-                    ivIcon.load(IconResMap.getIconRes(iconIndex)) {
+                    icon.load(IconResMap.getIconRes(iconIndex)) {
                         crossfade(true)
                         placeholder(R.drawable.ic_logo)
                     }
                 }
             }
-            tvCreateIssue.apply {
-                isClickable = true
-                movementMethod = LinkMovementMethod.getInstance()
-                text = HtmlCompat.fromHtml(
-                    "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${
-                        resources.getText(
-                            R.string.create_an_issue
-                        )
-                    } </a>", HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
-            }
         }
+    }
 
-        return AlertDialog.Builder(requireContext())
-            .setView(binding.root)
-            .create()
+    override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
+
+    private fun List<String>.toContributorsString(): String {
+        return this.joinToString(separator = ", ")
     }
 
     override fun onStart() {
         super.onStart()
         viewModel.detailBean.observe(this, {
             if (it != null) {
-                binding.apply {
-                    tvLabelName.text = it.label
-                    tvTeamName.text = it.team
-                    tvContributorName.text = it.contributors.toContributorsString()
-                    tvDescriptionName.text = it.description
-                    tvRelativeName.apply {
-                        isClickable = true
-                        movementMethod = LinkMovementMethod.getInstance()
-                        text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
+                root.apply {
+                    libDetailContentView.apply {
+                        label.text.text = it.label
+                        team.text.text = it.team
+                        contributor.text.text = it.contributors.toContributorsString()
+                        description.text.text = it.description
+                        relativeLink.text.apply {
+                            isClickable = true
+                            movementMethod = LinkMovementMethod.getInstance()
+                            text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
+                        }
                     }
 
-                    vfContainer.displayedChild = VF_CHILD_DETAIL
+                    viewFlipper.displayedChild = VF_CONTENT
                 }
             } else {
                 if (isStickyEventReceived) {
-                    binding.vfContainer.displayedChild = VF_CHILD_FAILED
+                    root.viewFlipper.displayedChild = VF_NOT_FOUND
                 } else {
                     isStickyEventReceived = true
                 }
@@ -112,7 +95,6 @@ class LibDetailDialogFragment : DialogFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         viewModel.detailBean.value = null
-        _binding = null
     }
 
     companion object {

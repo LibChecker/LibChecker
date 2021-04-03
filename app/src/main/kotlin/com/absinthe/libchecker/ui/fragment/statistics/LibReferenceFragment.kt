@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.fragment.statistics
 import android.content.Intent
 import android.graphics.Color
 import android.view.*
-import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
@@ -29,6 +28,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.detail.EmptyListView
+import com.absinthe.libchecker.view.statistics.LibReferenceItemView
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -239,11 +239,9 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 val last = layoutManager.findLastVisibleItemPosition() + 3
 
                 for (i in first..last) {
-                    (adapter.getViewByPosition(i, R.id.tv_label_name) as? TextView)?.apply {
-                        tintHighlightText(newText, text.toString())
-                    }
-                    (adapter.getViewByPosition(i, R.id.tv_lib_name) as? TextView)?.apply {
-                        tintHighlightText(newText, text.toString())
+                    (layoutManager.getChildAt(i) as? LibReferenceItemView)?.container?.apply {
+                        labelName.apply { tintHighlightText(newText, text.toString()) }
+                        libName.apply { tintHighlightText(newText, text.toString()) }
                     }
                 }
             })
@@ -264,7 +262,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
         }
     }
 
-    private fun getMenuIndex(@LibType type: Int) = when(type) {
+    private fun getMenuIndex(@LibType type: Int) = when (type) {
         ALL -> 0
         NATIVE -> 1
         SERVICE -> 2
