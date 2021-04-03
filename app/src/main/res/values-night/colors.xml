@@ -8,4 +8,6 @@
     <color name="cardBorder">#FF888888</color>
     <color name="libIconBackground">#50FFFFFF</color>
     <color name="highlightComponent">@color/material_blue_800</color>
+    <color name="bottom_sheet_header_handler">#AADFDFDF</color>
+    <color name="bottom_sheet_header_handler_activated">#CCFFFFFF</color>
 </resources>

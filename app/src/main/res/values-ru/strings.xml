@@ -62,7 +62,6 @@
     <string name="pref_group_others">Другие</string>
 
     <string name="show_system_apps">Показывать системные приложения</string>
-    <string name="entry_animation">Вступительная анимация</string>
     <string name="apk_analytics">Анализирование АРК</string>
     <string name="colorful_icon">Цветные значки</string>
     <string name="rules_repo_title">Репозиторий правил</string>
@@ -74,7 +73,6 @@
     <string name="cloud_rules">Облачные правила</string>
 
     <string name="show_system_apps_summary">Управление отображением системных приложений в списке приложений</string>
-    <string name="entry_animation_summary">Воспроизведение анимации при открытии и закрытии страницы сведений</string>
     <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
     <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
     <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
@@ -95,6 +93,7 @@
     <string name="further_operation">Дополнительные опции</string>
     <string name="app_info_launch">Запустить</string>
     <string name="app_info_settings">Настройки</string>
+    <string name="lib_detail_dialog_title">Library Details</string>
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
@@ -113,7 +112,6 @@
     <string name="snapshot_indicator_changed">Изменено</string>
     <string name="snapshot_indicator_moved">Перемещено</string>
     <string name="snapshot_empty_list_title">Нет изменений</string>
-    <string name="snapshot_empty_list_subtitle">Кажется, что нет никаких изменений в компонентах приложения, но внутри приложения могли произойти значительные изменения.</string>
     <string name="snapshot_detail_new_install_title">Это приложение недавно установлено</string>
     <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
 

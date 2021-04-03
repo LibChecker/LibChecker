@@ -63,7 +63,6 @@
     <string name="pref_group_others">Others</string>
 
     <string name="show_system_apps">Show System Apps</string>
-    <string name="entry_animation">Entry Animation</string>
     <string name="apk_analytics">APK Analytics</string>
     <string name="colorful_icon">Colorful Icon</string>
     <string name="rules_repo_title">Rules Repo</string>
@@ -76,7 +75,6 @@
     <string name="cloud_rules">Cloud Rules</string>
 
     <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
-    <string name="entry_animation_summary">Play animation when opening and closing detail page</string>
     <string name="apk_analytics_summary">Open the detail page when click an APK file</string>
     <string name="colorful_icon_summary">Part of the marked libraries will appear as a colored logo</string>
     <string name="lib_ref_threshold_summary">Only libraries with the number of library references reaching the threshold are displayed in the list</string>
@@ -99,6 +97,7 @@
     <string name="further_operation">Further Operation</string>
     <string name="app_info_launch">Launch</string>
     <string name="app_info_settings">Settings</string>
+    <string name="lib_detail_dialog_title">Library Details</string>
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Copied to clipboard</string>
@@ -118,7 +117,6 @@
     <string name="snapshot_indicator_changed">Changed</string>
     <string name="snapshot_indicator_moved">Moved</string>
     <string name="snapshot_empty_list_title">No Changes</string>
-    <string name="snapshot_empty_list_subtitle">It seems that there is no change in its components, but a lot of things may have happened inside.</string>
     <string name="snapshot_detail_new_install_title">This App has newly installed</string>
     <string name="snapshot_detail_deleted_title">This App has been removed</string>
 

@@ -13,5 +13,7 @@
     <color name="appColorDark">#B1B8DF</color>
     <color name="renge">#FFAB373A</color>
     <color name="highlightComponent">@color/material_blue_100</color>
+    <color name="bottom_sheet_header_handler">#CCDFDFDF</color>
+    <color name="bottom_sheet_header_handler_activated">#CC444444</color>
 
 </resources>

@@ -62,7 +62,6 @@
     <string name="pref_group_others">Інші</string>
 
     <string name="show_system_apps">Показувати системні додатки</string>
-    <string name="entry_animation">Вступна анімація</string>
     <string name="apk_analytics">Аналізування АРК</string>
     <string name="colorful_icon">Кольорові іконки</string>
     <string name="rules_repo_title">Сховище правил</string>
@@ -74,7 +73,6 @@
     <string name="cloud_rules">Правила в хмарі</string>
 
     <string name="show_system_apps_summary">Управління відображенням системних додатків в списку додатків</string>
-    <string name="entry_animation_summary">Відтворення анімації при відкритті і закритті сторінки відомостей</string>
     <string name="apk_analytics_summary">Відкриває сторінку подробиць при натисканні на APK-файл</string>
     <string name="colorful_icon_summary">Частина позначених бібліотек буде відображатися у вигляді кольорових іконок.</string>
     <string name="lib_ref_threshold_summary">Відображаються лише ті бібліотеки, число посилань на які перевищує заданий поріг</string>
@@ -95,6 +93,7 @@
     <string name="further_operation">Додаткові опції</string>
     <string name="app_info_launch">Запустити</string>
     <string name="app_info_settings">Налаштування</string>
+    <string name="lib_detail_dialog_title">Library Details</string>
 
     <!--  Toast  -->
     <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>
@@ -113,7 +112,6 @@
     <string name="snapshot_indicator_changed">Змінено</string>
     <string name="snapshot_indicator_moved">Переміщено</string>
     <string name="snapshot_empty_list_title">Немає змін</string>
-    <string name="snapshot_empty_list_subtitle">Здається, що немає ніяких змін в компонентах додатки, проте в додатку могли статися значні зміни.</string>
     <string name="snapshot_detail_new_install_title">Цей додаток нещодавно встановлено</string>
     <string name="snapshot_detail_deleted_title">Цей додаток був видалений</string>
 
