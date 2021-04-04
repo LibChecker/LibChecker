@@ -39,10 +39,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                 for (item in items) {
                     natives = try {
                         packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                        PackageUtils.getNativeDirLibs(
-                            packageInfo.applicationInfo.sourceDir,
-                            packageInfo.applicationInfo.nativeLibraryDir
-                        )
+                        PackageUtils.getNativeDirLibs(packageInfo)
                     } catch (e: Exception) {
                         Timber.e(e)
                         emptyList()

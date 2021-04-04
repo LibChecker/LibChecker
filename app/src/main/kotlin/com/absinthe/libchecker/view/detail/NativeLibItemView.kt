@@ -80,9 +80,10 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val chipWidth = chip?.apply { autoMeasure() }?.measuredWidth ?: 0
-        val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
+        if (chipWidth != 0) { chipWidth.plus(libName.marginEnd) }
+        val libNameWidth = measuredWidth - paddingStart - paddingEnd - chipWidth
         libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-        libSize.autoMeasure()
+        libSize.measure(libNameWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
         setMeasuredDimension(measuredWidth, (libName.measuredHeight + libSize.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(40.dp))
     }
 

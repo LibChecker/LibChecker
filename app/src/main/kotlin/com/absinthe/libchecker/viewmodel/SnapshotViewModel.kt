@@ -103,7 +103,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 versionCodeDiff = SnapshotDiffItem.DiffNode(dbItem.versionCode, versionCode),
                                 abiDiff = SnapshotDiffItem.DiffNode(dbItem.abi, PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir).toShort()),
                                 targetApiDiff = SnapshotDiffItem.DiffNode(dbItem.targetApi, it.targetSdkVersion.toShort()),
-                                nativeLibsDiff = SnapshotDiffItem.DiffNode(dbItem.nativeLibs, gson.toJson(PackageUtils.getNativeDirLibs(it.sourceDir, it.nativeLibraryDir))),
+                                nativeLibsDiff = SnapshotDiffItem.DiffNode(dbItem.nativeLibs, gson.toJson(PackageUtils.getNativeDirLibs(packageInfo))),
                                 servicesDiff = SnapshotDiffItem.DiffNode(dbItem.services, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))),
                                 activitiesDiff = SnapshotDiffItem.DiffNode(dbItem.activities, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))),
                                 receiversDiff = SnapshotDiffItem.DiffNode(dbItem.receivers, gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))),
@@ -165,7 +165,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()),
                             SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
                             SnapshotDiffItem.DiffNode(
-                                gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir))
+                                gson.toJson(PackageUtils.getNativeDirLibs(packageInfo))
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))

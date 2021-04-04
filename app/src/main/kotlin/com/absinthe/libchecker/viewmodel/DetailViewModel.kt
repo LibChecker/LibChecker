@@ -175,7 +175,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
 
     private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir ?: "", is32bit).toMutableList()
+        val list = PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(info.packageName), is32bit, true).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 

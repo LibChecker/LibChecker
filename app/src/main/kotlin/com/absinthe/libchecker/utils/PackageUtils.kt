@@ -31,6 +31,7 @@ import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.java.FreezeUtils
 import com.absinthe.libchecker.java.ManifestReader
+import com.absinthe.libchecker.java.StaticLibraryReader
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
@@ -40,7 +41,6 @@ import java.io.FileReader
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import kotlin.collections.ArrayList
 
 object PackageUtils {
 
@@ -170,11 +170,13 @@ object PackageUtils {
 
     /**
      * Get native libraries of an app
-     * @param sourcePath Source path of the app
-     * @param nativePath Native library path of the app
+     * @param packageInfo PackageInfo
+     * @param is32bit True if system is 32bit
+     * @param needStaticLibrary True if need get static libraries
      * @return List of LibStringItem
      */
-    fun getNativeDirLibs(sourcePath: String, nativePath: String, is32bit: Boolean = false): List<LibStringItem> {
+    fun getNativeDirLibs(packageInfo: PackageInfo, is32bit: Boolean = false, needStaticLibrary: Boolean = false): List<LibStringItem> {
+        val nativePath = packageInfo.applicationInfo.nativeLibraryDir
         val realNativePath = if (is32bit) {
             nativePath.substring(0, nativePath.lastIndexOf("/")) + "/arm"
         } else {
@@ -189,28 +191,32 @@ object PackageUtils {
         } ?: mutableListOf()
 
         if (list.isEmpty()) {
-            list.addAll(getSourceLibs(sourcePath, "lib/"))
+            list.addAll(getSourceLibs(packageInfo, "lib/"))
         }
-        list.addAll(getSourceLibs(sourcePath, "assets/", "/assets"))
+        list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
+
+        if (needStaticLibrary) {
+            list.addAll(getStaticLibs(packageInfo))
+        }
 
         return list.distinctBy { it.name }
     }
 
     /**
      * Get native libraries of an app from source path
-     * @param path Source path of the app
+     * @param packageInfo PackageInfo
      * @return List of LibStringItem
      */
-    private fun getSourceLibs(path: String, childDir: String, source: String? = null): List<LibStringItem> {
+    private fun getSourceLibs(packageInfo: PackageInfo, childDir: String, source: String? = null): List<LibStringItem> {
         try {
-            ZipFile(File(path)).use { zipFile ->
+            ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
                 return zipFile.entries()
                     .asSequence()
                     .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
                     .distinctBy { it.name.split("/").last() }
                     .map { LibStringItem(it.name.split("/").last(), it.size, source) }
                     .toList()
-                    .ifEmpty { getSplitLibs(path) }
+                    .ifEmpty { getSplitLibs(packageInfo) }
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -220,35 +226,29 @@ object PackageUtils {
 
     /**
      * Get native libraries of an app from split apk
-     * @param path Source path of the app
+     * @param packageInfo PackageInfo
      * @return List of LibStringItem
      */
-    private fun getSplitLibs(path: String): ArrayList<LibStringItem> {
-        val libList = ArrayList<LibStringItem>()
+    private fun getSplitLibs(packageInfo: PackageInfo): List<LibStringItem> {
+        val libList = mutableListOf<LibStringItem>()
+        val splitList = packageInfo.applicationInfo.splitSourceDirs
+        if (splitList.isNullOrEmpty()) {
+            return listOf()
+        }
 
-        File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-            var zipFile: ZipFile? = null
-            var entries: Enumeration<out ZipEntry>
-            var next: ZipEntry
+        splitList.find {
+            val fileName = it.split(File.separator).last()
+            fileName.startsWith("split_config.arm") || fileName.startsWith("split_config.x86")
+        }?.let {
+            ZipFile(File(it)).use { zipFile ->
+                val entries = zipFile.entries()
+                var next: ZipEntry
 
-            for (file in it) {
-                if (file.name.startsWith("split_config.arm") || file.name.startsWith("split_config.x86")) {
-                    try {
-                        zipFile = ZipFile(file)
-                        entries = zipFile.entries()
+                while (entries.hasMoreElements()) {
+                    next = entries.nextElement()
 
-                        while (entries.hasMoreElements()) {
-                            next = entries.nextElement()
-
-                            if (next.name.contains("lib/") && !next.isDirectory) {
-                                libList.add(LibStringItem(next.name.split("/").last(), next.size))
-                            }
-                        }
-                        break
-                    } catch (e: Exception) {
-                        continue
-                    } finally {
-                        zipFile?.close()
+                    if (next.name.contains("lib/") && !next.isDirectory) {
+                        libList.add(LibStringItem(next.name.split("/").last(), next.size))
                     }
                 }
             }
@@ -263,18 +263,7 @@ object PackageUtils {
      * @return true if it uses split apks
      */
     fun isSplitsApk(packageInfo: PackageInfo): Boolean {
-        try {
-            val path = packageInfo.applicationInfo.sourceDir
-            File(path.substring(0, path.lastIndexOf("/"))).listFiles()?.let {
-                if (it.any { item -> item.name.startsWith("split_config.") }) {
-                    return true
-                }
-            }
-        } catch (e: Exception) {
-            return false
-        }
-
-        return false
+        return !packageInfo.applicationInfo.splitSourceDirs.isNullOrEmpty()
     }
 
     /**
@@ -300,6 +289,31 @@ object PackageUtils {
         } catch (e: Exception) {
             false
         }
+    }
+
+    const val STATIC_LIBRARY_SOURCE_PREFIX = "[Static Library] "
+    const val VERSION_CODE_PREFIX = "[Version Code] "
+
+    /**
+     * Get static libraries which app uses
+     * @param packageInfo PackageInfo
+     * @return static libraries list
+     */
+    fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
+        val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
+        val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
+        if (demands.isNullOrEmpty() || sharedLibs.isNullOrEmpty()) {
+            return listOf()
+        }
+
+        val list = mutableListOf<LibStringItem>()
+        demands.forEach {
+            val source = sharedLibs.find { shared -> shared.contains(it.key) }
+            if (source != null) {
+                list.add(LibStringItem(it.key, (it.value as Int).toLong(), "$STATIC_LIBRARY_SOURCE_PREFIX$source"))
+            }
+        }
+        return list
     }
 
     /**

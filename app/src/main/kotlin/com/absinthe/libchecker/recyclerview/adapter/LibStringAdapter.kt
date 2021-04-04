@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
@@ -9,6 +11,7 @@ import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
@@ -20,6 +23,7 @@ import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
@@ -34,6 +38,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
         val itemName = if (item.item.source == DISABLED) {
             val sp = SpannableString(item.item.name)
@@ -47,7 +52,22 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
         if (type == NATIVE) {
             (holder.itemView as NativeLibItemView).apply {
                 libName.text = itemName
-                libSize.text = PackageUtils.sizeToString(item.item)
+                if (item.item.source?.startsWith(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX) == true) {
+                    libSize.let{
+                        it.text = "${item.item.source}\n${PackageUtils.VERSION_CODE_PREFIX}${item.item.size}"
+                        it.post {
+                            it.text = autoSplitText(it)
+                            val spannableString = SpannableString(it.text)
+                            val staticPrefixIndex = spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
+                            spannableString.setSpan(StyleSpan(Typeface.BOLD), staticPrefixIndex, staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+                            val versionCodePrefixIndex = spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
+                            spannableString.setSpan(StyleSpan(Typeface.BOLD), versionCodePrefixIndex, versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+                            it.text = spannableString
+                        }
+                    }
+                } else {
+                    libSize.text = PackageUtils.sizeToString(item.item)
+                }
                 setChip(item.chip)
             }
         } else {
@@ -81,5 +101,43 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
             return
         }
         highlightPosition = position
+    }
+
+    private fun autoSplitText(tv: TextView): String {
+        val rawText = tv.text.toString()
+        val tvPaint: Paint = tv.paint
+        val tvWidth = (tv.measuredWidth - tv.paddingStart - tv.paddingEnd).toFloat()
+
+        val rawTextLines = rawText.replace("\r".toRegex(), "").split("\n".toRegex()).toTypedArray()
+        val sbNewText = StringBuilder()
+
+        for (rawTextLine in rawTextLines) {
+            if (tvPaint.measureText(rawTextLine) <= tvWidth) {
+                sbNewText.append(rawTextLine)
+            } else {
+                var lineWidth = 0f
+                var cnt = 0
+
+                while (cnt != rawTextLine.length) {
+                    val ch = rawTextLine[cnt]
+                    lineWidth += tvPaint.measureText(ch.toString())
+
+                    if (lineWidth <= tvWidth) {
+                        sbNewText.append(ch)
+                    } else {
+                        sbNewText.append("\n")
+                        lineWidth = 0f
+                        --cnt
+                    }
+                    cnt++
+                }
+            }
+            sbNewText.append("\n")
+        }
+
+        if (!rawText.endsWith("\n")) {
+            sbNewText.deleteCharAt(sbNewText.length - 1)
+        }
+        return sbNewText.toString()
     }
 }

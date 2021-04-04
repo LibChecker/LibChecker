@@ -169,7 +169,7 @@ class ShootService : Service() {
                             abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
                             nativeLibs = gson.toJson(
-                                PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir)
+                                PackageUtils.getNativeDirLibs(it)
                             ),
                             services = gson.toJson(
                                 PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
@@ -223,7 +223,7 @@ class ShootService : Service() {
                             isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                             abi = abiValue.toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
-                            nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(info.sourceDir, info.nativeLibraryDir, PackageUtils.is32bit(abiValue))),
+                            nativeLibs = gson.toJson(PackageUtils.getNativeDirLibs(it, PackageUtils.is32bit(abiValue))),
                             services = gson.toJson(PackageUtils.getComponentStringList(it.packageName, SERVICE, false)),
                             activities = gson.toJson(PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)),
                             receivers = gson.toJson(PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)),

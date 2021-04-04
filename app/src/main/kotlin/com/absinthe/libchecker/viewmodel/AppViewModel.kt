@@ -279,10 +279,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
         try {
             for (item in appList) {
-                libList = PackageUtils.getNativeDirLibs(
-                    item.sourceDir,
-                    item.nativeLibraryDir
-                )
+                libList = PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
 
                 for (lib in libList) {
                     count = map[lib.name] ?: 0
@@ -410,10 +407,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         try {
                             packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                            libList = PackageUtils.getNativeDirLibs(
-                                packageInfo.applicationInfo.sourceDir,
-                                packageInfo.applicationInfo.nativeLibraryDir
-                            )
+                            libList = PackageUtils.getNativeDirLibs(packageInfo)
 
                             for (lib in libList) {
                                 count = map[lib.name]?.count ?: 0
@@ -469,10 +463,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         try {
                             packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                            libList = PackageUtils.getNativeDirLibs(
-                                packageInfo.applicationInfo.sourceDir,
-                                packageInfo.applicationInfo.nativeLibraryDir
-                            )
+                            libList = PackageUtils.getNativeDirLibs(packageInfo)
 
                             for (lib in libList) {
                                 count = map[lib.name]?.count ?: 0
@@ -623,7 +614,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     private suspend fun delete(item: LCItem) = repository.delete(item)
 
-    fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
+    private fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
 
     fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
         deleteAllRules()
