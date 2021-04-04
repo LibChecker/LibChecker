@@ -310,7 +310,7 @@ object PackageUtils {
         demands.forEach {
             val source = sharedLibs.find { shared -> shared.contains(it.key) }
             if (source != null) {
-                list.add(LibStringItem(it.key, (it.value as Int).toLong(), "$STATIC_LIBRARY_SOURCE_PREFIX$source"))
+                list.add(LibStringItem(it.key, 0L, "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"))
             }
         }
         return list

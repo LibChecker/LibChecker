@@ -54,7 +54,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 libName.text = itemName
                 if (item.item.source?.startsWith(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX) == true) {
                     libSize.let{
-                        it.text = "${item.item.source}\n${PackageUtils.VERSION_CODE_PREFIX}${item.item.size}"
+                        it.text = item.item.source
                         it.post {
                             it.text = autoSplitText(it)
                             val spannableString = SpannableString(it.text)
