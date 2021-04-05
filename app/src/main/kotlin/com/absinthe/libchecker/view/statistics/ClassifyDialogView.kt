@@ -21,9 +21,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-        paddingTopCompat = 16.dp
-        clipToPadding = false
-
+        addPaddingTop(16.dp)
         adapter.setOnItemClickListener { _, _, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {

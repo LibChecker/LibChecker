@@ -9,17 +9,27 @@ import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 
-abstract class BaseBottomSheetViewDialogFragment<T: View> : BottomSheetDialogFragment() {
+
+abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
 
     private var _root: T? = null
     private val behavior by lazy { BottomSheetBehavior.from(root.parent as View) }
     private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_DRAGGING) {
-                getHeaderView().onHandlerActivated(true)
-            } else if (newState == BottomSheetBehavior.STATE_SETTLING) {
-                getHeaderView().onHandlerActivated(false)
+            when (newState) {
+                BottomSheetBehavior.STATE_DRAGGING -> {
+                    getHeaderView().onHandlerActivated(true)
+                }
+                BottomSheetBehavior.STATE_SETTLING -> {
+                    getHeaderView().onHandlerActivated(false)
+                }
+                BottomSheetBehavior.STATE_EXPANDED -> {
+                    bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
+                }
+                else -> {}
             }
         }
 
@@ -56,5 +66,24 @@ abstract class BaseBottomSheetViewDialogFragment<T: View> : BottomSheetDialogFra
     override fun onDestroyView() {
         _root = null
         super.onDestroyView()
+    }
+
+    private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
+        //Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
+        val shapeAppearanceModel = ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
+                .build()
+
+        //Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
+        val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
+        val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+
+        //Copy the attributes in the new MaterialShapeDrawable
+        newMaterialShapeDrawable.initializeElevationOverlay(context)
+        newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
+        newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList
+        newMaterialShapeDrawable.elevation = currentMaterialShapeDrawable.elevation
+        newMaterialShapeDrawable.strokeWidth = currentMaterialShapeDrawable.strokeWidth
+        newMaterialShapeDrawable.strokeColor = currentMaterialShapeDrawable.strokeColor
+        return newMaterialShapeDrawable
     }
 }
