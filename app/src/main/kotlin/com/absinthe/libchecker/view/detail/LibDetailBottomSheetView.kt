@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.detail
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -15,6 +16,7 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.extensions.getColorByAttr
 import com.absinthe.libchecker.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
@@ -157,13 +159,13 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         }
 
         private val createNewIssueText = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = 16.dp
-            }
+            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             text = context.getString(R.string.create_an_issue)
             setLinkTextColor(context.getColor(R.color.colorPrimary))
+            gravity = Gravity.CENTER_VERTICAL
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
             compoundDrawablePadding = 4.dp
-            setCompoundDrawables(context.getDrawable(R.drawable.ic_github), null, null, null)
+            compoundDrawableTintList = ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
             isClickable = true
             movementMethod = LinkMovementMethod.getInstance()
             text = HtmlCompat.fromHtml(

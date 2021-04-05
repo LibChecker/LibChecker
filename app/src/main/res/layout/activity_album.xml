@@ -32,52 +32,6 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appbar">
-
-        <com.absinthe.libchecker.view.snapshot.AlbumItemView
-            android:id="@+id/item_comparison"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/album_item_margin_horizontal"
-            android:layout_marginVertical="@dimen/album_item_margin_vertival"
-            app:albumItemSubtitle="@string/album_item_comparison_subtitle"
-            app:albumItemTitle="@string/album_item_comparison_title"
-            app:itemIcon="@drawable/ic_compare"
-            app:itemIconTint="@color/material_red_300" />
-
-        <com.absinthe.libchecker.view.snapshot.AlbumItemView
-            android:id="@+id/item_management"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/album_item_margin_horizontal"
-            android:layout_marginVertical="@dimen/album_item_margin_vertival"
-            app:albumItemSubtitle="@string/album_item_management_subtitle"
-            app:albumItemTitle="@string/album_item_management_title"
-            app:itemIcon="@drawable/ic_manage"
-            app:itemIconTint="@color/material_blue_300" />
-
-        <com.absinthe.libchecker.view.snapshot.AlbumItemView
-            android:id="@+id/item_backup_restore"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/album_item_margin_horizontal"
-            android:layout_marginVertical="@dimen/album_item_margin_vertival"
-            app:albumItemSubtitle="@string/album_item_backup_restore_subtitle"
-            app:albumItemTitle="@string/album_item_backup_restore_title"
-            app:itemIcon="@drawable/ic_backup"
-            app:itemIconTint="@color/material_green_300" />
-
-        <com.absinthe.libchecker.view.snapshot.AlbumItemView
-            android:id="@+id/item_track"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/album_item_margin_horizontal"
-            android:layout_marginVertical="@dimen/album_item_margin_vertival"
-            app:albumItemSubtitle="@string/album_item_track_subtitle"
-            app:albumItemTitle="@string/album_item_track_title"
-            app:itemIcon="@drawable/ic_track"
-            app:itemIconTint="@color/material_orange_300" />
-
-    </LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/appbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

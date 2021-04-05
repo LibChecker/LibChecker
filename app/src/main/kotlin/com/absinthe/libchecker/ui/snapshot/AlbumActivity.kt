@@ -1,27 +1,21 @@
 package com.absinthe.libchecker.ui.snapshot
 
-import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.Fade
-import androidx.transition.TransitionManager
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
-import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
+import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,9 +25,6 @@ class AlbumActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAlbumBinding
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val itemClickObserver = MutableLiveData<Boolean>()
-    private var isEasterEggAdded = false
-    private var longClickCount = 0
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityAlbumBinding.inflate(layoutInflater)
@@ -50,10 +41,71 @@ class AlbumActivity : BaseActivity() {
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        binding.itemComparison.setOnClickListener {
+        val itemComparison = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
+                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+            }
+            background = null
+            container.apply {
+                setIcon(R.drawable.ic_compare)
+                setIconBackgroundColor(R.color.material_red_300)
+                title.text = getString(R.string.album_item_comparison_title)
+                subtitle.text = getString(R.string.album_item_comparison_subtitle)
+            }
+        }
+        val itemManagement = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
+                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+            }
+            background = null
+            container.apply {
+                setIcon(R.drawable.ic_manage)
+                setIconBackgroundColor(R.color.material_blue_300)
+                title.text = getString(R.string.album_item_management_title)
+                subtitle.text = getString(R.string.album_item_management_subtitle)
+            }
+        }
+        val itemBackupRestore = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
+                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+            }
+            background = null
+            container.apply {
+                setIcon(R.drawable.ic_backup)
+                setIconBackgroundColor(R.color.material_green_300)
+                title.text = getString(R.string.album_item_backup_restore_title)
+                subtitle.text = getString(R.string.album_item_backup_restore_subtitle)
+            }
+        }
+        val itemTrack = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
+                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+            }
+            background = null
+            container.apply {
+                setIcon(R.drawable.ic_track)
+                setIconBackgroundColor(R.color.material_orange_300)
+                title.text = getString(R.string.album_item_track_title)
+                subtitle.text = getString(R.string.album_item_track_subtitle)
+            }
+        }
+        binding.llContainer.addView(itemComparison)
+        binding.llContainer.addView(itemManagement)
+        binding.llContainer.addView(itemBackupRestore)
+        binding.llContainer.addView(itemTrack)
+
+        itemComparison.setOnClickListener {
             startActivity(Intent(this, ComparisonActivity::class.java))
         }
-        binding.itemManagement.setOnClickListener {
+        itemManagement.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
                 var timeStampList = viewModel.repository.getTimeStamps()
                 val charList = mutableListOf<String>()
@@ -89,38 +141,12 @@ class AlbumActivity : BaseActivity() {
                 }
             }
         }
-        binding.itemBackupRestore.setOnClickListener {
+        itemBackupRestore.setOnClickListener {
             startActivity(Intent(this, BackupActivity::class.java))
         }
-        binding.itemTrack.setOnClickListener {
+        itemTrack.setOnClickListener {
             startActivity(Intent(this, TrackActivity::class.java))
         }
-
-        binding.itemComparison.setOnTouchListener(touchListener)
-        binding.itemManagement.setOnTouchListener(touchListener)
-        binding.itemBackupRestore.setOnTouchListener(touchListener)
-        binding.itemTrack.setOnTouchListener(touchListener)
-
-        itemClickObserver.observe(this, {
-            if (longClickCount >= 2 && !isEasterEggAdded) {
-                val easterEgg = ImageView(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(200.dp, 200.dp).apply {
-                        gravity = Gravity.CENTER_HORIZONTAL
-                    }
-                    setImageResource(R.drawable.ic_album_easter_egg)
-                    isVisible = false
-                }
-                binding.llContainer.addView(easterEgg)
-
-                val transition = Fade().apply {
-                    duration = 600
-                    addTarget(easterEgg)
-                }
-                TransitionManager.beginDelayedTransition(binding.llContainer, transition)
-                easterEgg.isVisible = true
-                isEasterEggAdded = true
-            }
-        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -128,30 +154,5 @@ class AlbumActivity : BaseActivity() {
             onBackPressed()
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private val touchListener = View.OnTouchListener { _, event ->
-        var touchFlag = false
-
-        when (event?.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                touchFlag = false
-                longClickCount++
-                itemClickObserver.value = true
-            }
-            MotionEvent.ACTION_UP -> {
-                longClickCount--
-                itemClickObserver.value = false
-
-                if (longClickCount > 1) {
-                    touchFlag = true
-                }
-            }
-            MotionEvent.ACTION_MOVE -> {
-                touchFlag = true
-            }
-        }
-        touchFlag
     }
 }

@@ -1,11 +1,18 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
-import android.util.AttributeSet
-import android.view.LayoutInflater
+import android.content.res.ColorStateList
+import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
 /**
@@ -14,27 +21,69 @@ import com.google.android.material.card.MaterialCardView
  * time : 2020/09/22
  * </pre>
  */
-class AlbumItemView : MaterialCardView {
+class AlbumItemView(context: Context) : MaterialCardView(context) {
 
-    constructor(context: Context?) : super(context)
+    val container = AlbumItemContainerView(context).apply {
+        val paddingHorizontal = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
+        val paddingVertical = context.getDimensionPixelSize(R.dimen.album_card_inset_vertical)
+        setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical)
+    }
 
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        LayoutInflater.from(context).inflate(R.layout.layout_album_item, this)
-        context.obtainStyledAttributes(attrs, R.styleable.AlbumItemView).apply {
-            findViewById<TextView>(R.id.tv_title)?.text = getString(R.styleable.AlbumItemView_albumItemTitle)
-            findViewById<TextView>(R.id.tv_subtitle)?.text = getString(R.styleable.AlbumItemView_albumItemSubtitle)
-            findViewById<ImageView>(R.id.icon)?.apply {
-                setImageResource(getResourceId(R.styleable.AlbumItemView_itemIcon, 0))
-                backgroundTintList = getColorStateList(R.styleable.AlbumItemView_itemIconTint)
-            }
-            recycle()
+    init {
+        addView(container)
+    }
+
+    class AlbumItemContainerView(context: Context) : AViewGroup(context) {
+
+        private val icon = AppCompatImageView(context).apply {
+            val iconSize = context.getDimensionPixelSize(R.dimen.album_card_icon_size)
+            layoutParams = LayoutParams(iconSize, iconSize)
+            setBackgroundResource(R.drawable.bg_gray_circle)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
-        background = null
-        isClickable = true
-        isFocusable = true
+
+        val title = AppCompatTextView(context).apply {
+            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                it.marginStart = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
+            }
+            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+        }
+
+        val subtitle = AppCompatTextView(context).apply {
+            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
+            setTextColor(context.getColor(R.color.textSecondary))
+        }
+
+        init {
+            background = null
+            addView(icon)
+            addView(title)
+            addView(subtitle)
+        }
+
+        fun setIcon(@DrawableRes res: Int) {
+            icon.setImageResource(res)
+        }
+
+        fun setIconBackgroundColor(@ColorRes res: Int) {
+            icon.backgroundTintList = ColorStateList.valueOf(context.getColor(res))
+        }
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            icon.autoMeasure()
+            val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - title.marginStart
+            title.measure(textWidth.toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
+            subtitle.measure(textWidth.toExactlyMeasureSpec(), subtitle.defaultHeightMeasureSpec(this))
+            setMeasuredDimension(measuredWidth, (title.measuredHeight + subtitle.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom)
+        }
+
+        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+            icon.layout(paddingStart, icon.toVerticalCenter(this))
+            title.layout(icon.right + title.marginStart, (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2)
+            subtitle.layout(title.left, title.bottom)
+        }
     }
 
-    override fun performClick(): Boolean {
-        return super.performClick()
-    }
 }
