@@ -301,19 +301,24 @@ object PackageUtils {
      */
     fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
         val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
-        val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
-        if (demands.isNullOrEmpty() || sharedLibs.isNullOrEmpty()) {
-            return listOf()
-        }
-
-        val list = mutableListOf<LibStringItem>()
-        demands.forEach {
-            val source = sharedLibs.find { shared -> shared.contains(it.key) }
-            if (source != null) {
-                list.add(LibStringItem(it.key, 0L, "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"))
+        try {
+            val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
+            if (demands.isNullOrEmpty() || sharedLibs.isNullOrEmpty()) {
+                return listOf()
             }
+
+            val list = mutableListOf<LibStringItem>()
+            demands.forEach {
+                val source = sharedLibs.find { shared -> shared.contains(it.key) }
+                if (source != null) {
+                    list.add(LibStringItem(it.key, 0L, "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"))
+                }
+            }
+            return list
+        } catch (e: Exception) {
+            Timber.e(e)
+            return emptyList()
         }
-        return list
     }
 
     /**

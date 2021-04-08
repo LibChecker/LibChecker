@@ -16,7 +16,6 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -132,7 +131,7 @@ class BackupActivity : BaseActivity() {
                 lp.leftMargin = lp.rightMargin
             }
 
-            recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
+            recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as BaseActivity?)?.appBar?.setRaised(!top) }
             return recyclerView
         }
     }

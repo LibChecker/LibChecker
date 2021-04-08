@@ -43,7 +43,7 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
                 EXTRA_ITEM_LIST
             )?.toList()?.let {
                 root.adapter.setList(it)
-                item = it as ArrayList<LCItem>
+                item = ArrayList(it)
             }
         } else {
             root.adapter.setList(item)

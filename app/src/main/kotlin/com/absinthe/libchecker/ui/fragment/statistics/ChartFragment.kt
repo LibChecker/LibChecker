@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
@@ -296,7 +295,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     }
 
     override fun onNothingSelected() {
-        Log.d("Classify Fragment", "Nothing selected")
+        Timber.d("Nothing selected")
     }
 
     override fun onValueSelected(e: Entry?, h: Highlight?) {
@@ -304,7 +303,9 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         if (h == null) return
         if (mDialog != null && mDialog!!.isShowing()) return
 
-        chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        }
 
         var dialogTitle = ""
         var item: List<LCItem> = emptyList()
