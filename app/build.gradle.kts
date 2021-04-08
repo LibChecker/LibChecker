@@ -133,7 +133,7 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.36.1")
+val grpcVersion by extra("1.37.0")
 val protocVersion by extra("3.15.6")
 
 dependencies {
@@ -167,7 +167,7 @@ dependencies {
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-rc01")
+    implementation("androidx.recyclerview:recyclerview:1.2.0")
     implementation("androidx.core:core-ktx:1.6.0-alpha01")
 
     implementation("com.google.android.material:material:1.3.0")

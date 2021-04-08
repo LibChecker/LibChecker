@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.about
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
 import android.media.MediaPlayer
@@ -12,6 +13,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
@@ -20,6 +22,7 @@ import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -38,11 +41,7 @@ private const val RENGE_CHECKER = "RengeChecker"
 class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
-
-    override fun attachBaseContext(newBase: Context?) {
-        newBase?.apply { resources.configuration.setLocale(LocaleDelegate.defaultLocale) }
-        super.attachBaseContext(newBase)
-    }
+    private val configuration by lazy { Configuration(resources.configuration).apply { setLocale(GlobalValues.locale) } }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -102,7 +101,7 @@ class AboutActivity : AbsAboutActivity() {
 
         items.apply {
             add(Category("What's this"))
-            add(Card(getString(R.string.about_info)))
+            add(Card(getStringByConfiguration(R.string.about_info)))
 
             add(Category("Developers"))
             val developerUrl = if (hasInstallCoolApk) {
@@ -132,7 +131,7 @@ class AboutActivity : AbsAboutActivity() {
             add(Card(HtmlCompat.fromHtml(getAcknowledgementHtmlString(list), HtmlCompat.FROM_HTML_MODE_LEGACY)))
 
             add(Category("Declaration"))
-            add(Card(getString(R.string.library_declaration)))
+            add(Card(getStringByConfiguration(R.string.library_declaration)))
 
             add(Category("Open Source Licenses"))
             add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
@@ -187,8 +186,10 @@ class AboutActivity : AbsAboutActivity() {
         val sb = StringBuilder()
         val formatItem = "<a href=\"%s\">%s</a><br>"
 
-        sb.append(getString(R.string.resource_declaration)).append("<br>")
+        sb.append(getStringByConfiguration(R.string.resource_declaration)).append("<br>")
         list.forEach { sb.append(String.format(formatItem, it, it)) }
         return sb.toString()
     }
+
+    private fun getStringByConfiguration(@StringRes res: Int): String = createConfigurationContext(configuration).resources.getString(res)
 }

@@ -41,7 +41,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
 
     private val emptyView by lazy { EmptyListView(requireContext()) }
     private val hasIntegration by lazy {
-        MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY)
+        !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
     }
     private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 

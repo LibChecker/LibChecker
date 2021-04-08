@@ -56,6 +56,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.isApk = true
         intent.data?.scheme?.let { scheme ->
             if (scheme == "content") {
                 intent.data?.let {

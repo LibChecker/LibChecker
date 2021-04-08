@@ -44,6 +44,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
     var is32bit = false
+    var isApk = false
 
     init {
         componentsMap.put(SERVICE, MutableLiveData())
