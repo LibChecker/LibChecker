@@ -21,7 +21,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: gradle-core-${{ github.sha }}
+          key: gradle-app-${{ github.sha }}
           restore-keys: |
             gradle-
       - name: Retrieve version
