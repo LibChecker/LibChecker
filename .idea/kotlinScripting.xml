@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="KotlinScriptingSettings">
-    <scriptDefinition className="org.jetbrains.kotlin.scripting.resolve.KotlinScriptDefinitionFromAnnotatedTemplate" definitionName="KotlinBuildScript">
-      <order>2147483647</order>
-      <autoReloadConfigurations>true</autoReloadConfigurations>
-    </scriptDefinition>
-  </component>
-</project>

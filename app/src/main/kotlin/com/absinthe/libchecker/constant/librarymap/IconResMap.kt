@@ -81,6 +81,7 @@ object IconResMap {
             put(68, R.drawable.ic_lib_vlc)
             put(69, R.drawable.ic_lib_paypal)
             put(70, R.drawable.ic_lib_qt)
+            put(71, R.drawable.ic_lib_dataranger)
         }
 
         SINGLE_COLOR_ICON_SET = setOf(

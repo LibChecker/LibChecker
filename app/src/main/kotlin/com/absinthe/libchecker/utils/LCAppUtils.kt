@@ -122,7 +122,7 @@ object LCAppUtils {
             }
             val isApk = packageName.endsWith("/temp.apk")
             when(ruleEntity.name) {
-                "libjiagu.so" -> {
+                "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
                     return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util", isApk)) {
                         ruleEntity
                     } else {
