@@ -436,7 +436,12 @@ object PackageUtils {
         return list.asSequence()
             .map {
                 state = LibCheckerApp.context.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
-                isEnabled = state == PackageManager.COMPONENT_ENABLED_STATE_ENABLED || state == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+                isEnabled = when(state) {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+                    PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> it.enabled
+                    else -> false
+                }
 
                 if (isSimpleName) {
                     StatefulComponent(it.name.removePrefix(packageName), isEnabled)
