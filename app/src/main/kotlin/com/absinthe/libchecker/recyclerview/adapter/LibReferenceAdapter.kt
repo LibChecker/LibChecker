@@ -52,7 +52,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
                     setImageResource(it.iconRes)
 
                     if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                        colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                        this.drawable.mutate().colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                     }
                 }
 

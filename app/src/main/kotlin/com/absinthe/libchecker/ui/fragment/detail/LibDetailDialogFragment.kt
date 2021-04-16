@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.core.text.HtmlCompat
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import coil.load
@@ -97,6 +99,18 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
         viewModel.detailBean.value = null
     }
 
+    override fun show(manager: FragmentManager, tag: String?) {
+        if (!isShowing) {
+            isShowing = true
+            super.show(manager, tag)
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        isShowing = false
+    }
+
     companion object {
         fun newInstance(
             libName: String,
@@ -112,5 +126,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                     }
                 }
         }
+
+        var isShowing = false
     }
 }

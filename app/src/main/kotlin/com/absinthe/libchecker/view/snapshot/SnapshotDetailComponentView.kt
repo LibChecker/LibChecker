@@ -88,11 +88,11 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
                     if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(entity.iconIndex)) {
                         val icon = chipIcon
                         icon?.let {
-                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            it.mutate().colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                             chipIcon = it
                         }
                     } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
-                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, android.R.color.black))
+                        chipIcon?.mutate()?.setTint(Color.BLACK)
                     } else {
                         setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
                     }
