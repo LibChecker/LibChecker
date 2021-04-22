@@ -23,33 +23,26 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
     // To inline the bytecode built with JVM target 1.8 into
     // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
 
-    sourceSets {
-        getByName("main").java.apply {
-            srcDirs("src/main/kotlin")
-            srcDirs("src/main/java")
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    sourceSets["main"].java.srcDirs("src/main/kotlin")
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
-    packagingOptions {
-        exclude("META-INF/atomicfu.kotlin_module")
-    }
+    packagingOptions.excludes += setOf(
+        "META-INF/atomicfu.kotlin_module"
+    )
 }
 
 dependencies {

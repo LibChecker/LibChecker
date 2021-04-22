@@ -9,9 +9,8 @@ plugins {
     id("kotlin-parcelize")
     id("com.google.protobuf")
 }
-apply {
-    from("and_res_guard.gradle")
-}
+
+apply("and_res_guard.gradle")
 
 android {
     compileSdkVersion(30)
@@ -29,15 +28,16 @@ android {
         versionName = "${baseVersionName}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resConfigs("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments["room.incremental"] = "true"
-            }
-        }
     }
 
     buildFeatures {
         viewBinding = true
+    }
+
+    kapt {
+        arguments {
+            arg("room.incremental", "true")
+        }
     }
 
     buildTypes {
@@ -47,39 +47,31 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
     // To inline the bytecode built with JVM target 1.8 into
     // bytecode that is being built with JVM target 1.6. (e.g. navArgs)
 
-    sourceSets {
-        getByName("main").java.apply {
-            srcDirs("src/main/kotlin")
-            srcDirs("src/main/java")
-            srcDirs("src/main/proto")
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
+    sourceSets["main"].java.srcDirs("src/main/kotlin")
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
-    packagingOptions {
-        excludes += "META-INF/**"
-        excludes += "okhttp3/**"
-        excludes += "kotlin/**"
-        excludes += "org/**"
-        excludes += "**.properties"
-        excludes += "**.bin"
-    }
+    packagingOptions.excludes += setOf(
+        "META-INF/**",
+        "okhttp3/**",
+        "kotlin/**",
+        "org/**",
+        "**.properties",
+        "**.bin"
+    )
 
     dependenciesInfo.includeInApk = false
 
@@ -186,7 +178,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
-    implementation ("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
+    implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
     implementation("dev.rikka.rikkax.core:core:1.3.2")
     implementation("dev.rikka.rikkax.material:material:1.6.4")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.1")
@@ -230,7 +222,7 @@ protobuf {
                     }
                 }
 
-                it.plugins{
+                it.plugins {
                     create("grpc") {
                         option("lite")
                     }
