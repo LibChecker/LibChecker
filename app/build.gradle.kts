@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.google.protobuf.gradle.*
 import java.nio.file.Paths
+import java.nio.charset.Charset
 
 plugins {
     id("com.android.application")
@@ -16,8 +17,8 @@ android {
     compileSdkVersion(30)
     buildToolsVersion = "30.0.3"
 
-    val gitCommitId = "git rev-parse --short HEAD".runCommand(project.rootDir)
-    val gitCommitCount = "git rev-list --count HEAD".runCommand(project.rootDir).toInt()
+    val gitCommitId = "git rev-parse --short HEAD".exec()
+    val gitCommitCount = "git rev-list --count HEAD".exec().toInt()
     val baseVersionName = "2.0.10"
 
     defaultConfig {
@@ -230,17 +231,8 @@ protobuf {
             }
         }
     }
-
 }
 
-fun String.runCommand(workingDir: File = file("./")): String {
-    val parts = this.split("\\s".toRegex())
-    val proc = ProcessBuilder(*parts.toTypedArray())
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
+fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
+    .toString(Charset.defaultCharset()).trim()
 
-    proc.waitFor(1, TimeUnit.MINUTES)
-    return proc.inputStream.bufferedReader().readText().trim()
-}
