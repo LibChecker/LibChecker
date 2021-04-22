@@ -24,7 +24,7 @@ andResGuard {
             "*.webp"
     ]
     sevenzip {
-        artifact = 'com.tencent.mm:SevenZip:1.2.20'
+        artifact = 'com.tencent.mm:SevenZip:1.2.21'
         //path = "/usr/local/bin/7za"
     }
 

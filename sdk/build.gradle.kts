@@ -54,13 +54,13 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.1.5")
+    implementation("com.absinthe.libraries.utils:utils:1.2.0")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core-ktx:1.6.0-alpha01")
+    implementation("androidx.core:core-ktx:1.6.0-alpha02")
 
     testImplementation("junit:junit:4.13.2")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")

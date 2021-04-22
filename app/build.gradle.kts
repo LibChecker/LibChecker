@@ -133,11 +133,11 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.37.0")
-val protocVersion by extra("3.15.6")
+val protocVersion by extra("3.15.8")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
 
     implementation("com.absinthe.libraries.me:me:1.0.6")
     implementation("com.absinthe.libraries.utils:utils:1.2.0")
@@ -146,7 +146,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.2")
+    implementation("androidx.fragment:fragment-ktx:1.3.3")
     implementation("androidx.activity:activity-ktx:1.2.2")
     // Lifecycle
     val lifecycleVersion = "2.3.1"
@@ -156,7 +156,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
 
     // Room components
-    val roomVersion = "2.2.6"
+    val roomVersion = "2.3.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
@@ -167,14 +167,14 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0")
-    implementation("androidx.core:core-ktx:1.6.0-alpha01")
+    implementation("androidx.core:core-ktx:1.6.0-alpha02")
 
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
     implementation("com.airbnb.android:lottie:3.7.0")
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.2.0")
@@ -189,7 +189,7 @@ dependencies {
     implementation ("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
     implementation("dev.rikka.rikkax.core:core:1.3.2")
     implementation("dev.rikka.rikkax.material:material:1.6.4")
-    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.0")
+    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.1")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
 
