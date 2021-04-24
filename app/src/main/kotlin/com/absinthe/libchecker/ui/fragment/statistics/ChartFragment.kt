@@ -391,9 +391,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                     mDialog = null
                 }
             })
-        }.apply {
-            show(childFragmentManager, tag)
-            item = ArrayList(item)
+        }
+        mDialog?.let {
+            it.show(requireActivity().supportFragmentManager, tag)
+            it.item = ArrayList(item)
         }
     }
 
