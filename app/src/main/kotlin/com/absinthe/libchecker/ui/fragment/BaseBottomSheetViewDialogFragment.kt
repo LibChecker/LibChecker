@@ -56,6 +56,10 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
             UiUtils.setSystemBarStyle(it)
         }
         behavior.addBottomSheetCallback(bottomSheetCallback)
+
+        if (requireActivity().window.decorView.measuredHeight < 1200) {
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
     }
 
     override fun onStop() {
