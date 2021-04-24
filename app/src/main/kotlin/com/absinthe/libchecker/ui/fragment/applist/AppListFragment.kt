@@ -324,6 +324,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
             shouldRequestChange.observe(viewLifecycleOwner, {
                 if (isListReady && !it) {
+                    viewModel.dbItems.value?.let { updateItems(it) }
                     doOnMainThreadIdle({
                         flip(VF_LIST)
                     })

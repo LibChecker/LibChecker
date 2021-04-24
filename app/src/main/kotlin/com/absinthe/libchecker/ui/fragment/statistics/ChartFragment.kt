@@ -391,10 +391,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                     mDialog = null
                 }
             })
+        }.apply {
+            show(childFragmentManager, tag)
+            item = ArrayList(item)
         }
-        mDialog!!.show(requireActivity().supportFragmentManager, tag)
-        mDialog!!.item = ArrayList(item)
-
     }
 
     override fun onButtonChecked(

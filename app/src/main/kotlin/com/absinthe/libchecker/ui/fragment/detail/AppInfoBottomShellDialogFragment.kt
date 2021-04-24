@@ -8,11 +8,13 @@ import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.extensions.addSystemBarPadding
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
@@ -40,6 +42,10 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
     }
 
     private fun initView(root: AppInfoBottomSheetView) {
+        root.apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            setPadding(24.dp, 16.dp, 24.dp, 0)
+        }
         root.launch.setOnClickListener {
             try {
                 startLaunchAppActivity(packageName)

@@ -40,8 +40,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
     }
 
     init {
-        val padding = 24.dp
-        setPadding(padding, 16.dp, padding, padding)
+        setPadding(24.dp, 16.dp, 24.dp, 0)
         addView(header)
         addView(launch)
         addView(setting)

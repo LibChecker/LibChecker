@@ -112,7 +112,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         }!!
         findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
             setOnPreferenceClickListener {
-                CloudRulesDialogFragment().show(requireActivity().supportFragmentManager, tag)
+                CloudRulesDialogFragment().show(childFragmentManager, tag)
                 true
             }
         }
