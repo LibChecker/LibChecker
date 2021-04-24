@@ -149,11 +149,15 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                         launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
                     }
                 } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                        data = URLManager.DOCS_PAGE.toUri()
+                    Timber.e(e)
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            data = URLManager.DOCS_PAGE.toUri()
+                        }
+                        requireActivity().startActivity(intent)
+                    } catch (e: ActivityNotFoundException) {
+                        Timber.e(e)
                     }
-                    requireActivity().startActivity(intent)
                 }
                 true
             }
@@ -171,16 +175,21 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                     startActivity(Intent.parseUri(marketUrl, 0))
                     Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
                 } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
+                    Timber.e(e)
                 }
                 true
             }
         }
         findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
             setOnPreferenceClickListener {
-                startActivity(Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri()).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri()).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                } catch (e: ActivityNotFoundException) {
+
+                    Timber.e(e)
+                }
                 true
             }
         }

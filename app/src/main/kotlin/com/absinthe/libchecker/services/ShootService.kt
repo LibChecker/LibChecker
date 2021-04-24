@@ -50,6 +50,7 @@ class ShootService : Service() {
     private val gson = Gson()
     private val repository = LibCheckerApp.repository
     private val listenerList = RemoteCallbackList<OnShootListener>()
+    private var isSendingBroadcast = false
 
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
@@ -98,17 +99,21 @@ class ShootService : Service() {
     }
 
     private fun notifyFinished(timestamp: Long) {
-        Timber.i("notifyFinished start")
-        val count = listenerList.beginBroadcast()
-        for (i in 0 until count) {
-            try {
-                Timber.i("notifyFinished $i")
-                listenerList.getBroadcastItem(i).onShootFinished(timestamp)
-            } catch (e: RemoteException) {
-                Timber.e(e)
+        if (!isSendingBroadcast) {
+            isSendingBroadcast = true
+            Timber.i("notifyFinished start")
+            val count = listenerList.beginBroadcast()
+            for (i in 0 until count) {
+                try {
+                    Timber.i("notifyFinished $i")
+                    listenerList.getBroadcastItem(i).onShootFinished(timestamp)
+                } catch (e: RemoteException) {
+                    Timber.e(e)
+                }
             }
+            listenerList.finishBroadcast()
+            isSendingBroadcast = false
         }
-        listenerList.finishBroadcast()
     }
 
     private fun notifyProgress(progress: Int) {
