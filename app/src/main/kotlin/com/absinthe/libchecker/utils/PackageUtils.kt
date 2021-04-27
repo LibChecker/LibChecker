@@ -632,7 +632,7 @@ object PackageUtils {
         return resList.joinToString { context.getString(it) }
     }
 
-    private val ABI_BADGE_MAP = hashMapOf(
+    private val ABI_BADGE_MAP = mapOf(
         ARMV8 to R.drawable.ic_abi_label_64bit,
         X86_64 to R.drawable.ic_abi_label_64bit,
         ARMV7 to R.drawable.ic_abi_label_32bit,
@@ -651,7 +651,7 @@ object PackageUtils {
      * @return Badge resource
      */
     fun getAbiBadgeResource(type: Int): Int {
-        return ABI_BADGE_MAP[type] ?: R.drawable.ic_abi_label_no_libs
+        return ABI_BADGE_MAP[type] ?: R.drawable.ic_abi_label_64bit
     }
 
     /**
