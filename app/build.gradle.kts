@@ -1,7 +1,6 @@
-import com.android.build.gradle.internal.api.BaseVariantOutputImpl
 import com.google.protobuf.gradle.*
-import java.nio.file.Paths
 import java.nio.charset.Charset
+import java.nio.file.Paths
 
 plugins {
     id("com.android.application")
@@ -14,7 +13,7 @@ plugins {
 apply("and_res_guard.gradle")
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
     buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
@@ -23,12 +22,18 @@ android {
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
-        minSdkVersion(23)
-        targetSdkVersion(30)
+        minSdk = 23
+        targetSdk = 30
         versionCode = gitCommitCount
         versionName = "${baseVersionName}.${gitCommitId}"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
+        resourceConfigurations.apply {
+            add("en")
+            add("zh-rCN")
+            add("zh-rTW")
+            add("ru")
+            add("uk-rUA")
+        }
     }
 
     buildFeatures {
@@ -41,13 +46,17 @@ android {
         }
     }
 
+    compileOptions {
+        targetCompatibility(JavaVersion.VERSION_11)
+        sourceCompatibility(JavaVersion.VERSION_11)
+    }
+
     buildTypes {
         getByName("debug") {
             applicationIdSuffix = ".debug"
         }
         getByName("release") {
             isMinifyEnabled = true
-            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -61,7 +70,7 @@ android {
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
-    packagingOptions.excludes += setOf(
+    packagingOptions.resources.excludes += setOf(
         "META-INF/**",
         "okhttp3/**",
         "kotlin/**",
@@ -72,16 +81,16 @@ android {
 
     dependenciesInfo.includeInApk = false
 
-    applicationVariants.all {
-        outputs.map { it as BaseVariantOutputImpl }.forEach { output ->
-            output.outputFileName = "LibChecker-${versionName}-${versionCode}-${buildType.name}.apk"
-        }
-    }
+//    applicationVariants.all {
+//        outputs.map { it as BaseVariantOutputImpl }.forEach { output ->
+//            output.outputFileName = "LibChecker-${versionName}-${versionCode}-${buildType.name}.apk"
+//        }
+//    }
 }
 
 val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
     val aapt2 = Paths.get(
-        project.android.sdkDirectory.path,
+        project.androidComponents.sdkComponents.sdkDirectory.get().asFile.path,
         "build-tools",
         project.android.buildToolsVersion,
         "aapt2"
@@ -128,8 +137,8 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
 
-    implementation("com.absinthe.libraries.me:me:1.0.6")
-    implementation("com.absinthe.libraries.utils:utils:1.2.0")
+    implementation("com.github.zhaobozhen.libraries:me:1.0.1")
+    implementation("com.github.zhaobozhen.libraries:utils:1.0.1")
 
     val appCenterSdkVersion = "4.1.1"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
