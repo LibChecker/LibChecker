@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview.adapter
+package com.absinthe.libchecker.recyclerview.adapter.detail
 
 import android.annotation.SuppressLint
 import android.graphics.Color

@@ -1,6 +1,8 @@
 import com.google.protobuf.gradle.*
 import java.nio.charset.Charset
 import java.nio.file.Paths
+import com.android.build.api.variant.impl.ApplicationVariantImpl
+import com.android.build.gradle.internal.dsl.BuildType
 
 plugins {
     id("com.android.application")
@@ -17,27 +19,23 @@ android {
     buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
-    val gitCommitCount = "git rev-list --count HEAD".exec().toInt()
     val baseVersionName = "2.0.11"
+    val verName = "${baseVersionName}.${gitCommitId}"
+    val verCode = "git rev-list --count HEAD".exec().toInt()
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
         minSdk = 23
         targetSdk = 30
-        versionCode = gitCommitCount
-        versionName = "${baseVersionName}.${gitCommitId}"
+        versionCode = verCode
+        versionName = verName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        resourceConfigurations.apply {
-            add("en")
-            add("zh-rCN")
-            add("zh-rTW")
-            add("ru")
-            add("uk-rUA")
-        }
+        resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     kapt {
@@ -52,11 +50,12 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        debug {
             applicationIdSuffix = ".debug"
         }
-        getByName("release") {
+        release {
             isMinifyEnabled = true
+            (this as BuildType).isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -81,19 +80,18 @@ android {
 
     dependenciesInfo.includeInApk = false
 
-//    applicationVariants.all {
-//        outputs.map { it as BaseVariantOutputImpl }.forEach { output ->
-//            output.outputFileName = "LibChecker-${versionName}-${versionCode}-${buildType.name}.apk"
-//        }
-//    }
+    androidComponents.onVariants { v ->
+        val variant = v as ApplicationVariantImpl
+        variant.outputs.forEach {
+            it.outputFileName.set("LibChecker-${verName}-${verCode}-${variant.name}.apk")
+        }
+    }
 }
 
 val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
-    val aapt2 = Paths.get(
-        project.androidComponents.sdkComponents.sdkDirectory.get().asFile.path,
-        "build-tools",
-        project.android.buildToolsVersion,
-        "aapt2"
+    val aapt2 = File(
+        androidComponents.sdkComponents.sdkDirectory.get().asFile,
+        "build-tools/${project.android.buildToolsVersion}/aapt2"
     )
     val zip = Paths.get(
         project.buildDir.path,
@@ -175,7 +173,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.2.0")
+    implementation("io.coil-kt:coil:1.2.1")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
@@ -211,14 +209,22 @@ dependencies {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:$protocVersion"
+        artifact = if (osdetector.os == "osx") {
+            "com.google.protobuf:protoc:$protocVersion:osx-x86_64"
+        } else {
+            "com.google.protobuf:protoc:$protocVersion"
+        }
     }
     plugins {
         // Optional: an artifact spec for a protoc plugin, with "grpc" as
         // the identifier, which can be referred to in the "plugins"
         // container of the "generateProtoTasks" closure.
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+            artifact = if (osdetector.os == "osx") {
+                "io.grpc:protoc-gen-grpc-java:$grpcVersion:osx-x86_64"
+            } else {
+                "io.grpc:protoc-gen-grpc-java:$grpcVersion"
+            }
         }
         generateProtoTasks {
             all().forEach {

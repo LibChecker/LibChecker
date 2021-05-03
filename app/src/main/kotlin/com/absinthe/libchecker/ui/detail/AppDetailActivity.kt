@@ -150,12 +150,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 chipAppBundle.apply {
                                     isVisible = isSplitApk
                                     setOnClickListener {
-                                        AlertDialog.Builder(this@AppDetailActivity)
-                                            .setIcon(R.drawable.ic_aab)
-                                            .setTitle(R.string.app_bundle)
-                                            .setMessage(R.string.app_bundle_details)
-                                            .setPositiveButton(android.R.string.ok, null)
-                                            .show()
+                                        AppBundleBottomSheetDialogFragment().apply {
+                                            arguments = Bundle().apply {
+                                                putString(EXTRA_PACKAGE_NAME, pkgName)
+                                            }
+                                            show(supportFragmentManager, tag)
+                                        }
                                     }
                                 }
                                 chipKotlinUsed.apply {

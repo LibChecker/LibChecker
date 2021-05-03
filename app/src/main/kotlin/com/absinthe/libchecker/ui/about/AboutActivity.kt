@@ -1,17 +1,18 @@
 package com.absinthe.libchecker.ui.about
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.TransitionDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
@@ -35,7 +36,6 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import rikka.material.app.LocaleDelegate
 
 private const val RENGE_CHECKER = "RengeChecker"
 
@@ -79,10 +79,13 @@ class AboutActivity : AbsAboutActivity() {
 
                     val inputStream = assets.open("renge.webp")
                     icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
-                    slogan.text = "えい、私もよ。"
-                    setHeaderBackground(ColorDrawable(ContextCompat.getColor(this, R.color.renge)))
+                    slogan.text = "ええ、私もよ。"
+                    val headerContentLayout = findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
+                    val drawable = TransitionDrawable(arrayOf(headerContentLayout.background, ColorDrawable(ContextCompat.getColor(this, R.color.renge))))
+                    setHeaderBackground(drawable)
                     setHeaderContentScrim(ColorDrawable(ContextCompat.getColor(this, R.color.renge)))
                     window.statusBarColor = ContextCompat.getColor(this, R.color.renge)
+                    drawable.startTransition(250)
 
                     val fd = assets.openFd("renge_no_koe.aac")
                     MediaPlayer().apply {

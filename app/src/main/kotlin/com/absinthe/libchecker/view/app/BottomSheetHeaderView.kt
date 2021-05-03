@@ -31,6 +31,9 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
         addView(this)
     }
 
+    private val handlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler) }
+    private val activatedHandlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler_activated) }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         handler.autoMeasure()
@@ -45,9 +48,9 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
 
     fun onHandlerActivated(activated: Boolean) {
         val handlerArray = if (activated) {
-            arrayOf(context.getDrawable(R.drawable.bg_dialog_handler), context.getDrawable(R.drawable.bg_dialog_handler_activated))
+            arrayOf(handlerDrawable, activatedHandlerDrawable)
         } else {
-            arrayOf(context.getDrawable(R.drawable.bg_dialog_handler_activated), context.getDrawable(R.drawable.bg_dialog_handler))
+            arrayOf(activatedHandlerDrawable, handlerDrawable)
         }
         val transitionDrawable = TransitionDrawable(handlerArray)
         handler.background = transitionDrawable

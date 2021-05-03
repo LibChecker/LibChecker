@@ -121,6 +121,7 @@
 
 -dontwarn org.conscrypt.ConscryptHostnameVerifier
 -dontwarn java.lang.ClassValue
+-dontwarn okhttp3.internal.platform.ConscryptPlatform
 
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.recyclerview.adapter.LibStringAdapter
+import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE

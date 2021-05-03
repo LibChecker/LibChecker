@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.recyclerview.adapter
+package com.absinthe.libchecker.recyclerview.adapter.detail
 
 import android.content.pm.ResolveInfo
 import android.view.ViewGroup
@@ -13,7 +13,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
  * time : 2020/10/25
  * </pre>
  */
-class AppInfoAdapter :BaseQuickAdapter<ResolveInfo, BaseViewHolder>(0) {
+class AppInfoAdapter : BaseQuickAdapter<ResolveInfo, BaseViewHolder>(0) {
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return BaseViewHolder(AppInfoItemView(context))
@@ -25,5 +25,4 @@ class AppInfoAdapter :BaseQuickAdapter<ResolveInfo, BaseViewHolder>(0) {
             setText(item.activityInfo.loadLabel(context.packageManager))
         }
     }
-
 }

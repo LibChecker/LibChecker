@@ -11,7 +11,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import timber.log.Timber
 
 
 abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
@@ -21,7 +20,6 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     private val behavior by lazy { BottomSheetBehavior.from(root.parent as View) }
     private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            Timber.d("state = $newState， bottom = $bottomSheet")
             when (newState) {
                 BottomSheetBehavior.STATE_DRAGGING -> {
                     if (!isHandlerActivated) {
