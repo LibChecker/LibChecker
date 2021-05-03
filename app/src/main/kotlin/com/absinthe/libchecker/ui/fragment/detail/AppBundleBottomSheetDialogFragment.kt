@@ -14,6 +14,7 @@ import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppBundleBottomSheetView
 import com.absinthe.libchecker.view.detail.AppBundleItemView
 import java.io.File
+import java.util.*
 
 class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
@@ -40,13 +41,15 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
         packageName?.let {
             val packageInfo = PackageUtils.getPackageInfo(it)
             val list = packageInfo.applicationInfo.splitSourceDirs
+            val localeList by lazy { Locale.getISOCountries() }
             val bundleList = list.map { split ->
                 val name = split.substringAfterLast("/")
                 val type = when {
                     name.startsWith("split_config.arm") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
                     name.startsWith("split_config.x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
                     name.endsWith("dpi.apk") -> AppBundleItemView.IconType.TYPE_MATERIALS
-                    else -> AppBundleItemView.IconType.TYPE_STRINGS
+                    localeList.contains(name.removePrefix("split_config.").removeSuffix(".apk")) -> AppBundleItemView.IconType.TYPE_STRINGS
+                    else -> AppBundleItemView.IconType.TYPE_OTHERS
                 }
                 AppBundleItemBean(name = name, size = File(split).length(), type = type)
             }

@@ -41,6 +41,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
             IconType.TYPE_NATIVE_LIBS -> icon.setImageResource(R.drawable.ic_logo)
             IconType.TYPE_MATERIALS -> icon.setImageResource(R.drawable.ic_outline_image)
             IconType.TYPE_STRINGS -> icon.setImageResource(R.drawable.ic_translate)
+            IconType.TYPE_OTHERS -> icon.setImageResource(R.drawable.ic_split)
             else -> throw IllegalArgumentException("wrong type")
         }
     }
@@ -73,6 +74,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
             const val TYPE_NATIVE_LIBS = 0
             const val TYPE_MATERIALS = 1
             const val TYPE_STRINGS = 2
+            const val TYPE_OTHERS = 3
         }
     }
 }

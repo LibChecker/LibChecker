@@ -24,7 +24,6 @@ class AppBundleBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     }
 
     init {
-        setPadding(8.dp, 16.dp, 8.dp, 0)
         addView(header)
         addView(list)
     }
