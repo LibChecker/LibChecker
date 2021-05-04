@@ -29,7 +29,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     }
 
     init {
-        setPadding(16.dp, 8.dp, 16.dp, 8.dp)
+        setPadding(8.dp, 8.dp, 8.dp, 8.dp)
         setBackgroundResource(R.drawable.bg_lib_detail_item)
         addView(icon)
         addView(name)

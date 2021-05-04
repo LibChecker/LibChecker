@@ -41,7 +41,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
         packageName?.let {
             val packageInfo = PackageUtils.getPackageInfo(it)
             val list = packageInfo.applicationInfo.splitSourceDirs
-            val localeList by lazy { Locale.getISOCountries() }
+            val localeList by lazy { Locale.getISOLanguages() }
             val bundleList = list.map { split ->
                 val name = split.substringAfterLast("/")
                 val type = when {
