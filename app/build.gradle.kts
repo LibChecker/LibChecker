@@ -155,8 +155,8 @@ dependencies {
     val roomVersion = "2.3.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
+    kapt("org.xerial:sqlite-jdbc:3.34.0") //Work around on Apple Silicon
     kapt("androidx.room:room-compiler:$roomVersion")
-    //implementation("org.xerial:sqlite-jdbc:3.34.0")
 
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.browser:browser:1.3.0")

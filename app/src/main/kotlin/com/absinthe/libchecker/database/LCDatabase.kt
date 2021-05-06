@@ -10,7 +10,8 @@ import com.absinthe.libchecker.database.entity.*
 
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
-    TrackItem::class, RuleEntity::class], version = 11, exportSchema = false)
+    TrackItem::class, RuleEntity::class,
+    SnapshotDiffStoringItem::class], version = 12, exportSchema = false)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -34,7 +35,7 @@ abstract class LCDatabase : RoomDatabase() {
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
                         MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11
+                        MIGRATION_10_11, MIGRATION_11_12
                     )
                     .build()
                 INSTANCE = instance
@@ -130,6 +131,14 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL(
                     "ALTER TABLE item_table ADD COLUMN targetApi INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
+
+        private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "CREATE TABLE diff_table (packageName TEXT NOT NULL, lastUpdatedTime INTEGER NOT NULL, diffContent TEXT NOT NULL, PRIMARY KEY(packageName))"
                 )
             }
         }

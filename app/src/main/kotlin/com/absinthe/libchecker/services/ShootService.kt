@@ -149,6 +149,8 @@ class ShootService : Service() {
             } while (appList == null)
         }
 
+        repository.deleteAllSnapshotDiffItems()
+
         val size = appList.size
         var count = 0
         val dbList = mutableListOf<SnapshotItem>()
