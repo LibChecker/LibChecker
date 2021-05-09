@@ -182,24 +182,25 @@ object PackageUtils {
         } else {
             nativePath
         }
-        val file = File(realNativePath)
-        val list = file.listFiles()?.let { list ->
-            list.asSequence()
-                .distinctBy { it.name }
-                .map { LibStringItem(it.name, it.length()) }
-                .toMutableList()
-        } ?: mutableListOf()
+        try {
+            val file = File(realNativePath)
+            val list = file.listFiles()?.asSequence()?.distinctBy { it.name }
+                ?.map { LibStringItem(it.name, it.length()) }?.toMutableList()
+                ?: mutableListOf()
 
-        if (list.isEmpty()) {
-            list.addAll(getSourceLibs(packageInfo, "lib/"))
+            if (list.isEmpty()) {
+                list.addAll(getSourceLibs(packageInfo, "lib/"))
+            }
+            list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
+
+            if (needStaticLibrary) {
+                list.addAll(getStaticLibs(packageInfo))
+            }
+
+            return list.distinctBy { it.name }
+        } catch (e: NullPointerException) {
+            return emptyList()
         }
-        list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
-
-        if (needStaticLibrary) {
-            list.addAll(getStaticLibs(packageInfo))
-        }
-
-        return list.distinctBy { it.name }
     }
 
     /**
