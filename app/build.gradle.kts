@@ -35,7 +35,6 @@ android {
 
     buildFeatures {
         viewBinding = true
-        buildConfig = true
     }
 
     kapt {
@@ -62,8 +61,6 @@ android {
             )
         }
     }
-
-    sourceSets["main"].java.srcDirs("src/main/kotlin")
 
     kotlinOptions {
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
@@ -129,7 +126,7 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.37.0")
-val protocVersion by extra("3.15.8")
+val protocVersion by extra("3.16.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
