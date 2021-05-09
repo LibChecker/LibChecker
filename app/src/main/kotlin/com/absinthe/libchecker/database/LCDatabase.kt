@@ -11,7 +11,7 @@ import com.absinthe.libchecker.database.entity.*
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, RuleEntity::class,
-    SnapshotDiffStoringItem::class], version = 12, exportSchema = false)
+    SnapshotDiffStoringItem::class], version = 12, exportSchema = true)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao

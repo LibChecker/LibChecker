@@ -29,9 +29,9 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.exception.MiuiOpsException
-import com.absinthe.libchecker.java.FreezeUtils
-import com.absinthe.libchecker.java.ManifestReader
-import com.absinthe.libchecker.java.StaticLibraryReader
+import com.absinthe.libchecker.FreezeUtils
+import com.absinthe.libchecker.ManifestReader
+import com.absinthe.libchecker.StaticLibraryReader
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber

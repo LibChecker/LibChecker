@@ -40,6 +40,7 @@ android {
     kapt {
         arguments {
             arg("room.incremental", "true")
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 

@@ -119,12 +119,19 @@
 
 -keep public class com.absinthe.libchecker.protocol.*  { *; }
 
--dontwarn org.conscrypt.ConscryptHostnameVerifier
--dontwarn java.lang.ClassValue
--dontwarn okhttp3.internal.platform.ConscryptPlatform
-
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.
 -keepattributes Signature,InnerClasses
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
+
+-dontwarn org.conscrypt.ConscryptHostnameVerifier
+-dontwarn java.lang.ClassValue
+-dontwarn okhttp3.internal.platform.ConscryptPlatform
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+-dontwarn org.conscrypt.Conscrypt
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE
