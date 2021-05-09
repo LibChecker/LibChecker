@@ -51,8 +51,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
     }
 
-    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT) = viewModelScope.launch(Dispatchers.IO) {
+    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT, shouldClearDiff: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         val timer = TimeRecorder().apply { start() }
+
+        if (shouldClearDiff) {
+            repository.deleteAllSnapshotDiffItems()
+        }
+
         if (currTimeStamp == CURRENT_SNAPSHOT) {
             compareDiffWithApplicationList(preTimeStamp)
         } else {

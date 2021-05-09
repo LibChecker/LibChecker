@@ -137,8 +137,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                                 GlobalValues.snapshotTimestamp = timeStampList[which].timestamp
                                 viewModel.timestamp.value = timeStampList[which].timestamp
                                 flip(VF_LOADING)
-                                viewModel.repository.deleteAllSnapshotDiffItems()
-                                viewModel.compareDiff(timeStampList[which].timestamp)
+                                viewModel.compareDiff(timeStampList[which].timestamp, shouldClearDiff = true)
                             }
                             .show()
                     }
