@@ -49,7 +49,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
 
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.core:core-ktx:1.6.0-alpha02")
+    implementation("androidx.core:core-ktx:1.6.0-alpha03")
 
     testImplementation("junit:junit:4.13.2")
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")

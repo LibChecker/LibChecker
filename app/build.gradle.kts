@@ -19,7 +19,7 @@ android {
     buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
-    val baseVersionName = "2.0.11"
+    val baseVersionName = "2.0.12"
     val verName = "${baseVersionName}.${gitCommitId}"
     val verCode = "git rev-list --count HEAD".exec().toInt()
 
@@ -143,7 +143,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
     implementation("androidx.fragment:fragment-ktx:1.3.3")
-    implementation("androidx.activity:activity-ktx:1.2.2")
+    implementation("androidx.activity:activity-ktx:1.2.3")
     // Lifecycle
     val lifecycleVersion = "2.3.1"
     implementation("androidx.lifecycle:lifecycle-common-java8:${lifecycleVersion}")
@@ -163,7 +163,7 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.0")
-    implementation("androidx.core:core-ktx:1.6.0-alpha02")
+    implementation("androidx.core:core-ktx:1.6.0-alpha03")
 
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
@@ -184,7 +184,7 @@ dependencies {
 
     implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
     implementation("dev.rikka.rikkax.core:core:1.3.2")
-    implementation("dev.rikka.rikkax.material:material:1.6.4")
+    implementation("dev.rikka.rikkax.material:material:1.6.5")
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.1")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.2")
