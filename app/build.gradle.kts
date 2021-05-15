@@ -126,12 +126,12 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.37.0")
-val protocVersion by extra("3.16.0")
+val grpcVersion by extra("1.37.1")
+val protocVersion by extra("3.17.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
 
     implementation("com.github.zhaobozhen.libraries:me:1.0.1")
     implementation("com.github.zhaobozhen.libraries:utils:1.0.1")
