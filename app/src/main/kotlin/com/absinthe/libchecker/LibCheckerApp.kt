@@ -3,6 +3,7 @@ package com.absinthe.libchecker
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
@@ -18,12 +19,17 @@ import com.microsoft.appcenter.crashes.Crashes
 import jonathanfinerty.once.Once
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 import timber.log.Timber
 
 class LibCheckerApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            HiddenApiBypass.setHiddenApiExemptions("L")
+        }
 
         context = this
         if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
