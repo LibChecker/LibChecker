@@ -126,7 +126,7 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.37.1")
+val grpcVersion by extra("1.38.0")
 val protocVersion by extra("3.17.0")
 
 dependencies {
@@ -140,7 +140,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.3")
+    implementation("androidx.fragment:fragment-ktx:1.3.4")
     implementation("androidx.activity:activity-ktx:1.2.3")
     // Lifecycle
     val lifecycleVersion = "2.3.1"
