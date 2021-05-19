@@ -1,6 +1,16 @@
 name: Android CI
 
-on: push
+on:
+  push:
+    branches: [ master ]
+    paths:
+    - 'app/**'
+    - '.github/workflows/android.yml'
+    - 'gradle.properties'
+  pull_request:
+    paths:
+    - 'app/**'
+    - '.github/workflows/android.yml'
 
 jobs:
   build:
