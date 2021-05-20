@@ -129,7 +129,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         isApk = false
                     )
                     viewModel.is32bit = PackageUtils.is32bit(abi)
-                    val spanString = SpannableString("  ${PackageUtils.getAbiString(this@AppDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageName)}")
+                    val spanString = SpannableString(
+                        "  ${PackageUtils.getAbiString(this@AppDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageName)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                    )
                     ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
                         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                         val span = CenterAlignImageSpan(it)

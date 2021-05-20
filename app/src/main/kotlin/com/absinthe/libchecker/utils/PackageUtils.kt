@@ -495,7 +495,7 @@ object PackageUtils {
         try {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
-            val demands = ManifestReader.getManifestPropertities(file, listOf(use32bitAbiString, multiArchString).toTypedArray())
+            val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString).toTypedArray())
 
             val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
             val multiArch = demands[multiArchString] as? Boolean ?: false
@@ -795,5 +795,22 @@ object PackageUtils {
         } catch (e: PackageManager.NameNotFoundException) {
             false
         }
+    }
+
+    private const val minSdkVersion = "minSdkVersion"
+
+    /**
+     * Get minSdkVersion of an app
+     * @param packageInfo PackageInfo
+     * @return minSdkVersion
+     */
+    fun getMinSdkVersion(packageInfo: PackageInfo): String {
+        val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
+            packageInfo.applicationInfo.minSdkVersion.toString()
+        } else {
+            val demands = ManifestReader.getManifestProperties(File(packageInfo.applicationInfo.sourceDir), listOf(minSdkVersion).toTypedArray())
+            demands[minSdkVersion]?.toString() ?: "?"
+        }
+        return "$minSdkVersion $minSdkVersionValue"
     }
 }

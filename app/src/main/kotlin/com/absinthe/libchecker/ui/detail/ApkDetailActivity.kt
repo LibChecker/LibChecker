@@ -133,7 +133,9 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         }
 
                         val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
-                        val spanString = SpannableString("  ${PackageUtils.getAbiString(this@ApkDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageInfo)}")
+                        val spanString = SpannableString(
+                            "  ${PackageUtils.getAbiString(this@ApkDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageInfo)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                        )
                         ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { label ->
                             label.setBounds(0, 0, label.intrinsicWidth, label.intrinsicHeight)
                             val span = CenterAlignImageSpan(label)
