@@ -159,6 +159,7 @@ class AboutActivity : AbsAboutActivity() {
             add(License("AndroidFastScroll", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AndroidFastScroll"))
             add(License("AppIconLoader", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AppIconLoader"))
             add(License("LSPosed", "LSPosed", License.GPL_V3, "https://github.com/LSPosed/LSPosed"))
+            add(License("AndroidHiddenApiBypass", "LSPosed", License.APACHE_2, "https://github.com/LSPosed/AndroidHiddenApiBypass"))
         }
     }
 

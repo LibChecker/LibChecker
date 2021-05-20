@@ -1,12 +1,9 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.AppBundleItemBean
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
-import com.absinthe.libchecker.recyclerview.adapter.detail.AppBundleAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
@@ -19,25 +16,20 @@ import java.util.*
 class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-    private val mAdapter = AppBundleAdapter()
+    private lateinit var headerView: BottomSheetHeaderView
 
     override fun initRootView(): AppBundleBottomSheetView = AppBundleBottomSheetView(requireContext())
-    override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
+    override fun getHeaderView(): BottomSheetHeaderView = headerView
 
     override fun init() {
-        root.apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setPadding(24.dp, 16.dp, 24.dp, 0)
+        headerView = BottomSheetHeaderView(requireContext()).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                it.topMargin = 8.dp
+                it.bottomMargin = 24.dp
+            }
+            title.text = getString(R.string.app_bundle)
         }
-        root.list.apply {
-            adapter = mAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            addItemDecoration(VerticalSpacesItemDecoration(4.dp))
-            addSystemBarPadding(addStatusBarPadding = false)
-        }
+        root.adapter.setHeaderView(headerView)
         packageName?.let {
             val packageInfo = PackageUtils.getPackageInfo(it)
             val list = packageInfo.applicationInfo.splitSourceDirs
@@ -53,7 +45,7 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
                 }
                 AppBundleItemBean(name = name, size = File(split).length(), type = type)
             }
-            mAdapter.setList(bundleList)
+            root.adapter.setList(bundleList)
         }
     }
 }
