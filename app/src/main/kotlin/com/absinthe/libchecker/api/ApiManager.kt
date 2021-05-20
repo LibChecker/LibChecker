@@ -2,6 +2,10 @@ package com.absinthe.libchecker.api
 
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 private const val BRANCH_MASTER = "master"
 private const val WORKING_BRANCH = BRANCH_MASTER
@@ -13,7 +17,8 @@ object ApiManager {
     private const val GITEE_ROOT_URL =
         "https://gitee.com/zhaobozhen/LibChecker-Rules/raw/$WORKING_BRANCH/"
 
-    const val GITHUB_NEW_ISSUE_URL = "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
+    const val GITHUB_NEW_ISSUE_URL =
+        "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
 
     var root = GITHUB_ROOT_URL
         get() = when (GlobalValues.repo) {
@@ -22,4 +27,16 @@ object ApiManager {
             else -> GITHUB_ROOT_URL
         }
         private set
+
+    val retrofit by lazy {
+        val okhttpBuilder = OkHttpClient.Builder()
+            .connectTimeout(30 * 1000, TimeUnit.MILLISECONDS)
+            .readTimeout(30 * 1000, TimeUnit.MILLISECONDS)
+            .writeTimeout(30 * 1000, TimeUnit.MILLISECONDS)
+        Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okhttpBuilder.build())
+            .baseUrl(root)
+            .build()
+    }
 }

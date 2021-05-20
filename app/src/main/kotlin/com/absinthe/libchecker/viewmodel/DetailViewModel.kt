@@ -27,8 +27,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -136,12 +134,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 e.printStackTrace()
             }
         }
-
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(ApiManager.root)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val request: LibDetailRequest = retrofit.create(LibDetailRequest::class.java)
+    
+    private val request: LibDetailRequest = ApiManager.retrofit.create(LibDetailRequest::class.java)
 
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {
