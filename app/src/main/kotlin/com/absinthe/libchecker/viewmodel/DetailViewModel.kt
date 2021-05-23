@@ -135,7 +135,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     
-    private val request: LibDetailRequest = ApiManager.retrofit.create(LibDetailRequest::class.java)
+    private val request: LibDetailRequest = ApiManager.create()
 
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
         viewModelScope.launch(Dispatchers.IO) {

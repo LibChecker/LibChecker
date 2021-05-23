@@ -20,15 +20,14 @@ object ApiManager {
     const val GITHUB_NEW_ISSUE_URL =
         "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
 
-    var root = GITHUB_ROOT_URL
+    private val root
         get() = when (GlobalValues.repo) {
             Constants.REPO_GITHUB -> GITHUB_ROOT_URL
             Constants.REPO_GITEE -> GITEE_ROOT_URL
             else -> GITHUB_ROOT_URL
         }
-        private set
 
-    val retrofit by lazy {
+    private val retrofit by lazy {
         val okhttpBuilder = OkHttpClient.Builder()
             .connectTimeout(30 * 1000, TimeUnit.MILLISECONDS)
             .readTimeout(30 * 1000, TimeUnit.MILLISECONDS)
@@ -39,4 +38,8 @@ object ApiManager {
             .baseUrl(root)
             .build()
     }
+
+    fun <T> create(service: Class<T>): T = retrofit.create(service)
+
+    inline fun <reified T> create(): T = create(T::class.java)
 }
