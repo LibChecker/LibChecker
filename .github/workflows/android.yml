@@ -40,7 +40,7 @@ jobs:
       - name: Build with Gradle
         run: bash ./gradlew -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
-        if: success()
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         id: sign
         uses: r0adkll/sign-android-release@v1.0.4
         env:
@@ -63,6 +63,7 @@ jobs:
           name: mappings
           path: "app/build/outputs/mapping/release"
       - name: Send commit to telegram
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
