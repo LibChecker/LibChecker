@@ -28,7 +28,7 @@ class LibCheckerApp : Application() {
         super.onCreate()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            HiddenApiBypass.setHiddenApiExemptions("L")
+            HiddenApiBypass.addHiddenApiExemptions("L")
         }
 
         context = this

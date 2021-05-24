@@ -174,7 +174,7 @@ dependencies {
     implementation("io.coil-kt:coil:1.2.1")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
-    implementation("org.lsposed.hiddenapibypass:hiddenapibypass:1.1")
+    implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     //Serilization
