@@ -28,7 +28,7 @@ import timber.log.Timber
 
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
-    private val request: CloudRuleBundleRequest = ApiManager.retrofit.create(CloudRuleBundleRequest::class.java)
+    private val request: CloudRuleBundleRequest = ApiManager.create()
     private var bundlesCount: Int = 1
 
     override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
