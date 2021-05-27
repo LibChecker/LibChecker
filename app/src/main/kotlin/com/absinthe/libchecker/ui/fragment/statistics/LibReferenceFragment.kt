@@ -114,6 +114,9 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 isListReady = true
                 menu?.findItem(R.id.search)?.isVisible = true
             })
+            packageChangedLiveData.observe(viewLifecycleOwner) {
+                computeRef()
+            }
         }
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
             computeRef()

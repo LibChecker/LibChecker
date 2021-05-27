@@ -295,6 +295,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             initProgressLiveData.observe(viewLifecycleOwner, {
                 binding.progressIndicator.setProgressCompat(it, true)
             })
+            packageChangedLiveData.observe(viewLifecycleOwner) {
+                requestChange(true)
+            }
         }
 
         GlobalValues.apply {

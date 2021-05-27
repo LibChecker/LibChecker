@@ -25,6 +25,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -43,6 +44,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
     val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
+    val packageChangedLiveData = MutableLiveData<String?>()
     val comparingProgressLiveData = MutableLiveData(0)
 
     private val gson by lazy { Gson() }
@@ -51,20 +53,28 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
     }
 
-    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT, shouldClearDiff: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-        val timer = TimeRecorder().apply { start() }
+    private var compareDiffJob: Job? = null
 
-        if (shouldClearDiff) {
-            repository.deleteAllSnapshotDiffItems()
+    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT, shouldClearDiff: Boolean = false) {
+        if (compareDiffJob?.isActive == true) {
+            compareDiffJob?.cancel()
         }
+        compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
+            val timer = TimeRecorder().apply { start() }
 
-        if (currTimeStamp == CURRENT_SNAPSHOT) {
-            compareDiffWithApplicationList(preTimeStamp)
-        } else {
-            compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
+            if (shouldClearDiff) {
+                repository.deleteAllSnapshotDiffItems()
+            }
+
+            if (currTimeStamp == CURRENT_SNAPSHOT) {
+                compareDiffWithApplicationList(preTimeStamp)
+            } else {
+                compareDiffWithSnapshotList(preTimeStamp, currTimeStamp)
+            }
+            timer.end()
+            Timber.d("compareDiff: $timer")
         }
-        timer.end()
-        Timber.d("compareDiff: $timer")
+        compareDiffJob!!.start()
     }
 
     private suspend fun compareDiffWithApplicationList(preTimeStamp: Long) {

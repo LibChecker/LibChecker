@@ -44,6 +44,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val reloadAppsFlag = MutableLiveData(false)
     val initProgressLiveData = MutableLiveData(0)
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
+    val packageChangedLiveData = MutableLiveData<String?>()
     var hasRequestedChange = false
 
     private val repository = LibCheckerApp.repository

@@ -317,6 +317,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             comparingProgressLiveData.observe(viewLifecycleOwner, {
                 binding.progressIndicator.setProgressCompat(it, it != 1)
             })
+            packageChangedLiveData.observe(viewLifecycleOwner) {
+                compareDiff(GlobalValues.snapshotTimestamp)
+            }
         }
 
         lifecycleScope.launchWhenResumed {

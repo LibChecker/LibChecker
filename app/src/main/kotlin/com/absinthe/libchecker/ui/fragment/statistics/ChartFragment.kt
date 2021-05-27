@@ -66,9 +66,11 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             check(R.id.btn_abi)
         }
 
-        viewModel.dbItems.observe(viewLifecycleOwner, {
-            setData()
-        })
+        viewModel.apply {
+            dbItems.observe(viewLifecycleOwner, {
+                setData()
+            })
+        }
 
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
             setData()
