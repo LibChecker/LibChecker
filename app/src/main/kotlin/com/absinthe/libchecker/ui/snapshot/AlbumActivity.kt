@@ -41,62 +41,10 @@ class AlbumActivity : BaseActivity() {
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        val itemComparison = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
-                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
-                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-            }
-            background = null
-            container.apply {
-                setIcon(R.drawable.ic_compare)
-                setIconBackgroundColor(R.color.material_red_300)
-                title.text = getString(R.string.album_item_comparison_title)
-                subtitle.text = getString(R.string.album_item_comparison_subtitle)
-            }
-        }
-        val itemManagement = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
-                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
-                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-            }
-            background = null
-            container.apply {
-                setIcon(R.drawable.ic_manage)
-                setIconBackgroundColor(R.color.material_blue_300)
-                title.text = getString(R.string.album_item_management_title)
-                subtitle.text = getString(R.string.album_item_management_subtitle)
-            }
-        }
-        val itemBackupRestore = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
-                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
-                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-            }
-            background = null
-            container.apply {
-                setIcon(R.drawable.ic_backup)
-                setIconBackgroundColor(R.color.material_green_300)
-                title.text = getString(R.string.album_item_backup_restore_title)
-                subtitle.text = getString(R.string.album_item_backup_restore_subtitle)
-            }
-        }
-        val itemTrack = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
-                val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
-                it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-            }
-            background = null
-            container.apply {
-                setIcon(R.drawable.ic_track)
-                setIconBackgroundColor(R.color.material_orange_300)
-                title.text = getString(R.string.album_item_track_title)
-                subtitle.text = getString(R.string.album_item_track_subtitle)
-            }
-        }
+        val itemComparison = generateAlbumItemView(R.drawable.ic_compare, R.color.material_red_300, R.string.album_item_comparison_title, R.string.album_item_comparison_subtitle)
+        val itemManagement = generateAlbumItemView(R.drawable.ic_manage, R.color.material_blue_300, R.string.album_item_management_title, R.string.album_item_management_subtitle)
+        val itemBackupRestore = generateAlbumItemView(R.drawable.ic_backup, R.color.material_green_300, R.string.album_item_backup_restore_title, R.string.album_item_backup_restore_subtitle)
+        val itemTrack = generateAlbumItemView(R.drawable.ic_track, R.color.material_orange_300, R.string.album_item_track_title, R.string.album_item_track_subtitle)
         binding.llContainer.addView(itemComparison)
         binding.llContainer.addView(itemManagement)
         binding.llContainer.addView(itemBackupRestore)
@@ -154,5 +102,20 @@ class AlbumActivity : BaseActivity() {
             onBackPressed()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun generateAlbumItemView(iconRes: Int, iconBackgroundColorRes: Int, titleRes: Int, subtitleRes: Int): AlbumItemView = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
+            val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+            it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
+        }
+        background = null
+        container.apply {
+            setIcon(iconRes)
+            setIconBackgroundColor(iconBackgroundColorRes)
+            title.text = getString(titleRes)
+            subtitle.text = getString(subtitleRes)
+        }
     }
 }

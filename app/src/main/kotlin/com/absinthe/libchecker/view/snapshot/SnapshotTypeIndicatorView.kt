@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
@@ -13,24 +14,30 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
 
-    val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
         addView(this)
     }
 
-    val icon = AppCompatImageView(context).apply {
-        layoutParams = AViewGroup.LayoutParams(16.dp, 16.dp).also {
+    private val icon = AppCompatImageView(context).apply {
+        layoutParams = LayoutParams(16.dp, 16.dp).also {
             it.marginStart = 4.dp
         }
         addView(this)
     }
 
-    val colorLabel = View(context).apply {
-        layoutParams = AViewGroup.LayoutParams(20.dp, 5.dp).also {
+    private val colorLabel = View(context).apply {
+        layoutParams = LayoutParams(20.dp, 5.dp).also {
             it.marginStart = 4.dp
         }
         addView(this)
+    }
+
+    fun setIndicatorInfo(str: String, iconDrawable: Drawable?, labelColorRes: Int) {
+        text.text = str
+        icon.setImageDrawable(iconDrawable)
+        colorLabel.setBackgroundColor(labelColorRes)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
