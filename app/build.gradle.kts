@@ -178,7 +178,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     //Serilization
-    implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.google.code.gson:gson:2.8.7")
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
     implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
