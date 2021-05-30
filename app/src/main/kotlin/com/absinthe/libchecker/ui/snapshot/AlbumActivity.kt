@@ -107,7 +107,7 @@ class AlbumActivity : BaseActivity() {
     private fun generateAlbumItemView(iconRes: Int, iconBackgroundColorRes: Int, titleRes: Int, subtitleRes: Int): AlbumItemView = AlbumItemView(ContextThemeWrapper(this, R.style.AlbumMaterialCard)).apply {
         layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
             val marginHorizontal = context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
-            val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertival)
+            val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertical)
             it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
         }
         background = null

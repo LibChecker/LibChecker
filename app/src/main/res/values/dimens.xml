@@ -29,7 +29,7 @@
     <dimen name="main_card_elevation">1dp</dimen>
 
     <dimen name="album_item_margin_horizontal">8dp</dimen>
-    <dimen name="album_item_margin_vertival">4dp</dimen>
+    <dimen name="album_item_margin_vertical">4dp</dimen>
     <dimen name="album_card_icon_size">45dp</dimen>
     <dimen name="album_card_padding">8dp</dimen>
     <dimen name="album_card_corner">5dp</dimen>
