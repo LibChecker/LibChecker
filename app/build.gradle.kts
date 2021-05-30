@@ -131,7 +131,7 @@ val protocVersion by extra("3.17.0")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0-native-mt")
 
     implementation("com.github.zhaobozhen.libraries:me:1.0.1")
     implementation("com.github.zhaobozhen.libraries:utils:1.0.1")
