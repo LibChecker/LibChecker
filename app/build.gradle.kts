@@ -171,7 +171,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.2.1")
+    implementation("io.coil-kt:coil:1.2.2")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
