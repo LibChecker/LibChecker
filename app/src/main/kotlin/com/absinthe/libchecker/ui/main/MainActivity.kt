@@ -83,9 +83,13 @@ class MainActivity : BaseActivity(), IListContainer {
         handleIntentFromShortcuts(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        registerPackageBroadcast()
+    }
+
     override fun onResume() {
         super.onResume()
-        registerPackageBroadcast()
         if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(true)
         }
@@ -94,8 +98,8 @@ class MainActivity : BaseActivity(), IListContainer {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         unregisterPackageBroadcast()
     }
 
