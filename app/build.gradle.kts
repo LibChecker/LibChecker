@@ -136,7 +136,7 @@ dependencies {
     implementation("com.github.zhaobozhen.libraries:me:1.0.1")
     implementation("com.github.zhaobozhen.libraries:utils:1.0.1")
 
-    val appCenterSdkVersion = "4.1.1"
+    val appCenterSdkVersion = "4.2.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
@@ -160,8 +160,8 @@ dependencies {
     implementation("androidx.browser:browser:1.3.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-    implementation("androidx.recyclerview:recyclerview:1.2.0")
-    implementation("androidx.core:core-ktx:1.6.0-beta01")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+    implementation("androidx.core:core-ktx:1.6.0-beta02")
 
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
@@ -171,7 +171,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.jonathanfinerty.once:once:1.3.0")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.2.1")
+    implementation("io.coil-kt:coil:1.2.2")
     implementation("me.zhanghai.android.fastscroll:library:1.1.5")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")

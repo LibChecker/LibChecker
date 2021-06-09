@@ -142,7 +142,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
         if (appListStatusLiveData.value == STATUS_START) {
-            Timber.d("Request change isInitializngItems returns")
+            Timber.d("Request change appListStatusLiveData not equals STATUS_START")
             return@launch
         }
         if (XiaomiUtilities.isMIUI() && !XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
