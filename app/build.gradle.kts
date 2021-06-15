@@ -184,7 +184,7 @@ dependencies {
     implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
     implementation("dev.rikka.rikkax.core:core:1.3.2")
     implementation("dev.rikka.rikkax.material:material:1.6.5")
-    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.1")
+    implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.2")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
 
