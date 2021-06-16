@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:background="@null"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:titleCollapseMode="fade">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/header_content_layout"
