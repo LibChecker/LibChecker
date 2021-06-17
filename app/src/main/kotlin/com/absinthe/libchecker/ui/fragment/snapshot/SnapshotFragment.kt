@@ -17,12 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -197,7 +197,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                        (requireActivity() as BaseActivity).appBar?.setRaised(!top)
                     }
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -218,7 +218,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addSystemBarPadding()
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -346,7 +345,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 binding.extendedFab.hide()
             }
             binding.loading.resumeAnimation()
-            (requireActivity() as MainActivity).appBar?.setRaised(false)
+            (requireActivity() as BaseActivity).appBar?.setRaised(false)
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()

@@ -6,7 +6,7 @@
     android:fitsSystemWindows="false"
     app:consumeSystemWindowsInsets="start|end"
     app:edgeToEdge="true"
-    app:fitSystemWindowsInsets="start|end">
+    app:fitsSystemWindowsInsets="start|end">
 
     <rikka.material.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -57,7 +57,8 @@
             android:scrollbars="none"
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop" />
+            app:borderTopVisibility="whenTop"
+            app:fitsSystemWindowsInsets="bottom|top" />
 
     </ViewFlipper>
 

@@ -140,7 +140,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.4")
+    implementation("androidx.fragment:fragment-ktx:1.3.5")
     implementation("androidx.activity:activity-ktx:1.2.3")
     // Lifecycle
     val lifecycleVersion = "2.3.1"
@@ -161,22 +161,22 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.core:core-ktx:1.6.0-beta02")
+    implementation("androidx.core:core-ktx:1.6.0-rc01")
 
     implementation("com.google.android.material:material:1.4.0-rc01")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
+    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.2.0")
     implementation("com.airbnb.android:lottie:3.7.0")
-    implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
+    implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.2.2")
     implementation("me.zhanghai.android.fastscroll:library:1.1.6")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
-    implementation("com.jakewharton.timber:timber:4.7.1")
 
-    //Serilization
+    //Serialization
     implementation("com.google.code.gson:gson:2.8.7")
     implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
@@ -186,6 +186,7 @@ dependencies {
     implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.2")
     implementation("dev.rikka.rikkax.widget:borderview:1.0.1")
     implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
+    implementation("dev.rikka.rikkax.insets:insets:1.1.0")
 
     //Network
     implementation("com.squareup.okhttp3:okhttp:4.9.1")

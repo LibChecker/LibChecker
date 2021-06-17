@@ -12,7 +12,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.isOrientationLandscape
 import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -100,7 +99,6 @@ class LibReferenceActivity : BaseActivity() {
                         appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                addSystemBarPadding()
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {

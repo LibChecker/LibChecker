@@ -11,6 +11,7 @@
         android:clipToPadding="false"
         android:descendantFocusability="beforeDescendants"
         android:overScrollMode="never"
+        app:fitsSystemWindowsInsets="bottom"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
 </LinearLayout>
