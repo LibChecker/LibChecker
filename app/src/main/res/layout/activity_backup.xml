@@ -6,7 +6,7 @@
     android:fitsSystemWindows="false"
     app:consumeSystemWindowsInsets="start|end"
     app:edgeToEdge="true"
-    app:fitSystemWindowsInsets="start|end">
+    app:fitsSystemWindowsInsets="start|end">
 
     <rikka.material.widget.AppBarLayout
         android:id="@+id/appbar"

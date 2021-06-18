@@ -35,14 +35,14 @@
         <rikka.widget.borderview.BorderRecyclerView
             android:id="@android:id/list"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:clipToPadding="false"
             android:paddingTop="?actionBarSize"
-            android:scrollbarAlwaysDrawVerticalTrack="false"
             android:scrollbars="none"
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop" />
+            app:borderTopVisibility="whenTop"
+            app:fitsSystemWindowsInsets="bottom|top" />
 
     </ViewFlipper>
 

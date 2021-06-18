@@ -16,7 +16,6 @@ import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
@@ -59,7 +58,6 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         DividerItemDecoration.VERTICAL
                     )
                 )
-                addSystemBarPadding(addStatusBarPadding = false)
             }
         }
 

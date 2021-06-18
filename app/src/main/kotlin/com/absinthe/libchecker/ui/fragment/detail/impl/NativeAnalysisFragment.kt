@@ -7,7 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -32,7 +31,6 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@NativeAnalysisFragment.adapter
-                addSystemBarPadding(addStatusBarPadding = false)
             }
         }
 
