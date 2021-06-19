@@ -19,7 +19,7 @@ android {
     buildToolsVersion = "30.0.3"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
-    val baseVersionName = "2.0.13"
+    val baseVersionName = "2.0.14"
     val verName = "${baseVersionName}.${gitCommitId}"
     val verCode = "git rev-list --count HEAD".exec().toInt()
 

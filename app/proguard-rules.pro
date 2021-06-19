@@ -127,6 +127,7 @@
 
 -dontwarn java.lang.ClassValue
 
+-dontwarn org.conscrypt.**
 -dontwarn org.conscrypt.ConscryptHostnameVerifier
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 
