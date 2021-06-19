@@ -257,15 +257,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             })
 
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
-                if (appListStatusLiveData.value == STATUS_NOT_START) {
-                    binding.progressIndicator.isVisible = true
-                    flip(VF_LOADING)
-                    initItems()
-                }
-                Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-            }
-
             dbItems.observe(viewLifecycleOwner, {
                 if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START) {
                     return@observe
@@ -287,6 +278,13 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                             progress = 0
                         }
                         Once.markDone(OnceTag.FIRST_LAUNCH)
+                    }
+                } else if (status == STATUS_NOT_START) {
+                    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                        binding.progressIndicator.isVisible = true
+                        flip(VF_LOADING)
+                        initItems()
+                        Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                     }
                 }
             })

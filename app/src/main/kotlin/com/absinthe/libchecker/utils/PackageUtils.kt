@@ -8,8 +8,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.text.format.Formatter
 import androidx.core.content.pm.PackageInfoCompat
-import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.R
+import com.absinthe.libchecker.*
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
@@ -29,9 +28,6 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.exception.MiuiOpsException
-import com.absinthe.libchecker.FreezeUtils
-import com.absinthe.libchecker.ManifestReader
-import com.absinthe.libchecker.StaticLibraryReader
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
@@ -300,7 +296,7 @@ object PackageUtils {
      * @param packageInfo PackageInfo
      * @return static libraries list
      */
-    fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
+    private fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
         val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
         try {
             val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
@@ -460,7 +456,7 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentStringList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
+    private fun getComponentStringList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
         if (list.isNullOrEmpty()) {
             return emptyList()
         }
@@ -499,57 +495,78 @@ object PackageUtils {
 
             val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
             val multiArch = demands[multiArchString] as? Boolean ?: false
+            val abiSet = mutableSetOf<Int>()
+            var entry: ZipEntry
 
-            if (use32bitAbi) {
-                abi = when {
-                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7
-                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86
-                    else -> NO_LIBS
-                }
-            } else if (multiArch) {
-                abi = when {
-                    GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) -> ARMV8 + MULTI_ARCH
-                    GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) -> X86_64 + MULTI_ARCH
-                    GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) -> ARMV7 + MULTI_ARCH
-                    GlobalValues.deviceSupportedAbis.contains(X86_STRING) -> X86 + MULTI_ARCH
-                    else -> NO_LIBS
-                }
-            } else {
-                while (entries.hasMoreElements()) {
-                    elementName = entries.nextElement().name
+            while (entries.hasMoreElements()) {
+                entry = entries.nextElement()
 
-                    if (elementName.contains("lib/")) {
-                        if (elementName.contains(ARMV8_STRING)) {
+                if (entry.isDirectory) {
+                    continue
+                }
+
+                elementName = entry.name
+
+                if (abiSet.size == 5) {
+                    break
+                }
+
+                if (elementName.contains("lib/")) {
+                    when {
+                        elementName.contains(ARMV8_STRING) -> {
                             if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
-                                abi = ARMV8
+                                abiSet.add(ARMV8)
                             }
-                            break
-                        } else if (elementName.contains(ARMV7_STRING)) {
+                        }
+                        elementName.contains(ARMV7_STRING) -> {
                             if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
-                                abi = ARMV7
+                                abiSet.add(ARMV7)
                             }
-                        } else if (elementName.contains(ARMV5_STRING)) {
-                            if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) && abi != ARMV7) {
-                                abi = ARMV5
+                        }
+                        elementName.contains(ARMV5_STRING) -> {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING)) {
+                                abiSet.add(ARMV5)
                             }
-                        } else if (elementName.contains(X86_64_STRING)) {
-                            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
-                                abi = X86_64
+                        }
+                        elementName.contains(X86_64_STRING) -> {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING)) {
+                                abiSet.add(X86_64)
                             }
-                        } else if (elementName.contains(X86_STRING)) {
-                            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") } && abi != X86_64) {
-                                abi = X86
+                        }
+                        elementName.contains(X86_STRING) -> {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING)) {
+                                abiSet.add(X86)
                             }
                         }
                     }
                 }
             }
 
-            return if (abi == NO_LIBS && !isApk) {
-                getAbiByNativeDir(nativePath)
-            } else {
-                abi
+            if (abiSet.isEmpty() && !isApk) {
+                abiSet.addAll(getAbiListByNativeDir(nativePath))
             }
+
+            if (use32bitAbi) {
+                when {
+                    abiSet.contains(ARMV7) -> abi = ARMV7
+                    abiSet.contains(ARMV5) -> abi = ARMV5
+                    abiSet.contains(X86) -> abi = X86
+                }
+            } else {
+                when {
+                    abiSet.contains(ARMV8) -> abi = ARMV8
+                    abiSet.contains(ARMV7) -> abi = ARMV7
+                    abiSet.contains(ARMV5) -> abi = ARMV5
+                    abiSet.contains(X86_64) -> abi = X86_64
+                    abiSet.contains(X86) -> abi = X86
+                }
+            }
+
+            if (multiArch) {
+                abi += MULTI_ARCH
+            }
+
+            return abi
         } catch (e: Throwable) {
             Timber.e(e)
             return ERROR
@@ -565,11 +582,11 @@ object PackageUtils {
      * @param nativePath Native path of the app
      * @return ABI type
      */
-    private fun getAbiByNativeDir(nativePath: String): Int {
+    private fun getAbiListByNativeDir(nativePath: String): MutableSet<Int> {
         val file = File(nativePath.substring(0, nativePath.lastIndexOf("/")))
         val abis = mutableSetOf<Int>()
 
-        val fileList = file.listFiles() ?: return NO_LIBS
+        val fileList = file.listFiles() ?: return mutableSetOf()
 
         fileList.asSequence()
             .forEach {
@@ -578,28 +595,10 @@ object PackageUtils {
                     it.name.contains("arm") -> abis.add(ARMV7)
                     it.name.contains("x86_64") -> abis.add(X86_64)
                     it.name.contains("x86") -> abis.add(X86)
-                    else -> return NO_LIBS
                 }
             }
 
-        if (abis.contains(ARMV8)) {
-            if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
-                return ARMV8
-            }
-        } else if (abis.contains(ARMV7)) {
-            if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
-                return ARMV8
-            }
-        } else if (abis.contains(X86_64)) {
-            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
-                return X86_64
-            }
-        } else if (abis.contains(X86)) {
-            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) && GlobalValues.deviceSupportedAbis.none { it.startsWith("arm") }) {
-                return X86
-            }
-        }
-        return NO_LIBS
+        return abis
     }
 
     private val ABI_STRING_RES_MAP = hashMapOf(
