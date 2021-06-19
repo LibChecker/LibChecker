@@ -87,6 +87,10 @@ public class ManifestReader {
                 if (contains(name)) {
                     this.name = name;
                     value = obj;
+
+                    if(name != null && value != null) {
+                        properties.put(name, value);
+                    }
                 }
                 super.attr(ns, name, resourceId, type, obj);
             }
