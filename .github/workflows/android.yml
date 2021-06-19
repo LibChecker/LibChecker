@@ -61,6 +61,16 @@ jobs:
         with:
           name: mappings
           path: "app/build/outputs/mapping/release"
+      - name: Upload mappings to App Center
+        uses: zhaobozhen/AppCenter-Github-Action@v1
+        with:
+          appName: zhaobozhen2025-gmail.com/LibChecker
+          token: ${{secrets.APP_CENTER_TOKEN}}
+          group: Collaborators
+          file: ${{ steps.sign.outputs.signedReleaseFile }}
+          mappings: app/build/outputs/mappings/release/mappings.txt
+          notifyTesters: false
+          debug: false
       - name: Send commit to telegram
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: appleboy/telegram-action@master
