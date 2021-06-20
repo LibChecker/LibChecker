@@ -6,7 +6,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.text.format.Formatter
+import androidx.annotation.DrawableRes
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.*
 import com.absinthe.libchecker.annotation.*
@@ -660,8 +662,12 @@ object PackageUtils {
      * @param type ABI type
      * @return Badge resource
      */
+    @DrawableRes
     fun getAbiBadgeResource(type: Int): Int {
-        return ABI_BADGE_MAP[type] ?: R.drawable.ic_abi_label_64bit
+        return ABI_BADGE_MAP[type] ?: if (Build.SUPPORTED_64_BIT_ABIS.isEmpty())
+            R.drawable.ic_abi_label_32bit
+        else
+            R.drawable.ic_abi_label_64bit
     }
 
     /**
