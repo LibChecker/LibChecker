@@ -1,8 +1,8 @@
+import com.android.build.api.variant.impl.ApplicationVariantImpl
+import com.android.build.gradle.internal.dsl.BuildType
 import com.google.protobuf.gradle.*
 import java.nio.charset.Charset
 import java.nio.file.Paths
-import com.android.build.api.variant.impl.ApplicationVariantImpl
-import com.android.build.gradle.internal.dsl.BuildType
 
 plugins {
     id("com.android.application")
@@ -126,8 +126,8 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.38.0")
-val protocVersion by extra("3.17.0")
+val grpcVersion by extra("1.38.1")
+val protocVersion by extra("3.17.3")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
