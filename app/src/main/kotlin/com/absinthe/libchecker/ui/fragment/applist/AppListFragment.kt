@@ -31,7 +31,6 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -97,7 +96,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         (requireActivity() as MainActivity).appBar?.setRaised(!top)
                     }
                 setHasFixedSize(true)
-                addSystemBarPadding()
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
@@ -259,15 +257,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             })
 
-            if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
-                if (appListStatusLiveData.value == STATUS_NOT_START) {
-                    binding.progressIndicator.isVisible = true
-                    flip(VF_LOADING)
-                    initItems()
-                }
-                Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-            }
-
             dbItems.observe(viewLifecycleOwner, {
                 if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START) {
                     return@observe
@@ -290,11 +279,21 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         }
                         Once.markDone(OnceTag.FIRST_LAUNCH)
                     }
+                } else if (status == STATUS_NOT_START) {
+                    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                        binding.progressIndicator.isVisible = true
+                        flip(VF_LOADING)
+                        initItems()
+                        Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                    }
                 }
             })
             initProgressLiveData.observe(viewLifecycleOwner, {
                 binding.progressIndicator.setProgressCompat(it, true)
             })
+            packageChangedLiveData.observe(viewLifecycleOwner) {
+                requestChange(true)
+            }
         }
 
         GlobalValues.apply {
@@ -322,8 +321,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 }
             })
-            shouldRequestChange.observe(viewLifecycleOwner, {
-                if (isListReady && !it) {
+            shouldRequestChange.observe(viewLifecycleOwner, { should ->
+                if (isListReady && !should) {
                     viewModel.dbItems.value?.let { updateItems(it) }
                     doOnMainThreadIdle({
                         flip(VF_LIST)

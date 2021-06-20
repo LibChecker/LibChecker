@@ -18,9 +18,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".ui.main.MainActivity"
             android:configChanges="orientation"
+            android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
@@ -36,6 +38,7 @@
         <activity
             android:name=".ui.detail.AppDetailActivity"
             android:configChanges="orientation"
+            android:exported="true"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.SHOW_APP_INFO" />
@@ -46,6 +49,7 @@
         <activity
             android:name=".ui.detail.ApkDetailActivity"
             android:configChanges="orientation"
+            android:exported="true"
             android:label="@string/detail_label">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -62,20 +66,16 @@
         <activity
             android:name=".ui.snapshot.AlbumActivity"
             android:configChanges="orientation"
-            android:label="@string/title_album">
-        </activity>
+            android:label="@string/title_album" />
         <activity
             android:name=".ui.album.BackupActivity"
-            android:label="@string/album_item_backup_restore_title">
-        </activity>
+            android:label="@string/album_item_backup_restore_title" />
         <activity
             android:name=".ui.album.ComparisonActivity"
-            android:label="@string/album_item_comparison_title">
-        </activity>
+            android:label="@string/album_item_comparison_title" />
         <activity
             android:name=".ui.album.TrackActivity"
-            android:label="@string/album_item_track_title">
-        </activity>
+            android:label="@string/album_item_track_title" />
         <activity
             android:name=".ui.main.LibReferenceActivity"
             android:configChanges="orientation"
@@ -86,15 +86,15 @@
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
 
-        <service
-            android:name=".services.ShootService" />
-        
+        <service android:name=".services.ShootService" />
+
         <provider
             android:name=".provider.CoreProvider"
             android:authorities="${applicationId}.coreprovider"
-            android:exported="true"
             android:enabled="true"
+            android:exported="true"
             android:permission="com.absinthe.libchecker.permission.GET_LIBRARY_INFO" />
+
     </application>
 
 </manifest>

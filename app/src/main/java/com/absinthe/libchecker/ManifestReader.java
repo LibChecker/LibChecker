@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.java;
+package com.absinthe.libchecker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,11 +13,11 @@ import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
 
 public class ManifestReader {
-    private final HashMap<String, Object> propertities = new HashMap<>();
+    private final HashMap<String, Object> properties = new HashMap<>();
     private final String[] demands;
 
-    public static Map<String, Object> getManifestPropertities(File apk, String[] demands) throws IOException {
-        return new ManifestReader(apk, demands).propertities;
+    public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
+        return new ManifestReader(apk, demands).properties;
     }
 
     private ManifestReader(File apk, String[] demands) throws IOException {
@@ -36,15 +36,14 @@ public class ManifestReader {
         }
     }
 
-    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+    public static byte[] getBytesFromInputStream(InputStream inputStream) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] b = new byte[1024];
             int n;
             while ((n = inputStream.read(b)) != -1) {
                 bos.write(b, 0, n);
             }
-            byte[] data = bos.toByteArray();
-            return data;
+            return bos.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -66,8 +65,15 @@ public class ManifestReader {
         @Override
         public NodeVisitor child(String ns, String name) {
             NodeVisitor child = super.child(ns, name);
-            if ("application".equals(name)) {
-                return new ApplicationTagVisitor(child);
+            switch (name) {
+                case "application":
+                    return new ApplicationTagVisitor(child);
+                case "uses-sdk":
+                    return new UsesSdkTagVisitor(child);
+                case "overlay":
+                    properties.put("overlay", true);
+                    return new OverlayTagVisitor(child);
+                default:
             }
             return child;
         }
@@ -84,6 +90,10 @@ public class ManifestReader {
                 if (contains(name)) {
                     this.name = name;
                     value = obj;
+
+                    if(name != null && value != null) {
+                        properties.put(name, value);
+                    }
                 }
                 super.attr(ns, name, resourceId, type, obj);
             }
@@ -91,7 +101,57 @@ public class ManifestReader {
             @Override
             public void end() {
                 if(name != null && value != null) {
-                    propertities.put(name, value);
+                    properties.put(name, value);
+                }
+                super.end();
+            }
+        }
+
+        private class UsesSdkTagVisitor extends NodeVisitor {
+            public String name = null;
+            public Object value = null;
+            public UsesSdkTagVisitor(NodeVisitor child) {
+                super(child);
+            }
+
+            @Override
+            public void attr(String ns, String name, int resourceId, int type, Object obj) {
+                if (contains(name)) {
+                    this.name = name;
+                    value = obj;
+                }
+                super.attr(ns, name, resourceId, type, obj);
+            }
+
+            @Override
+            public void end() {
+                if(name != null && value != null) {
+                    properties.put(name, value);
+                }
+                super.end();
+            }
+        }
+
+        private class OverlayTagVisitor extends NodeVisitor {
+            public String name = null;
+            public Object value = null;
+            public OverlayTagVisitor(NodeVisitor child) {
+                super(child);
+            }
+
+            @Override
+            public void attr(String ns, String name, int resourceId, int type, Object obj) {
+                if (contains(name)) {
+                    this.name = name;
+                    value = obj;
+                }
+                super.attr(ns, name, resourceId, type, obj);
+            }
+
+            @Override
+            public void end() {
+                if(name != null && value != null) {
+                    properties.put(name, value);
                 }
                 super.end();
             }

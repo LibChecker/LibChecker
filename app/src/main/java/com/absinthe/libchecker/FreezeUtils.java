@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.java;
+package com.absinthe.libchecker;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;

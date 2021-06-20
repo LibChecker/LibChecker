@@ -30,10 +30,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,6 +49,7 @@ class ShootService : Service() {
     private val listenerList = RemoteCallbackList<OnShootListener>()
     private var isSendingBroadcast = false
 
+    @DelicateCoroutinesApi
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
             Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
@@ -69,13 +67,13 @@ class ShootService : Service() {
         }
     }
 
+    @DelicateCoroutinesApi
     override fun onBind(intent: Intent?): IBinder {
         return binder
     }
 
     override fun onCreate() {
         super.onCreate()
-
         showNotification()
     }
 
@@ -149,6 +147,8 @@ class ShootService : Service() {
             } while (appList == null)
         }
 
+        repository.deleteAllSnapshotDiffItems()
+
         val size = appList.size
         var count = 0
         val dbList = mutableListOf<SnapshotItem>()
@@ -171,7 +171,7 @@ class ShootService : Service() {
                             installedTime = it.firstInstallTime,
                             lastUpdatedTime = it.lastUpdateTime,
                             isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                            abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                            abi = PackageUtils.getAbi(info).toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
                             nativeLibs = gson.toJson(
                                 PackageUtils.getNativeDirLibs(it)
@@ -213,7 +213,7 @@ class ShootService : Service() {
         while (exceptionInfoList.isNotEmpty()) {
             try {
                 info = exceptionInfoList[0]
-                abiValue = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                abiValue = PackageUtils.getAbi(info)
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(

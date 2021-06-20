@@ -19,6 +19,7 @@ import coil.load
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -123,20 +124,22 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         setLongClickCopiedToClipboard(text.toString())
                     }
 
-                    val abi = PackageUtils.getAbi(
-                        packageInfo.applicationInfo.sourceDir,
-                        packageInfo.applicationInfo.nativeLibraryDir,
-                        isApk = false
-                    )
+                    val abi = PackageUtils.getAbi(packageInfo.applicationInfo, isApk = false)
                     viewModel.is32bit = PackageUtils.is32bit(abi)
-                    val spanString = SpannableString("  ${PackageUtils.getAbiString(this@AppDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageName)}")
-                    ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
-                        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                        val span = CenterAlignImageSpan(it)
-                        spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-                    }
 
-                    tvAbiAndApi.text = spanString
+                    val str = "${PackageUtils.getAbiString(this@AppDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageName)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                    val spanString: SpannableString
+                    if (abi != Constants.OVERLAY) {
+                        spanString = SpannableString("  $str")
+                        ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                            val span = CenterAlignImageSpan(it)
+                            spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                        }
+                        tvAbiAndApi.text = spanString
+                    } else {
+                        tvAbiAndApi.text = str
+                    }
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         val lcItem = LibCheckerApp.repository.getItem(packageName)
@@ -150,12 +153,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 chipAppBundle.apply {
                                     isVisible = isSplitApk
                                     setOnClickListener {
-                                        AlertDialog.Builder(this@AppDetailActivity)
-                                            .setIcon(R.drawable.ic_aab)
-                                            .setTitle(R.string.app_bundle)
-                                            .setMessage(R.string.app_bundle_details)
-                                            .setPositiveButton(android.R.string.ok, null)
-                                            .show()
+                                        AppBundleBottomSheetDialogFragment().apply {
+                                            arguments = Bundle().apply {
+                                                putString(EXTRA_PACKAGE_NAME, pkgName)
+                                            }
+                                            show(supportFragmentManager, tag)
+                                        }
                                     }
                                 }
                                 chipKotlinUsed.apply {

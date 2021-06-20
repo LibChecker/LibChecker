@@ -111,4 +111,18 @@ class LCRepository(private val lcDao: LCDao) {
     suspend fun getAllRules() = lcDao.getAllRules()
 
     suspend fun getRegexRules() = lcDao.getRegexRules()
+
+    suspend fun insertSnapshotDiffItems(item: SnapshotDiffStoringItem) {
+        lcDao.insertSnapshotDiff(item)
+    }
+
+    suspend fun updateSnapshotDiff(item: SnapshotDiffStoringItem) {
+        lcDao.updateSnapshotDiff(item)
+    }
+
+    fun deleteAllSnapshotDiffItems() {
+        lcDao.deleteAllSnapshotDiffItems()
+    }
+
+    suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? = lcDao.getSnapshotDiff(packageName)
 }

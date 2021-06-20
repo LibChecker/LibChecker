@@ -69,6 +69,10 @@
         <item name="fontFamily">sans-serif</item>
     </style>
 
+    <style name="TextView.SansSerifBlack" parent="Widget.MaterialComponents.TextView">
+        <item name="fontFamily">sans-serif-black</item>
+    </style>
+
     <style name="TextView.SansSerifMedium" parent="Widget.MaterialComponents.TextView">
         <item name="fontFamily">sans-serif-medium</item>
     </style>

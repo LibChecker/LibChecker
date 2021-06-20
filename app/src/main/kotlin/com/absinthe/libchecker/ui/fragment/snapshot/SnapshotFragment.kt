@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
+import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
@@ -16,13 +17,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.databinding.LayoutSnapshotDashboardBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -36,6 +36,7 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
@@ -97,32 +98,19 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
     override fun init() {
-        val dashboardBinding = LayoutSnapshotDashboardBinding.inflate(layoutInflater)
+        val dashboard = SnapshotDashboardView(ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            background = null
+        }
 
-        dashboardBinding.apply {
-//            indicatorAdded.apply {
-//                text.text = getString(R.string.snapshot_indicator_added)
-//                icon.setImageResource(R.drawable.ic_add)
-//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_green_300))
-//            }
-//            indicatorRemoved.apply {
-//                text.text = getString(R.string.snapshot_indicator_removed)
-//                icon.setImageResource(R.drawable.ic_remove)
-//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_red_300))
-//            }
-//            indicatorChanged.apply {
-//                text.text = getString(R.string.snapshot_indicator_changed)
-//                icon.setImageResource(R.drawable.ic_changed)
-//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_yellow_300))
-//            }
-//            indicatorMoved.apply {
-//                text.text = getString(R.string.snapshot_indicator_moved)
-//                icon.setImageResource(R.drawable.ic_move)
-//                colorLabel.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.material_blue_300))
-//            }
-            root.setOnClickListener {
-                startActivity(Intent(requireContext(), AlbumActivity::class.java))
-            }
+        dashboard.setOnClickListener {
+            startActivity(Intent(requireContext(), AlbumActivity::class.java))
+        }
+
+        dashboard.container.apply {
 
             fun changeTimeNode() {
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -137,7 +125,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                                 GlobalValues.snapshotTimestamp = timeStampList[which].timestamp
                                 viewModel.timestamp.value = timeStampList[which].timestamp
                                 flip(VF_LOADING)
-                                viewModel.compareDiff(timeStampList[which].timestamp)
+                                viewModel.compareDiff(timeStampList[which].timestamp, shouldClearDiff = true)
                             }
                             .show()
                     }
@@ -147,7 +135,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             tvSnapshotTimestampText.setOnClickListener {
                 changeTimeNode()
             }
-            ivArrow.setOnClickListener {
+            arrow.setOnClickListener {
                 changeTimeNode()
             }
         }
@@ -209,7 +197,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 layoutManager = getSuitableLayoutManager()
                 borderVisibilityChangedListener =
                     BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                        (requireActivity() as BaseActivity).appBar?.setRaised(!top)
                     }
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
                     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -230,7 +218,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
-                addSystemBarPadding()
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -241,7 +228,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         adapter.apply {
             headerWithEmptyEnable = true
             setEmptyView(SnapshotEmptyView(requireContext()))
-            setHeaderView(dashboardBinding.root)
+            setHeaderView(dashboard)
             setDiffCallback(SnapshotDiffUtil())
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {
@@ -260,9 +247,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         viewModel.apply {
             timestamp.observe(viewLifecycleOwner, {
                 if (it != 0L) {
-                    dashboardBinding.tvSnapshotTimestampText.text = getFormatDateString(it)
+                    dashboard.container.tvSnapshotTimestampText.text = getFormatDateString(it)
                 } else {
-                    dashboardBinding.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+                    dashboard.container.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
                     snapshotDiffItems.value = emptyList()
                     flip(VF_LIST)
                 }
@@ -283,7 +270,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             })
             snapshotAppsCount.observe(viewLifecycleOwner, {
                 if (it != null) {
-                    dashboardBinding.tvSnapshotAppsCountText.text = it.toString()
+                    dashboard.container.tvSnapshotAppsCountText.text = it.toString()
                 }
             })
             AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
@@ -317,6 +304,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             comparingProgressLiveData.observe(viewLifecycleOwner, {
                 binding.progressIndicator.setProgressCompat(it, it != 1)
             })
+            packageChangedLiveData.observe(viewLifecycleOwner) {
+                compareDiff(GlobalValues.snapshotTimestamp)
+            }
         }
 
         lifecycleScope.launchWhenResumed {
@@ -355,7 +345,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 binding.extendedFab.hide()
             }
             binding.loading.resumeAnimation()
-            (requireActivity() as MainActivity).appBar?.setRaised(false)
+            (requireActivity() as BaseActivity).appBar?.setRaised(false)
         } else {
             if (!binding.extendedFab.isShown) {
                 binding.extendedFab.show()

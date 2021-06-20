@@ -42,7 +42,8 @@
             android:scrollbars="none"
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop" />
+            app:borderTopVisibility="whenTop"
+            app:fitsSystemWindowsInsets="bottom|top" />
 
     </ViewFlipper>
 

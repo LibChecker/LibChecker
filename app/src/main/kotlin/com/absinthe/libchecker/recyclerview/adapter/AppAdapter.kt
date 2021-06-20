@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.tintHighlightText
@@ -62,14 +63,19 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
 
             versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 
-            val spanString = SpannableString("  ${PackageUtils.getAbiString(context, item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}")
-            ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
-                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                val span = CenterAlignImageSpan(it)
-                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+            val str = "${PackageUtils.getAbiString(context, item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}"
+            val spanString: SpannableString
+            if (item.abi.toInt() != Constants.OVERLAY) {
+                spanString = SpannableString("  $str")
+                ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
+                    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                    val span = CenterAlignImageSpan(it)
+                    spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                }
+                abiInfo.text = spanString
+            } else {
+                abiInfo.text = str
             }
-
-            abiInfo.text = spanString
         }
     }
 

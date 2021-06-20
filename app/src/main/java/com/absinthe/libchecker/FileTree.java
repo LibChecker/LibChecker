@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.java;
+package com.absinthe.libchecker;
 
 import android.os.Handler;
 import android.os.HandlerThread;

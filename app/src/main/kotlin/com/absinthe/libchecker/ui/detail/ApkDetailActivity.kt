@@ -17,6 +17,7 @@ import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.detail.*
@@ -132,14 +133,20 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             setLongClickCopiedToClipboard(text.toString())
                         }
 
-                        val abi = PackageUtils.getAbi(it.applicationInfo.sourceDir, "", isApk = true)
-                        val spanString = SpannableString("  ${PackageUtils.getAbiString(this@ApkDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageInfo)}")
-                        ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { label ->
-                            label.setBounds(0, 0, label.intrinsicWidth, label.intrinsicHeight)
-                            val span = CenterAlignImageSpan(label)
-                            spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BASELINE)
+                        val abi = PackageUtils.getAbi(it.applicationInfo, isApk = true)
+                        val str = "${PackageUtils.getAbiString(this@ApkDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageInfo)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                        val spanString: SpannableString
+                        if (abi != Constants.OVERLAY) {
+                            spanString = SpannableString("  $str")
+                            ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
+                                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                                val span = CenterAlignImageSpan(it)
+                                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                            }
+                            tvAbiAndApi.text = spanString
+                        } else {
+                            tvAbiAndApi.text = str
                         }
-                        tvAbiAndApi.text = spanString
                     } catch (e: Exception) {
                         Timber.e(e)
                         finish()

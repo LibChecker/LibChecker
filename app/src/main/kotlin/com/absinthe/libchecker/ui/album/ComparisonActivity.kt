@@ -16,7 +16,6 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -162,7 +161,6 @@ class ComparisonActivity : BaseActivity() {
                         )
                     )
                 }
-                addSystemBarPadding()
             }
             vfContainer.apply {
                 setInAnimation(this@ComparisonActivity, R.anim.anim_fade_in)

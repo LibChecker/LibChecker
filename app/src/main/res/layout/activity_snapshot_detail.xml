@@ -119,6 +119,7 @@
             android:clipToPadding="false"
             android:overScrollMode="never"
             android:padding="@dimen/normal_padding"
+            app:fitsSystemWindowsInsets="bottom"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     </LinearLayout>

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.java;
+package com.absinthe.libchecker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -34,7 +34,7 @@ public class StaticLibraryReader {
         }
     }
 
-    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+    public static byte[] getBytesFromInputStream(InputStream inputStream) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             byte[] b = new byte[1024];
             int n;

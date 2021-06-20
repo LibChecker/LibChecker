@@ -15,7 +15,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.recyclerview.adapter.AppInfoAdapter
+import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -37,11 +37,8 @@ class AppInfoBottomShellDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
 
     override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
     override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
-    override fun init() {
-        initView(root)
-    }
 
-    private fun initView(root: AppInfoBottomSheetView) {
+    override fun init() {
         root.apply {
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             setPadding(24.dp, 16.dp, 24.dp, 0)

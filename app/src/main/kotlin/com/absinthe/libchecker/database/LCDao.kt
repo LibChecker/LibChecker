@@ -104,4 +104,17 @@ interface LCDao {
 
     @Query("SELECT * from rules_table WHERE isRegexRule = 1")
     suspend fun getRegexRules(): List<RuleEntity>
+
+    //Diff
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem)
+
+    @Update
+    suspend fun updateSnapshotDiff(item: SnapshotDiffStoringItem)
+
+    @Query("DELETE FROM diff_table")
+    fun deleteAllSnapshotDiffItems()
+
+    @Query("SELECT * from diff_table WHERE packageName LIKE :packageName")
+    suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem?
 }

@@ -19,7 +19,6 @@ import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -97,7 +96,6 @@ class SnapshotDetailActivity : BaseActivity() {
                 adapter = this@SnapshotDetailActivity.adapter
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
                 addItemDecoration(VerticalSpacesItemDecoration(4.dp))
-                addSystemBarPadding(addStatusBarPadding = false, addNavigationBarPadding = true)
             }
 
             val isNewOrDeleted = entity.deleted || entity.newInstalled

@@ -238,6 +238,8 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             addView(relativeLink)
         }
 
+        private val marginVertical = 8.dp
+
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             label.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), label.defaultHeightMeasureSpec(this))
@@ -245,12 +247,11 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             contributor.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), contributor.defaultHeightMeasureSpec(this))
             description.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), description.defaultHeightMeasureSpec(this))
             relativeLink.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), relativeLink.defaultHeightMeasureSpec(this))
-            setMeasuredDimension(measuredWidth, label.measuredHeight + team.measuredHeight + contributor.measuredHeight + description.measuredHeight + relativeLink.measuredHeight + 16.dp * 4)
+            setMeasuredDimension(measuredWidth, label.measuredHeight + team.measuredHeight + contributor.measuredHeight + description.measuredHeight + relativeLink.measuredHeight + marginVertical * 4)
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             label.layout(0, 0)
-            val marginVertical = 8.dp
             team.layout(0, label.bottom + marginVertical)
             contributor.layout(0, team.bottom + marginVertical)
             description.layout(0, contributor.bottom + marginVertical)

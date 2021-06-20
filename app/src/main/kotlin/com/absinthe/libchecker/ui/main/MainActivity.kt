@@ -34,6 +34,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.applist.AppListRejectView
 import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
+import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -50,6 +51,7 @@ class MainActivity : BaseActivity(), IListContainer {
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
     private val appViewModel by viewModels<AppViewModel>()
+    private val snapshotViewModel by viewModels<SnapshotViewModel>()
     private val mask by lazy {
         AppListRejectView(this).apply {
             layoutParams = CoordinatorLayout.LayoutParams(
@@ -81,9 +83,13 @@ class MainActivity : BaseActivity(), IListContainer {
         handleIntentFromShortcuts(intent)
     }
 
+    override fun onStart() {
+        super.onStart()
+        registerPackageBroadcast()
+    }
+
     override fun onResume() {
         super.onResume()
-        registerPackageBroadcast()
         if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(true)
         }
@@ -92,8 +98,8 @@ class MainActivity : BaseActivity(), IListContainer {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         unregisterPackageBroadcast()
     }
 
@@ -176,7 +182,8 @@ class MainActivity : BaseActivity(), IListContainer {
 
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            appViewModel.requestChange(true)
+            appViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
+            snapshotViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
         }
     }
 

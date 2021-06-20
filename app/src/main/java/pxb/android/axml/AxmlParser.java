@@ -148,7 +148,11 @@ public class AxmlParser implements ResConst {
     }
 
     public String getNamespacePrefix() {
-        return strings[prefixIdx];
+        try {
+            return strings[prefixIdx];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return  "";
+        }
     }
 
     public String getNamespaceUri() {

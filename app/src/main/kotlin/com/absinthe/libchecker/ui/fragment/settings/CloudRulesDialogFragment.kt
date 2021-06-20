@@ -24,17 +24,11 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
 
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(ApiManager.root)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    private val request: CloudRuleBundleRequest = retrofit.create(CloudRuleBundleRequest::class.java)
+    private val request: CloudRuleBundleRequest = ApiManager.create()
     private var bundlesCount: Int = 1
 
     override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())

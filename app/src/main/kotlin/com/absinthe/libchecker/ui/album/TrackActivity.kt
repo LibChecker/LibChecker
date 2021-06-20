@@ -17,7 +17,6 @@ import com.absinthe.libchecker.bean.TrackListItem
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libchecker.view.detail.EmptyListView
@@ -60,7 +59,6 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
                     appBar?.setRaised(!top)
                 }
-            addSystemBarPadding()
             FastScrollerBuilder(this).useMd2Style().build()
         }
         adapter.apply {
