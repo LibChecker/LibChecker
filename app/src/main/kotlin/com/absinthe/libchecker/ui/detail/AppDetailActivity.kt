@@ -137,8 +137,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                         }
                         tvAbiAndApi.text = spanString
+                    } else {
+                        tvAbiAndApi.text = str
                     }
-                    tvAbiAndApi.text = str
 
                     lifecycleScope.launch(Dispatchers.IO) {
                         val lcItem = LibCheckerApp.repository.getItem(packageName)

@@ -144,8 +144,9 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                 spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                             }
                             tvAbiAndApi.text = spanString
+                        } else {
+                            tvAbiAndApi.text = str
                         }
-                        tvAbiAndApi.text = str
                     } catch (e: Exception) {
                         Timber.e(e)
                         finish()

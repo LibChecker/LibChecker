@@ -73,8 +73,9 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
                     spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                 }
                 abiInfo.text = spanString
+            } else {
+                abiInfo.text = str
             }
-            abiInfo.text = str
         }
     }
 
