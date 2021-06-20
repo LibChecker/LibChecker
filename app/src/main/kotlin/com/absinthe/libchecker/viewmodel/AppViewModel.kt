@@ -97,7 +97,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 packageInfo = PackageUtils.getPackageInfo(info)
                 versionCode = PackageUtils.getVersionCode(packageInfo)
-                abiType = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                abiType = PackageUtils.getAbi(info)
                 isSystemType = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
@@ -189,7 +189,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime
                             || (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)) {
-                            abi = PackageUtils.getAbi(it.sourceDir, it.nativeLibraryDir)
+                            abi = PackageUtils.getAbi(it)
                             lcItem = LCItem(
                                 it.packageName,
                                 it.loadLabel(packageManager).toString(),
@@ -229,12 +229,12 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo.firstInstallTime,
                         packageInfo.lastUpdateTime,
                         (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                        PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                        PackageUtils.getAbi(info).toShort(),
                         PackageUtils.isSplitsApk(packageInfo),
                         PackageUtils.isKotlinUsed(packageInfo),
                         packageInfo.applicationInfo.targetSdkVersion.toShort()
                     )
-                    abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                    abi = PackageUtils.getAbi(info)
                     lcItem = LCItem(
                         info.packageName,
                         info.loadLabel(packageManager).toString(),

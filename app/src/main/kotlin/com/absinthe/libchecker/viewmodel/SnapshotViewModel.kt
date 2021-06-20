@@ -125,7 +125,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                     ),
                     abiDiff = SnapshotDiffItem.DiffNode(
                         dbItem.abi,
-                        PackageUtils.getAbi(packageInfo.applicationInfo.sourceDir, packageInfo.applicationInfo.nativeLibraryDir)
+                        PackageUtils.getAbi(packageInfo.applicationInfo)
                             .toShort()
                     ),
                     targetApiDiff = SnapshotDiffItem.DiffNode(
@@ -261,7 +261,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
                             SnapshotDiffItem.DiffNode(packageInfo.versionName),
                             SnapshotDiffItem.DiffNode(versionCode),
-                            SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort()),
+                            SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info).toShort()),
                             SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(PackageUtils.getNativeDirLibs(packageInfo))

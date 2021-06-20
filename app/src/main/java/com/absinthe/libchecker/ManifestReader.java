@@ -70,6 +70,9 @@ public class ManifestReader {
                     return new ApplicationTagVisitor(child);
                 case "uses-sdk":
                     return new UsesSdkTagVisitor(child);
+                case "overlay":
+                    properties.put("overlay", true);
+                    return new OverlayTagVisitor(child);
                 default:
             }
             return child;
@@ -108,6 +111,31 @@ public class ManifestReader {
             public String name = null;
             public Object value = null;
             public UsesSdkTagVisitor(NodeVisitor child) {
+                super(child);
+            }
+
+            @Override
+            public void attr(String ns, String name, int resourceId, int type, Object obj) {
+                if (contains(name)) {
+                    this.name = name;
+                    value = obj;
+                }
+                super.attr(ns, name, resourceId, type, obj);
+            }
+
+            @Override
+            public void end() {
+                if(name != null && value != null) {
+                    properties.put(name, value);
+                }
+                super.end();
+            }
+        }
+
+        private class OverlayTagVisitor extends NodeVisitor {
+            public String name = null;
+            public Object value = null;
+            public OverlayTagVisitor(NodeVisitor child) {
                 super(child);
             }
 

@@ -21,6 +21,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV8_STRING
 import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
@@ -473,28 +474,34 @@ object PackageUtils {
 
     private const val use32bitAbiString = "use32bitAbi"
     private const val multiArchString = "multiArch"
+    private const val overlayString = "overlay"
 
     /**
      * Get ABI type of an app
-     * @param path Source path of the app
-     * @param nativePath Native path of the app
+     * @param applicationInfo ApplicationInfo
      * @param isApk Whether is an APK file
      * @return ABI type
      */
-    fun getAbi(path: String, nativePath: String, isApk: Boolean = false): Int {
+    fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
         var abi = NO_LIBS
         var elementName: String
 
-        val file = File(path)
+        val file = File(applicationInfo.sourceDir)
         var zipFile: ZipFile? = null
 
         try {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
-            val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString).toTypedArray())
+            val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray())
 
             val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
             val multiArch = demands[multiArchString] as? Boolean ?: false
+            val overlay = demands[overlayString] as? Boolean ?: false
+
+            if (overlay) {
+                return OVERLAY
+            }
+
             val abiSet = mutableSetOf<Int>()
             var entry: ZipEntry
 
@@ -543,7 +550,7 @@ object PackageUtils {
             }
 
             if (abiSet.isEmpty() && !isApk) {
-                abiSet.addAll(getAbiListByNativeDir(nativePath))
+                abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
             }
 
             if (use32bitAbi) {
@@ -624,6 +631,9 @@ object PackageUtils {
      * @return ABI string
      */
     fun getAbiString(context: Context, abi: Int, showExtraInfo: Boolean): String {
+        if (abi == OVERLAY) {
+            return "Overlay"
+        }
         val resList = if (!showExtraInfo && abi >= MULTI_ARCH) {
             ABI_STRING_RES_MAP[abi - MULTI_ARCH] ?: listOf(R.string.unknown)
         } else {

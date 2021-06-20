@@ -171,7 +171,7 @@ class ShootService : Service() {
                             installedTime = it.firstInstallTime,
                             lastUpdatedTime = it.lastUpdateTime,
                             isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                            abi = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir).toShort(),
+                            abi = PackageUtils.getAbi(info).toShort(),
                             targetApi = info.targetSdkVersion.toShort(),
                             nativeLibs = gson.toJson(
                                 PackageUtils.getNativeDirLibs(it)
@@ -213,7 +213,7 @@ class ShootService : Service() {
         while (exceptionInfoList.isNotEmpty()) {
             try {
                 info = exceptionInfoList[0]
-                abiValue = PackageUtils.getAbi(info.sourceDir, info.nativeLibraryDir)
+                abiValue = PackageUtils.getAbi(info)
                 PackageUtils.getPackageInfo(info.packageName).let {
                     dbList.add(
                         SnapshotItem(
