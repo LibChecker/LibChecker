@@ -62,9 +62,9 @@ jobs:
           name: mappings
           path: "app/build/outputs/mapping/release"
       - name: Upload mappings to App Center
+        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: zhaobozhen/AppCenter-Github-Action@v1
         with:
-          if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
           appName: zhaobozhen2025-gmail.com/LibChecker
           token: ${{secrets.APP_CENTER_TOKEN}}
           group: Collaborators
