@@ -23,7 +23,6 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
-import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -45,7 +44,7 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity(), IListContainer {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
@@ -58,7 +57,6 @@ class MainActivity : BaseActivity(), IListContainer {
             )
         }
     }
-    override var controller: IListController? = null
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -161,7 +159,7 @@ class MainActivity : BaseActivity(), IListContainer {
                                 clickBottomItemFlag = false
                             }
                         } else {
-                            controller?.onReturnTop()
+                            appViewModel.controller?.onReturnTop()
                         }
                     }
                 }

@@ -24,6 +24,7 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.protocol.CloudRulesBundle
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -46,6 +47,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
     val packageChangedLiveData = MutableLiveData<String?>()
     var hasRequestedChange = false
+    var controller: IListController? = null
 
     private val repository = LibCheckerApp.repository
 

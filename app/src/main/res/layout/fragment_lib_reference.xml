@@ -25,17 +25,17 @@
 
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <rikka.widget.borderview.BorderRecyclerView
             android:id="@android:id/list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:paddingTop="?actionBarSize"
             android:scrollbars="none"
             app:borderBottomVisibility="never"
             app:borderTopDrawable="@null"
             app:borderTopVisibility="whenTop"
-            app:fitsSystemWindowsInsets="bottom"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:fitsSystemWindowsInsets="bottom|top" />
 
     </ViewFlipper>
 

@@ -38,7 +38,6 @@ import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
-import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -56,7 +55,6 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
-    private val homeViewModel by activityViewModels<HomeViewModel>()
     private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
@@ -139,6 +137,25 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
             arrow.setOnClickListener {
                 changeTimeNode()
+            }
+        }
+
+        adapter.apply {
+            headerWithEmptyEnable = true
+            setEmptyView(SnapshotEmptyView(requireContext()))
+            setHeaderView(dashboard)
+            setDiffCallback(SnapshotDiffUtil())
+            setOnItemClickListener { _, view, position ->
+                if (AntiShakeUtils.isInvalidClick(view)) {
+                    return@setOnItemClickListener
+                }
+
+                val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
+                    putExtras(Bundle().apply {
+                        putSerializable(EXTRA_ENTITY, getItem(position))
+                    })
+                }
+                startActivity(intent)
             }
         }
 
@@ -227,25 +244,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
         }
 
-        adapter.apply {
-            headerWithEmptyEnable = true
-            setEmptyView(SnapshotEmptyView(requireContext()))
-            setHeaderView(dashboard)
-            setDiffCallback(SnapshotDiffUtil())
-            setOnItemClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemClickListener
-                }
-
-                val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
-                    putExtras(Bundle().apply {
-                        putSerializable(EXTRA_ENTITY, getItem(position))
-                    })
-                }
-                startActivity(intent)
-            }
-        }
-
         viewModel.apply {
             timestamp.observe(viewLifecycleOwner, {
                 if (it != 0L) {
@@ -293,7 +291,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         delay(250)
 
                         doOnMainThreadIdle({
-                            if ((requireActivity() as MainActivity).controller is SnapshotFragment
+                            if (this@SnapshotFragment == homeViewModel.controller
                                 && !binding.list.canScrollVertically(-1)
                             ) {
                                 (requireActivity() as MainActivity).showNavigationView()

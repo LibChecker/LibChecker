@@ -27,7 +27,6 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -47,6 +46,7 @@ import java.util.*
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     private lateinit var borderViewDelegate: BorderViewDelegate
+    private val viewModel by activityViewModels<HomeViewModel>()
 
     companion object {
         init {
@@ -128,7 +128,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                     .setTitle(R.string.dialog_title_reload_apps)
                     .setMessage(R.string.dialog_subtitle_reload_apps)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        val viewModel by activityViewModels<HomeViewModel>()
                         viewModel.reloadAppsFlag.value = true
                         Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RELOAD_APPS", "Ok"))
                     }
@@ -235,8 +234,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     override fun onResume() {
         super.onResume()
-        if ((requireActivity() as IListContainer).controller != this) {
-            (requireActivity() as IListContainer).controller = this
+        if (this != viewModel.controller) {
+            viewModel.controller = this
             requireActivity().invalidateOptionsMenu()
         }
         scheduleAppbarRaisingStatus()
@@ -260,6 +259,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
 
         return recyclerView
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        if (this == viewModel.controller) {
+            viewModel.controller = null
+        }
     }
 
     override fun onReturnTop() {
