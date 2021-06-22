@@ -381,10 +381,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     }
 
     override fun onReturnTop() {
-        binding.list.apply {
-            if (canScrollVertically(-1)) {
-                smoothScrollToPosition(0)
-            }
+        if (binding.list.canScrollVertically(-1)) {
+            binding.list.smoothScrollToPosition(0)
+        } else {
+            flip(VF_LOADING)
+            viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
     }
 }
