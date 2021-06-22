@@ -28,7 +28,7 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
-import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -36,7 +36,7 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
-    private val viewModel by activityViewModels<AppViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private val adapter = LibReferenceAdapter()
 
     private var isListReady = false
@@ -103,6 +103,9 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
         viewModel.apply {
             libReference.observe(viewLifecycleOwner, {
+                if (it == null) {
+                    return@observe
+                }
                 adapter.setList(it)
 
                 if (binding.vfContainer.displayedChild == 0) {

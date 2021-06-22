@@ -44,7 +44,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
     val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
-    val packageChangedLiveData = MutableLiveData<String?>()
     val comparingProgressLiveData = MutableLiveData(0)
 
     private val gson by lazy { Gson() }

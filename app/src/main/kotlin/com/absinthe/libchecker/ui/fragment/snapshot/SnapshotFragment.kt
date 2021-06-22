@@ -38,6 +38,7 @@ import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -55,6 +56,7 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
+    private val homeViewModel by activityViewModels<HomeViewModel>()
     private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
@@ -304,8 +306,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             comparingProgressLiveData.observe(viewLifecycleOwner, {
                 binding.progressIndicator.setProgressCompat(it, it != 1)
             })
+        }
+        homeViewModel.apply {
             packageChangedLiveData.observe(viewLifecycleOwner) {
-                compareDiff(GlobalValues.snapshotTimestamp)
+                viewModel.compareDiff(GlobalValues.snapshotTimestamp)
             }
         }
 

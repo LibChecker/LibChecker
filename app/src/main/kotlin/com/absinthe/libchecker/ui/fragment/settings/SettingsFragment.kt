@@ -30,7 +30,7 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.IListContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -128,7 +128,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                     .setTitle(R.string.dialog_title_reload_apps)
                     .setMessage(R.string.dialog_subtitle_reload_apps)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                        val viewModel by activityViewModels<AppViewModel>()
+                        val viewModel by activityViewModels<HomeViewModel>()
                         viewModel.reloadAppsFlag.value = true
                         Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RELOAD_APPS", "Ok"))
                     }

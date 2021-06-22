@@ -42,7 +42,7 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
-import com.absinthe.libchecker.viewmodel.AppViewModel
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -56,7 +56,7 @@ const val VF_LIST = 1
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
-    private val viewModel by activityViewModels<AppViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var isListReady = false

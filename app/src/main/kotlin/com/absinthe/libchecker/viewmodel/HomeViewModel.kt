@@ -37,7 +37,7 @@ import java.util.regex.Pattern
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
@@ -369,6 +369,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun computeLibReference(@LibType type: Int) {
         computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
+            libReference.postValue(null)
             var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
             if (appList.isNullOrEmpty()) {
