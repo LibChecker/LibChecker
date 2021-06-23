@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.view.Menu
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.BaseActivity
@@ -10,6 +11,8 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : Base
 
     protected var borderDelegate: BorderViewDelegate? = null
     protected val homeViewModel by activityViewModels<HomeViewModel>()
+    protected var isListReady = false
+    protected var menu: Menu? = null
 
     override fun onVisibilityChanged(visible: Boolean) {
         super.onVisibilityChanged(visible)

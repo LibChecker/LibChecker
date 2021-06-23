@@ -56,8 +56,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
-    private var isListReady = false
-    private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private lateinit var layoutManager: RecyclerView.LayoutManager
 

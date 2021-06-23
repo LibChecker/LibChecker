@@ -37,9 +37,6 @@ import rikka.widget.borderview.BorderView
 class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
     private val adapter = LibReferenceAdapter()
-
-    private var isListReady = false
-    private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private var category = GlobalValues.currentLibRefType
     private lateinit var layoutManager: LinearLayoutManager

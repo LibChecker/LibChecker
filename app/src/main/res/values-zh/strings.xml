@@ -116,7 +116,8 @@
     <string name="snapshot_indicator_removed">移除</string>
     <string name="snapshot_indicator_changed">变更</string>
     <string name="snapshot_indicator_moved">移动</string>
-    <string name="snapshot_empty_list_title">没有变更</string>
+    <string name="snapshot_empty_list_title">没有组件变更</string>
+    <string name="snapshot_no_snapshot">没有快照</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
 

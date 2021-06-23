@@ -46,6 +46,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val initProgressLiveData = MutableLiveData(0)
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
     val packageChangedLiveData = MutableLiveData<String?>()
+
     var hasRequestedChange = false
     var controller: IListController? = null
 

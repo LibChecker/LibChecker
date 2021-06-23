@@ -7,11 +7,8 @@ import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
-import android.view.ContextThemeWrapper
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +20,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -38,8 +34,7 @@ import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
-import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import com.absinthe.libraries.utils.manager.SystemBarManager
+import com.absinthe.libchecker.viewmodel.*
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -98,6 +93,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
 
     override fun init() {
+        setHasOptionsMenu(true)
+
         val dashboard = SnapshotDashboardView(ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)).apply {
             layoutParams = ViewGroup.MarginLayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -140,9 +137,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             }
         }
 
+        val emptyView = SnapshotEmptyView(requireContext()).apply {
+            if (GlobalValues.snapshotTimestamp == 0L) {
+                text.text = getString(R.string.snapshot_no_snapshot)
+            }
+        }
+
         adapter.apply {
             headerWithEmptyEnable = true
-            setEmptyView(SnapshotEmptyView(requireContext()))
+            setEmptyView(emptyView)
             setHeaderView(dashboard)
             setDiffCallback(SnapshotDiffUtil())
             setOnItemClickListener { _, view, position ->
@@ -160,56 +163,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
 
         binding.apply {
-            extendedFab.apply {
-                post {
-                    (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
-                        0, 0, 16.dp, 80.dp + paddingBottom + SystemBarManager.navigationBarSize
-                    )
-                }
-                setOnClickListener {
-                    if (AntiShakeUtils.isInvalidClick(it)) {
-                        return@setOnClickListener
-                    }
-
-                    fun computeNewSnapshot(dropPrevious: Boolean = false) {
-                        flip(VF_LOADING)
-                        this@SnapshotFragment.dropPrevious = dropPrevious
-                        shootBinder?.computeSnapshot(dropPrevious) ?: let {
-                            requireContext().bindService(Intent(requireContext(), ShootService::class.java), shootServiceConnection, Service.BIND_AUTO_CREATE)
-                        }
-                        shouldCompare = false
-                        Analytics.trackEvent(
-                            Constants.Event.SNAPSHOT_CLICK,
-                            EventProperties().set("Action", "Click to Save")
-                        )
-                    }
-
-                    if (GlobalValues.snapshotTimestamp == 0L) {
-                        computeNewSnapshot()
-                    } else {
-                        AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.dialog_title_keep_previous_snapshot)
-                            .setMessage(R.string.dialog_message_keep_previous_snapshot)
-                            .setPositiveButton(R.string.btn_keep) { _, _ ->
-                                computeNewSnapshot(false)
-                            }
-                            .setNegativeButton(R.string.btn_drop) { _, _ ->
-                                computeNewSnapshot(true)
-                            }
-                            .setNeutralButton(android.R.string.cancel, null)
-                            .show()
-                    }
-                }
-                setOnLongClickListener {
-                    hide()
-                    Analytics.trackEvent(
-                        Constants.Event.SNAPSHOT_CLICK,
-                        EventProperties().set("Action", "Long Click to Hide")
-                    )
-                    true
-                }
-                isVisible = false
-            }
             list.apply {
                 adapter = this@SnapshotFragment.adapter
                 borderDelegate = borderViewDelegate
@@ -219,13 +172,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         (requireActivity() as BaseActivity).appBar?.setRaised(!top)
                     }
                 addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        //dy less than zero means swiping up
-                        if (dy > 10 && binding.extendedFab.isShown) {
-                            binding.extendedFab.hide()
-                        } else if (dy < -10 && !binding.extendedFab.isShown) {
-                            binding.extendedFab.show()
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
+
                         }
                     }
                 })
@@ -237,6 +187,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         )
                     )
                 }
+                scrollToPosition(0)
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -295,7 +246,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                                 && !binding.list.canScrollVertically(-1)
                             ) {
                                 (requireActivity() as MainActivity).showNavigationView()
-                                binding.extendedFab.show()
                             }
                         })
                     }
@@ -308,14 +258,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         homeViewModel.apply {
             packageChangedLiveData.observe(viewLifecycleOwner) {
                 viewModel.compareDiff(GlobalValues.snapshotTimestamp)
-            }
-        }
-
-        lifecycleScope.launchWhenResumed {
-            delay(2000)
-
-            withContext(Dispatchers.Main) {
-                binding.extendedFab.shrink()
             }
         }
     }
@@ -338,20 +280,58 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         binding.list.layoutManager = getSuitableLayoutManager()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.snapshot_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.save) {
+            fun computeNewSnapshot(dropPrevious: Boolean = false) {
+                flip(VF_LOADING)
+                this@SnapshotFragment.dropPrevious = dropPrevious
+                shootBinder?.computeSnapshot(dropPrevious) ?: let {
+                    requireContext().bindService(
+                        Intent(
+                            requireContext(),
+                            ShootService::class.java
+                        ), shootServiceConnection, Service.BIND_AUTO_CREATE
+                    )
+                }
+                shouldCompare = false
+                Analytics.trackEvent(
+                    Constants.Event.SNAPSHOT_CLICK,
+                    EventProperties().set("Action", "Click to Save")
+                )
+            }
+
+            if (GlobalValues.snapshotTimestamp == 0L) {
+                computeNewSnapshot()
+            } else {
+                AlertDialog.Builder(requireContext())
+                    .setTitle(R.string.dialog_title_keep_previous_snapshot)
+                    .setMessage(R.string.dialog_message_keep_previous_snapshot)
+                    .setPositiveButton(R.string.btn_keep) { _, _ ->
+                        computeNewSnapshot(false)
+                    }
+                    .setNegativeButton(R.string.btn_drop) { _, _ ->
+                        computeNewSnapshot(true)
+                    }
+                    .setNeutralButton(android.R.string.cancel, null)
+                    .show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun flip(child: Int) {
         if (binding.vfContainer.displayedChild == child) {
             return
         }
         if (child == VF_LOADING) {
-            if (binding.extendedFab.isShown) {
-                binding.extendedFab.hide()
-            }
             binding.loading.resumeAnimation()
             (requireActivity() as BaseActivity).appBar?.setRaised(false)
         } else {
-            if (!binding.extendedFab.isShown) {
-                binding.extendedFab.show()
-            }
             binding.loading.pauseAnimation()
             binding.list.scrollToPosition(0)
         }

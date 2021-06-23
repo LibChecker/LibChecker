@@ -26,13 +26,12 @@ import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
-import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
+import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.applist.AppListRejectView
-import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
-import com.absinthe.libchecker.viewmodel.HomeViewModel
+import com.absinthe.libchecker.viewmodel.*
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -122,7 +121,7 @@ class MainActivity : BaseActivity() {
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
                             0 -> AppListFragment()
-                            1 -> StatisticsFragment()
+                            1 -> LibReferenceFragment()
                             2 -> SnapshotFragment()
                             else -> SettingsFragment()
                         }
@@ -139,7 +138,7 @@ class MainActivity : BaseActivity() {
 
                 //禁止左右滑动
                 isUserInputEnabled = false
-                offscreenPageLimit = 3
+                offscreenPageLimit = 1
             }
 
             // 当 ViewPager 切换页面时，改变 ViewPager 的显示
@@ -236,11 +235,11 @@ class MainActivity : BaseActivity() {
                 initItems()
             }
 
-            reloadAppsFlag.observe(this@MainActivity, {
+            reloadAppsFlag.observe(this@MainActivity) {
                 if (it) {
                     binding.viewpager.setCurrentItem(0, true)
                 }
-            })
+            }
         }
     }
 

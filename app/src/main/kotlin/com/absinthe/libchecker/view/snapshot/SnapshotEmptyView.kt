@@ -18,7 +18,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
         addView(this)
     }
 
-    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+    val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
             it.topMargin = 16.dp
         }
