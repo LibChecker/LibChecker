@@ -181,25 +181,30 @@ object PackageUtils {
         } else {
             nativePath
         }
-        try {
+        val list = mutableListOf<LibStringItem>()
+
+        if (realNativePath != null) {
             val file = File(realNativePath)
-            val list = file.listFiles()?.asSequence()?.distinctBy { it.name }
-                ?.map { LibStringItem(it.name, it.length()) }?.toMutableList()
-                ?: mutableListOf()
-
-            if (list.isEmpty()) {
-                list.addAll(getSourceLibs(packageInfo, "lib/"))
-            }
-            list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
-
-            if (needStaticLibrary) {
-                list.addAll(getStaticLibs(packageInfo))
-            }
-
-            return list.distinctBy { it.name }
-        } catch (e: NullPointerException) {
-            return emptyList()
+            list.addAll(
+                file.listFiles()
+                    ?.asSequence()
+                    ?.distinctBy { it.name }
+                    ?.map { LibStringItem(it.name, it.length()) }
+                    ?.toMutableList()
+                    .orEmpty()
+            )
         }
+
+        if (list.isEmpty()) {
+            list.addAll(getSourceLibs(packageInfo, "lib/"))
+        }
+        list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
+
+        if (needStaticLibrary) {
+            list.addAll(getStaticLibs(packageInfo))
+        }
+
+        return list.distinctBy { it.name }
     }
 
     /**
@@ -435,7 +440,11 @@ object PackageUtils {
         var isEnabled: Boolean
         return list.asSequence()
             .map {
-                state = LibCheckerApp.context.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
+                state = try {
+                    LibCheckerApp.context.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
+                } catch (e: IllegalArgumentException) {
+                    PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+                }
                 isEnabled = when(state) {
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true

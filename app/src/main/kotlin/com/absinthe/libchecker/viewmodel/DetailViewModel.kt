@@ -3,6 +3,7 @@ package com.absinthe.libchecker.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.SparseArray
 import androidx.lifecycle.AndroidViewModel
@@ -56,7 +57,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         val list = ArrayList<LibStringItemChip>()
 
         try {
-            val info = if (packageName.endsWith("/temp.apk")) {
+            val isApk = packageName.endsWith("/temp.apk")
+            val info = if (isApk) {
                 context.packageManager.getPackageArchiveInfo(
                     packageName,
                     0
@@ -70,11 +72,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
             info?.let {
                 list.addAll(
-                    getNativeChipList(info, is32bit)
+                    getNativeChipList(info, is32bit, isApk)
                 )
             }
         } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+            Timber.e(e)
         }
 
         nativeLibItems.postValue(list)
@@ -131,7 +133,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Timber.e(e)
             }
         }
     
@@ -169,8 +171,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             })
         }
 
-    private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean): List<LibStringItemChip> {
-        val list = PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(info.packageName), is32bit, true).toMutableList()
+    private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean, isApk: Boolean): List<LibStringItemChip> {
+        val packageInfo = if (!isApk) {
+            PackageUtils.getPackageInfo(info.packageName)
+        } else {
+            PackageInfo().apply {
+                packageName = info.packageName
+                applicationInfo = info
+            }
+        }
+        val list = PackageUtils.getNativeDirLibs(packageInfo, is32bit, true).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 
