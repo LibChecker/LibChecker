@@ -39,7 +39,7 @@ jobs:
       - name: Build with Gradle
         run: bash ./gradlew -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success()
         id: sign
         uses: r0adkll/sign-android-release@v1.0.4
         env:
@@ -51,7 +51,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built apk
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success()
         uses: actions/upload-artifact@v2
         with:
           name: snapshot

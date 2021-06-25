@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <permission
+        android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
+        android:label="@string/permission_label_get_marked_libraries"
+        android:description="@string/permission_label_get_marked_libraries"
+        android:protectionLevel="normal" />
+
     <application
         android:name=".LibCheckerApp"
         android:allowBackup="true"
@@ -82,6 +88,9 @@
             android:label="@string/tab_lib_reference_statistics"
             android:launchMode="singleTask" />
         <activity
+            android:name=".ui.main.ChartActivity"
+            android:label="@string/tab_chart" />
+        <activity
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />
@@ -93,7 +102,7 @@
             android:authorities="${applicationId}.coreprovider"
             android:enabled="true"
             android:exported="true"
-            android:permission="com.absinthe.libchecker.permission.GET_LIBRARY_INFO" />
+            android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
 
     </application>
 

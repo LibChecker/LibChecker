@@ -16,6 +16,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
@@ -90,12 +91,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
 
-            val pmFlag = if (LCAppUtils.atLeastN()) {
-                PackageManager.MATCH_DISABLED_COMPONENTS
-            } else {
-                PackageManager.GET_DISABLED_COMPONENTS
-            }
-
             try {
                 if (packageName.endsWith("/temp.apk")) {
                     context.packageManager.getPackageArchiveInfo(
@@ -104,7 +99,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                                 or PackageManager.GET_ACTIVITIES
                                 or PackageManager.GET_RECEIVERS
                                 or PackageManager.GET_PROVIDERS
-                                or pmFlag
+                                or VersionCompat.MATCH_DISABLED_COMPONENTS
                     )?.apply {
                         applicationInfo.sourceDir = packageName
                         applicationInfo.publicSourceDir = packageName

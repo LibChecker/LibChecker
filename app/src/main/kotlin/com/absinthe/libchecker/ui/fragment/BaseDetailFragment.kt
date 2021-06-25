@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -74,6 +75,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
 
     fun getItemsCount() = adapter.itemCount
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun navigateToComponentImpl(component: String) {
         val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
         if (componentPosition == -1) {

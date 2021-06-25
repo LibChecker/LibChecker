@@ -5,12 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="@dimen/normal_padding">
+    app:fitsSystemWindowsInsets="bottom|top"
+    android:paddingTop="?actionBarSize">
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/buttons_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/normal_padding"
         android:paddingHorizontal="@dimen/normal_padding"
         app:selectionRequired="true"
         app:singleSelection="true"

@@ -1,19 +1,24 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.view.Menu
+import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.ui.main.IListContainer
-import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), IListController {
 
     protected var borderDelegate: BorderViewDelegate? = null
+    protected val homeViewModel by activityViewModels<HomeViewModel>()
+    protected var isListReady = false
+    protected var menu: Menu? = null
 
     override fun onVisibilityChanged(visible: Boolean) {
         super.onVisibilityChanged(visible)
         if (visible) {
-            if ((requireActivity() as IListContainer).controller != this) {
-                (requireActivity() as IListContainer).controller = this@BaseListControllerFragment
+            if (this != homeViewModel.controller) {
+                homeViewModel.controller = this
                 requireActivity().invalidateOptionsMenu()
             }
         }
@@ -24,7 +29,14 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : Base
         scheduleAppbarRaisingStatus()
     }
 
-    override fun getAppBar() = (activity as MainActivity?)?.appBar
+    override fun onDetach() {
+        super.onDetach()
+        if (this == homeViewModel.controller) {
+            homeViewModel.controller = null
+        }
+    }
+
+    override fun getAppBar() = (activity as BaseActivity?)?.appBar
 
     override fun getBorderViewDelegate() = borderDelegate
 

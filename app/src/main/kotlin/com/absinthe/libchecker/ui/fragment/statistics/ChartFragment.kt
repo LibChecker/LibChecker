@@ -24,7 +24,7 @@ import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
-import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.extensions.dp
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.github.mikephil.charting.charts.HorizontalBarChart
@@ -48,7 +48,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     OnChartValueSelectedListener,
     MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-    private val viewModel by activityViewModels<LibReferenceViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private val legendList = mutableListOf<String>()
     private val existApiList = mutableListOf<Int>()
     private var chartType = TYPE_ABI
@@ -421,9 +421,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun generatePieChartView(): PieChart {
         return PieChart(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
-                setMargins(0, 0, 0, 56.dp + SystemBarManager.navigationBarSize)
-            }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             dragDecelerationFrictionCoef = 0.95f
             description.isEnabled = false
             legend.apply {

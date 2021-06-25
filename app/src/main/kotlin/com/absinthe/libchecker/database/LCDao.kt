@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.absinthe.libchecker.database.entity.*
@@ -104,6 +105,12 @@ interface LCDao {
 
     @Query("SELECT * from rules_table WHERE isRegexRule = 1")
     suspend fun getRegexRules(): List<RuleEntity>
+
+    @Query("SELECT * FROM rules_table")
+    fun selectAllRules(): Cursor?
+
+    @Query("SELECT * FROM rules_table WHERE name LIKE :name")
+    fun selectRuleByName(name: String): Cursor?
 
     //Diff
     @Insert(onConflict = OnConflictStrategy.REPLACE)

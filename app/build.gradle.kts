@@ -12,8 +12,6 @@ plugins {
     id("com.google.protobuf")
 }
 
-apply("and_res_guard.gradle")
-
 android {
     compileSdk = 30
     buildToolsVersion = "30.0.3"
@@ -126,7 +124,7 @@ configurations.all {
     exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.38.0")
+val grpcVersion by extra("1.38.1")
 val protocVersion by extra("3.17.0")
 
 dependencies {
@@ -167,12 +165,13 @@ dependencies {
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
-    implementation("com.drakeet.multitype:multitype:4.2.0")
+    implementation("com.drakeet.multitype:multitype:4.3.0")
     implementation("com.airbnb.android:lottie:3.7.0")
     implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation("com.jonathanfinerty.once:once:1.3.1")
     implementation("net.dongliu:apk-parser:2.6.10")
     implementation("io.coil-kt:coil:1.2.2")
-    implementation("me.zhanghai.android.fastscroll:library:1.1.6")
+    implementation("me.zhanghai.android.fastscroll:library:1.1.7")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
 

@@ -17,7 +17,7 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("==> onViewCreated")
+        Timber.d("${javaClass.simpleName} ==> onViewCreated")
         _binding = initBinding(view)
         init()
     }
@@ -26,24 +26,24 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
     abstract fun init()
 
     open fun onVisibilityChanged(visible: Boolean) {
-        Timber.d("==> onVisibilityChanged = $visible")
+        Timber.d("${javaClass.simpleName} ==> onVisibilityChanged = $visible")
     }
 
     override fun onDestroyView() {
-        Timber.d("==> onDestroyView")
+        Timber.d("${javaClass.simpleName} ==> onDestroyView")
         _binding = null
         super.onDestroyView()
     }
 
     override fun onResume() {
         super.onResume()
-        Timber.d("==> onResume")
+        Timber.d("${javaClass.simpleName} ==> onResume")
         onVisibilityChanged(true)
     }
 
     override fun onPause() {
         super.onPause()
-        Timber.d("==> onPause")
+        Timber.d("${javaClass.simpleName} ==> onPause")
         onVisibilityChanged(false)
     }
 

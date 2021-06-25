@@ -23,18 +23,15 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
-import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
-import com.absinthe.libchecker.ui.fragment.statistics.StatisticsFragment
+import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.applist.AppListRejectView
-import com.absinthe.libchecker.viewmodel.AppViewModel
-import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
-import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libchecker.viewmodel.*
 import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -46,12 +43,11 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity(), IListContainer {
+class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
-    private val appViewModel by viewModels<AppViewModel>()
-    private val snapshotViewModel by viewModels<SnapshotViewModel>()
+    private val appViewModel by viewModels<HomeViewModel>()
     private val mask by lazy {
         AppListRejectView(this).apply {
             layoutParams = CoordinatorLayout.LayoutParams(
@@ -60,7 +56,6 @@ class MainActivity : BaseActivity(), IListContainer {
             )
         }
     }
-    override var controller: IListController? = null
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -126,7 +121,7 @@ class MainActivity : BaseActivity(), IListContainer {
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
                             0 -> AppListFragment()
-                            1 -> StatisticsFragment()
+                            1 -> LibReferenceFragment()
                             2 -> SnapshotFragment()
                             else -> SettingsFragment()
                         }
@@ -143,7 +138,7 @@ class MainActivity : BaseActivity(), IListContainer {
 
                 //禁止左右滑动
                 isUserInputEnabled = false
-                offscreenPageLimit = 3
+                offscreenPageLimit = 1
             }
 
             // 当 ViewPager 切换页面时，改变 ViewPager 的显示
@@ -163,7 +158,7 @@ class MainActivity : BaseActivity(), IListContainer {
                                 clickBottomItemFlag = false
                             }
                         } else {
-                            controller?.onReturnTop()
+                            appViewModel.controller?.onReturnTop()
                         }
                     }
                 }
@@ -183,7 +178,6 @@ class MainActivity : BaseActivity(), IListContainer {
     private val requestPackageReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             appViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
-            snapshotViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
         }
     }
 
@@ -241,11 +235,11 @@ class MainActivity : BaseActivity(), IListContainer {
                 initItems()
             }
 
-            reloadAppsFlag.observe(this@MainActivity, {
+            reloadAppsFlag.observe(this@MainActivity) {
                 if (it) {
                     binding.viewpager.setCurrentItem(0, true)
                 }
-            })
+            }
         }
     }
 

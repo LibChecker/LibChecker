@@ -1,10 +1,10 @@
 package com.absinthe.libchecker;
 
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
 
 import androidx.annotation.Nullable;
+
+import com.absinthe.libchecker.compat.VersionCompat;
 
 import java.lang.reflect.Field;
 
@@ -27,9 +27,7 @@ public class FreezeUtils {
 
     private static final int PRIVATE_FLAG_HIDDEN = 1;
     private static final int FLAG_HIDDEN = 1 << 27;
-    public static final int PM_FLAGS_GET_APP_INFO = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N ?
-            PackageManager.MATCH_UNINSTALLED_PACKAGES
-            : PackageManager.GET_UNINSTALLED_PACKAGES;
+    public static final int PM_FLAGS_GET_APP_INFO = VersionCompat.INSTANCE.getMATCH_UNINSTALLED_PACKAGES();
 
     private static boolean isAppHidden(ApplicationInfo ai) {
         if (AI_FIELD != null) {

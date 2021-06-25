@@ -6,7 +6,6 @@ import android.view.*
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
-import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -20,27 +19,21 @@ import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
-import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
+import rikka.widget.borderview.BorderView
 
 class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
 
-    private val viewModel by activityViewModels<AppViewModel>()
     private val adapter = LibReferenceAdapter()
-
-    private var isListReady = false
-    private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private var category = GlobalValues.currentLibRefType
     private lateinit var layoutManager: LinearLayoutManager
@@ -55,6 +48,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             list.apply {
                 adapter = this@LibReferenceFragment.adapter
                 layoutManager = this@LibReferenceFragment.layoutManager
+                borderDelegate = borderViewDelegate
+                borderVisibilityChangedListener =
+                    BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                        (requireActivity() as MainActivity).appBar?.setRaised(!top)
+                    }
                 FastScrollerBuilder(this).useMd2Style().build()
             }
             vfContainer.apply {
@@ -101,8 +99,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             setEmptyView(EmptyListView(requireContext()))
         }
 
-        viewModel.apply {
+        homeViewModel.apply {
             libReference.observe(viewLifecycleOwner, {
+                if (it == null) {
+                    return@observe
+                }
                 adapter.setList(it)
 
                 if (binding.vfContainer.displayedChild == 0) {
@@ -120,7 +121,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             computeRef()
         })
         GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, {
-            viewModel.refreshRef()
+            homeViewModel.refreshRef()
         })
 
         AppItemRepository.allApplicationInfoItems.observe(viewLifecycleOwner, {
@@ -189,6 +190,12 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                         R.id.ref_category_not_marked -> doSaveLibRefType(NOT_MARKED)
                     }
                     computeRef()
+                    Analytics.trackEvent(
+                        Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
+                            "Type",
+                            category.toLong()
+                        )
+                    )
                     true
                 }
                 setOnDismissListener {
@@ -196,13 +203,10 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 }
             }
             popup?.show()
+        } else if (item.itemId == R.id.chart) {
+            startActivity(Intent(requireContext(), ChartActivity::class.java))
         }
-        Analytics.trackEvent(
-            Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
-                "Type",
-                category.toLong()
-            )
-        )
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -217,8 +221,8 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             binding.lottie.resumeAnimation()
         }
 
-        viewModel.cancelComputingLibReference()
-        viewModel.computeLibReference(category)
+        homeViewModel.cancelComputingLibReference()
+        homeViewModel.computeLibReference(category)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -226,7 +230,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        viewModel.libReference.value?.let { list ->
+        homeViewModel.libReference.value?.let { list ->
             val filter = list.filter {
                 it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
                     newText,

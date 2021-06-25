@@ -16,7 +16,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -42,7 +41,6 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
-import com.absinthe.libchecker.viewmodel.AppViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -56,11 +54,8 @@ const val VF_LIST = 1
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
-    private val viewModel by activityViewModels<AppViewModel>()
     private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
-    private var isListReady = false
-    private var menu: Menu? = null
     private var popup: PopupMenu? = null
     private lateinit var layoutManager: RecyclerView.LayoutManager
 
@@ -113,7 +108,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
         if (!isFirstLaunch && isListReady) {
             if (AppItemRepository.shouldRefreshAppList) {
-                viewModel.dbItems.value?.let {
+                homeViewModel.dbItems.value?.let {
                     updateItems(it)
                     AppItemRepository.shouldRefreshAppList = false
                 }
@@ -162,7 +157,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     override fun onQueryTextChange(newText: String): Boolean {
-        viewModel.dbItems.value?.let { allDatabaseItems ->
+        homeViewModel.dbItems.value?.let { allDatabaseItems ->
             val filter = allDatabaseItems.filter {
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
@@ -244,7 +239,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun initObserver() {
-        viewModel.apply {
+        homeViewModel.apply {
             reloadAppsFlag.observe(viewLifecycleOwner, {
                 if (it && appListStatusLiveData.value == STATUS_NOT_START) {
                     binding.progressIndicator.isVisible = true
@@ -262,14 +257,14 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     return@observe
                 }
                 updateItems(it)
-                viewModel.requestChange()
+                homeViewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
                 if (status == STATUS_END) {
                     dbItems.value?.let { updateItems(it) }
-                    if (!viewModel.hasRequestedChange) {
-                        viewModel.requestChange()
-                        viewModel.hasRequestedChange = true
+                    if (!homeViewModel.hasRequestedChange) {
+                        homeViewModel.requestChange()
+                        homeViewModel.hasRequestedChange = true
                     }
 
                     if (isFirstLaunch) {
@@ -299,12 +294,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         GlobalValues.apply {
             isShowSystemApps.observe(viewLifecycleOwner, {
                 if (isListReady) {
-                    updateItems(viewModel.dbItems.value!!)
+                    updateItems(homeViewModel.dbItems.value!!)
                 }
             })
             appSortMode.observe(viewLifecycleOwner, { mode ->
                 if (isListReady) {
-                    viewModel.dbItems.value?.let { allDatabaseItems ->
+                    homeViewModel.dbItems.value?.let { allDatabaseItems ->
                         val list = allDatabaseItems.toMutableList()
 
                         when (mode) {
@@ -323,7 +318,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
             shouldRequestChange.observe(viewLifecycleOwner, { should ->
                 if (isListReady && !should) {
-                    viewModel.dbItems.value?.let { updateItems(it) }
+                    homeViewModel.dbItems.value?.let { updateItems(it) }
                     doOnMainThreadIdle({
                         flip(VF_LIST)
                     })
@@ -384,7 +379,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun flip(page: Int) {
-        if (viewModel.appListStatusLiveData.value == STATUS_START) {
+        if (homeViewModel.appListStatusLiveData.value == STATUS_START) {
             return
         }
         if (binding.vfContainer.displayedChild != page) {
@@ -402,7 +397,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             returnTopOfList()
         } else {
             flip(VF_LOADING)
-            viewModel.requestChange(true)
+            homeViewModel.requestChange(true)
         }
     }
 }

@@ -14,6 +14,7 @@ import com.absinthe.libchecker.*
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
@@ -64,18 +65,15 @@ object PackageUtils {
      */
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
-        val pmFlag = if (LCAppUtils.atLeastN()) {
-            PackageManager.MATCH_DISABLED_COMPONENTS
-        } else {
-            PackageManager.GET_DISABLED_COMPONENTS
-        }
-        val packageInfo = LibCheckerApp.context.packageManager.getPackageInfo(
-            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or pmFlag
+        val packageInfo = SystemServices.packageManager.getPackageInfo(
+            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-            val info = LibCheckerApp.context.packageManager.getPackageInfo(packageInfo.packageName, 0)
+            val info = SystemServices.packageManager.getPackageInfo(packageInfo.packageName, 0)
 
-            return LibCheckerApp.context.packageManager.getPackageArchiveInfo(info.applicationInfo.sourceDir, pmFlag or flag)?.apply {
+            return SystemServices.packageManager.getPackageArchiveInfo(
+                info.applicationInfo.sourceDir, VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+            )?.apply {
                 applicationInfo.sourceDir = info.applicationInfo.sourceDir
                 applicationInfo.nativeLibraryDir = info.applicationInfo.nativeLibraryDir
             } ?: throw PackageManager.NameNotFoundException()
@@ -94,8 +92,7 @@ object PackageUtils {
             throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
         }
 
-        val flag = if (LCAppUtils.atLeastN()) PackageManager.MATCH_UNINSTALLED_PACKAGES else PackageManager.GET_UNINSTALLED_PACKAGES
-        return LibCheckerApp.context.packageManager?.getInstalledApplications(flag) ?: emptyList()
+        return SystemServices.packageManager.getInstalledApplications(VersionCompat.MATCH_UNINSTALLED_PACKAGES)
     }
 
     /**
@@ -123,7 +120,7 @@ object PackageUtils {
      */
     fun getVersionString(packageInfo: PackageInfo): String {
         return try {
-            "${packageInfo.versionName ?: "null"}(${getVersionCode(packageInfo)})"
+            "${packageInfo.versionName ?: "<unknown>"}(${getVersionCode(packageInfo)})"
         } catch (e: PackageManager.NameNotFoundException) {
             "Unknown"
         }
@@ -441,7 +438,7 @@ object PackageUtils {
         return list.asSequence()
             .map {
                 state = try {
-                    LibCheckerApp.context.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
+                    SystemServices.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
                 } catch (e: IllegalArgumentException) {
                     PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
                 }
@@ -659,6 +656,8 @@ object PackageUtils {
         ARMV7 to R.drawable.ic_abi_label_32bit,
         ARMV5 to R.drawable.ic_abi_label_32bit,
         X86 to R.drawable.ic_abi_label_32bit,
+        ERROR to R.drawable.ic_abi_label_no_libs,
+        OVERLAY to R.drawable.ic_abi_label_no_libs,
         ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
         X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
         ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
@@ -813,7 +812,7 @@ object PackageUtils {
      * @return true if it is installed
      */
     fun isAppInstalled(pkgName: String): Boolean {
-        val pm = LibCheckerApp.context.packageManager
+        val pm = SystemServices.packageManager
         return try {
             pm.getApplicationInfo(pkgName, 0).enabled
         } catch (e: PackageManager.NameNotFoundException) {

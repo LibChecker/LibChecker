@@ -138,9 +138,9 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         val spanString: SpannableString
                         if (abi != Constants.OVERLAY) {
                             spanString = SpannableString("  $str")
-                            ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
-                                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                                val span = CenterAlignImageSpan(it)
+                            ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { drawable ->
+                                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                                val span = CenterAlignImageSpan(drawable)
                                 spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                             }
                             tvAbiAndApi.text = spanString

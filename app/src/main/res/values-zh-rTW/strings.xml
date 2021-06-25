@@ -10,6 +10,7 @@
     <string name="channel_shoot">儲存快照</string>
     <string name="noti_shoot_title">正在儲存目前快照</string>
     <string name="noti_shoot_title_saved">快照已儲存</string>
+    <string name="permission_label_get_marked_libraries">允許應用程式獲取 LibChecker 所提供的標記庫訊息</string>
 
     <!--  App list  -->
     <string name="menu_search">搜尋</string>
@@ -116,7 +117,8 @@
     <string name="snapshot_indicator_removed">移除</string>
     <string name="snapshot_indicator_changed">變更</string>
     <string name="snapshot_indicator_moved">移動</string>
-    <string name="snapshot_empty_list_title">沒有變更</string>
+    <string name="snapshot_empty_list_title">沒有組件變更</string>
+    <string name="snapshot_no_snapshot">沒有快照</string>
     <string name="snapshot_detail_new_install_title">這是一個全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
 

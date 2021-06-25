@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.utils
 
-import android.content.Context
+import com.absinthe.libchecker.SystemServices
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -16,8 +16,6 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.RuleEntity
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,9 +51,8 @@ object LCAppUtils {
 
     fun getAppIcon(packageName: String): Drawable {
         return try {
-            val pm = LibCheckerApp.context.packageManager
-            val pi = pm.getPackageInfo(packageName, 0)
-            pi?.applicationInfo?.loadIcon(pm)!!
+            val pi = SystemServices.packageManager.getPackageInfo(packageName, 0)
+            pi?.applicationInfo?.loadIcon(SystemServices.packageManager)!!
         } catch (e: Exception) {
             ColorDrawable(Color.TRANSPARENT)
         }
@@ -84,23 +81,6 @@ object LCAppUtils {
     @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
     fun atLeastN(): Boolean {
         return Build.VERSION.SDK_INT >= 24
-    }
-
-    fun getFromAssets(context: Context, fileName: String): String? {
-        try {
-            val inputReader = InputStreamReader(context.resources.assets.open(fileName))
-            val bufReader = BufferedReader(inputReader)
-            val result = StringBuilder()
-            var line: String
-
-            while (bufReader.readLine().also { line = it } != null) {
-                result.append(line)
-            }
-            return result.toString()
-        } catch (e: Exception) {
-            Timber.e(e, "getFromAssets")
-            return null
-        }
     }
 
     fun findRuleRegex(string: String, @LibType type: Int): RuleEntity? {

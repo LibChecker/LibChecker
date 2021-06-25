@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.viewmodel
 
+import com.absinthe.libchecker.SystemServices
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -24,6 +25,7 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.protocol.CloudRulesBundle
+import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -37,7 +39,7 @@ import java.util.regex.Pattern
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
-class AppViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val dbItems: LiveData<List<LCItem>>
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
@@ -45,7 +47,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val initProgressLiveData = MutableLiveData(0)
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
     val packageChangedLiveData = MutableLiveData<String?>()
+
     var hasRequestedChange = false
+    var controller: IListController? = null
 
     private val repository = LibCheckerApp.repository
 
@@ -150,7 +154,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             return@launch
         }
 
-        requestChangeImpl(LibCheckerApp.context.packageManager, needRefresh)
+        requestChangeImpl(SystemServices.packageManager, needRefresh)
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
@@ -369,6 +373,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     fun computeLibReference(@LibType type: Int) {
         computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
+            libReference.postValue(null)
             var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
 
             if (appList.isNullOrEmpty()) {
