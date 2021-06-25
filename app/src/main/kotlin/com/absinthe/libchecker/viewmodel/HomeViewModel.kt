@@ -52,6 +52,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var controller: IListController? = null
 
     private val repository = LibCheckerApp.repository
+    private var insertRuleIndex = 0
 
     init {
         dbItems = repository.allDatabaseItems
@@ -623,6 +624,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
 
     fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
+        insertRuleIndex = 1
         deleteAllRules()
         insertPreinstallRules(context, 1)
         insertPreinstallRules(context, 2)
@@ -638,7 +640,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 val rulesList = mutableListOf<RuleEntity>()
                 rulesBundle.rulesList.cloudRulesList.forEach {
                     it?.let {
-                        rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+                        rulesList.add(RuleEntity(insertRuleIndex++, it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
                     }
                 }
                 repository.insertRules(rulesList)

@@ -19,7 +19,8 @@ android {
     val gitCommitId = "git rev-parse --short HEAD".exec()
     val baseVersionName = "2.0.14"
     val verName = "${baseVersionName}.${gitCommitId}"
-    val verCode = "git rev-list --count HEAD".exec().toInt()
+//    val verCode = "git rev-list --count HEAD".exec().toInt()
+    val verCode = 720
 
     defaultConfig {
         applicationId = "com.absinthe.libchecker"

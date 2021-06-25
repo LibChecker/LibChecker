@@ -14,11 +14,11 @@ object RuleGenerator {
         val inputStream = LibCheckerApp.context.resources.assets.open("rules.lcr.2")
         val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
         val rulesList = mutableListOf<RuleEntity>()
-        rulesBundle.rulesList.cloudRulesList.forEach {
-            it?.let {
-                rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-            }
-        }
+//        rulesBundle.rulesList.cloudRulesList.forEach {
+//            it?.let {
+//                rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+//            }
+//        }
 
         bundleBuilder.version = GlobalValues.localRulesVersion + 1
         bundleBuilder.count = rulesList.size

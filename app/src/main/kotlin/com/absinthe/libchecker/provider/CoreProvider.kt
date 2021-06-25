@@ -13,7 +13,7 @@ class CoreProvider : ContentProvider() {
 
     companion object {
         /** The authority of this content provider.  */
-        const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.coreprovider"
+        const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
         const val RULES_TABLE = "rules_table"
 
         /** The URI for the rules table.  */

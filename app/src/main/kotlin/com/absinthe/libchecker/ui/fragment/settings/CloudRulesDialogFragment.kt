@@ -91,11 +91,11 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                             Timber.d("count = ${builder?.count}")
 
                             val rulesList = mutableListOf<RuleEntity>()
-                            builder.rulesList.cloudRulesList.forEach { rule ->
-                                rule?.let {
-                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-                                }
-                            }
+//                            builder.rulesList.cloudRulesList.forEach { rule ->
+//                                rule?.let {
+//                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
+//                                }
+//                            }
                             LibCheckerApp.repository.insertRules(rulesList)
                             withContext(Dispatchers.Main) {
                                 root.cloudRulesContentView.localVersion.version.text = builder.version.toString()

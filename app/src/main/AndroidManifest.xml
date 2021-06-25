@@ -99,7 +99,7 @@
 
         <provider
             android:name=".provider.CoreProvider"
-            android:authorities="${applicationId}.coreprovider"
+            android:authorities="${applicationId}.provider"
             android:enabled="true"
             android:exported="true"
             android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
