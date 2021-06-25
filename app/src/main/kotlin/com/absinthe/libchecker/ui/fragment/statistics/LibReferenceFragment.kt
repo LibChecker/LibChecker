@@ -19,10 +19,7 @@ import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -193,6 +190,12 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                         R.id.ref_category_not_marked -> doSaveLibRefType(NOT_MARKED)
                     }
                     computeRef()
+                    Analytics.trackEvent(
+                        Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
+                            "Type",
+                            category.toLong()
+                        )
+                    )
                     true
                 }
                 setOnDismissListener {
@@ -200,13 +203,10 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 }
             }
             popup?.show()
+        } else if (item.itemId == R.id.chart) {
+            startActivity(Intent(requireContext(), ChartActivity::class.java))
         }
-        Analytics.trackEvent(
-            Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
-                "Type",
-                category.toLong()
-            )
-        )
+
         return super.onOptionsItemSelected(item)
     }
 

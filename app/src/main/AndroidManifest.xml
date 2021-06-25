@@ -88,6 +88,9 @@
             android:label="@string/tab_lib_reference_statistics"
             android:launchMode="singleTask" />
         <activity
+            android:name=".ui.main.ChartActivity"
+            android:label="@string/tab_chart" />
+        <activity
             android:name=".ui.about.AboutActivity"
             android:label="@string/settings_about"
             android:theme="@style/AppTheme.About" />

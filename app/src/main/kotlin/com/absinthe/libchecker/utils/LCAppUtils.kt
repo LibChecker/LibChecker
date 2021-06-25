@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.utils
 
-import SystemServices
+import com.absinthe.libchecker.SystemServices
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable

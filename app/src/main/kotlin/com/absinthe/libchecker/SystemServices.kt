@@ -1,3 +1,5 @@
+package com.absinthe.libchecker
+
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.LibCheckerApp
 

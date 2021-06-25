@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.viewmodel
 
-import SystemServices
+import com.absinthe.libchecker.SystemServices
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
