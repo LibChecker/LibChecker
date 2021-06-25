@@ -10,6 +10,7 @@
     <string name="channel_shoot">儲存快照</string>
     <string name="noti_shoot_title">正在儲存目前快照</string>
     <string name="noti_shoot_title_saved">快照已儲存</string>
+    <string name="permission_label_get_marked_libraries">允許應用程式獲取 LibChecker 所提供的標記庫訊息</string>
 
     <!--  App list  -->
     <string name="menu_search">搜尋</string>

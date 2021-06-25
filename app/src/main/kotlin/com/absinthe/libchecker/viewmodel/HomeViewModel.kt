@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.viewmodel
 
+import SystemServices
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -153,7 +154,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             return@launch
         }
 
-        requestChangeImpl(LibCheckerApp.context.packageManager, needRefresh)
+        requestChangeImpl(SystemServices.packageManager, needRefresh)
     }
 
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {

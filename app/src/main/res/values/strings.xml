@@ -10,6 +10,7 @@
     <string name="channel_shoot">Save snapshots</string>
     <string name="noti_shoot_title">Saving current snapshot</string>
     <string name="noti_shoot_title_saved">A snapshot has saved</string>
+    <string name="permission_label_get_marked_libraries">Allow application to get marked libraries info provided by LibChecker</string>
 
     <!--  App list  -->
     <string name="menu_search">Search</string>

@@ -92,8 +92,7 @@ object PackageUtils {
             throw MiuiOpsException("miui: not permitted OP_GET_INSTALLED_APPS")
         }
 
-        return SystemServices.packageManager
-            ?.getInstalledApplications(VersionCompat.MATCH_UNINSTALLED_PACKAGES) ?: emptyList()
+        return SystemServices.packageManager.getInstalledApplications(VersionCompat.MATCH_UNINSTALLED_PACKAGES)
     }
 
     /**
@@ -658,6 +657,7 @@ object PackageUtils {
         ARMV5 to R.drawable.ic_abi_label_32bit,
         X86 to R.drawable.ic_abi_label_32bit,
         ERROR to R.drawable.ic_abi_label_no_libs,
+        OVERLAY to R.drawable.ic_abi_label_no_libs,
         ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
         X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
         ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
