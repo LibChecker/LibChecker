@@ -12,8 +12,6 @@ plugins {
     id("com.google.protobuf")
 }
 
-apply("and_res_guard.gradle")
-
 android {
     compileSdk = 30
     buildToolsVersion = "30.0.3"

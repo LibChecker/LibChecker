@@ -12,6 +12,12 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
+        android:id="@+id/chart"
+        android:icon="@drawable/ic_chart"
+        android:title="@string/tab_chart"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/filter"
         android:icon="@drawable/ic_filter_list"
         android:title="@string/menu_filter"
