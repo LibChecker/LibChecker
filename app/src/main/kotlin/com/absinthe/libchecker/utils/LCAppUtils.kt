@@ -53,9 +53,8 @@ object LCAppUtils {
 
     fun getAppIcon(packageName: String): Drawable {
         return try {
-            val pm = LibCheckerApp.context.packageManager
-            val pi = pm.getPackageInfo(packageName, 0)
-            pi?.applicationInfo?.loadIcon(pm)!!
+            val pi = SystemServices.packageManager.getPackageInfo(packageName, 0)
+            pi?.applicationInfo?.loadIcon(SystemServices.packageManager)!!
         } catch (e: Exception) {
             ColorDrawable(Color.TRANSPARENT)
         }
