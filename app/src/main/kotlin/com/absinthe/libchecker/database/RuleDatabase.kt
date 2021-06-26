@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.absinthe.libchecker.database.entity.RuleEntity
+import java.io.File
 
 @Database(entities = [RuleEntity::class], version = 1, exportSchema = true)
 abstract class RuleDatabase : RoomDatabase() {
@@ -34,6 +35,18 @@ abstract class RuleDatabase : RoomDatabase() {
                 INSTANCE = instance
                 return instance
             }
+        }
+
+        fun setDatabase(context: Context, file: File) {
+            val instance = Room.databaseBuilder(
+                context.applicationContext,
+                RuleDatabase::class.java,
+                "rule_database"
+            )
+                .createFromFile(file)
+                .fallbackToDestructiveMigration()
+                .build()
+            INSTANCE = instance
         }
     }
 }

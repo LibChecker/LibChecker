@@ -5,7 +5,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.GET
 
-private const val VERSION = 3
+const val VERSION = 3
 
 interface CloudRuleBundleRequest {
     @GET("cloud/md5/v$VERSION")
