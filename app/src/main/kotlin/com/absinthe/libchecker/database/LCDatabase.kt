@@ -10,8 +10,8 @@ import com.absinthe.libchecker.database.entity.*
 
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
-    TrackItem::class, RuleEntity::class,
-    SnapshotDiffStoringItem::class], version = 13, exportSchema = true)
+    TrackItem::class, SnapshotDiffStoringItem::class],
+    version = 13, exportSchema = true)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -37,6 +37,7 @@ abstract class LCDatabase : RoomDatabase() {
                         MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
                         MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13
                     )
+                    .createFromAsset("database/rules.db")
                     .build()
                 INSTANCE = instance
                 return instance
@@ -147,7 +148,7 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Create the new table
                 database.execSQL(
-                    "CREATE TABLE rules_new (_id INTEGER, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))")
+                    "CREATE TABLE rules_new (_id INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))")
                 // Remove the old table
                 database.execSQL("DROP TABLE rules_table")
                 // Change the table name to the correct one

@@ -66,7 +66,7 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                         }
                     }
                 } else {
-                    libSize.text = PackageUtils.sizeToString(item.item)
+                    libSize.text = PackageUtils.sizeToString(context, item.item)
                 }
                 setChip(item.chip)
             }

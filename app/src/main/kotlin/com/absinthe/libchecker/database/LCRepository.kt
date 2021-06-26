@@ -98,20 +98,6 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.deleteAllItems()
     }
 
-    suspend fun getRule(name: String) = lcDao.getRule(name)
-
-    suspend fun insertRules(rules: List<RuleEntity>) {
-        lcDao.insertRules(rules)
-    }
-
-    fun deleteAllRules() {
-        lcDao.deleteAllRules()
-    }
-
-    suspend fun getAllRules() = lcDao.getAllRules()
-
-    suspend fun getRegexRules() = lcDao.getRegexRules()
-
     suspend fun insertSnapshotDiffItems(item: SnapshotDiffStoringItem) {
         lcDao.insertSnapshotDiff(item)
     }

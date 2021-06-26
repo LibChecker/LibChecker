@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.viewmodel
 
-import com.absinthe.libchecker.SystemServices
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
@@ -11,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
@@ -20,11 +20,11 @@ import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.valueUnsafe
-import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -34,14 +34,13 @@ import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.io.InputStream
 import java.util.regex.Pattern
 
 const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    val dbItems: LiveData<List<LCItem>>
+    val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
     val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
     val reloadAppsFlag = MutableLiveData(false)
     val initProgressLiveData = MutableLiveData(0)
@@ -51,13 +50,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var hasRequestedChange = false
     var controller: IListController? = null
 
-    private val repository = LibCheckerApp.repository
-    private var insertRuleIndex = 0
-
-    init {
-        dbItems = repository.allDatabaseItems
-    }
-
     fun initItems() = viewModelScope.launch(Dispatchers.IO) {
         Timber.d("initItems: START")
 
@@ -66,7 +58,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         timeRecorder.start()
 
         appListStatusLiveData.postValue(STATUS_START)
-        repository.deleteAllItems()
+        Repositories.lcRepository.deleteAllItems()
         initProgressLiveData.postValue(0)
 
         var appList: List<ApplicationInfo>?
@@ -613,48 +605,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private suspend fun insert(item: LCItem) = repository.insert(item)
+    private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)
 
-    private suspend fun insert(list: List<LCItem>) = repository.insert(list)
+    private suspend fun insert(list: List<LCItem>) = Repositories.lcRepository.insert(list)
 
-    private suspend fun update(item: LCItem) = repository.update(item)
+    private suspend fun update(item: LCItem) = Repositories.lcRepository.update(item)
 
-    private suspend fun delete(item: LCItem) = repository.delete(item)
-
-    private fun deleteAllRules() = viewModelScope.launch(Dispatchers.IO) { repository.getAllRules() }
-
-    fun insertPreinstallRules(context: Context) = viewModelScope.launch(Dispatchers.IO) {
-        insertRuleIndex = 1
-        deleteAllRules()
-        insertPreinstallRules(context, 1)
-        insertPreinstallRules(context, 2)
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun insertPreinstallRules(context: Context, bundleCount: Int) {
-        withContext(Dispatchers.IO) {
-            var inputStream: InputStream? = null
-            try {
-                inputStream = context.resources.assets.open("rules.lcr.$bundleCount")
-                val rulesBundle = CloudRulesBundle.parseFrom(inputStream)
-                val rulesList = mutableListOf<RuleEntity>()
-                rulesBundle.rulesList.cloudRulesList.forEach {
-                    it?.let {
-                        rulesList.add(RuleEntity(insertRuleIndex++, it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-                    }
-                }
-                repository.insertRules(rulesList)
-                GlobalValues.localRulesVersion = rulesBundle.version
-            } catch (e: Exception) {
-                Timber.e(e)
-            } finally {
-                inputStream?.close()
-            }
-        }
-    }
+    private suspend fun delete(item: LCItem) = Repositories.lcRepository.delete(item)
 
     fun initRegexRules() = viewModelScope.launch(Dispatchers.IO) {
-        val list = repository.getRegexRules()
+        val list = Repositories.ruleRepository.getRegexRules()
         list.forEach {
             AppItemRepository.rulesRegexList[Pattern.compile(it.name)] = it
         }

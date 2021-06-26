@@ -109,7 +109,7 @@ class MainActivity : BaseActivity() {
     private fun initView() {
         setAppBar(binding.appbar, binding.toolbar)
         (binding.root as ViewGroup).bringChildToFront(binding.appbar)
-        supportActionBar?.title = LCAppUtils.setTitle()
+        supportActionBar?.title = LCAppUtils.setTitle(this)
 
         binding.apply {
             viewpager.apply {
@@ -226,11 +226,6 @@ class MainActivity : BaseActivity() {
 
     private fun initObserver() {
         appViewModel.apply {
-            if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.FIRST_INSERT_RULES)) {
-                insertPreinstallRules(this@MainActivity)
-                Once.markDone(OnceTag.FIRST_INSERT_RULES)
-            }
-
             if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
                 initItems()
             }

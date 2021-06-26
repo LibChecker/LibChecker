@@ -8,8 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.LCDatabase
-import com.absinthe.libchecker.database.LCRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -50,8 +49,7 @@ class LibCheckerApp : Application() {
         DayNightDelegate.setApplicationContext(this)
         DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
         Once.initialise(this)
-        repository = LCRepository(LCDatabase.getDatabase(this).lcDao())
-//        ProcessLifecycleOwner.get().lifecycle.addObserver(GlobalLifecycleObserver())
+        Repositories.init(this)
     }
 
     override fun attachBaseContext(base: Context?) {
@@ -60,8 +58,6 @@ class LibCheckerApp : Application() {
     }
 
     companion object {
-        lateinit var repository: LCRepository
-
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
     }

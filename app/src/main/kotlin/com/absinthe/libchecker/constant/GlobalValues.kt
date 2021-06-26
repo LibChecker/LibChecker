@@ -53,20 +53,18 @@ object GlobalValues {
     val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
 
-    //        MutableLiveData(getPreferences().getBoolean(Constants.PREF_ENTRY_ANIMATION, false))
     val isColorfulIcon: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
+
     val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
 
-    val appSortMode: MutableLiveData<Int> = MutableLiveData(
-        getPreferences().getInt(
-            Constants.PREF_APP_SORT_MODE,
-            Constants.SORT_MODE_DEFAULT
-        )
-    )
+    val appSortMode: MutableLiveData<Int> =
+        MutableLiveData(getPreferences().getInt(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT))
+
     val libSortMode: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
+
     val libReferenceThreshold: MutableLiveData<Int> =
         MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
 
@@ -92,4 +90,6 @@ object GlobalValues {
             field = value
             getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
         }
+
+    var hasFinishedShoot: Boolean = false
 }

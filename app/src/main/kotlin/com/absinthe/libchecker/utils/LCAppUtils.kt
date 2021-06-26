@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.utils
 
-import com.absinthe.libchecker.SystemServices
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -10,10 +10,11 @@ import android.os.Looper
 import android.os.MessageQueue
 import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.RuleEntity
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -31,8 +32,8 @@ object LCAppUtils {
         }
     }
 
-    fun setTitle(): String {
-        val sb = StringBuilder(LibCheckerApp.context.getString(R.string.app_name))
+    fun setTitle(context: Context): String {
+        val sb = StringBuilder(context.getString(R.string.app_name))
         val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
         when {
@@ -95,7 +96,7 @@ object LCAppUtils {
     }
 
     suspend fun getRuleWithDexChecking(name: String, packageName: String? = null): RuleEntity? {
-        val ruleEntity = LibCheckerApp.repository.getRule(name) ?: return null
+        val ruleEntity = Repositories.ruleRepository.getRule(name) ?: return null
         if (ruleEntity.type == NATIVE) {
             if (packageName == null) {
                 return ruleEntity

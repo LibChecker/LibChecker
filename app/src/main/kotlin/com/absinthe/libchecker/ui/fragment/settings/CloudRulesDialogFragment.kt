@@ -3,12 +3,12 @@ package com.absinthe.libchecker.ui.fragment.settings
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
@@ -96,7 +96,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 //                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
 //                                }
 //                            }
-                            LibCheckerApp.repository.insertRules(rulesList)
+                            Repositories.ruleRepository.insertRules(rulesList)
                             withContext(Dispatchers.Main) {
                                 root.cloudRulesContentView.localVersion.version.text = builder.version.toString()
                                 root.cloudRulesContentView.updateButton.isEnabled = false
