@@ -11,7 +11,7 @@ import com.absinthe.libchecker.database.entity.*
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class],
-    version = 13, exportSchema = true)
+    version = 14, exportSchema = true)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -35,7 +35,7 @@ abstract class LCDatabase : RoomDatabase() {
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
                         MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13
+                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14
                     )
                     .createFromAsset("database/rules.db")
                     .build()
@@ -153,6 +153,13 @@ abstract class LCDatabase : RoomDatabase() {
                 database.execSQL("DROP TABLE rules_table")
                 // Change the table name to the correct one
                 database.execSQL("ALTER TABLE rules_new RENAME TO rules_table")
+            }
+        }
+
+        private val MIGRATION_13_14: Migration = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Remove the old table
+                database.execSQL("DROP TABLE rules_table")
             }
         }
     }

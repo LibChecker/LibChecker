@@ -29,6 +29,7 @@ abstract class RuleDatabase : RoomDatabase() {
                     "rule_database"
                 )
                     .createFromAsset("database/rules.db")
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 return instance

@@ -8,11 +8,8 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
@@ -29,7 +26,6 @@ import timber.log.Timber
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
     private val request: CloudRuleBundleRequest = ApiManager.create()
-    private var bundlesCount: Int = 1
 
     override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
     override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -37,9 +33,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     override fun init() {
         root.addPaddingTop(16.dp)
         root.cloudRulesContentView.updateButton.setOnClickListener {
-            for (i in 1..bundlesCount) {
-                requestBundle(i)
-            }
+            requestBundle()
         }
     }
 
@@ -58,7 +52,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                                     root.cloudRulesContentView.updateButton.isEnabled = true
                                 }
                                 root.viewFlipper.displayedChild = 1
-                                bundlesCount = it.bundles
                             } catch (e: Exception) {
                                 Timber.e(e)
                                 context?.let {
@@ -79,29 +72,13 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         }
     }
 
-    private fun requestBundle(bundleCount: Int) {
-        request.requestRulesBundle(bundleCount).enqueue(object : Callback<ResponseBody> {
+    private fun requestBundle() {
+        request.requestRulesBundle().enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 response.body()?.let { rb ->
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val builder = CloudRulesBundle.parseFrom(rb.byteStream())
-
                         try {
-                            Timber.d("version = ${builder?.version}")
-                            Timber.d("count = ${builder?.count}")
-
-                            val rulesList = mutableListOf<RuleEntity>()
-//                            builder.rulesList.cloudRulesList.forEach { rule ->
-//                                rule?.let {
-//                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-//                                }
-//                            }
-                            Repositories.ruleRepository.insertRules(rulesList)
-                            withContext(Dispatchers.Main) {
-                                root.cloudRulesContentView.localVersion.version.text = builder.version.toString()
-                                root.cloudRulesContentView.updateButton.isEnabled = false
-                                GlobalValues.localRulesVersion = builder.version
-                            }
+                            //Todo
                         } catch (e: Throwable) {
                             Timber.e(e)
                             context?.let {
