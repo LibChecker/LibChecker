@@ -4,8 +4,9 @@ import android.content.*
 import android.database.Cursor
 import android.net.Uri
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.database.LCDao
 import com.absinthe.libchecker.database.LCDatabase
+import com.absinthe.libchecker.database.RuleDao
+import com.absinthe.libchecker.database.RuleDatabase
 import timber.log.Timber
 import java.util.concurrent.Callable
 
@@ -13,7 +14,7 @@ class CoreProvider : ContentProvider() {
 
     companion object {
         /** The authority of this content provider.  */
-        const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.coreprovider"
+        const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
         const val RULES_TABLE = "rules_table"
 
         /** The URI for the rules table.  */
@@ -43,9 +44,9 @@ class CoreProvider : ContentProvider() {
         Timber.d("Query: code=$code")
         return if (code == CODE_RULES_DIR || code == CODE_RULES_ITEM) {
             val context = context ?: return null
-            val lcDao: LCDao = LCDatabase.getDatabase(context).lcDao()
+            val ruleDao: RuleDao = RuleDatabase.getDatabase(context).ruleDao()
             val cursor: Cursor? = if (code == CODE_RULES_DIR) {
-                lcDao.selectAllRules()
+                ruleDao.selectAllRules()
             } else {
 //                lcDao.selectRuleByName(ContentUris.parseId(uri))
                 null

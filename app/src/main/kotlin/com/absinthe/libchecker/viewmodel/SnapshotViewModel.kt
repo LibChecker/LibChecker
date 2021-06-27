@@ -13,6 +13,7 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
@@ -38,7 +39,7 @@ const val CURRENT_SNAPSHOT = -1L
 
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository = LibCheckerApp.repository
+    val repository = Repositories.lcRepository
     val allSnapshots = repository.allSnapshotItems
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
@@ -394,11 +395,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         snapshotDiffItems.postValue(diffList)
     }
 
-    fun computeDiffDetail(entity: SnapshotDiffItem) = viewModelScope.launch {
+    fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch {
         val list = mutableListOf<SnapshotDetailItem>()
 
         list.addAll(
             getNativeDiffList(
+                context,
                 gson.fromJson(entity.nativeLibsDiff.old, object : TypeToken<List<LibStringItem>>() {}.type),
                 gson.fromJson(entity.nativeLibsDiff.new, object : TypeToken<List<LibStringItem>>() {}.type)
             )
@@ -448,7 +450,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         repository.insert(TimeStampItem(timestamp))
     }
 
-    private fun getNativeDiffList(oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {
+    private fun getNativeDiffList(context: Context, oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
         if (newList == null) {
             return list
@@ -462,7 +464,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             oldList.find { it.name == item.name }?.let {
                 if (it.size != item.size) {
                     list.add(
-                        SnapshotDetailItem(it.name, it.name, "${sizeToString(it.size)} $ARROW ${sizeToString(item.size)}", CHANGED, NATIVE)
+                        SnapshotDetailItem(it.name, it.name, "${sizeToString(context, it.size)} $ARROW ${sizeToString(context, item.size)}", CHANGED, NATIVE)
                     )
                 }
                 sameList.add(item)
@@ -476,12 +478,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), REMOVED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(context, item), REMOVED, NATIVE)
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(item), ADDED, NATIVE)
+                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(context, item), ADDED, NATIVE)
             )
         }
 
@@ -577,8 +579,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         return list
     }
 
-    private fun sizeToString(size: Long): String {
-        return "${Formatter.formatFileSize(LibCheckerApp.context, size)} ($size Bytes)"
+    private fun sizeToString(context: Context, size: Long): String {
+        return "${Formatter.formatFileSize(context, size)} ($size Bytes)"
     }
 
     data class CompareDiffNode(

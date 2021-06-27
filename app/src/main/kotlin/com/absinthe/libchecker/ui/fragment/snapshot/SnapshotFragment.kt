@@ -268,6 +268,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             AppItemRepository.trackItemsChanged = false
             viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
+        if (GlobalValues.hasFinishedShoot) {
+            flip(VF_LIST)
+        }
     }
 
     override fun onDestroyView() {

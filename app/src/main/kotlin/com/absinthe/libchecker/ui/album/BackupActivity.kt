@@ -70,10 +70,6 @@ class BackupActivity : BaseActivity() {
                     try {
                         requireActivity().contentResolver.openOutputStream(it)?.let { os ->
                             viewModel.backup(os)
-//                            lifecycleScope.launch(Dispatchers.IO) {
-//                                os.write(RuleGenerator.generateRulesByteArray())
-//                                os.close()
-//                            }
                         }
                     } catch (e: IOException) {
                         Timber.e(e)

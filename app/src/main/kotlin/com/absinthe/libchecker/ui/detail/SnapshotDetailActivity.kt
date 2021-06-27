@@ -63,7 +63,7 @@ class SnapshotDetailActivity : BaseActivity() {
         if (_entity != null) {
             entity = _entity!!
             initView()
-            viewModel.computeDiffDetail(entity)
+            viewModel.computeDiffDetail(this, entity)
         } else {
             onBackPressed()
         }

@@ -16,10 +16,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -142,7 +142,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
 
                     lifecycleScope.launch(Dispatchers.IO) {
-                        val lcItem = LibCheckerApp.repository.getItem(packageName)
+                        val lcItem = Repositories.lcRepository.getItem(packageName)
 
                         val isSplitApk = lcItem?.isSplitApk ?: false
                         val isKotlinUsed = lcItem?.isKotlinUsed ?: false

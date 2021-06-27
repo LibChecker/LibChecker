@@ -34,7 +34,6 @@ import timber.log.Timber
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
     val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
-    val repository = LibCheckerApp.repository
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()

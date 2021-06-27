@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
@@ -57,7 +58,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
 
     override suspend fun sort() {
         coroutineScope {
-            val rules = viewModel.repository.getAllRules()
+            val rules = Repositories.ruleRepository.getAllRules()
             val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
                 adapter.data.sortedByDescending { rules.any { find -> it.item.name == find.name } || LCAppUtils.findRuleRegex(it.item.name, type) != null }
             } else {

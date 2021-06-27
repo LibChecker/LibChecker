@@ -6,11 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -21,12 +21,7 @@ import timber.log.Timber
 class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
 
     val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
-    val dbItems: LiveData<List<LCItem>>
-    private val repository = LibCheckerApp.repository
-
-    init {
-        dbItems = repository.allDatabaseItems
-    }
+    val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
 
     fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
         val list = mutableListOf<LCItem>()

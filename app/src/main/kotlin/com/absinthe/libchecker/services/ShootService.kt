@@ -14,7 +14,6 @@ import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -22,6 +21,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
@@ -45,7 +45,7 @@ class ShootService : Service() {
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
     private val configuration by lazy { Configuration(resources.configuration).apply { setLocale(GlobalValues.locale) } }
     private val gson = Gson()
-    private val repository = LibCheckerApp.repository
+    private val repository = Repositories.lcRepository
     private val listenerList = RemoteCallbackList<OnShootListener>()
     private var isSendingBroadcast = false
 
@@ -128,6 +128,7 @@ class ShootService : Service() {
 
     private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
         Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
+        GlobalValues.hasFinishedShoot = false
         notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
         initBuilder()
 
@@ -266,6 +267,7 @@ class ShootService : Service() {
         Timber.d("computeSnapshots: $timer")
 
         GlobalValues.snapshotTimestamp = ts
+        GlobalValues.hasFinishedShoot = true
         notifyFinished(ts)
         stopForeground(true)
         stopSelf()

@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.api
 
+import com.absinthe.libchecker.api.request.VERSION
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import okhttp3.OkHttpClient
@@ -26,6 +27,8 @@ object ApiManager {
             Constants.REPO_GITEE -> GITEE_ROOT_URL
             else -> GITHUB_ROOT_URL
         }
+
+    val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 
     private val retrofit by lazy {
         val okhttpBuilder = OkHttpClient.Builder()

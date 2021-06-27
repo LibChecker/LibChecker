@@ -1,12 +1,14 @@
 package com.absinthe.libchecker.database.entity
 
+import android.provider.BaseColumns
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "rules_table")
 data class RuleEntity(
-    @PrimaryKey @ColumnInfo(name = "name") val name: String,
+    @PrimaryKey @ColumnInfo(name = BaseColumns._ID) val id: Int,
+    @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "label") val label: String,
     @ColumnInfo(name = "type") val type: Int,
     @ColumnInfo(name = "iconIndex") val iconIndex: Int,

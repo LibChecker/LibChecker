@@ -683,9 +683,9 @@ object PackageUtils {
      * @param item LibStringItem
      * @return String of size number (100KB)
      */
-    fun sizeToString(item: LibStringItem): String {
+    fun sizeToString(context: Context, item: LibStringItem): String {
         val source = item.source?.let { ", ${item.source}" } ?: ""
-        return "(${Formatter.formatFileSize(LibCheckerApp.context, item.size)}$source)"
+        return "(${Formatter.formatFileSize(context, item.size)}$source)"
     }
 
     fun hasDexClass(packageName: String, dexClassPrefix: String, isApk: Boolean = false): Boolean {

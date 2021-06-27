@@ -3,16 +3,16 @@ package com.absinthe.libchecker.ui.fragment.settings
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.DownloadUtils
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.database.RuleDatabase
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
-import com.absinthe.libchecker.protocol.CloudRulesBundle
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
@@ -20,16 +20,15 @@ import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
+import java.io.File
 
 class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDialogView>() {
 
     private val request: CloudRuleBundleRequest = ApiManager.create()
-    private var bundlesCount: Int = 1
 
     override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
     override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
@@ -37,10 +36,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     override fun init() {
         root.addPaddingTop(16.dp)
         root.cloudRulesContentView.updateButton.setOnClickListener {
-            for (i in 1..bundlesCount) {
-                requestBundle(i)
-            }
+            requestBundle()
         }
+        root.cloudRulesContentView.updateButton.isEnabled = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +56,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                                     root.cloudRulesContentView.updateButton.isEnabled = true
                                 }
                                 root.viewFlipper.displayedChild = 1
-                                bundlesCount = it.bundles
                             } catch (e: Exception) {
                                 Timber.e(e)
                                 context?.let {
@@ -79,43 +76,46 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         }
     }
 
-    private fun requestBundle(bundleCount: Int) {
-        request.requestRulesBundle(bundleCount).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                response.body()?.let { rb ->
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val builder = CloudRulesBundle.parseFrom(rb.byteStream())
-
-                        try {
-                            Timber.d("version = ${builder?.version}")
-                            Timber.d("count = ${builder?.count}")
-
-                            val rulesList = mutableListOf<RuleEntity>()
-                            builder.rulesList.cloudRulesList.forEach { rule ->
-                                rule?.let {
-                                    rulesList.add(RuleEntity(it.name, it.label, it.type, it.iconIndex, it.isRegexRule, it.regexName))
-                                }
-                            }
-                            LibCheckerApp.repository.insertRules(rulesList)
-                            withContext(Dispatchers.Main) {
-                                root.cloudRulesContentView.localVersion.version.text = builder.version.toString()
-                                root.cloudRulesContentView.updateButton.isEnabled = false
-                                GlobalValues.localRulesVersion = builder.version
-                            }
-                        } catch (e: Throwable) {
-                            Timber.e(e)
-                            context?.let {
-                                withContext(Dispatchers.Main) {
-                                    Toasty.show(it, R.string.toast_cloud_rules_update_error)
-                                }
-                            }
-                        }
+    private fun requestBundle() {
+        val saveFile = File(requireContext().cacheDir, Constants.RULES_DB_FILE_NAME)
+        DownloadUtils.get().download(requireContext(), ApiManager.rulesBundleUrl, saveFile, object : DownloadUtils.OnDownloadListener{
+            override fun onDownloadSuccess() {
+                RuleDatabase.getDatabase(requireContext()).close()
+                val databaseDir = File(requireContext().filesDir.parent, "databases")
+                if (databaseDir.exists()) {
+                    var file = File(databaseDir, Constants.RULES_DATABASE_NAME)
+                    if (file.exists()) {
+                        file.delete()
                     }
+                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm")
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal")
+                    if (file.exists()) {
+                        file.delete()
+                    }
+                }
+
+                lifecycleScope.launch(Dispatchers.Main) {
+                    root.cloudRulesContentView.localVersion.version.text = root.cloudRulesContentView.remoteVersion.version.text
+                    root.cloudRulesContentView.updateButton.isEnabled = false
+                    try {
+                        GlobalValues.localRulesVersion = root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
+                    } catch (e: NumberFormatException) { }
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                Timber.e(t)
+            override fun onDownloading(progress: Int) {
+
+            }
+
+            override fun onDownloadFailed() {
+                context?.let {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        Toasty.show(it, R.string.toast_cloud_rules_update_error)
+                    }
+                }
             }
 
         })
