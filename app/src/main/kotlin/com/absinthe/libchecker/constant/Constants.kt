@@ -19,6 +19,7 @@ object Constants {
     const val ARMV5_STRING = "armeabi"
     const val X86_STRING = "x86"
     const val X86_64_STRING = "x86_64"
+    const val OVERLAY_STRING = "Overlay"
 
     const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
     const val PREF_APK_ANALYTICS = "apkAnalytics"

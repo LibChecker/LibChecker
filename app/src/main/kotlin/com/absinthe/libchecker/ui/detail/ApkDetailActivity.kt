@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.text.Spannable
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
+import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
@@ -15,10 +18,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.ManifestReader
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.extensions.isOrientationPortrait
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
@@ -38,7 +43,6 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
-import java.lang.StringBuilder
 
 class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
@@ -134,27 +138,74 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             setLongClickCopiedToClipboard(text.toString())
                         }
 
-                        val abi = PackageUtils.getAbi(it.applicationInfo, isApk = true)
-                        val extraInfo = StringBuilder()
-                            .append(PackageUtils.getAbiString(this@ApkDetailActivity, abi, true))
-                            .append(", ")
-                            .append(PackageUtils.getTargetApiString(packageName))
-                            .append(", ")
-                        packageInfo.sharedUserId?.let {
-                            extraInfo.append("\nsharedUserId = $it")
-                        }
-                        val spanString: SpannableString
-                        if (abi != Constants.OVERLAY && abi != Constants.ERROR) {
-                            spanString = SpannableString("  $extraInfo")
-                            ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { drawable ->
-                                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-                                val span = CenterAlignImageSpan(drawable)
-                                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                        val extraInfo = SpannableStringBuilder()
+                        val file = File(packageInfo.applicationInfo.sourceDir)
+                        val demands = ManifestReader.getManifestProperties(file, listOf(
+                            PackageUtils.use32bitAbiString,
+                            PackageUtils.multiArchString,
+                            PackageUtils.overlayString
+                        ).toTypedArray())
+                        val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
+                        val abiSet = PackageUtils.getAbiSet(file, packageInfo.applicationInfo,  isApk = true, overlay = overlay, ignoreArch = true)
+                        val abi = PackageUtils.getAbi(abiSet, demands)
+                        viewModel.is32bit = PackageUtils.is32bit(abi)
+
+                        if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
+                            val spanStringBuilder = SpannableStringBuilder()
+                            var spanString: SpannableString
+                            var firstLoop = true
+                            var itemCount = 0
+                            abiSet.forEach { eachAbi ->
+                                itemCount++
+                                if (firstLoop) {
+                                    firstLoop = false
+                                }
+                                spanString = SpannableString("  ${PackageUtils.getAbiString(this@ApkDetailActivity, eachAbi, false)}")
+                                ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(eachAbi))?.mutate()?.let { drawable ->
+                                    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                                    if (eachAbi != abi % Constants.MULTI_ARCH) {
+                                        drawable.alpha = 128
+                                    } else {
+                                        drawable.alpha = 255
+                                    }
+                                    val span = CenterAlignImageSpan(drawable)
+                                    spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                                }
+                                if (eachAbi != abi % Constants.MULTI_ARCH) {
+                                    spanString.setSpan(StrikethroughSpan(), 2, spanString.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                }
+                                spanStringBuilder.append(spanString)
+                                if (itemCount < abiSet.size) {
+                                    spanStringBuilder.append(", ")
+                                }
+                                if (itemCount == 3 && isOrientationPortrait) {
+                                    spanStringBuilder.appendLine()
+                                }
                             }
-                            tvExtraInfo.text = spanString
-                        } else {
-                            tvExtraInfo.text = extraInfo
+                            extraInfo.append(spanStringBuilder).appendLine()
                         }
+
+                        val advanced = when(abi) {
+                            Constants.ERROR -> getString(R.string.cannot_read)
+                            Constants.OVERLAY -> Constants.OVERLAY_STRING
+                            else -> ""
+                        }
+                        extraInfo.apply {
+                            append(advanced)
+                            if (abi >= Constants.MULTI_ARCH) {
+                                if (advanced.isNotEmpty()) {
+                                    append(", ")
+                                }
+                                append(getString(R.string.multiArch))
+                                append(", ")
+                            }
+                            append(PackageUtils.getTargetApiString(packageName))
+                            append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
+                            packageInfo.sharedUserId?.let { sharedUid ->
+                                appendLine().append("sharedUserId = $sharedUid")
+                            }
+                        }
+                        tvExtraInfo.text = extraInfo
                     } catch (e: Exception) {
                         Timber.e(e)
                         finish()

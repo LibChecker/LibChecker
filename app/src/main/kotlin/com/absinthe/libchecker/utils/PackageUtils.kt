@@ -15,6 +15,7 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
 import com.absinthe.libchecker.constant.Constants.ARMV7
@@ -144,19 +145,6 @@ object PackageUtils {
     fun getTargetApiString(packageName: String): String {
         return try {
             "Target API ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
-        } catch (e: PackageManager.NameNotFoundException) {
-            "Target API ?"
-        }
-    }
-
-    /**
-     * Get target api string of an app ( API 30 )
-     * @param packageInfo PackageInfo
-     * @return version code as String
-     */
-    fun getTargetApiString(packageInfo: PackageInfo): String {
-        return try {
-            "Target API ${packageInfo.applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "Target API ?"
         }
@@ -480,37 +468,34 @@ object PackageUtils {
             .toList()
     }
 
-    private const val use32bitAbiString = "use32bitAbi"
-    private const val multiArchString = "multiArch"
-    private const val overlayString = "overlay"
+    const val use32bitAbiString = "use32bitAbi"
+    const val multiArchString = "multiArch"
+    const val overlayString = "overlay"
 
     /**
-     * Get ABI type of an app
+     * Get ABIs set of an app
+     * @param file Application file
      * @param applicationInfo ApplicationInfo
      * @param isApk Whether is an APK file
+     * @param overlay Is this app an overlay app
+     * @param ignoreArch Ignore arch so you can get all ABIs
      * @return ABI type
      */
-    fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
-        var abi = NO_LIBS
+    fun getAbiSet(file: File, applicationInfo: ApplicationInfo, isApk: Boolean = false, overlay: Boolean, ignoreArch: Boolean = false): Set<Int> {
         var elementName: String
 
-        val file = File(applicationInfo.sourceDir)
+        val abiSet = mutableSetOf<Int>()
         var zipFile: ZipFile? = null
 
         try {
             zipFile = ZipFile(file)
             val entries = zipFile.entries()
-            val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray())
-
-            val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
-            val multiArch = demands[multiArchString] as? Boolean ?: false
-            val overlay = demands[overlayString] as? Boolean ?: false
 
             if (overlay) {
-                return OVERLAY
+                abiSet.add(OVERLAY)
+                return abiSet
             }
 
-            val abiSet = mutableSetOf<Int>()
             var entry: ZipEntry
 
             while (entries.hasMoreElements()) {
@@ -529,27 +514,27 @@ object PackageUtils {
                 if (elementName.contains("lib/")) {
                     when {
                         elementName.contains(ARMV8_STRING) -> {
-                            if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) || ignoreArch) {
                                 abiSet.add(ARMV8)
                             }
                         }
                         elementName.contains(ARMV7_STRING) -> {
-                            if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) || ignoreArch) {
                                 abiSet.add(ARMV7)
                             }
                         }
                         elementName.contains(ARMV5_STRING) -> {
-                            if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) || ignoreArch) {
                                 abiSet.add(ARMV5)
                             }
                         }
                         elementName.contains(X86_64_STRING) -> {
-                            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) || ignoreArch) {
                                 abiSet.add(X86_64)
                             }
                         }
                         elementName.contains(X86_STRING) -> {
-                            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING)) {
+                            if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) || ignoreArch) {
                                 abiSet.add(X86)
                             }
                         }
@@ -560,6 +545,29 @@ object PackageUtils {
             if (abiSet.isEmpty() && !isApk) {
                 abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
             }
+            return abiSet
+        } catch (e: Throwable) {
+            Timber.e(e)
+            abiSet.clear()
+            abiSet.add(ERROR)
+            return abiSet
+        } finally {
+            zipFile?.close()
+        }
+    }
+
+    /**
+     * Get ABI type of an app
+     * @param abiSet ABIs set
+     * @param demands Requested manifest properties
+     * @return ABI type
+     */
+    fun getAbi(abiSet: Set<Int>, demands: Map<String, Any?>): Int {
+        var abi = NO_LIBS
+
+        try {
+            val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
+            val multiArch = demands[multiArchString] as? Boolean ?: false
 
             if (use32bitAbi) {
                 when {
@@ -582,12 +590,24 @@ object PackageUtils {
             }
 
             return abi
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             Timber.e(e)
             return ERROR
-        } finally {
-            zipFile?.close()
         }
+    }
+
+    /**
+     * Get ABI type of an app
+     * @param applicationInfo ApplicationInfo
+     * @param isApk Whether is an APK file
+     * @return ABI type
+     */
+    fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
+        val file = File(applicationInfo.sourceDir)
+        val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray())
+        val overlay = demands[overlayString] as? Boolean ?: false
+        val abiSet = getAbiSet(file, applicationInfo, isApk, overlay)
+        return getAbi(abiSet, demands)
     }
 
     fun is32bit(abi: Int): Boolean = abi == ARMV7 || abi == ARMV5 || abi == X86
@@ -631,25 +651,6 @@ object PackageUtils {
         X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
     )
 
-    /**
-     * Get ABI string from ABI type
-     * @param context Context
-     * @param abi ABI type
-     * @param showExtraInfo show "multiArch" etc. if is true
-     * @return ABI string
-     */
-    fun getAbiString(context: Context, abi: Int, showExtraInfo: Boolean): String {
-        if (abi == OVERLAY) {
-            return "Overlay"
-        }
-        val resList = if (!showExtraInfo && abi >= MULTI_ARCH) {
-            ABI_STRING_RES_MAP[abi - MULTI_ARCH] ?: listOf(R.string.unknown)
-        } else {
-            ABI_STRING_RES_MAP[abi] ?: listOf(R.string.unknown)
-        }
-        return resList.joinToString { context.getString(it) }
-    }
-
     private val ABI_BADGE_MAP = mapOf(
         ARMV8 to R.drawable.ic_abi_label_64bit,
         X86_64 to R.drawable.ic_abi_label_64bit,
@@ -664,6 +665,25 @@ object PackageUtils {
         ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
         X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit
     )
+
+    /**
+     * Get ABI string from ABI type
+     * @param context Context
+     * @param abi ABI type
+     * @param showExtraInfo show "multiArch" etc. if is true
+     * @return ABI string
+     */
+    fun getAbiString(context: Context, abi: Int, showExtraInfo: Boolean): String {
+        if (abi == OVERLAY) {
+            return Constants.OVERLAY_STRING
+        }
+        val resList = if (!showExtraInfo && abi >= MULTI_ARCH) {
+            ABI_STRING_RES_MAP[abi % MULTI_ARCH] ?: listOf(R.string.unknown)
+        } else {
+            ABI_STRING_RES_MAP[abi] ?: listOf(R.string.unknown)
+        }
+        return resList.joinToString { context.getString(it) }
+    }
 
     /**
      * Get ABI badge resource from ABI type
