@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view
 
 import android.content.Context
+import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.marginBottom
@@ -11,7 +12,8 @@ import androidx.core.view.marginTop
 /**
  * From drakeet
  */
-abstract class AViewGroup(context: Context) : ViewGroup(context) {
+abstract class AViewGroup(context: Context, attributeSet: AttributeSet? = null) : ViewGroup(context, attributeSet) {
+
     protected fun View.defaultWidthMeasureSpec(parentView: ViewGroup): Int {
         return when (layoutParams.width) {
             ViewGroup.LayoutParams.MATCH_PARENT -> parentView.measuredWidth.toExactlyMeasureSpec()

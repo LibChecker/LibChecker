@@ -65,7 +65,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
 
             val str = "${PackageUtils.getAbiString(context, item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}"
             val spanString: SpannableString
-            if (item.abi.toInt() != Constants.OVERLAY) {
+            if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR) {
                 spanString = SpannableString("  $str")
                 ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
                     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)

@@ -5,17 +5,12 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,8 +44,9 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
 
-const val VF_LOADING = 0
-const val VF_LIST = 1
+const val VF_LIST = 0
+const val VF_INIT = 1
+const val VF_LOADING = 2
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
@@ -97,7 +93,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            progressIndicator.isVisible = isFirstLaunch
         }
 
         initObserver()
@@ -242,11 +237,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         homeViewModel.apply {
             reloadAppsFlag.observe(viewLifecycleOwner, {
                 if (it && appListStatusLiveData.value == STATUS_NOT_START) {
-                    binding.progressIndicator.isVisible = true
                     Once.clearDone(OnceTag.FIRST_LAUNCH)
                     isFirstLaunch = true
                     doOnMainThreadIdle({
-                        flip(VF_LOADING)
+                        flip(VF_INIT)
                         initItems()
                     })
                 }
@@ -263,28 +257,24 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 if (status == STATUS_END) {
                     dbItems.value?.let { updateItems(it) }
                     if (!homeViewModel.hasRequestedChange) {
+                        flip(VF_LOADING)
                         homeViewModel.requestChange()
                         homeViewModel.hasRequestedChange = true
                     }
 
                     if (isFirstLaunch) {
-                        binding.progressIndicator.apply {
-                            isGone = true
-                            progress = 0
-                        }
                         Once.markDone(OnceTag.FIRST_LAUNCH)
                     }
                 } else if (status == STATUS_NOT_START) {
                     if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
-                        binding.progressIndicator.isVisible = true
-                        flip(VF_LOADING)
+                        flip(VF_INIT)
                         initItems()
                         Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                     }
                 }
             })
             initProgressLiveData.observe(viewLifecycleOwner, {
-                binding.progressIndicator.setProgressCompat(it, true)
+                binding.initView.progressIndicator.setProgressCompat(it, true)
             })
             packageChangedLiveData.observe(viewLifecycleOwner) {
                 requestChange(true)
@@ -319,9 +309,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             shouldRequestChange.observe(viewLifecycleOwner, { should ->
                 if (isListReady && !should) {
                     homeViewModel.dbItems.value?.let { updateItems(it) }
-                    doOnMainThreadIdle({
-                        flip(VF_LIST)
-                    })
                 }
             })
         }
@@ -385,10 +372,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
         }
-        if (page == VF_LOADING) {
-            binding.loading.resumeAnimation()
+        if (page == VF_INIT) {
+            binding.initView.loadingView.resumeAnimation()
         } else {
-            binding.loading.pauseAnimation()
+            binding.initView.loadingView.pauseAnimation()
         }
     }
 
