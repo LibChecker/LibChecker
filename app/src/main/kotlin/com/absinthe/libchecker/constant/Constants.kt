@@ -60,6 +60,9 @@ object Constants {
 
     const val COMMAND_DEBUG_MODE = "/debugMode"
 
+    const val RULES_DB_FILE_NAME = "rules.db"
+    const val RULES_DATABASE_NAME = "rule_database"
+
     object Event {
         const val LAUNCH_ACTION = "Launch Action"
         const val SNAPSHOT_CLICK = "Snapshot Click"

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.RuleEntity
 import java.io.File
 
@@ -24,29 +25,20 @@ abstract class RuleDatabase : RoomDatabase() {
                 return tempInstance
             }
             synchronized(this) {
-                val instance = Room.databaseBuilder(
+                val ruleFile = File(context.cacheDir, Constants.RULES_DB_FILE_NAME)
+                val builder = Room.databaseBuilder(
                     context.applicationContext,
                     RuleDatabase::class.java,
-                    "rule_database"
-                )
-                    .createFromAsset("database/rules.db")
-                    .fallbackToDestructiveMigration()
-                    .build()
-                INSTANCE = instance
-                return instance
+                    Constants.RULES_DATABASE_NAME
+                ).fallbackToDestructiveMigration()
+                if (ruleFile.exists()) {
+                    builder.createFromFile(ruleFile)
+                } else {
+                    builder.createFromAsset("database/rules.db")
+                }
+                INSTANCE = builder.build()
+                return INSTANCE!!
             }
-        }
-
-        fun setDatabase(context: Context, file: File) {
-            val instance = Room.databaseBuilder(
-                context.applicationContext,
-                RuleDatabase::class.java,
-                "rule_database"
-            )
-                .createFromFile(file)
-                .fallbackToDestructiveMigration()
-                .build()
-            INSTANCE = instance
         }
     }
 }

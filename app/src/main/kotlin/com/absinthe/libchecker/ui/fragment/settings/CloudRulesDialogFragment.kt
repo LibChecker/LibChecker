@@ -8,6 +8,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.RuleDatabase
 import com.absinthe.libchecker.extensions.addPaddingTop
@@ -37,6 +38,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         root.cloudRulesContentView.updateButton.setOnClickListener {
             requestBundle()
         }
+        root.cloudRulesContentView.updateButton.isEnabled = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -75,26 +77,25 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     }
 
     private fun requestBundle() {
-        val saveFile = File(requireContext().cacheDir, "rules.db")
+        val saveFile = File(requireContext().cacheDir, Constants.RULES_DB_FILE_NAME)
         DownloadUtils.get().download(requireContext(), ApiManager.rulesBundleUrl, saveFile, object : DownloadUtils.OnDownloadListener{
             override fun onDownloadSuccess() {
                 RuleDatabase.getDatabase(requireContext()).close()
                 val databaseDir = File(requireContext().filesDir.parent, "databases")
                 if (databaseDir.exists()) {
-                    var file = File(databaseDir, "rule_database")
+                    var file = File(databaseDir, Constants.RULES_DATABASE_NAME)
                     if (file.exists()) {
                         file.delete()
                     }
-                    file = File(databaseDir, "rule_database-shm")
+                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm")
                     if (file.exists()) {
                         file.delete()
                     }
-                    file = File(databaseDir, "rule_database-wal")
+                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal")
                     if (file.exists()) {
                         file.delete()
                     }
                 }
-                RuleDatabase.setDatabase(requireContext(), saveFile)
 
                 lifecycleScope.launch(Dispatchers.Main) {
                     root.cloudRulesContentView.localVersion.version.text = root.cloudRulesContentView.remoteVersion.version.text
