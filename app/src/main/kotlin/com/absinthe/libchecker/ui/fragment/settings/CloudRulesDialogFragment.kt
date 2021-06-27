@@ -38,7 +38,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         root.cloudRulesContentView.updateButton.setOnClickListener {
             requestBundle()
         }
-        root.cloudRulesContentView.updateButton.isEnabled = true
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
