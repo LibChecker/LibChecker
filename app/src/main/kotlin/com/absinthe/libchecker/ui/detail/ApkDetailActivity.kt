@@ -38,6 +38,7 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
+import java.lang.StringBuilder
 
 class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
@@ -134,18 +135,25 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         }
 
                         val abi = PackageUtils.getAbi(it.applicationInfo, isApk = true)
-                        val str = "${PackageUtils.getAbiString(this@ApkDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageInfo)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                        val extraInfo = StringBuilder()
+                            .append(PackageUtils.getAbiString(this@ApkDetailActivity, abi, true))
+                            .append(", ")
+                            .append(PackageUtils.getTargetApiString(packageName))
+                            .append(", ")
+                        packageInfo.sharedUserId?.let {
+                            extraInfo.append("\nsharedUserId = $it")
+                        }
                         val spanString: SpannableString
-                        if (abi != Constants.OVERLAY) {
-                            spanString = SpannableString("  $str")
+                        if (abi != Constants.OVERLAY && abi != Constants.ERROR) {
+                            spanString = SpannableString("  $extraInfo")
                             ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let { drawable ->
                                 drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
                                 val span = CenterAlignImageSpan(drawable)
                                 spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                             }
-                            tvAbiAndApi.text = spanString
+                            tvExtraInfo.text = spanString
                         } else {
-                            tvAbiAndApi.text = str
+                            tvExtraInfo.text = extraInfo
                         }
                     } catch (e: Exception) {
                         Timber.e(e)

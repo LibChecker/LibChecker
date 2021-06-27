@@ -22,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.StringBuilder
 
 class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
@@ -63,7 +64,10 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
 
             versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 
-            val str = "${PackageUtils.getAbiString(context, item.abi.toInt(), true)}, ${PackageUtils.getTargetApiString(item.targetApi)}"
+            val str = StringBuilder()
+                .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
+                .append(", ")
+                .append(PackageUtils.getTargetApiString(item.targetApi))
             val spanString: SpannableString
             if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR) {
                 spanString = SpannableString("  $str")

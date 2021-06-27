@@ -39,6 +39,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
+import java.lang.StringBuilder
 
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
@@ -127,18 +128,26 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     val abi = PackageUtils.getAbi(packageInfo.applicationInfo, isApk = false)
                     viewModel.is32bit = PackageUtils.is32bit(abi)
 
-                    val str = "${PackageUtils.getAbiString(this@AppDetailActivity, abi, true)}, ${PackageUtils.getTargetApiString(packageName)}, ${PackageUtils.getMinSdkVersion(packageInfo)}"
+                    val extraInfo = StringBuilder()
+                        .append(PackageUtils.getAbiString(this@AppDetailActivity, abi, true))
+                        .append(", ")
+                        .append(PackageUtils.getTargetApiString(packageName))
+                        .append(", ")
+                        .append(PackageUtils.getMinSdkVersion(packageInfo))
+                    packageInfo.sharedUserId?.let {
+                        extraInfo.append("\nsharedUserId = $it")
+                    }
                     val spanString: SpannableString
-                    if (abi != Constants.OVERLAY) {
-                        spanString = SpannableString("  $str")
+                    if (abi != Constants.OVERLAY && abi != Constants.ERROR) {
+                        spanString = SpannableString("  $extraInfo")
                         ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(abi))?.let {
                             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                             val span = CenterAlignImageSpan(it)
                             spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                         }
-                        tvAbiAndApi.text = spanString
+                        tvExtraInfo.text = spanString
                     } else {
-                        tvAbiAndApi.text = str
+                        tvExtraInfo.text = extraInfo
                     }
 
                     lifecycleScope.launch(Dispatchers.IO) {

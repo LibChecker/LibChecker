@@ -81,7 +81,7 @@
                     tools:text="1.2.0(120)" />
 
                 <TextView
-                    android:id="@+id/tv_abi_and_api"
+                    android:id="@+id/tv_extra_info"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-condensed-medium"
@@ -103,7 +103,7 @@
                     android:visibility="gone"
                     app:chipSpacing="@dimen/normal_padding"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_abi_and_api"
+                    app:layout_constraintTop_toBottomOf="@id/tv_extra_info"
                     tools:visibility="visible">
 
                     <com.google.android.material.chip.Chip
