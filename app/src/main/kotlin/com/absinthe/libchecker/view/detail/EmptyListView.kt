@@ -17,7 +17,7 @@ class EmptyListView(context: Context) : AViewGroup(context) {
         setImageResource(R.drawable.ic_empty_list)
         addView(this)
     }
-    
+
     val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
             it.topMargin = 8.dp
@@ -32,13 +32,13 @@ class EmptyListView(context: Context) : AViewGroup(context) {
         icon.autoMeasure()
         text.autoMeasure()
         setMeasuredDimension(
-            icon.measuredWidth.coerceAtLeast(text.measuredWidth),
-            icon.measuredHeight + text.marginTop + text.measuredHeight
+            paddingStart + icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
+            paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
         )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        icon.layout(icon.toHorizontalCenter(this), icon.toVerticalCenter(this))
+        icon.layout(icon.toHorizontalCenter(this), paddingTop)
         text.layout(text.toHorizontalCenter(this), icon.bottom + text.marginTop)
     }
 }

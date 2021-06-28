@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.statistics
 import android.content.Intent
 import android.graphics.Color
 import android.view.*
+import android.widget.FrameLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
@@ -96,7 +97,11 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
                 }
             }
-            setEmptyView(EmptyListView(requireContext()))
+            setEmptyView(EmptyListView(requireContext()).apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+                    it.gravity = Gravity.CENTER
+                }
+            })
         }
 
         homeViewModel.apply {

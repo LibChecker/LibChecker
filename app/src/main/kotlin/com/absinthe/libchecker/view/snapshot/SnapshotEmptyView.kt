@@ -31,11 +31,14 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         image.autoMeasure()
         text.autoMeasure()
-        setMeasuredDimension(measuredWidth, measuredHeight)
+        setMeasuredDimension(
+            paddingStart + image.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
+            paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        image.layout(image.toHorizontalCenter(this), image.toVerticalCenter(this))
+        image.layout(image.toHorizontalCenter(this), paddingTop)
         text.layout(text.toHorizontalCenter(this), image.bottom + text.marginTop)
     }
 }

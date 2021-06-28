@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,6 +18,8 @@ import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
@@ -52,12 +56,6 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         binding.apply {
             list.apply {
                 adapter = this@ComponentsAnalysisFragment.adapter
-                addItemDecoration(
-                    DividerItemDecoration(
-                        requireContext(),
-                        DividerItemDecoration.VERTICAL
-                    )
-                )
             }
         }
 
@@ -66,6 +64,12 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 if (componentList.isEmpty()) {
                     emptyView.text.text = getString(R.string.empty_list)
                 } else {
+                    binding.list.addItemDecoration(
+                        DividerItemDecoration(
+                            requireContext(),
+                            DividerItemDecoration.VERTICAL
+                        )
+                    )
                     lifecycleScope.launch(Dispatchers.IO) {
                         val list = mutableListOf<LibStringItemChip>()
                         var chip: LibChip?
@@ -122,7 +126,13 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 true
             }
             setDiffCallback(LibStringDiffUtil())
-            emptyView.text.text = getString(R.string.loading)
+            emptyView.apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                    it.gravity = Gravity.CENTER_HORIZONTAL
+                }
+                addPaddingTop(96.dp)
+                text.text = getString(R.string.loading)
+            }
             setEmptyView(emptyView)
         }
     }

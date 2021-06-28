@@ -2,11 +2,9 @@ package com.absinthe.libchecker.ui.album
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Checkable
+import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -112,7 +110,11 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                     adapter.setList(list)
                     menu?.findItem(R.id.search)?.isVisible = true
                     isListReady = true
-                    adapter.setEmptyView(EmptyListView(this@TrackActivity))
+                    adapter.setEmptyView(EmptyListView(this@TrackActivity).apply {
+                        layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+                            it.gravity = Gravity.CENTER
+                        }
+                    })
                 }
             }
         })

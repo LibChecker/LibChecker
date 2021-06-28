@@ -8,6 +8,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.IBinder
 import android.view.*
+import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,8 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -138,6 +141,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
 
         val emptyView = SnapshotEmptyView(requireContext()).apply {
+            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                it.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            addPaddingTop(96.dp)
             if (GlobalValues.snapshotTimestamp == 0L) {
                 text.text = getString(R.string.snapshot_no_snapshot)
             }
@@ -145,8 +152,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
 
         adapter.apply {
             headerWithEmptyEnable = true
-            setEmptyView(emptyView)
             setHeaderView(dashboard)
+            setEmptyView(emptyView)
             setDiffCallback(SnapshotDiffUtil())
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {
