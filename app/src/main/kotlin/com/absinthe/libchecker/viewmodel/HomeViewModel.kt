@@ -271,6 +271,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun collectPopularLibraries(appList: List<ApplicationInfo>) = viewModelScope.launch(Dispatchers.IO) {
+        if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
+            return@launch
+        }
         val map = HashMap<String, Int>()
         var libList: List<LibStringItem>
         var count: Int

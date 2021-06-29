@@ -5,8 +5,10 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -19,6 +21,7 @@ import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
@@ -174,7 +177,12 @@ class SnapshotDetailActivity : BaseActivity() {
             when {
                 entity.newInstalled -> SnapshotDetailNewInstallView(this)
                 entity.deleted -> SnapshotDetailDeletedView(this)
-                else -> SnapshotEmptyView(this)
+                else -> SnapshotEmptyView(this).apply {
+                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                        it.gravity = Gravity.CENTER_HORIZONTAL
+                    }
+                    addPaddingTop(96.dp)
+                }
             }
         )
         adapter.setOnItemClickListener { _, view, position ->
