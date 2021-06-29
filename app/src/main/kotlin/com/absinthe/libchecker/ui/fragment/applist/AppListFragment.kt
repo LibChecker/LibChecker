@@ -53,6 +53,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var popup: PopupMenu? = null
+    private var hasScrolledList = false
+
     private lateinit var layoutManager: RecyclerView.LayoutManager
 
     override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
@@ -88,6 +90,13 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 setHasFixedSize(true)
                 FastScrollerBuilder(this).useMd2Style().build()
+                addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        super.onScrolled(recyclerView, dx, dy)
+                        hasScrolledList = true
+                        removeOnScrollListener(this)
+                    }
+                })
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -336,16 +345,19 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         doOnMainThreadIdle({
             flip(VF_LIST)
 
-            if (!binding.list.canScrollVertically(-1) &&
-                GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC &&
-                binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
-            ) {
+            if (shouReturnTopOfList()) {
                 returnTopOfList()
             }
 
             menu?.findItem(R.id.search)?.isVisible = true
             isListReady = true
         })
+    }
+
+    private fun shouReturnTopOfList(): Boolean {
+        return binding.list.canScrollVertically(-1) &&
+                (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC || !hasScrolledList) &&
+                binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
     }
 
     private fun returnTopOfList() {

@@ -14,6 +14,7 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
@@ -107,21 +108,35 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
             versionInfo.text = getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
             targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
 
-            val oldAbiSpanString = SpannableString("  ${PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)}")
-            ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))?.let {
-                it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                val span = CenterAlignImageSpan(it)
-                oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-            }
-            val builder = SpannableStringBuilder(oldAbiSpanString)
-            var newAbiSpanString: SpannableString? = null
-            if (item.abiDiff.new != null) {
-                newAbiSpanString = SpannableString("  ${PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)}")
-                ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))?.let {
+            val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)
+            val oldAbiSpanString: SpannableString
+            if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY) {
+                oldAbiSpanString = SpannableString("  $oldAbiString")
+                ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))?.let {
                     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                     val span = CenterAlignImageSpan(it)
-                    newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                    oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                 }
+            } else {
+                oldAbiSpanString = SpannableString(oldAbiString)
+            }
+            val builder = SpannableStringBuilder(oldAbiSpanString)
+
+            val newAbiSpanString: SpannableString
+            if (item.abiDiff.new != null) {
+                val newAbiString = PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)
+                if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY) {
+                    newAbiSpanString = SpannableString("  $newAbiString")
+                    ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))?.let {
+                        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+                        val span = CenterAlignImageSpan(it)
+                        newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+                    }
+                } else {
+                    newAbiSpanString = SpannableString(newAbiString)
+                }
+            } else {
+                newAbiSpanString = SpannableString("")
             }
 
             if (item.abiDiff.new != null && item.abiDiff.old != item.abiDiff.new) {
