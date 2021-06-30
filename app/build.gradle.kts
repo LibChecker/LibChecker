@@ -160,7 +160,7 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.core:core-ktx:1.6.0-rc01")
+    implementation("androidx.core:core-ktx:1.7.0-alpha01")
 
     implementation("com.google.android.material:material:1.4.0-rc01")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
