@@ -652,12 +652,13 @@ object PackageUtils {
     )
 
     private val ABI_BADGE_MAP = mapOf(
+        NO_LIBS to if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) { R.drawable.ic_abi_label_32bit } else { R.drawable.ic_abi_label_64bit },
+        ERROR to 0,
         ARMV8 to R.drawable.ic_abi_label_64bit,
         X86_64 to R.drawable.ic_abi_label_64bit,
         ARMV7 to R.drawable.ic_abi_label_32bit,
         ARMV5 to R.drawable.ic_abi_label_32bit,
         X86 to R.drawable.ic_abi_label_32bit,
-        ERROR to R.drawable.ic_abi_label_no_libs,
         OVERLAY to R.drawable.ic_abi_label_no_libs,
         ARMV8 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
         X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
@@ -692,10 +693,7 @@ object PackageUtils {
      */
     @DrawableRes
     fun getAbiBadgeResource(type: Int): Int {
-        return ABI_BADGE_MAP[type] ?: if (Build.SUPPORTED_64_BIT_ABIS.isEmpty())
-            R.drawable.ic_abi_label_32bit
-        else
-            R.drawable.ic_abi_label_64bit
+        return ABI_BADGE_MAP[type] ?: 0
     }
 
     /**

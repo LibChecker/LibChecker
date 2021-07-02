@@ -69,9 +69,10 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
                 .append(", ")
                 .append(PackageUtils.getTargetApiString(item.targetApi))
             val spanString: SpannableString
-            if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR) {
+            val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
+            if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
                 spanString = SpannableString("  $str")
-                ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abi.toInt()))?.let {
+                ContextCompat.getDrawable(context, abiBadgeRes)?.let {
                     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                     val span = CenterAlignImageSpan(it)
                     spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)

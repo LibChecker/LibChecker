@@ -110,9 +110,10 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
 
             val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)
             val oldAbiSpanString: SpannableString
-            if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY) {
+            var abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt())
+            if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
                 oldAbiSpanString = SpannableString("  $oldAbiString")
-                ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt()))?.let {
+                ContextCompat.getDrawable(context, abiBadgeRes)?.let {
                     it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                     val span = CenterAlignImageSpan(it)
                     oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
@@ -125,9 +126,10 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
             val newAbiSpanString: SpannableString
             if (item.abiDiff.new != null) {
                 val newAbiString = PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)
-                if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY) {
+                abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt())
+                if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
                     newAbiSpanString = SpannableString("  $newAbiString")
-                    ContextCompat.getDrawable(context, PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt()))?.let {
+                    ContextCompat.getDrawable(context, abiBadgeRes)?.let {
                         it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
                         val span = CenterAlignImageSpan(it)
                         newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
