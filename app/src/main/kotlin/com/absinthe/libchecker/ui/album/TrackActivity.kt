@@ -21,7 +21,6 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -63,7 +62,7 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             setDiffCallback(TrackListDiff())
 
             fun doSaveItemState(pos: Int, state: Boolean) {
-                GlobalScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch(Dispatchers.IO) {
                     if (state) {
                         repository.insert(TrackItem(data[pos].packageName))
                     } else {

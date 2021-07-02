@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
-import com.absinthe.libchecker.annotation.STATUS_START
+import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -44,6 +44,7 @@ import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
+import timber.log.Timber
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -256,17 +257,17 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
 
             dbItems.observe(viewLifecycleOwner, {
-                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START) {
+                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START_INIT) {
                     return@observe
                 }
                 updateItems(it)
                 homeViewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
+                Timber.d("appListStatusLiveData update to $status")
                 if (status == STATUS_END) {
                     dbItems.value?.let { updateItems(it) }
                     if (!homeViewModel.hasRequestedChange) {
-                        flip(VF_LOADING)
                         homeViewModel.requestChange()
                         homeViewModel.hasRequestedChange = true
                     }
@@ -324,6 +325,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun updateItems(newItems: List<LCItem>) {
+        Timber.d("updateItems")
         val filterList = mutableListOf<LCItem>()
 
         GlobalValues.isShowSystemApps.value?.let { isShowSystem ->
@@ -376,7 +378,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     }
 
     private fun flip(page: Int) {
-        if (homeViewModel.appListStatusLiveData.value == STATUS_START) {
+        Timber.d("flip to $page")
+        if (homeViewModel.appListStatusLiveData.value == STATUS_START_INIT) {
+            Timber.d("flip encounters STATUS_START_INIT")
             return
         }
         if (binding.vfContainer.displayedChild != page) {
