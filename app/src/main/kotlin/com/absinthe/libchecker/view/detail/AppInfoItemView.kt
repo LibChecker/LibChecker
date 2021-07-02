@@ -32,7 +32,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         isClickable = true
         isFocusable = true
-        setPadding(8.dp, 24.dp, 8.dp, 24.dp)
+        setPadding(8.dp, 24.dp, 8.dp, 0)
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
     }
 
@@ -95,7 +95,10 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         icon.autoMeasure()
         text.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
-        setMeasuredDimension(measuredWidth, paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom)
+        setMeasuredDimension(
+            measuredWidth,
+            (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).coerceAtLeast(135.dp)
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

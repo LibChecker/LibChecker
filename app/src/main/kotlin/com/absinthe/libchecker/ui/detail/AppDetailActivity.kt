@@ -109,7 +109,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
-                            AppInfoBottomShellDialogFragment().apply {
+                            AppInfoBottomSheetDialogFragment().apply {
                                 arguments = Bundle().apply {
                                     putString(EXTRA_PACKAGE_NAME, pkgName)
                                 }

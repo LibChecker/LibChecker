@@ -30,7 +30,7 @@ import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
  * </pre>
  */
 
-class AppInfoBottomShellDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
+class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
