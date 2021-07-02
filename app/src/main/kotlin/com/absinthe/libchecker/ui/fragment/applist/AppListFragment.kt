@@ -45,10 +45,9 @@ import jonathanfinerty.once.Once
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-
-const val VF_LIST = 0
-const val VF_INIT = 1
-const val VF_LOADING = 2
+const val VF_LOADING = 0
+const val VF_LIST = 1
+const val VF_INIT = 2
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 

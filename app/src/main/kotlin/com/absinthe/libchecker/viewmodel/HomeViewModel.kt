@@ -101,7 +101,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 lcItem = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
-                    packageInfo.versionName ?: "",
+                    packageInfo.versionName.orEmpty(),
                     versionCode,
                     packageInfo.firstInstallTime,
                     packageInfo.lastUpdateTime,
