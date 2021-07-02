@@ -4,12 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -21,7 +18,6 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.exception.MiuiOpsException
 import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
@@ -29,14 +25,12 @@ import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.view.applist.AppListRejectView
 import com.absinthe.libchecker.viewmodel.*
-import com.absinthe.libraries.utils.utils.XiaomiUtilities
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -48,14 +42,6 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private var clickBottomItemFlag = false
     private val appViewModel by viewModels<HomeViewModel>()
-    private val mask by lazy {
-        AppListRejectView(this).apply {
-            layoutParams = CoordinatorLayout.LayoutParams(
-                CoordinatorLayout.LayoutParams.MATCH_PARENT,
-                CoordinatorLayout.LayoutParams.MATCH_PARENT
-            )
-        }
-    }
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -87,9 +73,6 @@ class MainActivity : BaseActivity() {
         super.onResume()
         if (GlobalValues.shouldRequestChange.value == true) {
             appViewModel.requestChange(true)
-        }
-        if (XiaomiUtilities.isMIUI()) {
-            addOrRemoveMiuiAppsListMask()
         }
     }
 
@@ -206,20 +189,8 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initAllApplicationInfoItems() {
-        lifecycleScope.launch {
-            var appList: List<ApplicationInfo>?
-
-            do {
-                appList = try {
-                    PackageUtils.getInstallApplications()
-                } catch (e: MiuiOpsException) {
-                    emptyList()
-                } catch (e: Exception) {
-                    delay(GET_INSTALL_APPS_RETRY_PERIOD)
-                    null
-                }
-            } while (appList == null)
-
+        lifecycleScope.launch(Dispatchers.IO) {
+            val appList = appViewModel.getAppsList()
             AppItemRepository.allApplicationInfoItems.postValue(appList)
         }
     }
@@ -240,19 +211,5 @@ class MainActivity : BaseActivity() {
 
     private fun clearApkCache() {
         FileUtils.delete(File(externalCacheDir, "temp.apk"))
-    }
-
-    private fun addOrRemoveMiuiAppsListMask() {
-        if (!XiaomiUtilities.isCustomPermissionGranted(XiaomiUtilities.OP_GET_INSTALLED_APPS)) {
-            if (mask.parent == null) {
-                binding.root.addView(mask)
-                binding.navView.isVisible = false
-            }
-        } else {
-            mask.parent?.let {
-                binding.root.removeView(mask)
-                binding.navView.isVisible = true
-            }
-        }
     }
 }
