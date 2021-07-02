@@ -162,7 +162,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.core:core-ktx:1.6.0-rc01")
 
-    implementation("com.google.android.material:material:1.4.0-rc01")
+    implementation("com.google.android.material:material:1.4.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
