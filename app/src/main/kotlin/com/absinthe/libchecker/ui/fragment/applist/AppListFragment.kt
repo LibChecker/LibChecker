@@ -25,6 +25,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -37,6 +38,7 @@ import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -53,7 +55,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var popup: PopupMenu? = null
-    private var hasScrolledList = false
 
     private lateinit var layoutManager: RecyclerView.LayoutManager
 
@@ -90,13 +91,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 setHasFixedSize(true)
                 FastScrollerBuilder(this).useMd2Style().build()
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        hasScrolledList = true
-                        removeOnScrollListener(this)
-                    }
-                })
+                addPaddingTop(UiUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -356,7 +351,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     private fun shouReturnTopOfList(): Boolean {
         return binding.list.canScrollVertically(-1) &&
-                (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC || !hasScrolledList) &&
+                (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
                 binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
     }
 

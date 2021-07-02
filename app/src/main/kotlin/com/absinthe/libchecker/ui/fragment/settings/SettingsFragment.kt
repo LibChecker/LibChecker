@@ -244,7 +244,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
-        recyclerView.addVerticalPadding(0, 8)
         recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.isVerticalScrollBarEnabled = false
