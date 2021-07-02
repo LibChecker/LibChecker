@@ -18,7 +18,7 @@ const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
     var item: ArrayList<LCItem> = ArrayList()
-    private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE) ?: "" }
+    private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE).orEmpty() }
     private var mListener: OnDismissListener? = null
     private lateinit var headerView: BottomSheetHeaderView
 

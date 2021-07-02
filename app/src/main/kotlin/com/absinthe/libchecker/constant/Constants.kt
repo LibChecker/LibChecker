@@ -44,6 +44,8 @@ object Constants {
     const val PREF_LOCAL_RULES_VERSION = "localRulesVersion"
     const val PREF_LOCALE = "locale"
 
+    const val PREF_DEBUG_MODE = "debugMode"
+
     const val SORT_MODE_UPDATE_TIME_DESC = 0
     const val SORT_MODE_TARGET_API_DESC = 1
     const val SORT_MODE_DEFAULT = 2
@@ -60,6 +62,7 @@ object Constants {
     const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
 
     const val COMMAND_DEBUG_MODE = "/debugMode"
+    const val COMMAND_USER_MODE = "/userMode"
 
     const val RULES_DB_FILE_NAME = "rules.db"
     const val RULES_DATABASE_NAME = "rule_database"

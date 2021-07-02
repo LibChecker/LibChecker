@@ -16,11 +16,11 @@ object SPUtils {
     }
 
     fun getString(key: String): String {
-        return sp.getString(key, "") ?: ""
+        return sp.getString(key, "").orEmpty()
     }
 
     fun getString(key: String, defaultValue: String): String {
-        return sp.getString(key, defaultValue) ?: ""
+        return sp.getString(key, defaultValue).orEmpty()
     }
 
     fun putBoolean(key: String, value: Boolean) {

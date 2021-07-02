@@ -77,6 +77,11 @@ object GlobalValues {
     }
 
     var debugMode: Boolean = false
+    get() = getPreferences().getBoolean(Constants.PREF_DEBUG_MODE, false)
+    set(value) {
+        field = value
+        getPreferences().edit { putBoolean(Constants.PREF_DEBUG_MODE, value) }
+    }
 
     var locale: Locale = Locale.getDefault()
         get() {

@@ -21,7 +21,7 @@ import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
+    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
     private val emptyView by lazy { DexListEmptyView(requireContext()) }
 
     override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)

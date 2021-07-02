@@ -30,7 +30,7 @@ const val EXTRA_REGEX_NAME = "EXTRA_REGEX_NAME"
 
 class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBottomSheetView>() {
 
-    private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME) ?: "" }
+    private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME).orEmpty() }
     private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
     private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
     private val viewModel by activityViewModels<DetailViewModel>()

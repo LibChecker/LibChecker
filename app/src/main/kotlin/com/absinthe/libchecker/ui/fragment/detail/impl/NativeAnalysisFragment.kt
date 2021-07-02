@@ -25,7 +25,7 @@ import rikka.core.util.ClipboardUtils
 class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
     private val emptyView by lazy { EmptyListView(requireContext()) }
-    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) ?: "" }
+    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 

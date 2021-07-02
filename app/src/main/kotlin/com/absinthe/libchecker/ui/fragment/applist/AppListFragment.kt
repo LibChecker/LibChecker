@@ -190,13 +190,19 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 }
             })
 
-            if (newText.equals("Easter Egg", true)) {
-                Toasty.show(requireContext(), "🥚")
-                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
-            }
-            if (newText == Constants.COMMAND_DEBUG_MODE) {
-                GlobalValues.debugMode = true
-                Toasty.show(requireActivity(), "DEBUG MODE")
+            when {
+                newText.equals("Easter Egg", true) -> {
+                    Toasty.show(requireContext(), "🥚")
+                    Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
+                }
+                newText == Constants.COMMAND_DEBUG_MODE -> {
+                    GlobalValues.debugMode = true
+                    Toasty.show(requireActivity(), "DEBUG MODE")
+                }
+                newText == Constants.COMMAND_DEBUG_MODE -> {
+                    GlobalValues.debugMode = false
+                    Toasty.show(requireActivity(), "USER MODE")
+                }
             }
         }
         return false
@@ -334,9 +340,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
         }
 
-        mAdapter.setDiffNewData(filterList)
-
-        doOnMainThreadIdle({
+        mAdapter.setDiffNewData(filterList) {
             flip(VF_LIST)
 
             if (shouReturnTopOfList()) {
@@ -345,7 +349,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
             menu?.findItem(R.id.search)?.isVisible = true
             isListReady = true
-        })
+        }
     }
 
     private fun shouReturnTopOfList(): Boolean {
