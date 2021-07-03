@@ -6,7 +6,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.0-beta03")
+        classpath("com.android.tools.build:gradle:7.0.0-beta05")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20")
 
         // NOTE: Do not place your application dependencies here; they belong

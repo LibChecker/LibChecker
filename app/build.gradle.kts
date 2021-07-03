@@ -1,8 +1,8 @@
+import com.android.build.api.variant.impl.ApplicationVariantImpl
+import com.android.build.gradle.internal.dsl.BuildType
 import com.google.protobuf.gradle.*
 import java.nio.charset.Charset
 import java.nio.file.Paths
-import com.android.build.api.variant.impl.ApplicationVariantImpl
-import com.android.build.gradle.internal.dsl.BuildType
 
 plugins {
     id("com.android.application")
@@ -125,7 +125,7 @@ configurations.all {
 }
 
 val grpcVersion by extra("1.39.0")
-val protocVersion by extra("3.17.0")
+val protocVersion by extra("3.17.3")
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
@@ -152,7 +152,7 @@ dependencies {
     val roomVersion = "2.3.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("org.xerial:sqlite-jdbc:3.36.0") //Work around on Apple Silicon
+    kapt("org.xerial:sqlite-jdbc:3.36.0.1") //Work around on Apple Silicon
     kapt("androidx.room:room-compiler:$roomVersion")
 
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
@@ -160,9 +160,9 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.core:core-ktx:1.6.0-rc01")
+    implementation("androidx.core:core-ktx:1.6.0")
 
-    implementation("com.google.android.material:material:1.4.0-rc01")
+    implementation("com.google.android.material:material:1.4.0")
     implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
