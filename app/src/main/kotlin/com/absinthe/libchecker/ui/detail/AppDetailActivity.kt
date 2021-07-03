@@ -1,5 +1,9 @@
 package com.absinthe.libchecker.ui.detail
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -23,6 +27,7 @@ import com.absinthe.libchecker.ManifestReader
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.isOrientationPortrait
@@ -71,6 +76,16 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         super.onCreate(savedInstanceState)
         initView()
         resolveReferenceExtras()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerPackageBroadcast()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterPackageBroadcast()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -326,5 +341,33 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
         binding.viewpager.currentItem = refType
         detailFragmentManager.navigateToComponent(refType, refName.removePrefix(packageName))
+    }
+
+    private val requestPackageReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val pkg = intent.data?.schemeSpecificPart.orEmpty()
+            if (pkg == pkgName) {
+                if (intent.action == Intent.ACTION_PACKAGE_REPLACED) {
+                    recreate()
+                } else if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
+                    GlobalValues.shouldRequestChange.postValue(true)
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun registerPackageBroadcast() {
+        val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_PACKAGE_REPLACED)
+            addAction(Intent.ACTION_PACKAGE_REMOVED)
+            addDataScheme("package")
+        }
+
+        registerReceiver(requestPackageReceiver, intentFilter)
+    }
+
+    private fun unregisterPackageBroadcast() {
+        unregisterReceiver(requestPackageReceiver)
     }
 }
