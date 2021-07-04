@@ -192,7 +192,7 @@ public class ArscParser implements ResConst {
             int count = in.getInt();
             BagValue bag = new BagValue(parent);
             for (int i = 0; i < count; i++) {
-                Map.Entry<Integer, Value> entry = new AbstractMap.SimpleEntry(in.getInt(), readValue());
+                Map.Entry<Integer, Value> entry = new AbstractMap.SimpleEntry<>(in.getInt(), readValue());
                 bag.map.add(entry);
             }
             resEntry.value = bag;
@@ -302,7 +302,7 @@ public class ArscParser implements ResConst {
         }
     }
 
-    private Object readValue() {
+    private Value readValue() {
         int size1 = in.getShort();// 8
         int zero = in.get();// 0
         int type = in.get() & 0xFF; // TypedValue.*

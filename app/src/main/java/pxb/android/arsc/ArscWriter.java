@@ -48,7 +48,7 @@ public class ArscWriter implements ResConst {
     private final Map<String, StringItem> strTable = new TreeMap<>();
     private final StringItems strTable0 = new StringItems();
 
-    private void write(ByteBuffer out, int size) throws IOException {
+    private void write(ByteBuffer out, int size) {
         out.putInt(RES_TABLE_TYPE | (0x000c << 16));
         out.putInt(size);
         out.putInt(ctxs.size());

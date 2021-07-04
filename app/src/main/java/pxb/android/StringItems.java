@@ -28,7 +28,7 @@ public class StringItems extends ArrayList<StringItem> {
 	private static final int UTF8_FLAG = 0x00000100;
 
 
-    public static String[] read(ByteBuffer in) throws IOException {
+    public static String[] read(ByteBuffer in) {
         int trunkOffset = in.position() - 8;
         int stringCount = in.getInt();
         int styleOffsetCount = in.getInt();
