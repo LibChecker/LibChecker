@@ -85,6 +85,11 @@ object IconResMap {
             put(72, R.drawable.ic_lib_rclone)
             put(73, R.drawable.ic_lib_sentry)
             put(74, R.drawable.ic_lib_jd)
+            put(75, R.drawable.ic_lib_curl)
+            put(76, R.drawable.ic_lib_opencc)
+            put(77, R.drawable.ic_lib_zbar)
+            put(78, R.drawable.ic_lib_opus)
+            put(79, R.drawable.ic_lib_live2d)
         }
 
         SINGLE_COLOR_ICON_SET = setOf(
