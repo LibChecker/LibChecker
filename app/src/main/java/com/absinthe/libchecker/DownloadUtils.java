@@ -21,6 +21,10 @@ public class DownloadUtils {
     private volatile static DownloadUtils sDownloadUtil;
     private final OkHttpClient mOkHttpClient;
 
+    private DownloadUtils() {
+        mOkHttpClient = new OkHttpClient();
+    }
+
     public static DownloadUtils get() {
         if (sDownloadUtil == null) {
             synchronized (DownloadUtils.class) {
@@ -32,13 +36,9 @@ public class DownloadUtils {
         return sDownloadUtil;
     }
 
-    private DownloadUtils() {
-        mOkHttpClient = new OkHttpClient();
-    }
-
     /**
-     * @param url Download URL
-     * @param file File
+     * @param url      Download URL
+     * @param file     File
      * @param listener Download callback
      */
     public void download(final Context context, final String url, final File file, final OnDownloadListener listener) {
@@ -90,7 +90,8 @@ public class DownloadUtils {
                         if (fos != null) {
                             fos.close();
                         }
-                    } catch (IOException ignore) { }
+                    } catch (IOException ignore) {
+                    }
                 }
             }
         });
@@ -98,7 +99,9 @@ public class DownloadUtils {
 
     public interface OnDownloadListener {
         void onDownloadSuccess();
+
         void onDownloading(int progress);
+
         void onDownloadFailed();
     }
 }

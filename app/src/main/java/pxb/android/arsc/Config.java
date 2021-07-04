@@ -23,8 +23,8 @@ public class Config {
     public final byte[] id;
     public final Map<Integer, ResEntry> resources = new TreeMap<>();
     /* package */ int wChunkSize;
-    /* package */int wEntryStart;
-    /* package */int wPosition;
+    /* package */ int wEntryStart;
+    /* package */ int wPosition;
 
     public Config(byte[] id, int entryCount) {
         super();

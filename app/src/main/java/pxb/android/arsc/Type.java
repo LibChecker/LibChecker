@@ -23,7 +23,7 @@ public class Type {
     public int id;
     public String name;
     public ResSpec[] specs;
-    /* package */int wPosition;
+    /* package */ int wPosition;
 
     public void addConfig(Config config) {
         if (config.entryCount != specs.length) {

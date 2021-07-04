@@ -26,7 +26,6 @@ import pxb.android.axml.Util;
  * dump an arsc file
  *
  * @author bob
- *
  */
 public class ArscDumper {
     public static void dump(List<Pkg> pkgs) {

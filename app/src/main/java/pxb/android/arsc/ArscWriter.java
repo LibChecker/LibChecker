@@ -39,14 +39,30 @@ import pxb.android.axml.Util;
  */
 public class ArscWriter implements ResConst {
     private final List<PkgCtx> ctxs = new ArrayList<>(5);
+    private final List<Pkg> pkgs;
+    private final Map<String, StringItem> strTable = new TreeMap<>();
+    private final StringItems strTable0 = new StringItems();
+
+    public ArscWriter(List<Pkg> pkgs) {
+        this.pkgs = pkgs;
+    }
 
     private static void D(String fmt, Object... args) {
 
     }
 
-    private final List<Pkg> pkgs;
-    private final Map<String, StringItem> strTable = new TreeMap<>();
-    private final StringItems strTable0 = new StringItems();
+    public static void main(String... args) throws IOException {
+        if (args.length < 2) {
+            System.err.println("asrc-write-test in.arsc out.arsc");
+            return;
+        }
+        byte[] data = Util.readFile(new File(args[0]));
+        List<Pkg> pkgs = new ArscParser(data).parse();
+        // ArscDumper.dump(pkgs);
+        byte[] data2 = new ArscWriter(pkgs).toByteArray();
+        // ArscDumper.dump(new ArscParser(data2).parse());
+        Util.writeFile(data2, new File(args[1]));
+    }
 
     private void write(ByteBuffer out, int size) {
         out.putInt(RES_TABLE_TYPE | (0x000c << 16));
@@ -195,23 +211,6 @@ public class ArscWriter implements ResConst {
         }
     }
 
-    public ArscWriter(List<Pkg> pkgs) {
-        this.pkgs = pkgs;
-    }
-
-    public static void main(String... args) throws IOException {
-        if (args.length < 2) {
-            System.err.println("asrc-write-test in.arsc out.arsc");
-            return;
-        }
-        byte[] data = Util.readFile(new File(args[0]));
-        List<Pkg> pkgs = new ArscParser(data).parse();
-        // ArscDumper.dump(pkgs);
-        byte[] data2 = new ArscWriter(pkgs).toByteArray();
-        // ArscDumper.dump(new ArscParser(data2).parse());
-        Util.writeFile(data2, new File(args[1]));
-    }
-
     private void addString(String str) {
         if (strTable.containsKey(str)) {
             return;
@@ -261,7 +260,7 @@ public class ArscWriter implements ResConst {
             for (Type type : ctx.pkg.types.values()) {
                 type.wPosition = size + pkgSize;
                 pkgSize += 8 + 4 + 4 + 4 * type.specs.length; // trunk,id,entryCount,
-                                                              // configs
+                // configs
 
                 for (Config config : type.configs) {
                     config.wPosition = pkgSize + size;
@@ -352,16 +351,26 @@ public class ArscWriter implements ResConst {
         }
     }
 
+    private void writeValue(Value value, ByteBuffer out) {
+        out.putShort((short) 8);
+        out.put((byte) 0);
+        out.put((byte) value.type);
+        if (value.type == ArscParser.TYPE_STRING) {
+            out.putInt(strTable.get(value.raw).index);
+        } else {
+            out.putInt(value.data);
+        }
+    }
+
     private static class PkgCtx {
         final Map<String, StringItem> keyNames = new HashMap<>();
         final StringItems keyNames0 = new StringItems();
+        final List<StringItem> typeNames = new ArrayList<>();
+        final StringItems typeNames0 = new StringItems();
         public int keyStringOff;
         int offset;
         Pkg pkg;
         int pkgSize;
-        final List<StringItem> typeNames = new ArrayList<>();
-
-        final StringItems typeNames0 = new StringItems();
         int typeStringOff;
 
         public void addKeyName(String name) {
@@ -384,17 +393,6 @@ public class ArscWriter implements ResConst {
             } else {
                 throw new RuntimeException();
             }
-        }
-    }
-
-    private void writeValue(Value value, ByteBuffer out) {
-        out.putShort((short) 8);
-        out.put((byte) 0);
-        out.put((byte) value.type);
-        if (value.type == ArscParser.TYPE_STRING) {
-            out.putInt(strTable.get(value.raw).index);
-        } else {
-            out.putInt(value.data);
         }
     }
 

@@ -37,19 +37,19 @@ public class AxmlReader {
     public static final NodeVisitor EMPTY_VISITOR = new NodeVisitor() {
 
         @Override
-		public NodeVisitor child(String ns, String name) {
-			return this;
-		}
+        public NodeVisitor child(String ns, String name) {
+            return this;
+        }
 
-	};
-	final AxmlParser parser;
+    };
+    final AxmlParser parser;
 
-	public AxmlReader(byte[] data) {
-		super();
-		this.parser = new AxmlParser(data);
-	}
+    public AxmlReader(byte[] data) {
+        super();
+        this.parser = new AxmlParser(data);
+    }
 
-	public void accept(final AxmlVisitor av) throws IOException {
+    public void accept(final AxmlVisitor av) throws IOException {
         Stack<NodeVisitor> nvs = new Stack<>();
         NodeVisitor tos = av;
         while (true) {
@@ -68,26 +68,26 @@ public class AxmlReader {
                                 tos.attr(parser.getAttrNs(i), parser.getAttrName(i), parser.getAttrResId(i),
                                     parser.getAttrType(i), parser.getAttrValue(i));
                             }
-					}
-				} else {
-					tos = EMPTY_VISITOR;
-				}
-				break;
-			case END_TAG:
-				tos.end();
-				tos = nvs.pop();
-				break;
-			case START_NS:
-				av.ns(parser.getNamespacePrefix(), parser.getNamespaceUri(), parser.getLineNumber());
-				break;
+                        }
+                    } else {
+                        tos = EMPTY_VISITOR;
+                    }
+                    break;
+                case END_TAG:
+                    tos.end();
+                    tos = nvs.pop();
+                    break;
+                case START_NS:
+                    av.ns(parser.getNamespacePrefix(), parser.getNamespaceUri(), parser.getLineNumber());
+                    break;
                 case TEXT:
-				tos.text(parser.getLineNumber(), parser.getText());
-				break;
-			case END_FILE:
-				return;
-			default:
-				Timber.d("Unsupported tag: %s", type);
-			}
-		}
-	}
+                    tos.text(parser.getLineNumber(), parser.getText());
+                    break;
+                case END_FILE:
+                    return;
+                default:
+                    Timber.d("Unsupported tag: %s", type);
+            }
+        }
+    }
 }

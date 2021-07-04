@@ -16,15 +16,11 @@ public class ManifestReader {
     private final HashMap<String, Object> properties = new HashMap<>();
     private final String[] demands;
 
-    public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
-        return new ManifestReader(apk, demands).properties;
-    }
-
     private ManifestReader(File apk, String[] demands) throws IOException {
         this.demands = demands;
-        try(JarFile zip = new JarFile(apk)) {
+        try (JarFile zip = new JarFile(apk)) {
             InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
-            byte[] bytes =  getBytesFromInputStream(is);
+            byte[] bytes = getBytesFromInputStream(is);
             AxmlReader reader = new AxmlReader(bytes);
             reader.accept(new AxmlVisitor() {
                 @Override
@@ -34,6 +30,10 @@ public class ManifestReader {
                 }
             });
         }
+    }
+
+    public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
+        return new ManifestReader(apk, demands).properties;
     }
 
     public static byte[] getBytesFromInputStream(InputStream inputStream) {
@@ -51,7 +51,7 @@ public class ManifestReader {
     }
 
     private boolean contains(String name) {
-        for (String demand: demands) {
+        for (String demand : demands) {
             if (demand.equals(name)) return true;
         }
         return false;
@@ -81,6 +81,7 @@ public class ManifestReader {
         private class ApplicationTagVisitor extends NodeVisitor {
             public String name = null;
             public Object value = null;
+
             public ApplicationTagVisitor(NodeVisitor child) {
                 super(child);
             }
@@ -91,7 +92,7 @@ public class ManifestReader {
                     this.name = name;
                     value = obj;
 
-                    if(name != null && value != null) {
+                    if (name != null && value != null) {
                         properties.put(name, value);
                     }
                 }
@@ -100,7 +101,7 @@ public class ManifestReader {
 
             @Override
             public void end() {
-                if(name != null && value != null) {
+                if (name != null && value != null) {
                     properties.put(name, value);
                 }
                 super.end();
@@ -110,6 +111,7 @@ public class ManifestReader {
         private class UsesSdkTagVisitor extends NodeVisitor {
             public String name = null;
             public Object value = null;
+
             public UsesSdkTagVisitor(NodeVisitor child) {
                 super(child);
             }
@@ -125,7 +127,7 @@ public class ManifestReader {
 
             @Override
             public void end() {
-                if(name != null && value != null) {
+                if (name != null && value != null) {
                     properties.put(name, value);
                 }
                 super.end();
@@ -135,6 +137,7 @@ public class ManifestReader {
         private class OverlayTagVisitor extends NodeVisitor {
             public String name = null;
             public Object value = null;
+
             public OverlayTagVisitor(NodeVisitor child) {
                 super(child);
             }
@@ -150,7 +153,7 @@ public class ManifestReader {
 
             @Override
             public void end() {
-                if(name != null && value != null) {
+                if (name != null && value != null) {
                     properties.put(name, value);
                 }
                 super.end();

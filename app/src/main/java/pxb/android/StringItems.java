@@ -25,8 +25,9 @@ import java.util.Map;
 
 @SuppressWarnings("serial")
 public class StringItems extends ArrayList<StringItem> {
-	private static final int UTF8_FLAG = 0x00000100;
-
+    private static final int UTF8_FLAG = 0x00000100;
+    byte[] stringData;
+    private boolean useUTF8 = true;
 
     public static String[] read(ByteBuffer in) {
         int trunkOffset = in.position() - 8;
@@ -64,29 +65,27 @@ public class StringItems extends ArrayList<StringItem> {
         return strings;
     }
 
-	static int u16length(ByteBuffer in) {
-		int length = in.getShort() & 0xFFFF;
-		if (length > 0x7FFF) {
-			length = ((length & 0x7FFF) << 8) | (in.getShort() & 0xFFFF);
-		}
-		return length;
-	}
+    static int u16length(ByteBuffer in) {
+        int length = in.getShort() & 0xFFFF;
+        if (length > 0x7FFF) {
+            length = ((length & 0x7FFF) << 8) | (in.getShort() & 0xFFFF);
+        }
+        return length;
+    }
 
-	static int u8length(ByteBuffer in) {
-		int len = in.get() & 0xFF;
-		if ((len & 0x80) != 0) {
-			len = ((len & 0x7F) << 8) | (in.get() & 0xFF);
-		}
-		return len;
-	}
+    static int u8length(ByteBuffer in) {
+        int len = in.get() & 0xFF;
+        if ((len & 0x80) != 0) {
+            len = ((len & 0x7F) << 8) | (in.get() & 0xFF);
+        }
+        return len;
+    }
 
-	byte[] stringData;
-
-	public int getSize() {
+    public int getSize() {
         return 5 * 4 + this.size() * 4 + stringData.length;// TODO
     }
 
-	public void prepare() throws IOException {
+    public void prepare() throws IOException {
         for (StringItem s : this) {
             if (s.data.length() > 0x7FFF) {
                 useUTF8 = false;
@@ -119,13 +118,13 @@ public class StringItems extends ArrayList<StringItem> {
 
                     if (u8lenght > 0x7F) {
                         offset++;
-						baos.write((u8lenght >> 8) | 0x80);
-					}
-					baos.write(u8lenght);
-					baos.write(data);
-					baos.write(0);
-					offset += 3 + u8lenght;
-				} else {
+                        baos.write((u8lenght >> 8) | 0x80);
+                    }
+                    baos.write(u8lenght);
+                    baos.write(data);
+                    baos.write(0);
+                    offset += 3 + u8lenght;
+                } else {
                     int length = stringData.length();
                     byte[] data = stringData.getBytes(StandardCharsets.UTF_16LE);
                     if (length > 0x7FFF) {
@@ -138,7 +137,7 @@ public class StringItems extends ArrayList<StringItem> {
                     baos.write(length >> 8);
                     baos.write(data);
                     baos.write(0);
-					baos.write(0);
+                    baos.write(0);
                     offset += 4 + data.length;
                 }
             }
@@ -146,8 +145,6 @@ public class StringItems extends ArrayList<StringItem> {
         // TODO
         stringData = baos.toByteArray();
     }
-
-    private boolean useUTF8 = true;
 
     public void write(ByteBuffer out) {
         out.putInt(this.size());
@@ -160,5 +157,5 @@ public class StringItems extends ArrayList<StringItem> {
         }
         out.put(stringData);
         // TODO
-	}
+    }
 }

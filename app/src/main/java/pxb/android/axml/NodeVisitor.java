@@ -35,14 +35,12 @@ public abstract class NodeVisitor {
 
     /**
      * add attribute to the node
-     * 
+     *
      * @param ns
      * @param name
      * @param resourceId
-     * @param type
-     *            {@link #TYPE_STRING} or others
-     * @param obj
-     *            a string for {@link #TYPE_STRING} ,and Integer for others
+     * @param type       {@link #TYPE_STRING} or others
+     * @param obj        a string for {@link #TYPE_STRING} ,and Integer for others
      */
     public void attr(String ns, String name, int resourceId, int type, Object obj) {
         if (nv != null) {
@@ -52,7 +50,7 @@ public abstract class NodeVisitor {
 
     /**
      * create a child node
-     * 
+     *
      * @param ns
      * @param name
      * @return
@@ -75,7 +73,7 @@ public abstract class NodeVisitor {
 
     /**
      * line number in the .xml
-     * 
+     *
      * @param ln
      */
     public void line(int ln) {
@@ -86,7 +84,7 @@ public abstract class NodeVisitor {
 
     /**
      * the node text
-     * 
+     *
      * @param value
      */
     public void text(int lineNumber, String value) {
