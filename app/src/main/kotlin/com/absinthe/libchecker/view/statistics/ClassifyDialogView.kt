@@ -40,7 +40,6 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
             clipToPadding = false
             clipChildren = false
             setHasFixedSize(true)
-            addSystemBarPadding(addStatusBarPadding = false)
             FastScrollerBuilder(this).useMd2Style().build()
         }
 

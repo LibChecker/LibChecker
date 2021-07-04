@@ -8,7 +8,6 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +22,7 @@ import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
+import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -77,14 +77,11 @@ class ComparisonActivity : BaseActivity() {
             infoLeft.setOnClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    val charList = mutableListOf<String>()
-                    timeStampList.forEach { charList.add(viewModel.getFormatDateString(it.timestamp)) }
-
                     withContext(Dispatchers.Main) {
-                        AlertDialog.Builder(this@ComparisonActivity)
-                            .setTitle(R.string.dialog_title_change_timestamp)
-                            .setItems(charList.toTypedArray()) { _, which ->
-                                leftTimeStamp = timeStampList[which].timestamp
+                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                            setOnItemClickListener { position ->
+                                val item = timeStampList[position]
+                                leftTimeStamp = item.timestamp
                                 infoLeft.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     val count = viewModel.repository.getSnapshots(leftTimeStamp).size
@@ -93,8 +90,10 @@ class ComparisonActivity : BaseActivity() {
                                         infoLeft.tvSnapshotAppsCountText.text = count.toString()
                                     }
                                 }
+                                dismiss()
                             }
-                            .show()
+                        }
+                        dialog.show(supportFragmentManager, dialog.tag)
                     }
                 }
             }
@@ -102,14 +101,11 @@ class ComparisonActivity : BaseActivity() {
             infoRight.setOnClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    val charList = mutableListOf<String>()
-                    timeStampList.forEach { charList.add(viewModel.getFormatDateString(it.timestamp)) }
-
                     withContext(Dispatchers.Main) {
-                        AlertDialog.Builder(this@ComparisonActivity)
-                            .setTitle(R.string.dialog_title_change_timestamp)
-                            .setItems(charList.toTypedArray()) { _, which ->
-                                rightTimeStamp = timeStampList[which].timestamp
+                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                            setOnItemClickListener { position ->
+                                val item = timeStampList[position]
+                                rightTimeStamp = item.timestamp
                                 infoRight.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
                                 lifecycleScope.launch(Dispatchers.IO) {
                                     val count = viewModel.repository.getSnapshots(rightTimeStamp).size
@@ -118,8 +114,10 @@ class ComparisonActivity : BaseActivity() {
                                         infoRight.tvSnapshotAppsCountText.text = count.toString()
                                     }
                                 }
+                                dismiss()
                             }
-                            .show()
+                        }
+                        dialog.show(supportFragmentManager, dialog.tag)
                     }
                 }
             }

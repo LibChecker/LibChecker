@@ -115,19 +115,18 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             fun changeTimeNode() {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    val charList = mutableListOf<String>()
-                    timeStampList.forEach { charList.add(viewModel.getFormatDateString(it.timestamp)) }
-
                     withContext(Dispatchers.Main) {
-                        AlertDialog.Builder(requireContext())
-                            .setTitle(R.string.dialog_title_change_timestamp)
-                            .setItems(charList.toTypedArray()) { _, which ->
-                                GlobalValues.snapshotTimestamp = timeStampList[which].timestamp
-                                viewModel.timestamp.value = timeStampList[which].timestamp
+                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                            setOnItemClickListener { position ->
+                                val item = timeStampList[position]
+                                GlobalValues.snapshotTimestamp = item.timestamp
+                                viewModel.timestamp.value = item.timestamp
                                 flip(VF_LOADING)
-                                viewModel.compareDiff(timeStampList[which].timestamp, shouldClearDiff = true)
+                                viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
+                                dismiss()
                             }
-                            .show()
+                        }
+                        dialog.show(requireActivity().supportFragmentManager, dialog.tag)
                     }
                 }
             }
@@ -182,7 +181,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                         super.onScrollStateChanged(recyclerView, newState)
                         if (newState == RecyclerView.SCROLL_STATE_SETTLING) {
-
+                            //Todo
                         }
                     }
                 })

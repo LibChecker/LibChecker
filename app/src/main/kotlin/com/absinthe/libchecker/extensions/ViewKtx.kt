@@ -16,8 +16,6 @@ import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
-import com.absinthe.libraries.utils.manager.NOT_MEASURED
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
@@ -93,16 +91,3 @@ fun TextView.tintHighlightText(highlightText: String, rawText: String) {
 }
 
 fun DialogFragment.isShowing() = this.dialog != null && this.dialog!!.isShowing && !this.isRemoving
-
-fun View.addSystemBarPadding(addStatusBarPadding: Boolean = true, addNavigationBarPadding: Boolean = true) {
-    if (addStatusBarPadding) {
-        addPaddingTop(UiUtils.getStatusBarHeight())
-    }
-    if (addNavigationBarPadding) {
-        if (SystemBarManager.navigationBarSize == NOT_MEASURED) {
-            post { addPaddingBottom(SystemBarManager.navigationBarSize) }
-        } else {
-            addPaddingBottom(SystemBarManager.navigationBarSize)
-        }
-    }
-}

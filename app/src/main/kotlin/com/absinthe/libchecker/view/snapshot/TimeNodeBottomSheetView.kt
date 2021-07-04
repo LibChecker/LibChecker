@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.view.detail
+package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
 import android.view.ViewGroup
@@ -7,11 +7,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
-import com.absinthe.libchecker.recyclerview.adapter.detail.AppBundleAdapter
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.TimeNodeAdapter
 
-class AppBundleBottomSheetView(context: Context) : LinearLayout(context) {
+class TimeNodeBottomSheetView(context: Context) : LinearLayout(context) {
 
-    val adapter by lazy { AppBundleAdapter() }
+    val adapter by lazy { TimeNodeAdapter() }
 
     init {
         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -19,7 +19,7 @@ class AppBundleBottomSheetView(context: Context) : LinearLayout(context) {
         val list = RecyclerView(context).apply {
             layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             overScrollMode = RecyclerView.OVER_SCROLL_NEVER
-            adapter = this@AppBundleBottomSheetView.adapter
+            adapter = this@TimeNodeBottomSheetView.adapter
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(VerticalSpacesItemDecoration(4.dp))
         }

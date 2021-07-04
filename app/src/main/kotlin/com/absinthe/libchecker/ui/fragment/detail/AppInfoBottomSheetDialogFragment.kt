@@ -13,7 +13,6 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.addSystemBarPadding
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -66,7 +65,6 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
             adapter = mAdapter
             layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
             setHasFixedSize(true)
-            addSystemBarPadding(addStatusBarPadding = false)
         }
 
         if (LCAppUtils.atLeastN()) {

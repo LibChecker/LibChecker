@@ -122,6 +122,7 @@
     <string name="snapshot_no_snapshot">没有快照</string>
     <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
     <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
+    <string name="snapshot_time_node_uninitialized">（未初始化）</string>
 
     <!--  Dialog  -->
     <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>

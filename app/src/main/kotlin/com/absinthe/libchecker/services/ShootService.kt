@@ -250,7 +250,7 @@ class ShootService : Service() {
         builder.setProgress(size, count, false)
         notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
         repository.insertSnapshots(dbList)
-        repository.insert(TimeStampItem(ts))
+        repository.insert(TimeStampItem(ts, null))
 
         if (dropPrevious) {
             Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")

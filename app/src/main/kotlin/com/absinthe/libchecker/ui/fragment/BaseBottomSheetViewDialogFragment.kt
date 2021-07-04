@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -11,6 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import java.lang.IllegalStateException
 
 
 abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
@@ -81,6 +83,12 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     override fun onDestroyView() {
         _root = null
         super.onDestroyView()
+    }
+
+    override fun show(manager: FragmentManager, tag: String?) {
+        try {
+            super.show(manager, tag)
+        } catch (ignore: IllegalStateException) { }
     }
 
     private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
