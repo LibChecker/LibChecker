@@ -12,6 +12,9 @@ import java.lang.reflect.Field;
  * Refer to com.catchingnow.icebox.sdk_client
  */
 public class FreezeUtils {
+    public static final int PM_FLAGS_GET_APP_INFO = VersionCompat.INSTANCE.getMATCH_UNINSTALLED_PACKAGES();
+    private static final int PRIVATE_FLAG_HIDDEN = 1;
+    private static final int FLAG_HIDDEN = 1 << 27;
     @Nullable
     private static Field AI_FIELD;
 
@@ -24,10 +27,6 @@ public class FreezeUtils {
             AI_FIELD = null;
         }
     }
-
-    private static final int PRIVATE_FLAG_HIDDEN = 1;
-    private static final int FLAG_HIDDEN = 1 << 27;
-    public static final int PM_FLAGS_GET_APP_INFO = VersionCompat.INSTANCE.getMATCH_UNINSTALLED_PACKAGES();
 
     private static boolean isAppHidden(ApplicationInfo ai) {
         if (AI_FIELD != null) {

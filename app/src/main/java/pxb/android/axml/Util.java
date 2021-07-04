@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,9 +50,8 @@ public class Util {
     }
 
     public static Map<String, String> readProguardConfig(File config) throws IOException {
-        Map<String, String> clzMap = new HashMap<String, String>();
-        BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(config), "utf8"));
-        try {
+        Map<String, String> clzMap = new HashMap<>();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(config), StandardCharsets.UTF_8))) {
             for (String ln = r.readLine(); ln != null; ln = r.readLine()) {
                 if (ln.startsWith("#") || ln.startsWith(" ")) {
                     continue;
@@ -62,8 +62,6 @@ public class Util {
                     clzMap.put(ln.substring(0, i).trim(), ln.substring(i + 2, ln.length() - 1).trim());
                 }
             }
-        } finally {
-            r.close();
         }
         return clzMap;
     }

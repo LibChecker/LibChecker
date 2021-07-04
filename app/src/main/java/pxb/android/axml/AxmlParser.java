@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import pxb.android.StringItems;
 
 /**
  * a class to read android axml
- * 
+ *
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  */
 public class AxmlParser implements ResConst {
@@ -45,15 +45,12 @@ public class AxmlParser implements ResConst {
     // private int attrResId[];
     // private int attrType[];
     // private Object attrValue[];
-
+    private final ByteBuffer in;
     private int attributeCount;
-
     private IntBuffer attrs;
-
     private int classAttribute;
     private int fileSize = -1;
     private int idAttribute;
-    private ByteBuffer in;
     private int lineNumber;
     private int nameIdx;
     private int nsIdx;
@@ -92,7 +89,7 @@ public class AxmlParser implements ResConst {
     }
 
     public String getAttrNs(int i) {
-        int idx = attrs.get(i * 5 + 0);
+        int idx = attrs.get(i * 5);
         return idx >= 0 ? strings[idx] : null;
     }
 
@@ -130,12 +127,12 @@ public class AxmlParser implements ResConst {
         }
 
         switch (getAttrType(i)) {
-        case TYPE_STRING:
-            return strings[v];
-        case TYPE_INT_BOOLEAN:
-            return v != 0;
-        default:
-            return v;
+            case TYPE_STRING:
+                return strings[v];
+            case TYPE_INT_BOOLEAN:
+                return v != 0;
+            default:
+                return v;
         }
     }
 
@@ -151,7 +148,7 @@ public class AxmlParser implements ResConst {
         try {
             return strings[prefixIdx];
         } catch (ArrayIndexOutOfBoundsException e) {
-            return  "";
+            return "";
         }
     }
 
@@ -172,103 +169,103 @@ public class AxmlParser implements ResConst {
             fileSize = in.getInt();
             return START_FILE;
         }
-        int event = -1;
+        int event;
         for (int p = in.position(); p < fileSize; p = in.position()) {
             int type = in.getInt() & 0xFFFF;
             int size = in.getInt();
             switch (type) {
-            case RES_XML_START_ELEMENT_TYPE: {
-                {
-                    lineNumber = in.getInt();
-                    in.getInt();/* skip, 0xFFFFFFFF */
-                    nsIdx = in.getInt();
-                    nameIdx = in.getInt();
-                    int flag = in.getInt();// 0x00140014 ?
-                    if (flag != 0x00140014) {
-                        throw new RuntimeException();
+                case RES_XML_START_ELEMENT_TYPE: {
+                    {
+                        lineNumber = in.getInt();
+                        in.getInt();/* skip, 0xFFFFFFFF */
+                        nsIdx = in.getInt();
+                        nameIdx = in.getInt();
+                        int flag = in.getInt();// 0x00140014 ?
+                        if (flag != 0x00140014) {
+                            throw new RuntimeException();
+                        }
                     }
+
+                    attributeCount = in.getShort() & 0xFFFF;
+                    idAttribute = (in.getShort() & 0xFFFF) - 1;
+                    classAttribute = (in.getShort() & 0xFFFF) - 1;
+                    styleAttribute = (in.getShort() & 0xFFFF) - 1;
+
+                    attrs = in.asIntBuffer();
+
+                    // attrResId = new int[attributeCount];
+                    // attrName = new int[attributeCount];
+                    // attrNs = new int[attributeCount];
+                    // attrType = new int[attributeCount];
+                    // attrValue = new Object[attributeCount];
+                    // for (int i = 0; i < attributeCount; i++) {
+                    // int attrNsIdx = in.getInt();
+                    // int attrNameIdx = in.getInt();
+                    // int raw = in.getInt();
+                    // int aValueType = in.getInt() >>> 24;
+                    // int aValue = in.getInt();
+                    // Object value = null;
+                    // switch (aValueType) {
+                    // case TYPE_STRING:
+                    // value = strings[aValue];
+                    // break;
+                    // case TYPE_INT_BOOLEAN:
+                    // value = aValue != 0;
+                    // break;
+                    // default:
+                    // value = aValue;
+                    // }
+                    // int resourceId = attrNameIdx < this.resourceIds.length ?
+                    // resourceIds[attrNameIdx] : -1;
+                    // attrNs[i] = attrNsIdx;
+                    // attrName[i] = attrNameIdx;
+                    // attrType[i] = aValueType;
+                    // attrResId[i] = resourceId;
+                    // attrValue[i] = value;
+                    // }
+                    event = START_TAG;
                 }
-
-                attributeCount = in.getShort() & 0xFFFF;
-                idAttribute = (in.getShort() & 0xFFFF) - 1;
-                classAttribute = (in.getShort() & 0xFFFF) - 1;
-                styleAttribute = (in.getShort() & 0xFFFF) - 1;
-
-                attrs = in.asIntBuffer();
-
-                // attrResId = new int[attributeCount];
-                // attrName = new int[attributeCount];
-                // attrNs = new int[attributeCount];
-                // attrType = new int[attributeCount];
-                // attrValue = new Object[attributeCount];
-                // for (int i = 0; i < attributeCount; i++) {
-                // int attrNsIdx = in.getInt();
-                // int attrNameIdx = in.getInt();
-                // int raw = in.getInt();
-                // int aValueType = in.getInt() >>> 24;
-                // int aValue = in.getInt();
-                // Object value = null;
-                // switch (aValueType) {
-                // case TYPE_STRING:
-                // value = strings[aValue];
-                // break;
-                // case TYPE_INT_BOOLEAN:
-                // value = aValue != 0;
-                // break;
-                // default:
-                // value = aValue;
-                // }
-                // int resourceId = attrNameIdx < this.resourceIds.length ?
-                // resourceIds[attrNameIdx] : -1;
-                // attrNs[i] = attrNsIdx;
-                // attrName[i] = attrNameIdx;
-                // attrType[i] = aValueType;
-                // attrResId[i] = resourceId;
-                // attrValue[i] = value;
-                // }
-                event = START_TAG;
-            }
                 break;
-            case RES_XML_END_ELEMENT_TYPE: {
-                in.position(p + size);
-                event = END_TAG;
-            }
-                break;
-            case RES_XML_START_NAMESPACE_TYPE:
-                lineNumber = in.getInt();
-                in.getInt();/* 0xFFFFFFFF */
-                prefixIdx = in.getInt();
-                nsIdx = in.getInt();
-                event = START_NS;
-                break;
-            case RES_XML_END_NAMESPACE_TYPE:
-                in.position(p + size);
-                event = END_NS;
-                break;
-            case RES_STRING_POOL_TYPE:
-                strings = StringItems.read(in);
-                in.position(p + size);
-                continue;
-            case RES_XML_RESOURCE_MAP_TYPE:
-                int count = size / 4 - 2;
-                resourceIds = new int[count];
-                for (int i = 0; i < count; i++) {
-                    resourceIds[i] = in.getInt();
+                case RES_XML_END_ELEMENT_TYPE: {
+                    in.position(p + size);
+                    event = END_TAG;
                 }
-                in.position(p + size);
-                continue;
-            case RES_XML_CDATA_TYPE:
-                lineNumber = in.getInt();
-                in.getInt();/* 0xFFFFFFFF */
-                textIdx = in.getInt();
-
-                in.getInt();/* 00000008 00000000 */
-                in.getInt();
-
-                event = TEXT;
                 break;
-            default:
-                throw new RuntimeException("Unsupported type: " + type);
+                case RES_XML_START_NAMESPACE_TYPE:
+                    lineNumber = in.getInt();
+                    in.getInt();/* 0xFFFFFFFF */
+                    prefixIdx = in.getInt();
+                    nsIdx = in.getInt();
+                    event = START_NS;
+                    break;
+                case RES_XML_END_NAMESPACE_TYPE:
+                    in.position(p + size);
+                    event = END_NS;
+                    break;
+                case RES_STRING_POOL_TYPE:
+                    strings = StringItems.read(in);
+                    in.position(p + size);
+                    continue;
+                case RES_XML_RESOURCE_MAP_TYPE:
+                    int count = size / 4 - 2;
+                    resourceIds = new int[count];
+                    for (int i = 0; i < count; i++) {
+                        resourceIds[i] = in.getInt();
+                    }
+                    in.position(p + size);
+                    continue;
+                case RES_XML_CDATA_TYPE:
+                    lineNumber = in.getInt();
+                    in.getInt();/* 0xFFFFFFFF */
+                    textIdx = in.getInt();
+
+                    in.getInt();/* 00000008 00000000 */
+                    in.getInt();
+
+                    event = TEXT;
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported type: " + type);
             }
             in.position(p + size);
             return event;

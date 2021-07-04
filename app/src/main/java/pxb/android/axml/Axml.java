@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,28 +20,48 @@ import java.util.List;
 
 public class Axml extends AxmlVisitor {
 
+    public final List<Node> firsts = new ArrayList<>();
+    public final List<Ns> nses = new ArrayList<>();
+
+    public void accept(final AxmlVisitor visitor) {
+        for (Ns ns : nses) {
+            ns.accept(visitor);
+        }
+        for (Node first : firsts) {
+            first.accept(visitor);
+        }
+    }
+
+    @Override
+    public NodeVisitor child(String ns, String name) {
+        Node node = new Node();
+        node.name = name;
+        node.ns = ns;
+        firsts.add(node);
+        return node;
+    }
+
+    @Override
+    public void ns(String prefix, String uri, int ln) {
+        Ns ns = new Ns();
+        ns.prefix = prefix;
+        ns.uri = uri;
+        ns.ln = ln;
+        nses.add(ns);
+    }
+
+    public static class Ns {
+        public int ln;
+        public String prefix, uri;
+
+        public void accept(AxmlVisitor visitor) {
+            visitor.ns(prefix, uri, ln);
+        }
+    }
+
     public static class Node extends NodeVisitor {
-        public static class Attr {
-            public String ns, name;
-            public int resourceId, type;
-            public Object value;
-
-            public void accept(NodeVisitor nodeVisitor) {
-                nodeVisitor.attr(ns, name, resourceId, type, value);
-            }
-        }
-
-        public static class Text {
-            public int ln;
-            public String text;
-
-            public void accept(NodeVisitor nodeVisitor) {
-                nodeVisitor.text(ln, text);
-            }
-        }
-
-        public List<Attr> attrs = new ArrayList<Attr>();
-        public List<Node> children = new ArrayList<Node>();
+        public final List<Attr> attrs = new ArrayList<>();
+        public final List<Node> children = new ArrayList<>();
         public Integer ln;
         public String ns, name;
         public Text text;
@@ -99,44 +119,24 @@ public class Axml extends AxmlVisitor {
             text.text = value;
             this.text = text;
         }
-    }
 
-    public static class Ns {
-        public int ln;
-        public String prefix, uri;
+        public static class Attr {
+            public String ns, name;
+            public int resourceId, type;
+            public Object value;
 
-        public void accept(AxmlVisitor visitor) {
-            visitor.ns(prefix, uri, ln);
+            public void accept(NodeVisitor nodeVisitor) {
+                nodeVisitor.attr(ns, name, resourceId, type, value);
+            }
         }
-    }
 
-    public List<Node> firsts = new ArrayList<Node>();
-    public List<Ns> nses = new ArrayList<Ns>();
+        public static class Text {
+            public int ln;
+            public String text;
 
-    public void accept(final AxmlVisitor visitor) {
-        for (Ns ns : nses) {
-            ns.accept(visitor);
+            public void accept(NodeVisitor nodeVisitor) {
+                nodeVisitor.text(ln, text);
+            }
         }
-        for (Node first : firsts) {
-            first.accept(visitor);
-        }
-    }
-
-    @Override
-    public NodeVisitor child(String ns, String name) {
-        Node node = new Node();
-        node.name = name;
-        node.ns = ns;
-        firsts.add(node);
-        return node;
-    }
-
-    @Override
-    public void ns(String prefix, String uri, int ln) {
-        Ns ns = new Ns();
-        ns.prefix = prefix;
-        ns.uri = uri;
-        ns.ln = ln;
-        nses.add(ns);
     }
 }

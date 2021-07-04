@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +20,19 @@ import java.util.Map;
 
 /**
  * dump axml to stdout
- * 
+ *
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  */
 public class DumpAdapter extends AxmlVisitor {
-    protected int deep;
-    protected Map<String, String> nses;
+    protected final int deep;
+    protected final Map<String, String> nses;
 
     public DumpAdapter() {
         this(null);
     }
 
     public DumpAdapter(NodeVisitor nv) {
-        this(nv, 0, new HashMap<String, String>());
+        this(nv, 0, new HashMap<>());
     }
 
     public DumpAdapter(NodeVisitor nv, int x, Map<String, String> nses) {
@@ -47,23 +47,23 @@ public class DumpAdapter extends AxmlVisitor {
             System.out.print("  ");
         }
         if (ns != null) {
-            System.out.print(String.format("%s:", getPrefix(ns)));
+            System.out.printf("%s:", getPrefix(ns));
         }
         System.out.print(name);
         if (resourceId != -1) {
-            System.out.print(String.format("(%08x)", resourceId));
+            System.out.printf("(%08x)", resourceId);
         }
         if (obj instanceof String) {
-            System.out.print(String.format("=[%08x]\"%s\"", type, obj));
+            System.out.printf("=[%08x]\"%s\"", type, obj);
         } else if (obj instanceof Boolean) {
-            System.out.print(String.format("=[%08x]\"%b\"", type, obj));
+            System.out.printf("=[%08x]\"%b\"", type, obj);
         } else if (obj instanceof ValueWrapper) {
             ValueWrapper w = (ValueWrapper) obj;
-            System.out.print(String.format("=[%08x]@%08x, raw: \"%s\"", type, w.ref, w.raw));
+            System.out.printf("=[%08x]@%08x, raw: \"%s\"", type, w.ref, w.raw);
         } else if (type == TYPE_REFERENCE) {
-            System.out.print(String.format("=[%08x]@%08x", type, obj));
+            System.out.printf("=[%08x]@%08x", type, obj);
         } else {
-            System.out.print(String.format("=[%08x]%08x", type, obj));
+            System.out.printf("=[%08x]%08x", type, obj);
         }
         System.out.println();
         super.attr(ns, name, resourceId, type, obj);

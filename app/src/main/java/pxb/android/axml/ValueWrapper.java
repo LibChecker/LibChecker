@@ -16,10 +16,6 @@ public class ValueWrapper {
         this.ref = ref;
     }
 
-    public ValueWrapper replaceRaw(String raw) {
-        return new ValueWrapper(type, ref, raw);
-    }
-
     public static ValueWrapper wrapId(int ref, String raw) {
         return new ValueWrapper(ID, ref, raw);
     }
@@ -30,5 +26,9 @@ public class ValueWrapper {
 
     public static ValueWrapper wrapClass(int ref, String raw) {
         return new ValueWrapper(CLASS, ref, raw);
+    }
+
+    public ValueWrapper replaceRaw(String raw) {
+        return new ValueWrapper(type, ref, raw);
     }
 }

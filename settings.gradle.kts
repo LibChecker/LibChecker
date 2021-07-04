@@ -1,5 +1,2 @@
-include(":app", "sdk")
-rootProject.apply {
-    name = "LibChecker"
-    buildFileName = "build.gradle.kts"
-}
+include(":app", ":sdk")
+rootProject.name = "LibChecker"
