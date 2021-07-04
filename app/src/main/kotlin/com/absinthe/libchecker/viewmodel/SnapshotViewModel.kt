@@ -295,6 +295,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         snapshotDiffItems.postValue(diffList)
+        updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
 
     private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
@@ -393,6 +394,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         snapshotDiffItems.postValue(diffList)
+        updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+    }
+
+    private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
+        val appsList = list.asSequence()
+            .map { it.packageName }
+            .toList()
+        repository.updateTimeStampItem(TimeStampItem(timestamp, Gson().toJson(appsList)))
     }
 
     fun computeDiffDetail(context: Context, entity: SnapshotDiffItem) = viewModelScope.launch {
@@ -447,7 +456,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         if (timestamp == 0L) {
             return@launch
         }
-        repository.insert(TimeStampItem(timestamp))
+        repository.insert(TimeStampItem(timestamp, null))
     }
 
     private fun getNativeDiffList(context: Context, oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {

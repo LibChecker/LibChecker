@@ -24,7 +24,6 @@ class AppBundleBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<App
     override fun init() {
         headerView = BottomSheetHeaderView(requireContext()).apply {
             layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = 8.dp
                 it.bottomMargin = 24.dp
             }
             title.text = getString(R.string.app_bundle)

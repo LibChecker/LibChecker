@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.database
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.absinthe.libchecker.database.entity.*
@@ -79,6 +78,12 @@ interface LCDao {
 
     @Delete
     fun delete(item: TimeStampItem)
+
+    @Query("DELETE from timestamp_table WHERE timestamp LIKE :timestamp")
+    suspend fun deleteByTimeStamp(timestamp: Long)
+
+    @Update
+    suspend fun update(item: TimeStampItem)
 
     //Track table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
