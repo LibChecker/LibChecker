@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,46 +41,101 @@ import pxb.android.StringItems;
 
 /**
  * a class to write android axml
- * 
+ *
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  */
 public class AxmlWriter extends AxmlVisitor {
-    static final Comparator<Attr> ATTR_CMP = new Comparator<Attr>() {
-
-        @Override
-        public int compare(Attr a, Attr b) {
-            int x = a.resourceId - b.resourceId;
+    static final Comparator<Attr> ATTR_CMP = (a, b) -> {
+        int x = a.resourceId - b.resourceId;
+        if (x == 0) {
+            x = a.name.data.compareTo(b.name.data);
             if (x == 0) {
-                x = a.name.data.compareTo(b.name.data);
-                if (x == 0) {
-                    boolean aNsIsnull = a.ns == null;
-                    boolean bNsIsnull = b.ns == null;
-                    if (aNsIsnull) {
-                        if (bNsIsnull) {
-                            x = 0;
-                        } else {
-                            x = -1;
-                        }
+                boolean aNsIsnull = a.ns == null;
+                boolean bNsIsnull = b.ns == null;
+                if (aNsIsnull) {
+                    if (bNsIsnull) {
+                        x = 0;
                     } else {
-                        if (bNsIsnull) {
-                            x = 1;
-                        } else {
-                            x = a.ns.data.compareTo(b.ns.data);
-                        }
+                        x = -1;
                     }
-
+                } else {
+                    if (bNsIsnull) {
+                        x = 1;
+                    } else {
+                        x = a.ns.data.compareTo(b.ns.data);
+                    }
                 }
+
             }
-            return x;
         }
+        return x;
     };
+    private final List<NodeImpl> firsts = new ArrayList<>(3);
+    private final Map<String, Ns> nses = new HashMap<>();
+    private final Map<String, StringItem> resourceId2Str = new HashMap<>();
+    private final List<Integer> resourceIds = new ArrayList<>();
+    private final StringItems stringItems = new StringItems();
+    private List<StringItem> otherString = new ArrayList<>();
+    private List<StringItem> resourceString = new ArrayList<>();
+
+    public byte[] toByteArray() throws IOException {
+
+        int size = 8 + prepare();
+        ByteBuffer out = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
+
+        out.putInt(RES_XML_TYPE | (0x0008 << 16));
+        out.putInt(size);
+
+        int stringSize = this.stringItems.getSize();
+        int padding = 0;
+        if (stringSize % 4 != 0) {
+            padding = 4 - stringSize % 4;
+        }
+        out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
+        out.putInt(stringSize + padding + 8);
+        this.stringItems.write(out);
+        out.put(new byte[padding]);
+
+        out.putInt(RES_XML_RESOURCE_MAP_TYPE | (0x0008 << 16));
+        out.putInt(8 + this.resourceIds.size() * 4);
+        for (Integer i : resourceIds) {
+            out.putInt(i);
+        }
+
+        Stack<Ns> stack = new Stack<>();
+        for (Map.Entry<String, Ns> e : this.nses.entrySet()) {
+            Ns ns = e.getValue();
+            stack.push(ns);
+            out.putInt(RES_XML_START_NAMESPACE_TYPE | (0x0010 << 16));
+            out.putInt(24);
+            out.putInt(-1);
+            out.putInt(0xFFFFFFFF);
+            out.putInt(ns.prefix.index);
+            out.putInt(ns.uri.index);
+        }
+
+        for (NodeImpl first : firsts) {
+            first.write(out);
+        }
+
+        while (stack.size() > 0) {
+            Ns ns = stack.pop();
+            out.putInt(RES_XML_END_NAMESPACE_TYPE | (0x0010 << 16));
+            out.putInt(24);
+            out.putInt(ns.ln);
+            out.putInt(0xFFFFFFFF);
+            out.putInt(ns.prefix.index);
+            out.putInt(ns.uri.index);
+        }
+        return out.array();
+    }
 
     static class Attr {
 
         public int index;
         public StringItem name;
         public StringItem ns;
-        public int resourceId;
+        public final int resourceId;
         public int type;
         public Object value;
         public StringItem raw;
@@ -112,8 +167,8 @@ public class AxmlWriter extends AxmlVisitor {
     }
 
     static class NodeImpl extends NodeVisitor {
-        private Set<Attr> attrs = new TreeSet<Attr>(ATTR_CMP);
-        private List<NodeImpl> children = new ArrayList<NodeImpl>();
+        private final Set<Attr> attrs = new TreeSet<>(ATTR_CMP);
+        private final List<NodeImpl> children = new ArrayList<>();
         private int line;
         private StringItem name;
         private StringItem ns;
@@ -211,7 +266,7 @@ public class AxmlWriter extends AxmlVisitor {
             this.textLineNumber = ln;
         }
 
-        void write(ByteBuffer out) throws IOException {
+        void write(ByteBuffer out) {
             // start tag
             out.putInt(RES_XML_START_ELEMENT_TYPE | (0x0010 << 16));
             out.putInt(36 + attrs.size() * 20);
@@ -265,33 +320,6 @@ public class AxmlWriter extends AxmlVisitor {
             out.putInt(name.index);
         }
     }
-
-    static class Ns {
-        int ln;
-        StringItem prefix;
-        StringItem uri;
-
-        public Ns(StringItem prefix, StringItem uri, int ln) {
-            super();
-            this.prefix = prefix;
-            this.uri = uri;
-            this.ln = ln;
-        }
-    }
-
-    private List<NodeImpl> firsts = new ArrayList<NodeImpl>(3);
-
-    private Map<String, Ns> nses = new HashMap<String, Ns>();
-
-    private List<StringItem> otherString = new ArrayList<StringItem>();
-
-    private Map<String, StringItem> resourceId2Str = new HashMap<String, StringItem>();
-
-    private List<Integer> resourceIds = new ArrayList<Integer>();
-
-    private List<StringItem> resourceString = new ArrayList<StringItem>();
-
-    private StringItems stringItems = new StringItems();
 
     // TODO add style support
     // private List<StringItem> styleItems = new ArrayList();
@@ -350,56 +378,17 @@ public class AxmlWriter extends AxmlVisitor {
         return size;
     }
 
-    public byte[] toByteArray() throws IOException {
+    static class Ns {
+        final int ln;
+        StringItem prefix;
+        StringItem uri;
 
-        int size = 8 + prepare();
-        ByteBuffer out = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
-
-        out.putInt(RES_XML_TYPE | (0x0008 << 16));
-        out.putInt(size);
-
-        int stringSize = this.stringItems.getSize();
-        int padding = 0;
-        if (stringSize % 4 != 0) {
-            padding = 4 - stringSize % 4;
+        public Ns(StringItem prefix, StringItem uri, int ln) {
+            super();
+            this.prefix = prefix;
+            this.uri = uri;
+            this.ln = ln;
         }
-        out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
-        out.putInt(stringSize + padding + 8);
-        this.stringItems.write(out);
-        out.put(new byte[padding]);
-
-        out.putInt(RES_XML_RESOURCE_MAP_TYPE | (0x0008 << 16));
-        out.putInt(8 + this.resourceIds.size() * 4);
-        for (Integer i : resourceIds) {
-            out.putInt(i);
-        }
-
-        Stack<Ns> stack = new Stack<Ns>();
-        for (Map.Entry<String, Ns> e : this.nses.entrySet()) {
-            Ns ns = e.getValue();
-            stack.push(ns);
-            out.putInt(RES_XML_START_NAMESPACE_TYPE | (0x0010 << 16));
-            out.putInt(24);
-            out.putInt(-1);
-            out.putInt(0xFFFFFFFF);
-            out.putInt(ns.prefix.index);
-            out.putInt(ns.uri.index);
-        }
-
-        for (NodeImpl first : firsts) {
-            first.write(out);
-        }
-
-        while (stack.size() > 0) {
-            Ns ns = stack.pop();
-            out.putInt(RES_XML_END_NAMESPACE_TYPE | (0x0010 << 16));
-            out.putInt(24);
-            out.putInt(ns.ln);
-            out.putInt(0xFFFFFFFF);
-            out.putInt(ns.prefix.index);
-            out.putInt(ns.uri.index);
-        }
-        return out.array();
     }
 
     StringItem update(StringItem item) {

@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Axml extends AxmlVisitor {
+
+    public final List<Node> firsts = new ArrayList<>();
+
+    public static class Ns {
+        public int ln;
+        public String prefix, uri;
+
+        public void accept(AxmlVisitor visitor) {
+            visitor.ns(prefix, uri, ln);
+        }
+    }
+
+    public final List<Ns> nses = new ArrayList<>();
 
     public static class Node extends NodeVisitor {
         public static class Attr {
@@ -40,8 +53,8 @@ public class Axml extends AxmlVisitor {
             }
         }
 
-        public List<Attr> attrs = new ArrayList<Attr>();
-        public List<Node> children = new ArrayList<Node>();
+        public final List<Attr> attrs = new ArrayList<>();
+        public final List<Node> children = new ArrayList<>();
         public Integer ln;
         public String ns, name;
         public Text text;
@@ -100,18 +113,6 @@ public class Axml extends AxmlVisitor {
             this.text = text;
         }
     }
-
-    public static class Ns {
-        public int ln;
-        public String prefix, uri;
-
-        public void accept(AxmlVisitor visitor) {
-            visitor.ns(prefix, uri, ln);
-        }
-    }
-
-    public List<Node> firsts = new ArrayList<Node>();
-    public List<Ns> nses = new ArrayList<Ns>();
 
     public void accept(final AxmlVisitor visitor) {
         for (Ns ns : nses) {

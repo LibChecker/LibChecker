@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,18 +27,18 @@ import pxb.android.ResConst;
 import pxb.android.StringItems;
 
 /**
- * 
+ *
  * Read the resources.arsc inside an Android apk.
- * 
+ *
  * Usage:
- * 
+ *
  * <pre>
  * byte[] oldArscFile= ... ; //
  * List&lt;Pkg&gt; pkgs = new ArscParser(oldArscFile).parse(); // read the file
  * modify(pkgs); // do what you want here
  * byte[] newArscFile = new ArscWriter(pkgs).toByteArray(); // build a new file
  * </pre>
- * 
+ *
  * The format of arsc is described here (gingerbread)
  * <ul>
  * <li>frameworks/base/libs/utils/ResourceTypes.cpp</li>
@@ -46,13 +46,13 @@ import pxb.android.StringItems;
  * </ul>
  * and the cmd line <code>aapt d resources abc.apk</code> is also good for debug
  * (available in android sdk)
- * 
+ *
  * <p>
  * Todos:
  * <ul>
  * TODO add support to read styled strings
  * </ul>
- * 
+ *
  * <p>
  * Thanks to the the following projects
  * <ul>
@@ -60,9 +60,9 @@ import pxb.android.StringItems;
  * <li>Apktool https://code.google.com/p/android-apktool</li>
  * <li>Android http://source.android.com/</li>
  * </ul>
- * 
+ *
  * @author bob
- * 
+ *
  */
 public class ArscParser implements ResConst {
 
@@ -95,12 +95,10 @@ public class ArscParser implements ResConst {
     public static final int TYPE_STRING = 0x03;
 
     private int fileSize = -1;
-    private ByteBuffer in;
+    private final ByteBuffer in;
     private String[] keyNamesX;
-    private Pkg pkg;
-    private List<Pkg> pkgs = new ArrayList<Pkg>();
+    private final List<Pkg> pkgs = new ArrayList<>();
     private String[] strings;
-    private String[] typeNamesX;
 
     public ArscParser(byte[] b) {
         this.in = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN);
@@ -223,7 +221,7 @@ public class ArscParser implements ResConst {
             in.position(nextPisition);
         }
 
-        pkg = new Pkg(pid, name);
+        Pkg pkg = new Pkg(pid, name);
         pkgs.add(pkg);
 
         int typeStringOff = in.getInt();
@@ -231,6 +229,7 @@ public class ArscParser implements ResConst {
         int keyStringOff = in.getInt();
         int specNameCount = in.getInt();
 
+        String[] typeNamesX;
         {
             Chunk chunk = new Chunk();
             if (chunk.type != RES_STRING_POOL_TYPE) {

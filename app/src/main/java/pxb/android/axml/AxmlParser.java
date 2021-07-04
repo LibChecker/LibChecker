@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,7 +28,7 @@ import pxb.android.StringItems;
 
 /**
  * a class to read android axml
- * 
+ *
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  */
 public class AxmlParser implements ResConst {
@@ -53,7 +53,7 @@ public class AxmlParser implements ResConst {
     private int classAttribute;
     private int fileSize = -1;
     private int idAttribute;
-    private ByteBuffer in;
+    private final ByteBuffer in;
     private int lineNumber;
     private int nameIdx;
     private int nsIdx;
@@ -92,7 +92,7 @@ public class AxmlParser implements ResConst {
     }
 
     public String getAttrNs(int i) {
-        int idx = attrs.get(i * 5 + 0);
+        int idx = attrs.get(i * 5);
         return idx >= 0 ? strings[idx] : null;
     }
 
@@ -172,7 +172,7 @@ public class AxmlParser implements ResConst {
             fileSize = in.getInt();
             return START_FILE;
         }
-        int event = -1;
+        int event;
         for (int p = in.position(); p < fileSize; p = in.position()) {
             int type = in.getInt() & 0xFFFF;
             int size = in.getInt();

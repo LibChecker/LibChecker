@@ -1,12 +1,12 @@
 /*
  * Copyright (c) 2009-2013 Panxiaobo
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,55 +33,167 @@ import pxb.android.axml.Util;
 
 /**
  * Write pkgs to an arsc file
- * 
- * @see ArscParser
+ *
  * @author bob
- * 
+ * @see ArscParser
  */
 public class ArscWriter implements ResConst {
-    private static class PkgCtx {
-        Map<String, StringItem> keyNames = new HashMap<String, StringItem>();
-        StringItems keyNames0 = new StringItems();
-        public int keyStringOff;
-        int offset;
-        Pkg pkg;
-        int pkgSize;
-        List<StringItem> typeNames = new ArrayList<StringItem>();
-
-        StringItems typeNames0 = new StringItems();
-        int typeStringOff;
-
-        public void addKeyName(String name) {
-            if (keyNames.containsKey(name)) {
-                return;
-            }
-            StringItem stringItem = new StringItem(name);
-            keyNames.put(name, stringItem);
-            keyNames0.add(stringItem);
-        }
-
-        public void addTypeName(int id, String name) {
-            while (typeNames.size() <= id) {
-                typeNames.add(null);
-            }
-
-            StringItem item = typeNames.get(id);
-            if (item == null) {
-                typeNames.set(id, new StringItem(name));
-            } else {
-                throw new RuntimeException();
-            }
-        }
-    }
+    private final List<PkgCtx> ctxs = new ArrayList<>(5);
 
     private static void D(String fmt, Object... args) {
 
     }
 
-    private List<PkgCtx> ctxs = new ArrayList<PkgCtx>(5);
-    private List<Pkg> pkgs;
-    private Map<String, StringItem> strTable = new TreeMap<String, StringItem>();
-    private StringItems strTable0 = new StringItems();
+    private final List<Pkg> pkgs;
+    private final Map<String, StringItem> strTable = new TreeMap<>();
+    private final StringItems strTable0 = new StringItems();
+
+    private void write(ByteBuffer out, int size) throws IOException {
+        out.putInt(RES_TABLE_TYPE | (0x000c << 16));
+        out.putInt(size);
+        out.putInt(ctxs.size());
+
+        {
+            int stringSize = strTable0.getSize();
+            int padding = 0;
+            if (stringSize % 4 != 0) {
+                padding = 4 - stringSize % 4;
+            }
+            out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
+            out.putInt(stringSize + padding + 8);
+            strTable0.write(out);
+            out.put(new byte[padding]);
+        }
+
+        for (PkgCtx pctx : ctxs) {
+            if (out.position() != pctx.offset) {
+                throw new RuntimeException();
+            }
+            final int basePosition = out.position();
+            out.putInt(RES_TABLE_PACKAGE_TYPE | (0x011c << 16));
+            out.putInt(pctx.pkgSize);
+            out.putInt(pctx.pkg.id);
+            int p = out.position();
+            out.put(pctx.pkg.name.getBytes(StandardCharsets.UTF_16LE));
+            out.position(p + 256);
+
+            out.putInt(pctx.typeStringOff);
+            out.putInt(pctx.typeNames0.size());
+
+            out.putInt(pctx.keyStringOff);
+            out.putInt(pctx.keyNames0.size());
+
+            {
+                if (out.position() - basePosition != pctx.typeStringOff) {
+                    throw new RuntimeException();
+                }
+                int stringSize = pctx.typeNames0.getSize();
+                int padding = 0;
+                if (stringSize % 4 != 0) {
+                    padding = 4 - stringSize % 4;
+                }
+                out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
+                out.putInt(stringSize + padding + 8);
+                pctx.typeNames0.write(out);
+                out.put(new byte[padding]);
+            }
+
+            {
+                if (out.position() - basePosition != pctx.keyStringOff) {
+                    throw new RuntimeException();
+                }
+                int stringSize = pctx.keyNames0.getSize();
+                int padding = 0;
+                if (stringSize % 4 != 0) {
+                    padding = 4 - stringSize % 4;
+                }
+                out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
+                out.putInt(stringSize + padding + 8);
+                pctx.keyNames0.write(out);
+                out.put(new byte[padding]);
+            }
+
+            for (Type t : pctx.pkg.types.values()) {
+                D("[%08x]write spec", out.position(), t.name);
+                if (t.wPosition != out.position()) {
+                    throw new RuntimeException();
+                }
+                out.putInt(RES_TABLE_TYPE_SPEC_TYPE | (0x0010 << 16));
+                out.putInt(4 * 4 + 4 * t.specs.length);// size
+
+                out.putInt(t.id);
+                out.putInt(t.specs.length);
+                for (ResSpec spec : t.specs) {
+                    out.putInt(spec.flags);
+                }
+
+                for (Config config : t.configs) {
+                    D("[%08x]write config", out.position());
+                    int typeConfigPosition = out.position();
+                    if (config.wPosition != typeConfigPosition) {
+                        throw new RuntimeException();
+                    }
+                    out.putInt(RES_TABLE_TYPE_TYPE | (0x0038 << 16));
+                    out.putInt(config.wChunkSize);// size
+
+                    out.putInt(t.id);
+                    out.putInt(t.specs.length);
+                    out.putInt(config.wEntryStart);
+
+                    D("[%08x]write config ids", out.position());
+                    out.put(config.id);
+
+                    int size0 = config.id.length;
+                    int padding = 0;
+                    if (size0 % 4 != 0) {
+                        padding = 4 - size0 % 4;
+                    }
+                    out.put(new byte[padding]);
+
+                    out.position(typeConfigPosition + 0x0038);
+
+                    D("[%08x]write config entry offsets", out.position());
+                    for (int i = 0; i < config.entryCount; i++) {
+                        ResEntry entry = config.resources.get(i);
+                        if (entry == null) {
+                            out.putInt(-1);
+                        } else {
+                            out.putInt(entry.wOffset);
+                        }
+                    }
+
+                    if (out.position() - typeConfigPosition != config.wEntryStart) {
+                        throw new RuntimeException();
+                    }
+                    D("[%08x]write config entrys", out.position());
+                    for (ResEntry e : config.resources.values()) {
+                        D("[%08x]ResTable_entry", out.position());
+                        boolean isBag = e.value instanceof BagValue;
+                        out.putShort((short) (isBag ? 16 : 8));
+                        int flag = e.flag;
+                        if (isBag) { // add complex flag
+                            flag |= ArscParser.ENTRY_FLAG_COMPLEX;
+                        } else { // remove
+                            flag &= ~ArscParser.ENTRY_FLAG_COMPLEX;
+                        }
+                        out.putShort((short) flag);
+                        out.putInt(pctx.keyNames.get(e.spec.name).index);
+                        if (isBag) {
+                            BagValue bag = (BagValue) e.value;
+                            out.putInt(bag.parent);
+                            out.putInt(bag.map.size());
+                            for (Map.Entry<Integer, Value> entry : bag.map) {
+                                out.putInt(entry.getKey());
+                                writeValue(entry.getValue(), out);
+                            }
+                        } else {
+                            writeValue((Value) e.value, out);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public ArscWriter(List<Pkg> pkgs) {
         this.pkgs = pkgs;
@@ -239,149 +352,37 @@ public class ArscWriter implements ResConst {
         }
     }
 
-    private void write(ByteBuffer out, int size) throws IOException {
-        out.putInt(RES_TABLE_TYPE | (0x000c << 16));
-        out.putInt(size);
-        out.putInt(ctxs.size());
+    private static class PkgCtx {
+        final Map<String, StringItem> keyNames = new HashMap<>();
+        final StringItems keyNames0 = new StringItems();
+        public int keyStringOff;
+        int offset;
+        Pkg pkg;
+        int pkgSize;
+        final List<StringItem> typeNames = new ArrayList<>();
 
-        {
-            int stringSize = strTable0.getSize();
-            int padding = 0;
-            if (stringSize % 4 != 0) {
-                padding = 4 - stringSize % 4;
+        final StringItems typeNames0 = new StringItems();
+        int typeStringOff;
+
+        public void addKeyName(String name) {
+            if (keyNames.containsKey(name)) {
+                return;
             }
-            out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
-            out.putInt(stringSize + padding + 8);
-            strTable0.write(out);
-            out.put(new byte[padding]);
+            StringItem stringItem = new StringItem(name);
+            keyNames.put(name, stringItem);
+            keyNames0.add(stringItem);
         }
 
-        for (PkgCtx pctx : ctxs) {
-            if (out.position() != pctx.offset) {
+        public void addTypeName(int id, String name) {
+            while (typeNames.size() <= id) {
+                typeNames.add(null);
+            }
+
+            StringItem item = typeNames.get(id);
+            if (item == null) {
+                typeNames.set(id, new StringItem(name));
+            } else {
                 throw new RuntimeException();
-            }
-            final int basePosition = out.position();
-            out.putInt(RES_TABLE_PACKAGE_TYPE | (0x011c << 16));
-            out.putInt(pctx.pkgSize);
-            out.putInt(pctx.pkg.id);
-            int p = out.position();
-            out.put(pctx.pkg.name.getBytes("UTF-16LE"));
-            out.position(p + 256);
-
-            out.putInt(pctx.typeStringOff);
-            out.putInt(pctx.typeNames0.size());
-
-            out.putInt(pctx.keyStringOff);
-            out.putInt(pctx.keyNames0.size());
-
-            {
-                if (out.position() - basePosition != pctx.typeStringOff) {
-                    throw new RuntimeException();
-                }
-                int stringSize = pctx.typeNames0.getSize();
-                int padding = 0;
-                if (stringSize % 4 != 0) {
-                    padding = 4 - stringSize % 4;
-                }
-                out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
-                out.putInt(stringSize + padding + 8);
-                pctx.typeNames0.write(out);
-                out.put(new byte[padding]);
-            }
-
-            {
-                if (out.position() - basePosition != pctx.keyStringOff) {
-                    throw new RuntimeException();
-                }
-                int stringSize = pctx.keyNames0.getSize();
-                int padding = 0;
-                if (stringSize % 4 != 0) {
-                    padding = 4 - stringSize % 4;
-                }
-                out.putInt(RES_STRING_POOL_TYPE | (0x001C << 16));
-                out.putInt(stringSize + padding + 8);
-                pctx.keyNames0.write(out);
-                out.put(new byte[padding]);
-            }
-
-            for (Type t : pctx.pkg.types.values()) {
-                D("[%08x]write spec", out.position(), t.name);
-                if (t.wPosition != out.position()) {
-                    throw new RuntimeException();
-                }
-                out.putInt(RES_TABLE_TYPE_SPEC_TYPE | (0x0010 << 16));
-                out.putInt(4 * 4 + 4 * t.specs.length);// size
-
-                out.putInt(t.id);
-                out.putInt(t.specs.length);
-                for (ResSpec spec : t.specs) {
-                    out.putInt(spec.flags);
-                }
-
-                for (Config config : t.configs) {
-                    D("[%08x]write config", out.position());
-                    int typeConfigPosition = out.position();
-                    if (config.wPosition != typeConfigPosition) {
-                        throw new RuntimeException();
-                    }
-                    out.putInt(RES_TABLE_TYPE_TYPE | (0x0038 << 16));
-                    out.putInt(config.wChunkSize);// size
-
-                    out.putInt(t.id);
-                    out.putInt(t.specs.length);
-                    out.putInt(config.wEntryStart);
-
-                    D("[%08x]write config ids", out.position());
-                    out.put(config.id);
-
-                    int size0 = config.id.length;
-                    int padding = 0;
-                    if (size0 % 4 != 0) {
-                        padding = 4 - size0 % 4;
-                    }
-                    out.put(new byte[padding]);
-
-                    out.position(typeConfigPosition + 0x0038);
-
-                    D("[%08x]write config entry offsets", out.position());
-                    for (int i = 0; i < config.entryCount; i++) {
-                        ResEntry entry = config.resources.get(i);
-                        if (entry == null) {
-                            out.putInt(-1);
-                        } else {
-                            out.putInt(entry.wOffset);
-                        }
-                    }
-
-                    if (out.position() - typeConfigPosition != config.wEntryStart) {
-                        throw new RuntimeException();
-                    }
-                    D("[%08x]write config entrys", out.position());
-                    for (ResEntry e : config.resources.values()) {
-                        D("[%08x]ResTable_entry", out.position());
-                        boolean isBag = e.value instanceof BagValue;
-                        out.putShort((short) (isBag ? 16 : 8));
-                        int flag = e.flag;
-                        if (isBag) { // add complex flag
-                            flag |= ArscParser.ENTRY_FLAG_COMPLEX;
-                        } else { // remove
-                            flag &= ~ArscParser.ENTRY_FLAG_COMPLEX;
-                        }
-                        out.putShort((short) flag);
-                        out.putInt(pctx.keyNames.get(e.spec.name).index);
-                        if (isBag) {
-                            BagValue bag = (BagValue) e.value;
-                            out.putInt(bag.parent);
-                            out.putInt(bag.map.size());
-                            for (Map.Entry<Integer, Value> entry : bag.map) {
-                                out.putInt(entry.getKey());
-                                writeValue(entry.getValue(), out);
-                            }
-                        } else {
-                            writeValue((Value) e.value, out);
-                        }
-                    }
-                }
             }
         }
     }
