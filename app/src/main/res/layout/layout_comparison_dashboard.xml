@@ -18,16 +18,14 @@
         android:orientation="horizontal"
         android:padding="@dimen/normal_padding">
 
-        <include
+        <com.absinthe.libchecker.view.snapshot.ComparisonDashboardHalfView
             android:id="@+id/info_left"
-            layout="@layout/layout_comparison_snapshot_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <include
+        <com.absinthe.libchecker.view.snapshot.ComparisonDashboardHalfView
             android:id="@+id/info_right"
-            layout="@layout/layout_comparison_snapshot_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -23,7 +25,6 @@ import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,8 +73,8 @@ class ComparisonActivity : BaseActivity() {
         val dashboardBinding = LayoutComparisonDashboardBinding.inflate(layoutInflater)
 
         dashboardBinding.apply {
-            infoLeft.root.gravity = Gravity.START
-            infoLeft.root.setOnClickListener {
+            infoLeft.horizontalGravity = Gravity.START
+            infoLeft.setOnClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
                     val charList = mutableListOf<String>()
@@ -97,8 +98,8 @@ class ComparisonActivity : BaseActivity() {
                     }
                 }
             }
-            infoRight.root.gravity = Gravity.END
-            infoRight.root.setOnClickListener {
+            infoRight.horizontalGravity = Gravity.END
+            infoRight.setOnClickListener {
                 lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
                     val charList = mutableListOf<String>()
@@ -128,7 +129,7 @@ class ComparisonActivity : BaseActivity() {
             extendedFab.apply {
                 post {
                     (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
-                        0, 0, 16.dp, paddingBottom + SystemBarManager.navigationBarSize
+                        0, 0, 16.dp, paddingBottom + (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0)
                     )
                 }
                 setOnClickListener {
@@ -171,7 +172,13 @@ class ComparisonActivity : BaseActivity() {
 
         adapter.apply {
             headerWithEmptyEnable = true
-            setEmptyView(SnapshotEmptyView(this@ComparisonActivity))
+            val emptyView = SnapshotEmptyView(this@ComparisonActivity).apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                    it.gravity = Gravity.CENTER_HORIZONTAL
+                }
+                addPaddingTop(96.dp)
+            }
+            setEmptyView(emptyView)
             setHeaderView(dashboardBinding.root)
             setOnItemClickListener { _, view, position ->
                 if (AntiShakeUtils.isInvalidClick(view)) {

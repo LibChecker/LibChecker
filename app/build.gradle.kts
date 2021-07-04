@@ -132,8 +132,8 @@ dependencies {
     compileOnly(fileTree("ohos"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
 
-    implementation("com.github.zhaobozhen.libraries:me:1.0.1")
-    implementation("com.github.zhaobozhen.libraries:utils:1.0.1")
+    implementation("com.github.zhaobozhen.libraries:me:1.0.2")
+    implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
     val appCenterSdkVersion = "4.2.0"
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")

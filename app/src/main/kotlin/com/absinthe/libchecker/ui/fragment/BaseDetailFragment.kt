@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
@@ -36,7 +38,13 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by lazy { LibStringAdapter(type) }
-    protected val emptyView by lazy { EmptyListView(requireContext()) }
+    protected val emptyView by lazy { EmptyListView(requireContext()).apply {
+        layoutParams = android.widget.FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.MATCH_PARENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT).also {
+            it.gravity = android.view.Gravity.CENTER_HORIZONTAL
+        }
+        addPaddingTop(96.dp)
+        text.text = getString(com.absinthe.libchecker.R.string.loading)
+    } }
     protected var isListReady = false
     protected var navigateToComponentTask: Runnable? = null
 

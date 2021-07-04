@@ -75,8 +75,6 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
                 true
             }
             setDiffCallback(LibStringDiffUtil())
-
-            emptyView.text.text = getString(R.string.loading)
             setEmptyView(emptyView)
         }
         viewModel.initDexData(packageName)

@@ -1,16 +1,12 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -72,14 +68,6 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
                 true
             }
             setDiffCallback(LibStringDiffUtil())
-
-            emptyView.apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
-                    it.gravity = Gravity.CENTER_HORIZONTAL
-                }
-                addPaddingTop(96.dp)
-                text.text = getString(R.string.loading)
-            }
             setEmptyView(emptyView)
         }
         viewModel.initStaticData(packageName)

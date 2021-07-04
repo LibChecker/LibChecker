@@ -25,8 +25,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.HomeViewModel
-import com.absinthe.libraries.utils.extensions.dp
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -446,9 +444,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun generateBarChartView(): HorizontalBarChart {
         return HorizontalBarChart(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT).apply {
-                setMargins(0, 0, 0, 56.dp + SystemBarManager.navigationBarSize)
-            }
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
             description.isEnabled = false
             legend.isEnabled = false
             setDrawBorders(false)
