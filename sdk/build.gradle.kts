@@ -19,7 +19,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -27,8 +27,6 @@ android {
             )
         }
     }
-
-    sourceSets["main"].java.srcDirs("src/main/kotlin")
 
     kotlinOptions {
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
