@@ -18,14 +18,10 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
 class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
-
-    private val emptyView by lazy { EmptyListView(requireContext()) }
-    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
 
     override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 

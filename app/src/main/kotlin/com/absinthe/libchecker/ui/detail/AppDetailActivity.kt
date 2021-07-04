@@ -37,6 +37,7 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
@@ -109,17 +110,17 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         }
 
         pkgName?.let { packageName ->
+            val packageInfo = PackageUtils.getPackageInfo(packageName)
             viewModel.packageName = packageName
             supportActionBar?.apply {
                 title = try {
-                    PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
+                    packageInfo.applicationInfo.loadLabel(packageManager).toString()
                 } catch (e: PackageManager.NameNotFoundException) {
                     getString(R.string.detail_label)
                 }
             }
             binding.apply {
                 try {
-                    val packageInfo = PackageUtils.getPackageInfo(packageName)
                     ivAppIcon.apply {
                         val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
@@ -133,7 +134,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         }
                     }
                     tvAppName.apply {
-                        text = PackageUtils.getPackageInfo(packageName).applicationInfo.loadLabel(packageManager).toString()
+                        text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
                         setLongClickCopiedToClipboard(text.toString())
                     }
                     tvPackageName.apply {
@@ -273,10 +274,10 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 }
             }
 
-            val types = listOf(
+            val types = mutableListOf(
                 NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
             )
-            val tabTitles = listOf(
+            val tabTitles = mutableListOf(
                 getText(R.string.ref_category_native),
                 getText(R.string.ref_category_service),
                 getText(R.string.ref_category_activity),
@@ -284,6 +285,10 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 getText(R.string.ref_category_cp),
                 getText(R.string.ref_category_dex)
             )
+            if (PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
+                types.add(1, STATIC)
+                tabTitles.add(1, getText(R.string.ref_category_static))
+            }
 
             binding.viewpager.apply {
                 adapter = object : FragmentStateAdapter(this@AppDetailActivity) {
@@ -293,27 +298,33 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
                     override fun createFragment(position: Int): Fragment {
                         return when (position) {
-                            types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(pkgName!!, NATIVE)
-                            types.indexOf(DEX) -> DexAnalysisFragment.newInstance(pkgName!!, DEX)
+                            types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(packageName, NATIVE)
+                            types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(packageName, STATIC)
+                            types.indexOf(DEX) -> DexAnalysisFragment.newInstance(packageName, DEX)
                             else -> ComponentsAnalysisFragment.newInstance(types[position])
                         }
                     }
                 }
             }
-            binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    val count = viewModel.itemsCountList[tab.position]
-                    if (detailFragmentManager.currentItemsCount != count) {
-                        binding.tsComponentCount.setText(count.toString())
-                        detailFragmentManager.currentItemsCount = count
-                    }
-                    detailFragmentManager.selectedPosition = tab.position
+            binding.tabLayout.apply {
+                tabTitles.forEach {
+                    addTab(newTab().apply { text = it })
                 }
+                addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                    override fun onTabSelected(tab: TabLayout.Tab) {
+                        val count = viewModel.itemsCountList[types[tab.position]]
+                        if (detailFragmentManager.currentItemsCount != count) {
+                            binding.tsComponentCount.setText(count.toString())
+                            detailFragmentManager.currentItemsCount = count
+                        }
+                        detailFragmentManager.selectedPosition = tab.position
+                    }
 
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+                    override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
-            })
+                    override fun onTabReselected(tab: TabLayout.Tab?) {}
+                })
+            }
 
             val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
                 tab.text = tabTitles[position]
@@ -321,7 +332,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
             mediator.attach()
 
             viewModel.itemsCountLiveData.observe(this, {
-                if (detailFragmentManager.currentItemsCount != it.count && binding.tabLayout.selectedTabPosition == it.locate) {
+                if (detailFragmentManager.currentItemsCount != it.count && types[binding.tabLayout.selectedTabPosition] == it.locate) {
                     binding.tsComponentCount.setText(it.count.toString())
                     detailFragmentManager.currentItemsCount = it.count
                 }
@@ -347,12 +358,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         override fun onReceive(context: Context, intent: Intent) {
             val pkg = intent.data?.schemeSpecificPart.orEmpty()
             if (pkg == pkgName) {
-                if (intent.action == Intent.ACTION_PACKAGE_REPLACED) {
-                    recreate()
-                } else if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
-                    GlobalValues.shouldRequestChange.postValue(true)
-                    finish()
-                }
+                GlobalValues.shouldRequestChange.postValue(true)
+                recreate()
             }
         }
     }

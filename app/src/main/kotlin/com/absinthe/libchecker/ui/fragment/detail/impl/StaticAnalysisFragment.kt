@@ -1,13 +1,16 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
+import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
+import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -18,29 +21,23 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
-class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
-    override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
 
     override fun getRecyclerView() = binding.list
 
     override fun init() {
         binding.apply {
             list.apply {
-                adapter = this@DexAnalysisFragment.adapter
-                addItemDecoration(
-                    DividerItemDecoration(
-                        requireContext(),
-                        DividerItemDecoration.VERTICAL
-                    )
-                )
+                adapter = this@StaticAnalysisFragment.adapter
             }
         }
 
         viewModel.apply {
             val observer = Observer<List<LibStringItemChip>> {
                 if (it.isEmpty()) {
-                    emptyView.text.text = getString(R.string.uncharted_territory)
+                    emptyView.text.text = getString(R.string.empty_list)
                 } else {
                     adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
                 }
@@ -52,7 +49,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
                 }
             }
 
-            dexLibItems.observe(viewLifecycleOwner, observer)
+            staticLibItems.observe(viewLifecycleOwner, observer)
         }
 
         fun openLibDetailDialog(position: Int) {
@@ -76,15 +73,21 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
             }
             setDiffCallback(LibStringDiffUtil())
 
-            emptyView.text.text = getString(R.string.loading)
+            emptyView.apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                    it.gravity = Gravity.CENTER_HORIZONTAL
+                }
+                addPaddingTop(96.dp)
+                text.text = getString(R.string.loading)
+            }
             setEmptyView(emptyView)
         }
-        viewModel.initDexData(packageName)
+        viewModel.initStaticData(packageName)
     }
 
     companion object {
-        fun newInstance(packageName: String, @LibType type: Int): DexAnalysisFragment {
-            return DexAnalysisFragment()
+        fun newInstance(packageName: String, @LibType type: Int): StaticAnalysisFragment {
+            return StaticAnalysisFragment()
                 .apply {
                     arguments = Bundle().apply {
                         putString(EXTRA_PACKAGE_NAME, packageName)

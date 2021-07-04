@@ -44,6 +44,7 @@
     <string name="ref_category_br">Ресівери</string>
     <string name="ref_category_cp">Провайдери</string>
     <string name="ref_category_perm">Дозволи</string>
+    <string name="ref_category_static">Static Libraries</string>
 
     <string name="string_kotlin_used">Використовується Kotlin</string>
     <string name="string_kotlin_unused">Kotlin не використовується</string>

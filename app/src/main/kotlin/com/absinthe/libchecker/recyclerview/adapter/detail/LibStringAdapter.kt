@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
@@ -16,11 +15,13 @@ import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
+import com.absinthe.libchecker.view.detail.StaticLibItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
@@ -34,11 +35,11 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (type) {
             NATIVE -> createBaseViewHolder(NativeLibItemView(context))
+            STATIC -> createBaseViewHolder(StaticLibItemView(context))
             else -> createBaseViewHolder(ComponentLibItemView(context))
         }
     }
 
-    @SuppressLint("SetTextI18n")
     override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
         val itemName = if (item.item.source == DISABLED) {
             val sp = SpannableString(item.item.name)
@@ -49,31 +50,46 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
             item.item.name
         }
 
-        if (type == NATIVE) {
-            (holder.itemView as NativeLibItemView).apply {
-                libName.text = itemName
-                if (item.item.source?.startsWith(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX) == true) {
-                    libSize.let{
+        when (type) {
+            NATIVE -> {
+                (holder.itemView as NativeLibItemView).apply {
+                    libName.text = itemName
+                    libSize.text = PackageUtils.sizeToString(context, item.item)
+                    setChip(item.chip)
+                }
+            }
+            STATIC -> {
+                (holder.itemView as StaticLibItemView).apply {
+                    libName.text = itemName
+                    libDetail.let {
                         it.text = item.item.source
                         it.post {
-                            it.text = autoSplitText(it)
-                            val spannableString = SpannableString(it.text)
+                            val spannableString = SpannableString(autoSplitText(it))
                             val staticPrefixIndex = spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
-                            spannableString.setSpan(StyleSpan(Typeface.BOLD), staticPrefixIndex, staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+                            spannableString.setSpan(
+                                StyleSpan(Typeface.BOLD),
+                                staticPrefixIndex,
+                                staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
+                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                            )
                             val versionCodePrefixIndex = spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
-                            spannableString.setSpan(StyleSpan(Typeface.BOLD), versionCodePrefixIndex, versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+                            spannableString.setSpan(
+                                StyleSpan(Typeface.BOLD),
+                                versionCodePrefixIndex,
+                                versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length,
+                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                            )
                             it.text = spannableString
                         }
                     }
-                } else {
-                    libSize.text = PackageUtils.sizeToString(context, item.item)
+                    setChip(item.chip)
                 }
-                setChip(item.chip)
             }
-        } else {
-            (holder.itemView as ComponentLibItemView).apply {
-                libName.text = itemName
-                setChip(item.chip)
+            else -> {
+                (holder.itemView as ComponentLibItemView).apply {
+                    libName.text = itemName
+                    setChip(item.chip)
+                }
             }
         }
 

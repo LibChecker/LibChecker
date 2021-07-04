@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageInfo
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
@@ -29,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
@@ -106,15 +108,15 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
         val path = tempFile!!.path
         var inputStream: InputStream? = null
+        var packageInfo: PackageInfo? = null
 
         try {
             inputStream = contentResolver.openInputStream(uri)
 
             FileUtils.writeFileFromIS(tempFile!!, inputStream)
 
-            val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
+            packageInfo = packageManager.getPackageArchiveInfo(path, 0)
             packageInfo?.let {
-                //Refer to https://juejin.im/post/5cb41f7b6fb9a0688b574228
                 it.applicationInfo.sourceDir = path
                 it.applicationInfo.publicSourceDir = path
 
@@ -222,13 +224,6 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                     }
                 }
 
-                viewModel.itemsCountLiveData.observe(this, { locatedCount ->
-                    if (detailFragmentManager.currentItemsCount != locatedCount.count && binding.tabLayout.selectedTabPosition == locatedCount.locate) {
-                        binding.tsComponentCount.setText(locatedCount.count.toString())
-                        detailFragmentManager.currentItemsCount = locatedCount.count
-                    }
-                })
-
                 viewModel.initComponentsData(path)
             } ?: run {
                 Timber.e("PackageInfo is null")
@@ -241,10 +236,10 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
             inputStream?.close()
         }
 
-        val types = listOf(
+        val types = mutableListOf(
             NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
         )
-        val tabTitles = listOf(
+        val tabTitles = mutableListOf(
             getText(R.string.ref_category_native),
             getText(R.string.ref_category_service),
             getText(R.string.ref_category_activity),
@@ -252,6 +247,10 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
             getText(R.string.ref_category_cp),
             getText(R.string.ref_category_dex)
         )
+        if (packageInfo != null && PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
+            types.add(1, STATIC)
+            tabTitles.add(1, getText(R.string.ref_category_static))
+        }
 
         binding.viewpager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
@@ -261,29 +260,42 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path, NATIVE)
+                    types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(path, STATIC)
                     types.indexOf(DEX) -> DexAnalysisFragment.newInstance(path, DEX)
                     else -> ComponentsAnalysisFragment.newInstance(types[position])
                 }
             }
         }
-        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                val count = viewModel.itemsCountList[tab.position]
-                if (detailFragmentManager.currentItemsCount != count) {
-                    binding.tsComponentCount.setText(count.toString())
-                    detailFragmentManager.currentItemsCount = count
-                }
-                detailFragmentManager.selectedPosition = tab.position
+        binding.tabLayout.apply {
+            tabTitles.forEach {
+                addTab(newTab().apply { text = it })
             }
+            addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val count = viewModel.itemsCountList[types[tab.position]]
+                    if (detailFragmentManager.currentItemsCount != count) {
+                        binding.tsComponentCount.setText(count.toString())
+                        detailFragmentManager.currentItemsCount = count
+                    }
+                    detailFragmentManager.selectedPosition = tab.position
+                }
 
-            override fun onTabUnselected(tab: TabLayout.Tab?) { }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
 
-            override fun onTabReselected(tab: TabLayout.Tab?) { }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            })
+        }
 
         val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
             tab.text = tabTitles[position]
         }
         mediator.attach()
+
+        viewModel.itemsCountLiveData.observe(this, { locatedCount ->
+            if (detailFragmentManager.currentItemsCount != locatedCount.count && types[binding.tabLayout.selectedTabPosition] == locatedCount.locate) {
+                binding.tsComponentCount.setText(locatedCount.count.toString())
+                detailFragmentManager.currentItemsCount = locatedCount.count
+            }
+        })
     }
 }

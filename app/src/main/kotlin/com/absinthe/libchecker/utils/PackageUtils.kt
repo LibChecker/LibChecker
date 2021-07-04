@@ -275,7 +275,7 @@ object PackageUtils {
         }
     }
 
-    const val STATIC_LIBRARY_SOURCE_PREFIX = "[Static Library] "
+    const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
     const val VERSION_CODE_PREFIX = "[Version Code] "
 
     /**
@@ -283,7 +283,7 @@ object PackageUtils {
      * @param packageInfo PackageInfo
      * @return static libraries list
      */
-    private fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
+    fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
         val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
         try {
             val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))

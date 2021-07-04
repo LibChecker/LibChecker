@@ -10,12 +10,14 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.impl.EXTRA_TYPE
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -31,8 +33,10 @@ import timber.log.Timber
 abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), Sortable {
 
     protected val viewModel by activityViewModels<DetailViewModel>()
+    protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by lazy { LibStringAdapter(type) }
+    protected val emptyView by lazy { EmptyListView(requireContext()) }
     protected var isListReady = false
     protected var navigateToComponentTask: Runnable? = null
 

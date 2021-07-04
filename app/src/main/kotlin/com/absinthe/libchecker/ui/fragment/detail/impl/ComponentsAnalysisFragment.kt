@@ -30,7 +30,6 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,7 +41,6 @@ const val EXTRA_TYPE = "EXTRA_TYPE"
 
 class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val emptyView by lazy { EmptyListView(requireContext()) }
     private val hasIntegration by lazy {
         !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
     }

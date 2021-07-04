@@ -45,6 +45,7 @@
     <string name="ref_category_cp">Content Providers</string>
     <string name="ref_category_dex" translatable="false">Dex</string>
     <string name="ref_category_perm">Permissions</string>
+    <string name="ref_category_static">Static Libraries</string>
 
     <string name="string_kotlin_used">Kotlin Used</string>
     <string name="string_kotlin_unused">Kotlin Unused</string>

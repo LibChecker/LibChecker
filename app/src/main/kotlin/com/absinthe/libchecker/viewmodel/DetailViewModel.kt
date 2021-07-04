@@ -20,6 +20,7 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -36,10 +37,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
 
     val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
+    val staticLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
     val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
-    val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0)
+    val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0, 0)
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
     var is32bit = false
@@ -80,6 +82,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         nativeLibItems.postValue(list)
+    }
+
+    fun initStaticData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+        staticLibItems.postValue(getStaticChipList(packageName))
     }
 
     fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -143,6 +149,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 RECEIVER -> "receivers-libs"
                 PROVIDER -> "providers-libs"
                 DEX -> "dex-libs"
+                STATIC -> "static-libs"
                 else -> throw IllegalArgumentException("Illegal LibType.")
             }
             if (isRegex) {
@@ -174,7 +181,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 applicationInfo = info
             }
         }
-        val list = PackageUtils.getNativeDirLibs(packageInfo, is32bit, true).toMutableList()
+        val list = PackageUtils.getNativeDirLibs(packageInfo, is32bit).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 
@@ -190,6 +197,31 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
+            } else {
+                chipList.sortByDescending { it.chip != null }
+            }
+        }
+        return chipList
+    }
+
+    private suspend fun getStaticChipList(packageName: String): List<LibStringItemChip> {
+        Timber.d("getStaticChipList")
+        val list = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+        val chipList = mutableListOf<LibStringItemChip>()
+        var chip: LibChip?
+
+        if (list.isEmpty()) {
+            return chipList
+        } else {
+            list.forEach {
+                chip = null
+                Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                }
+                chipList.add(LibStringItemChip(it, chip))
+            }
+            if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+                chipList.sortByDescending { it.item.name }
             } else {
                 chipList.sortByDescending { it.chip != null }
             }
