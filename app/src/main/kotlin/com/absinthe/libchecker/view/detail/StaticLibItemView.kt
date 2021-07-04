@@ -57,6 +57,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
                 }
             }
             chip!!.apply {
+                isClickable = false
                 text = libChip.name
                 setChipIconResource(libChip.iconRes)
 

@@ -559,6 +559,10 @@ object PackageUtils {
     fun getAbi(abiSet: Set<Int>, demands: Map<String, Any?>): Int {
         var abi = NO_LIBS
 
+        if (abiSet.contains(OVERLAY)) {
+            return OVERLAY
+        }
+
         try {
             val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
             val multiArch = demands[multiArchString] as? Boolean ?: false
@@ -600,6 +604,11 @@ object PackageUtils {
         val file = File(applicationInfo.sourceDir)
         val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray())
         val overlay = demands[overlayString] as? Boolean ?: false
+
+        if (overlay) {
+            return OVERLAY
+        }
+
         val abiSet = getAbiSet(file, applicationInfo, isApk, overlay)
         return getAbi(abiSet, demands)
     }

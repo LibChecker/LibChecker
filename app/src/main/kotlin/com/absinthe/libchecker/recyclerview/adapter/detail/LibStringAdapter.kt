@@ -1,16 +1,17 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
+import android.annotation.SuppressLint
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
+import android.graphics.text.LineBreaker
+import android.text.Layout
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
@@ -62,25 +64,28 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                 (holder.itemView as StaticLibItemView).apply {
                     libName.text = itemName
                     libDetail.let {
-                        it.text = item.item.source
-                        it.post {
-                            val spannableString = SpannableString(autoSplitText(it))
-                            val staticPrefixIndex = spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
-                            spannableString.setSpan(
-                                StyleSpan(Typeface.BOLD),
-                                staticPrefixIndex,
-                                staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
-                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                            )
-                            val versionCodePrefixIndex = spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
-                            spannableString.setSpan(
-                                StyleSpan(Typeface.BOLD),
-                                versionCodePrefixIndex,
-                                versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length,
-                                Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                            )
-                            it.text = spannableString
+                        if (LCAppUtils.atLeastQ()) {
+                            it.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+                        } else if (LCAppUtils.atLeastO()) {
+                            @SuppressLint("WrongConstant")
+                            it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
                         }
+                        val spannableString = SpannableString(item.item.source)
+                        val staticPrefixIndex = spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
+                        spannableString.setSpan(
+                            StyleSpan(Typeface.BOLD),
+                            staticPrefixIndex,
+                            staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
+                            Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                        )
+                        val versionCodePrefixIndex = spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
+                        spannableString.setSpan(
+                            StyleSpan(Typeface.BOLD),
+                            versionCodePrefixIndex,
+                            versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length,
+                            Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                        )
+                        it.text = spannableString
                     }
                     setChip(item.chip)
                 }
@@ -117,43 +122,5 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
             return
         }
         highlightPosition = position
-    }
-
-    private fun autoSplitText(tv: TextView): String {
-        val rawText = tv.text.toString()
-        val tvPaint: Paint = tv.paint
-        val tvWidth = (tv.measuredWidth - tv.paddingStart - tv.paddingEnd).toFloat()
-
-        val rawTextLines = rawText.replace("\r".toRegex(), "").split("\n".toRegex()).toTypedArray()
-        val sbNewText = StringBuilder()
-
-        for (rawTextLine in rawTextLines) {
-            if (tvPaint.measureText(rawTextLine) <= tvWidth) {
-                sbNewText.append(rawTextLine)
-            } else {
-                var lineWidth = 0f
-                var cnt = 0
-
-                while (cnt != rawTextLine.length) {
-                    val ch = rawTextLine[cnt]
-                    lineWidth += tvPaint.measureText(ch.toString())
-
-                    if (lineWidth <= tvWidth) {
-                        sbNewText.append(ch)
-                    } else {
-                        sbNewText.append("\n")
-                        lineWidth = 0f
-                        --cnt
-                    }
-                    cnt++
-                }
-            }
-            sbNewText.append("\n")
-        }
-
-        if (!rawText.endsWith("\n")) {
-            sbNewText.deleteCharAt(sbNewText.length - 1)
-        }
-        return sbNewText.toString()
     }
 }
