@@ -56,7 +56,6 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
     override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
     override fun setViewBinding(): ViewGroup {
-        isPaddingToolbar = true
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
     }

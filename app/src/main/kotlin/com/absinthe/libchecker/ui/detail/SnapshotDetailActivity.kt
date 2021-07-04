@@ -55,7 +55,6 @@ class SnapshotDetailActivity : BaseActivity() {
     private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
     override fun setViewBinding(): ViewGroup {
-        isPaddingToolbar = true
         binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)
         return binding.root
     }

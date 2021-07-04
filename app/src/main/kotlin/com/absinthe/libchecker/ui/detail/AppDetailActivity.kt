@@ -68,7 +68,6 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     override fun requirePackageName() = pkgName
 
     override fun setViewBinding(): ViewGroup {
-        isPaddingToolbar = true
         binding = ActivityAppDetailBinding.inflate(layoutInflater)
         return binding.root
     }
