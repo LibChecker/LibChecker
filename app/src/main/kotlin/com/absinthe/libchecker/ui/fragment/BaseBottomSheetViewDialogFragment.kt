@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,12 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import java.lang.IllegalStateException
 
 
 abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
@@ -66,7 +66,13 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
         dialog?.window?.let {
             it.attributes?.windowAnimations = R.style.DialogAnimation
             it.findViewById<View>(com.google.android.material.R.id.container).fitsSystemWindows = false
-            UiUtils.setSystemBarStyle(it)
+            it.statusBarColor = Color.TRANSPARENT
+            it.decorView.post {
+                it.navigationBarColor = Color.TRANSPARENT
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    it.isNavigationBarContrastEnforced = false
+                }
+            }
         }
         behavior.addBottomSheetCallback(bottomSheetCallback)
 

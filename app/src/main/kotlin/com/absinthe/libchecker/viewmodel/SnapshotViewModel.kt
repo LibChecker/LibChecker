@@ -295,7 +295,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         snapshotDiffItems.postValue(diffList)
-        updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+        if (diffList.isNotEmpty()) {
+            updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+        }
     }
 
     private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
@@ -394,7 +396,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         }
 
         snapshotDiffItems.postValue(diffList)
-        updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+        if (diffList.isNotEmpty()) {
+            updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
+        }
     }
 
     private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
