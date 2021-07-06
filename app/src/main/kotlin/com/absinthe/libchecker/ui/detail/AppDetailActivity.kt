@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -95,13 +94,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        setRootPadding()
-    }
-
     private fun initView() {
-        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)

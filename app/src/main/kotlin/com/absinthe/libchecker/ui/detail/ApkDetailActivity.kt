@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.text.Spannable
@@ -85,13 +84,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        setRootPadding()
-    }
-
     private fun initView(uri: Uri) {
-        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)

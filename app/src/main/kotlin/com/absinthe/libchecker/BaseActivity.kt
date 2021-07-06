@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
-import com.absinthe.libchecker.extensions.setSystemPadding
 import rikka.material.app.MaterialActivity
 
 @SuppressLint("Registered, MissingSuperCall")
@@ -15,10 +14,6 @@ abstract class BaseActivity : MaterialActivity() {
     protected var root: ViewGroup? = null
 
     protected abstract fun setViewBinding(): ViewGroup
-
-    protected fun setRootPadding() {
-        root?.setSystemPadding()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

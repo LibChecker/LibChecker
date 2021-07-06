@@ -404,6 +404,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
         val appsList = list.asSequence()
             .map { it.packageName }
+            .filter { PackageUtils.isAppInstalled(it) }
             .toList()
         repository.updateTimeStampItem(TimeStampItem(timestamp, Gson().toJson(appsList)))
     }

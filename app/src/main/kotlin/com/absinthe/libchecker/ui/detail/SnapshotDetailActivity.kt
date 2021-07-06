@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.detail
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
@@ -78,14 +77,8 @@ class SnapshotDetailActivity : BaseActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        setRootPadding()
-    }
-
     @SuppressLint("SetTextI18n")
     private fun initView() {
-        setRootPadding()
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)

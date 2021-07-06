@@ -40,6 +40,10 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         }
     }
 
+    fun setTitle(title: String) {
+        headerView.title.text = title
+    }
+
     fun setOnItemClickListener(action: (position: Int) -> Unit) {
         itemClickAction = action
     }
