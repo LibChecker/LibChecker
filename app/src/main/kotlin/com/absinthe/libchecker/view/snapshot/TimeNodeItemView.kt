@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -59,5 +60,9 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         name.layout(paddingStart, paddingTop)
         rvList.layout(name.left, name.bottom)
+    }
+
+    override fun onInterceptTouchEvent(ev: MotionEvent?): Boolean {
+        return true
     }
 }

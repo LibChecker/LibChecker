@@ -55,10 +55,10 @@ class AlbumActivity : BaseActivity() {
         }
         itemManagement.setOnClickListener {
             lifecycleScope.launch(Dispatchers.IO) {
-                val timeStampList = viewModel.repository.getTimeStamps()
+                val timeStampList = viewModel.repository.getTimeStamps().toMutableList()
                 withContext(Dispatchers.Main) {
                     val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
-                        setTitle(getString(R.string.dialog_title_select_to_delete))
+                        setTitle(this@AlbumActivity.getString(R.string.dialog_title_select_to_delete))
                         setOnItemClickListener { position ->
                             val item = timeStampList[position]
                             lifecycleScope.launch(Dispatchers.IO) {
@@ -71,13 +71,14 @@ class AlbumActivity : BaseActivity() {
                                     progressDialog.show()
                                 }
                                 viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
-                                root.adapter.remove(item)
+                                timeStampList.removeAt(position)
                                 GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
                                     0L
                                 } else {
                                     timeStampList[0].timestamp
                                 }
                                 withContext(Dispatchers.Main) {
+                                    root.adapter.remove(item)
                                     progressDialog.dismiss()
                                 }
                             }
