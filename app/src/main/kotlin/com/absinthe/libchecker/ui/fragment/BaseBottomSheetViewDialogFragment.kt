@@ -65,6 +65,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
         dialog?.window?.let {
             it.attributes?.windowAnimations = R.style.DialogAnimation
             it.decorView.rootView.fitsSystemWindows = false
+            it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
             UiUtils.setSystemBarStyle(it)
         }
         behavior.addBottomSheetCallback(bottomSheetCallback)

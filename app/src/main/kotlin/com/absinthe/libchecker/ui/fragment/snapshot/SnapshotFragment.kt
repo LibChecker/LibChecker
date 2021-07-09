@@ -58,6 +58,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
     private var isApplicationInfoItemsReady = false
     private var dropPrevious = false
     private var shouldCompare = true
+    private var isShooting = false
 
     private var shootBinder: IShootService? = null
     private val shootListener = object : OnShootListener.Stub() {
@@ -66,6 +67,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 viewModel.timestamp.value = timestamp
                 compareDiff()
                 shouldCompare = true
+                isShooting = false
             }
         }
 
@@ -263,7 +265,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
         homeViewModel.apply {
             packageChangedLiveData.observe(viewLifecycleOwner) {
-                viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+                if (!isShooting) {
+                    viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+                }
             }
         }
     }
@@ -307,6 +311,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                         ), shootServiceConnection, Service.BIND_AUTO_CREATE
                     )
                 }
+                isShooting = true
                 shouldCompare = false
                 Analytics.trackEvent(
                     Constants.Event.SNAPSHOT_CLICK,

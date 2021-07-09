@@ -24,11 +24,13 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.HomeViewModel
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.app.LocaleDelegate
@@ -241,6 +243,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
         val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
+        recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.isVerticalScrollBarEnabled = false
 

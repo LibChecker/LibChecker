@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.utils.harmony
 
 import android.content.Context
-import android.util.Log
 import ohos.bundle.IBundleManager
+import timber.log.Timber
 
 /**
  * Created by su1216 on 21-6-28.
@@ -28,7 +28,7 @@ class ApplicationDelegate(context: Context) {
                 val getApplicationContextMethod = clazzOhosApplication.getMethod("getApplicationContext")
                 return getApplicationContextMethod.invoke(sOhosApplication) as ohos.app.Context
             } catch (e: Throwable) {
-                Log.w(TAG, e)
+                Timber.w(e)
             }
             return null
         }
@@ -51,12 +51,11 @@ class ApplicationDelegate(context: Context) {
                 clazzOhosApplication.getMethod("attachBaseContext", ohos.app.Context::class.java)
             attachBaseContextMethod.invoke(sOhosApplication, contextDeal)
         } catch (e: Throwable) {
-            Log.w(TAG, e)
+            Timber.w(e)
         }
     }
 
     companion object {
-        val TAG = ApplicationDelegate::class.java.simpleName
         private var sOhosApplication: Any? = null
     }
 }

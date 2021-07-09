@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.absinthe.libchecker.view.detail.ComponentRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@android:id/list"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.absinthe.libchecker.view.detail.ComponentRecyclerView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:descendantFocusability="beforeDescendants"
-        android:overScrollMode="never"
-        app:fitsSystemWindowsInsets="bottom"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-</LinearLayout>
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:descendantFocusability="beforeDescendants"
+    android:overScrollMode="never"
+    app:fitsSystemWindowsInsets="bottom"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
