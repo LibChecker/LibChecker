@@ -212,6 +212,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
                         val isSplitApk = lcItem?.isSplitApk ?: false
                         val isKotlinUsed = lcItem?.isKotlinUsed ?: false
+                        val variant = lcItem?.variant
 
                         withContext(Dispatchers.Main) {
                             if (isSplitApk || isKotlinUsed) {
@@ -240,6 +241,10 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 }
                             } else {
                                 chipGroup.isVisible = false
+                            }
+                            if (variant == Constants.VARIANT_HAP) {
+                                badge.isVisible = true
+                                badge.setImageResource(R.drawable.ic_harmony_badge)
                             }
                         }
                     }

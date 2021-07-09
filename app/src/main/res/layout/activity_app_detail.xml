@@ -45,11 +45,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/normal_padding"
+                    android:layout_marginEnd="8dp"
                     android:fontFamily="sans-serif-medium"
                     android:textColor="@color/textNormal"
                     android:textSize="16sp"
                     android:transitionName="app_name"
-                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/badge"
                     app:layout_constraintStart_toEndOf="@id/iv_app_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="LibChecker" />
@@ -123,6 +124,14 @@
                         app:chipIcon="@drawable/ic_kotlin_logo" />
 
                 </com.google.android.material.chip.ChipGroup>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/badge"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

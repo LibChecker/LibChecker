@@ -14,6 +14,9 @@ object Constants {
     const val MULTI_ARCH = 10
     const val OVERLAY = 100
 
+    const val VARIANT_APK: Short = 0
+    const val VARIANT_HAP: Short = 1
+
     const val ARMV8_STRING = "arm64-v8a"
     const val ARMV7_STRING = "armeabi-v7a"
     const val ARMV5_STRING = "armeabi"

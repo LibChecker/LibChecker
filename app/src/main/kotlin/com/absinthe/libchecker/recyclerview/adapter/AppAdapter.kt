@@ -22,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.StringBuilder
 
 class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
@@ -70,6 +69,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
                 .append(PackageUtils.getTargetApiString(item.targetApi))
             val spanString: SpannableString
             val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
+
             if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
                 spanString = SpannableString("  $str")
                 ContextCompat.getDrawable(context, abiBadgeRes)?.let {
@@ -80,6 +80,10 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
                 abiInfo.text = spanString
             } else {
                 abiInfo.text = str
+            }
+
+            if (item.variant == Constants.VARIANT_HAP) {
+                setBadge(R.drawable.ic_harmony_badge)
             }
         }
     }

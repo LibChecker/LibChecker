@@ -36,6 +36,7 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -275,10 +276,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         Once.markDone(OnceTag.FIRST_LAUNCH)
                     }
                 } else if (status == STATUS_NOT_START) {
-                    if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                    if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT))
+                        || !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
                         flip(VF_INIT)
                         initItems()
                         Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                        Once.markDone(OnceTag.HARMONY_FIRST_INIT)
                     }
                 }
             })

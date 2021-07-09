@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
+    <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
+
     <permission
         android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
         android:label="@string/permission_label_get_marked_libraries"

@@ -58,12 +58,6 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 if (componentList.isEmpty()) {
                     emptyView.text.text = getString(R.string.empty_list)
                 } else {
-                    binding.list.addItemDecoration(
-                        DividerItemDecoration(
-                            requireContext(),
-                            DividerItemDecoration.VERTICAL
-                        )
-                    )
                     lifecycleScope.launch(Dispatchers.IO) {
                         val list = mutableListOf<LibStringItemChip>()
                         var chip: LibChip?
@@ -89,6 +83,12 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         }
 
                         withContext(Dispatchers.Main) {
+                            binding.list.addItemDecoration(
+                                DividerItemDecoration(
+                                    requireContext(),
+                                    DividerItemDecoration.VERTICAL
+                                )
+                            )
                             adapter.setDiffNewData(list, navigateToComponentTask)
                         }
                     }
