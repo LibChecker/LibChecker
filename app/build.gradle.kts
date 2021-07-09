@@ -167,7 +167,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.3.0")
-    implementation("com.airbnb.android:lottie:3.7.0")
+    implementation("com.airbnb.android:lottie:3.7.1")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jonathanfinerty.once:once:1.3.1")
     implementation("net.dongliu:apk-parser:2.6.10")
