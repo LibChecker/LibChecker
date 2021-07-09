@@ -15,10 +15,12 @@ import coil.load
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
@@ -40,6 +42,9 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
@@ -191,13 +196,19 @@ class SnapshotDetailActivity : BaseActivity() {
                 return@setOnItemClickListener
             }
 
-            startActivity(Intent(this, AppDetailActivity::class.java).apply {
-                putExtras(Bundle().apply {
-                    putString(EXTRA_PACKAGE_NAME, entity.packageName)
-                    putString(EXTRA_REF_NAME, item.name)
-                    putInt(EXTRA_REF_TYPE, item.itemType)
-                })
-            })
+            lifecycleScope.launch(Dispatchers.IO) {
+                val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+                withContext(Dispatchers.Main) {
+                    startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
+                        putExtras(Bundle().apply {
+                            putString(EXTRA_PACKAGE_NAME, entity.packageName)
+                            putString(EXTRA_REF_NAME, item.name)
+                            putInt(EXTRA_REF_TYPE, item.itemType)
+                            putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(lcItem.isSplitApk, lcItem.isKotlinUsed, lcItem.variant))
+                        })
+                    })
+                }
+            }
         }
     }
 

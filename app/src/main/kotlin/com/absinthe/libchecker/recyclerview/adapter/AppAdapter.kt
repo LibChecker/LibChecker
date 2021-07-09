@@ -84,6 +84,8 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter
 
             if (item.variant == Constants.VARIANT_HAP) {
                 setBadge(R.drawable.ic_harmony_badge)
+            } else {
+                setBadge(null)
             }
         }
     }

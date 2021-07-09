@@ -19,6 +19,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
+import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -30,6 +31,7 @@ import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
@@ -71,7 +73,9 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
                 val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
                     putExtras(Bundle().apply {
-                        putString(EXTRA_PACKAGE_NAME, mAdapter.getItem(position).packageName)
+                        val item = mAdapter.getItem(position)
+                        putString(EXTRA_PACKAGE_NAME, item.packageName)
+                        putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
                     })
                 }
                 startActivity(intent)

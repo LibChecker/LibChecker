@@ -25,21 +25,20 @@ import coil.load
 import com.absinthe.libchecker.ManifestReader
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.DetailExtraBean
+import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.extensions.isOrientationPortrait
 import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.*
-import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
-import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
@@ -48,11 +47,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+import ohos.bundle.IBundleManager
 import timber.log.Timber
 import java.io.File
 
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
+const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
 class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
@@ -60,7 +61,11 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
     private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
     private val refName by lazy { intent.getStringExtra(EXTRA_REF_NAME) }
     private val refType by lazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
+    private val extraBean by lazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
     private val viewModel by viewModels<DetailViewModel>()
+    private val bundleManager by lazy { ApplicationDelegate(this).iBundleManager }
+
+    private var isHarmonyMode = false
 
     override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
@@ -199,53 +204,58 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             append(getString(R.string.multiArch))
                             append(", ")
                         }
-                        append(PackageUtils.getTargetApiString(packageName))
-                        append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
-                        packageInfo.sharedUserId?.let {
-                            appendLine().append("sharedUserId = $it")
+                        if (!isHarmonyMode) {
+                            append(PackageUtils.getTargetApiString(packageName))
+                            append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
+                            packageInfo.sharedUserId?.let {
+                                appendLine().append("sharedUserId = $it")
+                            }
+                        } else {
+                            if (extraBean != null && extraBean!!.variant == Constants.VARIANT_HAP) {
+                                bundleManager?.let {
+                                    val hapBundle = it.getBundleInfo(packageName, IBundleManager.GET_BUNDLE_DEFAULT)
+                                    append("targetVersion ${hapBundle.targetVersion}")
+                                    append(", ").append("minSdkVersion ${hapBundle.minSdkVersion}")
+                                    if (!hapBundle.jointUserId.isNullOrEmpty()) {
+                                        appendLine().append("jointUserId = ${hapBundle.jointUserId}")
+                                    }
+                                }
+                            }
                         }
                     }
                     tvExtraInfo.text = extraInfo
 
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val lcItem = Repositories.lcRepository.getItem(packageName)
-
-                        val isSplitApk = lcItem?.isSplitApk ?: false
-                        val isKotlinUsed = lcItem?.isKotlinUsed ?: false
-                        val variant = lcItem?.variant
-
-                        withContext(Dispatchers.Main) {
-                            if (isSplitApk || isKotlinUsed) {
-                                chipGroup.isVisible = true
-                                chipAppBundle.apply {
-                                    isVisible = isSplitApk
-                                    setOnClickListener {
-                                        AppBundleBottomSheetDialogFragment().apply {
-                                            arguments = Bundle().apply {
-                                                putString(EXTRA_PACKAGE_NAME, pkgName)
-                                            }
-                                            show(supportFragmentManager, tag)
+                    extraBean?.let {
+                        if (it.isSplitApk || it.isKotlinUsed) {
+                            chipGroup.isVisible = true
+                            chipAppBundle.apply {
+                                isVisible = it.isSplitApk
+                                setOnClickListener {
+                                    AppBundleBottomSheetDialogFragment().apply {
+                                        arguments = Bundle().apply {
+                                            putString(EXTRA_PACKAGE_NAME, pkgName)
                                         }
+                                        show(supportFragmentManager, tag)
                                     }
                                 }
-                                chipKotlinUsed.apply {
-                                    isVisible = isKotlinUsed
-                                    setOnClickListener {
-                                        AlertDialog.Builder(this@AppDetailActivity)
-                                            .setIcon(R.drawable.ic_kotlin_logo)
-                                            .setTitle(R.string.kotlin_string)
-                                            .setMessage(R.string.kotlin_details)
-                                            .setPositiveButton(android.R.string.ok, null)
-                                            .show()
-                                    }
+                            }
+                            chipKotlinUsed.apply {
+                                isVisible = it.isKotlinUsed
+                                setOnClickListener {
+                                    AlertDialog.Builder(this@AppDetailActivity)
+                                        .setIcon(R.drawable.ic_kotlin_logo)
+                                        .setTitle(R.string.kotlin_string)
+                                        .setMessage(R.string.kotlin_details)
+                                        .setPositiveButton(android.R.string.ok, null)
+                                        .show()
                                 }
-                            } else {
-                                chipGroup.isVisible = false
                             }
-                            if (variant == Constants.VARIANT_HAP) {
-                                badge.isVisible = true
-                                badge.setImageResource(R.drawable.ic_harmony_badge)
-                            }
+                        } else {
+                            chipGroup.isVisible = false
+                        }
+                        if (it.variant == Constants.VARIANT_HAP) {
+                            badge.isVisible = true
+                            badge.setImageResource(R.drawable.ic_harmony_badge)
                         }
                     }
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -269,19 +279,43 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         }
                     }
                 }
+
+                if (badge.isVisible) {
+                    badge.setOnClickListener {
+                        isHarmonyMode = !isHarmonyMode
+                        initView()
+                    }
+                }
             }
 
-            val types = mutableListOf(
-                NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
-            )
-            val tabTitles = mutableListOf(
-                getText(R.string.ref_category_native),
-                getText(R.string.ref_category_service),
-                getText(R.string.ref_category_activity),
-                getText(R.string.ref_category_br),
-                getText(R.string.ref_category_cp),
-                getText(R.string.ref_category_dex)
-            )
+            val types = if (!isHarmonyMode) {
+                mutableListOf(
+                    NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
+                )
+            } else {
+                mutableListOf(
+                    NATIVE, AbilityType.PAGE, AbilityType.SERVICE, AbilityType.WEB, AbilityType.DATA, DEX
+                )
+            }
+            val tabTitles = if (!isHarmonyMode) {
+                mutableListOf(
+                    getText(R.string.ref_category_native),
+                    getText(R.string.ref_category_service),
+                    getText(R.string.ref_category_activity),
+                    getText(R.string.ref_category_br),
+                    getText(R.string.ref_category_cp),
+                    getText(R.string.ref_category_dex)
+                )
+            } else {
+                mutableListOf(
+                    getText(R.string.ref_category_native),
+                    getText(R.string.ability_page),
+                    getText(R.string.ability_service),
+                    getText(R.string.ability_web),
+                    getText(R.string.ability_data),
+                    getText(R.string.ref_category_dex)
+                )
+            }
             if (PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
                 types.add(1, STATIC)
                 tabTitles.add(1, getText(R.string.ref_category_static))
@@ -294,16 +328,21 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
 
                     override fun createFragment(position: Int): Fragment {
-                        return when (position) {
-                            types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(packageName, NATIVE)
-                            types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(packageName, STATIC)
-                            types.indexOf(DEX) -> DexAnalysisFragment.newInstance(packageName, DEX)
-                            else -> ComponentsAnalysisFragment.newInstance(types[position])
+                        return when (val type = types.indexOf(position)) {
+                            NATIVE -> NativeAnalysisFragment.newInstance(packageName, NATIVE)
+                            STATIC -> StaticAnalysisFragment.newInstance(packageName, STATIC)
+                            DEX -> DexAnalysisFragment.newInstance(packageName, DEX)
+                            else -> if (!isHarmonyMode) {
+                                ComponentsAnalysisFragment.newInstance(type)
+                            } else {
+                                AbilityAnalysisFragment.newInstance(type)
+                            }
                         }
                     }
                 }
             }
             binding.tabLayout.apply {
+                removeAllTabs()
                 tabTitles.forEach {
                     addTab(newTab().apply { text = it })
                 }
@@ -335,7 +374,11 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 }
             })
 
-            viewModel.initComponentsData(packageName)
+            if (!isHarmonyMode) {
+                viewModel.initComponentsData(packageName)
+            } else {
+                viewModel.initAbilities(packageName)
+            }
         } ?: supportFinishAfterTransition()
     }
 

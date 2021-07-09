@@ -10,12 +10,14 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.extensions.isOrientationLandscape
 import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
@@ -140,9 +142,11 @@ class LibReferenceActivity : BaseActivity() {
 
             val intent = Intent(this, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
-                    putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
+                    val item = adapter.getItem(position)
+                    putString(EXTRA_PACKAGE_NAME, item.packageName)
                     putString(EXTRA_REF_NAME, refName)
                     putInt(EXTRA_REF_TYPE, refType)
+                    putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
                 })
             }
             startActivity(intent)
