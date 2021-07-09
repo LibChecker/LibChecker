@@ -17,7 +17,6 @@ import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
-import com.absinthe.libchecker.ui.fragment.detail.impl.EXTRA_TYPE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -32,6 +31,9 @@ import timber.log.Timber
  * time : 2020/11/27
  * </pre>
  */
+
+const val EXTRA_TYPE = "EXTRA_TYPE"
+
 abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), Sortable {
 
     protected val viewModel by activityViewModels<DetailViewModel>()

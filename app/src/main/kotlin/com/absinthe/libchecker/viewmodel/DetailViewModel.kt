@@ -17,6 +17,7 @@ import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
@@ -25,8 +26,11 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ohos.bundle.AbilityInfo
+import ohos.bundle.IBundleManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -40,8 +44,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val staticLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
     val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
+    val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
     val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
-    val itemsCountList = mutableListOf(0, 0, 0, 0, 0, 0, 0)
+    val itemsCountList = MutableList(7) { 0 }
     var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
     var packageName: String = ""
     var is32bit = false
@@ -92,8 +97,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         dexLibItems.postValue(getDexChipList(packageName))
     }
 
-    fun initComponentsData(packageName: String) =
-        viewModelScope.launch(Dispatchers.IO) {
+    fun initComponentsData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
             val context: Context = getApplication<LibCheckerApp>()
 
             try {
@@ -136,7 +140,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 Timber.e(e)
             }
         }
-    
+
     private val request: LibDetailRequest = ApiManager.create()
 
     fun requestLibDetail(libName: String, @LibType type: Int, isRegex: Boolean = false) =
@@ -252,5 +256,44 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
         return chipList
+    }
+
+    fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+        abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
+        abilitiesMap.put(AbilityType.SERVICE, MutableLiveData())
+        abilitiesMap.put(AbilityType.WEB, MutableLiveData())
+        abilitiesMap.put(AbilityType.DATA, MutableLiveData())
+
+        val context: Context = getApplication<LibCheckerApp>()
+
+        try {
+            ApplicationDelegate(context).iBundleManager?.getBundleInfo(
+                packageName, IBundleManager.GET_BUNDLE_WITH_ABILITIES
+            )?.abilityInfos?.let { abilities ->
+                val pages = abilities.asSequence()
+                    .filter { it.type == AbilityInfo.AbilityType.PAGE }
+                    .map { StatefulComponent(it.className, it.enabled) }
+                    .toList()
+                val services = abilities.asSequence()
+                    .filter { it.type == AbilityInfo.AbilityType.SERVICE }
+                    .map { StatefulComponent(it.className, it.enabled) }
+                    .toList()
+                val webs = abilities.asSequence()
+                    .filter { it.type == AbilityInfo.AbilityType.WEB }
+                    .map { StatefulComponent(it.className, it.enabled) }
+                    .toList()
+                val datas = abilities.asSequence()
+                    .filter { it.type == AbilityInfo.AbilityType.DATA }
+                    .map { StatefulComponent(it.className, it.enabled) }
+                    .toList()
+
+                abilitiesMap[AbilityType.PAGE]?.postValue(pages)
+                abilitiesMap[AbilityType.SERVICE]?.postValue(services)
+                abilitiesMap[AbilityType.WEB]?.postValue(webs)
+                abilitiesMap[AbilityType.DATA]?.postValue(datas)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
     }
 }

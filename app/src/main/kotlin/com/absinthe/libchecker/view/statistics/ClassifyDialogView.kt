@@ -8,9 +8,11 @@ import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.extensions.*
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
@@ -25,7 +27,9 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
         adapter.setOnItemClickListener { _, _, position ->
             val intent = Intent(context, AppDetailActivity::class.java).apply {
                 putExtras(Bundle().apply {
-                    putString(EXTRA_PACKAGE_NAME, adapter.getItem(position).packageName)
+                    val item = adapter.getItem(position)
+                    putString(EXTRA_PACKAGE_NAME, item.packageName)
+                    putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
                 })
             }
             context.startActivity(intent)
