@@ -28,12 +28,6 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         binding.apply {
             list.apply {
                 adapter = this@DexAnalysisFragment.adapter
-                addItemDecoration(
-                    DividerItemDecoration(
-                        requireContext(),
-                        DividerItemDecoration.VERTICAL
-                    )
-                )
             }
         }
 
@@ -42,6 +36,12 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
                 if (it.isEmpty()) {
                     emptyView.text.text = getString(R.string.uncharted_territory)
                 } else {
+                    binding.list.addItemDecoration(
+                        DividerItemDecoration(
+                            requireContext(),
+                            DividerItemDecoration.VERTICAL
+                        )
+                    )
                     adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
                 }
 

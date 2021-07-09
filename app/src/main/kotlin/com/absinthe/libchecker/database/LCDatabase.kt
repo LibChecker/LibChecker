@@ -11,7 +11,7 @@ import com.absinthe.libchecker.database.entity.*
 @Database(entities = [LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class],
-    version = 15, exportSchema = true)
+    version = 16, exportSchema = true)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -35,7 +35,8 @@ abstract class LCDatabase : RoomDatabase() {
                 )
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
                         MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15
+                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15,
+                        MIGRATION_15_16
                     )
                     .createFromAsset("database/rules.db")
                     .build()
@@ -166,6 +167,14 @@ abstract class LCDatabase : RoomDatabase() {
         private val MIGRATION_14_15: Migration = object : Migration(14, 15) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE timestamp_table ADD COLUMN topApps TEXT")
+            }
+        }
+
+        private val MIGRATION_15_16: Migration = object : Migration(15, 16) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE item_table ADD COLUMN variant INTEGER NOT NULL DEFAULT 0"
+                )
             }
         }
     }

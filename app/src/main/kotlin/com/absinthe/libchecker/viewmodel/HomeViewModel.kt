@@ -15,6 +15,7 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibChip
 import com.absinthe.libchecker.constant.OnceTag
@@ -27,10 +28,13 @@ import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.*
+import ohos.bundle.IBundleManager
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -110,11 +114,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         initProgressLiveData.postValue(0)
 
         val appList = getAppsList()
-
         val lcItems = mutableListOf<LCItem>()
+        val isHarmony = HarmonyOsUtil.isHarmonyOs()
+        val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
+
         var packageInfo: PackageInfo
         var versionCode: Long
         var abiType: Int
+        var variant: Short
         var isSystemType: Boolean
         var isKotlinType: Boolean
 
@@ -130,6 +137,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 isSystemType = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
                 isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
+                variant = if (isHarmony && bundleManager?.getBundleInfo(info.packageName, IBundleManager.GET_BUNDLE_DEFAULT) != null) {
+                    Constants.VARIANT_HAP
+                } else {
+                    Constants.VARIANT_APK
+                }
+
                 lcItem = LCItem(
                     info.packageName,
                     info.loadLabel(context.packageManager).toString(),
@@ -141,7 +154,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     abiType.toShort(),
                     PackageUtils.isSplitsApk(packageInfo),
                     isKotlinType,
-                    packageInfo.applicationInfo.targetSdkVersion.toShort()
+                    packageInfo.applicationInfo.targetSdkVersion.toShort(),
+                    variant
                 )
 
                 lcItems.add(lcItem)
@@ -197,10 +211,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         dbItems.value?.let { value ->
+            val isHarmony = HarmonyOsUtil.isHarmonyOs()
+            val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.context).iBundleManager }
             var packageInfo: PackageInfo
             var versionCode: Long
             var lcItem: LCItem
             var abi: Int
+            var variant: Short
 
             for (dbItem in value) {
                 try {
@@ -211,6 +228,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime
                             || (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)) {
                             abi = PackageUtils.getAbi(it)
+
+                            variant = if (isHarmony && bundleManager?.getBundleInfo(it.packageName, IBundleManager.GET_BUNDLE_DEFAULT) != null) {
+                                Constants.VARIANT_HAP
+                            } else {
+                                Constants.VARIANT_APK
+                            }
+
                             lcItem = LCItem(
                                 it.packageName,
                                 it.loadLabel(packageManager).toString(),
@@ -222,7 +246,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                                 abi.toShort(),
                                 PackageUtils.isSplitsApk(packageInfo),
                                 PackageUtils.isKotlinUsed(packageInfo),
-                                packageInfo.applicationInfo.targetSdkVersion.toShort()
+                                packageInfo.applicationInfo.targetSdkVersion.toShort(),
+                                variant
                             )
                             update(lcItem)
                         }
@@ -242,6 +267,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     packageInfo = PackageUtils.getPackageInfo(info)
                     versionCode = PackageUtils.getVersionCode(packageInfo)
 
+                    variant = if (isHarmony && bundleManager?.getBundleInfo(info.packageName, IBundleManager.GET_BUNDLE_DEFAULT) != null) {
+                        Constants.VARIANT_HAP
+                    } else {
+                        Constants.VARIANT_APK
+                    }
+
                     lcItem = LCItem(
                         info.packageName,
                         info.loadLabel(packageManager).toString(),
@@ -253,21 +284,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         PackageUtils.getAbi(info).toShort(),
                         PackageUtils.isSplitsApk(packageInfo),
                         PackageUtils.isKotlinUsed(packageInfo),
-                        packageInfo.applicationInfo.targetSdkVersion.toShort()
-                    )
-                    abi = PackageUtils.getAbi(info)
-                    lcItem = LCItem(
-                        info.packageName,
-                        info.loadLabel(packageManager).toString(),
-                        packageInfo.versionName ?: "null",
-                        versionCode,
-                        packageInfo.firstInstallTime,
-                        packageInfo.lastUpdateTime,
-                        (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                        abi.toShort(),
-                        PackageUtils.isSplitsApk(packageInfo),
-                        PackageUtils.isKotlinUsed(packageInfo),
-                        packageInfo.applicationInfo.targetSdkVersion.toShort()
+                        packageInfo.applicationInfo.targetSdkVersion.toShort(),
+                        variant
                     )
 
                     insert(lcItem)
