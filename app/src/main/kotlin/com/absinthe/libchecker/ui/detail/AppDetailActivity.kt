@@ -254,8 +254,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             chipGroup.isVisible = false
                         }
                         if (it.variant == Constants.VARIANT_HAP) {
-                            badge.isVisible = true
-                            badge.setImageResource(R.drawable.ic_harmony_badge)
+                            ibHarmonyBadge.isVisible = true
+                            ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
                         }
                     }
                 } catch (e: PackageManager.NameNotFoundException) {
@@ -280,8 +280,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
                 }
 
-                if (badge.isVisible) {
-                    badge.setOnClickListener {
+                if (ibHarmonyBadge.isVisible) {
+                    ibHarmonyBadge.setOnClickListener {
                         isHarmonyMode = !isHarmonyMode
                         initView()
                     }

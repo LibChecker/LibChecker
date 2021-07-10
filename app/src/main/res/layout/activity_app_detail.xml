@@ -50,7 +50,7 @@
                     android:textColor="@color/textNormal"
                     android:textSize="16sp"
                     android:transitionName="app_name"
-                    app:layout_constraintEnd_toStartOf="@id/badge"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/iv_app_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_app_icon"
                     tools:text="LibChecker" />
@@ -125,15 +125,6 @@
 
                 </com.google.android.material.chip.ChipGroup>
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/badge"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
@@ -191,7 +182,20 @@
                     android:padding="8dp"
                     app:layout_constraintStart_toEndOf="@id/tv_items" />
 
-                <ImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/ib_harmony_badge"
+                    android:layout_width="@dimen/detail_toolbar_size"
+                    android:layout_height="@dimen/detail_toolbar_size"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_harmonyos_logo"
+                    android:tooltipText="@string/ability"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/ib_sort"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:targetApi="o" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/ib_sort"
                     android:layout_width="@dimen/detail_toolbar_size"
                     android:layout_height="@dimen/detail_toolbar_size"

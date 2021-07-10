@@ -6,6 +6,7 @@
     <string name="x86" translatable="false">x86</string>
     <string name="x86_64" translatable="false">x86_64</string>
     <string name="multiArch" translatable="false">multiArch</string>
+    <string name="ability" translatable="false">Ability</string>
     <string name="ability_page" translatable="false">Page</string>
     <string name="ability_service" translatable="false">Service</string>
     <string name="ability_data" translatable="false">Data</string>
