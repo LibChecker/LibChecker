@@ -4,8 +4,8 @@
     tools:targetApi="n_mr1">
 
     <shortcut
-        android:shortcutId="start_app_list"
         android:icon="@drawable/ic_sc_app_list"
+        android:shortcutId="start_app_list"
         android:shortcutShortLabel="@string/title_app_list">
 
         <intent
@@ -15,8 +15,8 @@
     </shortcut>
 
     <shortcut
-        android:shortcutId="start_statistics"
         android:icon="@drawable/ic_sc_statistics"
+        android:shortcutId="start_statistics"
         android:shortcutShortLabel="@string/title_statistics">
 
         <intent
@@ -26,8 +26,8 @@
     </shortcut>
 
     <shortcut
-        android:shortcutId="start_snapshot"
         android:icon="@drawable/ic_sc_snapshot"
+        android:shortcutId="start_snapshot"
         android:shortcutShortLabel="@string/title_snapshot">
 
         <intent

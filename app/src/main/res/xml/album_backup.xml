@@ -7,10 +7,10 @@
         app:title="@string/album_backup">
 
         <Preference
+            app:icon="@drawable/ic_backup"
             app:key="localBackup"
-            app:title="@string/album_backup"
             app:summary="@string/album_backup_summary"
-            app:icon="@drawable/ic_backup"/>
+            app:title="@string/album_backup" />
 
     </PreferenceCategory>
 
@@ -19,10 +19,10 @@
         app:title="@string/album_restore">
 
         <Preference
+            android:icon="@drawable/ic_restore"
             app:key="localRestore"
-            app:title="@string/album_restore"
             app:summary="@string/album_restore_summary"
-            android:icon="@drawable/ic_restore">
+            app:title="@string/album_restore">
 
         </Preference>
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ThemeOverlay"/>
+
+    <style name="ThemeOverlay" />
 
     <style name="ThemeOverlay.Black">
         <item name="android:colorPrimary">@android:color/black</item>

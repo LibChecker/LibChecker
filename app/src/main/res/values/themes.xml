@@ -22,8 +22,11 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowSplashscreenContent" tools:targetApi="o">@drawable/splash_drawable</item>
-        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
+        <item name="android:windowSplashscreenContent" tools:targetApi="o">
+            @drawable/splash_drawable
+        </item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
+        </item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
@@ -50,8 +53,11 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowSplashscreenContent" tools:targetApi="o">@drawable/splash_drawable</item>
-        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
+        <item name="android:windowSplashscreenContent" tools:targetApi="o">
+            @drawable/splash_drawable
+        </item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
+        </item>
         <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
         <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
@@ -76,8 +82,12 @@
 
     <style name="ThemeOverlay.ActionBar" parent="ThemeOverlay.MaterialComponents.ActionBar">
         <item name="elevation">0dp</item>
-        <item name="titleTextAppearance">@android:style/TextAppearance.Material.Widget.Toolbar.Title</item>
-        <item name="subtitleTextAppearance">@android:style/TextAppearance.Material.Widget.Toolbar.Subtitle</item>
+        <item name="titleTextAppearance">
+            @android:style/TextAppearance.Material.Widget.Toolbar.Title
+        </item>
+        <item name="subtitleTextAppearance">
+            @android:style/TextAppearance.Material.Widget.Toolbar.Subtitle
+        </item>
     </style>
 
 </resources>
