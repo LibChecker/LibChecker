@@ -33,6 +33,7 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
 import rikka.recyclerview.fixEdgeEffect
@@ -109,6 +110,14 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 true
             }
         }!!
+        findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
+            setOnPreferenceChangeListener { _, newValue ->
+                GlobalValues.darkMode = newValue.toString()
+                DayNightDelegate.setDefaultNightMode(getNightMode(newValue.toString()))
+                activity?.recreate()
+                true
+            }
+        }
         findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
             setOnPreferenceClickListener {
                 CloudRulesDialogFragment().show(childFragmentManager, tag)
@@ -276,5 +285,15 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     override fun scheduleAppbarRaisingStatus() {
         getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
+    }
+
+    private fun getNightMode(nightModeString: String): Int {
+        return when(nightModeString) {
+            Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
+            Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
+            Constants.DARK_MODE_BATTERY -> DayNightDelegate.MODE_NIGHT_AUTO_BATTERY
+            Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
     }
 }

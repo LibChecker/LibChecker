@@ -28,6 +28,15 @@
             app:defaultValue="true"/>
 
         <rikka.preference.SimpleMenuPreference
+            app:key="darkMode"
+            app:title="@string/dark_mode"
+            app:summary="%s"
+            app:icon="@drawable/ic_dark_mode"
+            app:entries="@array/list_dark_mode"
+            app:entryValues="@array/list_dark_mode_value"
+            app:defaultValue="system"/>
+
+        <rikka.preference.SimpleMenuPreference
             app:key="rulesRepository"
             app:title="@string/rules_repo_title"
             app:summary="%s"

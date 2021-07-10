@@ -75,6 +75,7 @@
     <string name="join_telegram_group">划水</string>
     <string name="anonymous_statistics">匿名统计</string>
     <string name="cloud_rules">云端规则</string>
+    <string name="dark_mode">深色模式</string>
 
     <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
     <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
@@ -85,6 +86,12 @@
     <string name="join_telegram_group_summary">来一起划水</string>
     <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
     <string name="cloud_rules_summary">在此更新最新的标记库</string>
+
+    <string name="array_dark_mode_off">关闭</string>
+    <string name="array_dark_mode_on">开启</string>
+    <string name="array_dark_mode_auto">自动</string>
+    <string name="array_dark_mode_system">系统默认</string>
+    <string name="array_dark_mode_battery">由省电模式设置</string>
 
     <!--  Detail  -->
     <string name="detail_label">查看 App 详情</string>

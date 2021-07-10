@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string-array name="list_repo">
         <item>GitHub</item>
         <item>Gitee</item>
@@ -26,5 +26,15 @@
         <item>zh-TW</item>
         <item>ru-RU</item>
         <item>uk-UA</item>
+    </string-array>
+
+    <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
+        <item>@string/array_dark_mode_off</item>
+        <item>@string/array_dark_mode_on</item>
+    </string-array>
+
+    <string-array name="list_dark_mode_value" tools:ignore="InconsistentArrays">
+        <item>off</item>
+        <item>on</item>
     </string-array>
 </resources>

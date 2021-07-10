@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
+import com.absinthe.libchecker.constant.GlobalValues
 import rikka.material.app.MaterialActivity
 
 @SuppressLint("Registered, MissingSuperCall")
@@ -25,7 +26,7 @@ abstract class BaseActivity : MaterialActivity() {
     }
 
     override fun computeUserThemeKey(): String {
-        return ""
+        return GlobalValues.darkMode
     }
 
     override fun onApplyTranslucentSystemBars() {

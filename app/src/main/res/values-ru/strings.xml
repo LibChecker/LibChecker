@@ -73,6 +73,7 @@
     <string name="join_telegram_group">Связь</string>
     <string name="anonymous_statistics">Анонимная статистика</string>
     <string name="cloud_rules">Облачные правила</string>
+    <string name="dark_mode">Dark Mode</string>
 
     <string name="show_system_apps_summary">Управление отображением системных приложений в списке приложений</string>
     <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
@@ -83,6 +84,12 @@
     <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
     <string name="anonymous_statistics_summary">Мы используем Microsoft AppCenter для анонимной отправки наиболее часто используемых помеченных библиотек и некоторых данных о привычках использования, чтобы сделать LibChecker более практичным.</string>
     <string name="cloud_rules_summary">Обновите последние отмеченные правила библиотеки здесь</string>
+
+    <string name="array_dark_mode_off">Off</string>
+    <string name="array_dark_mode_on">On</string>
+    <string name="array_dark_mode_auto">Auto</string>
+    <string name="array_dark_mode_system">System Default</string>
+    <string name="array_dark_mode_battery">Set by Battery Saver</string>
 
     <!--  Detail  -->
     <string name="detail_label">Просмотр сведений о приложении</string>

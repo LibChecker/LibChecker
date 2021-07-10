@@ -97,4 +97,11 @@ object GlobalValues {
         }
 
     var hasFinishedShoot: Boolean = false
+
+    var darkMode: String = Constants.DARK_MODE_FOLLOW_SYSTEM
+        get() = getPreferences().getString(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)!!
+        set(value) {
+            field = value
+            getPreferences().edit { putString(Constants.PREF_DARK_MODE, value) }
+        }
 }
