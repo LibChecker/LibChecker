@@ -7,5 +7,5 @@ import retrofit2.http.Path
 
 interface LibDetailRequest {
     @GET("{categoryDir}/{libName}.json")
-    fun requestLibDetail(@Path("categoryDir") categoryDir: String, @Path("libName") libName: String): Call<LibDetailBean>
+    suspend fun requestLibDetail(@Path("categoryDir") categoryDir: String, @Path("libName") libName: String): LibDetailBean
 }
