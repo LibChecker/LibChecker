@@ -160,20 +160,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            val detail = request.requestLibDetail(categoryDir, libName)
-            detail.enqueue(object : Callback<LibDetailBean> {
-                override fun onFailure(call: Call<LibDetailBean>, t: Throwable) {
-                    Timber.e(t, "DetailViewModel")
-                    detailBean.value = null
-                }
-
-                override fun onResponse(
-                    call: Call<LibDetailBean>,
-                    response: Response<LibDetailBean>
-                ) {
-                    detailBean.value = response.body()
-                }
-            })
+            detailBean.value = try {
+                request.requestLibDetail(categoryDir, libName)
+            } catch (t: Throwable) {
+                Timber.e(t, "DetailViewModel")
+                null
+            }
         }
 
     private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean, isApk: Boolean): List<LibStringItemChip> {
