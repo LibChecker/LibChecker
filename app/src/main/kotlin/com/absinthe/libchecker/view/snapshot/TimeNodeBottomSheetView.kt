@@ -8,10 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.TimeNodeAdapter
+import com.absinthe.libchecker.utils.unsafeLazy
 
 class TimeNodeBottomSheetView(context: Context) : LinearLayout(context) {
 
-    val adapter by lazy { TimeNodeAdapter() }
+    val adapter by unsafeLazy { TimeNodeAdapter() }
 
     init {
         layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)

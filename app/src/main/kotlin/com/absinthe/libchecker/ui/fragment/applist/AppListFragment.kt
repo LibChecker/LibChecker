@@ -39,6 +39,7 @@ import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -54,7 +55,7 @@ const val VF_INIT = 2
 
 class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
 
-    private val mAdapter by lazy { AppAdapter(lifecycleScope) }
+    private val mAdapter by unsafeLazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var popup: PopupMenu? = null
 
@@ -165,7 +166,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
             }.toMutableList()
-            
+
             if (HarmonyOsUtil.isHarmonyOs() && newText.contains("Harmony", true)) {
                 filter.addAll(allDatabaseItems.filter { it.variant == Constants.VARIANT_HAP })
             }

@@ -35,6 +35,7 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.*
@@ -53,7 +54,7 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
-    private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
+    private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
     private var isSnapshotDatabaseItemsReady = false
     private var isApplicationInfoItemsReady = false
     private var dropPrevious = false
