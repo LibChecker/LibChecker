@@ -164,7 +164,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             val filter = allDatabaseItems.filter {
                 it.label.contains(newText, ignoreCase = true) ||
                         it.packageName.contains(newText, ignoreCase = true)
+            }.toMutableList()
+            
+            if (HarmonyOsUtil.isHarmonyOs() && newText.contains("Harmony", true)) {
+                filter.addAll(allDatabaseItems.filter { it.variant == Constants.VARIANT_HAP })
             }
+
             mAdapter.highlightText = newText
             updateItems(filter)
             doOnMainThreadIdle({
