@@ -32,9 +32,9 @@ object ApiManager {
 
     private val retrofit by lazy {
         val okhttpBuilder = OkHttpClient.Builder()
-            .connectTimeout(30 * 1000, TimeUnit.MILLISECONDS)
-            .readTimeout(30 * 1000, TimeUnit.MILLISECONDS)
-            .writeTimeout(30 * 1000, TimeUnit.MILLISECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
         Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .client(okhttpBuilder.build())
