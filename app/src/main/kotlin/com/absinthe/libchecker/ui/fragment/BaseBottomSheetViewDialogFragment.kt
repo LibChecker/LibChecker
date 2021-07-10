@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -18,7 +19,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
 
     private var _root: T? = null
     private var isHandlerActivated = false
-    private val behavior by lazy { BottomSheetBehavior.from(root.parent as View) }
+    private val behavior by unsafeLazy { BottomSheetBehavior.from(root.parent as View) }
     private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             when (newState) {
