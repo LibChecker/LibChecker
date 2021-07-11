@@ -24,6 +24,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
+import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -36,11 +37,11 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
-import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -91,7 +92,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                     }
                 setHasFixedSize(true)
                 FastScrollerBuilder(this).useMd2Style().build()
-                fixEdgeEffect()
+                addPaddingTop(UiUtils.getStatusBarHeight())
             }
             vfContainer.apply {
                 setInAnimation(activity, R.anim.anim_fade_in)
@@ -262,20 +263,26 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
 
             dbItems.observe(viewLifecycleOwner, {
-                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START_INIT
-                    || appListStatusLiveData.value == STATUS_START_REQUEST_CHANGE) {
-                    return@observe
+                if (it.isNullOrEmpty()) {
+                    flip(VF_INIT)
+                    initItems()
+                } else if (appListStatusLiveData.value != STATUS_START_INIT
+                    && appListStatusLiveData.value != STATUS_START_REQUEST_CHANGE) {
+                    updateItems(it)
+                    homeViewModel.requestChange()
                 }
-                updateItems(it)
-                homeViewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
                 Timber.d("AppList status updates to $status")
                 when(status) {
+                    STATUS_START_INIT -> {
+                        flip(VF_INIT)
+                    }
                     STATUS_INIT_END -> {
                         if (isFirstLaunch) {
                             Once.markDone(OnceTag.FIRST_LAUNCH)
                         }
+                        requestChange()
                     }
                     STATUS_START_REQUEST_CHANGE_END -> {
                         dbItems.value?.let { updateItems(it) }
@@ -288,9 +295,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                             Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                             Once.markDone(OnceTag.HARMONY_FIRST_INIT)
                         }
-                    }
-                    STATUS_START_INIT -> {
-                        flip(VF_INIT)
                     }
                 }
             })
