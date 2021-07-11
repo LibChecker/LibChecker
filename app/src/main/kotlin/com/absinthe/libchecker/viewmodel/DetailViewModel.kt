@@ -31,9 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -160,12 +157,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            detailBean.value = try {
+            val libDetailBean = try {
                 request.requestLibDetail(categoryDir, libName)
             } catch (t: Throwable) {
                 Timber.e(t, "DetailViewModel")
                 null
             }
+            detailBean.postValue(libDetailBean)
         }
 
     private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean, isApk: Boolean): List<LibStringItemChip> {
