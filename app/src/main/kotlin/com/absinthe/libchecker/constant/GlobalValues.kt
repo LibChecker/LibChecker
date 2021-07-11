@@ -17,7 +17,7 @@ const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
 
-    private val preferences: SharedPreferences = LibCheckerApp.context
+    private val preferences: SharedPreferences = LibCheckerApp.app
         .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
 
     private fun getPreferences(): SharedPreferences {

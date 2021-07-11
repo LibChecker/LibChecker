@@ -30,7 +30,7 @@ class LibCheckerApp : Application() {
             HiddenApiBypass.addHiddenApiExemptions("L")
         }
 
-        context = this
+        app = this
         if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
             AppCenter.start(
                 this, Constants.APP_CENTER_SECRET,
@@ -59,6 +59,6 @@ class LibCheckerApp : Application() {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var context: Context
+        lateinit var app: Application
     }
 }

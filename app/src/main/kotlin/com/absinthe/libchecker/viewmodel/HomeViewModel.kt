@@ -12,12 +12,12 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
@@ -212,7 +212,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         dbItems.value?.let { value ->
             val isHarmony = HarmonyOsUtil.isHarmonyOs()
-            val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.context).iBundleManager }
+            val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
             var packageInfo: PackageInfo
             var versionCode: Long
             var lcItem: LCItem
