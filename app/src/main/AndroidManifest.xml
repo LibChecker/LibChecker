@@ -12,8 +12,8 @@
 
     <permission
         android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
-        android:label="@string/permission_label_get_marked_libraries"
         android:description="@string/permission_label_get_marked_libraries"
+        android:label="@string/permission_label_get_marked_libraries"
         android:protectionLevel="normal" />
 
     <application
