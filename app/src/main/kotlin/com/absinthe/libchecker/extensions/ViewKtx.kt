@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
@@ -22,7 +22,7 @@ import rikka.core.util.ClipboardUtils
 fun View.setLongClickCopiedToClipboard(text: String) {
     setOnLongClickListener {
         ClipboardUtils.put(context, text)
-        Toasty.show(context, R.string.toast_copied_to_clipboard)
+        context.showToast(R.string.toast_copied_to_clipboard)
         true
     }
 }

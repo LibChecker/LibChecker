@@ -32,7 +32,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
@@ -222,7 +222,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                 finish()
             }
         } catch (e: Exception) {
-            Toasty.show(this, R.string.toast_use_another_file_manager)
+            showToast(R.string.toast_use_another_file_manager)
             finish()
         } finally {
             inputStream?.close()

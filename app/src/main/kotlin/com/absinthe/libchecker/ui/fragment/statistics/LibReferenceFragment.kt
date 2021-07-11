@@ -22,8 +22,8 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -257,7 +257,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
             })
 
             if (newText.equals("Easter Egg", true)) {
-                Toasty.show(requireContext(), "🥚")
+                context?.showToast("🥚")
                 Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Lib Reference Search"))
             }
         }

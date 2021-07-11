@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import com.google.gson.Gson
 
 const val TYPE_ACTIVITY = "activity"
@@ -47,7 +47,7 @@ class MonkeyKingManager {
         try {
             context.contentResolver.call(uri, "blocks", packageName, bundle)
         } catch (e: Exception) {
-            Toasty.show(context, e.message.toString())
+            context.showToast(e.message.toString())
         }
     }
 

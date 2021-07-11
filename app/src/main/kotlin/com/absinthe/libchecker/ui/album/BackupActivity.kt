@@ -17,7 +17,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
 import com.absinthe.libchecker.utils.StorageUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
@@ -81,7 +81,7 @@ class BackupActivity : BaseActivity() {
                     try {
                         requireActivity().contentResolver.openInputStream(it)?.let { inputStream ->
                             viewModel.restore(inputStream) {
-                                Toasty.show(requireContext(), "Backup file error")
+                                context.showToast("Backup file error")
                             }
                         }
                     } catch (e: IOException) {
@@ -103,7 +103,7 @@ class BackupActivity : BaseActivity() {
                     if (StorageUtils.isExternalStorageWritable) {
                         backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
                     } else {
-                        Toasty.show(requireContext(), "External storage is not writable")
+                        context.showToast("External storage is not writable")
                     }
                     true
                 }
