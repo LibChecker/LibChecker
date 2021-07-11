@@ -108,17 +108,17 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
         }
 
         pkgName?.let { packageName ->
-            val packageInfo = PackageUtils.getPackageInfo(packageName)
             viewModel.packageName = packageName
-            supportActionBar?.apply {
-                title = try {
-                    packageInfo.applicationInfo.loadLabel(packageManager).toString()
-                } catch (e: PackageManager.NameNotFoundException) {
-                    getString(R.string.detail_label)
-                }
-            }
             binding.apply {
                 try {
+                    val packageInfo = PackageUtils.getPackageInfo(packageName)
+                    supportActionBar?.apply {
+                        title = try {
+                            packageInfo.applicationInfo.loadLabel(packageManager).toString()
+                        } catch (e: PackageManager.NameNotFoundException) {
+                            getString(R.string.detail_label)
+                        }
+                    }
                     ivAppIcon.apply {
                         val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
@@ -317,7 +317,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     getText(R.string.ref_category_dex)
                 )
             }
-            if (PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
+            if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)).isNotEmpty()) {
                 types.add(1, STATIC)
                 tabTitles.add(1, getText(R.string.ref_category_static))
             }
