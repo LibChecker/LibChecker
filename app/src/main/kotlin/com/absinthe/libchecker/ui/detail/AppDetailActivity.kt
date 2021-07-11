@@ -39,6 +39,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
@@ -58,12 +59,12 @@ const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
     private lateinit var binding: ActivityAppDetailBinding
-    private val pkgName by lazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
-    private val refName by lazy { intent.getStringExtra(EXTRA_REF_NAME) }
-    private val refType by lazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
-    private val extraBean by lazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
-    private val viewModel by viewModels<DetailViewModel>()
-    private val bundleManager by lazy { ApplicationDelegate(this).iBundleManager }
+    private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
+    private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
+    private val refType by unsafeLazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
+    private val extraBean by unsafeLazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
+    private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
+    private val viewModel: DetailViewModel by viewModels()
 
     private var isHarmonyMode = false
 

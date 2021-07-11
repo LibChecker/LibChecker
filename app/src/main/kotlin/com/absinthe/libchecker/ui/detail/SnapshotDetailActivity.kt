@@ -34,6 +34,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleN
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
@@ -54,9 +55,9 @@ class SnapshotDetailActivity : BaseActivity() {
     private lateinit var binding: ActivitySnapshotDetailBinding
     private lateinit var entity: SnapshotDiffItem
 
-    private val adapter by lazy { SnapshotDetailAdapter(lifecycleScope) }
+    private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val _entity by lazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
+    private val _entity by unsafeLazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
     override fun setViewBinding(): ViewGroup {
         binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)

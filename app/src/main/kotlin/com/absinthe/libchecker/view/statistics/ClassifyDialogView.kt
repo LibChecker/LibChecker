@@ -14,12 +14,13 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.utils.unsafeLazy
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 @SuppressLint("ViewConstructor")
 class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) : LinearLayout(context) {
 
-    val adapter by lazy { AppAdapter(lifecycleScope) }
+    val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
 
     init {
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)

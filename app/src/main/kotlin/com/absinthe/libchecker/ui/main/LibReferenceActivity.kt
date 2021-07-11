@@ -20,6 +20,7 @@ import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +35,7 @@ const val EXTRA_REF_TYPE = "REF_TYPE"
 class LibReferenceActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLibReferenceBinding
-    private val adapter by lazy { AppAdapter(lifecycleScope) }
+    private val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
     private val viewModel by viewModels<LibReferenceViewModel>()
     private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
     private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }

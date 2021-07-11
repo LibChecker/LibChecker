@@ -23,6 +23,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -38,7 +39,7 @@ class ComparisonActivity : BaseActivity() {
 
     private lateinit var binding: ActivityComparisonBinding
     private val viewModel by viewModels<SnapshotViewModel>()
-    private val adapter by lazy { SnapshotAdapter(lifecycleScope) }
+    private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
     private var leftTimeStamp = 0L
     private var rightTimeStamp = 0L
 

@@ -43,35 +43,27 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launchWhenResumed {
-            request.requestCloudRuleInfo().enqueue(object : Callback<CloudRuleInfo> {
-                override fun onResponse(call: Call<CloudRuleInfo>, response: Response<CloudRuleInfo>) {
-                    val body = response.body()
-                    body?.let {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            try {
-                                root.cloudRulesContentView.localVersion.version.text = GlobalValues.localRulesVersion.toString()
-                                root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
-                                if (GlobalValues.localRulesVersion < it.version) {
-                                    root.cloudRulesContentView.updateButton.isEnabled = true
-                                }
-                                root.viewFlipper.displayedChild = 1
-                            } catch (e: Exception) {
-                                Timber.e(e)
-                                context?.let {
-                                    withContext(Dispatchers.Main) {
-                                        Toasty.show(it, R.string.toast_cloud_rules_update_error)
-                                    }
-                                }
-                            }
+            try {
+                request.requestCloudRuleInfo()?.let {
+                    try {
+                        root.cloudRulesContentView.localVersion.version.text =
+                            GlobalValues.localRulesVersion.toString()
+                        root.cloudRulesContentView.remoteVersion.version.text =
+                            it.version.toString()
+                        if (GlobalValues.localRulesVersion < it.version) {
+                            root.cloudRulesContentView.updateButton.isEnabled = true
+                        }
+                        root.viewFlipper.displayedChild = 1
+                    } catch (e: Exception) {
+                        Timber.e(e)
+                        context?.let { ct ->
+                            Toasty.show(ct, R.string.toast_cloud_rules_update_error)
                         }
                     }
                 }
-
-                override fun onFailure(call: Call<CloudRuleInfo>, t: Throwable) {
-                    Timber.e(t)
-                }
-
-            })
+            } catch (t: Throwable) {
+                Timber.e(t)
+            }
         }
     }
 
