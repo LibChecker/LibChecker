@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
@@ -200,14 +201,21 @@ class SnapshotDetailActivity : BaseActivity() {
             lifecycleScope.launch(Dispatchers.IO) {
                 val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
                 withContext(Dispatchers.Main) {
-                    startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
-                        putExtras(Bundle().apply {
-                            putString(EXTRA_PACKAGE_NAME, entity.packageName)
-                            putString(EXTRA_REF_NAME, item.name)
-                            putInt(EXTRA_REF_TYPE, item.itemType)
-                            putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(lcItem.isSplitApk, lcItem.isKotlinUsed, lcItem.variant))
-                        })
-                    })
+                    startActivity(
+                        Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
+                            .putExtras(
+                                bundleOf(
+                                    EXTRA_PACKAGE_NAME to entity.packageName,
+                                    EXTRA_REF_NAME to item.name,
+                                    EXTRA_REF_TYPE to item.itemType,
+                                    EXTRA_DETAIL_BEAN to DetailExtraBean(
+                                        lcItem.isSplitApk,
+                                        lcItem.isKotlinUsed,
+                                        lcItem.variant
+                                    )
+                                )
+                            )
+                    )
                 }
             }
         }

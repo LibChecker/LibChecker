@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -17,6 +16,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.putArguments
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -108,12 +108,9 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
 
     companion object {
         fun newInstance(@LibType type: Int): AbilityAnalysisFragment {
-            return AbilityAnalysisFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putInt(EXTRA_TYPE, type)
-                    }
-                }
+            return AbilityAnalysisFragment().putArguments(
+                EXTRA_TYPE to type
+            )
         }
     }
 }

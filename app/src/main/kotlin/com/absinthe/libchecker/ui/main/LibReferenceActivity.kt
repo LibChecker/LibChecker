@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
@@ -119,7 +120,7 @@ class LibReferenceActivity : BaseActivity() {
             lottie.apply {
                 imageAssetsFolder = "/"
 
-                val assetName = when(GlobalValues.season) {
+                val assetName = when (GlobalValues.season) {
                     SPRING -> "lib_reference_spring.json"
                     SUMMER -> "lib_reference_summer.json"
                     AUTUMN -> "lib_reference_autumn.json"
@@ -140,16 +141,20 @@ class LibReferenceActivity : BaseActivity() {
             if (AntiShakeUtils.isInvalidClick(view)) {
                 return@setOnItemClickListener
             }
-
-            val intent = Intent(this, AppDetailActivity::class.java).apply {
-                putExtras(Bundle().apply {
-                    val item = adapter.getItem(position)
-                    putString(EXTRA_PACKAGE_NAME, item.packageName)
-                    putString(EXTRA_REF_NAME, refName)
-                    putInt(EXTRA_REF_TYPE, refType)
-                    putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
-                })
-            }
+            val item = adapter.getItem(position)
+            val intent = Intent(this, AppDetailActivity::class.java)
+                .putExtras(
+                    bundleOf(
+                        EXTRA_PACKAGE_NAME to item.packageName,
+                        EXTRA_REF_NAME to refName,
+                        EXTRA_REF_TYPE to refType,
+                        EXTRA_DETAIL_BEAN to DetailExtraBean(
+                            item.isSplitApk,
+                            item.isKotlinUsed,
+                            item.variant
+                        )
+                    )
+                )
             startActivity(intent)
         }
     }

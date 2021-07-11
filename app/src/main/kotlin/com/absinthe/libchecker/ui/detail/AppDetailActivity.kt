@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -36,9 +37,9 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -124,9 +125,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
                             AppInfoBottomSheetDialogFragment().apply {
-                                arguments = Bundle().apply {
-                                    putString(EXTRA_PACKAGE_NAME, pkgName)
-                                }
+                                arguments = bundleOf(
+                                    EXTRA_PACKAGE_NAME to pkgName
+                                )
                                 show(supportFragmentManager, tag)
                             }
                         }
@@ -233,9 +234,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 isVisible = it.isSplitApk
                                 setOnClickListener {
                                     AppBundleBottomSheetDialogFragment().apply {
-                                        arguments = Bundle().apply {
-                                            putString(EXTRA_PACKAGE_NAME, pkgName)
-                                        }
+                                        arguments = bundleOf(
+                                            EXTRA_PACKAGE_NAME to pkgName
+                                        )
                                         show(supportFragmentManager, tag)
                                     }
                                 }

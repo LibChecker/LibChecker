@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.content.DialogInterface
-import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentManager
@@ -14,6 +13,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.view.detail.VF_CONTENT
@@ -117,14 +117,11 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
             @LibType type: Int,
             regexName: String? = null
         ): LibDetailDialogFragment {
-            return LibDetailDialogFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putString(EXTRA_LIB_NAME, libName)
-                        putInt(EXTRA_LIB_TYPE, type)
-                        putString(EXTRA_REGEX_NAME, regexName)
-                    }
-                }
+            return LibDetailDialogFragment().putArguments(
+                EXTRA_LIB_NAME to libName,
+                EXTRA_LIB_TYPE to type,
+                EXTRA_REGEX_NAME to regexName
+            )
         }
 
         var isShowing = false

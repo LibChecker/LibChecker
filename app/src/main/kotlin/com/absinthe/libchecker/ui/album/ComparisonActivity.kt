@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -184,11 +185,12 @@ class ComparisonActivity : BaseActivity() {
                     return@setOnItemClickListener
                 }
 
-                val intent = Intent(this@ComparisonActivity, SnapshotDetailActivity::class.java).apply {
-                    putExtras(Bundle().apply {
-                        putSerializable(EXTRA_ENTITY, getItem(position))
-                    })
-                }
+                val intent = Intent(this@ComparisonActivity, SnapshotDetailActivity::class.java)
+                    .putExtras(
+                        bundleOf(
+                            EXTRA_ENTITY to getItem(position)
+                        )
+                    )
 
                 startActivity(intent)
             }

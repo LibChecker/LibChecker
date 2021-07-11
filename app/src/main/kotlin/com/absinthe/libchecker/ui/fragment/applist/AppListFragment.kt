@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
-import android.os.Bundle
 import android.view.*
 import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,14 +68,18 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 if (AntiShakeUtils.isInvalidClick(view)) {
                     return@setOnItemClickListener
                 }
-
-                val intent = Intent(requireActivity(), AppDetailActivity::class.java).apply {
-                    putExtras(Bundle().apply {
-                        val item = mAdapter.getItem(position)
-                        putString(EXTRA_PACKAGE_NAME, item.packageName)
-                        putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
-                    })
-                }
+                val item = mAdapter.getItem(position)
+                val intent = Intent(requireActivity(), AppDetailActivity::class.java)
+                    .putExtras(
+                        bundleOf(
+                            EXTRA_PACKAGE_NAME to item.packageName,
+                            EXTRA_DETAIL_BEAN to DetailExtraBean(
+                                item.isSplitApk,
+                                item.isKotlinUsed,
+                                item.variant
+                            )
+                        )
+                    )
                 startActivity(intent)
             }
             setDiffCallback(AppListDiffUtil())
