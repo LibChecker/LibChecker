@@ -18,7 +18,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BaseActivity
-import com.absinthe.libchecker.ManifestReader
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
@@ -31,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
+import com.absinthe.libchecker.utils.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan

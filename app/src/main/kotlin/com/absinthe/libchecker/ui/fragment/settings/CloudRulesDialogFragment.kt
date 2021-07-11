@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.fragment.settings
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.DownloadUtils
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
@@ -13,6 +12,7 @@ import com.absinthe.libchecker.database.RuleDatabase
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView

@@ -22,7 +22,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.ManifestReader
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.DetailExtraBean
@@ -37,6 +36,7 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.utils.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.unsafeLazy

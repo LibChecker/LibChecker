@@ -1,4 +1,4 @@
-package com.absinthe.libchecker;
+package com.absinthe.libchecker.utils;
 
 import android.content.Context;
 
