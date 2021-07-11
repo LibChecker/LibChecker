@@ -65,6 +65,8 @@ android {
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
+    sourceSets["main"].java.srcDirs("src/main/kotlin")
+
     packagingOptions.resources.excludes += setOf(
         "META-INF/**",
         "okhttp3/**",
