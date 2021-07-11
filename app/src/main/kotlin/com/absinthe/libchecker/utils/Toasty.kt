@@ -62,6 +62,7 @@ object Toasty {
         if (LCAppUtils.atLeastR() && context !is Activity) {
             Toast(context).also {
                 it.duration = duration
+                it.setText(message)
                 toast = WeakReference(it)
             }.show()
         } else {
