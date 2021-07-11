@@ -36,9 +36,9 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -317,9 +317,13 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     getText(R.string.ref_category_dex)
                 )
             }
-            if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)).isNotEmpty()) {
-                types.add(1, STATIC)
-                tabTitles.add(1, getText(R.string.ref_category_static))
+            try {
+                if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)).isNotEmpty()) {
+                    types.add(1, STATIC)
+                    tabTitles.add(1, getText(R.string.ref_category_static))
+                }
+            } catch (e: PackageManager.NameNotFoundException) {
+                Timber.e(e)
             }
 
             binding.viewpager.apply {

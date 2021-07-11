@@ -16,9 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.STATUS_END
-import com.absinthe.libchecker.annotation.STATUS_NOT_START
-import com.absinthe.libchecker.annotation.STATUS_START_INIT
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -264,31 +262,35 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             })
 
             dbItems.observe(viewLifecycleOwner, {
-                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START_INIT) {
+                if (it.isNullOrEmpty() || appListStatusLiveData.value == STATUS_START_INIT
+                    || appListStatusLiveData.value == STATUS_START_REQUEST_CHANGE) {
                     return@observe
                 }
                 updateItems(it)
                 homeViewModel.requestChange()
             })
             appListStatusLiveData.observe(viewLifecycleOwner, { status ->
-                Timber.d("appListStatusLiveData update to $status")
-                if (status == STATUS_END) {
-                    dbItems.value?.let { updateItems(it) }
-                    if (!homeViewModel.hasRequestedChange) {
-                        homeViewModel.requestChange()
-                        homeViewModel.hasRequestedChange = true
+                Timber.d("AppList status updates to $status")
+                when(status) {
+                    STATUS_INIT_END -> {
+                        if (isFirstLaunch) {
+                            Once.markDone(OnceTag.FIRST_LAUNCH)
+                        }
                     }
-
-                    if (isFirstLaunch) {
-                        Once.markDone(OnceTag.FIRST_LAUNCH)
+                    STATUS_START_REQUEST_CHANGE_END -> {
+                        dbItems.value?.let { updateItems(it) }
                     }
-                } else if (status == STATUS_NOT_START) {
-                    if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT))
-                        || !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)) {
+                    STATUS_NOT_START -> {
+                        if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT))
+                            || (!isFirstLaunch && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST))) {
+                            flip(VF_INIT)
+                            initItems()
+                            Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                            Once.markDone(OnceTag.HARMONY_FIRST_INIT)
+                        }
+                    }
+                    STATUS_START_INIT -> {
                         flip(VF_INIT)
-                        initItems()
-                        Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-                        Once.markDone(OnceTag.HARMONY_FIRST_INIT)
                     }
                 }
             })
@@ -388,10 +390,6 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     private fun flip(page: Int) {
         Timber.d("flip to $page")
-        if (homeViewModel.appListStatusLiveData.value == STATUS_START_INIT) {
-            Timber.d("flip encounters STATUS_START_INIT")
-            return
-        }
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
         }

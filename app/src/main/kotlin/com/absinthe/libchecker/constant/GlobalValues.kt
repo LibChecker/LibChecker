@@ -50,7 +50,7 @@ object GlobalValues {
             getPreferences().edit { putInt(Constants.CURRENT_LIB_REF_TYPE, value) }
         }
 
-    val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(true)
+    val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(false)
 
     val isShowSystemApps: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))

@@ -52,7 +52,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
     val packageChangedLiveData = MutableLiveData<String?>()
 
-    var hasRequestedChange = false
     var controller: IListController? = null
 
     suspend fun getAppsList(): List<ApplicationInfo> {
@@ -177,7 +176,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         insert(lcItems)
         lcItems.clear()
         withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_END
+            appListStatusLiveData.value = STATUS_INIT_END
         }
 
         timeRecorder.end()
@@ -301,7 +300,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_END
+            appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE_END
         }
         timeRecorder.end()
         Timber.d("Request change: END, $timeRecorder")

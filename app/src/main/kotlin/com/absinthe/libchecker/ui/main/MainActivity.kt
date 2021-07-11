@@ -54,8 +54,8 @@ class MainActivity : BaseActivity() {
 
         initView()
         handleIntentFromShortcuts(intent)
-        initAllApplicationInfoItems()
         initObserver()
+        initAllApplicationInfoItems()
         clearApkCache()
         appViewModel.initRegexRules()
     }
