@@ -31,9 +31,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -98,48 +95,51 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun initComponentsData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-            val context: Context = getApplication<LibCheckerApp>()
+        val context: Context = getApplication<LibCheckerApp>()
 
-            try {
-                if (packageName.endsWith("/temp.apk")) {
-                    context.packageManager.getPackageArchiveInfo(
-                        packageName,
-                        PackageManager.GET_SERVICES
-                                or PackageManager.GET_ACTIVITIES
-                                or PackageManager.GET_RECEIVERS
-                                or PackageManager.GET_PROVIDERS
-                                or VersionCompat.MATCH_DISABLED_COMPONENTS
-                    )?.apply {
-                        applicationInfo.sourceDir = packageName
-                        applicationInfo.publicSourceDir = packageName
-                    }?.let {
-                        val services = PackageUtils.getComponentList(it.packageName, it.services, true)
-                        val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
-                        val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
-                        val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
+        try {
+            if (packageName.endsWith("/temp.apk")) {
+                context.packageManager.getPackageArchiveInfo(
+                    packageName,
+                    PackageManager.GET_SERVICES
+                        or PackageManager.GET_ACTIVITIES
+                        or PackageManager.GET_RECEIVERS
+                        or PackageManager.GET_PROVIDERS
+                        or VersionCompat.MATCH_DISABLED_COMPONENTS
+                )?.apply {
+                    applicationInfo.sourceDir = packageName
+                    applicationInfo.publicSourceDir = packageName
+                }?.let {
+                    val services = PackageUtils.getComponentList(it.packageName, it.services, true)
+                    val activities =
+                        PackageUtils.getComponentList(it.packageName, it.activities, true)
+                    val receivers =
+                        PackageUtils.getComponentList(it.packageName, it.receivers, true)
+                    val providers =
+                        PackageUtils.getComponentList(it.packageName, it.providers, true)
 
-                        componentsMap[SERVICE]?.postValue(services)
-                        componentsMap[ACTIVITY]?.postValue(activities)
-                        componentsMap[RECEIVER]?.postValue(receivers)
-                        componentsMap[PROVIDER]?.postValue(providers)
-                    }
-                } else {
-                    PackageUtils.getPackageInfo(packageName).let {
-                        val services = PackageUtils.getComponentList(it.packageName, SERVICE, true)
-                        val activities = PackageUtils.getComponentList(it.packageName, ACTIVITY, true)
-                        val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
-                        val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
-
-                        componentsMap[SERVICE]?.postValue(services)
-                        componentsMap[ACTIVITY]?.postValue(activities)
-                        componentsMap[RECEIVER]?.postValue(receivers)
-                        componentsMap[PROVIDER]?.postValue(providers)
-                    }
+                    componentsMap[SERVICE]?.postValue(services)
+                    componentsMap[ACTIVITY]?.postValue(activities)
+                    componentsMap[RECEIVER]?.postValue(receivers)
+                    componentsMap[PROVIDER]?.postValue(providers)
                 }
-            } catch (e: Exception) {
-                Timber.e(e)
+            } else {
+                PackageUtils.getPackageInfo(packageName).let {
+                    val services = PackageUtils.getComponentList(it.packageName, SERVICE, true)
+                    val activities = PackageUtils.getComponentList(it.packageName, ACTIVITY, true)
+                    val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
+                    val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
+
+                    componentsMap[SERVICE]?.postValue(services)
+                    componentsMap[ACTIVITY]?.postValue(activities)
+                    componentsMap[RECEIVER]?.postValue(receivers)
+                    componentsMap[PROVIDER]?.postValue(providers)
+                }
             }
+        } catch (e: Exception) {
+            Timber.e(e)
         }
+    }
 
     private val request: LibDetailRequest = ApiManager.create()
 
@@ -160,15 +160,21 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 categoryDir += "/regex"
             }
 
-            detailBean.value = try {
-                request.requestLibDetail(categoryDir, libName)
-            } catch (t: Throwable) {
-                Timber.e(t, "DetailViewModel")
-                null
-            }
+            detailBean.postValue(
+                try {
+                    request.requestLibDetail(categoryDir, libName)
+                } catch (t: Throwable) {
+                    Timber.e(t, "DetailViewModel")
+                    null
+                }
+            )
         }
 
-    private suspend fun getNativeChipList(info: ApplicationInfo, is32bit: Boolean, isApk: Boolean): List<LibStringItemChip> {
+    private suspend fun getNativeChipList(
+        info: ApplicationInfo,
+        is32bit: Boolean,
+        isApk: Boolean
+    ): List<LibStringItemChip> {
         val packageInfo = if (!isApk) {
             PackageUtils.getPackageInfo(info.packageName)
         } else {
@@ -187,7 +193,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             list.forEach {
                 chip = null
                 LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
-                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                    chip = LibChip(
+                        iconRes = IconResMap.getIconRes(rule.iconIndex),
+                        name = rule.label,
+                        regexName = rule.regexName
+                    )
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }
@@ -212,7 +222,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             list.forEach {
                 chip = null
                 Repositories.ruleRepository.getRule(it.name)?.let { rule ->
-                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                    chip = LibChip(
+                        iconRes = IconResMap.getIconRes(rule.iconIndex),
+                        name = rule.label,
+                        regexName = rule.regexName
+                    )
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }
@@ -227,7 +241,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
         Timber.d("getDexChipList")
-        val list = PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
+        val list =
+            PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
         val chipList = mutableListOf<LibStringItemChip>()
         var chip: LibChip?
 
@@ -237,7 +252,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             list.forEach {
                 chip = null
                 LCAppUtils.getRuleWithRegex(it.name, DEX)?.let { rule ->
-                    chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                    chip = LibChip(
+                        iconRes = IconResMap.getIconRes(rule.iconIndex),
+                        name = rule.label,
+                        regexName = rule.regexName
+                    )
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }

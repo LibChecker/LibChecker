@@ -3,15 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.Light"/>
 
-    <style name="AppTheme.About" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/aboutHeader</item>
-        <item name="colorAccent">@android:color/black</item>
-
-        <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-        <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
-    </style>
-
     <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
         <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>
         <item name="android:windowExitAnimation">@anim/rd_dialog_exit</item>
