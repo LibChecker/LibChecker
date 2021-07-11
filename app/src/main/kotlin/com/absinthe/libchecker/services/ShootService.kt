@@ -135,7 +135,8 @@ class ShootService : Service() {
         val timer = TimeRecorder()
         timer.start()
         val ts = System.currentTimeMillis()
-        var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
+
+        var appList: List<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems()
 
         if (appList.isNullOrEmpty()) {
             do {

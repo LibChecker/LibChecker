@@ -13,9 +13,11 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.RuleEntity
+import rikka.material.app.DayNightDelegate
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
@@ -138,6 +140,16 @@ object LCAppUtils {
             "libjiagu.so" -> { PackageUtils.hasDexClass(packageName, "com.qihoo.util", false) }
             "libapp.so" -> { PackageUtils.hasDexClass(packageName, "io.flutter", false) }
             else -> true
+        }
+    }
+
+    fun getNightMode(nightModeString: String): Int {
+        return when(nightModeString) {
+            Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
+            Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
+            Constants.DARK_MODE_BATTERY -> DayNightDelegate.MODE_NIGHT_AUTO_BATTERY
+            Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         }
     }
 }

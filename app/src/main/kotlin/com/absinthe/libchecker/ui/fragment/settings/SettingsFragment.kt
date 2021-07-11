@@ -23,11 +23,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -83,7 +83,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         (findPreference<SwitchPreference>(Constants.PREF_COLORFUL_ICON))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
-                AppItemRepository.allApplicationInfoItems.value = AppItemRepository.allApplicationInfoItems.value
+                activity?.recreate()
                 Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_COLORFUL_ICON", newValue))
                 true
             }
@@ -113,7 +113,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.darkMode = newValue.toString()
-                DayNightDelegate.setDefaultNightMode(getNightMode(newValue.toString()))
+                DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(newValue.toString()))
                 activity?.recreate()
                 true
             }
@@ -285,15 +285,5 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     override fun scheduleAppbarRaisingStatus() {
         getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
-    }
-
-    private fun getNightMode(nightModeString: String): Int {
-        return when(nightModeString) {
-            Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
-            Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
-            Constants.DARK_MODE_BATTERY -> DayNightDelegate.MODE_NIGHT_AUTO_BATTERY
-            Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-            else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-        }
     }
 }

@@ -13,6 +13,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -189,9 +190,11 @@ class MainActivity : BaseActivity() {
     }
 
     private fun initAllApplicationInfoItems() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val appList = appViewModel.getAppsList()
-            AppItemRepository.allApplicationInfoItems.postValue(appList)
+        Global.applicationListJob = lifecycleScope.launch(Dispatchers.IO) {
+            AppItemRepository.allApplicationInfoItems = appViewModel.getAppsList()
+            Global.applicationListJob = null
+        }.also {
+            it.start()
         }
     }
 

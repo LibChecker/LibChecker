@@ -107,12 +107,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onResume() {
         super.onResume()
 
-        if (!isFirstLaunch && isListReady) {
-            if (AppItemRepository.shouldRefreshAppList) {
-                homeViewModel.dbItems.value?.let {
-                    updateItems(it)
-                    AppItemRepository.shouldRefreshAppList = false
-                }
+        if (!isFirstLaunch && isListReady && AppItemRepository.shouldRefreshAppList) {
+            homeViewModel.dbItems.value?.let {
+                updateItems(it, false)
+                AppItemRepository.shouldRefreshAppList = false
             }
         }
     }
@@ -335,7 +333,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         }
     }
 
-    private fun updateItems(newItems: List<LCItem>) {
+    private fun updateItems(newItems: List<LCItem>, needReturnTop: Boolean = true) {
         Timber.d("updateItems")
         val filterList = mutableListOf<LCItem>()
 
@@ -356,7 +354,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         mAdapter.setDiffNewData(filterList) {
             flip(VF_LIST)
 
-            if (shouReturnTopOfList()) {
+            if (shouReturnTopOfList() && needReturnTop) {
                 returnTopOfList()
             }
 

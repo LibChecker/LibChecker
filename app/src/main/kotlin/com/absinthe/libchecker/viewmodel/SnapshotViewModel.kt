@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.bean.*
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
@@ -53,13 +54,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
     }
 
-    private var compareDiffJob: Job? = null
+    var compareDiffJob: Job? = null
+        private set
 
     fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT, shouldClearDiff: Boolean = false) {
         if (compareDiffJob?.isActive == true) {
             compareDiffJob?.cancel()
         }
         compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
+            Global.applicationListJob?.join()
             val timer = TimeRecorder().apply { start() }
 
             if (shouldClearDiff) {
@@ -88,7 +91,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val context: Context = getApplication<LibCheckerApp>()
         val packageManager = context.packageManager
-        val appList: MutableList<ApplicationInfo> = AppItemRepository.allApplicationInfoItems.value?.toMutableList() ?: mutableListOf()
+        val appList: MutableList<ApplicationInfo> = AppItemRepository.getApplicationInfoItems().toMutableList()
         val appMap = mutableMapOf<String, ApplicationInfo>()
         val size = appList.size
         var count = 0

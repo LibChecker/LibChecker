@@ -12,12 +12,12 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
@@ -65,8 +65,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 Timber.w(e)
                 delay(GET_INSTALL_APPS_RETRY_PERIOD)
                 null
-            }?.apply {
-                AppItemRepository.allApplicationInfoItems.postValue(this)
+            }?.also {
+                AppItemRepository.allApplicationInfoItems = it
             }
         } while (appList == null)
 
@@ -199,7 +199,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
         Timber.d("Request change: START")
         val timeRecorder = TimeRecorder()
-        var appList: MutableList<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value?.toMutableList()
+        var appList: MutableList<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems().toMutableList()
 
         timeRecorder.start()
         withContext(Dispatchers.Main) {
@@ -416,7 +416,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun computeLibReference(@LibType type: Int) {
         computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
             libReference.postValue(null)
-            var appList: List<ApplicationInfo>? = AppItemRepository.allApplicationInfoItems.value
+            var appList: List<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems()
 
             if (appList.isNullOrEmpty()) {
                 appList = getAppsList()

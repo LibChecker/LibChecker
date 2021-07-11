@@ -1,14 +1,19 @@
 package com.absinthe.libchecker.database
 
 import android.content.pm.ApplicationInfo
-import androidx.lifecycle.MutableLiveData
+import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.entity.RuleEntity
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object AppItemRepository {
-    val allApplicationInfoItems: MutableLiveData<List<ApplicationInfo>> = MutableLiveData()
+    var allApplicationInfoItems: List<ApplicationInfo> = emptyList()
     var trackItemsChanged = false
     var shouldRefreshAppList = false
     var rulesRegexList = ConcurrentHashMap<Pattern, RuleEntity>()
+
+    suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
+        Global.applicationListJob?.join()
+        return allApplicationInfoItems
+    }
 }

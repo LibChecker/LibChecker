@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import androidx.appcompat.app.AppCompatDelegate
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -47,14 +47,14 @@ class LibCheckerApp : Application() {
         Utility.init(this)
         LocaleDelegate.defaultLocale = GlobalValues.locale
         DayNightDelegate.setApplicationContext(this)
-        DayNightDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
+        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
         Once.initialise(this)
         Repositories.init(this)
     }
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-        Global.loop()
+        Global.start()
     }
 
     companion object {

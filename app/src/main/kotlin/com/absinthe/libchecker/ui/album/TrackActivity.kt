@@ -90,40 +90,38 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             setEmptyView(TrackLoadingView(this@TrackActivity))
         }
 
-        AppItemRepository.allApplicationInfoItems.observe(this, { appList ->
-            lifecycleScope.launch(Dispatchers.IO) {
-                val trackedList = repository.getTrackItems()
-                list.addAll(appList
-                    .asSequence()
-                    .map {
-                        TrackListItem(
-                            label = it.loadLabel(packageManager).toString(),
-                            packageName = it.packageName,
-                            switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
-                        )
-                    }
-                    .sortedByDescending { it.switchState }
-                    .toList()
-                )
-
-                withContext(Dispatchers.Main) {
-                    adapter.setList(list)
-                    menu?.findItem(R.id.search)?.isVisible = true
-                    isListReady = true
-                    adapter.setEmptyView(EmptyListView(this@TrackActivity).apply {
-                        layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
-                            it.gravity = Gravity.CENTER
-                        }
-                    })
+        lifecycleScope.launch(Dispatchers.IO) {
+            val appList = AppItemRepository.getApplicationInfoItems()
+            val trackedList = repository.getTrackItems()
+            list.addAll(appList
+                .asSequence()
+                .map {
+                    TrackListItem(
+                        label = it.loadLabel(packageManager).toString(),
+                        packageName = it.packageName,
+                        switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
+                    )
                 }
+                .sortedByDescending { it.switchState }
+                .toList()
+            )
+
+            withContext(Dispatchers.Main) {
+                adapter.setList(list)
+                menu?.findItem(R.id.search)?.isVisible = true
+                isListReady = true
+                adapter.setEmptyView(EmptyListView(this@TrackActivity).apply {
+                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+                        it.gravity = Gravity.CENTER
+                    }
+                })
             }
-        })
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         adapter.release()
-        AppItemRepository.allApplicationInfoItems.removeObservers(this)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
