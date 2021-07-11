@@ -17,7 +17,7 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository

@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -52,20 +53,28 @@ object Toasty {
         showLong(context, context.getString(res))
     }
 
-    @SuppressLint("InflateParams")
+    @Suppress("deprecation")
     @MainThread
     private fun show(context: Context, message: String, duration: Int) {
         toast?.get()?.cancel()
         toast = null
-        val view = ToastView(context).also {
-            it.message.text = message
+
+        if (LCAppUtils.atLeastR() && context !is Activity) {
+            Toast(context).also {
+                it.duration = duration
+                toast = WeakReference(it)
+            }.show()
+        } else {
+            val view = ToastView(context).also {
+                it.message.text = message
+            }
+            Toast(context).also {
+                it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
+                it.duration = duration
+                it.view = view
+                toast = WeakReference(it)
+            }.show()
         }
-        Toast(context).also {
-            it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
-            it.duration = duration
-            it.view = view
-            toast = WeakReference(it)
-        }.show()
     }
 }
 

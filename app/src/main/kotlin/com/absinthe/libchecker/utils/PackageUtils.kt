@@ -32,6 +32,8 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
+import com.absinthe.libchecker.utils.manifest.ManifestReader
+import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
 import java.io.BufferedReader

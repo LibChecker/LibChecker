@@ -12,7 +12,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding

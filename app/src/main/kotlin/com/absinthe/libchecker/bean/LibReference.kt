@@ -2,7 +2,6 @@ package com.absinthe.libchecker.bean
 
 import android.os.Parcelable
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.constant.LibChip
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

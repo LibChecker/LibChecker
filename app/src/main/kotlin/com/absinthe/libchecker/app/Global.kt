@@ -3,8 +3,8 @@ package com.absinthe.libchecker.app
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.utils.showToast
 import timber.log.Timber
 
 object Global {
@@ -33,10 +33,10 @@ object Global {
             Timber.w(e)
         } else if (stack.contains("ClipboardService")) {
             Timber.w(e)
-            Toast.makeText(LibCheckerApp.context, "Cannot access to ClipboardService", Toast.LENGTH_SHORT).show()
+            LibCheckerApp.context.showToast("Cannot access to ClipboardService")
         } else if (stack.contains("de.robv.android.xposed")) {
             Timber.w(e)
-            Toast.makeText(LibCheckerApp.context, "Encounter Xposed module crash", Toast.LENGTH_SHORT).show()
+            LibCheckerApp.context.showToast("Encounter Xposed module crash")
         } else {
             throw e
         }

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.utils;
+package com.absinthe.libchecker.utils.manifest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

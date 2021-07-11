@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginEnd
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup

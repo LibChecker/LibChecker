@@ -19,7 +19,7 @@ import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.LibChip
+import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount

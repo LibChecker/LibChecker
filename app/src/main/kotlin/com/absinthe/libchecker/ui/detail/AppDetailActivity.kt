@@ -36,7 +36,7 @@ import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
-import com.absinthe.libchecker.utils.ManifestReader
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.unsafeLazy

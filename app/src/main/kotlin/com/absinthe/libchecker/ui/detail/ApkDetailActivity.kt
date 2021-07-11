@@ -30,7 +30,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.ManifestReader
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
