@@ -35,11 +35,8 @@ import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
-import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -203,16 +200,18 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
             when {
                 newText.equals("Easter Egg", true) -> {
-                    Toasty.show(requireContext(), "🥚")
+                    context?.showToast("🥚")
                     Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
                 }
                 newText == Constants.COMMAND_DEBUG_MODE -> {
                     GlobalValues.debugMode = true
-                    Toasty.show(requireActivity(), "DEBUG MODE")
+                    context?.showToast("DEBUG MODE")
                 }
                 newText == Constants.COMMAND_DEBUG_MODE -> {
                     GlobalValues.debugMode = false
-                    Toasty.show(requireActivity(), "USER MODE")
+                    context?.showToast("USER MODE")
+                }
+                else -> {
                 }
             }
         }

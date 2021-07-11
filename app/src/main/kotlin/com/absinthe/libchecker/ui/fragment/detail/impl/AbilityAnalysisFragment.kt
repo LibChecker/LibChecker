@@ -17,7 +17,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -103,7 +103,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
 
     private fun doOnLongClick(componentName: String) {
         ClipboardUtils.put(requireContext(), componentName)
-        Toasty.show(requireContext(), R.string.toast_copied_to_clipboard)
+        context?.showToast(R.string.toast_copied_to_clipboard)
     }
 
     companion object {

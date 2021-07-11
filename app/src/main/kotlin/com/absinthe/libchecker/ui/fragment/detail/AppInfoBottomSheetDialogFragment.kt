@@ -18,7 +18,7 @@ import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
 
@@ -46,9 +46,9 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
             try {
                 startLaunchAppActivity(packageName)
             } catch (e: ActivityNotFoundException) {
-                Toasty.show(requireContext(), R.string.toast_cant_open_app)
+                context?.showToast(R.string.toast_cant_open_app)
             } catch (e: NullPointerException) {
-                Toasty.show(requireContext(), R.string.toast_package_name_null)
+                context?.showToast(R.string.toast_package_name_null)
             } finally {
                 dismiss()
             }

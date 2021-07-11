@@ -26,7 +26,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.drakeet.about.*
@@ -54,12 +54,12 @@ class AboutActivity : AbsAboutActivity() {
         icon.load(R.drawable.pic_splash)
         slogan.setText(R.string.app_name)
         version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
-        
+
         val rebornCoroutine = lifecycleScope.launch(Dispatchers.Default) {
             delay(300)
             shouldShowEasterEggCount = if (slogan.text == RENGE_CHECKER) 11 else 1
         }
-        icon.setOnClickListener {       
+        icon.setOnClickListener {
             if (shouldShowEasterEggCount < 10) {
                 rebornCoroutine.cancel()
                 shouldShowEasterEggCount++
@@ -68,7 +68,10 @@ class AboutActivity : AbsAboutActivity() {
                 slogan.text = RENGE_CHECKER
                 rebornCoroutine.cancel()
                 shouldShowEasterEggCount++
-                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 10 hits"))
+                Analytics.trackEvent(
+                    Constants.Event.EASTER_EGG,
+                    EventProperties().set("EASTER_EGG", "Renge 10 hits")
+                )
             } else {
                 if (shouldShowEasterEggCount < 20) {
                     rebornCoroutine.cancel()
@@ -177,7 +180,7 @@ class AboutActivity : AbsAboutActivity() {
                 })
             } catch (e: ActivityNotFoundException) {
                 e.printStackTrace()
-                Toasty.showLong(this, R.string.toast_not_existing_market)
+                showLongToast(R.string.toast_not_existing_market)
             }
         }
         return super.onOptionsItemSelected(menuItem)
