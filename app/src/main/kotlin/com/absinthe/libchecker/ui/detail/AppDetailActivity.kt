@@ -329,7 +329,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     }
 
                     override fun createFragment(position: Int): Fragment {
-                        return when (val type = types.indexOf(position)) {
+                        return when (val type = types[position]) {
                             NATIVE -> NativeAnalysisFragment.newInstance(packageName, NATIVE)
                             STATIC -> StaticAnalysisFragment.newInstance(packageName, STATIC)
                             DEX -> DexAnalysisFragment.newInstance(packageName, DEX)

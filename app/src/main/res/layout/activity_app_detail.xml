@@ -7,21 +7,21 @@
     android:fitsSystemWindows="false"
     app:consumeSystemWindowsInsets="start|end"
     app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end"
+    app:fitsSystemWindowsInsets="start|end|top"
     tools:context=".ui.detail.AppDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@null"
-        android:fitsSystemWindows="true">
+        android:background="@null">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
+            app:contentScrim="?android:colorBackground"
             app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 

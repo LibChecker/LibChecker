@@ -6,7 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.DownloadUtils
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.api.bean.CloudRuleInfo
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -19,10 +18,6 @@ import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
 import java.io.File
 
