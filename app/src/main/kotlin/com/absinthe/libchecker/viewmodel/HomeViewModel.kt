@@ -106,7 +106,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        appListStatusLiveData.postValue(STATUS_START_INIT)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_START_INIT
+        }
         Repositories.lcRepository.deleteAllItems()
         initProgressLiveData.postValue(0)
 
@@ -173,11 +175,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         insert(lcItems)
         lcItems.clear()
-        appListStatusLiveData.postValue(STATUS_INIT_END)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_INIT_END
+        }
 
         timeRecorder.end()
         Timber.d("initItems: END, $timeRecorder")
-        appListStatusLiveData.postValue(STATUS_NOT_START)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_NOT_START
+        }
     }
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
@@ -192,10 +198,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
         Timber.d("Request change: START")
         val timeRecorder = TimeRecorder()
-        var appList: MutableList<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems().toMutableList()
+        var appList: MutableList<ApplicationInfo>? =
+            AppItemRepository.getApplicationInfoItems().toMutableList()
 
         timeRecorder.start()
-        appListStatusLiveData.postValue(STATUS_START_REQUEST_CHANGE)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE
+        }
 
         if (appList.isNullOrEmpty() || needRefresh) {
             appList = getAppsList().toMutableList()
@@ -291,10 +300,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             GlobalValues.shouldRequestChange.postValue(true)
         }
 
-        appListStatusLiveData.postValue(STATUS_START_REQUEST_CHANGE_END)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE_END
+        }
         timeRecorder.end()
         Timber.d("Request change: END, $timeRecorder")
-        appListStatusLiveData.postValue(STATUS_NOT_START)
+        withContext(Dispatchers.Main) {
+            appListStatusLiveData.value = STATUS_NOT_START
+        }
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             delay(10000)
