@@ -57,7 +57,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     var compareDiffJob: Job? = null
         private set
 
-    fun compareDiff(preTimeStamp: Long, currTimeStamp: Long = CURRENT_SNAPSHOT, shouldClearDiff: Boolean = false) {
+    fun compareDiff(
+        preTimeStamp: Long,
+        currTimeStamp: Long = CURRENT_SNAPSHOT,
+        shouldClearDiff: Boolean = false
+    ) {
         if (compareDiffJob?.isActive == true) {
             compareDiffJob?.cancel()
         }
@@ -91,7 +95,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         val context: Context = getApplication<LibCheckerApp>()
         val packageManager = context.packageManager
-        val appList: MutableList<ApplicationInfo> = AppItemRepository.getApplicationInfoItems().toMutableList()
+        val appList: MutableList<ApplicationInfo> =
+            AppItemRepository.getApplicationInfoItems().toMutableList()
         val appMap = mutableMapOf<String, ApplicationInfo>()
         val size = appList.size
         var count = 0
@@ -194,11 +199,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 diffList.add(snapshotDiffItem)
 
                 snapshotDiffContent = gson.toJson(snapshotDiffItem)
-                repository.insertSnapshotDiffItems(SnapshotDiffStoringItem(
-                    packageName = packageInfo.packageName,
-                    lastUpdatedTime = packageInfo.lastUpdateTime,
-                    diffContent = snapshotDiffContent
-                ))
+                repository.insertSnapshotDiffItems(
+                    SnapshotDiffStoringItem(
+                        packageName = packageInfo.packageName,
+                        lastUpdatedTime = packageInfo.lastUpdateTime,
+                        diffContent = snapshotDiffContent
+                    )
+                )
             }
         }
 
@@ -212,7 +219,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
                         if (snapshotDiffStoringItem != null && snapshotDiffStoringItem!!.lastUpdatedTime == packageInfo.lastUpdateTime) {
                             try {
-                                snapshotDiffItem = gson.fromJson(snapshotDiffStoringItem!!.diffContent, SnapshotDiffItem::class.java)
+                                snapshotDiffItem = gson.fromJson(
+                                    snapshotDiffStoringItem!!.diffContent,
+                                    SnapshotDiffItem::class.java
+                                )
                                 diffList.add(snapshotDiffItem)
                             } catch (e: Exception) {
                                 Timber.e(e, "diffContent parsing failed")
@@ -270,16 +280,40 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                                 gson.toJson(PackageUtils.getNativeDirLibs(packageInfo))
                             ),
                             SnapshotDiffItem.DiffNode(
-                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, SERVICE, false))
+                                gson.toJson(
+                                    PackageUtils.getComponentStringList(
+                                        packageInfo.packageName,
+                                        SERVICE,
+                                        false
+                                    )
+                                )
                             ),
                             SnapshotDiffItem.DiffNode(
-                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, ACTIVITY, false))
+                                gson.toJson(
+                                    PackageUtils.getComponentStringList(
+                                        packageInfo.packageName,
+                                        ACTIVITY,
+                                        false
+                                    )
+                                )
                             ),
                             SnapshotDiffItem.DiffNode(
-                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, RECEIVER, false))
+                                gson.toJson(
+                                    PackageUtils.getComponentStringList(
+                                        packageInfo.packageName,
+                                        RECEIVER,
+                                        false
+                                    )
+                                )
                             ),
                             SnapshotDiffItem.DiffNode(
-                                gson.toJson(PackageUtils.getComponentStringList(packageInfo.packageName, PROVIDER, false))
+                                gson.toJson(
+                                    PackageUtils.getComponentStringList(
+                                        packageInfo.packageName,
+                                        PROVIDER,
+                                        false
+                                    )
+                                )
                             ),
                             SnapshotDiffItem.DiffNode(
                                 gson.toJson(PackageUtils.getPermissionsList(packageInfo.packageName))
@@ -331,16 +365,31 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                         packageName = it.packageName,
                         updateTime = it.lastUpdatedTime,
                         labelDiff = SnapshotDiffItem.DiffNode(preItem.label, it.label),
-                        versionNameDiff = SnapshotDiffItem.DiffNode(preItem.versionName, it.versionName),
-                        versionCodeDiff = SnapshotDiffItem.DiffNode(preItem.versionCode, it.versionCode),
+                        versionNameDiff = SnapshotDiffItem.DiffNode(
+                            preItem.versionName,
+                            it.versionName
+                        ),
+                        versionCodeDiff = SnapshotDiffItem.DiffNode(
+                            preItem.versionCode,
+                            it.versionCode
+                        ),
                         abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, it.abi),
                         targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, it.targetApi),
-                        nativeLibsDiff = SnapshotDiffItem.DiffNode(preItem.nativeLibs, it.nativeLibs),
+                        nativeLibsDiff = SnapshotDiffItem.DiffNode(
+                            preItem.nativeLibs,
+                            it.nativeLibs
+                        ),
                         servicesDiff = SnapshotDiffItem.DiffNode(preItem.services, it.services),
-                        activitiesDiff = SnapshotDiffItem.DiffNode(preItem.activities, it.activities),
+                        activitiesDiff = SnapshotDiffItem.DiffNode(
+                            preItem.activities,
+                            it.activities
+                        ),
                         receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, it.receivers),
                         providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, it.providers),
-                        permissionsDiff = SnapshotDiffItem.DiffNode(preItem.permissions, it.permissions),
+                        permissionsDiff = SnapshotDiffItem.DiffNode(
+                            preItem.permissions,
+                            it.permissions
+                        ),
                         isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
                     )
                     compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
@@ -418,8 +467,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         list.addAll(
             getNativeDiffList(
                 context,
-                gson.fromJson(entity.nativeLibsDiff.old, object : TypeToken<List<LibStringItem>>() {}.type),
-                gson.fromJson(entity.nativeLibsDiff.new, object : TypeToken<List<LibStringItem>>() {}.type)
+                gson.fromJson(
+                    entity.nativeLibsDiff.old,
+                    object : TypeToken<List<LibStringItem>>() {}.type
+                ),
+                gson.fromJson(
+                    entity.nativeLibsDiff.new,
+                    object : TypeToken<List<LibStringItem>>() {}.type
+                )
             )
         )
         list.addAll(
@@ -431,8 +486,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         )
         list.addAll(
             getComponentsDiffList(
-                gson.fromJson(entity.activitiesDiff.old, object : TypeToken<List<String>>() {}.type),
-                gson.fromJson(entity.activitiesDiff.new, object : TypeToken<List<String>>() {}.type),
+                gson.fromJson(
+                    entity.activitiesDiff.old,
+                    object : TypeToken<List<String>>() {}.type
+                ),
+                gson.fromJson(
+                    entity.activitiesDiff.new,
+                    object : TypeToken<List<String>>() {}.type
+                ),
                 ACTIVITY
             )
         )
@@ -452,8 +513,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         )
         list.addAll(
             getPermissionsDiffList(
-                gson.fromJson(entity.permissionsDiff.old, object : TypeToken<List<String>>() {}.type),
-                gson.fromJson(entity.permissionsDiff.new, object : TypeToken<List<String>>() {}.type)
+                gson.fromJson(
+                    entity.permissionsDiff.old,
+                    object : TypeToken<List<String>>() {}.type
+                ),
+                gson.fromJson(
+                    entity.permissionsDiff.new,
+                    object : TypeToken<List<String>>() {}.type
+                )
             )
         )
 
@@ -467,7 +534,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         repository.insert(TimeStampItem(timestamp, null))
     }
 
-    private fun getNativeDiffList(context: Context, oldList: List<LibStringItem>, newList: List<LibStringItem>?): List<SnapshotDetailItem> {
+    private fun getNativeDiffList(
+        context: Context,
+        oldList: List<LibStringItem>,
+        newList: List<LibStringItem>?
+    ): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
         if (newList == null) {
             return list
@@ -481,7 +552,18 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             oldList.find { it.name == item.name }?.let {
                 if (it.size != item.size) {
                     list.add(
-                        SnapshotDetailItem(it.name, it.name, "${sizeToString(context, it.size)} $ARROW ${sizeToString(context, item.size)}", CHANGED, NATIVE)
+                        SnapshotDetailItem(
+                            it.name,
+                            it.name,
+                            "${sizeToString(context, it.size)} $ARROW ${
+                                sizeToString(
+                                    context,
+                                    item.size
+                                )
+                            }",
+                            CHANGED,
+                            NATIVE
+                        )
                     )
                 }
                 sameList.add(item)
@@ -495,19 +577,35 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
         for (item in tempOldList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(context, item), REMOVED, NATIVE)
+                SnapshotDetailItem(
+                    item.name,
+                    item.name,
+                    PackageUtils.sizeToString(context, item),
+                    REMOVED,
+                    NATIVE
+                )
             )
         }
         for (item in tempNewList) {
             list.add(
-                SnapshotDetailItem(item.name, item.name, PackageUtils.sizeToString(context, item), ADDED, NATIVE)
+                SnapshotDetailItem(
+                    item.name,
+                    item.name,
+                    PackageUtils.sizeToString(context, item),
+                    ADDED,
+                    NATIVE
+                )
             )
         }
 
         return list
     }
 
-    private fun getComponentsDiffList(oldList: List<String>, newList: List<String>?, @LibType type: Int): List<SnapshotDetailItem> {
+    private fun getComponentsDiffList(
+        oldList: List<String>,
+        newList: List<String>?,
+        @LibType type: Int
+    ): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
 
         if (newList == null) {
@@ -560,7 +658,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         return list
     }
 
-    private fun getPermissionsDiffList(oldList: List<String>, newList: List<String>?): List<SnapshotDetailItem> {
+    private fun getPermissionsDiffList(
+        oldList: List<String>,
+        newList: List<String>?
+    ): List<SnapshotDetailItem> {
         val list = mutableListOf<SnapshotDetailItem>()
 
         if (newList == null) {
@@ -670,10 +771,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         )
 
         val totalNode = CompareDiffNode()
-        totalNode.added = nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added or permissionsCompareNode.added
-        totalNode.removed = nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed or permissionsCompareNode.removed
+        totalNode.added =
+            nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added or permissionsCompareNode.added
+        totalNode.removed =
+            nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed or permissionsCompareNode.removed
         totalNode.changed = nativeCompareNode.changed
-        totalNode.moved = servicesCompareNode.moved or activitiesCompareNode.moved or receiversCompareNode.moved or providersCompareNode.moved
+        totalNode.moved =
+            servicesCompareNode.moved or activitiesCompareNode.moved or receiversCompareNode.moved or providersCompareNode.moved
 
         return totalNode
     }
@@ -831,25 +935,25 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         os.close()
     }
 
-    fun restore(inputStream: InputStream, failedAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
-        inputStream.use {
-            val list: SnapshotList = try {
-                SnapshotList.parseFrom(inputStream)
-            } catch (e: InvalidProtocolBufferException) {
-                withContext(Dispatchers.Main) {
-                    failedAction()
+    fun restore(inputStream: InputStream, failedAction: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            inputStream.use {
+                val list: SnapshotList = try {
+                    SnapshotList.parseFrom(inputStream)
+                } catch (e: InvalidProtocolBufferException) {
+                    withContext(Dispatchers.Main) {
+                        failedAction()
+                    }
+                    SnapshotList.newBuilder().build()
                 }
-                SnapshotList.newBuilder().build()
-            }
-            val finalList = mutableListOf<SnapshotItem>()
-            val timeStampSet = mutableSetOf<Long>()
-            var count = 0
+                val finalList = mutableListOf<SnapshotItem>()
+                val timeStampSet = mutableSetOf<Long>()
+                var count = 0
 
-            list.snapshotsList.forEach {
-                if (it != null) {
-                    timeStampSet.add(it.timeStamp)
-                    finalList.add(
-                        SnapshotItem(
+                list.snapshotsList.forEach {
+                    if (it != null) {
+                        timeStampSet += it.timeStamp
+                        finalList += SnapshotItem(
                             null,
                             it.packageName,
                             it.timeStamp,
@@ -868,22 +972,22 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             it.providers,
                             it.permissions
                         )
-                    )
-                    count++
+                        count++
+                    }
+
+                    if (count == 50) {
+                        repository.insertSnapshots(finalList)
+                        finalList.clear()
+                        count = 0
+                    }
                 }
 
-                if (count == 50) {
-                    repository.insertSnapshots(finalList)
-                    finalList.clear()
-                    count = 0
-                }
+                repository.insertSnapshots(finalList)
+                finalList.clear()
+                count = 0
+                timeStampSet.forEach { insertTimeStamp(it) }
+                timeStampSet.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
             }
-
-            repository.insertSnapshots(finalList)
-            finalList.clear()
-            count = 0
-            timeStampSet.forEach { insertTimeStamp(it) }
-            timeStampSet.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
         }
     }
 

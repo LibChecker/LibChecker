@@ -63,15 +63,13 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
             setDiffCallback(TrackListDiff())
 
             fun doSaveItemState(pos: Int, state: Boolean) {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     if (state) {
                         repository.insert(TrackItem(data[pos].packageName))
                     } else {
                         repository.delete(TrackItem(data[pos].packageName))
                     }
-                    withContext(Dispatchers.Main) {
-                        list.find { it.packageName == data[pos].packageName }?.switchState = state
-                    }
+                    list.find { it.packageName == data[pos].packageName }?.switchState = state
                 }
                 AppItemRepository.trackItemsChanged = true
             }
@@ -91,9 +89,8 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val appList = AppItemRepository.getApplicationInfoItems()
             val trackedList = repository.getTrackItems()
-            list.addAll(appList
+            list += AppItemRepository.getApplicationInfoItems()
                 .asSequence()
                 .map {
                     TrackListItem(
@@ -104,14 +101,16 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 }
                 .sortedByDescending { it.switchState }
                 .toList()
-            )
 
             withContext(Dispatchers.Main) {
                 adapter.setList(list)
                 menu?.findItem(R.id.search)?.isVisible = true
                 isListReady = true
                 adapter.setEmptyView(EmptyListView(this@TrackActivity).apply {
-                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    ).also {
                         it.gravity = Gravity.CENTER
                     }
                 })

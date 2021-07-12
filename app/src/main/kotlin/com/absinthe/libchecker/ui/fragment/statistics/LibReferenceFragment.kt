@@ -30,9 +30,7 @@ import com.absinthe.libchecker.view.statistics.LibReferenceItemView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -135,9 +133,7 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
         lifecycleScope.launch {
             if (adapter.data.isEmpty() && AppItemRepository.getApplicationInfoItems().isNotEmpty()) {
-                withContext(Dispatchers.Main) {
-                    computeRef()
-                }
+                computeRef()
             }
         }
     }

@@ -198,7 +198,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun requestChangeImpl(packageManager: PackageManager, needRefresh: Boolean = false) {
         Timber.d("Request change: START")
         val timeRecorder = TimeRecorder()
-        var appList: MutableList<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems().toMutableList()
+        var appList: MutableList<ApplicationInfo>? =
+            AppItemRepository.getApplicationInfoItems().toMutableList()
 
         timeRecorder.start()
         withContext(Dispatchers.Main) {

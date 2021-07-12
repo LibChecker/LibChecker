@@ -24,9 +24,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -55,11 +53,9 @@ class LibReferenceActivity : BaseActivity() {
                 viewModel.setData(name, refType)
             })
 
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 LCAppUtils.getRuleWithRegex(name, refType)?.let {
-                    withContext(Dispatchers.Main) {
-                        binding.toolbar.title = it.label
-                    }
+                    binding.toolbar.title = it.label
                 }
             }
         } ?: finish()
