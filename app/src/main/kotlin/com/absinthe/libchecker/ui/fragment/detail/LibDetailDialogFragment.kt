@@ -13,7 +13,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.putArguments
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.view.detail.VF_CONTENT
