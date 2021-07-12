@@ -5,11 +5,11 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.res.Configuration
-import android.os.Bundle
 import android.os.IBinder
 import android.view.*
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -163,11 +163,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                     return@setOnItemClickListener
                 }
 
-                val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java).apply {
-                    putExtras(Bundle().apply {
-                        putSerializable(EXTRA_ENTITY, getItem(position))
-                    })
-                }
+                val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java)
+                    .putExtras(
+                        bundleOf(
+                            EXTRA_ENTITY to getItem(position)
+                        )
+                    )
                 startActivity(intent)
             }
         }

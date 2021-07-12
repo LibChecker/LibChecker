@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
@@ -14,6 +13,7 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
@@ -76,13 +76,10 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
 
     companion object {
         fun newInstance(packageName: String, @LibType type: Int): StaticAnalysisFragment {
-            return StaticAnalysisFragment()
-                .apply {
-                    arguments = Bundle().apply {
-                        putString(EXTRA_PACKAGE_NAME, packageName)
-                        putInt(EXTRA_TYPE, type)
-                    }
-                }
+            return StaticAnalysisFragment().putArguments(
+                EXTRA_PACKAGE_NAME to packageName,
+                EXTRA_TYPE to type
+            )
         }
     }
 }

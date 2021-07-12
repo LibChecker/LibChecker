@@ -1,17 +1,18 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
-import android.os.Bundle
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.utils.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.snapshot.TimeNodeBottomSheetView
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
 
-class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
+class TimeNodeBottomSheetDialogFragment :
+    BaseBottomSheetViewDialogFragment<TimeNodeBottomSheetView>() {
 
     private lateinit var headerView: BottomSheetHeaderView
 
@@ -33,9 +34,11 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         }
         root.adapter.setHeaderView(headerView)
         customTitle?.let { headerView.title.text = it }
-        itemClickAction?.let { root.adapter.setOnItemClickListener { _, _, position ->
-            it(position)
-        } }
+        itemClickAction?.let {
+            root.adapter.setOnItemClickListener { _, _, position ->
+                it(position)
+            }
+        }
 
         arguments?.getParcelableArrayList<TimeStampItem>(EXTRA_TOP_APPS)?.let { topApps ->
             root.adapter.setList(topApps)
@@ -52,11 +55,9 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
     companion object {
         fun newInstance(topApps: ArrayList<TimeStampItem>): TimeNodeBottomSheetDialogFragment {
-            return TimeNodeBottomSheetDialogFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelableArrayList(EXTRA_TOP_APPS, topApps)
-                }
-            }
+            return TimeNodeBottomSheetDialogFragment().putArguments(
+                EXTRA_TOP_APPS to topApps
+            )
         }
     }
 }

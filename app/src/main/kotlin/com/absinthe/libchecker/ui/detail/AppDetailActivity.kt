@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -124,9 +125,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
                             AppInfoBottomSheetDialogFragment().apply {
-                                arguments = Bundle().apply {
-                                    putString(EXTRA_PACKAGE_NAME, pkgName)
-                                }
+                                arguments = bundleOf(
+                                    EXTRA_PACKAGE_NAME to pkgName
+                                )
                                 show(supportFragmentManager, tag)
                             }
                         }
@@ -233,9 +234,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 isVisible = it.isSplitApk
                                 setOnClickListener {
                                     AppBundleBottomSheetDialogFragment().apply {
-                                        arguments = Bundle().apply {
-                                            putString(EXTRA_PACKAGE_NAME, pkgName)
-                                        }
+                                        arguments = bundleOf(
+                                            EXTRA_PACKAGE_NAME to pkgName
+                                        )
                                         show(supportFragmentManager, tag)
                                     }
                                 }

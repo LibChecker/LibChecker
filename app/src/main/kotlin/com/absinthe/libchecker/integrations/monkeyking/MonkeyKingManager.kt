@@ -2,7 +2,8 @@ package com.absinthe.libchecker.integrations.monkeyking
 
 import android.content.Context
 import android.net.Uri
-import android.os.Bundle
+import androidx.core.net.toUri
+import androidx.core.os.bundleOf
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.showToast
@@ -34,18 +35,25 @@ class MonkeyKingManager {
     fun addBlockedComponent(context: Context, packageName: String,
                             componentName: String, @LibType type: Int,
                             shouldBlock: Boolean) {
-        val fullComponentName = if (componentName.startsWith(".")) { packageName + componentName } else { componentName }
-        val shareCmpInfo = ShareCmpInfo(packageName, listOf( ShareCmpInfo.Component(
-            type = getType(type),
-            name = fullComponentName,
-            block = shouldBlock
-        ) ))
-        val bundle = Bundle().apply {
-            putString("cmp_list", Gson().toJson(shareCmpInfo))
+        val fullComponentName = if (componentName.startsWith(".")) {
+            packageName + componentName
+        } else {
+            componentName
         }
-        val uri = Uri.parse(URI_AUTHORIZATION)
+        val shareCmpInfo = ShareCmpInfo(
+            packageName, listOf(
+                ShareCmpInfo.Component(
+                    type = getType(type),
+                    name = fullComponentName,
+                    block = shouldBlock
+                )
+            )
+        )
+        val bundle = bundleOf(
+            "cmp_list" to Gson().toJson(shareCmpInfo)
+        )
         try {
-            context.contentResolver.call(uri, "blocks", packageName, bundle)
+            context.contentResolver.call(URI_AUTHORIZATION.toUri(), "blocks", packageName, bundle)
         } catch (e: Exception) {
             context.showToast(e.message.toString())
         }

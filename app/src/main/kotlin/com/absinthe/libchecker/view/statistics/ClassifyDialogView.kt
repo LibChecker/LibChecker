@@ -3,8 +3,8 @@ package com.absinthe.libchecker.view.statistics
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.widget.LinearLayout
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -26,12 +26,18 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         addPaddingTop(16.dp)
         adapter.setOnItemClickListener { _, _, position ->
+            val item = adapter.getItem(position)
             val intent = Intent(context, AppDetailActivity::class.java).apply {
-                putExtras(Bundle().apply {
-                    val item = adapter.getItem(position)
-                    putString(EXTRA_PACKAGE_NAME, item.packageName)
-                    putParcelable(EXTRA_DETAIL_BEAN, DetailExtraBean(item.isSplitApk, item.isKotlinUsed, item.variant))
-                })
+                putExtras(
+                    bundleOf(
+                        EXTRA_PACKAGE_NAME to item.packageName,
+                        EXTRA_DETAIL_BEAN to DetailExtraBean(
+                            item.isSplitApk,
+                            item.isKotlinUsed,
+                            item.variant
+                        )
+                    )
+                )
             }
             context.startActivity(intent)
         }

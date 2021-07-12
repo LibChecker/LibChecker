@@ -4,12 +4,12 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
-import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants.ARMV5
@@ -383,9 +383,9 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
 
         mDialog = ClassifyBottomSheetDialogFragment().apply {
-            arguments = Bundle().apply {
-                putString(EXTRA_TITLE, dialogTitle)
-            }
+            arguments = bundleOf(
+                EXTRA_TITLE to dialogTitle
+            )
             setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
                 override fun onDismiss() {
                     mDialog = null
