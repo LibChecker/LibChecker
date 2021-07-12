@@ -195,9 +195,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         var appList: MutableList<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems().toMutableList()
 
         timeRecorder.start()
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE
-        }
+        appListStatusLiveData.postValue(STATUS_START_REQUEST_CHANGE)
 
         if (appList.isNullOrEmpty() || needRefresh) {
             appList = getAppsList().toMutableList()
@@ -293,14 +291,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             GlobalValues.shouldRequestChange.postValue(true)
         }
 
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE_END
-        }
+        appListStatusLiveData.postValue(STATUS_START_REQUEST_CHANGE_END)
         timeRecorder.end()
         Timber.d("Request change: END, $timeRecorder")
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_NOT_START
-        }
+        appListStatusLiveData.postValue(STATUS_NOT_START)
 
         if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
             delay(10000)

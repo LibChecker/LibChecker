@@ -17,9 +17,7 @@ import com.absinthe.libchecker.ui.album.TrackActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AlbumActivity : BaseActivity() {
 
@@ -81,15 +79,12 @@ class AlbumActivity : BaseActivity() {
                         setTitle(getString(R.string.dialog_title_select_to_delete))
                         setOnItemClickListener { position ->
                             val item = timeStampList[position]
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                val progressDialog: ProgressDialog
-                                withContext(Dispatchers.Main) {
-                                    progressDialog = ProgressDialog(this@AlbumActivity).apply {
-                                        setMessage(getString(R.string.album_dialog_delete_snapshot_message))
-                                        setCancelable(false)
-                                    }
-                                    progressDialog.show()
+                            lifecycleScope.launch {
+                                val progressDialog = ProgressDialog(this@AlbumActivity).apply {
+                                    setMessage(getString(R.string.album_dialog_delete_snapshot_message))
+                                    setCancelable(false)
                                 }
+                                progressDialog.show()
                                 viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
                                 timeStampList.removeAt(position)
                                 GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
@@ -97,10 +92,8 @@ class AlbumActivity : BaseActivity() {
                                 } else {
                                     timeStampList[0].timestamp
                                 }
-                                withContext(Dispatchers.Main) {
-                                    root.adapter.remove(item)
-                                    progressDialog.dismiss()
-                                }
+                                root.adapter.remove(item)
+                                progressDialog.dismiss()
                             }
                         }
                     }

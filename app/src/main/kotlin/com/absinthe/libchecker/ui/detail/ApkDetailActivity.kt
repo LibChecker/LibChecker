@@ -30,16 +30,14 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
 import java.io.File
@@ -117,7 +115,11 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                 }
                 binding.apply {
                     try {
-                        val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@ApkDetailActivity)
+                        val appIconLoader = AppIconLoader(
+                            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+                            false,
+                            this@ApkDetailActivity
+                        )
                         ivAppIcon.load(appIconLoader.loadIcon(it.applicationInfo))
                         tvAppName.apply {
                             text = it.applicationInfo.loadLabel(packageManager)
@@ -134,17 +136,28 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
 
                         val extraInfo = SpannableStringBuilder()
                         val file = File(packageInfo.applicationInfo.sourceDir)
-                        val demands = ManifestReader.getManifestProperties(file, listOf(
-                            PackageUtils.use32bitAbiString,
-                            PackageUtils.multiArchString,
-                            PackageUtils.overlayString
-                        ).toTypedArray())
+                        val demands = ManifestReader.getManifestProperties(
+                            file, listOf(
+                                PackageUtils.use32bitAbiString,
+                                PackageUtils.multiArchString,
+                                PackageUtils.overlayString
+                            ).toTypedArray()
+                        )
                         val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
-                        val abiSet = PackageUtils.getAbiSet(file, packageInfo.applicationInfo,  isApk = true, overlay = overlay, ignoreArch = true)
+                        val abiSet = PackageUtils.getAbiSet(
+                            file,
+                            packageInfo.applicationInfo,
+                            isApk = true,
+                            overlay = overlay,
+                            ignoreArch = true
+                        )
                         val abi = PackageUtils.getAbi(abiSet, demands)
                         viewModel.is32bit = PackageUtils.is32bit(abi)
 
-                        if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
+                        if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
+                                Constants.ERROR
+                            )
+                        ) {
                             val spanStringBuilder = SpannableStringBuilder()
                             var spanString: SpannableString
                             var firstLoop = true
@@ -154,9 +167,25 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                 if (firstLoop) {
                                     firstLoop = false
                                 }
-                                spanString = SpannableString("  ${PackageUtils.getAbiString(this@ApkDetailActivity, eachAbi, false)}")
-                                ContextCompat.getDrawable(this@ApkDetailActivity, PackageUtils.getAbiBadgeResource(eachAbi))?.mutate()?.let { drawable ->
-                                    drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                                spanString = SpannableString(
+                                    "  ${
+                                        PackageUtils.getAbiString(
+                                            this@ApkDetailActivity,
+                                            eachAbi,
+                                            false
+                                        )
+                                    }"
+                                )
+                                ContextCompat.getDrawable(
+                                    this@ApkDetailActivity,
+                                    PackageUtils.getAbiBadgeResource(eachAbi)
+                                )?.mutate()?.let { drawable ->
+                                    drawable.setBounds(
+                                        0,
+                                        0,
+                                        drawable.intrinsicWidth,
+                                        drawable.intrinsicHeight
+                                    )
                                     if (eachAbi != abi % Constants.MULTI_ARCH) {
                                         drawable.alpha = 128
                                     } else {
@@ -166,7 +195,12 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                     spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                                 }
                                 if (eachAbi != abi % Constants.MULTI_ARCH) {
-                                    spanString.setSpan(StrikethroughSpan(), 2, spanString.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                    spanString.setSpan(
+                                        StrikethroughSpan(),
+                                        2,
+                                        spanString.length,
+                                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                                    )
                                 }
                                 spanStringBuilder.append(spanString)
                                 if (itemCount < abiSet.size) {
@@ -179,7 +213,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                             extraInfo.append(spanStringBuilder).appendLine()
                         }
 
-                        val advanced = when(abi) {
+                        val advanced = when (abi) {
                             Constants.ERROR -> getString(R.string.cannot_read)
                             Constants.OVERLAY -> Constants.OVERLAY_STRING
                             else -> ""
@@ -208,10 +242,12 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                     ibSort.setOnClickListener {
                         lifecycleScope.launch {
                             detailFragmentManager.sortAll()
-                            withContext(Dispatchers.Main) {
-                                viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) { MODE_SORT_BY_SIZE } else { MODE_SORT_BY_LIB }
-                                detailFragmentManager.changeSortMode(viewModel.sortMode)
+                            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+                                MODE_SORT_BY_SIZE
+                            } else {
+                                MODE_SORT_BY_LIB
                             }
+                            detailFragmentManager.changeSortMode(viewModel.sortMode)
                         }
                     }
                 }
