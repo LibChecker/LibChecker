@@ -507,7 +507,7 @@ object PackageUtils {
                     break
                 }
 
-                if (elementName.contains("lib/")) {
+                if (elementName.contains("lib/") && !elementName.contains("assets/")) {
                     when {
                         elementName.contains(ARMV8_STRING) -> {
                             if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) || ignoreArch) {
