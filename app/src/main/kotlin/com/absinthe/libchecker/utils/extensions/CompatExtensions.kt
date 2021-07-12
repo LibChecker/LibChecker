@@ -11,7 +11,9 @@ import kotlin.io.use as kotlinUse
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
 
-// @see https://youtrack.jetbrains.com/issue/KT-35216
+/**
+ * [issue](https://youtrack.jetbrains.com/issue/KT-35216)
+ */
 @OptIn(ExperimentalContracts::class)
 inline fun <T : Closeable?, R> T.use(block: (T) -> R): R {
     contract {
