@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.compat
+package com.absinthe.libchecker.utils.extensions
 
 import android.annotation.SuppressLint
 import androidx.appcompat.widget.TintTypedArray

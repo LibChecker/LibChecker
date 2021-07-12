@@ -14,7 +14,6 @@ import com.absinthe.libchecker.*
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
-import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -32,6 +31,7 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
+import com.absinthe.libchecker.utils.extensions.VersionCompat
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import net.dongliu.apk.parser.ApkFile
