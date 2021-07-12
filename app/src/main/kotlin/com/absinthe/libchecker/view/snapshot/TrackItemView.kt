@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox

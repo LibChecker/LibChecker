@@ -10,11 +10,11 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import kotlinx.coroutines.launch

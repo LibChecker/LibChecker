@@ -10,8 +10,8 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 

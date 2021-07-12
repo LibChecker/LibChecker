@@ -15,9 +15,9 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter

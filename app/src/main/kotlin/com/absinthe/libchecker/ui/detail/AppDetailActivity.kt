@@ -30,14 +30,14 @@ import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.extensions.isOrientationPortrait
-import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.*
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.unsafeLazy

@@ -11,9 +11,9 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.extensions.tintHighlightText
-import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

@@ -23,12 +23,12 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
-import com.absinthe.libchecker.extensions.addPaddingTop
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics

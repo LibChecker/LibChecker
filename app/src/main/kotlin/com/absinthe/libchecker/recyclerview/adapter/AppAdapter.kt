@@ -10,10 +10,10 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.BaseQuickAdapter

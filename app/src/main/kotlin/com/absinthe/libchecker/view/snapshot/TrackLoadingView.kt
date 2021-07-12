@@ -2,7 +2,7 @@ package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable

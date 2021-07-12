@@ -19,9 +19,9 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
-import com.absinthe.libchecker.extensions.isShowing
 import com.absinthe.libchecker.ui.fragment.BaseFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.HomeViewModel
