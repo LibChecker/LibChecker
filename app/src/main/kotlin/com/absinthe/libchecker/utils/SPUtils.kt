@@ -8,7 +8,7 @@ import com.absinthe.libchecker.constant.SP_NAME
 object SPUtils {
 
     private val sp by lazy {
-        LibCheckerApp.context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
+        LibCheckerApp.app.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     }
 
     fun putString(key: String, value: String) {

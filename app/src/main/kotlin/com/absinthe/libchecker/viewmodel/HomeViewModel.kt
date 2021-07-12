@@ -211,7 +211,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         dbItems.value?.let { value ->
             val isHarmony = HarmonyOsUtil.isHarmonyOs()
-            val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.context).iBundleManager }
+            val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
             var packageInfo: PackageInfo
             var versionCode: Long
             var lcItem: LCItem

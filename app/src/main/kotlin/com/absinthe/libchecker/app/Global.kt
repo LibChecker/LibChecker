@@ -36,10 +36,10 @@ object Global {
             Timber.w(e)
         } else if (stack.contains("ClipboardService")) {
             Timber.w(e)
-            LibCheckerApp.context.showToast("Cannot access to ClipboardService")
+            LibCheckerApp.app.showToast("Cannot access to ClipboardService")
         } else if (stack.contains("de.robv.android.xposed")) {
             Timber.w(e)
-            LibCheckerApp.context.showToast("Encounter Xposed module crash")
+            LibCheckerApp.app.showToast("Encounter Xposed module crash")
         } else {
             throw e
         }
