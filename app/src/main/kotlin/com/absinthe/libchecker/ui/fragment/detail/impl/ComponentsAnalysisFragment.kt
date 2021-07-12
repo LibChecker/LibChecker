@@ -66,12 +66,21 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                             rule = LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
                             chip = null
                             if (rule != null) {
-                                chip = LibChip(iconRes = IconResMap.getIconRes(rule.iconIndex), name = rule.label, regexName = rule.regexName)
+                                chip = LibChip(
+                                    iconRes = IconResMap.getIconRes(rule.iconIndex),
+                                    name = rule.label,
+                                    regexName = rule.regexName
+                                )
                             }
-                            if (item.enabled) {
-                                list.add(LibStringItemChip(LibStringItem(item.componentName), chip))
+                            list += if (item.enabled) {
+                                LibStringItemChip(LibStringItem(item.componentName), chip)
                             } else {
-                                list.add(LibStringItemChip(LibStringItem(name = item.componentName, source = DISABLED), chip))
+                                LibStringItemChip(
+                                    LibStringItem(
+                                        name = item.componentName,
+                                        source = DISABLED
+                                    ), chip
+                                )
                             }
                         }
 

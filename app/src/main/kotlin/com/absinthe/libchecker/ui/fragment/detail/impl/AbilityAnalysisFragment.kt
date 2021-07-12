@@ -24,9 +24,12 @@ import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 
-class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
+    R.layout.fragment_lib_component
+) {
 
-    override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibComponentBinding =
+        FragmentLibComponentBinding.bind(view)
 
     override fun getRecyclerView() = binding.list
 
@@ -46,10 +49,15 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                         val list = mutableListOf<LibStringItemChip>()
 
                         for (item in componentList) {
-                            if (item.enabled) {
-                                list.add(LibStringItemChip(LibStringItem(item.componentName), null))
+                            list += if (item.enabled) {
+                                LibStringItemChip(LibStringItem(item.componentName), null)
                             } else {
-                                list.add(LibStringItemChip(LibStringItem(name = item.componentName, source = DISABLED), null))
+                                LibStringItemChip(
+                                    LibStringItem(
+                                        name = item.componentName,
+                                        source = DISABLED
+                                    ), null
+                                )
                             }
                         }
 
@@ -62,8 +70,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                         withContext(Dispatchers.Main) {
                             binding.list.addItemDecoration(
                                 DividerItemDecoration(
-                                    requireContext(),
-                                    DividerItemDecoration.VERTICAL
+                                    requireContext(), DividerItemDecoration.VERTICAL
                                 )
                             )
                             adapter.setDiffNewData(list, navigateToComponentTask)
@@ -71,7 +78,8 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                     }
                 }
                 if (!isListReady) {
-                    viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = componentList.size)
+                    viewModel.itemsCountLiveData.value =
+                        LocatedCount(locate = type, count = componentList.size)
                     viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }
@@ -82,7 +90,8 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
             val name = adapter.getItem(position).item.name
             val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
 
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
+            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+                .show(childFragmentManager, tag)
         }
 
         adapter.apply {

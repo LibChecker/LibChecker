@@ -20,9 +20,7 @@ import com.absinthe.libchecker.view.detail.VF_CONTENT
 import com.absinthe.libchecker.view.detail.VF_LOADING
 import com.absinthe.libchecker.view.detail.VF_NOT_FOUND
 import com.absinthe.libchecker.viewmodel.DetailViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
@@ -36,19 +34,18 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     private val viewModel by activityViewModels<DetailViewModel>()
     private var isStickyEventReceived = false
 
-    override fun initRootView(): LibDetailBottomSheetView = LibDetailBottomSheetView(requireContext())
+    override fun initRootView(): LibDetailBottomSheetView =
+        LibDetailBottomSheetView(requireContext())
 
     override fun init() {
         root.apply {
             viewFlipper.displayedChild = VF_LOADING
             title.text = libName
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 val iconIndex = LCAppUtils.getRuleWithRegex(libName, type)?.iconIndex ?: -1
-                withContext(Dispatchers.Main) {
-                    icon.load(IconResMap.getIconRes(iconIndex)) {
-                        crossfade(true)
-                        placeholder(R.drawable.ic_logo)
-                    }
+                icon.load(IconResMap.getIconRes(iconIndex)) {
+                    crossfade(true)
+                    placeholder(R.drawable.ic_logo)
                 }
             }
         }
@@ -73,7 +70,10 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                         relativeLink.text.apply {
                             isClickable = true
                             movementMethod = LinkMovementMethod.getInstance()
-                            text = HtmlCompat.fromHtml("<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>", HtmlCompat.FROM_HTML_MODE_LEGACY)
+                            text = HtmlCompat.fromHtml(
+                                "<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>",
+                                HtmlCompat.FROM_HTML_MODE_LEGACY
+                            )
                         }
                     }
 

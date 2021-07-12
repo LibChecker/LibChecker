@@ -45,9 +45,7 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
 import timber.log.Timber
@@ -121,7 +119,11 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         }
                     }
                     ivAppIcon.apply {
-                        val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@AppDetailActivity)
+                        val appIconLoader = AppIconLoader(
+                            resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+                            false,
+                            this@AppDetailActivity
+                        )
                         load(appIconLoader.loadIcon(packageInfo.applicationInfo))
                         setOnClickListener {
                             AppInfoBottomSheetDialogFragment().apply {
@@ -147,17 +149,28 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
 
                     val extraInfo = SpannableStringBuilder()
                     val file = File(packageInfo.applicationInfo.sourceDir)
-                    val demands = ManifestReader.getManifestProperties(file, listOf(
-                        PackageUtils.use32bitAbiString,
-                        PackageUtils.multiArchString,
-                        PackageUtils.overlayString
-                    ).toTypedArray())
+                    val demands = ManifestReader.getManifestProperties(
+                        file, listOf(
+                            PackageUtils.use32bitAbiString,
+                            PackageUtils.multiArchString,
+                            PackageUtils.overlayString
+                        ).toTypedArray()
+                    )
                     val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
-                    val abiSet = PackageUtils.getAbiSet(file, packageInfo.applicationInfo, isApk = false, overlay = overlay, ignoreArch = true)
+                    val abiSet = PackageUtils.getAbiSet(
+                        file,
+                        packageInfo.applicationInfo,
+                        isApk = false,
+                        overlay = overlay,
+                        ignoreArch = true
+                    )
                     val abi = PackageUtils.getAbi(abiSet, demands)
                     viewModel.is32bit = PackageUtils.is32bit(abi)
 
-                    if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
+                    if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
+                            Constants.ERROR
+                        )
+                    ) {
                         val spanStringBuilder = SpannableStringBuilder()
                         var spanString: SpannableString
                         var firstLoop = true
@@ -167,9 +180,25 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             if (firstLoop) {
                                 firstLoop = false
                             }
-                            spanString = SpannableString("  ${PackageUtils.getAbiString(this@AppDetailActivity, it, false)}")
-                            ContextCompat.getDrawable(this@AppDetailActivity, PackageUtils.getAbiBadgeResource(it))?.mutate()?.let { drawable ->
-                                drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+                            spanString = SpannableString(
+                                "  ${
+                                    PackageUtils.getAbiString(
+                                        this@AppDetailActivity,
+                                        it,
+                                        false
+                                    )
+                                }"
+                            )
+                            ContextCompat.getDrawable(
+                                this@AppDetailActivity,
+                                PackageUtils.getAbiBadgeResource(it)
+                            )?.mutate()?.let { drawable ->
+                                drawable.setBounds(
+                                    0,
+                                    0,
+                                    drawable.intrinsicWidth,
+                                    drawable.intrinsicHeight
+                                )
                                 if (it != abi % Constants.MULTI_ARCH) {
                                     drawable.alpha = 128
                                 } else {
@@ -179,7 +208,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                                 spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                             }
                             if (it != abi % Constants.MULTI_ARCH) {
-                                spanString.setSpan(StrikethroughSpan(), 2, spanString.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+                                spanString.setSpan(
+                                    StrikethroughSpan(),
+                                    2,
+                                    spanString.length,
+                                    Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+                                )
                             }
                             spanStringBuilder.append(spanString)
                             if (itemCount < abiSet.size) {
@@ -192,7 +226,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         extraInfo.append(spanStringBuilder).appendLine()
                     }
 
-                    val advanced = when(abi) {
+                    val advanced = when (abi) {
                         Constants.ERROR -> getString(R.string.cannot_read)
                         Constants.OVERLAY -> Constants.OVERLAY_STRING
                         else -> ""
@@ -215,7 +249,10 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                         } else {
                             if (extraBean != null && extraBean!!.variant == Constants.VARIANT_HAP) {
                                 bundleManager?.let {
-                                    val hapBundle = it.getBundleInfo(packageName, IBundleManager.GET_BUNDLE_DEFAULT)
+                                    val hapBundle = it.getBundleInfo(
+                                        packageName,
+                                        IBundleManager.GET_BUNDLE_DEFAULT
+                                    )
                                     append("targetVersion ${hapBundle.targetVersion}")
                                     append(", ").append("minSdkVersion ${hapBundle.minSdkVersion}")
                                     if (!hapBundle.jointUserId.isNullOrEmpty()) {
@@ -271,14 +308,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 ibSort.setOnClickListener {
                     lifecycleScope.launch {
                         detailFragmentManager.sortAll()
-                        withContext(Dispatchers.Main) {
-                            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
-                                MODE_SORT_BY_SIZE
-                            } else {
-                                MODE_SORT_BY_LIB
-                            }
-                            detailFragmentManager.changeSortMode(viewModel.sortMode)
+                        viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+                            MODE_SORT_BY_SIZE
+                        } else {
+                            MODE_SORT_BY_LIB
                         }
+                        detailFragmentManager.changeSortMode(viewModel.sortMode)
                     }
                 }
 
@@ -296,7 +331,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 )
             } else {
                 mutableListOf(
-                    NATIVE, AbilityType.PAGE, AbilityType.SERVICE, AbilityType.WEB, AbilityType.DATA, DEX
+                    NATIVE,
+                    AbilityType.PAGE,
+                    AbilityType.SERVICE,
+                    AbilityType.WEB,
+                    AbilityType.DATA,
+                    DEX
                 )
             }
             val tabTitles = if (!isHarmonyMode) {
@@ -319,7 +359,9 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 )
             }
             try {
-                if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)).isNotEmpty()) {
+                if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+                        .isNotEmpty()
+                ) {
                     types.add(1, STATIC)
                     tabTitles.add(1, getText(R.string.ref_category_static))
                 }
@@ -368,9 +410,10 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 })
             }
 
-            val mediator = TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
-                tab.text = tabTitles[position]
-            }
+            val mediator =
+                TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
+                    tab.text = tabTitles[position]
+                }
             mediator.attach()
 
             viewModel.itemsCountLiveData.observe(this, {

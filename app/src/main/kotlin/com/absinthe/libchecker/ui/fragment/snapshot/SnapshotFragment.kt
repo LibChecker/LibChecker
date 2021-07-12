@@ -46,13 +46,14 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.layout.fragment_snapshot) {
+class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
+    R.layout.fragment_snapshot
+) {
 
     private val viewModel by activityViewModels<SnapshotViewModel>()
     private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
@@ -97,12 +98,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
     }
 
-    override fun initBinding(view: View): FragmentSnapshotBinding = FragmentSnapshotBinding.bind(view)
+    override fun initBinding(view: View): FragmentSnapshotBinding =
+        FragmentSnapshotBinding.bind(view)
 
     override fun init() {
         setHasOptionsMenu(true)
 
-        val dashboard = SnapshotDashboardView(ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)).apply {
+        val dashboard = SnapshotDashboardView(
+            ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)
+        ).apply {
             layoutParams = ViewGroup.MarginLayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -117,10 +121,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         dashboard.container.apply {
 
             fun changeTimeNode() {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    withContext(Dispatchers.Main) {
-                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                    val dialog = TimeNodeBottomSheetDialogFragment
+                        .newInstance(ArrayList(timeStampList))
+                        .apply {
                             setOnItemClickListener { position ->
                                 val item = timeStampList[position]
                                 GlobalValues.snapshotTimestamp = item.timestamp
@@ -130,8 +135,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                                 dismiss()
                             }
                         }
-                        dialog.show(requireActivity().supportFragmentManager, dialog.tag)
-                    }
+                    dialog.show(requireActivity().supportFragmentManager, dialog.tag)
                 }
             }
 
@@ -144,7 +148,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
         }
 
         val emptyView = SnapshotEmptyView(requireContext()).apply {
-            layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.gravity = Gravity.CENTER_HORIZONTAL
             }
             addPaddingTop(96.dp)
@@ -203,7 +210,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
                 if (it != 0L) {
                     dashboard.container.tvSnapshotTimestampText.text = getFormatDateString(it)
                 } else {
-                    dashboard.container.tvSnapshotTimestampText.text = getString(R.string.snapshot_none)
+                    dashboard.container.tvSnapshotTimestampText.text =
+                        getString(R.string.snapshot_none)
                     snapshotDiffItems.value = emptyList()
                     flip(VF_LIST)
                 }
@@ -220,7 +228,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(R.l
             })
             snapshotDiffItems.observe(
                 viewLifecycleOwner, { list ->
-                    adapter.setDiffNewData(list.sortedByDescending { it.updateTime }.toMutableList()) {
+                    adapter.setDiffNewData(list.sortedByDescending { it.updateTime }
+                        .toMutableList()) {
                         if (!binding.list.canScrollVertically(1)) {
                             if (!hasAddedListBottomPadding) {
                                 binding.list.addPaddingBottom(100.dp)

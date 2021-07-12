@@ -106,9 +106,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_START_INIT
-        }
+        appListStatusLiveData.postValue(STATUS_START_INIT)
         Repositories.lcRepository.deleteAllItems()
         initProgressLiveData.postValue(0)
 
@@ -175,15 +173,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         insert(lcItems)
         lcItems.clear()
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_INIT_END
-        }
+        appListStatusLiveData.postValue(STATUS_INIT_END)
 
         timeRecorder.end()
         Timber.d("initItems: END, $timeRecorder")
-        withContext(Dispatchers.Main) {
-            appListStatusLiveData.value = STATUS_NOT_START
-        }
+        appListStatusLiveData.postValue(STATUS_NOT_START)
     }
 
     fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {

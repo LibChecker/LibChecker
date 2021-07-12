@@ -9,7 +9,7 @@ class LCRepository(private val lcDao: LCDao) {
     val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
     val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
 
-    fun getItem(packageName: String): LCItem? {
+    suspend fun getItem(packageName: String): LCItem? {
         return lcDao.getItem(packageName)
     }
 

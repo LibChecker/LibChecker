@@ -44,9 +44,7 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
@@ -103,17 +101,30 @@ class SnapshotDetailActivity : BaseActivity() {
             val isNewOrDeleted = entity.deleted || entity.newInstalled
 
             ivAppIcon.apply {
-                val appIconLoader = AppIconLoader(resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size), false, this@SnapshotDetailActivity)
+                val appIconLoader = AppIconLoader(
+                    resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+                    false,
+                    this@SnapshotDetailActivity
+                )
                 val icon = try {
-                    appIconLoader.loadIcon(PackageUtils.getPackageInfo(entity.packageName, PackageManager.GET_META_DATA).applicationInfo)
+                    appIconLoader.loadIcon(
+                        PackageUtils.getPackageInfo(
+                            entity.packageName,
+                            PackageManager.GET_META_DATA
+                        ).applicationInfo
+                    )
                 } catch (e: PackageManager.NameNotFoundException) {
                     null
                 }
                 load(icon)
                 setOnClickListener {
-                    startActivity(Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java).apply {
-                        putExtra(EXTRA_PACKAGE_NAME, entity.packageName)
-                    })
+                    startActivity(
+                        Intent(
+                            this@SnapshotDetailActivity,
+                            AppDetailActivity::class.java
+                        ).apply {
+                            putExtra(EXTRA_PACKAGE_NAME, entity.packageName)
+                        })
                 }
             }
             tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
@@ -133,37 +144,55 @@ class SnapshotDetailActivity : BaseActivity() {
             getNodeList(details.filter { it.itemType == NATIVE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, NATIVE))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Native", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Native", this.size.toLong())
+                    )
                 }
             }
             getNodeList(details.filter { it.itemType == SERVICE }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, SERVICE))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Service", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Service", this.size.toLong())
+                    )
                 }
             }
             getNodeList(details.filter { it.itemType == ACTIVITY }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, ACTIVITY))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Activity", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Activity", this.size.toLong())
+                    )
                 }
             }
             getNodeList(details.filter { it.itemType == RECEIVER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, RECEIVER))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Receiver", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Receiver", this.size.toLong())
+                    )
                 }
             }
             getNodeList(details.filter { it.itemType == PROVIDER }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, PROVIDER))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Provider", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Provider", this.size.toLong())
+                    )
                 }
             }
             getNodeList(details.filter { it.itemType == PERMISSION }).apply {
                 if (isNotEmpty()) {
                     titleList.add(SnapshotTitleNode(this, PERMISSION))
-                    Analytics.trackEvent(Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT, EventProperties().set("Permission", this.size.toLong()))
+                    Analytics.trackEvent(
+                        Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+                        EventProperties().set("Permission", this.size.toLong())
+                    )
                 }
             }
 
@@ -177,7 +206,10 @@ class SnapshotDetailActivity : BaseActivity() {
                 entity.newInstalled -> SnapshotDetailNewInstallView(this)
                 entity.deleted -> SnapshotDetailDeletedView(this)
                 else -> SnapshotEmptyView(this).apply {
-                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    ).also {
                         it.gravity = Gravity.CENTER_HORIZONTAL
                     }
                     addPaddingTop(96.dp)
@@ -198,25 +230,23 @@ class SnapshotDetailActivity : BaseActivity() {
                 return@setOnItemClickListener
             }
 
-            lifecycleScope.launch(Dispatchers.IO) {
+            lifecycleScope.launch {
                 val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-                withContext(Dispatchers.Main) {
-                    startActivity(
-                        Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
-                            .putExtras(
-                                bundleOf(
-                                    EXTRA_PACKAGE_NAME to entity.packageName,
-                                    EXTRA_REF_NAME to item.name,
-                                    EXTRA_REF_TYPE to item.itemType,
-                                    EXTRA_DETAIL_BEAN to DetailExtraBean(
-                                        lcItem.isSplitApk,
-                                        lcItem.isKotlinUsed,
-                                        lcItem.variant
-                                    )
+                startActivity(
+                    Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
+                        .putExtras(
+                            bundleOf(
+                                EXTRA_PACKAGE_NAME to entity.packageName,
+                                EXTRA_REF_NAME to item.name,
+                                EXTRA_REF_TYPE to item.itemType,
+                                EXTRA_DETAIL_BEAN to DetailExtraBean(
+                                    lcItem.isSplitApk,
+                                    lcItem.isKotlinUsed,
+                                    lcItem.variant
                                 )
                             )
-                    )
-                }
+                        )
+                )
             }
         }
     }
@@ -241,7 +271,12 @@ class SnapshotDetailActivity : BaseActivity() {
         format: String = "%s"
     ): String {
         return if (diff.old != diff.new && !isNewOrDeleted) {
-            "${String.format(format, diff.old.toString())} $ARROW ${String.format(format, diff.new.toString())}"
+            "${String.format(format, diff.old.toString())} $ARROW ${
+                String.format(
+                    format,
+                    diff.new.toString()
+                )
+            }"
         } else {
             String.format(format, diff.old.toString())
         }
@@ -254,7 +289,13 @@ class SnapshotDetailActivity : BaseActivity() {
         format: String = "%s"
     ): String {
         return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-            "${String.format(format, diff1.old.toString(), diff2.old.toString())} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+            "${
+                String.format(
+                    format,
+                    diff1.old.toString(),
+                    diff2.old.toString()
+                )
+            } $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
         } else {
             String.format(format, diff1.old.toString(), diff2.old.toString())
         }

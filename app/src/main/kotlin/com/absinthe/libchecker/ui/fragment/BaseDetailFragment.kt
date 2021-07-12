@@ -22,7 +22,6 @@ import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -72,20 +71,23 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     }
 
     override suspend fun sort() {
-        coroutineScope {
-            val rules = Repositories.ruleRepository.getAllRules()
-            val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-                adapter.data.sortedByDescending { rules.any { find -> it.item.name == find.name } || LCAppUtils.findRuleRegex(it.item.name, type) != null }
+        val rules = Repositories.ruleRepository.getAllRules()
+        val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
+            adapter.data.sortedByDescending {
+                rules.any { find -> it.item.name == find.name } || LCAppUtils.findRuleRegex(
+                    it.item.name,
+                    type
+                ) != null
+            }
+        } else {
+            if (type == NATIVE) {
+                adapter.data.sortedByDescending { it.item.size }
             } else {
-                if (type == NATIVE) {
-                    adapter.data.sortedByDescending { it.item.size }
-                } else {
-                    adapter.data.sortedByDescending { it.item.name }
-                }
+                adapter.data.sortedByDescending { it.item.name }
             }
-            withContext(Dispatchers.Main) {
-                adapter.setDiffNewData(list.toMutableList())
-            }
+        }
+        withContext(Dispatchers.Main) {
+            adapter.setDiffNewData(list.toMutableList())
         }
     }
 
@@ -112,5 +114,4 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
         adapter.setHighlightBackgroundItem(componentPosition)
         adapter.notifyDataSetChanged()
     }
-
 }

@@ -28,9 +28,7 @@ import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 
 const val VF_LOADING = 0
@@ -77,50 +75,49 @@ class ComparisonActivity : BaseActivity() {
         dashboardBinding.apply {
             infoLeft.horizontalGravity = Gravity.START
             infoLeft.setOnClickListener {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    withContext(Dispatchers.Main) {
-                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                    val dialog = TimeNodeBottomSheetDialogFragment
+                        .newInstance(ArrayList(timeStampList))
+                        .apply {
                             setOnItemClickListener { position ->
                                 val item = timeStampList[position]
                                 leftTimeStamp = item.timestamp
-                                infoLeft.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    val count = viewModel.repository.getSnapshots(leftTimeStamp).size
-
-                                    withContext(Dispatchers.Main) {
-                                        infoLeft.tvSnapshotAppsCountText.text = count.toString()
-                                    }
+                                infoLeft.tvSnapshotTimestampText.text =
+                                    viewModel.getFormatDateString(leftTimeStamp)
+                                lifecycleScope.launch {
+                                    val count =
+                                        viewModel.repository.getSnapshots(leftTimeStamp).size
+                                    infoLeft.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()
                             }
                         }
-                        dialog.show(supportFragmentManager, dialog.tag)
-                    }
+                    dialog.show(supportFragmentManager, dialog.tag)
                 }
             }
             infoRight.horizontalGravity = Gravity.END
             infoRight.setOnClickListener {
-                lifecycleScope.launch(Dispatchers.IO) {
+                lifecycleScope.launch {
                     val timeStampList = viewModel.repository.getTimeStamps()
-                    withContext(Dispatchers.Main) {
-                        val dialog = TimeNodeBottomSheetDialogFragment.newInstance(ArrayList(timeStampList)).apply {
+                    val dialog = TimeNodeBottomSheetDialogFragment
+                        .newInstance(ArrayList(timeStampList))
+                        .apply {
                             setOnItemClickListener { position ->
                                 val item = timeStampList[position]
                                 rightTimeStamp = item.timestamp
-                                infoRight.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
-                                lifecycleScope.launch(Dispatchers.IO) {
-                                    val count = viewModel.repository.getSnapshots(rightTimeStamp).size
+                                infoRight.tvSnapshotTimestampText.text =
+                                    viewModel.getFormatDateString(rightTimeStamp)
+                                lifecycleScope.launch {
+                                    val count =
+                                        viewModel.repository.getSnapshots(rightTimeStamp).size
 
-                                    withContext(Dispatchers.Main) {
-                                        infoRight.tvSnapshotAppsCountText.text = count.toString()
-                                    }
+                                    infoRight.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()
                             }
                         }
-                        dialog.show(supportFragmentManager, dialog.tag)
-                    }
+                    dialog.show(supportFragmentManager, dialog.tag)
                 }
             }
         }
@@ -129,7 +126,11 @@ class ComparisonActivity : BaseActivity() {
             extendedFab.apply {
                 post {
                     (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
-                        0, 0, 16.dp, paddingBottom + (window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0)
+                        0,
+                        0,
+                        16.dp,
+                        paddingBottom + (window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                            ?: 0)
                     )
                 }
                 setOnClickListener {
@@ -139,7 +140,10 @@ class ComparisonActivity : BaseActivity() {
                     if (leftTimeStamp == rightTimeStamp || leftTimeStamp == 0L || rightTimeStamp == 0L) {
                         return@setOnClickListener
                     }
-                    viewModel.compareDiff(leftTimeStamp.coerceAtMost(rightTimeStamp), leftTimeStamp.coerceAtLeast(rightTimeStamp))
+                    viewModel.compareDiff(
+                        leftTimeStamp.coerceAtMost(rightTimeStamp),
+                        leftTimeStamp.coerceAtLeast(rightTimeStamp)
+                    )
                     flip(VF_LOADING)
                 }
                 setOnLongClickListener {
@@ -173,7 +177,10 @@ class ComparisonActivity : BaseActivity() {
         adapter.apply {
             headerWithEmptyEnable = true
             val emptyView = SnapshotEmptyView(this@ComparisonActivity).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT).also {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                ).also {
                     it.gravity = Gravity.CENTER_HORIZONTAL
                 }
                 addPaddingTop(96.dp)
