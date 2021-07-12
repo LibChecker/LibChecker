@@ -17,4 +17,4 @@ fun <T : Fragment> T.putArguments(bundle: Bundle): T {
 fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T =
     putArguments(bundleOf(*pairs))
 
-fun DialogFragment.isShowing() = this.dialog != null && this.dialog!!.isShowing && !this.isRemoving
+fun DialogFragment.isShowing() = this.dialog?.isShowing == true && !this.isRemoving
