@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.dp
+import com.absinthe.libchecker.utils.extensions.dp
 
 class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
 

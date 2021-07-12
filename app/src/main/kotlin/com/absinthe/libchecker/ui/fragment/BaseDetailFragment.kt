@@ -9,8 +9,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
@@ -18,6 +16,8 @@ import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel

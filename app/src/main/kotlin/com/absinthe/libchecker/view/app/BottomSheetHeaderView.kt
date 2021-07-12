@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class BottomSheetHeaderView(context: Context) : AViewGroup(context) {

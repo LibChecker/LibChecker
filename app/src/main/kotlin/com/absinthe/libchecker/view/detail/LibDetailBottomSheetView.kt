@@ -16,8 +16,8 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.extensions.getColorByAttr
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView

@@ -14,6 +14,8 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.unsafeLazy
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 

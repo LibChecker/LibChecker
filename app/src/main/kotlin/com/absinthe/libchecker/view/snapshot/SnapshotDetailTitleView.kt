@@ -9,9 +9,9 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionByAttr
-import com.absinthe.libchecker.extensions.getDrawableByAttr
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
+import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {

@@ -21,9 +21,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
-import com.absinthe.libchecker.extensions.addPaddingBottom
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
@@ -36,6 +33,9 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.addPaddingBottom
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView

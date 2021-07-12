@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 

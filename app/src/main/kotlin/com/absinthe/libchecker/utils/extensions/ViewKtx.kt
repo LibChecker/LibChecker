@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.extensions
+package com.absinthe.libchecker.utils.extensions
 
 import android.content.res.Resources
 import android.text.Spannable

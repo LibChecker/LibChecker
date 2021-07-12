@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.TrackListItem
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

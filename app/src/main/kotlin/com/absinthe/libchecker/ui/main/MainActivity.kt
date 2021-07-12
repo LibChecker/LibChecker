@@ -19,13 +19,13 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
-import com.absinthe.libchecker.extensions.setCurrentItem
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.*
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics

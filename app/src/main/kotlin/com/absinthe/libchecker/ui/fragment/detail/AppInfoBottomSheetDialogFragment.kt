@@ -13,11 +13,11 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView

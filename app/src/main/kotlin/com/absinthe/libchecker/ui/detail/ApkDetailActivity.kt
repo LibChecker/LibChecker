@@ -22,8 +22,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.extensions.isOrientationPortrait
-import com.absinthe.libchecker.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.ui.fragment.detail.*
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
@@ -31,6 +29,8 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan

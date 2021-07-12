@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.extensions
+package com.absinthe.libchecker.utils.extensions
 
 import androidx.lifecycle.MutableLiveData
 

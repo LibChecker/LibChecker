@@ -24,10 +24,10 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.extensions.valueUnsafe
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder

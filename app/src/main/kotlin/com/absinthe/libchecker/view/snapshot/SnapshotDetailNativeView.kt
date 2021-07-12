@@ -17,8 +17,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.extensions.valueUnsafe
+import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip

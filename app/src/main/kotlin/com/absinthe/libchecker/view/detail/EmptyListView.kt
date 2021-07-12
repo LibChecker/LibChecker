@@ -7,7 +7,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
 class EmptyListView(context: Context) : AViewGroup(context) {

@@ -17,13 +17,13 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
-import com.absinthe.libchecker.extensions.addPaddingTop
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel

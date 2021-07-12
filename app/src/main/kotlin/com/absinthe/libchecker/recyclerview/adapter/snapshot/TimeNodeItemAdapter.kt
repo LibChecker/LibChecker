@@ -3,9 +3,9 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 import android.content.pm.PackageManager
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
-import com.absinthe.libchecker.extensions.dp
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import kotlinx.coroutines.Job

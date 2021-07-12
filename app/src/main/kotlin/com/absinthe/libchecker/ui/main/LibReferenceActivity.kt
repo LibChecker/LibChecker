@@ -14,13 +14,13 @@ import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
-import com.absinthe.libchecker.extensions.isOrientationLandscape
-import com.absinthe.libchecker.extensions.paddingTopCompat
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
+import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libchecker.utils.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils

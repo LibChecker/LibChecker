@@ -16,7 +16,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
-import com.absinthe.libchecker.extensions.tintHighlightText
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -24,6 +23,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.*
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
