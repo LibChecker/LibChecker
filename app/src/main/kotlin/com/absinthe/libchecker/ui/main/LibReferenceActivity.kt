@@ -21,7 +21,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.launch

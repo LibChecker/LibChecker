@@ -16,7 +16,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.putArguments
+import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.TimeNodeAdapter
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 
 class TimeNodeBottomSheetView(context: Context) : LinearLayout(context) {
 

@@ -25,7 +25,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.VersionCompat
+import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

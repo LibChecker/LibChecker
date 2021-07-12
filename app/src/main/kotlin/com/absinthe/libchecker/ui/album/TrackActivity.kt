@@ -17,7 +17,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView

@@ -35,7 +35,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView

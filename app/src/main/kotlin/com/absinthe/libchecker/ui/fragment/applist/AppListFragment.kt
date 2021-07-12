@@ -34,6 +34,7 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.utils.AntiShakeUtils

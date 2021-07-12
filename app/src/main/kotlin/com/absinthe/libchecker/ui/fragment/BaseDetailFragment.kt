@@ -2,11 +2,14 @@ package com.absinthe.libchecker.ui.fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.Gravity
+import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
@@ -18,7 +21,7 @@ import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
@@ -41,11 +44,14 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by unsafeLazy { LibStringAdapter(type) }
     protected val emptyView by unsafeLazy { EmptyListView(requireContext()).apply {
-        layoutParams = android.widget.FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.MATCH_PARENT, android.widget.FrameLayout.LayoutParams.WRAP_CONTENT).also {
-            it.gravity = android.view.Gravity.CENTER_HORIZONTAL
+        layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        ).also {
+            it.gravity = Gravity.CENTER_HORIZONTAL
         }
         addPaddingTop(96.dp)
-        text.text = getString(com.absinthe.libchecker.R.string.loading)
+        text.text = getString(R.string.loading)
     } }
     protected var isListReady = false
     protected var navigateToComponentTask: Runnable? = null

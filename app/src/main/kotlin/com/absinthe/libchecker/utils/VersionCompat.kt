@@ -1,9 +1,8 @@
 @file:Suppress("DEPRECATION")
 
-package com.absinthe.libchecker.utils.extensions
+package com.absinthe.libchecker.utils
 
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.utils.LCAppUtils
 
 object VersionCompat {
     val MATCH_DISABLED_COMPONENTS = if (LCAppUtils.atLeastN()) {

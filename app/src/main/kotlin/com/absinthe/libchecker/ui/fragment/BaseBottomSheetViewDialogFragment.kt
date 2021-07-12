@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior

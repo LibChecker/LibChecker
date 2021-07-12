@@ -4,8 +4,6 @@ import android.content.pm.ApplicationInfo;
 
 import androidx.annotation.Nullable;
 
-import com.absinthe.libchecker.utils.extensions.VersionCompat;
-
 import java.lang.reflect.Field;
 
 /**
