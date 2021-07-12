@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Light"/>
+    <style name="AppTheme" parent="Theme.Light" />
 
     <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
         <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>

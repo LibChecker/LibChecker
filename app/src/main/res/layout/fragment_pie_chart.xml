@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    app:fitsSystemWindowsInsets="bottom|top"
-    android:paddingTop="?actionBarSize">
+    android:paddingTop="?actionBarSize"
+    app:fitsSystemWindowsInsets="bottom|top">
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/buttons_group"
