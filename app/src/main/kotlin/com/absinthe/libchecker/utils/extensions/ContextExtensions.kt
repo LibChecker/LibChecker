@@ -19,7 +19,6 @@ import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.res.ResourcesCompat
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.compat.use
 
 val Context.activity: Activity?
     get() {

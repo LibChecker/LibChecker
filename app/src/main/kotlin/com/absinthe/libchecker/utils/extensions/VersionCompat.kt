@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.absinthe.libchecker.compat
+package com.absinthe.libchecker.utils.extensions
 
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.utils.LCAppUtils
