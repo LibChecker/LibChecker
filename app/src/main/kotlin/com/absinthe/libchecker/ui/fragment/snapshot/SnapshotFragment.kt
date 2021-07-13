@@ -232,14 +232,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
             snapshotDiffItems.observe(viewLifecycleOwner) { list ->
                 adapter.setDiffNewData(list.sortedByDescending { it.updateTime }
                     .toMutableList()) {
-                    if (!binding.list.canScrollVertically(1)) {
+                    if (!binding.list.canScrollVertically(-1)) {
                         if (!hasAddedListBottomPadding) {
-                            binding.list.addPaddingBottom(100.dp)
+                            binding.list.addPaddingBottom(20.dp)
                             hasAddedListBottomPadding = true
                         }
                     } else {
                         if (hasAddedListBottomPadding) {
-                            binding.list.addPaddingBottom((-100).dp)
+                            binding.list.addPaddingBottom((-20).dp)
                             hasAddedListBottomPadding = false
                         }
                     }
