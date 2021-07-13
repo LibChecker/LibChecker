@@ -173,7 +173,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jonathanfinerty.once:once:1.3.1")
     implementation("net.dongliu:apk-parser:2.6.10")
-    implementation("io.coil-kt:coil:1.2.2")
+    implementation("io.coil-kt:coil:1.3.0")
     implementation("me.zhanghai.android.fastscroll:library:1.1.7")
     implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
