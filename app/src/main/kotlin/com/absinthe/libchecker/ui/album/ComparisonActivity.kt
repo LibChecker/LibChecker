@@ -28,6 +28,7 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import rikka.widget.borderview.BorderView
 
@@ -75,7 +76,7 @@ class ComparisonActivity : BaseActivity() {
         dashboardBinding.apply {
             infoLeft.horizontalGravity = Gravity.START
             infoLeft.setOnClickListener {
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
                     val dialog = TimeNodeBottomSheetDialogFragment
                         .newInstance(ArrayList(timeStampList))
@@ -86,8 +87,7 @@ class ComparisonActivity : BaseActivity() {
                                 infoLeft.tvSnapshotTimestampText.text =
                                     viewModel.getFormatDateString(leftTimeStamp)
                                 lifecycleScope.launch {
-                                    val count =
-                                        viewModel.repository.getSnapshots(leftTimeStamp).size
+                                    val count = viewModel.repository.getSnapshots(leftTimeStamp).size
                                     infoLeft.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()
@@ -98,7 +98,7 @@ class ComparisonActivity : BaseActivity() {
             }
             infoRight.horizontalGravity = Gravity.END
             infoRight.setOnClickListener {
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
                     val dialog = TimeNodeBottomSheetDialogFragment
                         .newInstance(ArrayList(timeStampList))
@@ -109,9 +109,7 @@ class ComparisonActivity : BaseActivity() {
                                 infoRight.tvSnapshotTimestampText.text =
                                     viewModel.getFormatDateString(rightTimeStamp)
                                 lifecycleScope.launch {
-                                    val count =
-                                        viewModel.repository.getSnapshots(rightTimeStamp).size
-
+                                    val count = viewModel.repository.getSnapshots(rightTimeStamp).size
                                     infoRight.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()

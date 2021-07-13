@@ -71,7 +71,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
                             LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
                         LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
                             .apply {
-                                show((context as BaseActivity).supportFragmentManager, tag)
+                                show((this@SnapshotNativeProvider.context as BaseActivity).supportFragmentManager, tag)
                             }
                     }
                 } else {

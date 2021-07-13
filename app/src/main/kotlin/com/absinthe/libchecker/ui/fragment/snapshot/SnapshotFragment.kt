@@ -121,7 +121,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
         dashboard.container.apply {
 
             fun changeTimeNode() {
-                lifecycleScope.launch {
+                lifecycleScope.launch(Dispatchers.IO) {
                     val timeStampList = viewModel.repository.getTimeStamps()
                     val dialog = TimeNodeBottomSheetDialogFragment
                         .newInstance(ArrayList(timeStampList))
@@ -129,10 +129,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                             setOnItemClickListener { position ->
                                 val item = timeStampList[position]
                                 GlobalValues.snapshotTimestamp = item.timestamp
-                                viewModel.timestamp.value = item.timestamp
-                                flip(VF_LOADING)
+                                lifecycleScope.launch(Dispatchers.Main) {
+                                    viewModel.timestamp.value = item.timestamp
+                                    flip(VF_LOADING)
+                                    dismiss()
+                                }
                                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
-                                dismiss()
+
                             }
                         }
                     dialog.show(requireActivity().supportFragmentManager, dialog.tag)

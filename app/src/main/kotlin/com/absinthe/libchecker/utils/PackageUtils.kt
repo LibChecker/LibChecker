@@ -156,7 +156,7 @@ object PackageUtils {
      */
     fun getNativeDirLibs(packageInfo: PackageInfo, is32bit: Boolean = false, needStaticLibrary: Boolean = false): List<LibStringItem> {
         val nativePath = packageInfo.applicationInfo.nativeLibraryDir
-        val realNativePath = if (is32bit) {
+        val realNativePath = if (is32bit && nativePath != null) {
             nativePath.substring(0, nativePath.lastIndexOf("/")) + "/arm"
         } else {
             nativePath

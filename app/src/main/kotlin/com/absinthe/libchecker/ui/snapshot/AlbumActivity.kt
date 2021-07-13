@@ -17,7 +17,9 @@ import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFra
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AlbumActivity : BaseActivity() {
 
@@ -72,32 +74,39 @@ class AlbumActivity : BaseActivity() {
             startActivity(Intent(this, ComparisonActivity::class.java))
         }
         itemManagement.setOnClickListener {
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 val timeStampList = viewModel.repository.getTimeStamps().toMutableList()
-                val dialog = TimeNodeBottomSheetDialogFragment
-                    .newInstance(ArrayList(timeStampList)).apply {
-                        setTitle(getString(R.string.dialog_title_select_to_delete))
-                        setOnItemClickListener { position ->
-                            val item = timeStampList[position]
-                            lifecycleScope.launch {
-                                val progressDialog = ProgressDialog(this@AlbumActivity).apply {
-                                    setMessage(getString(R.string.album_dialog_delete_snapshot_message))
-                                    setCancelable(false)
+                withContext(Dispatchers.Main) {
+                    val dialog = TimeNodeBottomSheetDialogFragment
+                        .newInstance(ArrayList(timeStampList)).apply {
+                            setTitle(this@AlbumActivity.getString(R.string.dialog_title_select_to_delete))
+                            setOnItemClickListener { position ->
+                                val item = timeStampList[position]
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    val progressDialog: ProgressDialog
+                                    withContext(Dispatchers.Main) {
+                                        progressDialog = ProgressDialog(this@AlbumActivity).apply {
+                                            setMessage(getString(R.string.album_dialog_delete_snapshot_message))
+                                            setCancelable(false)
+                                        }
+                                        progressDialog.show()
+                                    }
+                                    viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
+                                    timeStampList.removeAt(position)
+                                    GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
+                                        0L
+                                    } else {
+                                        timeStampList[0].timestamp
+                                    }
+                                    withContext(Dispatchers.Main) {
+                                        root.adapter.remove(item)
+                                        progressDialog.dismiss()
+                                    }
                                 }
-                                progressDialog.show()
-                                viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
-                                timeStampList.removeAt(position)
-                                GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
-                                    0L
-                                } else {
-                                    timeStampList[0].timestamp
-                                }
-                                root.adapter.remove(item)
-                                progressDialog.dismiss()
                             }
                         }
-                    }
-                dialog.show(supportFragmentManager, dialog.tag)
+                    dialog.show(supportFragmentManager, dialog.tag)
+                }
             }
         }
         itemBackupRestore.setOnClickListener {
