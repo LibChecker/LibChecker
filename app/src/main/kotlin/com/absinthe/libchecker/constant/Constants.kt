@@ -59,7 +59,6 @@ object Constants {
 
     const val DARK_MODE_OFF = "off"
     const val DARK_MODE_ON = "on"
-    const val DARK_MODE_BATTERY = "battery"
     const val DARK_MODE_FOLLOW_SYSTEM = "system"
 
     const val REPO_GITHUB = "github"
