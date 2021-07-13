@@ -49,9 +49,9 @@ class LibReferenceActivity : BaseActivity() {
 
         refName?.let { name ->
             initView()
-            viewModel.dbItems.observe(this, {
+            viewModel.dbItems.observe(this) {
                 viewModel.setData(name, refType)
-            })
+            }
 
             lifecycleScope.launch {
                 LCAppUtils.getRuleWithRegex(name, refType)?.let {
@@ -128,10 +128,10 @@ class LibReferenceActivity : BaseActivity() {
             }
         }
 
-        viewModel.libRefList.observe(this, {
+        viewModel.libRefList.observe(this) {
             adapter.setList(it)
             binding.vfContainer.displayedChild = 1
-        })
+        }
 
         adapter.setOnItemClickListener { _, view, position ->
             if (AntiShakeUtils.isInvalidClick(view)) {

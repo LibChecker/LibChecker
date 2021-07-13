@@ -1,11 +1,9 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.view.View
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -32,28 +30,24 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
             }
         }
 
-        viewModel.apply {
-            val observer = Observer<List<LibStringItemChip>> {
-                if (it.isEmpty()) {
-                    emptyView.text.text = getString(R.string.uncharted_territory)
-                } else {
-                    binding.list.addItemDecoration(
-                        DividerItemDecoration(
-                            requireContext(),
-                            DividerItemDecoration.VERTICAL
-                        )
+        viewModel.dexLibItems.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                emptyView.text.text = getString(R.string.uncharted_territory)
+            } else {
+                binding.list.addItemDecoration(
+                    DividerItemDecoration(
+                        requireContext(),
+                        DividerItemDecoration.VERTICAL
                     )
-                    adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
-                }
-
-                if (!isListReady) {
-                    viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
-                    viewModel.itemsCountList[type] = it.size
-                    isListReady = true
-                }
+                )
+                adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
             }
 
-            dexLibItems.observe(viewLifecycleOwner, observer)
+            if (!isListReady) {
+                viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
+                viewModel.itemsCountList[type] = it.size
+                isListReady = true
+            }
         }
 
         fun openLibDetailDialog(position: Int) {

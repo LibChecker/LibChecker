@@ -203,10 +203,10 @@ class ComparisonActivity : BaseActivity() {
             }
         }
 
-        viewModel.snapshotDiffItems.observe(this, { list ->
+        viewModel.snapshotDiffItems.observe(this) { list ->
             adapter.setList(list.sortedByDescending { it.updateTime })
             flip(VF_LIST)
-        })
+        }
     }
 
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {

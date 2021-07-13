@@ -206,7 +206,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
         }
 
         viewModel.apply {
-            timestamp.observe(viewLifecycleOwner, {
+            timestamp.observe(viewLifecycleOwner) {
                 if (it != 0L) {
                     dashboard.container.tvSnapshotTimestampText.text = getFormatDateString(it)
                 } else {
@@ -215,51 +215,49 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                     snapshotDiffItems.value = emptyList()
                     flip(VF_LIST)
                 }
-            })
-            allSnapshots.observe(viewLifecycleOwner, {
+            }
+            allSnapshots.observe(viewLifecycleOwner) {
                 if (shouldCompare) {
                     compareDiff()
                 }
-            })
-            snapshotAppsCount.observe(viewLifecycleOwner, {
+            }
+            snapshotAppsCount.observe(viewLifecycleOwner) {
                 if (it != null) {
                     dashboard.container.tvSnapshotAppsCountText.text = it.toString()
                 }
-            })
-            snapshotDiffItems.observe(
-                viewLifecycleOwner, { list ->
-                    adapter.setDiffNewData(list.sortedByDescending { it.updateTime }
-                        .toMutableList()) {
-                        if (!binding.list.canScrollVertically(1)) {
-                            if (!hasAddedListBottomPadding) {
-                                binding.list.addPaddingBottom(100.dp)
-                                hasAddedListBottomPadding = true
-                            }
-                        } else {
-                            if (hasAddedListBottomPadding) {
-                                binding.list.addPaddingBottom((-100).dp)
-                                hasAddedListBottomPadding = false
-                            }
+            }
+            snapshotDiffItems.observe(viewLifecycleOwner) { list ->
+                adapter.setDiffNewData(list.sortedByDescending { it.updateTime }
+                    .toMutableList()) {
+                    if (!binding.list.canScrollVertically(1)) {
+                        if (!hasAddedListBottomPadding) {
+                            binding.list.addPaddingBottom(100.dp)
+                            hasAddedListBottomPadding = true
+                        }
+                    } else {
+                        if (hasAddedListBottomPadding) {
+                            binding.list.addPaddingBottom((-100).dp)
+                            hasAddedListBottomPadding = false
                         }
                     }
-                    flip(VF_LIST)
-
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        delay(250)
-
-                        doOnMainThreadIdle({
-                            if (this@SnapshotFragment == homeViewModel.controller
-                                && !binding.list.canScrollVertically(-1)
-                            ) {
-                                (requireActivity() as MainActivity).showNavigationView()
-                            }
-                        })
-                    }
                 }
-            )
-            comparingProgressLiveData.observe(viewLifecycleOwner, {
+                flip(VF_LIST)
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    delay(250)
+
+                    doOnMainThreadIdle({
+                        if (this@SnapshotFragment == homeViewModel.controller
+                            && !binding.list.canScrollVertically(-1)
+                        ) {
+                            (requireActivity() as MainActivity).showNavigationView()
+                        }
+                    })
+                }
+            }
+            comparingProgressLiveData.observe(viewLifecycleOwner) {
                 binding.progressIndicator.setProgressCompat(it, it != 1)
-            })
+            }
         }
         homeViewModel.apply {
             packageChangedLiveData.observe(viewLifecycleOwner) {

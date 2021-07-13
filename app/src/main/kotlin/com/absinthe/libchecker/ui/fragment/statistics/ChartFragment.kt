@@ -53,7 +53,8 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
     private var mDialog: ClassifyBottomSheetDialogFragment? = null
     private lateinit var chartView: ViewGroup
 
-    override fun initBinding(view: View): FragmentPieChartBinding = FragmentPieChartBinding.bind(view)
+    override fun initBinding(view: View): FragmentPieChartBinding =
+        FragmentPieChartBinding.bind(view)
 
     override fun init() {
         chartView = generatePieChartView()
@@ -65,14 +66,14 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
         }
 
         viewModel.apply {
-            dbItems.observe(viewLifecycleOwner, {
+            dbItems.observe(viewLifecycleOwner) {
                 setData()
-            })
+            }
         }
 
-        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
             setData()
-        })
+        }
     }
 
     private fun setData() {
@@ -419,14 +420,18 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun generatePieChartView(): PieChart {
         return PieChart(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
             dragDecelerationFrictionCoef = 0.95f
             description.isEnabled = false
             legend.apply {
                 verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
                 horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
                 orientation = Legend.LegendOrientation.HORIZONTAL
-                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                textColor =
+                    ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
                 xEntrySpace = 7f
                 yEntrySpace = 0f
                 isWordWrapEnabled = true
@@ -444,7 +449,10 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
 
     private fun generateBarChartView(): HorizontalBarChart {
         return HorizontalBarChart(requireContext()).apply {
-            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
             description.isEnabled = false
             legend.isEnabled = false
             setDrawBorders(false)
@@ -458,19 +466,19 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
                 setLabelCount(existApiList.size, false)
                 granularity = 1f
                 textSize = 10f
-                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                textColor = ContextCompat.getColor(requireContext(), R.color.textNormal)
             }
             axisLeft.apply {
                 valueFormatter = IntegerFormatter()
                 setDrawGridLines(false)
                 setDrawZeroLine(false)
-                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                textColor = ContextCompat.getColor(requireContext(), R.color.textNormal)
             }
             axisRight.apply {
                 valueFormatter = IntegerFormatter()
                 setDrawGridLines(false)
                 setDrawZeroLine(false)
-                textColor = ContextCompat.getColor(this@ChartFragment.requireContext(), R.color.textNormal)
+                textColor = ContextCompat.getColor(requireContext(), R.color.textNormal)
             }
             setMaxVisibleValueCount(Build.VERSION_CODES.R + 1)
             setDrawGridBackground(false)

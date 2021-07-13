@@ -53,7 +53,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         }
 
         viewModel.apply {
-            componentsMap[adapter.type]?.observe(viewLifecycleOwner, { componentList ->
+            componentsMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
                 if (componentList.isEmpty()) {
                     emptyView.text.text = getString(R.string.empty_list)
                 } else {
@@ -106,7 +106,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                     viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }
-            })
+            }
         }
 
         fun openLibDetailDialog(position: Int) {

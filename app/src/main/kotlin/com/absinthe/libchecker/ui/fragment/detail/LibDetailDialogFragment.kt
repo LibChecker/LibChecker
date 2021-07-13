@@ -59,7 +59,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
     override fun onStart() {
         super.onStart()
-        viewModel.detailBean.observe(this, {
+        viewModel.detailBean.observe(this) {
             if (it != null) {
                 root.apply {
                     libDetailContentView.apply {
@@ -86,7 +86,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                     isStickyEventReceived = true
                 }
             }
-        })
+        }
         if (regexName.isNullOrEmpty()) {
             viewModel.requestLibDetail(libName, type)
         } else {

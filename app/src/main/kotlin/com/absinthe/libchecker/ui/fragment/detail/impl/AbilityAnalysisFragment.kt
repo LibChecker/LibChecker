@@ -41,7 +41,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
         }
 
         viewModel.apply {
-            abilitiesMap[adapter.type]?.observe(viewLifecycleOwner, { componentList ->
+            abilitiesMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
                 if (componentList.isEmpty()) {
                     emptyView.text.text = getString(R.string.empty_list)
                 } else {
@@ -83,7 +83,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                     viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }
-            })
+            }
         }
 
         fun openLibDetailDialog(position: Int) {

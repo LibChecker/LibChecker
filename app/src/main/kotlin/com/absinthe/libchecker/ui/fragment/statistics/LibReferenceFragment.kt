@@ -34,14 +34,17 @@ import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference), SearchView.OnQueryTextListener {
+class LibReferenceFragment :
+    BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference),
+    SearchView.OnQueryTextListener {
 
     private val adapter = LibReferenceAdapter()
     private var popup: PopupMenu? = null
     private var category = GlobalValues.currentLibRefType
     private lateinit var layoutManager: LinearLayoutManager
 
-    override fun initBinding(view: View): FragmentLibReferenceBinding = FragmentLibReferenceBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibReferenceBinding =
+        FragmentLibReferenceBinding.bind(view)
 
     override fun init() {
         setHasOptionsMenu(true)
@@ -96,18 +99,22 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                     val ref = this@LibReferenceFragment.adapter.getItem(position)
                     val name = ref.libName
                     val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
-                    LibDetailDialogFragment.newInstance(name, ref.type, regexName).show(childFragmentManager, tag)
+                    LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+                        .show(childFragmentManager, tag)
                 }
             }
             setEmptyView(EmptyListView(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                ).also {
                     it.gravity = Gravity.CENTER
                 }
             })
         }
 
         homeViewModel.apply {
-            libReference.observe(viewLifecycleOwner, {
+            libReference.observe(viewLifecycleOwner) {
                 if (it == null) {
                     return@observe
                 }
@@ -119,20 +126,22 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
                 }
                 isListReady = true
                 menu?.findItem(R.id.search)?.isVisible = true
-            })
+            }
             packageChangedLiveData.observe(viewLifecycleOwner) {
                 computeRef()
             }
         }
-        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner, {
+        GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
             computeRef()
-        })
-        GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner, {
+        }
+        GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner) {
             homeViewModel.refreshRef()
-        })
+        }
 
         lifecycleScope.launch {
-            if (adapter.data.isEmpty() && AppItemRepository.getApplicationInfoItems().isNotEmpty()) {
+            if (adapter.data.isEmpty() &&
+                AppItemRepository.getApplicationInfoItems().isNotEmpty()
+            ) {
                 computeRef()
             }
         }
@@ -258,7 +267,10 @@ class LibReferenceFragment : BaseListControllerFragment<FragmentLibReferenceBind
 
             if (newText.equals("Easter Egg", true)) {
                 context?.showToast("🥚")
-                Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Lib Reference Search"))
+                Analytics.trackEvent(
+                    Constants.Event.EASTER_EGG,
+                    EventProperties().set("EASTER_EGG", "Lib Reference Search")
+                )
             }
         }
         return false
