@@ -138,7 +138,7 @@ class SnapshotDetailActivity : BaseActivity() {
             tvTargetApi.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
         }
 
-        viewModel.snapshotDetailItems.observe(this, { details ->
+        viewModel.snapshotDetailItems.observe(this) { details ->
             val titleList = mutableListOf<SnapshotTitleNode>()
 
             getNodeList(details.filter { it.itemType == NATIVE }).apply {
@@ -199,7 +199,7 @@ class SnapshotDetailActivity : BaseActivity() {
             if (titleList.isNotEmpty()) {
                 adapter.setList(titleList)
             }
-        })
+        }
 
         adapter.setEmptyView(
             when {

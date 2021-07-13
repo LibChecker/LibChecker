@@ -416,12 +416,12 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 }
             mediator.attach()
 
-            viewModel.itemsCountLiveData.observe(this, {
+            viewModel.itemsCountLiveData.observe(this) {
                 if (detailFragmentManager.currentItemsCount != it.count && types[binding.tabLayout.selectedTabPosition] == it.locate) {
                     binding.tsComponentCount.setText(it.count.toString())
                     detailFragmentManager.currentItemsCount = it.count
                 }
-            })
+            }
 
             if (!isHarmonyMode) {
                 viewModel.initComponentsData(packageName)

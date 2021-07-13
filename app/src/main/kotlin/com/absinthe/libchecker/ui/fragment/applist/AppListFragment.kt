@@ -50,7 +50,9 @@ const val VF_LOADING = 0
 const val VF_LIST = 1
 const val VF_INIT = 2
 
-class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list), SearchView.OnQueryTextListener {
+class AppListFragment :
+    BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
+    SearchView.OnQueryTextListener {
 
     private val mAdapter by unsafeLazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
@@ -163,7 +165,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
         homeViewModel.dbItems.value?.let { allDatabaseItems ->
             val filter = allDatabaseItems.filter {
                 it.label.contains(newText, ignoreCase = true) ||
-                        it.packageName.contains(newText, ignoreCase = true)
+                    it.packageName.contains(newText, ignoreCase = true)
             }.toMutableList()
 
             if (HarmonyOsUtil.isHarmonyOs() && newText.contains("Harmony", true)) {
@@ -177,12 +179,16 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                 val last: Int
                 when (layoutManager) {
                     is LinearLayoutManager -> {
-                        first = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
-                        last = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition() + 3
+                        first = (layoutManager as LinearLayoutManager)
+                            .findFirstVisibleItemPosition()
+                        last = (layoutManager as LinearLayoutManager)
+                            .findLastVisibleItemPosition() + 3
                     }
                     is StaggeredGridLayoutManager -> {
-                        first = (layoutManager as StaggeredGridLayoutManager).findFirstVisibleItemPositions(null).first()
-                        last = (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(null).last() + 3
+                        first = (layoutManager as StaggeredGridLayoutManager)
+                            .findFirstVisibleItemPositions(null).first()
+                        last = (layoutManager as StaggeredGridLayoutManager)
+                            .findLastVisibleItemPositions(null).last() + 3
                     }
                     else -> {
                         first = 0
@@ -203,7 +209,10 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
             when {
                 newText.equals("Easter Egg", true) -> {
                     context?.showToast("🥚")
-                    Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "AppList Search"))
+                    Analytics.trackEvent(
+                        Constants.Event.EASTER_EGG,
+                        EventProperties().set("EASTER_EGG", "AppList Search")
+                    )
                 }
                 newText == Constants.COMMAND_DEBUG_MODE -> {
                     GlobalValues.debugMode = true
@@ -224,29 +233,31 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.sort -> {
-                popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort)).apply {
-                    menuInflater.inflate(R.menu.sort_menu, menu)
+                popup =
+                    PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort)).apply {
+                        menuInflater.inflate(R.menu.sort_menu, menu)
 
-                    if (menu is MenuBuilder) {
-                        (menu as MenuBuilder).setOptionalIconsVisible(true)
-                    }
-
-                    menu[GlobalValues.appSortMode.value ?: Constants.SORT_MODE_DEFAULT].isChecked = true
-                    setOnMenuItemClickListener { menuItem ->
-                        val mode = when (menuItem.itemId) {
-                            R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
-                            R.id.sort_by_target_api_desc -> Constants.SORT_MODE_TARGET_API_DESC
-                            R.id.sort_default -> Constants.SORT_MODE_DEFAULT
-                            else -> Constants.SORT_MODE_DEFAULT
+                        if (menu is MenuBuilder) {
+                            (menu as MenuBuilder).setOptionalIconsVisible(true)
                         }
-                        GlobalValues.appSortMode.value = mode
-                        SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
-                        true
+
+                        menu[GlobalValues.appSortMode.value
+                            ?: Constants.SORT_MODE_DEFAULT].isChecked = true
+                        setOnMenuItemClickListener { menuItem ->
+                            val mode = when (menuItem.itemId) {
+                                R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
+                                R.id.sort_by_target_api_desc -> Constants.SORT_MODE_TARGET_API_DESC
+                                R.id.sort_default -> Constants.SORT_MODE_DEFAULT
+                                else -> Constants.SORT_MODE_DEFAULT
+                            }
+                            GlobalValues.appSortMode.value = mode
+                            SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
+                            true
+                        }
+                        setOnDismissListener {
+                            popup = null
+                        }
                     }
-                    setOnDismissListener {
-                        popup = null
-                    }
-                }
                 popup?.show()
             }
         }
@@ -256,7 +267,7 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     private fun initObserver() {
         homeViewModel.apply {
-            reloadAppsFlag.observe(viewLifecycleOwner, {
+            reloadAppsFlag.observe(viewLifecycleOwner) {
                 if (it && appListStatusLiveData.value == STATUS_NOT_START) {
                     Once.clearDone(OnceTag.FIRST_LAUNCH)
                     isFirstLaunch = true
@@ -265,21 +276,23 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         initItems()
                     })
                 }
-            })
+            }
 
-            dbItems.observe(viewLifecycleOwner, {
+            dbItems.observe(viewLifecycleOwner) {
                 if (it.isNullOrEmpty()) {
                     flip(VF_INIT)
                     initItems()
-                } else if (appListStatusLiveData.value != STATUS_START_INIT
-                    && appListStatusLiveData.value != STATUS_START_REQUEST_CHANGE) {
+                } else if (
+                    appListStatusLiveData.value != STATUS_START_INIT &&
+                    appListStatusLiveData.value != STATUS_START_REQUEST_CHANGE
+                ) {
                     updateItems(it)
                     homeViewModel.requestChange()
                 }
-            })
-            appListStatusLiveData.observe(viewLifecycleOwner, { status ->
+            }
+            appListStatusLiveData.observe(viewLifecycleOwner) { status ->
                 Timber.d("AppList status updates to $status")
-                when(status) {
+                when (status) {
                     STATUS_START_INIT -> {
                         flip(VF_INIT)
                     }
@@ -293,8 +306,15 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         dbItems.value?.let { updateItems(it) }
                     }
                     STATUS_NOT_START -> {
-                        if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT))
-                            || (!isFirstLaunch && !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST))) {
+                        if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(
+                                Once.THIS_APP_INSTALL,
+                                OnceTag.HARMONY_FIRST_INIT
+                            )) ||
+                            (!isFirstLaunch && !Once.beenDone(
+                                Once.THIS_APP_INSTALL,
+                                OnceTag.SHOULD_RELOAD_APP_LIST
+                            ))
+                        ) {
                             flip(VF_INIT)
                             initItems()
                             Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
@@ -302,22 +322,22 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         }
                     }
                 }
-            })
-            initProgressLiveData.observe(viewLifecycleOwner, {
+            }
+            initProgressLiveData.observe(viewLifecycleOwner) {
                 binding.initView.progressIndicator.setProgressCompat(it, true)
-            })
+            }
             packageChangedLiveData.observe(viewLifecycleOwner) {
                 requestChange(true)
             }
         }
 
         GlobalValues.apply {
-            isShowSystemApps.observe(viewLifecycleOwner, {
+            isShowSystemApps.observe(viewLifecycleOwner) {
                 if (isListReady) {
                     updateItems(homeViewModel.dbItems.value!!)
                 }
-            })
-            appSortMode.observe(viewLifecycleOwner, { mode ->
+            }
+            appSortMode.observe(viewLifecycleOwner) { mode ->
                 if (isListReady) {
                     homeViewModel.dbItems.value?.let { allDatabaseItems ->
                         val list = allDatabaseItems.toMutableList()
@@ -335,12 +355,12 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
                         updateItems(list)
                     }
                 }
-            })
-            shouldRequestChange.observe(viewLifecycleOwner, { should ->
+            }
+            shouldRequestChange.observe(viewLifecycleOwner) { should ->
                 if (isListReady && !should) {
                     homeViewModel.dbItems.value?.let { updateItems(it) }
                 }
-            })
+            }
         }
     }
 
@@ -376,8 +396,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
 
     private fun shouReturnTopOfList(): Boolean {
         return binding.list.canScrollVertically(-1) &&
-                (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
-                binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
+            (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
+            binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
     }
 
     private fun returnTopOfList() {
@@ -391,7 +411,8 @@ class AppListFragment : BaseListControllerFragment<FragmentAppListBinding>(R.lay
     private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
         layoutManager = when (resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-            Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            Configuration.ORIENTATION_LANDSCAPE ->
+                StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
         }
         return layoutManager

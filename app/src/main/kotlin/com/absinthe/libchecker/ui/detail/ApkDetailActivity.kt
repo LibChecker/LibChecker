@@ -319,11 +319,11 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
         }
         mediator.attach()
 
-        viewModel.itemsCountLiveData.observe(this, { locatedCount ->
+        viewModel.itemsCountLiveData.observe(this) { locatedCount ->
             if (detailFragmentManager.currentItemsCount != locatedCount.count && types[binding.tabLayout.selectedTabPosition] == locatedCount.locate) {
                 binding.tsComponentCount.setText(locatedCount.count.toString())
                 detailFragmentManager.currentItemsCount = locatedCount.count
             }
-        })
+        }
     }
 }

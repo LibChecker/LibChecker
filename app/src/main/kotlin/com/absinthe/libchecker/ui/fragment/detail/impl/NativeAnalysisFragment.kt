@@ -1,10 +1,8 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.view.View
-import androidx.lifecycle.Observer
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -31,22 +29,18 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
             }
         }
 
-        viewModel.apply {
-            val observer = Observer<List<LibStringItemChip>> {
-                if (it.isEmpty()) {
-                    emptyView.text.text = getString(R.string.empty_list)
-                } else {
-                    adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
-                }
-
-                if (!isListReady) {
-                    viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
-                    viewModel.itemsCountList[type] = it.size
-                    isListReady = true
-                }
+        viewModel.nativeLibItems.observe(viewLifecycleOwner) {
+            if (it.isEmpty()) {
+                emptyView.text.text = getString(R.string.empty_list)
+            } else {
+                adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
             }
 
-            nativeLibItems.observe(viewLifecycleOwner, observer)
+            if (!isListReady) {
+                viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
+                viewModel.itemsCountList[type] = it.size
+                isListReady = true
+            }
         }
 
         fun openLibDetailDialog(position: Int) {
