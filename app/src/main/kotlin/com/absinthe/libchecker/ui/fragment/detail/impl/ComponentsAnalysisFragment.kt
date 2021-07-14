@@ -85,9 +85,9 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         }
 
                         if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortByDescending { it.chip != null }
+                            list.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
                         } else {
-                            adapter.data.sortedByDescending { it.item.name }
+                            list.sortBy { it.item.name }
                         }
 
                         withContext(Dispatchers.Main) {

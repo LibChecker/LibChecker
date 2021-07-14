@@ -11,14 +11,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
-import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -77,23 +76,20 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     }
 
     override suspend fun sort() {
-        val rules = Repositories.ruleRepository.getAllRules()
-        val list = if (viewModel.sortMode == MODE_SORT_BY_SIZE) {
-            adapter.data.sortedByDescending {
-                rules.any { find -> it.item.name == find.name } || LCAppUtils.findRuleRegex(
-                    it.item.name,
-                    type
-                ) != null
+        val list = mutableListOf<LibStringItemChip>().also {
+            it += adapter.data
+        }
+        if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+            if (type == NATIVE) {
+                list.sortByDescending { it.item.size }
+            } else {
+                list.sortByDescending { it.item.name }
             }
         } else {
-            if (type == NATIVE) {
-                adapter.data.sortedByDescending { it.item.size }
-            } else {
-                adapter.data.sortedByDescending { it.item.name }
-            }
+            list.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
         }
         withContext(Dispatchers.Main) {
-            adapter.setDiffNewData(list.toMutableList())
+            adapter.setDiffNewData(list)
         }
     }
 

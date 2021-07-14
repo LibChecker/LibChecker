@@ -111,12 +111,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                     applicationInfo.publicSourceDir = packageName
                 }?.let {
                     val services = PackageUtils.getComponentList(it.packageName, it.services, true)
-                    val activities =
-                        PackageUtils.getComponentList(it.packageName, it.activities, true)
-                    val receivers =
-                        PackageUtils.getComponentList(it.packageName, it.receivers, true)
-                    val providers =
-                        PackageUtils.getComponentList(it.packageName, it.providers, true)
+                    val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
+                    val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
+                    val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
 
                     componentsMap[SERVICE]?.postValue(services)
                     componentsMap[ACTIVITY]?.postValue(activities)
@@ -191,9 +188,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             return chipList
         } else {
             list.forEach {
-                chip = null
-                LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
-                    chip = LibChip(
+                chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
+                    LibChip(
                         iconRes = IconResMap.getIconRes(rule.iconIndex),
                         name = rule.label,
                         regexName = rule.regexName
@@ -204,7 +200,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
             } else {
-                chipList.sortByDescending { it.chip != null }
+                chipList.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
             }
         }
         return chipList
