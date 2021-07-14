@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
 import android.widget.ImageView
+import androidx.annotation.IntRange
 import androidx.collection.LruCache
 import com.absinthe.libchecker.R
 import kotlinx.coroutines.*
@@ -17,7 +18,8 @@ import kotlin.coroutines.CoroutineContext
  */
 object AppIconCache : CoroutineScope {
 
-    private class AppIconLruCache constructor(maxSize: Int) : LruCache<Triple<String, Int, Int>, Bitmap>(maxSize) {
+    private class AppIconLruCache(@IntRange(from = 1) maxSize: Int) :
+        LruCache<Triple<String, Int, Int>, Bitmap>(maxSize) {
 
         override fun sizeOf(key: Triple<String, Int, Int>, bitmap: Bitmap): Int {
             return bitmap.byteCount / 1024
@@ -30,7 +32,7 @@ object AppIconCache : CoroutineScope {
 
     private val dispatcher: CoroutineDispatcher
 
-    private var appIconLoaders = mutableMapOf<Int, AppIconLoader>()
+    private val appIconLoaders = mutableMapOf<Int, AppIconLoader>()
 
     init {
         // Initialize app icon lru cache
@@ -67,7 +69,12 @@ object AppIconCache : CoroutineScope {
         lruCache.remove(Triple(packageName, userId, size))
     }
 
-    fun getOrLoadBitmap(context: Context, info: ApplicationInfo, userId: Int, size: Int): Bitmap {
+    private fun getOrLoadBitmap(
+        context: Context,
+        info: ApplicationInfo,
+        userId: Int,
+        size: Int
+    ): Bitmap {
         val cachedBitmap = get(info.packageName, userId, size)
         if (cachedBitmap != null) {
             return cachedBitmap
@@ -84,11 +91,15 @@ object AppIconCache : CoroutineScope {
     }
 
     @JvmStatic
-    fun loadIconBitmapAsync(context: Context,
-                            info: ApplicationInfo, userId: Int,
-                            view: ImageView): Job {
+    fun loadIconBitmapAsync(
+        context: Context,
+        info: ApplicationInfo, userId: Int,
+        view: ImageView
+    ): Job {
         return launch {
-            val size = view.measuredWidth.let { if (it > 0) it else context.resources.getDimensionPixelSize(R.dimen.app_icon_size) }
+            val size = view.measuredWidth.let {
+                if (it > 0) it else context.resources.getDimensionPixelSize(R.dimen.app_icon_size)
+            }
             val cachedBitmap = get(info.packageName, userId, size)
             if (cachedBitmap != null) {
                 view.setImageBitmap(cachedBitmap)

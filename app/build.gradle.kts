@@ -148,7 +148,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:${lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVersion}")
-    implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-service:${lifecycleVersion}")
 
     // Room components
     val roomVersion = "2.3.0"
