@@ -3,7 +3,6 @@ package com.absinthe.libchecker.services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.Service
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.res.Configuration
@@ -14,6 +13,8 @@ import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -39,7 +40,7 @@ private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
 private const val SHOOT_SUCCESS_NOTIFICATION_ID = 2
 
-class ShootService : Service() {
+class ShootService : LifecycleService() {
 
     private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
     private val notificationManager by lazy { NotificationManagerCompat.from(this) }
@@ -57,7 +58,7 @@ class ShootService : Service() {
     private val binder = object : IShootService.Stub() {
         override fun computeSnapshot(dropPrevious: Boolean) {
             Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
-            GlobalScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
+            lifecycleScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
         }
 
         override fun registerOnShootOverListener(listener: OnShootListener?) {
@@ -72,7 +73,8 @@ class ShootService : Service() {
     }
 
     @DelicateCoroutinesApi
-    override fun onBind(intent: Intent?): IBinder {
+    override fun onBind(intent: Intent): IBinder {
+        super.onBind(intent)
         return binder
     }
 
