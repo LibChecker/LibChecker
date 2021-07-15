@@ -62,6 +62,7 @@ android {
     }
 
     kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
         freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
     }
 
@@ -130,7 +131,7 @@ val grpcVersion by extra("1.39.0")
 val protocVersion by extra("3.17.3")
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
     compileOnly(fileTree("ohos"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt")
 
