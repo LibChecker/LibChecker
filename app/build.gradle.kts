@@ -13,8 +13,8 @@ plugins {
 }
 
 android {
-    compileSdk = 30
-    buildToolsVersion = "30.0.3"
+    compileSdk = 31
+    buildToolsVersion = "31.0.0"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
     val baseVersionName = "2.1.1"
@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId = "com.absinthe.libchecker"
         minSdk = 23
-        targetSdk = 30
+        targetSdk = 31
         versionCode = verCode
         versionName = verName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
