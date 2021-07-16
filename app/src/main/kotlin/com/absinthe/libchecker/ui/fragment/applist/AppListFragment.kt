@@ -420,6 +420,7 @@ class AppListFragment :
 
     private fun flip(page: Int) {
         Timber.d("flip to $page")
+        allowRefreshing = page == VF_LIST
         if (binding.vfContainer.displayedChild != page) {
             binding.vfContainer.displayedChild = page
         }

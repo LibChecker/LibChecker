@@ -9,6 +9,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.*
@@ -33,6 +34,9 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
+
+const val VF_LOADING = 0
+const val VF_LIST = 1
 
 class LibReferenceFragment :
     BaseListControllerFragment<FragmentLibReferenceBinding>(R.layout.fragment_lib_reference),
@@ -65,7 +69,7 @@ class LibReferenceFragment :
                 setInAnimation(activity, R.anim.anim_fade_in)
                 setOutAnimation(activity, R.anim.anim_fade_out)
             }
-            lottie.apply {
+            loading.apply {
                 imageAssetsFolder = "/"
 
                 val assetName = when (GlobalValues.season) {
@@ -120,10 +124,7 @@ class LibReferenceFragment :
                 }
                 adapter.setList(it)
 
-                if (binding.vfContainer.displayedChild == 0) {
-                    binding.vfContainer.displayedChild = 1
-                    binding.lottie.pauseAnimation()
-                }
+                flip(VF_LIST)
                 isListReady = true
                 menu?.findItem(R.id.search)?.isVisible = true
             }
@@ -230,11 +231,7 @@ class LibReferenceFragment :
     }
 
     private fun computeRef() {
-        if (binding.vfContainer.displayedChild == 1) {
-            binding.vfContainer.displayedChild = 0
-            binding.lottie.resumeAnimation()
-        }
-
+        flip(VF_LOADING)
         homeViewModel.cancelComputingLibReference()
         homeViewModel.computeLibReference(category)
     }
@@ -293,5 +290,21 @@ class LibReferenceFragment :
         PROVIDER -> 5
         DEX -> 6
         else -> 0
+    }
+
+    private fun flip(child: Int) {
+        allowRefreshing = child == VF_LIST
+        if (binding.vfContainer.displayedChild == child) {
+            return
+        }
+        if (child == VF_LOADING) {
+            binding.loading.resumeAnimation()
+            (requireActivity() as BaseActivity).appBar?.setRaised(false)
+        } else {
+            binding.loading.pauseAnimation()
+            binding.list.scrollToPosition(0)
+        }
+
+        binding.vfContainer.displayedChild = child
     }
 }

@@ -36,6 +36,7 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val RENGE_CHECKER = "RengeChecker"
 
@@ -179,7 +180,7 @@ class AboutActivity : AbsAboutActivity() {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
             } catch (e: ActivityNotFoundException) {
-                e.printStackTrace()
+                Timber.e(e)
                 showLongToast(R.string.toast_not_existing_market)
             }
         }

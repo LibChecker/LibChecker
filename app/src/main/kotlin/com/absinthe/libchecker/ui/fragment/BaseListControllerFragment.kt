@@ -12,6 +12,7 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : Base
     protected var borderDelegate: BorderViewDelegate? = null
     protected val homeViewModel by activityViewModels<HomeViewModel>()
     protected var isListReady = false
+    protected var allowRefreshing = true
     protected var menu: Menu? = null
 
     override fun onVisibilityChanged(visible: Boolean) {
@@ -43,4 +44,6 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) : Base
     override fun scheduleAppbarRaisingStatus() {
         getAppBar()?.setRaised(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
     }
+
+    override fun isAllowRefreshing() = allowRefreshing
 }

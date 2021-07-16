@@ -286,4 +286,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     override fun scheduleAppbarRaisingStatus() {
         getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
     }
+
+    override fun isAllowRefreshing() = true
 }

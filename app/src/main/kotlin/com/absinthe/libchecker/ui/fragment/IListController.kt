@@ -14,4 +14,5 @@ interface IListController {
     fun getAppBar(): AppBar?
     fun getBorderViewDelegate(): BorderViewDelegate?
     fun scheduleAppbarRaisingStatus()
+    fun isAllowRefreshing(): Boolean
 }

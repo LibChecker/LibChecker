@@ -39,7 +39,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
-import com.absinthe.libchecker.viewmodel.*
+import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -60,7 +60,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
     private var isSnapshotDatabaseItemsReady = false
     private var dropPrevious = false
     private var shouldCompare = true
-    private var isShooting = false
     private var hasAddedListBottomPadding = false
 
     private var shootBinder: IShootService? = null
@@ -70,7 +69,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                 viewModel.timestamp.value = timestamp
                 compareDiff()
                 shouldCompare = true
-                isShooting = false
             }
         }
 
@@ -264,7 +262,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
         }
         homeViewModel.apply {
             packageChangedLiveData.observe(viewLifecycleOwner) {
-                if (!isShooting) {
+                if (allowRefreshing) {
                     viewModel.compareDiff(GlobalValues.snapshotTimestamp)
                 }
             }
@@ -310,7 +308,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                         ), shootServiceConnection, Service.BIND_AUTO_CREATE
                     )
                 }
-                isShooting = true
                 shouldCompare = false
                 Analytics.trackEvent(
                     Constants.Event.SNAPSHOT_CLICK,
@@ -338,6 +335,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
     }
 
     private fun flip(child: Int) {
+        allowRefreshing = child == VF_LIST
         if (binding.vfContainer.displayedChild == child) {
             return
         }

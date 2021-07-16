@@ -141,7 +141,7 @@ class MainActivity : BaseActivity() {
                                 delay(200)
                                 clickBottomItemFlag = false
                             }
-                        } else {
+                        } else if (appViewModel.controller?.isAllowRefreshing() == true) {
                             appViewModel.controller?.onReturnTop()
                         }
                     }
