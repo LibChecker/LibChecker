@@ -126,7 +126,7 @@ class MainActivity : BaseActivity() {
             }
 
             // 当 ViewPager 切换页面时，改变 ViewPager 的显示
-            navView.setOnNavigationItemSelectedListener {
+            navView.setOnItemSelectedListener {
 
                 fun performClickNavigationItem(index: Int) {
                     if (binding.viewpager.currentItem != index) {
