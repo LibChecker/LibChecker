@@ -1,4 +1,5 @@
 import com.android.build.api.variant.impl.ApplicationVariantImpl
+import com.android.build.api.component.analytics.AnalyticsEnabledApplicationVariant
 import com.android.build.gradle.internal.dsl.BuildType
 import com.google.protobuf.gradle.*
 import java.nio.charset.Charset
@@ -80,7 +81,9 @@ android {
     dependenciesInfo.includeInApk = false
 
     androidComponents.onVariants { v ->
-        val variant = v as ApplicationVariantImpl
+        val variant: ApplicationVariantImpl =
+            if (v is ApplicationVariantImpl) v
+            else (v as AnalyticsEnabledApplicationVariant).delegate as ApplicationVariantImpl
         variant.outputs.forEach {
             it.outputFileName.set("LibChecker-${verName}-${verCode}-${variant.name}.apk")
         }
