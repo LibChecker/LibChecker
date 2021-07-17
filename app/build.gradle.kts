@@ -1,6 +1,4 @@
-import com.android.build.api.variant.impl.ApplicationVariantImpl
-import com.android.build.api.component.analytics.AnalyticsEnabledApplicationVariant
-import com.android.build.gradle.internal.dsl.BuildType
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import com.google.protobuf.gradle.*
 import java.nio.charset.Charset
 import java.nio.file.Paths
@@ -54,7 +52,7 @@ android {
         }
         release {
             isMinifyEnabled = true
-            (this as BuildType).isShrinkResources = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -80,12 +78,10 @@ android {
 
     dependenciesInfo.includeInApk = false
 
-    androidComponents.onVariants { v ->
-        val variant: ApplicationVariantImpl =
-            if (v is ApplicationVariantImpl) v
-            else (v as AnalyticsEnabledApplicationVariant).delegate as ApplicationVariantImpl
-        variant.outputs.forEach {
-            it.outputFileName.set("LibChecker-${verName}-${verCode}-${variant.name}.apk")
+    applicationVariants.all {
+        outputs.all {
+            (this as? ApkVariantOutputImpl)?.outputFileName =
+                "LibChecker-${verName}-${verCode}-${name}.apk"
         }
     }
 }
