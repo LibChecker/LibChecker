@@ -16,7 +16,7 @@ android {
     buildToolsVersion = "31.0.0"
 
     val gitCommitId = "git rev-parse --short HEAD".exec()
-    val baseVersionName = "2.1.1"
+    val baseVersionName = "2.1.2"
     val verName = "${baseVersionName}.${gitCommitId}"
     val verCode = "git rev-list --count HEAD".exec().toInt()
 
@@ -169,7 +169,7 @@ dependencies {
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
     implementation("com.drakeet.about:about:2.4.1")
     implementation("com.drakeet.multitype:multitype:4.3.0")
-    implementation("com.airbnb.android:lottie:3.7.1")
+    implementation("com.airbnb.android:lottie:3.7.2")
     implementation("com.jakewharton.timber:timber:4.7.1")
     implementation("com.jonathanfinerty.once:once:1.3.1")
     implementation("net.dongliu:apk-parser:2.6.10")
