@@ -141,7 +141,7 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
     implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-    implementation("androidx.fragment:fragment-ktx:1.3.5")
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
     implementation("androidx.activity:activity-ktx:1.2.3")
     // Lifecycle
     val lifecycleVersion = "2.3.1"
