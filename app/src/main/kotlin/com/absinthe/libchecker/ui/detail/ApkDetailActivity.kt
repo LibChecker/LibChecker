@@ -227,7 +227,7 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                 append(getString(R.string.multiArch))
                                 append(", ")
                             }
-                            append(PackageUtils.getTargetApiString(packageName))
+                            append(PackageUtils.getTargetApiString(it))
                             append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
                             packageInfo.sharedUserId?.let { sharedUid ->
                                 appendLine().append("sharedUserId = $sharedUid")

@@ -10,7 +10,8 @@ import android.os.Build
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.core.content.pm.PackageInfoCompat
-import com.absinthe.libchecker.*
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
@@ -38,7 +39,6 @@ import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
-import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -138,8 +138,12 @@ object PackageUtils {
      * @return version code as String
      */
     fun getTargetApiString(packageName: String): String {
+        return getTargetApiString(getPackageInfo(packageName))
+    }
+
+    fun getTargetApiString(packageInfo: PackageInfo): String {
         return try {
-            "targetSdkVersion ${getPackageInfo(packageName).applicationInfo.targetSdkVersion}"
+            "targetSdkVersion ${packageInfo.applicationInfo.targetSdkVersion}"
         } catch (e: PackageManager.NameNotFoundException) {
             "targetSdkVersion ?"
         }
