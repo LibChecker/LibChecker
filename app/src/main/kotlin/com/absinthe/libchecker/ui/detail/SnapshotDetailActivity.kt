@@ -118,13 +118,22 @@ class SnapshotDetailActivity : BaseActivity() {
                 }
                 load(icon)
                 setOnClickListener {
-                    startActivity(
-                        Intent(
-                            this@SnapshotDetailActivity,
-                            AppDetailActivity::class.java
-                        ).apply {
-                            putExtra(EXTRA_PACKAGE_NAME, entity.packageName)
-                        })
+                    lifecycleScope.launch {
+                        val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+                        startActivity(
+                            Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
+                                .putExtras(
+                                    bundleOf(
+                                        EXTRA_PACKAGE_NAME to entity.packageName,
+                                        EXTRA_DETAIL_BEAN to DetailExtraBean(
+                                            lcItem.isSplitApk,
+                                            lcItem.isKotlinUsed,
+                                            lcItem.variant
+                                        )
+                                    )
+                                )
+                        )
+                    }
                 }
             }
             tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
