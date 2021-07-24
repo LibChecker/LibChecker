@@ -18,6 +18,7 @@ import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -25,6 +26,7 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import rikka.insets.setInitialPadding
 import timber.log.Timber
 
 /**
@@ -36,22 +38,25 @@ import timber.log.Timber
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId), Sortable {
+abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId),
+    Sortable {
 
     protected val viewModel by activityViewModels<DetailViewModel>()
     protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
     protected val adapter by unsafeLazy { LibStringAdapter(type) }
-    protected val emptyView by unsafeLazy { EmptyListView(requireContext()).apply {
-        layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT
-        ).also {
-            it.gravity = Gravity.CENTER_HORIZONTAL
+    protected val emptyView by unsafeLazy {
+        EmptyListView(requireContext()).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            addPaddingTop(96.dp)
+            text.text = getString(R.string.loading)
         }
-        addPaddingTop(96.dp)
-        text.text = getString(R.string.loading)
-    } }
+    }
     protected var isListReady = false
     protected var navigateToComponentTask: Runnable? = null
 
@@ -63,8 +68,27 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
             context.detailFragmentManager.register(type, this)
         }
         if (DetailFragmentManager.navType == type) {
-            DetailFragmentManager.navComponent?.let { navigateToComponentTask = Runnable { navigateToComponentImpl(it) } }
+            DetailFragmentManager.navComponent?.let {
+                navigateToComponentTask = Runnable { navigateToComponentImpl(it) }
+            }
             DetailFragmentManager.resetNavigationParams()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (!LCAppUtils.atLeastR()) {
+            getRecyclerView().also {
+                it.post {
+                    it.setInitialPadding(
+                        0,
+                        0,
+                        0,
+                        requireActivity().window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                            ?: 0
+                    )
+                }
+            }
         }
     }
 
@@ -86,7 +110,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
                 list.sortByDescending { it.item.name }
             }
         } else {
-            list.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
+            list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
         }
         withContext(Dispatchers.Main) {
             adapter.setDiffNewData(list)

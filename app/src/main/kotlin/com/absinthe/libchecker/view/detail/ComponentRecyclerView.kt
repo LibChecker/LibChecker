@@ -4,11 +4,11 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import androidx.recyclerview.widget.RecyclerView
+import rikka.widget.borderview.BorderRecyclerView
 import kotlin.math.absoluteValue
 import kotlin.math.pow
 
-class ComponentRecyclerView : RecyclerView {
+class ComponentRecyclerView : BorderRecyclerView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
