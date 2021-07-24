@@ -34,7 +34,6 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -53,7 +52,7 @@ class AppListFragment :
     BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
     SearchView.OnQueryTextListener {
 
-    private val mAdapter by unsafeLazy { AppAdapter(lifecycleScope) }
+    private val mAdapter by lazy { AppAdapter(lifecycleScope) }
     private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
     private var popup: PopupMenu? = null
 

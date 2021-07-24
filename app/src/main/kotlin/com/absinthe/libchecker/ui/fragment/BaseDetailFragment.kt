@@ -44,7 +44,7 @@ abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment
     protected val viewModel by activityViewModels<DetailViewModel>()
     protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
     protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
-    protected val adapter by unsafeLazy { LibStringAdapter(type) }
+    protected val adapter by lazy { LibStringAdapter(type) }
     protected val emptyView by unsafeLazy {
         EmptyListView(requireContext()).apply {
             layoutParams = FrameLayout.LayoutParams(
