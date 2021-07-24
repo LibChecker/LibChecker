@@ -7,6 +7,7 @@
     <color name="backgroundGray">#FF121212</color>
     <color name="cardBorder">#FF888888</color>
     <color name="libIconBackground">#50FFFFFF</color>
+    <color name="renge">#FFBB5E61</color>
     <color name="highlightComponent">@color/material_blue_800</color>
     <color name="bottom_sheet_header_handler">#CCBBBBBB</color>
     <color name="bottom_sheet_header_handler_activated">#FFFFFFFF</color>

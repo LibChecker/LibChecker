@@ -135,7 +135,7 @@ class LibReferenceFragment :
         GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
             computeRef()
         }
-        GlobalValues.libReferenceThreshold.observe(viewLifecycleOwner) {
+        GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
             homeViewModel.refreshRef()
         }
 

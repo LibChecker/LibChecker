@@ -76,6 +76,8 @@ object Constants {
     const val RULES_DB_FILE_NAME = "rules.db"
     const val RULES_DATABASE_NAME = "rule_database"
 
+    const val RENGE_THEME = "rengeTheme"
+
     object Event {
         const val LAUNCH_ACTION = "Launch Action"
         const val SNAPSHOT_CLICK = "Snapshot Click"

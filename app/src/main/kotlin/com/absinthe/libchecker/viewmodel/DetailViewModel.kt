@@ -44,7 +44,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
     val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
     val itemsCountList = MutableList(7) { 0 }
-    var sortMode = GlobalValues.libSortMode.value ?: MODE_SORT_BY_SIZE
+    var sortMode = GlobalValues.libSortMode
     var packageName: String = ""
     var is32bit = false
     var isApk = false
@@ -197,7 +197,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }
-            if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+            if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
             } else {
                 chipList.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
@@ -226,7 +226,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }
-            if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+            if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.name }
             } else {
                 chipList.sortByDescending { it.chip != null }
@@ -256,7 +256,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                 }
                 chipList.add(LibStringItemChip(it, chip))
             }
-            if (GlobalValues.libSortMode.value == MODE_SORT_BY_SIZE) {
+            if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.name }
             } else {
                 chipList.sortByDescending { it.chip != null }

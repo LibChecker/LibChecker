@@ -27,7 +27,6 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -611,7 +610,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             var chip: LibChip?
             var rule: RuleEntity?
             for (entry in map) {
-                if (entry.value.count >= GlobalValues.libReferenceThreshold.valueUnsafe && entry.key.isNotBlank()) {
+                if (entry.value.count >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
                     rule = LCAppUtils.getRuleWithRegex(entry.key, entry.value.type)
                     chip = null
                     rule?.let {
@@ -639,7 +638,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun refreshRef() {
         libReference.value?.let { ref ->
-            libReference.value = ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold.valueUnsafe }
+            libReference.value = ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold }
         }
     }
 

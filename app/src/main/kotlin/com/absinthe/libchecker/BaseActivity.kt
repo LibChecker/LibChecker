@@ -26,7 +26,7 @@ abstract class BaseActivity : MaterialActivity() {
     }
 
     override fun computeUserThemeKey(): String {
-        return GlobalValues.darkMode
+        return GlobalValues.darkMode + GlobalValues.rengeTheme
     }
 
     override fun onApplyTranslucentSystemBars() {
@@ -42,6 +42,10 @@ abstract class BaseActivity : MaterialActivity() {
 
     override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
         theme.applyStyle(R.style.ThemeOverlay, true)
+
+        if (GlobalValues.rengeTheme) {
+            theme.applyStyle(R.style.ThemeOverlay_Renge, true)
+        }
     }
 
     private fun setViewBindingImpl(root: ViewGroup) {

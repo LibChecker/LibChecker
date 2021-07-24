@@ -3,10 +3,8 @@ package com.absinthe.libchecker.ui.fragment.detail
 import android.util.SparseArray
 import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
-import com.absinthe.libchecker.utils.SPUtils
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
@@ -43,8 +41,8 @@ class DetailFragmentManager {
     }
 
     fun changeSortMode(mode: Int) {
-        GlobalValues.libSortMode.value = mode
-        SPUtils.putInt(Constants.PREF_LIB_SORT_MODE, mode)
+        GlobalValues.libSortModeLiveData.value = mode
+        GlobalValues.libSortMode = mode
     }
 
     fun navigateToComponent(@LibType refType: Int, component: String) {

@@ -1,57 +1,37 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
-import androidx.core.content.edit
+import android.content.SharedPreferences
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.constant.SP_NAME
 
 object SPUtils {
 
-    private val sp by lazy {
+    val sp: SharedPreferences by lazy {
         LibCheckerApp.app.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
     }
 
-    fun putString(key: String, value: String) {
-        sp.edit { putString(key, value) }
+    fun <T> getValue(name: String, default: T): T = with(sp) {
+        val res: Any = when (default) {
+            is Long -> getLong(name, default)
+            is String -> getString(name, default).orEmpty()
+            is Int -> getInt(name, default)
+            is Boolean -> getBoolean(name, default)
+            is Float -> getFloat(name, default)
+            else -> throw java.lang.IllegalArgumentException()
+        }
+        @Suppress("UNCHECKED_CAST")
+        res as T
     }
 
-    fun getString(key: String): String {
-        return sp.getString(key, "").orEmpty()
-    }
-
-    fun getString(key: String, defaultValue: String): String {
-        return sp.getString(key, defaultValue).orEmpty()
-    }
-
-    fun putBoolean(key: String, value: Boolean) {
-        sp.edit { putBoolean(key, value) }
-    }
-
-    fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-        return sp.getBoolean(key, defaultValue)
-    }
-
-    fun putInt(key: String, value: Int) {
-        sp.edit { putInt(key, value) }
-    }
-
-    fun getInt(key: String): Int {
-        return sp.getInt(key, 0)
-    }
-
-    fun getInt(key: String, defaultValue: Int): Int {
-        return sp.getInt(key, defaultValue)
-    }
-
-    fun putLong(key: String, value: Long) {
-        sp.edit { putLong(key, value) }
-    }
-
-    fun getLong(key: String): Long {
-        return sp.getLong(key, 0)
-    }
-
-    fun getLong(key: String, defaultValue: Long): Long {
-        return sp.getLong(key, defaultValue)
+    fun <T> putValue(name: String, value: T) = with(sp.edit()) {
+        when (value) {
+            is Long -> putLong(name, value)
+            is String -> putString(name, value)
+            is Int -> putInt(name, value)
+            is Boolean -> putBoolean(name, value)
+            is Float -> putFloat(name, value)
+            else -> throw IllegalArgumentException("This type can't be saved into Preferences")
+        }.apply()
     }
 }

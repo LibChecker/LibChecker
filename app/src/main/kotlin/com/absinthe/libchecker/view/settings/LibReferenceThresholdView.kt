@@ -16,7 +16,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
         valueFrom = 1f
         valueTo = 50f
         stepSize = 1f
-        value = GlobalValues.libReferenceThreshold.value?.toFloat() ?: 1f
+        value = GlobalValues.libReferenceThreshold.toFloat()
         addView(this)
     }
     val count: TextView = TextView(context).apply {

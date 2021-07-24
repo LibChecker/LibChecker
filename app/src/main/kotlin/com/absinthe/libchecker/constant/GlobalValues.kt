@@ -1,54 +1,45 @@
 package com.absinthe.libchecker.constant
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.SPDelegates
+import com.absinthe.libchecker.utils.SPUtils
 import java.util.*
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
 object GlobalValues {
 
-    private val preferences: SharedPreferences = LibCheckerApp.app
-        .getSharedPreferences(SP_NAME, Context.MODE_PRIVATE)
-
     private fun getPreferences(): SharedPreferences {
-        return preferences
+        return SPUtils.sp
     }
 
-    var repo = getPreferences().getString(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
-        ?: Constants.REPO_GITEE
+    var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
 
-    var snapshotTimestamp: Long = 0
-        get() = getPreferences().getLong(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
-        set(value) {
-            field = value
-            getPreferences().edit { putLong(Constants.PREF_SNAPSHOT_TIMESTAMP, value) }
-        }
+    var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 
-    var localRulesVersion: Int = RULES_VERSION
-        get() = getPreferences().getInt(Constants.PREF_LOCAL_RULES_VERSION, RULES_VERSION)
-        set(value) {
-            field = value
-            getPreferences().edit { putInt(Constants.PREF_LOCAL_RULES_VERSION, value) }
-        }
+    var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, RULES_VERSION)
 
-    @LibType
-    var currentLibRefType: Int = NATIVE
-        get() = getPreferences().getInt(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
-        set(value) {
-            field = value
-            getPreferences().edit { putInt(Constants.CURRENT_LIB_REF_TYPE, value) }
-        }
+    var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
+
+    var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
+
+    var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
+
+    var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
+
+    var appSortMode: Int by SPDelegates(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
+
+    var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
+
+    var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
     val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(false)
 
@@ -61,14 +52,11 @@ object GlobalValues {
     val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
         MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
 
-    val appSortMode: MutableLiveData<Int> =
-        MutableLiveData(getPreferences().getInt(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT))
+    val appSortModeLiveData: MutableLiveData<Int> = MutableLiveData(appSortMode)
 
-    val libSortMode: MutableLiveData<Int> =
-        MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE))
+    val libSortModeLiveData: MutableLiveData<Int> = MutableLiveData(libSortMode)
 
-    val libReferenceThreshold: MutableLiveData<Int> =
-        MutableLiveData(getPreferences().getInt(Constants.PREF_LIB_REF_THRESHOLD, 2))
+    val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
     val season = LCAppUtils.getCurrentSeason()
 
@@ -78,12 +66,7 @@ object GlobalValues {
         Build.SUPPORTED_ABIS.toList()
     }
 
-    var debugMode: Boolean = false
-    get() = getPreferences().getBoolean(Constants.PREF_DEBUG_MODE, false)
-    set(value) {
-        field = value
-        getPreferences().edit { putBoolean(Constants.PREF_DEBUG_MODE, value) }
-    }
+    var hasFinishedShoot: Boolean = false
 
     var locale: Locale = Locale.getDefault()
         get() {
@@ -96,14 +79,5 @@ object GlobalValues {
         set(value) {
             field = value
             getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
-        }
-
-    var hasFinishedShoot: Boolean = false
-
-    var darkMode: String = Constants.DARK_MODE_FOLLOW_SYSTEM
-        get() = getPreferences().getString(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)!!
-        set(value) {
-            field = value
-            getPreferences().edit { putString(Constants.PREF_DARK_MODE, value) }
         }
 }

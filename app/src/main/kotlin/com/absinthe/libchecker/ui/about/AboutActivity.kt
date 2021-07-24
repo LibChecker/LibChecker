@@ -44,11 +44,19 @@ class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
     private val configuration by lazy { Configuration(resources.configuration).apply { setLocale(GlobalValues.locale) } }
+    private val mediaPlayer by lazy { MediaPlayer() }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         initView()
         Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ABOUT", "Entered"))
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (shouldShowEasterEggCount == 20) {
+            mediaPlayer.release()
+        }
     }
 
     override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
@@ -61,24 +69,28 @@ class AboutActivity : AbsAboutActivity() {
             shouldShowEasterEggCount = if (slogan.text == RENGE_CHECKER) 11 else 1
         }
         icon.setOnClickListener {
-            if (shouldShowEasterEggCount < 10) {
-                rebornCoroutine.cancel()
-                shouldShowEasterEggCount++
-                rebornCoroutine.start()
-            } else if (shouldShowEasterEggCount == 10) {
-                slogan.text = RENGE_CHECKER
-                rebornCoroutine.cancel()
-                shouldShowEasterEggCount++
-                Analytics.trackEvent(
-                    Constants.Event.EASTER_EGG,
-                    EventProperties().set("EASTER_EGG", "Renge 10 hits")
-                )
-            } else {
-                if (shouldShowEasterEggCount < 20) {
+            when(shouldShowEasterEggCount) {
+                in 0..9 -> {
                     rebornCoroutine.cancel()
                     shouldShowEasterEggCount++
                     rebornCoroutine.start()
-                } else if (shouldShowEasterEggCount == 20) {
+                }
+                10 -> {
+                    slogan.text = RENGE_CHECKER
+                    rebornCoroutine.cancel()
+                    shouldShowEasterEggCount++
+                    Analytics.trackEvent(
+                        Constants.Event.EASTER_EGG,
+                        EventProperties().set("EASTER_EGG", "Renge 10 hits")
+                    )
+                }
+                in 11..19 -> {
+                    rebornCoroutine.cancel()
+                    shouldShowEasterEggCount++
+                    rebornCoroutine.start()
+                }
+                20 -> {
+                    rebornCoroutine.cancel()
                     shouldShowEasterEggCount++
 
                     val inputStream = assets.open("renge.webp")
@@ -92,11 +104,12 @@ class AboutActivity : AbsAboutActivity() {
                     drawable.startTransition(250)
 
                     val fd = assets.openFd("renge_no_koe.aac")
-                    MediaPlayer().apply {
-                        setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
-                        prepare()
-                        start()
+                    mediaPlayer.also {
+                        it.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
+                        it.prepare()
+                        it.start()
                     }
+                    GlobalValues.rengeTheme = !GlobalValues.rengeTheme
                     Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 20 hits!"))
                 }
             }

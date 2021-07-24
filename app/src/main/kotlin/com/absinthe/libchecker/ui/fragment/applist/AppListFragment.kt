@@ -35,7 +35,6 @@ import com.absinthe.libchecker.utils.*
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -218,7 +217,7 @@ class AppListFragment :
                     GlobalValues.debugMode = true
                     context?.showToast("DEBUG MODE")
                 }
-                newText == Constants.COMMAND_DEBUG_MODE -> {
+                newText == Constants.COMMAND_USER_MODE -> {
                     GlobalValues.debugMode = false
                     context?.showToast("USER MODE")
                 }
@@ -241,8 +240,7 @@ class AppListFragment :
                             (menu as MenuBuilder).setOptionalIconsVisible(true)
                         }
 
-                        menu[GlobalValues.appSortMode.value
-                            ?: Constants.SORT_MODE_DEFAULT].isChecked = true
+                        menu[GlobalValues.appSortMode].isChecked = true
                         setOnMenuItemClickListener { menuItem ->
                             val mode = when (menuItem.itemId) {
                                 R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
@@ -250,8 +248,8 @@ class AppListFragment :
                                 R.id.sort_default -> Constants.SORT_MODE_DEFAULT
                                 else -> Constants.SORT_MODE_DEFAULT
                             }
-                            GlobalValues.appSortMode.value = mode
-                            SPUtils.putInt(Constants.PREF_APP_SORT_MODE, mode)
+                            GlobalValues.appSortModeLiveData.value = mode
+                            GlobalValues.appSortMode = mode
                             true
                         }
                         setOnDismissListener {
@@ -337,7 +335,7 @@ class AppListFragment :
                     updateItems(homeViewModel.dbItems.value!!)
                 }
             }
-            appSortMode.observe(viewLifecycleOwner) { mode ->
+            appSortModeLiveData.observe(viewLifecycleOwner) { mode ->
                 if (isListReady) {
                     homeViewModel.dbItems.value?.let { allDatabaseItems ->
                         val list = allDatabaseItems.toMutableList()
@@ -376,7 +374,7 @@ class AppListFragment :
             }
         }
 
-        when (GlobalValues.appSortMode.value) {
+        when (GlobalValues.appSortMode) {
             Constants.SORT_MODE_DEFAULT -> filterList.sortWith(compareBy({ it.abi }, { it.label }))
             Constants.SORT_MODE_UPDATE_TIME_DESC -> filterList.sortByDescending { it.lastUpdatedTime }
             Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
@@ -396,7 +394,7 @@ class AppListFragment :
 
     private fun shouReturnTopOfList(): Boolean {
         return binding.list.canScrollVertically(-1) &&
-            (GlobalValues.appSortMode.valueUnsafe == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
+            (GlobalValues.appSortMode == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
             binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
     }
 
