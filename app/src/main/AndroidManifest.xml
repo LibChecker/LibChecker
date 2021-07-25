@@ -1,110 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.absinthe.libchecker"
-    tools:ignore="QueryAllPackagesPermission">
+  xmlns:tools="http://schemas.android.com/tools"
+  package="com.absinthe.libchecker"
+  tools:ignore="QueryAllPackagesPermission">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-    <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
+  <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
 
-    <permission
-        android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
-        android:description="@string/permission_label_get_marked_libraries"
-        android:label="@string/permission_label_get_marked_libraries"
-        android:protectionLevel="normal" />
+  <permission
+    android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
+    android:description="@string/permission_label_get_marked_libraries"
+    android:label="@string/permission_label_get_marked_libraries"
+    android:protectionLevel="normal" />
 
-    <application
-        android:name=".LibCheckerApp"
-        android:allowBackup="true"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+  <application
+    android:name=".LibCheckerApp"
+    android:allowBackup="true"
+    android:fullBackupContent="@xml/backup_rules"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/AppTheme">
 
-        <activity
-            android:name=".ui.main.MainActivity"
-            android:configChanges="orientation"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+    <activity
+      android:name=".ui.main.MainActivity"
+      android:configChanges="orientation"
+      android:exported="true"
+      android:label="@string/app_name"
+      android:launchMode="singleTop">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
 
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
-        </activity>
-        <activity
-            android:name=".ui.detail.AppDetailActivity"
-            android:configChanges="orientation"
-            android:exported="true"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.SHOW_APP_INFO" />
+      <meta-data
+        android:name="android.app.shortcuts"
+        android:resource="@xml/shortcuts" />
+    </activity>
+    <activity
+      android:name=".ui.detail.AppDetailActivity"
+      android:configChanges="orientation"
+      android:exported="true"
+      android:launchMode="singleTask">
+      <intent-filter>
+        <action android:name="android.intent.action.SHOW_APP_INFO" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.detail.ApkDetailActivity"
-            android:configChanges="orientation"
-            android:exported="true"
-            android:label="@string/detail_label">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+    </activity>
+    <activity
+      android:name=".ui.detail.ApkDetailActivity"
+      android:configChanges="orientation"
+      android:exported="true"
+      android:label="@string/detail_label">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="content" />
-                <data android:mimeType="application/vnd.android.package-archive" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".ui.detail.SnapshotDetailActivity"
-            android:configChanges="orientation" />
-        <activity
-            android:name=".ui.snapshot.AlbumActivity"
-            android:configChanges="orientation"
-            android:label="@string/title_album" />
-        <activity
-            android:name=".ui.album.BackupActivity"
-            android:label="@string/album_item_backup_restore_title" />
-        <activity
-            android:name=".ui.album.ComparisonActivity"
-            android:label="@string/album_item_comparison_title" />
-        <activity
-            android:name=".ui.album.TrackActivity"
-            android:label="@string/album_item_track_title" />
-        <activity
-            android:name=".ui.main.LibReferenceActivity"
-            android:configChanges="orientation"
-            android:label="@string/tab_lib_reference_statistics"
-            android:launchMode="singleTask" />
-        <activity
-            android:name=".ui.main.ChartActivity"
-            android:label="@string/tab_chart" />
-        <activity
-            android:name=".ui.about.AboutActivity"
-            android:label="@string/settings_about"
-            android:theme="@style/AppTheme.About" />
+        <data android:scheme="content" />
+        <data android:mimeType="application/vnd.android.package-archive" />
+      </intent-filter>
+    </activity>
+    <activity
+      android:name=".ui.detail.SnapshotDetailActivity"
+      android:configChanges="orientation" />
+    <activity
+      android:name=".ui.snapshot.AlbumActivity"
+      android:configChanges="orientation"
+      android:label="@string/title_album" />
+    <activity
+      android:name=".ui.album.BackupActivity"
+      android:label="@string/album_item_backup_restore_title" />
+    <activity
+      android:name=".ui.album.ComparisonActivity"
+      android:label="@string/album_item_comparison_title" />
+    <activity
+      android:name=".ui.album.TrackActivity"
+      android:label="@string/album_item_track_title" />
+    <activity
+      android:name=".ui.main.LibReferenceActivity"
+      android:configChanges="orientation"
+      android:label="@string/tab_lib_reference_statistics"
+      android:launchMode="singleTask" />
+    <activity
+      android:name=".ui.main.ChartActivity"
+      android:label="@string/tab_chart" />
+    <activity
+      android:name=".ui.about.AboutActivity"
+      android:label="@string/settings_about"
+      android:theme="@style/AppTheme.About" />
 
-        <service android:name=".services.ShootService" />
+    <service android:name=".services.ShootService" />
 
-        <provider
-            android:name=".provider.CoreProvider"
-            android:authorities="${applicationId}.provider"
-            android:enabled="true"
-            android:exported="true"
-            android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
+    <provider
+      android:name=".provider.CoreProvider"
+      android:authorities="${applicationId}.provider"
+      android:enabled="true"
+      android:exported="true"
+      android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
 
-    </application>
+  </application>
 
 </manifest>

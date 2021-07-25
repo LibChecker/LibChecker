@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="ThemeOverlay" />
+  <style name="ThemeOverlay" />
 
-    <style name="ThemeOverlay.Black">
-        <item name="android:colorPrimary">@android:color/black</item>
-        <item name="android:colorPrimaryDark">@android:color/black</item>
-        <item name="android:colorBackground">@android:color/black</item>
-    </style>
+  <style name="ThemeOverlay.Black">
+    <item name="android:colorPrimary">@android:color/black</item>
+    <item name="android:colorPrimaryDark">@android:color/black</item>
+    <item name="android:colorBackground">@android:color/black</item>
+  </style>
 </resources>

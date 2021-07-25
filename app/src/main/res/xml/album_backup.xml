@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-        app:key="backupCategory"
-        app:title="@string/album_backup">
+  <PreferenceCategory
+    app:key="backupCategory"
+    app:title="@string/album_backup">
 
-        <Preference
-            app:icon="@drawable/ic_backup"
-            app:key="localBackup"
-            app:summary="@string/album_backup_summary"
-            app:title="@string/album_backup" />
+    <Preference
+      app:icon="@drawable/ic_backup"
+      app:key="localBackup"
+      app:summary="@string/album_backup_summary"
+      app:title="@string/album_backup" />
 
-    </PreferenceCategory>
+  </PreferenceCategory>
 
-    <PreferenceCategory
-        app:key="restoreCategory"
-        app:title="@string/album_restore">
+  <PreferenceCategory
+    app:key="restoreCategory"
+    app:title="@string/album_restore">
 
-        <Preference
-            android:icon="@drawable/ic_restore"
-            app:key="localRestore"
-            app:summary="@string/album_restore_summary"
-            app:title="@string/album_restore">
+    <Preference
+      android:icon="@drawable/ic_restore"
+      app:key="localRestore"
+      app:summary="@string/album_restore_summary"
+      app:title="@string/album_restore">
 
-        </Preference>
+    </Preference>
 
-    </PreferenceCategory>
+  </PreferenceCategory>
 
 </PreferenceScreen>

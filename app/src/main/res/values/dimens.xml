@@ -1,42 +1,42 @@
 <resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="app_icon_size">40dp</dimen>
-    <dimen name="lib_reference_icon_size">50dp</dimen>
-    <dimen name="lib_detail_icon_size">60dp</dimen>
-    <dimen name="normal_padding">16dp</dimen>
-    <dimen name="normal_icon_size">24dp</dimen>
-    <dimen name="app_info_icon_size">45dp</dimen>
-    <dimen name="normal_padding_24">24dp</dimen>
+  <!-- Default screen margins, per the Android Design guidelines. -->
+  <dimen name="app_icon_size">40dp</dimen>
+  <dimen name="lib_reference_icon_size">50dp</dimen>
+  <dimen name="lib_detail_icon_size">60dp</dimen>
+  <dimen name="normal_padding">16dp</dimen>
+  <dimen name="normal_icon_size">24dp</dimen>
+  <dimen name="app_info_icon_size">45dp</dimen>
+  <dimen name="normal_padding_24">24dp</dimen>
 
-    <dimen name="app_bar_elevation">4dp</dimen>
+  <dimen name="app_bar_elevation">4dp</dimen>
 
-    <dimen name="lottie_anim_size">300dp</dimen>
+  <dimen name="lottie_anim_size">300dp</dimen>
 
-    <integer name="rd_material_dialog_enter_alpha_anim_duration">150</integer>
-    <integer name="rd_material_dialog_enter_scale_anim_duration">225</integer>
-    <integer name="rd_material_dialog_exit_alpha_anim_duration">150</integer>
-    <integer name="rd_material_dialog_exit_scale_anim_duration">150</integer>
+  <integer name="rd_material_dialog_enter_alpha_anim_duration">150</integer>
+  <integer name="rd_material_dialog_enter_scale_anim_duration">225</integer>
+  <integer name="rd_material_dialog_exit_alpha_anim_duration">150</integer>
+  <integer name="rd_material_dialog_exit_scale_anim_duration">150</integer>
 
-    <dimen name="toast_radius">24dp</dimen>
-    <dimen name="snapshot_detail_count_radius">36dp</dimen>
-    <dimen name="dialog_handler_radius">2dp</dimen>
+  <dimen name="toast_radius">24dp</dimen>
+  <dimen name="snapshot_detail_count_radius">36dp</dimen>
+  <dimen name="dialog_handler_radius">2dp</dimen>
 
-    <dimen name="condense_abi_badge_width">60dp</dimen>
+  <dimen name="condense_abi_badge_width">60dp</dimen>
 
-    <dimen name="main_card_margin">4dp</dimen>
-    <dimen name="main_card_padding">8dp</dimen>
-    <dimen name="main_card_corner_radius">3dp</dimen>
-    <dimen name="main_card_elevation">1dp</dimen>
+  <dimen name="main_card_margin">4dp</dimen>
+  <dimen name="main_card_padding">8dp</dimen>
+  <dimen name="main_card_corner_radius">3dp</dimen>
+  <dimen name="main_card_elevation">1dp</dimen>
 
-    <dimen name="album_item_margin_horizontal">8dp</dimen>
-    <dimen name="album_item_margin_vertical">4dp</dimen>
-    <dimen name="album_card_icon_size">45dp</dimen>
-    <dimen name="album_card_padding">8dp</dimen>
-    <dimen name="album_card_corner">5dp</dimen>
-    <dimen name="album_card_inset_horizontal">20dp</dimen>
-    <dimen name="album_card_inset_vertical">32dp</dimen>
-    <dimen name="album_card_stroke_width">1.5dp</dimen>
+  <dimen name="album_item_margin_horizontal">8dp</dimen>
+  <dimen name="album_item_margin_vertical">4dp</dimen>
+  <dimen name="album_card_icon_size">45dp</dimen>
+  <dimen name="album_card_padding">8dp</dimen>
+  <dimen name="album_card_corner">5dp</dimen>
+  <dimen name="album_card_inset_horizontal">20dp</dimen>
+  <dimen name="album_card_inset_vertical">32dp</dimen>
+  <dimen name="album_card_stroke_width">1.5dp</dimen>
 
-    <dimen name="detail_toolbar_size">48dp</dimen>
+  <dimen name="detail_toolbar_size">48dp</dimen>
 
 </resources>

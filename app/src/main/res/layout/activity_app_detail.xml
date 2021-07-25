@@ -1,229 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    app:consumeSystemWindowsInsets="start|end"
-    app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end|top"
-    tools:context=".ui.detail.AppDetailActivity">
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="false"
+  app:consumeSystemWindowsInsets="start|end"
+  app:edgeToEdge="true"
+  app:fitsSystemWindowsInsets="start|end|top"
+  tools:context=".ui.detail.AppDetailActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/header_layout"
+  <com.google.android.material.appbar.AppBarLayout
+    android:id="@+id/header_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@null">
+
+    <com.google.android.material.appbar.CollapsingToolbarLayout
+      android:id="@+id/collapsing_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@null"
+      app:contentScrim="?android:colorBackground"
+      app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
+      app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+      <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@null">
+        android:paddingHorizontal="@dimen/normal_padding"
+        android:paddingTop="?attr/actionBarSize"
+        android:paddingBottom="@dimen/normal_padding"
+        app:layout_collapseMode="parallax">
 
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
-            android:layout_width="match_parent"
+        <ImageView
+          android:id="@+id/iv_app_icon"
+          android:layout_width="@dimen/lib_detail_icon_size"
+          android:layout_height="@dimen/lib_detail_icon_size"
+          android:contentDescription="App icon"
+          android:transitionName="app_icon"
+          app:layout_constraintStart_toStartOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          tools:background="@drawable/pic_splash"
+          tools:ignore="HardcodedText" />
+
+        <com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
+          android:id="@+id/tv_app_name"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="@dimen/normal_padding"
+          android:layout_marginEnd="8dp"
+          android:fontFamily="sans-serif-medium"
+          android:textColor="@color/textNormal"
+          android:textSize="16sp"
+          android:transitionName="app_name"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toEndOf="@id/iv_app_icon"
+          app:layout_constraintTop_toTopOf="@id/iv_app_icon"
+          tools:text="LibChecker" />
+
+        <TextView
+          android:id="@+id/tv_package_name"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:fontFamily="sans-serif"
+          android:textColor="@color/textNormal"
+          android:textSize="14sp"
+          android:transitionName="package_name"
+          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
+          app:layout_constraintStart_toStartOf="@id/tv_app_name"
+          app:layout_constraintTop_toBottomOf="@id/tv_app_name"
+          tools:text="com.absinthe.libchecker" />
+
+        <TextView
+          android:id="@+id/tv_version"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:fontFamily="sans-serif-condensed"
+          android:textColor="@android:color/darker_gray"
+          android:textSize="12sp"
+          android:transitionName="version_name"
+          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
+          app:layout_constraintStart_toStartOf="@id/tv_package_name"
+          app:layout_constraintTop_toBottomOf="@id/tv_package_name"
+          tools:text="1.2.0(120)" />
+
+        <TextView
+          android:id="@+id/tv_extra_info"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:fontFamily="sans-serif-condensed-medium"
+          android:textColor="@android:color/darker_gray"
+          android:textSize="12sp"
+          android:transitionName="abi_and_api"
+          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
+          app:layout_constraintStart_toStartOf="@id/tv_package_name"
+          app:layout_constraintTop_toBottomOf="@id/tv_version"
+          tools:text="arm64-v8, Target API 30" />
+
+        <com.google.android.material.chip.ChipGroup
+          android:id="@+id/chipGroup"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="@dimen/normal_padding"
+          android:clipToPadding="false"
+          android:paddingVertical="4dp"
+          android:visibility="gone"
+          app:chipSpacing="@dimen/normal_padding"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintTop_toBottomOf="@id/tv_extra_info"
+          tools:visibility="visible">
+
+          <com.google.android.material.chip.Chip
+            android:id="@+id/chip_app_bundle"
+            style="@style/App.LibChip"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@null"
-            app:contentScrim="?android:colorBackground"
-            app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            android:text="@string/app_bundle"
+            app:chipIcon="@drawable/ic_aab" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/header_content_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/normal_padding"
-                android:paddingTop="?attr/actionBarSize"
-                android:paddingBottom="@dimen/normal_padding"
-                app:layout_collapseMode="parallax">
+          <com.google.android.material.chip.Chip
+            android:id="@+id/chip_kotlin_used"
+            style="@style/App.LibChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/kotlin_used"
+            app:chipIcon="@drawable/ic_kotlin_logo" />
 
-                <ImageView
-                    android:id="@+id/iv_app_icon"
-                    android:layout_width="@dimen/lib_detail_icon_size"
-                    android:layout_height="@dimen/lib_detail_icon_size"
-                    android:contentDescription="App icon"
-                    android:transitionName="app_icon"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:background="@drawable/pic_splash"
-                    tools:ignore="HardcodedText" />
+        </com.google.android.material.chip.ChipGroup>
 
-                <com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
-                    android:id="@+id/tv_app_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/normal_padding"
-                    android:layout_marginEnd="8dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/textNormal"
-                    android:textSize="16sp"
-                    android:transitionName="app_name"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/iv_app_icon"
-                    app:layout_constraintTop_toTopOf="@id/iv_app_icon"
-                    tools:text="LibChecker" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <TextView
-                    android:id="@+id/tv_package_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:textColor="@color/textNormal"
-                    android:textSize="14sp"
-                    android:transitionName="package_name"
-                    app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-                    app:layout_constraintStart_toStartOf="@id/tv_app_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_app_name"
-                    tools:text="com.absinthe.libchecker" />
+      <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_collapseMode="pin"
+        app:titleTextColor="@color/textNormal" />
 
-                <TextView
-                    android:id="@+id/tv_version"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp"
-                    android:transitionName="version_name"
-                    app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-                    app:layout_constraintStart_toStartOf="@id/tv_package_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_package_name"
-                    tools:text="1.2.0(120)" />
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
 
-                <TextView
-                    android:id="@+id/tv_extra_info"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-condensed-medium"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="12sp"
-                    android:transitionName="abi_and_api"
-                    app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-                    app:layout_constraintStart_toStartOf="@id/tv_package_name"
-                    app:layout_constraintTop_toBottomOf="@id/tv_version"
-                    tools:text="arm64-v8, Target API 30" />
+  </com.google.android.material.appbar.AppBarLayout>
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/normal_padding"
-                    android:clipToPadding="false"
-                    android:paddingVertical="4dp"
-                    android:visibility="gone"
-                    app:chipSpacing="@dimen/normal_padding"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_extra_info"
-                    tools:visibility="visible">
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_app_bundle"
-                        style="@style/App.LibChip"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/app_bundle"
-                        app:chipIcon="@drawable/ic_aab" />
+    <com.google.android.material.tabs.TabLayout
+      android:id="@+id/tab_layout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?android:colorBackground"
+      app:tabGravity="start"
+      app:tabMode="scrollable">
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_kotlin_used"
-                        style="@style/App.LibChip"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/kotlin_used"
-                        app:chipIcon="@drawable/ic_kotlin_logo" />
+    </com.google.android.material.tabs.TabLayout>
 
-                </com.google.android.material.chip.ChipGroup>
+    <androidx.cardview.widget.CardView
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/detail_toolbar_size"
+      android:backgroundTint="?android:colorBackground"
+      app:layout_constraintTop_toTopOf="parent">
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:titleTextColor="@color/textNormal" />
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <LinearLayout
+      <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+        android:background="@null">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:colorBackground"
-            app:tabGravity="start"
-            app:tabMode="scrollable">
+        <TextView
+          android:id="@+id/tv_items"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:layout_marginStart="@dimen/normal_padding"
+          android:gravity="center"
+          android:text="@string/items_count"
+          android:textColor="@color/textNormal"
+          app:layout_constraintStart_toStartOf="parent" />
 
-        </com.google.android.material.tabs.TabLayout>
+        <com.absinthe.libchecker.view.detail.TextSwitcherView
+          android:id="@+id/ts_component_count"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:padding="8dp"
+          app:layout_constraintStart_toEndOf="@id/tv_items" />
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/detail_toolbar_size"
-            android:backgroundTint="?android:colorBackground"
-            app:layout_constraintTop_toTopOf="parent">
+        <androidx.appcompat.widget.AppCompatImageButton
+          android:id="@+id/ib_harmony_badge"
+          android:layout_width="@dimen/detail_toolbar_size"
+          android:layout_height="@dimen/detail_toolbar_size"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          android:scaleType="center"
+          android:src="@drawable/ic_harmonyos_logo"
+          android:tooltipText="@string/ability"
+          android:visibility="gone"
+          app:layout_constraintEnd_toStartOf="@id/ib_sort"
+          app:layout_constraintTop_toTopOf="parent"
+          tools:targetApi="o" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@null">
+        <androidx.appcompat.widget.AppCompatImageButton
+          android:id="@+id/ib_sort"
+          android:layout_width="@dimen/detail_toolbar_size"
+          android:layout_height="@dimen/detail_toolbar_size"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          android:contentDescription="Sort"
+          android:scaleType="center"
+          android:src="@drawable/ic_lib_sort"
+          android:tooltipText="@string/menu_sort"
+          app:layout_constraintBottom_toBottomOf="parent"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintTop_toTopOf="parent"
+          tools:ignore="HardcodedText"
+          tools:targetApi="o" />
 
-                <TextView
-                    android:id="@+id/tv_items"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/normal_padding"
-                    android:gravity="center"
-                    android:text="@string/items_count"
-                    android:textColor="@color/textNormal"
-                    app:layout_constraintStart_toStartOf="parent" />
+      </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <com.absinthe.libchecker.view.detail.TextSwitcherView
-                    android:id="@+id/ts_component_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:padding="8dp"
-                    app:layout_constraintStart_toEndOf="@id/tv_items" />
+    </androidx.cardview.widget.CardView>
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/ib_harmony_badge"
-                    android:layout_width="@dimen/detail_toolbar_size"
-                    android:layout_height="@dimen/detail_toolbar_size"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_harmonyos_logo"
-                    android:tooltipText="@string/ability"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toStartOf="@id/ib_sort"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:targetApi="o" />
+    <androidx.viewpager2.widget.ViewPager2
+      android:id="@+id/viewpager"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
 
-                <androidx.appcompat.widget.AppCompatImageButton
-                    android:id="@+id/ib_sort"
-                    android:layout_width="@dimen/detail_toolbar_size"
-                    android:layout_height="@dimen/detail_toolbar_size"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Sort"
-                    android:scaleType="center"
-                    android:src="@drawable/ic_lib_sort"
-                    android:tooltipText="@string/menu_sort"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="HardcodedText"
-                    tools:targetApi="o" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewpager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </LinearLayout>
+  </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

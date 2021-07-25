@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/navigation_app_list"
-        android:icon="@drawable/ic_app_list"
-        android:title="@string/title_app_list" />
+  <item
+    android:id="@+id/navigation_app_list"
+    android:icon="@drawable/ic_app_list"
+    android:title="@string/title_app_list" />
 
-    <item
-        android:id="@+id/navigation_classify"
-        android:icon="@drawable/ic_classify"
-        android:title="@string/title_statistics" />
+  <item
+    android:id="@+id/navigation_classify"
+    android:icon="@drawable/ic_classify"
+    android:title="@string/title_statistics" />
 
-    <item
-        android:id="@+id/navigation_snapshot"
-        android:icon="@drawable/ic_snapshot"
-        android:title="@string/title_snapshot" />
+  <item
+    android:id="@+id/navigation_snapshot"
+    android:icon="@drawable/ic_snapshot"
+    android:title="@string/title_snapshot" />
 
-    <item
-        android:id="@+id/navigation_settings"
-        android:icon="@drawable/ic_settings"
-        android:title="@string/title_settings" />
+  <item
+    android:id="@+id/navigation_settings"
+    android:icon="@drawable/ic_settings"
+    android:title="@string/title_settings" />
 
 </menu>

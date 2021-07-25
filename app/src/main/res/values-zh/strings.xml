@@ -1,171 +1,171 @@
 <resources>
-    <!--  General  -->
-    <string name="app_name">LibChecker</string>
-    <string name="title_app_list">应用列表</string>
-    <string name="title_statistics">统计</string>
-    <string name="title_snapshot">快照</string>
-    <string name="title_settings">设置</string>
-    <string name="title_album">相簿</string>
-    <string name="loading">加载中…</string>
-    <string name="channel_shoot">保存快照</string>
-    <string name="noti_shoot_title">正在保存当前快照</string>
-    <string name="noti_shoot_title_saved">快照已保存</string>
-    <string name="permission_label_get_marked_libraries">允许应用程序获取由 LibChecker 提供的标记库信息</string>
+  <!--  General  -->
+  <string name="app_name">LibChecker</string>
+  <string name="title_app_list">应用列表</string>
+  <string name="title_statistics">统计</string>
+  <string name="title_snapshot">快照</string>
+  <string name="title_settings">设置</string>
+  <string name="title_album">相簿</string>
+  <string name="loading">加载中…</string>
+  <string name="channel_shoot">保存快照</string>
+  <string name="noti_shoot_title">正在保存当前快照</string>
+  <string name="noti_shoot_title_saved">快照已保存</string>
+  <string name="permission_label_get_marked_libraries">允许应用程序获取由 LibChecker 提供的标记库信息</string>
 
-    <!--  App list  -->
-    <string name="menu_search">搜索</string>
-    <string name="menu_sort">排序</string>
-    <string name="menu_filter">过滤</string>
-    <string name="search_hint">搜索…</string>
-    <string name="string_64_bit">64 位</string>
-    <string name="string_32_bit">32 位</string>
-    <string name="no_libs">无原生库</string>
-    <string name="cannot_read">无法读取</string>
-    <string name="unknown">未知</string>
-    <string name="empty_list">空列表</string>
-    <string name="uncharted_territory">未知领域</string>
-    <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
+  <!--  App list  -->
+  <string name="menu_search">搜索</string>
+  <string name="menu_sort">排序</string>
+  <string name="menu_filter">过滤</string>
+  <string name="search_hint">搜索…</string>
+  <string name="string_64_bit">64 位</string>
+  <string name="string_32_bit">32 位</string>
+  <string name="no_libs">无原生库</string>
+  <string name="cannot_read">无法读取</string>
+  <string name="unknown">未知</string>
+  <string name="empty_list">空列表</string>
+  <string name="uncharted_territory">未知领域</string>
+  <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
 
-    <string name="menu_sort_by_time_desc">按更新时间降序</string>
-    <string name="menu_sort_by_target_api_desc">按 Target API 降序</string>
-    <string name="menu_sort_default">默认顺序</string>
+  <string name="menu_sort_by_time_desc">按更新时间降序</string>
+  <string name="menu_sort_by_target_api_desc">按 Target API 降序</string>
+  <string name="menu_sort_default">默认顺序</string>
 
-    <!-- Statistics   -->
-    <string name="title_statistics_dialog">%s架构的 Apps</string>
-    <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
-    <string name="tab_chart">图表</string>
-    <string name="tab_lib_reference_statistics">库引用统计</string>
-    <string name="not_marked_lib">未标记的库</string>
+  <!-- Statistics   -->
+  <string name="title_statistics_dialog">%s架构的 Apps</string>
+  <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
+  <string name="tab_chart">图表</string>
+  <string name="tab_lib_reference_statistics">库引用统计</string>
+  <string name="not_marked_lib">未标记的库</string>
 
-    <string name="ref_category_all">全部</string>
-    <string name="ref_category_native">原生库</string>
-    <string name="ref_category_service">服务</string>
-    <string name="ref_category_activity">活动</string>
-    <string name="ref_category_br">广播接收器</string>
-    <string name="ref_category_cp">内容提供器</string>
-    <string name="ref_category_dex" translatable="false">Dex</string>
-    <string name="ref_category_perm">权限</string>
-    <string name="ref_category_static">静态库</string>
+  <string name="ref_category_all">全部</string>
+  <string name="ref_category_native">原生库</string>
+  <string name="ref_category_service">服务</string>
+  <string name="ref_category_activity">活动</string>
+  <string name="ref_category_br">广播接收器</string>
+  <string name="ref_category_cp">内容提供器</string>
+  <string name="ref_category_dex" translatable="false">Dex</string>
+  <string name="ref_category_perm">权限</string>
+  <string name="ref_category_static">静态库</string>
 
-    <string name="string_kotlin_used">使用了 Kotlin</string>
-    <string name="string_kotlin_unused">未使用 Kotlin</string>
+  <string name="string_kotlin_used">使用了 Kotlin</string>
+  <string name="string_kotlin_unused">未使用 Kotlin</string>
 
-    <!--  About  -->
-    <string name="settings_about">关于</string>
-    <string name="settings_rate_us">给我们评分</string>
-    <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
-    <string name="settings_about_summary">这里是 LibChecker!</string>
-    <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
-    <string name="toolbar_rate">评分</string>
-    <string name="resource_declaration">应用中的部分素材来自于： </string>
-    <string name="library_declaration">LibChecker 中的所有标记库信息均来自于其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
+  <!--  About  -->
+  <string name="settings_about">关于</string>
+  <string name="settings_rate_us">给我们评分</string>
+  <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
+  <string name="settings_about_summary">这里是 LibChecker!</string>
+  <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
+  <string name="toolbar_rate">评分</string>
+  <string name="resource_declaration">应用中的部分素材来自于： </string>
+  <string name="library_declaration">LibChecker 中的所有标记库信息均来自于其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
 
-    <!--  Settings  -->
-    <string name="pref_group_normal">常规</string>
-    <string name="pref_group_others">其它</string>
+  <!--  Settings  -->
+  <string name="pref_group_normal">常规</string>
+  <string name="pref_group_others">其它</string>
 
-    <string name="show_system_apps">显示系统应用</string>
-    <string name="apk_analytics">APK 分析</string>
-    <string name="colorful_icon">多彩图标</string>
-    <string name="rules_repo_title">规则仓库</string>
-    <string name="lib_ref_threshold">库引用阈值</string>
-    <string name="languages">语言</string>
-    <string name="reload_apps">重载应用列表</string>
-    <string name="help_docs">帮助文档</string>
-    <string name="join_telegram_group">划水</string>
-    <string name="anonymous_statistics">匿名统计</string>
-    <string name="cloud_rules">云端规则</string>
-    <string name="dark_mode">深色模式</string>
+  <string name="show_system_apps">显示系统应用</string>
+  <string name="apk_analytics">APK 分析</string>
+  <string name="colorful_icon">多彩图标</string>
+  <string name="rules_repo_title">规则仓库</string>
+  <string name="lib_ref_threshold">库引用阈值</string>
+  <string name="languages">语言</string>
+  <string name="reload_apps">重载应用列表</string>
+  <string name="help_docs">帮助文档</string>
+  <string name="join_telegram_group">划水</string>
+  <string name="anonymous_statistics">匿名统计</string>
+  <string name="cloud_rules">云端规则</string>
+  <string name="dark_mode">深色模式</string>
 
-    <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
-    <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
-    <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
-    <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
-    <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
-    <string name="help_docs_summary">学习如何使用 LibChecker</string>
-    <string name="join_telegram_group_summary">来一起划水</string>
-    <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
-    <string name="cloud_rules_summary">在此更新最新的标记库</string>
+  <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
+  <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
+  <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
+  <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
+  <string name="reload_apps_summary">当应用列表显示不正常时尝试此选项</string>
+  <string name="help_docs_summary">学习如何使用 LibChecker</string>
+  <string name="join_telegram_group_summary">来一起划水</string>
+  <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
+  <string name="cloud_rules_summary">在此更新最新的标记库</string>
 
-    <string name="array_dark_mode_off">关闭</string>
-    <string name="array_dark_mode_on">开启</string>
-    <string name="array_dark_mode_auto">自动</string>
-    <string name="array_dark_mode_system">系统默认</string>
-    <string name="array_dark_mode_battery">由省电模式设置</string>
+  <string name="array_dark_mode_off">关闭</string>
+  <string name="array_dark_mode_on">开启</string>
+  <string name="array_dark_mode_auto">自动</string>
+  <string name="array_dark_mode_system">系统默认</string>
+  <string name="array_dark_mode_battery">由省电模式设置</string>
 
-    <!--  Detail  -->
-    <string name="detail_label">查看 App 详情</string>
-    <string name="not_found">未找到</string>
-    <string name="create_an_issue">协助我们来补充信息</string>
-    <string name="app_bundle" translatable="false">App Bundles</string>
-    <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
-    <string name="kotlin_used">使用了 Kotlin</string>
-    <string name="kotlin_details">Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言。虽然与 Java 语法并不兼容，但在 JVM 环境中 Kotlin 被设计成可以和 Java 代码相互运作，并可以重复使用如 Java 集合框架等的现有 Java 引用的函数库。</string>
-    <string name="kotlin_string" translatable="false">Kotlin</string>
-    <string name="items_count">项数：</string>
-    <string name="further_operation">进一步操作</string>
-    <string name="app_info_launch">启动</string>
-    <string name="app_info_settings">设置</string>
-    <string name="lib_detail_dialog_title">库详情</string>
+  <!--  Detail  -->
+  <string name="detail_label">查看 App 详情</string>
+  <string name="not_found">未找到</string>
+  <string name="create_an_issue">协助我们来补充信息</string>
+  <string name="app_bundle" translatable="false">App Bundles</string>
+  <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
+  <string name="kotlin_used">使用了 Kotlin</string>
+  <string name="kotlin_details">Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言。虽然与 Java 语法并不兼容，但在 JVM 环境中 Kotlin 被设计成可以和 Java 代码相互运作，并可以重复使用如 Java 集合框架等的现有 Java 引用的函数库。</string>
+  <string name="kotlin_string" translatable="false">Kotlin</string>
+  <string name="items_count">项数：</string>
+  <string name="further_operation">进一步操作</string>
+  <string name="app_info_launch">启动</string>
+  <string name="app_info_settings">设置</string>
+  <string name="lib_detail_dialog_title">库详情</string>
 
-    <!--  Toast  -->
-    <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
-    <string name="toast_not_existing_market">设备中不存在应用市场</string>
-    <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
-    <string name="toast_cant_open_app">无法启动此 App</string>
-    <string name="toast_package_name_null">软件包名称为空</string>
-    <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
+  <!--  Toast  -->
+  <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
+  <string name="toast_not_existing_market">设备中不存在应用市场</string>
+  <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
+  <string name="toast_cant_open_app">无法启动此 App</string>
+  <string name="toast_package_name_null">软件包名称为空</string>
+  <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
 
-    <!--  Snapshot  -->
-    <string name="snapshot_none" translatable="false">None</string>
-    <string name="snapshot_btn_save_current">保存当前快照</string>
-    <string name="snapshot_current_timestamp">当前快照时间戳</string>
-    <string name="snapshot_apps_count">快照应用程序数量</string>
-    <string name="snapshot_indicator_added">增加</string>
-    <string name="snapshot_indicator_removed">移除</string>
-    <string name="snapshot_indicator_changed">变更</string>
-    <string name="snapshot_indicator_moved">移动</string>
-    <string name="snapshot_empty_list_title">没有组件变更</string>
-    <string name="snapshot_no_snapshot">没有快照</string>
-    <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
-    <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
-    <string name="snapshot_time_node_uninitialized">（未初始化）</string>
+  <!--  Snapshot  -->
+  <string name="snapshot_none" translatable="false">None</string>
+  <string name="snapshot_btn_save_current">保存当前快照</string>
+  <string name="snapshot_current_timestamp">当前快照时间戳</string>
+  <string name="snapshot_apps_count">快照应用程序数量</string>
+  <string name="snapshot_indicator_added">增加</string>
+  <string name="snapshot_indicator_removed">移除</string>
+  <string name="snapshot_indicator_changed">变更</string>
+  <string name="snapshot_indicator_moved">移动</string>
+  <string name="snapshot_empty_list_title">没有组件变更</string>
+  <string name="snapshot_no_snapshot">没有快照</string>
+  <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
+  <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
+  <string name="snapshot_time_node_uninitialized">（未初始化）</string>
 
-    <!--  Dialog  -->
-    <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
-    <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
-    <string name="dialog_title_change_timestamp">更换时间节点</string>
-    <string name="dialog_title_keep_previous_snapshot">注意</string>
-    <string name="dialog_message_keep_previous_snapshot">是否保留上一张快照？</string>
-    <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
-    <string name="btn_keep">保留</string>
-    <string name="btn_drop">丢弃</string>
+  <!--  Dialog  -->
+  <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
+  <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
+  <string name="dialog_title_change_timestamp">更换时间节点</string>
+  <string name="dialog_title_keep_previous_snapshot">注意</string>
+  <string name="dialog_message_keep_previous_snapshot">是否保留上一张快照？</string>
+  <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
+  <string name="btn_keep">保留</string>
+  <string name="btn_drop">丢弃</string>
 
-    <!--  Album  -->
-    <string name="album_compare">对比</string>
-    <string name="album_item_comparison_title">对比</string>
-    <string name="album_item_comparison_subtitle">对比两个快照</string>
-    <string name="album_item_management_title">管理</string>
-    <string name="album_item_management_subtitle">管理所有快照</string>
-    <string name="album_item_backup_restore_title">备份与恢复</string>
-    <string name="album_item_backup_restore_subtitle">备份与恢复快照</string>
-    <string name="album_item_track_title">追踪</string>
-    <string name="album_item_track_subtitle">选择应用进行强制对比变化</string>
-    <string name="album_backup">备份</string>
-    <string name="album_backup_summary">将所有快照备份</string>
-    <string name="album_restore">恢复</string>
-    <string name="album_restore_summary">从备份文件恢复快照</string>
-    <string name="album_click_to_choose">点击选择</string>
-    <string name="album_dialog_delete_snapshot_message">处理中…</string>
+  <!--  Album  -->
+  <string name="album_compare">对比</string>
+  <string name="album_item_comparison_title">对比</string>
+  <string name="album_item_comparison_subtitle">对比两个快照</string>
+  <string name="album_item_management_title">管理</string>
+  <string name="album_item_management_subtitle">管理所有快照</string>
+  <string name="album_item_backup_restore_title">备份与恢复</string>
+  <string name="album_item_backup_restore_subtitle">备份与恢复快照</string>
+  <string name="album_item_track_title">追踪</string>
+  <string name="album_item_track_subtitle">选择应用进行强制对比变化</string>
+  <string name="album_backup">备份</string>
+  <string name="album_backup_summary">将所有快照备份</string>
+  <string name="album_restore">恢复</string>
+  <string name="album_restore_summary">从备份文件恢复快照</string>
+  <string name="album_click_to_choose">点击选择</string>
+  <string name="album_dialog_delete_snapshot_message">处理中…</string>
 
-    <!--  Integration  -->
-    <string name="integration_monkey_king_menu_block">使用「大圣净化」禁用此组件</string>
-    <string name="integration_monkey_king_menu_unblock">使用「大圣净化」解禁此组件</string>
-    <string name="integration_anywhere_menu_editor">在「Anywhere- 编辑器」中打开</string>
+  <!--  Integration  -->
+  <string name="integration_monkey_king_menu_block">使用「大圣净化」禁用此组件</string>
+  <string name="integration_monkey_king_menu_unblock">使用「大圣净化」解禁此组件</string>
+  <string name="integration_anywhere_menu_editor">在「Anywhere- 编辑器」中打开</string>
 
-    <!--  Cloud rules  -->
-    <string name="rules_local_repo_version">本地规则库版本</string>
-    <string name="rules_remote_repo_version">远端规则库版本</string>
-    <string name="rules_btn_update">更新</string>
+  <!--  Cloud rules  -->
+  <string name="rules_local_repo_version">本地规则库版本</string>
+  <string name="rules_remote_repo_version">远端规则库版本</string>
+  <string name="rules_btn_update">更新</string>
 
 </resources>
