@@ -9,7 +9,7 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 
 @Dao
 interface RuleDao {
-    //Rules
+    // Rules
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRules(items: List<RuleEntity>)
 

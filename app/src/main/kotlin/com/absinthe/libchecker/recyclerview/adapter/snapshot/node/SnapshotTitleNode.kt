@@ -10,5 +10,4 @@ class SnapshotTitleNode(override val childNode: MutableList<BaseNode>, @LibType 
     init {
         isExpanded = true
     }
-
 }

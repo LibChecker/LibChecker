@@ -139,7 +139,6 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
                 localVersion.bottom + updateButton.marginTop
             )
         }
-
     }
 
     class CloudRulesVersionView(context: Context) : AViewGroup(context) {
@@ -181,7 +180,6 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
             version.layout(version.toHorizontalCenter(this), 0)
             desc.layout(desc.toHorizontalCenter(this), version.bottom)
         }
-
     }
 
     override fun getHeaderView(): BottomSheetHeaderView {

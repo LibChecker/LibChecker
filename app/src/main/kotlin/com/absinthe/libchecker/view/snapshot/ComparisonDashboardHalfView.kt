@@ -112,7 +112,6 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) 
                 tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight +
                 paddingTop + paddingBottom
         )
-
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

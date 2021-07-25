@@ -27,7 +27,6 @@ import com.absinthe.libchecker.view.detail.StaticLibItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
 class LibStringAdapter(@LibType val type: Int) :

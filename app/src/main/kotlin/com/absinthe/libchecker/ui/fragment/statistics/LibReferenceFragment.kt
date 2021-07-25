@@ -107,14 +107,16 @@ class LibReferenceFragment :
                         .show(childFragmentManager, tag)
                 }
             }
-            setEmptyView(EmptyListView(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                ).also {
-                    it.gravity = Gravity.CENTER
+            setEmptyView(
+                EmptyListView(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    ).also {
+                        it.gravity = Gravity.CENTER
+                    }
                 }
-            })
+            )
         }
 
         homeViewModel.apply {
@@ -206,7 +208,8 @@ class LibReferenceFragment :
                     }
                     computeRef()
                     Analytics.trackEvent(
-                        Constants.Event.LIB_REFERENCE_FILTER_TYPE, EventProperties().set(
+                        Constants.Event.LIB_REFERENCE_FILTER_TYPE,
+                        EventProperties().set(
                             "Type",
                             category.toLong()
                         )

@@ -13,9 +13,11 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
 
 @Database(
-    entities = [LCItem::class,
+    entities = [
+        LCItem::class,
         SnapshotItem::class, TimeStampItem::class,
-        TrackItem::class, SnapshotDiffStoringItem::class],
+        TrackItem::class, SnapshotDiffStoringItem::class
+    ],
     version = 16, exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
@@ -104,7 +106,7 @@ abstract class LCDatabase : RoomDatabase() {
 
         private val MIGRATION_5_6: Migration = object : Migration(5, 6) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                //Add TimeStampItem entity
+                // Add TimeStampItem entity
             }
         }
 

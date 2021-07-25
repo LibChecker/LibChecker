@@ -27,16 +27,18 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     }
 
     val adapter = TimeNodeItemAdapter().apply {
-        setFooterView(AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).also {
-                gravity = Gravity.CENTER_VERTICAL
+        setFooterView(
+            AppCompatTextView(context).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).also {
+                    gravity = Gravity.CENTER_VERTICAL
+                }
+                text = "…"
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
             }
-            text = "…"
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-        })
+        )
         setEmptyView(
             AppCompatTextView(
                 ContextThemeWrapper(
@@ -48,7 +50,8 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
                 gravity = Gravity.CENTER
                 text = context.getString(R.string.snapshot_time_node_uninitialized)
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            })
+            }
+        )
     }
 
     private val rvList = RecyclerView(context).apply {

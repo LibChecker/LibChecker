@@ -344,10 +344,12 @@ class AboutActivity : AbsAboutActivity() {
     override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
         if (menuItem.itemId == R.id.toolbar_rate) {
             try {
-                startActivity(Intent(Intent.ACTION_VIEW).apply {
-                    data = URLManager.MARKET_PAGE.toUri()
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                })
+                startActivity(
+                    Intent(Intent.ACTION_VIEW).apply {
+                        data = URLManager.MARKET_PAGE.toUri()
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    }
+                )
             } catch (e: ActivityNotFoundException) {
                 Timber.e(e)
                 showLongToast(R.string.toast_not_existing_market)

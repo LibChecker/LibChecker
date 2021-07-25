@@ -51,7 +51,6 @@ import ohos.bundle.IBundleManager
 import timber.log.Timber
 import java.io.File
 
-
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
@@ -150,7 +149,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                     val extraInfo = SpannableStringBuilder()
                     val file = File(packageInfo.applicationInfo.sourceDir)
                     val demands = ManifestReader.getManifestProperties(
-                        file, listOf(
+                        file,
+                        listOf(
                             PackageUtils.use32bitAbiString,
                             PackageUtils.multiArchString,
                             PackageUtils.overlayString
@@ -182,11 +182,11 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             }
                             spanString = SpannableString(
                                 "  ${
-                                    PackageUtils.getAbiString(
-                                        this@AppDetailActivity,
-                                        it,
-                                        false
-                                    )
+                                PackageUtils.getAbiString(
+                                    this@AppDetailActivity,
+                                    it,
+                                    false
+                                )
                                 }"
                             )
                             ContextCompat.getDrawable(
@@ -360,7 +360,7 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
             }
             try {
                 if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-                        .isNotEmpty()
+                    .isNotEmpty()
                 ) {
                     types.add(1, STATIC)
                     tabTitles.add(1, getText(R.string.ref_category_static))

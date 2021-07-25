@@ -10,7 +10,7 @@ class TrackListDiff : DiffUtil.ItemCallback<TrackListItem>() {
     }
 
     override fun areContentsTheSame(oldItem: TrackListItem, newItem: TrackListItem): Boolean {
-        return oldItem.label == newItem.label
-            && oldItem.switchState == newItem.switchState
+        return oldItem.label == newItem.label &&
+            oldItem.switchState == newItem.switchState
     }
 }

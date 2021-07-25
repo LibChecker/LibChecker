@@ -129,8 +129,10 @@ class ComparisonActivity : BaseActivity() {
                         0,
                         0,
                         16.dp,
-                        paddingBottom + (window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                            ?: 0)
+                        paddingBottom + (
+                            window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                                ?: 0
+                            )
                     )
                 }
                 setOnClickListener {

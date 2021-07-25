@@ -34,5 +34,4 @@ class VerticalSpacesItemDecoration(
             top = space
         }
     }
-
 }

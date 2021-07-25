@@ -46,5 +46,4 @@ abstract class BaseFragment<T : ViewBinding>(layoutId: Int) : Fragment(layoutId)
         Timber.d("${javaClass.simpleName} ==> onPause")
         onVisibilityChanged(false)
     }
-
 }

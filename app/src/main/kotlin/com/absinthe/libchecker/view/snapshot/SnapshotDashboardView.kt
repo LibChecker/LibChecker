@@ -167,7 +167,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
                         tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight
                     ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
             )
-
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -194,5 +193,4 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
             movedIndicator.layout(paddingEnd, changedIndicator.bottom, fromRight = true)
         }
     }
-
 }

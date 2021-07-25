@@ -14,7 +14,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
-
 abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
 
     private var _root: T? = null
@@ -100,16 +99,16 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     }
 
     private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
-        //Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
+        // Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
         val shapeAppearanceModel =
             ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
                 .build()
 
-        //Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
+        // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
         val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
         val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
 
-        //Copy the attributes in the new MaterialShapeDrawable
+        // Copy the attributes in the new MaterialShapeDrawable
         newMaterialShapeDrawable.initializeElevationOverlay(context)
         newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
         newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList

@@ -50,7 +50,7 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                 for (item in items) {
                     try {
                         if (PackageUtils.getComponentStringList(item.packageName, type, false)
-                                .contains(name)
+                            .contains(name)
                         ) {
                             list.add(item)
                         }
@@ -69,5 +69,4 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
 
         libRefList.postValue(filterList)
     }
-
 }

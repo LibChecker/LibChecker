@@ -162,8 +162,12 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
             name.layout(
                 typeIcon.right + name.marginStart,
-                (measuredHeight - name.measuredHeight - libSize.measuredHeight - (chip?.measuredHeight
-                    ?: 0)) / 2
+                (
+                    measuredHeight - name.measuredHeight - libSize.measuredHeight - (
+                        chip?.measuredHeight
+                            ?: 0
+                        )
+                    ) / 2
             )
             libSize.layout(name.left, name.bottom)
             chip?.layout(name.left, libSize.bottom + chip!!.marginTop)

@@ -175,13 +175,16 @@ fun doOnMainThreadIdle(action: () -> Unit, timeout: Long? = null) {
 
     fun setupIdleHandler(queue: MessageQueue) {
         if (timeout != null) {
-            handler.postDelayed({
-                queue.removeIdleHandler(idleHandler)
-                action()
-                if (BuildConfig.DEBUG) {
-                    Timber.d("doOnMainThreadIdle: ${timeout}ms timeout!")
-                }
-            }, timeout)
+            handler.postDelayed(
+                {
+                    queue.removeIdleHandler(idleHandler)
+                    action()
+                    if (BuildConfig.DEBUG) {
+                        Timber.d("doOnMainThreadIdle: ${timeout}ms timeout!")
+                    }
+                },
+                timeout
+            )
         }
         queue.addIdleHandler(idleHandler)
     }

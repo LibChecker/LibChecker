@@ -83,9 +83,11 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
             count.autoMeasure()
-            val labelWidth = (measuredWidth - paddingStart - paddingEnd
-                - icon.measuredWidth - count.measuredWidth
-                - labelName.marginLeft - labelName.marginRight)
+            val labelWidth = (
+                measuredWidth - paddingStart - paddingEnd -
+                    icon.measuredWidth - count.measuredWidth -
+                    labelName.marginLeft - labelName.marginRight
+                )
             labelName.measure(
                 labelWidth.toExactlyMeasureSpec(),
                 labelName.defaultHeightMeasureSpec(this)

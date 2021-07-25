@@ -31,5 +31,4 @@ class HorizontalSpacesItemDecoration(private val space: Int) : RecyclerView.Item
             top = space / 2
         }
     }
-
 }
