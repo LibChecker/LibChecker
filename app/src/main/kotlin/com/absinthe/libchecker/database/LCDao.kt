@@ -13,6 +13,7 @@ import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LCDao {
@@ -50,7 +51,7 @@ interface LCDao {
 
     @Transaction
     @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
-    fun getSnapshotsLiveData(timestamp: Long): LiveData<List<SnapshotItem>>
+    fun getSnapshotsFlow(timestamp: Long): Flow<List<SnapshotItem>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: SnapshotItem)

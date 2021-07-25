@@ -54,7 +54,7 @@ const val CURRENT_SNAPSHOT = -1L
 class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
 
     val repository = Repositories.lcRepository
-    val allSnapshots = repository.allSnapshotItems
+    val allSnapshots = repository.allSnapshotItemsFlow
     val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
     val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
     val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()

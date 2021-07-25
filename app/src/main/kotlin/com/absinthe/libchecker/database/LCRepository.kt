@@ -7,12 +7,13 @@ import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.database.entity.TrackItem
+import kotlinx.coroutines.flow.Flow
 
 class LCRepository(private val lcDao: LCDao) {
 
     val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
-    val allSnapshotItems: LiveData<List<SnapshotItem>> =
-        lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
+    val allSnapshotItemsFlow: Flow<List<SnapshotItem>> =
+        lcDao.getSnapshotsFlow(GlobalValues.snapshotTimestamp)
 
     suspend fun getItem(packageName: String): LCItem? {
         return lcDao.getItem(packageName)

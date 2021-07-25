@@ -51,6 +51,8 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import rikka.widget.borderview.BorderView
 
@@ -217,11 +219,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                     flip(VF_LIST)
                 }
             }
-            allSnapshots.observe(viewLifecycleOwner) {
+            allSnapshots.onEach {
                 if (shouldCompare) {
                     compareDiff()
                 }
-            }
+            }.launchIn(lifecycleScope)
             snapshotAppsCount.observe(viewLifecycleOwner) {
                 if (it != null) {
                     dashboard.container.tvSnapshotAppsCountText.text = it.toString()
