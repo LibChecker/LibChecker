@@ -28,45 +28,45 @@ import pxb.android.axml.Util;
  * @author bob
  */
 public class ArscDumper {
-    public static void dump(List<Pkg> pkgs) {
-        for (int x = 0; x < pkgs.size(); x++) {
-            Pkg pkg = pkgs.get(x);
+  public static void dump(List<Pkg> pkgs) {
+    for (int x = 0; x < pkgs.size(); x++) {
+      Pkg pkg = pkgs.get(x);
 
-            System.out.printf("  Package %d id=%d name=%s typeCount=%d%n", x, pkg.id, pkg.name,
-                pkg.types.size());
-            for (Type type : pkg.types.values()) {
-                System.out.printf("    type %d %s%n", type.id - 1, type.name);
+      System.out.printf("  Package %d id=%d name=%s typeCount=%d%n", x, pkg.id, pkg.name,
+        pkg.types.size());
+      for (Type type : pkg.types.values()) {
+        System.out.printf("    type %d %s%n", type.id - 1, type.name);
 
-                int resPrefix = pkg.id << 24 | type.id << 16;
-                for (int i = 0; i < type.specs.length; i++) {
-                    ResSpec spec = type.getSpec(i);
-                    System.out.printf("      spec 0x%08x 0x%08x %s%n", resPrefix | spec.id, spec.flags,
-                        spec.name);
-                }
-                for (int i = 0; i < type.configs.size(); i++) {
-                    Config config = type.configs.get(i);
-                    System.out.println("      config");
-
-                    List<ResEntry> entries = new ArrayList<>(config.resources.values());
-                    for (int j = 0; j < entries.size(); j++) {
-                        ResEntry entry = entries.get(j);
-                        System.out.printf("        resource 0x%08x %-20s: %s%n",
-                            resPrefix | entry.spec.id, entry.spec.name, entry.value);
-                    }
-                }
-            }
+        int resPrefix = pkg.id << 24 | type.id << 16;
+        for (int i = 0; i < type.specs.length; i++) {
+          ResSpec spec = type.getSpec(i);
+          System.out.printf("      spec 0x%08x 0x%08x %s%n", resPrefix | spec.id, spec.flags,
+            spec.name);
         }
-    }
+        for (int i = 0; i < type.configs.size(); i++) {
+          Config config = type.configs.get(i);
+          System.out.println("      config");
 
-    public static void main(String... args) throws IOException {
-        if (args.length == 0) {
-            System.err.println("asrc-dump file.arsc");
-            return;
+          List<ResEntry> entries = new ArrayList<>(config.resources.values());
+          for (int j = 0; j < entries.size(); j++) {
+            ResEntry entry = entries.get(j);
+            System.out.printf("        resource 0x%08x %-20s: %s%n",
+              resPrefix | entry.spec.id, entry.spec.name, entry.value);
+          }
         }
-        byte[] data = Util.readFile(new File(args[0]));
-        List<Pkg> pkgs = new ArscParser(data).parse();
-
-        dump(pkgs);
-
+      }
     }
+  }
+
+  public static void main(String... args) throws IOException {
+    if (args.length == 0) {
+      System.err.println("asrc-dump file.arsc");
+      return;
+    }
+    byte[] data = Util.readFile(new File(args[0]));
+    List<Pkg> pkgs = new ArscParser(data).parse();
+
+    dump(pkgs);
+
+  }
 }

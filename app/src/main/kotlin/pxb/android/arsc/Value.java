@@ -18,23 +18,23 @@ package pxb.android.arsc;
 import androidx.annotation.NonNull;
 
 public class Value {
-    public final int data;
-    public final String raw;
-    public final int type;
+  public final int data;
+  public final String raw;
+  public final int type;
 
-    public Value(int type, int data, String raw) {
-        super();
-        this.type = type;
-        this.data = data;
-        this.raw = raw;
-    }
+  public Value(int type, int data, String raw) {
+    super();
+    this.type = type;
+    this.data = data;
+    this.raw = raw;
+  }
 
-    @NonNull
-    public String toString() {
-        if (type == 0x03) {
-            return raw;
-        }
-        return String.format("{t=0x%02x d=0x%08x}", type, data);
+  @NonNull
+  public String toString() {
+    if (type == 0x03) {
+      return raw;
     }
+    return String.format("{t=0x%02x d=0x%08x}", type, data);
+  }
 
 }

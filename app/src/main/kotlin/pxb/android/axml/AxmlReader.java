@@ -34,60 +34,60 @@ import timber.log.Timber;
  * @author <a href="mailto:pxb1988@gmail.com">Panxiaobo</a>
  */
 public class AxmlReader {
-    public static final NodeVisitor EMPTY_VISITOR = new NodeVisitor() {
+  public static final NodeVisitor EMPTY_VISITOR = new NodeVisitor() {
 
-        @Override
-        public NodeVisitor child(String ns, String name) {
-            return this;
-        }
-
-    };
-    final AxmlParser parser;
-
-    public AxmlReader(byte[] data) {
-        super();
-        this.parser = new AxmlParser(data);
+    @Override
+    public NodeVisitor child(String ns, String name) {
+      return this;
     }
 
-    public void accept(final AxmlVisitor av) throws IOException {
-        Stack<NodeVisitor> nvs = new Stack<>();
-        NodeVisitor tos = av;
-        while (true) {
-            int type = parser.next();
-            switch (type) {
-                case START_FILE:
-                case END_NS:
-                    break;
-                case START_TAG:
-                    nvs.push(tos);
-                    tos = tos.child(parser.getNamespaceUri(), parser.getName());
-                    if (tos != null) {
-                        if (tos != EMPTY_VISITOR) {
-                            tos.line(parser.getLineNumber());
-                            for (int i = 0; i < parser.getAttrCount(); i++) {
-                                tos.attr(parser.getAttrNs(i), parser.getAttrName(i), parser.getAttrResId(i),
-                                    parser.getAttrType(i), parser.getAttrValue(i));
-                            }
-                        }
-                    } else {
-                        tos = EMPTY_VISITOR;
-                    }
-                    break;
-                case END_TAG:
-                    tos.end();
-                    tos = nvs.pop();
-                    break;
-                case START_NS:
-                    av.ns(parser.getNamespacePrefix(), parser.getNamespaceUri(), parser.getLineNumber());
-                    break;
-                case TEXT:
-                    tos.text(parser.getLineNumber(), parser.getText());
-                    break;
-                case END_FILE:
-                    return;
-                default:
-                    Timber.d("Unsupported tag: %s", type);
+  };
+  final AxmlParser parser;
+
+  public AxmlReader(byte[] data) {
+    super();
+    this.parser = new AxmlParser(data);
+  }
+
+  public void accept(final AxmlVisitor av) throws IOException {
+    Stack<NodeVisitor> nvs = new Stack<>();
+    NodeVisitor tos = av;
+    while (true) {
+      int type = parser.next();
+      switch (type) {
+        case START_FILE:
+        case END_NS:
+          break;
+        case START_TAG:
+          nvs.push(tos);
+          tos = tos.child(parser.getNamespaceUri(), parser.getName());
+          if (tos != null) {
+            if (tos != EMPTY_VISITOR) {
+              tos.line(parser.getLineNumber());
+              for (int i = 0; i < parser.getAttrCount(); i++) {
+                tos.attr(parser.getAttrNs(i), parser.getAttrName(i), parser.getAttrResId(i),
+                  parser.getAttrType(i), parser.getAttrValue(i));
+              }
             }
-        }
+          } else {
+            tos = EMPTY_VISITOR;
+          }
+          break;
+        case END_TAG:
+          tos.end();
+          tos = nvs.pop();
+          break;
+        case START_NS:
+          av.ns(parser.getNamespacePrefix(), parser.getNamespaceUri(), parser.getLineNumber());
+          break;
+        case TEXT:
+          tos.text(parser.getLineNumber(), parser.getText());
+          break;
+        case END_FILE:
+          return;
+        default:
+          Timber.d("Unsupported tag: %s", type);
+      }
     }
+  }
 }

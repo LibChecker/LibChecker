@@ -19,16 +19,16 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Config {
-    public final int entryCount;
-    public final byte[] id;
-    public final Map<Integer, ResEntry> resources = new TreeMap<>();
-    /* package */ int wChunkSize;
-    /* package */ int wEntryStart;
-    /* package */ int wPosition;
+  public final int entryCount;
+  public final byte[] id;
+  public final Map<Integer, ResEntry> resources = new TreeMap<>();
+  /* package */ int wChunkSize;
+  /* package */ int wEntryStart;
+  /* package */ int wPosition;
 
-    public Config(byte[] id, int entryCount) {
-        super();
-        this.id = id;
-        this.entryCount = entryCount;
-    }
+  public Config(byte[] id, int entryCount) {
+    super();
+    this.id = id;
+    this.entryCount = entryCount;
+  }
 }

@@ -19,26 +19,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Type {
-    public final List<Config> configs = new ArrayList<>();
-    public int id;
-    public String name;
-    public ResSpec[] specs;
-    /* package */ int wPosition;
+  public final List<Config> configs = new ArrayList<>();
+  public int id;
+  public String name;
+  public ResSpec[] specs;
+  /* package */ int wPosition;
 
-    public void addConfig(Config config) {
-        if (config.entryCount != specs.length) {
-            throw new RuntimeException();
-        }
-        configs.add(config);
+  public void addConfig(Config config) {
+    if (config.entryCount != specs.length) {
+      throw new RuntimeException();
     }
+    configs.add(config);
+  }
 
-    public ResSpec getSpec(int resId) {
-        ResSpec res = specs[resId];
-        if (res == null) {
-            res = new ResSpec(resId);
-            specs[resId] = res;
-        }
-        return res;
+  public ResSpec getSpec(int resId) {
+    ResSpec res = specs[resId];
+    if (res == null) {
+      res = new ResSpec(resId);
+      specs[resId] = res;
     }
+    return res;
+  }
 
 }
