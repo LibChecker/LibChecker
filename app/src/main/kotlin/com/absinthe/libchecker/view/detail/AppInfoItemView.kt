@@ -29,7 +29,8 @@ import com.absinthe.libchecker.view.AViewGroup
 class AppInfoItemView(context: Context) : AViewGroup(context) {
 
     init {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         isClickable = true
         isFocusable = true
         setPadding(8.dp, 24.dp, 8.dp, 0)
@@ -44,8 +45,16 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
         addView(this)
     }
 
-    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+    private val text = AppCompatTextView(
+        ContextThemeWrapper(
+            context,
+            R.style.TextView_SansSerifCondensedMedium
+        )
+    ).apply {
+        layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
             it.topMargin = 12.dp
         }
         gravity = Gravity.CENTER_HORIZONTAL
@@ -94,10 +103,15 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         icon.autoMeasure()
-        text.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
+        text.measure(
+            (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+            text.defaultHeightMeasureSpec(this)
+        )
         setMeasuredDimension(
             measuredWidth,
-            (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).coerceAtLeast(135.dp)
+            (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).coerceAtLeast(
+                135.dp
+            )
         )
     }
 

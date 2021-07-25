@@ -30,7 +30,8 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
-class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
+class LibStringAdapter(@LibType val type: Int) :
+    BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
 
     private var highlightPosition: Int = -1
 
@@ -45,8 +46,18 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
     override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
         val itemName = if (item.item.source == DISABLED) {
             val sp = SpannableString(item.item.name)
-            sp.setSpan(StrikethroughSpan(), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sp.setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, item.item.name.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sp.setSpan(
+                StrikethroughSpan(),
+                0,
+                item.item.name.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            sp.setSpan(
+                StyleSpan(Typeface.BOLD_ITALIC),
+                0,
+                item.item.name.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
             sp
         } else {
             item.item.name
@@ -71,14 +82,16 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
                             it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
                         }
                         val spannableString = SpannableString(item.item.source)
-                        val staticPrefixIndex = spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
+                        val staticPrefixIndex =
+                            spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
                         spannableString.setSpan(
                             StyleSpan(Typeface.BOLD),
                             staticPrefixIndex,
                             staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
                             Spanned.SPAN_INCLUSIVE_EXCLUSIVE
                         )
-                        val versionCodePrefixIndex = spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
+                        val versionCodePrefixIndex =
+                            spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
                         spannableString.setSpan(
                             StyleSpan(Typeface.BOLD),
                             versionCodePrefixIndex,
@@ -100,7 +113,9 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
 
         if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
             if (holder.itemView.background is TransitionDrawable) {
-                (holder.itemView.background as TransitionDrawable).reverseTransition(HIGHLIGHT_TRANSITION_DURATION)
+                (holder.itemView.background as TransitionDrawable).reverseTransition(
+                    HIGHLIGHT_TRANSITION_DURATION
+                )
             }
             holder.itemView.background = null
         } else {
@@ -112,7 +127,9 @@ class LibStringAdapter(@LibType val type: Int) : BaseQuickAdapter<LibStringItemC
             )
             holder.itemView.background = drawable
             if (holder.itemView.background is TransitionDrawable) {
-                (holder.itemView.background as TransitionDrawable).startTransition(HIGHLIGHT_TRANSITION_DURATION)
+                (holder.itemView.background as TransitionDrawable).startTransition(
+                    HIGHLIGHT_TRANSITION_DURATION
+                )
             }
         }
     }

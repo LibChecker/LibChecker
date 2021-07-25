@@ -12,7 +12,11 @@ class ComponentRecyclerView : BorderRecyclerView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
+    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    )
 
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private var lastX = 0f
@@ -30,7 +34,9 @@ class ComponentRecyclerView : BorderRecyclerView {
                 val deltaY = (ev.y - lastY).absoluteValue
 
                 //Intercept parent touch event if user swipe horizontally
-                if (((deltaX.pow(2) + deltaY.pow(2) > touchSlop.toFloat().pow(2)) && (deltaX > deltaY * 1.5))) {
+                if (((deltaX.pow(2) + deltaY.pow(2) > touchSlop.toFloat()
+                        .pow(2)) && (deltaX > deltaY * 1.5))
+                ) {
                     parent.requestDisallowInterceptTouchEvent(false)
                 }
             }

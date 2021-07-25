@@ -10,7 +10,8 @@ import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 
-class AppListLoadingView(context: Context, attributeSet: AttributeSet? = null) : AViewGroup(context, attributeSet) {
+class AppListLoadingView(context: Context, attributeSet: AttributeSet? = null) :
+    AViewGroup(context, attributeSet) {
 
     private val icon = AppCompatImageView(context).apply {
         layoutParams = LayoutParams(160.dp, 160.dp)
@@ -19,7 +20,10 @@ class AppListLoadingView(context: Context, attributeSet: AttributeSet? = null) :
     }
 
     private val text = AppCompatTextView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
             it.topMargin = 8.dp
         }
         text = context.getString(R.string.loading)

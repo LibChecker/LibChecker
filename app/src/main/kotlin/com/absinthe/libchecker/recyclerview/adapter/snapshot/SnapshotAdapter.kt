@@ -28,12 +28,20 @@ import kotlinx.coroutines.launch
 
 const val ARROW = "→"
 
-class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
+    BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
     private var loadIconJob: Job? = null
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(SnapshotItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)))
+        return createBaseViewHolder(
+            SnapshotItemView(
+                ContextThemeWrapper(
+                    context,
+                    R.style.AppListMaterialCard
+                )
+            )
+        )
     }
 
     @SuppressLint("SetTextI18n")
@@ -41,8 +49,12 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
         (holder.itemView as SnapshotItemView).container.apply {
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
-                    val ai = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).applicationInfo
-                    loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+                    val ai = PackageUtils.getPackageInfo(
+                        item.packageName,
+                        PackageManager.GET_META_DATA
+                    ).applicationInfo
+                    loadIconJob =
+                        AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
                 } catch (e: PackageManager.NameNotFoundException) {
                     val bitmap = ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
                         setTint(ContextCompat.getColor(context, R.color.textNormal))
@@ -82,9 +94,24 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
                 }
                 else -> {
                     holder.itemView.backgroundTintList = null
-                    versionInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
-                    targetApiInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
-                    abiInfo.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+                    versionInfo.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            android.R.color.darker_gray
+                        )
+                    )
+                    targetApiInfo.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            android.R.color.darker_gray
+                        )
+                    )
+                    abiInfo.setTextColor(
+                        ContextCompat.getColor(
+                            context,
+                            android.R.color.darker_gray
+                        )
+                    )
                 }
             }
 
@@ -105,7 +132,8 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
             }
 
             packageName.text = item.packageName
-            versionInfo.text = getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+            versionInfo.text =
+                getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
             targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
 
             val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)
@@ -125,7 +153,8 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
 
             val newAbiSpanString: SpannableString
             if (item.abiDiff.new != null) {
-                val newAbiString = PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)
+                val newAbiString =
+                    PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)
                 abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt())
                 if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
                     newAbiSpanString = SpannableString("  $newAbiString")
@@ -154,17 +183,37 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAd
         }
     }
 
-    private fun <T> getDiffString(diff: SnapshotDiffItem.DiffNode<T>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+    private fun <T> getDiffString(
+        diff: SnapshotDiffItem.DiffNode<T>,
+        isNewOrDeleted: Boolean = false,
+        format: String = "%s"
+    ): String {
         return if (diff.old != diff.new && !isNewOrDeleted) {
-            "${String.format(format, diff.old.toString())} $ARROW ${String.format(format, diff.new.toString())}"
+            "${String.format(format, diff.old.toString())} $ARROW ${
+                String.format(
+                    format,
+                    diff.new.toString()
+                )
+            }"
         } else {
             String.format(format, diff.old.toString())
         }
     }
 
-    private fun getDiffString(diff1: SnapshotDiffItem.DiffNode<*>, diff2: SnapshotDiffItem.DiffNode<*>, isNewOrDeleted: Boolean = false, format: String = "%s"): String {
+    private fun getDiffString(
+        diff1: SnapshotDiffItem.DiffNode<*>,
+        diff2: SnapshotDiffItem.DiffNode<*>,
+        isNewOrDeleted: Boolean = false,
+        format: String = "%s"
+    ): String {
         return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-            "${String.format(format, diff1.old.toString(), diff2.old.toString())} $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+            "${
+                String.format(
+                    format,
+                    diff1.old.toString(),
+                    diff2.old.toString()
+                )
+            } $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
         } else {
             String.format(format, diff1.old.toString(), diff2.old.toString())
         }

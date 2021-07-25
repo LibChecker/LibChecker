@@ -25,7 +25,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     }
 
     val title = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setPadding(10.dp, 6.dp, 10.dp, 6.dp)
         text = context.getString(R.string.snapshot_empty_list_title)
         setTextAppearance(context.getResourceIdByAttr(android.R.attr.textAppearanceListItemSmall))
@@ -34,12 +35,16 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     }
 
     val list = RecyclerView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     init {
         background = context.getDrawableByAttr(android.R.attr.selectableItemBackground)
-        layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, context.getDimensionByAttr(android.R.attr.listPreferredItemHeightSmall).toInt())
+        layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            context.getDimensionByAttr(android.R.attr.listPreferredItemHeightSmall).toInt()
+        )
         isClickable = true
         isFocusable = true
     }

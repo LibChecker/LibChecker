@@ -19,7 +19,10 @@ class EmptyListView(context: Context) : AViewGroup(context) {
     }
 
     val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
             it.topMargin = 8.dp
         }
         text = context.getString(R.string.empty_list)

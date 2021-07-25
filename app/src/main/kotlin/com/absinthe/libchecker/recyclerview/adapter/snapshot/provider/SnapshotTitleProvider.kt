@@ -8,7 +8,11 @@ import android.widget.ImageView
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailCountAdapter
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotDetailCountNode
@@ -41,7 +45,7 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
         val countList = mutableListOf(0, 0, 0, 0)
         val finalList = mutableListOf<SnapshotDetailCountNode>()
 
-        val titleRes = when(node.type) {
+        val titleRes = when (node.type) {
             NATIVE -> R.string.ref_category_native
             SERVICE -> R.string.ref_category_service
             ACTIVITY -> R.string.ref_category_activity

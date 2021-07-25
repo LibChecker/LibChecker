@@ -22,12 +22,14 @@ import com.google.android.material.button.MaterialButton
 class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView {
 
     private val header = BottomSheetHeaderView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         title.text = context.getString(R.string.cloud_rules)
     }
 
     val viewFlipper = ViewFlipper(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setInAnimation(context, R.anim.anim_fade_in)
         setOutAnimation(context, R.anim.anim_fade_out)
     }
@@ -43,7 +45,10 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     }
 
     val cloudRulesContentView = CloudRulesContentView(context).apply {
-        layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     init {
@@ -73,7 +78,10 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     class CloudRulesContentView(context: Context) : AViewGroup(context) {
 
         val localVersion = CloudRulesVersionView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             desc.text = context.getString(R.string.rules_local_repo_version)
         }
 
@@ -83,7 +91,10 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
         }
 
         val remoteVersion = CloudRulesVersionView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             desc.text = context.getString(R.string.rules_remote_repo_version)
         }
 
@@ -110,14 +121,23 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
             arrow.autoMeasure()
             remoteVersion.autoMeasure()
             updateButton.autoMeasure()
-            setMeasuredDimension(measuredWidth, paddingTop + localVersion.measuredHeight + updateButton.marginTop + updateButton.measuredHeight + paddingBottom)
+            setMeasuredDimension(
+                measuredWidth,
+                paddingTop + localVersion.measuredHeight + updateButton.marginTop + updateButton.measuredHeight + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             arrow.layout(arrow.toHorizontalCenter(this), paddingTop)
-            localVersion.layout(arrow.left - 24.dp - localVersion.measuredWidth, localVersion.toViewVerticalCenter(arrow))
+            localVersion.layout(
+                arrow.left - 24.dp - localVersion.measuredWidth,
+                localVersion.toViewVerticalCenter(arrow)
+            )
             remoteVersion.layout(arrow.right + 24.dp, remoteVersion.toViewVerticalCenter(arrow))
-            updateButton.layout(updateButton.toHorizontalCenter(this), localVersion.bottom + updateButton.marginTop)
+            updateButton.layout(
+                updateButton.toHorizontalCenter(this),
+                localVersion.bottom + updateButton.marginTop
+            )
         }
 
     }
@@ -125,11 +145,19 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     class CloudRulesVersionView(context: Context) : AViewGroup(context) {
 
         val version = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline3))
         }
 
-        val desc = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
+        val desc = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensedMedium
+            )
+        ).apply {
             layoutParams = LayoutParams(120.dp, ViewGroup.LayoutParams.WRAP_CONTENT)
             gravity = Gravity.CENTER
         }
@@ -143,7 +171,10 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             version.autoMeasure()
             desc.autoMeasure()
-            setMeasuredDimension(version.measuredWidth.coerceAtLeast(desc.measuredWidth), version.measuredHeight + desc.measuredHeight)
+            setMeasuredDimension(
+                version.measuredWidth.coerceAtLeast(desc.measuredWidth),
+                version.measuredHeight + desc.measuredHeight
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

@@ -29,14 +29,18 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
         setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     }
 
-    val libName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
+    val libName =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
+            }
+            setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            addView(this)
         }
-        setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        addView(this)
-    }
 
     private var chip: Chip? = null
 
@@ -60,11 +64,17 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
 
                 if (!GlobalValues.isColorfulIcon.valueUnsafe) {
                     if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                        chipIconTint = ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.textNormal
+                            )
+                        )
                     } else {
                         val icon = chipIcon
                         icon?.let {
-                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            it.colorFilter =
+                                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                             chipIcon = it
                         }
                     }

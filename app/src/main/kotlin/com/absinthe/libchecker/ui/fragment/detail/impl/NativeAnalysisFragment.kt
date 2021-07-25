@@ -16,9 +16,11 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
-class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
+class NativeAnalysisFragment :
+    BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
-    override fun initBinding(view: View): FragmentLibNativeBinding = FragmentLibNativeBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibNativeBinding =
+        FragmentLibNativeBinding.bind(view)
 
     override fun getRecyclerView() = binding.list
 
@@ -46,7 +48,8 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>(R.la
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
             val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
-            LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
+            LibDetailDialogFragment.newInstance(name, type, regexName)
+                .show(childFragmentManager, tag)
         }
 
         adapter.apply {

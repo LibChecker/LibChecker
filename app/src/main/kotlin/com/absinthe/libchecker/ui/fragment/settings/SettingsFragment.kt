@@ -41,7 +41,8 @@ import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 import timber.log.Timber
-import java.util.*
+import java.util.ArrayList
+import java.util.Locale
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
@@ -60,7 +61,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isShowSystemApps.value = newValue as Boolean
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue))
+                Analytics.trackEvent(
+                    Constants.Event.SETTINGS,
+                    EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue)
+                )
                 true
             }
         }
@@ -76,7 +80,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                     ComponentName(requireActivity(), ApkDetailActivity::class.java),
                     flag, PackageManager.DONT_KILL_APP
                 )
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_APK_ANALYTICS", newValue))
+                Analytics.trackEvent(
+                    Constants.Event.SETTINGS,
+                    EventProperties().set("PREF_APK_ANALYTICS", newValue)
+                )
                 true
             }
         }
@@ -84,32 +91,39 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.isColorfulIcon.value = newValue as Boolean
                 activity?.recreate()
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_COLORFUL_ICON", newValue))
+                Analytics.trackEvent(
+                    Constants.Event.SETTINGS,
+                    EventProperties().set("PREF_COLORFUL_ICON", newValue)
+                )
                 true
             }
         }
         (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.repo = newValue as String
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RULES_REPO", newValue))
+                Analytics.trackEvent(
+                    Constants.Event.SETTINGS,
+                    EventProperties().set("PREF_RULES_REPO", newValue)
+                )
                 true
             }
         }
-        val languagePreference = (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                if (newValue is String) {
-                    val locale: Locale = if ("SYSTEM" == newValue) {
-                        LocaleDelegate.systemLocale
-                    } else {
-                        Locale.forLanguageTag(newValue)
+        val languagePreference =
+            (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
+                setOnPreferenceChangeListener { _, newValue ->
+                    if (newValue is String) {
+                        val locale: Locale = if ("SYSTEM" == newValue) {
+                            LocaleDelegate.systemLocale
+                        } else {
+                            Locale.forLanguageTag(newValue)
+                        }
+                        LocaleDelegate.defaultLocale = locale
+                        Timber.d("Locale = $locale")
+                        activity?.recreate()
                     }
-                    LocaleDelegate.defaultLocale = locale
-                    Timber.d("Locale = $locale")
-                    activity?.recreate()
+                    true
                 }
-                true
-            }
-        }!!
+            }!!
         findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
             setOnPreferenceChangeListener { _, newValue ->
                 GlobalValues.darkMode = newValue.toString()
@@ -137,7 +151,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                     .setMessage(R.string.dialog_subtitle_reload_apps)
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         viewModel.reloadAppsFlag.value = true
-                        Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RELOAD_APPS", "Ok"))
+                        Analytics.trackEvent(
+                            Constants.Event.SETTINGS,
+                            EventProperties().set("PREF_RELOAD_APPS", "Ok")
+                        )
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()
@@ -180,7 +197,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
                 try {
                     startActivity(Intent.parseUri(marketUrl, 0))
-                    Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_RATE", "Clicked"))
+                    Analytics.trackEvent(
+                        Constants.Event.SETTINGS,
+                        EventProperties().set("PREF_RATE", "Clicked")
+                    )
                 } catch (e: ActivityNotFoundException) {
                     Timber.e(e)
                 }
@@ -190,9 +210,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
             setOnPreferenceClickListener {
                 try {
-                    startActivity(Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri()).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    })
+                    startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            URLManager.TELEGRAM_GROUP.toUri()
+                        ).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        })
                 } catch (e: ActivityNotFoundException) {
 
                     Timber.e(e)
@@ -214,8 +238,16 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         val userLocale = GlobalValues.locale
         for (i in 1 until languagePreference.entries.size) {
             val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
-            localeName.add(if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(locale))
-            localeNameUser.add(if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(userLocale) else locale.getDisplayName(userLocale))
+            localeName.add(
+                if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(
+                    locale
+                )
+            )
+            localeNameUser.add(
+                if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(
+                    userLocale
+                ) else locale.getDisplayName(userLocale)
+            )
         }
 
         for (i in 1 until languagePreference.entries.size) {
@@ -249,8 +281,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         scheduleAppbarRaisingStatus()
     }
 
-    override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
-        val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+    override fun onCreateRecyclerView(
+        inflater: LayoutInflater,
+        parent: ViewGroup,
+        savedInstanceState: Bundle?
+    ): RecyclerView {
+        val recyclerView =
+            super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
         recyclerView.fixEdgeEffect()
         recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
@@ -258,12 +295,17 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
         val lp = recyclerView.layoutParams
         if (lp is FrameLayout.LayoutParams) {
-            lp.rightMargin = recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin).toInt()
+            lp.rightMargin =
+                recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
+                    .toInt()
             lp.leftMargin = lp.rightMargin
         }
 
         borderViewDelegate = recyclerView.borderViewDelegate
-        borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as MainActivity?)?.appBar?.setRaised(!top) }
+        borderViewDelegate.borderVisibilityChangedListener =
+            BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                (activity as MainActivity?)?.appBar?.setRaised(!top)
+            }
 
         return recyclerView
     }

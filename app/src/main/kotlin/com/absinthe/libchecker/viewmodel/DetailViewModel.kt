@@ -10,7 +10,14 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.LibDetailRequest
@@ -111,9 +118,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
                     applicationInfo.publicSourceDir = packageName
                 }?.let {
                     val services = PackageUtils.getComponentList(it.packageName, it.services, true)
-                    val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
-                    val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
-                    val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
+                    val activities =
+                        PackageUtils.getComponentList(it.packageName, it.activities, true)
+                    val receivers =
+                        PackageUtils.getComponentList(it.packageName, it.receivers, true)
+                    val providers =
+                        PackageUtils.getComponentList(it.packageName, it.providers, true)
 
                     componentsMap[SERVICE]?.postValue(services)
                     componentsMap[ACTIVITY]?.postValue(activities)
@@ -200,7 +210,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
                 chipList.sortByDescending { it.item.size }
             } else {
-                chipList.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
+                chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
             }
         }
         return chipList

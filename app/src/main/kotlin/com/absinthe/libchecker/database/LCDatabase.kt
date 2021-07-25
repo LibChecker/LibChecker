@@ -6,12 +6,18 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.absinthe.libchecker.database.entity.*
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
-@Database(entities = [LCItem::class,
-    SnapshotItem::class, TimeStampItem::class,
-    TrackItem::class, SnapshotDiffStoringItem::class],
-    version = 16, exportSchema = true)
+@Database(
+    entities = [LCItem::class,
+        SnapshotItem::class, TimeStampItem::class,
+        TrackItem::class, SnapshotDiffStoringItem::class],
+    version = 16, exportSchema = true
+)
 abstract class LCDatabase : RoomDatabase() {
 
     abstract fun lcDao(): LCDao
@@ -33,9 +39,21 @@ abstract class LCDatabase : RoomDatabase() {
                     LCDatabase::class.java,
                     "lc_database"
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
-                        MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14, MIGRATION_14_15,
+                    .addMigrations(
+                        MIGRATION_1_2,
+                        MIGRATION_2_3,
+                        MIGRATION_3_4,
+                        MIGRATION_4_5,
+                        MIGRATION_5_6,
+                        MIGRATION_6_7,
+                        MIGRATION_7_8,
+                        MIGRATION_8_9,
+                        MIGRATION_9_10,
+                        MIGRATION_10_11,
+                        MIGRATION_11_12,
+                        MIGRATION_12_13,
+                        MIGRATION_13_14,
+                        MIGRATION_14_15,
                         MIGRATION_15_16
                     )
                     .createFromAsset("database/rules.db")
@@ -94,10 +112,12 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Create the new table
                 database.execSQL(
-                    "CREATE TABLE snapshot_new (id INTEGER, packageName TEXT NOT NULL, timeStamp INTEGER NOT NULL DEFAULT 0, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, permissions TEXT NOT NULL, PRIMARY KEY(id))")
+                    "CREATE TABLE snapshot_new (id INTEGER, packageName TEXT NOT NULL, timeStamp INTEGER NOT NULL DEFAULT 0, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, permissions TEXT NOT NULL, PRIMARY KEY(id))"
+                )
                 // Copy the data
                 database.execSQL(
-                    "INSERT INTO snapshot_new (packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions) SELECT packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions FROM snapshot_table")
+                    "INSERT INTO snapshot_new (packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions) SELECT packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions FROM snapshot_table"
+                )
                 // Remove the old table
                 database.execSQL("DROP TABLE snapshot_table")
                 // Change the table name to the correct one
@@ -149,7 +169,8 @@ abstract class LCDatabase : RoomDatabase() {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // Create the new table
                 database.execSQL(
-                    "CREATE TABLE rules_new (_id INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))")
+                    "CREATE TABLE rules_new (_id INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))"
+                )
                 // Remove the old table
                 database.execSQL("DROP TABLE rules_table")
                 // Change the table name to the correct one

@@ -28,18 +28,26 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     }
 
-    val libName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        addView(this)
-    }
+    val libName =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+            addView(this)
+        }
 
-    val libDetail = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        addView(this)
-    }
+    val libDetail =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            addView(this)
+        }
 
     private var chip: Chip? = null
 
@@ -63,11 +71,17 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
 
                 if (!GlobalValues.isColorfulIcon.valueUnsafe) {
                     if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-                        chipIconTint = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.textNormal))
+                        chipIconTint = ColorStateList.valueOf(
+                            ContextCompat.getColor(
+                                context,
+                                R.color.textNormal
+                            )
+                        )
                     } else {
                         val icon = chipIcon
                         icon?.let {
-                            it.colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            it.colorFilter =
+                                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                             chipIcon = it
                         }
                     }
@@ -80,11 +94,15 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val libNameWidth = measuredWidth - paddingStart - paddingEnd
         libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
-        libDetail.measure(libNameWidth.toExactlyMeasureSpec(), libDetail.defaultHeightMeasureSpec(this))
+        libDetail.measure(
+            libNameWidth.toExactlyMeasureSpec(),
+            libDetail.defaultHeightMeasureSpec(this)
+        )
         chip?.autoMeasure()
         setMeasuredDimension(
             measuredWidth,
-            (libName.measuredHeight + libDetail.measuredHeight + (chip?.measuredHeight ?: 0) + paddingTop + paddingBottom).coerceAtLeast(40.dp)
+            (libName.measuredHeight + libDetail.measuredHeight + (chip?.measuredHeight
+                ?: 0) + paddingTop + paddingBottom).coerceAtLeast(40.dp)
         )
     }
 

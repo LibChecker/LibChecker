@@ -8,7 +8,14 @@ import android.text.style.ImageSpan
 class CenterAlignImageSpan(drawable: Drawable) : ImageSpan(drawable) {
 
     override fun draw(
-        canvas: Canvas, text: CharSequence?, start: Int, end: Int, x: Float, top: Int, y: Int, bottom: Int,
+        canvas: Canvas,
+        text: CharSequence?,
+        start: Int,
+        end: Int,
+        x: Float,
+        top: Int,
+        y: Int,
+        bottom: Int,
         paint: Paint
     ) {
         val b = drawable

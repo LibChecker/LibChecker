@@ -181,12 +181,15 @@ class MainActivity : BaseActivity() {
     }
 
     private fun handleIntentFromShortcuts(intent: Intent) {
-        when(intent.action) {
+        when (intent.action) {
             Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
             Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
             Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
         }
-        Analytics.trackEvent(Constants.Event.LAUNCH_ACTION, EventProperties().set("Action", intent.action))
+        Analytics.trackEvent(
+            Constants.Event.LAUNCH_ACTION,
+            EventProperties().set("Action", intent.action)
+        )
     }
 
     private fun initAllApplicationInfoItems() {

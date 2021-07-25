@@ -9,5 +9,5 @@ data class LibReference(
     val libName: String,
     val chip: LibChip?,
     val referredCount: Int,
-    @LibType val type :Int
+    @LibType val type: Int
 ) : Parcelable

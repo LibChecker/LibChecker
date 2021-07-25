@@ -34,8 +34,16 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val appName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        val appName = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = 8.dp
             }
             setTextColor(ContextCompat.getColor(context, R.color.textNormal))
@@ -43,29 +51,57 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val packageName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-            addView(this)
-        }
+        val packageName =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+                addView(this)
+            }
 
-        val versionInfo = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val versionInfo = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensed
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
             addView(this)
         }
 
-        val targetApiInfo = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val targetApiInfo = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensed
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
             addView(this)
         }
 
-        val abiInfo = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val abiInfo = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensedMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
             addView(this)
@@ -81,7 +117,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         fun addRedMask() {
             if (redMask == null) {
                 redMask = View(context).apply {
-                    layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                    layoutParams = LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
                     setBackgroundColor(ContextCompat.getColor(context, R.color.material_red_300))
                     alpha = 0.5f
                     addView(this)
@@ -99,23 +138,42 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
-            val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
-            appName.measure(textWidth.toExactlyMeasureSpec(), appName.defaultHeightMeasureSpec(this))
-            packageName.measure(textWidth.toExactlyMeasureSpec(), packageName.defaultHeightMeasureSpec(this))
-            versionInfo.measure(textWidth.toExactlyMeasureSpec(), versionInfo.defaultHeightMeasureSpec(this))
-            targetApiInfo.measure(textWidth.toExactlyMeasureSpec(), targetApiInfo.defaultHeightMeasureSpec(this))
-            abiInfo.measure(textWidth.toExactlyMeasureSpec(), abiInfo.defaultHeightMeasureSpec(this))
+            val textWidth =
+                measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - 5.dp - appName.marginStart
+            appName.measure(
+                textWidth.toExactlyMeasureSpec(),
+                appName.defaultHeightMeasureSpec(this)
+            )
+            packageName.measure(
+                textWidth.toExactlyMeasureSpec(),
+                packageName.defaultHeightMeasureSpec(this)
+            )
+            versionInfo.measure(
+                textWidth.toExactlyMeasureSpec(),
+                versionInfo.defaultHeightMeasureSpec(this)
+            )
+            targetApiInfo.measure(
+                textWidth.toExactlyMeasureSpec(),
+                targetApiInfo.defaultHeightMeasureSpec(this)
+            )
+            abiInfo.measure(
+                textWidth.toExactlyMeasureSpec(),
+                abiInfo.defaultHeightMeasureSpec(this)
+            )
             setMeasuredDimension(
                 measuredWidth, (
-                        paddingTop +
-                                appName.measuredHeight +
-                                packageName.measuredHeight +
-                                versionInfo.measuredHeight +
-                                targetApiInfo.measuredHeight +
-                                abiInfo.measuredHeight +
-                                paddingBottom)
+                    paddingTop +
+                        appName.measuredHeight +
+                        packageName.measuredHeight +
+                        versionInfo.measuredHeight +
+                        targetApiInfo.measuredHeight +
+                        abiInfo.measuredHeight +
+                        paddingBottom)
             )
-            stateIndicator.measure(stateIndicator.defaultWidthMeasureSpec(this), (measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec())
+            stateIndicator.measure(
+                stateIndicator.defaultWidthMeasureSpec(this),
+                (measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec()
+            )
             redMask?.autoMeasure()
         }
 
@@ -126,7 +184,11 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             versionInfo.layout(appName.left, packageName.bottom)
             targetApiInfo.layout(appName.left, versionInfo.bottom)
             abiInfo.layout(appName.left, targetApiInfo.bottom)
-            stateIndicator.layout(paddingEnd, stateIndicator.toVerticalCenter(this), fromRight = true)
+            stateIndicator.layout(
+                paddingEnd,
+                stateIndicator.toVerticalCenter(this),
+                fromRight = true
+            )
             redMask?.layout(0, 0)
         }
     }

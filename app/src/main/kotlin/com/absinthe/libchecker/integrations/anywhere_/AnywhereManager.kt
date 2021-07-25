@@ -16,7 +16,11 @@ private const val EXTRA_CLASS_NAME = "EXTRA_CLASS_NAME"
 class AnywhereManager {
 
     fun launchActivityEditor(context: Context, packageName: String, className: String) {
-        val fullClassName = if (className.startsWith(".")) { packageName + className } else { className }
+        val fullClassName = if (className.startsWith(".")) {
+            packageName + className
+        } else {
+            className
+        }
         try {
             context.startActivity(Intent(ACTION_EDITOR).apply {
                 putExtra(EXTRA_PACKAGE_NAME, packageName)
@@ -30,6 +34,6 @@ class AnywhereManager {
     companion object {
         val isSupportInteraction =
             PackageUtils.isAppInstalled(ANYWHERE_APPLICATION_ID)
-                    && PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+                && PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

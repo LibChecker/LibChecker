@@ -25,7 +25,8 @@ class ApplicationDelegate(context: Context) {
         get() {
             try {
                 val clazzOhosApplication = Class.forName("ohos.app.Application")
-                val getApplicationContextMethod = clazzOhosApplication.getMethod("getApplicationContext")
+                val getApplicationContextMethod =
+                    clazzOhosApplication.getMethod("getApplicationContext")
                 return getApplicationContextMethod.invoke(sOhosApplication) as ohos.app.Context
             } catch (e: Throwable) {
                 Timber.w(e)

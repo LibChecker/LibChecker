@@ -2,12 +2,17 @@ package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.entity.*
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
 class LCRepository(private val lcDao: LCDao) {
 
     val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
-    val allSnapshotItems: LiveData<List<SnapshotItem>> = lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
+    val allSnapshotItems: LiveData<List<SnapshotItem>> =
+        lcDao.getSnapshotsLiveData(GlobalValues.snapshotTimestamp)
 
     suspend fun getItem(packageName: String): LCItem? {
         return lcDao.getItem(packageName)
@@ -114,5 +119,6 @@ class LCRepository(private val lcDao: LCDao) {
         lcDao.deleteAllSnapshotDiffItems()
     }
 
-    suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? = lcDao.getSnapshotDiff(packageName)
+    suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? =
+        lcDao.getSnapshotDiff(packageName)
 }

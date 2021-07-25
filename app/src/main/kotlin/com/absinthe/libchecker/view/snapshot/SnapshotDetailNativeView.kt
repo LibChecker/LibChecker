@@ -41,12 +41,25 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
         val typeIcon = AppCompatImageView(context).apply {
             layoutParams = LayoutParams(16.dp, 16.dp)
-            imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_blue_grey_700))
+            imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    context,
+                    R.color.material_blue_grey_700
+                )
+            )
             addView(this)
         }
 
-        val name = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        val name = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = 8.dp
             }
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -54,8 +67,16 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val libSize = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val libSize = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensed
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             setTextColor(Color.BLACK)
             addView(this)
@@ -76,7 +97,10 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             } else {
                 if (chip == null) {
                     chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
-                        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                        layoutParams = LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).also {
                             it.topMargin = 4.dp
                         }
                         setTextColor(Color.BLACK)
@@ -90,12 +114,17 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
                 chip!!.apply {
                     setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
                     text = entity.label
-                    chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+                    chipBackgroundColor =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 
-                    if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(entity.iconIndex)) {
+                    if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
+                            entity.iconIndex
+                        )
+                    ) {
                         val icon = chipIcon
                         icon?.let {
-                            it.mutate().colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            it.mutate().colorFilter =
+                                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                             chipIcon = it
                         }
                     } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
@@ -110,21 +139,32 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             typeIcon.autoMeasure()
-            val textWidth = (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd)
+            val textWidth =
+                (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd)
             name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
-            libSize.measure(textWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
+            libSize.measure(
+                textWidth.toExactlyMeasureSpec(),
+                libSize.defaultHeightMeasureSpec(this)
+            )
             chip?.autoMeasure()
             val chipHeight = if (chip != null) {
                 chip!!.measuredHeight + chip!!.marginTop
             } else {
                 0
             }
-            setMeasuredDimension(measuredWidth, paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom)
+            setMeasuredDimension(
+                measuredWidth,
+                paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
-            name.layout(typeIcon.right + name.marginStart, (measuredHeight - name.measuredHeight - libSize.measuredHeight - (chip?.measuredHeight ?: 0)) / 2)
+            name.layout(
+                typeIcon.right + name.marginStart,
+                (measuredHeight - name.measuredHeight - libSize.measuredHeight - (chip?.measuredHeight
+                    ?: 0)) / 2
+            )
             libSize.layout(name.left, name.bottom)
             chip?.layout(name.left, libSize.bottom + chip!!.marginTop)
         }

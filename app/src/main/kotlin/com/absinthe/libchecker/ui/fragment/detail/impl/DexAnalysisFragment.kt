@@ -17,9 +17,11 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
-class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+class DexAnalysisFragment :
+    BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibComponentBinding =
+        FragmentLibComponentBinding.bind(view)
 
     override fun getRecyclerView() = binding.list
 
@@ -53,7 +55,8 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.la
         fun openLibDetailDialog(position: Int) {
             val name = adapter.getItem(position).item.name
             val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
-            LibDetailDialogFragment.newInstance(name, type, regexName).show(childFragmentManager, tag)
+            LibDetailDialogFragment.newInstance(name, type, regexName)
+                .show(childFragmentManager, tag)
         }
 
         adapter.apply {

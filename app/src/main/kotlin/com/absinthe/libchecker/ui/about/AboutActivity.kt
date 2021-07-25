@@ -43,13 +43,22 @@ private const val RENGE_CHECKER = "RengeChecker"
 class AboutActivity : AbsAboutActivity() {
 
     private var shouldShowEasterEggCount = 1
-    private val configuration by lazy { Configuration(resources.configuration).apply { setLocale(GlobalValues.locale) } }
+    private val configuration by lazy {
+        Configuration(resources.configuration).apply {
+            setLocale(
+                GlobalValues.locale
+            )
+        }
+    }
     private val mediaPlayer by lazy { MediaPlayer() }
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
         initView()
-        Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_ABOUT", "Entered"))
+        Analytics.trackEvent(
+            Constants.Event.SETTINGS,
+            EventProperties().set("PREF_ABOUT", "Entered")
+        )
     }
 
     override fun onDestroy() {
@@ -69,7 +78,7 @@ class AboutActivity : AbsAboutActivity() {
             shouldShowEasterEggCount = if (slogan.text == RENGE_CHECKER) 11 else 1
         }
         icon.setOnClickListener {
-            when(shouldShowEasterEggCount) {
+            when (shouldShowEasterEggCount) {
                 in 0..9 -> {
                     rebornCoroutine.cancel()
                     shouldShowEasterEggCount++
@@ -96,10 +105,23 @@ class AboutActivity : AbsAboutActivity() {
                     val inputStream = assets.open("renge.webp")
                     icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
                     slogan.text = "ええ、私もよ。"
-                    val headerContentLayout = findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
-                    val drawable = TransitionDrawable(arrayOf(headerContentLayout.background, ColorDrawable(ContextCompat.getColor(this, R.color.renge))))
+                    val headerContentLayout =
+                        findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
+                    val drawable = TransitionDrawable(
+                        arrayOf(
+                            headerContentLayout.background,
+                            ColorDrawable(ContextCompat.getColor(this, R.color.renge))
+                        )
+                    )
                     setHeaderBackground(drawable)
-                    setHeaderContentScrim(ColorDrawable(ContextCompat.getColor(this, R.color.renge)))
+                    setHeaderContentScrim(
+                        ColorDrawable(
+                            ContextCompat.getColor(
+                                this,
+                                R.color.renge
+                            )
+                        )
+                    )
                     window.statusBarColor = ContextCompat.getColor(this, R.color.renge)
                     drawable.startTransition(250)
 
@@ -110,7 +132,10 @@ class AboutActivity : AbsAboutActivity() {
                         it.start()
                     }
                     GlobalValues.rengeTheme = !GlobalValues.rengeTheme
-                    Analytics.trackEvent(Constants.Event.EASTER_EGG, EventProperties().set("EASTER_EGG", "Renge 20 hits!"))
+                    Analytics.trackEvent(
+                        Constants.Event.EASTER_EGG,
+                        EventProperties().set("EASTER_EGG", "Renge 20 hits!")
+                    )
                 }
             }
         }
@@ -131,13 +156,32 @@ class AboutActivity : AbsAboutActivity() {
                 URLManager.GITHUB_PAGE
             }
             add(Contributor(R.mipmap.pic_rabbit, Absinthe.ME, "Developer & Designer", developerUrl))
-            add(Contributor(R.drawable.ic_github, "Source Code", URLManager.GITHUB_REPO_PAGE, URLManager.GITHUB_REPO_PAGE))
+            add(
+                Contributor(
+                    R.drawable.ic_github,
+                    "Source Code",
+                    URLManager.GITHUB_REPO_PAGE,
+                    URLManager.GITHUB_REPO_PAGE
+                )
+            )
 
             add(Category("Other Works"))
-            addAll(Absinthe.getAboutPageRecommendedApps(this@AboutActivity, BuildConfig.APPLICATION_ID))
+            addAll(
+                Absinthe.getAboutPageRecommendedApps(
+                    this@AboutActivity,
+                    BuildConfig.APPLICATION_ID
+                )
+            )
 
             add(Category("Contribution"))
-            add(Contributor(0/*TODO*/, "Telegram @tommynok", "Russian & Ukrainian Translation", "https://t.me/tommynok"))
+            add(
+                Contributor(
+                    0/*TODO*/,
+                    "Telegram @tommynok",
+                    "Russian & Ukrainian Translation",
+                    "https://t.me/tommynok"
+                )
+            )
 
             val list = listOf(
                 "https://www.iconfont.cn/",
@@ -149,34 +193,146 @@ class AboutActivity : AbsAboutActivity() {
                 "https://chojugiga.com/2017/09/05/da4choju53_0031/"
             )
             add(Category("Acknowledgement"))
-            add(Card(HtmlCompat.fromHtml(getAcknowledgementHtmlString(list), HtmlCompat.FROM_HTML_MODE_LEGACY)))
+            add(
+                Card(
+                    HtmlCompat.fromHtml(
+                        getAcknowledgementHtmlString(list),
+                        HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                )
+            )
 
             add(Category("Declaration"))
             add(Card(getStringByConfiguration(R.string.library_declaration)))
 
             add(Category("Open Source Licenses"))
-            add(License("kotlin", "JetBrains", License.APACHE_2, "https://github.com/JetBrains/kotlin"))
-            add(License("MultiType", "drakeet", License.APACHE_2, "https://github.com/drakeet/MultiType"))
-            add(License("about-page", "drakeet", License.APACHE_2, "https://github.com/drakeet/about-page"))
+            add(
+                License(
+                    "kotlin",
+                    "JetBrains",
+                    License.APACHE_2,
+                    "https://github.com/JetBrains/kotlin"
+                )
+            )
+            add(
+                License(
+                    "MultiType",
+                    "drakeet",
+                    License.APACHE_2,
+                    "https://github.com/drakeet/MultiType"
+                )
+            )
+            add(
+                License(
+                    "about-page",
+                    "drakeet",
+                    License.APACHE_2,
+                    "https://github.com/drakeet/about-page"
+                )
+            )
             add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
             add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
             add(License("gson", "Google", License.APACHE_2, "https://github.com/google/gson"))
-            add(License("protobuf", "Google", License.APACHE_2, "https://github.com/protocolbuffers/protobuf"))
-            add(License("material-components-android", "Google", License.APACHE_2, "https://github.com/material-components/material-components-android"))
+            add(
+                License(
+                    "protobuf",
+                    "Google",
+                    License.APACHE_2,
+                    "https://github.com/protocolbuffers/protobuf"
+                )
+            )
+            add(
+                License(
+                    "material-components-android",
+                    "Google",
+                    License.APACHE_2,
+                    "https://github.com/material-components/material-components-android"
+                )
+            )
             add(License("RikkaX", "RikkaApps", License.MIT, "https://github.com/RikkaApps/RikkaX"))
-            add(License("lottie-android", "Airbnb", License.APACHE_2, "https://github.com/airbnb/lottie-android"))
-            add(License("MPAndroidChart", "PhilJay", License.APACHE_2, "https://github.com/PhilJay/MPAndroidChart"))
-            add(License("Once", "jonfinerty", License.APACHE_2, "https://github.com/jonfinerty/Once"))
-            add(License("BaseRecyclerViewAdapterHelper", "CymChad", License.MIT, "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"))
+            add(
+                License(
+                    "lottie-android",
+                    "Airbnb",
+                    License.APACHE_2,
+                    "https://github.com/airbnb/lottie-android"
+                )
+            )
+            add(
+                License(
+                    "MPAndroidChart",
+                    "PhilJay",
+                    License.APACHE_2,
+                    "https://github.com/PhilJay/MPAndroidChart"
+                )
+            )
+            add(
+                License(
+                    "Once",
+                    "jonfinerty",
+                    License.APACHE_2,
+                    "https://github.com/jonfinerty/Once"
+                )
+            )
+            add(
+                License(
+                    "BaseRecyclerViewAdapterHelper",
+                    "CymChad",
+                    License.MIT,
+                    "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"
+                )
+            )
             add(License("OkHttp", "Square", License.APACHE_2, "https://github.com/square/okhttp"))
-            add(License("Retrofit", "Square", License.APACHE_2, "https://github.com/square/retrofit"))
-            add(License("AndResGuard", "shwenzhang", License.APACHE_2, "https://github.com/shwenzhang/AndResGuard"))
-            add(License("apk-parser", "hsiafan", "BSD-2-Clause", "https://github.com/hsiafan/apk-parser"))
+            add(
+                License(
+                    "Retrofit",
+                    "Square",
+                    License.APACHE_2,
+                    "https://github.com/square/retrofit"
+                )
+            )
+            add(
+                License(
+                    "AndResGuard",
+                    "shwenzhang",
+                    License.APACHE_2,
+                    "https://github.com/shwenzhang/AndResGuard"
+                )
+            )
+            add(
+                License(
+                    "apk-parser",
+                    "hsiafan",
+                    "BSD-2-Clause",
+                    "https://github.com/hsiafan/apk-parser"
+                )
+            )
             add(License("coil", "coil-kt", License.APACHE_2, "https://github.com/coil-kt/coil"))
-            add(License("AndroidFastScroll", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AndroidFastScroll"))
-            add(License("AppIconLoader", "zhanghai", License.APACHE_2, "https://github.com/zhanghai/AppIconLoader"))
+            add(
+                License(
+                    "AndroidFastScroll",
+                    "zhanghai",
+                    License.APACHE_2,
+                    "https://github.com/zhanghai/AndroidFastScroll"
+                )
+            )
+            add(
+                License(
+                    "AppIconLoader",
+                    "zhanghai",
+                    License.APACHE_2,
+                    "https://github.com/zhanghai/AppIconLoader"
+                )
+            )
             add(License("LSPosed", "LSPosed", License.GPL_V3, "https://github.com/LSPosed/LSPosed"))
-            add(License("AndroidHiddenApiBypass", "LSPosed", License.APACHE_2, "https://github.com/LSPosed/AndroidHiddenApiBypass"))
+            add(
+                License(
+                    "AndroidHiddenApiBypass",
+                    "LSPosed",
+                    License.APACHE_2,
+                    "https://github.com/LSPosed/AndroidHiddenApiBypass"
+                )
+            )
         }
     }
 
@@ -216,5 +372,6 @@ class AboutActivity : AbsAboutActivity() {
         return sb.toString()
     }
 
-    private fun getStringByConfiguration(@StringRes res: Int): String = createConfigurationContext(configuration).resources.getString(res)
+    private fun getStringByConfiguration(@StringRes res: Int): String =
+        createConfigurationContext(configuration).resources.getString(res)
 }

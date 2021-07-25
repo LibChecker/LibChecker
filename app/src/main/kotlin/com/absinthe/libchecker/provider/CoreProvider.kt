@@ -1,6 +1,11 @@
 package com.absinthe.libchecker.provider
 
-import android.content.*
+import android.content.ContentProvider
+import android.content.ContentProviderOperation
+import android.content.ContentProviderResult
+import android.content.ContentValues
+import android.content.OperationApplicationException
+import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import com.absinthe.libchecker.BuildConfig
@@ -39,7 +44,13 @@ class CoreProvider : ContentProvider() {
         return true
     }
 
-    override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
+    override fun query(
+        uri: Uri,
+        projection: Array<out String>?,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+        sortOrder: String?
+    ): Cursor? {
         val code = MATCHER.match(uri)
         Timber.d("Query: code=$code")
         return if (code == CODE_RULES_DIR || code == CODE_RULES_ITEM) {
@@ -66,7 +77,12 @@ class CoreProvider : ContentProvider() {
         return 0
     }
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
+    override fun update(
+        uri: Uri,
+        values: ContentValues?,
+        selection: String?,
+        selectionArgs: Array<out String>?
+    ): Int {
         return 0
     }
 
@@ -82,6 +98,10 @@ class CoreProvider : ContentProvider() {
     override fun applyBatch(operations: ArrayList<ContentProviderOperation?>): Array<ContentProviderResult?> {
         val context = context ?: return arrayOfNulls(0)
         val database: LCDatabase = LCDatabase.getDatabase(context)
-        return database.runInTransaction(Callable<Array<ContentProviderResult?>> { super.applyBatch(operations) })
+        return database.runInTransaction(Callable<Array<ContentProviderResult?>> {
+            super.applyBatch(
+                operations
+            )
+        })
     }
 }

@@ -20,16 +20,20 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
         addView(this)
     }
 
-    val title = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.topMargin = 16.dp
+    val title =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.topMargin = 16.dp
+            }
+            setPadding(16.dp, 0, 16.dp, 0)
+            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
+            text = context.getString(R.string.further_operation)
+            gravity = Gravity.CENTER_HORIZONTAL
+            addView(this)
         }
-        setPadding(16.dp, 0, 16.dp, 0)
-        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
-        text = context.getString(R.string.further_operation)
-        gravity = Gravity.CENTER_HORIZONTAL
-        addView(this)
-    }
 
     private val handlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler) }
     private val activatedHandlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler_activated) }
@@ -38,7 +42,10 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         handler.autoMeasure()
         title.autoMeasure()
-        setMeasuredDimension(measuredWidth, handler.marginTop + handler.measuredHeight + title.marginTop + title.measuredHeight)
+        setMeasuredDimension(
+            measuredWidth,
+            handler.marginTop + handler.measuredHeight + title.marginTop + title.measuredHeight
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

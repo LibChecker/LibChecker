@@ -62,41 +62,49 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
     private fun requestBundle() {
         val saveFile = File(requireContext().cacheDir, Constants.RULES_DB_FILE_NAME)
-        DownloadUtils.get().download(requireContext(), ApiManager.rulesBundleUrl, saveFile, object : DownloadUtils.OnDownloadListener{
-            override fun onDownloadSuccess() {
-                RuleDatabase.getDatabase(requireContext()).close()
-                val databaseDir = File(requireContext().filesDir.parent, "databases")
-                if (databaseDir.exists()) {
-                    var file = File(databaseDir, Constants.RULES_DATABASE_NAME)
-                    if (file.exists()) {
-                        file.delete()
+        DownloadUtils.get().download(
+            requireContext(),
+            ApiManager.rulesBundleUrl,
+            saveFile,
+            object : DownloadUtils.OnDownloadListener {
+                override fun onDownloadSuccess() {
+                    RuleDatabase.getDatabase(requireContext()).close()
+                    val databaseDir = File(requireContext().filesDir.parent, "databases")
+                    if (databaseDir.exists()) {
+                        var file = File(databaseDir, Constants.RULES_DATABASE_NAME)
+                        if (file.exists()) {
+                            file.delete()
+                        }
+                        file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm")
+                        if (file.exists()) {
+                            file.delete()
+                        }
+                        file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal")
+                        if (file.exists()) {
+                            file.delete()
+                        }
                     }
-                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm")
-                    if (file.exists()) {
-                        file.delete()
-                    }
-                    file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal")
-                    if (file.exists()) {
-                        file.delete()
+
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        root.cloudRulesContentView.localVersion.version.text =
+                            root.cloudRulesContentView.remoteVersion.version.text
+                        root.cloudRulesContentView.updateButton.isEnabled = false
+                        try {
+                            GlobalValues.localRulesVersion =
+                                root.cloudRulesContentView.remoteVersion.version.text.toString()
+                                    .toInt()
+                        } catch (e: NumberFormatException) {
+                        }
                     }
                 }
 
-                lifecycleScope.launch(Dispatchers.Main) {
-                    root.cloudRulesContentView.localVersion.version.text = root.cloudRulesContentView.remoteVersion.version.text
-                    root.cloudRulesContentView.updateButton.isEnabled = false
-                    try {
-                        GlobalValues.localRulesVersion = root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
-                    } catch (e: NumberFormatException) { }
+                override fun onDownloading(progress: Int) {
+
                 }
-            }
 
-            override fun onDownloading(progress: Int) {
-
-            }
-
-            override fun onDownloadFailed() {
-                context?.showToast(R.string.toast_cloud_rules_update_error)
-            }
-        })
+                override fun onDownloadFailed() {
+                    context?.showToast(R.string.toast_cloud_rules_update_error)
+                }
+            })
     }
 }
