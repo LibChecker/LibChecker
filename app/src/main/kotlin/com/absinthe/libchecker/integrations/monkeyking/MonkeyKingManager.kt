@@ -37,8 +37,10 @@ class MonkeyKingManager {
     }
 
     fun addBlockedComponent(
-        context: Context, packageName: String,
-        componentName: String, @LibType type: Int,
+        context: Context,
+        packageName: String,
+        componentName: String,
+        @LibType type: Int,
         shouldBlock: Boolean
     ) {
         val fullComponentName = if (componentName.startsWith(".")) {
@@ -47,7 +49,8 @@ class MonkeyKingManager {
             componentName
         }
         val shareCmpInfo = ShareCmpInfo(
-            packageName, listOf(
+            packageName,
+            listOf(
                 ShareCmpInfo.Component(
                     type = getType(type),
                     name = fullComponentName,
@@ -75,7 +78,7 @@ class MonkeyKingManager {
 
     companion object {
         val isSupportInteraction =
-            PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID)
-                && PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+            PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID) &&
+                PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

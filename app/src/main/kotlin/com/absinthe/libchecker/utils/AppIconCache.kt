@@ -93,7 +93,8 @@ object AppIconCache : CoroutineScope {
     @JvmStatic
     fun loadIconBitmapAsync(
         context: Context,
-        info: ApplicationInfo, userId: Int,
+        info: ApplicationInfo,
+        userId: Int,
         view: ImageView
     ): Job {
         return launch {

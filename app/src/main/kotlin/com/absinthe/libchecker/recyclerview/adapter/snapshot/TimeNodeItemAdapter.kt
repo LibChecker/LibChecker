@@ -16,10 +16,12 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
     private var loadIconJob: Job? = null
 
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return BaseViewHolder(AppCompatImageView(context).apply {
-            layoutParams = ViewGroup.LayoutParams(24.dp, 24.dp)
-            setPadding(0, 0, 4.dp, 0)
-        })
+        return BaseViewHolder(
+            AppCompatImageView(context).apply {
+                layoutParams = ViewGroup.LayoutParams(24.dp, 24.dp)
+                setPadding(0, 0, 4.dp, 0)
+            }
+        )
     }
 
     override fun convert(holder: BaseViewHolder, item: String) {

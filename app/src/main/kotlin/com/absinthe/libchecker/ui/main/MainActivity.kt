@@ -120,7 +120,7 @@ class MainActivity : BaseActivity() {
                     }
                 })
 
-                //禁止左右滑动
+                // 禁止左右滑动
                 isUserInputEnabled = false
                 offscreenPageLimit = 2
             }

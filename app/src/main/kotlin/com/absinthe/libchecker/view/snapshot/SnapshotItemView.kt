@@ -161,14 +161,16 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
                 abiInfo.defaultHeightMeasureSpec(this)
             )
             setMeasuredDimension(
-                measuredWidth, (
+                measuredWidth,
+                (
                     paddingTop +
                         appName.measuredHeight +
                         packageName.measuredHeight +
                         versionInfo.measuredHeight +
                         targetApiInfo.measuredHeight +
                         abiInfo.measuredHeight +
-                        paddingBottom)
+                        paddingBottom
+                    )
             )
             stateIndicator.measure(
                 stateIndicator.defaultWidthMeasureSpec(this),

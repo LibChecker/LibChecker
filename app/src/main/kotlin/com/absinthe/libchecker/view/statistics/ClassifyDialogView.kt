@@ -63,5 +63,4 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
         super.onDetachedFromWindow()
         adapter.release()
     }
-
 }

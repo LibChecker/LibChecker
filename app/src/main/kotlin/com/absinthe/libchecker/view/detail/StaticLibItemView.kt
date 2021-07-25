@@ -101,8 +101,12 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         chip?.autoMeasure()
         setMeasuredDimension(
             measuredWidth,
-            (libName.measuredHeight + libDetail.measuredHeight + (chip?.measuredHeight
-                ?: 0) + paddingTop + paddingBottom).coerceAtLeast(40.dp)
+            (
+                libName.measuredHeight + libDetail.measuredHeight + (
+                    chip?.measuredHeight
+                        ?: 0
+                    ) + paddingTop + paddingBottom
+                ).coerceAtLeast(40.dp)
         )
     }
 

@@ -22,10 +22,12 @@ class AnywhereManager {
             className
         }
         try {
-            context.startActivity(Intent(ACTION_EDITOR).apply {
-                putExtra(EXTRA_PACKAGE_NAME, packageName)
-                putExtra(EXTRA_CLASS_NAME, fullClassName)
-            })
+            context.startActivity(
+                Intent(ACTION_EDITOR).apply {
+                    putExtra(EXTRA_PACKAGE_NAME, packageName)
+                    putExtra(EXTRA_CLASS_NAME, fullClassName)
+                }
+            )
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)
         }
@@ -33,7 +35,7 @@ class AnywhereManager {
 
     companion object {
         val isSupportInteraction =
-            PackageUtils.isAppInstalled(ANYWHERE_APPLICATION_ID)
-                && PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+            PackageUtils.isAppInstalled(ANYWHERE_APPLICATION_ID) &&
+                PackageUtils.getVersionCode(ANYWHERE_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

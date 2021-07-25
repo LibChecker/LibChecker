@@ -23,5 +23,4 @@ class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
         setTextColor(ContextCompat.getColor(context, R.color.grey_600))
     }
-
 }

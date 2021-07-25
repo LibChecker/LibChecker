@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-
 class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
     R.layout.fragment_lib_component
 ) {
@@ -56,7 +55,8 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
                                     LibStringItem(
                                         name = item.componentName,
                                         source = DISABLED
-                                    ), null
+                                    ),
+                                    null
                                 )
                             }
                         }

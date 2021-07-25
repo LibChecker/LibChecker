@@ -101,5 +101,4 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
             subtitle.layout(title.left, title.bottom)
         }
     }
-
 }

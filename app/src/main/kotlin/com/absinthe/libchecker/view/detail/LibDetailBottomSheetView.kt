@@ -214,10 +214,11 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             movementMethod = LinkMovementMethod.getInstance()
             text = HtmlCompat.fromHtml(
                 "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${
-                    resources.getText(
-                        R.string.create_an_issue
-                    )
-                } </a>", HtmlCompat.FROM_HTML_MODE_LEGACY
+                resources.getText(
+                    R.string.create_an_issue
+                )
+                } </a>",
+                HtmlCompat.FROM_HTML_MODE_LEGACY
             )
         }
 
@@ -340,6 +341,5 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             description.layout(0, contributor.bottom + marginVertical)
             relativeLink.layout(0, description.bottom + marginVertical)
         }
-
     }
 }

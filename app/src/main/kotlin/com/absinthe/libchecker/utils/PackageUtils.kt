@@ -130,7 +130,7 @@ object PackageUtils {
      * @return version code as String
      */
     fun getVersionString(versionName: String, versionCode: Long): String {
-        return "${versionName}(${versionCode})"
+        return "$versionName($versionCode)"
     }
 
     /**
@@ -821,11 +821,11 @@ object PackageUtils {
                     .map { item ->
                         splits = item.split(".")
                         when {
-                            //Remove obfuscated classes
+                            // Remove obfuscated classes
                             splits.any { it.length == 1 } -> LibStringItem("")
-                            //Merge AndroidX classes
+                            // Merge AndroidX classes
                             splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
-                            //Filter classes which paths deep level greater than 4
+                            // Filter classes which paths deep level greater than 4
                             else -> LibStringItem(
                                 splits.subList(0, splits.size.coerceAtMost(4))
                                     .joinToString(separator = ".")
@@ -836,15 +836,15 @@ object PackageUtils {
                     .filter {
                         it.name.length > 11 && it.name.contains(".") &&
                             (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
-                    }    //Remove obfuscated classes
+                    } // Remove obfuscated classes
                     .toMutableList()
 
-                //Merge path deep level 3 classes
+                // Merge path deep level 3 classes
                 primaryList.filter { it.name.split(".").size == 3 }.forEach {
                     primaryList.removeAll { item -> item.name.startsWith(it.name) }
                     primaryList.add(it)
                 }
-                //Merge path deep level 4 classes
+                // Merge path deep level 4 classes
                 var pathLevel3Item: String
                 var filter: List<LibStringItem>
                 primaryList.filter { it.name.split(".").size == 4 }.forEach {

@@ -303,14 +303,18 @@ class AppListFragment :
                         dbItems.value?.let { updateItems(it) }
                     }
                     STATUS_NOT_START -> {
-                        if ((HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(
-                                Once.THIS_APP_INSTALL,
-                                OnceTag.HARMONY_FIRST_INIT
-                            )) ||
-                            (!isFirstLaunch && !Once.beenDone(
-                                Once.THIS_APP_INSTALL,
-                                OnceTag.SHOULD_RELOAD_APP_LIST
-                            ))
+                        if ((
+                            HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(
+                                    Once.THIS_APP_INSTALL,
+                                    OnceTag.HARMONY_FIRST_INIT
+                                )
+                            ) ||
+                            (
+                                !isFirstLaunch && !Once.beenDone(
+                                        Once.THIS_APP_INSTALL,
+                                        OnceTag.SHOULD_RELOAD_APP_LIST
+                                    )
+                                )
                         ) {
                             flip(VF_INIT)
                             initItems()
@@ -343,11 +347,11 @@ class AppListFragment :
                             Constants.SORT_MODE_DEFAULT -> list.sortWith(
                                 compareBy(
                                     { it.abi },
-                                    { it.label })
+                                    { it.label }
+                                )
                             )
                             Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.lastUpdatedTime }
                             Constants.SORT_MODE_TARGET_API_DESC -> list.sortByDescending { it.targetApi }
-
                         }
                         updateItems(list)
                     }

@@ -77,7 +77,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                 try {
                     binding.progressIndicator.setProgressCompat(progress, true)
                 } catch (e: NullPointerException) {
-
                 }
             }
         }
@@ -133,7 +132,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                                     dismiss()
                                 }
                                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
-
                             }
                         }
                     dialog.show(requireActivity().supportFragmentManager, dialog.tag)
@@ -228,8 +226,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                 }
             }
             snapshotDiffItems.observe(viewLifecycleOwner) { list ->
-                adapter.setDiffNewData(list.sortedByDescending { it.updateTime }
-                    .toMutableList()) {
+                adapter.setDiffNewData(
+                    list.sortedByDescending { it.updateTime }
+                        .toMutableList()
+                ) {
                     if (!binding.list.canScrollVertically(-1)) {
                         if (!hasAddedListBottomPadding) {
                             binding.list.addPaddingBottom(20.dp)
@@ -248,8 +248,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                     delay(250)
 
                     doOnMainThreadIdle({
-                        if (this@SnapshotFragment == homeViewModel.controller
-                            && !binding.list.canScrollVertically(-1)
+                        if (this@SnapshotFragment == homeViewModel.controller &&
+                            !binding.list.canScrollVertically(-1)
                         ) {
                             (requireActivity() as MainActivity).showNavigationView()
                         }
@@ -305,7 +305,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                         Intent(
                             requireContext(),
                             ShootService::class.java
-                        ), shootServiceConnection, Service.BIND_AUTO_CREATE
+                        ),
+                        shootServiceConnection, Service.BIND_AUTO_CREATE
                     )
                 }
                 shouldCompare = false

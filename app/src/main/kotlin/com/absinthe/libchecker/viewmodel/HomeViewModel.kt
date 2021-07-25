@@ -232,8 +232,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                         packageInfo = PackageUtils.getPackageInfo(it)
                         versionCode = PackageUtils.getVersionCode(packageInfo)
 
-                        if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime
-                            || (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)
+                        if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
+                            (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)
                         ) {
                             abi = PackageUtils.getAbi(it)
 

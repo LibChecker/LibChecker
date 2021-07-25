@@ -33,7 +33,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-
 class ComponentsAnalysisFragment :
     BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
@@ -81,7 +80,8 @@ class ComponentsAnalysisFragment :
                                     LibStringItem(
                                         name = item.componentName,
                                         source = DISABLED
-                                    ), chip
+                                    ),
+                                    chip
                                 )
                             }
                         }
@@ -142,7 +142,7 @@ class ComponentsAnalysisFragment :
                 ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
             arrayAdapter.add(getString(android.R.string.copy))
 
-            //MonkeyKing Purify
+            // MonkeyKing Purify
             if (integrationMonkeyKingBlockList == null) {
                 integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(
                     requireContext(),
@@ -158,7 +158,7 @@ class ComponentsAnalysisFragment :
                     arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
                 }
             }
-            //Anywhere-
+            // Anywhere-
             if (AnywhereManager.isSupportInteraction && type == ACTIVITY) {
                 arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
             }

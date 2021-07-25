@@ -38,7 +38,8 @@ import timber.log.Timber
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) : BaseFragment<T>(layoutId),
+abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) :
+    BaseFragment<T>(layoutId),
     Sortable {
 
     protected val viewModel by activityViewModels<DetailViewModel>()

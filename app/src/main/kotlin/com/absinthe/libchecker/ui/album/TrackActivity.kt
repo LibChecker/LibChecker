@@ -106,14 +106,16 @@ class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
                 adapter.setList(list)
                 menu?.findItem(R.id.search)?.isVisible = true
                 isListReady = true
-                adapter.setEmptyView(EmptyListView(this@TrackActivity).apply {
-                    layoutParams = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                    ).also {
-                        it.gravity = Gravity.CENTER
+                adapter.setEmptyView(
+                    EmptyListView(this@TrackActivity).apply {
+                        layoutParams = FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT
+                        ).also {
+                            it.gravity = Gravity.CENTER
+                        }
                     }
-                })
+                )
             }
         }
     }

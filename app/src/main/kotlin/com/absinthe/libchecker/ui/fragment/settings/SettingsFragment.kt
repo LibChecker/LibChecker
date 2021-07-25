@@ -216,7 +216,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                             URLManager.TELEGRAM_GROUP.toUri()
                         ).apply {
                             flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        })
+                        }
+                    )
                 } catch (e: ActivityNotFoundException) {
 
                     Timber.e(e)
@@ -257,7 +258,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                         "%s - %s",
                         localeName[i - 1],
                         localeNameUser[i - 1]
-                    ), HtmlCompat.FROM_HTML_MODE_LEGACY
+                    ),
+                    HtmlCompat.FROM_HTML_MODE_LEGACY
                 )
             } else {
                 languagePreference.entries[i] = localeNameUser[i - 1]
@@ -318,7 +320,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
 
     override fun onReturnTop() {
-        //Do nothing
+        // Do nothing
     }
 
     override fun getAppBar() = (activity as MainActivity?)?.appBar

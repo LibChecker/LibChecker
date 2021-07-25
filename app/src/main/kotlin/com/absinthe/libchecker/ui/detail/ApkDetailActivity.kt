@@ -137,7 +137,8 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                         val extraInfo = SpannableStringBuilder()
                         val file = File(packageInfo.applicationInfo.sourceDir)
                         val demands = ManifestReader.getManifestProperties(
-                            file, listOf(
+                            file,
+                            listOf(
                                 PackageUtils.use32bitAbiString,
                                 PackageUtils.multiArchString,
                                 PackageUtils.overlayString
@@ -169,11 +170,11 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                 }
                                 spanString = SpannableString(
                                     "  ${
-                                        PackageUtils.getAbiString(
-                                            this@ApkDetailActivity,
-                                            eachAbi,
-                                            false
-                                        )
+                                    PackageUtils.getAbiString(
+                                        this@ApkDetailActivity,
+                                        eachAbi,
+                                        false
+                                    )
                                     }"
                                 )
                                 ContextCompat.getDrawable(

@@ -17,7 +17,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
 @Dao
 interface LCDao {
 
-    //Item Table
+    // Item Table
     @Query("SELECT * from item_table ORDER BY label ASC")
     fun getItems(): LiveData<List<LCItem>>
 
@@ -39,7 +39,7 @@ interface LCDao {
     @Query("DELETE FROM item_table")
     fun deleteAllItems()
 
-    //Snapshot Table
+    // Snapshot Table
     @Transaction
     @Query("SELECT * from snapshot_table ORDER BY packageName ASC")
     suspend fun getSnapshots(): List<SnapshotItem>
@@ -79,7 +79,7 @@ interface LCDao {
     @Delete
     fun deleteSnapshots(list: List<SnapshotItem>)
 
-    //TimeStamp Table
+    // TimeStamp Table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: TimeStampItem)
 
@@ -95,7 +95,7 @@ interface LCDao {
     @Update
     suspend fun update(item: TimeStampItem)
 
-    //Track table
+    // Track table
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(item: TrackItem)
 
@@ -105,7 +105,7 @@ interface LCDao {
     @Query("SELECT * from track_table")
     suspend fun getTrackItems(): List<TrackItem>
 
-    //Diff
+    // Diff
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSnapshotDiff(item: SnapshotDiffStoringItem)
 

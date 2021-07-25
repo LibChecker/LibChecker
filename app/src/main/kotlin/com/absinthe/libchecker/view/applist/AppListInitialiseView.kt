@@ -46,5 +46,4 @@ class AppListInitialiseView(context: Context, attributeSet: AttributeSet? = null
         loadingView.layout(loadingView.toHorizontalCenter(this), 0)
         progressIndicator.layout(progressIndicator.toHorizontalCenter(this), loadingView.bottom)
     }
-
 }

@@ -50,9 +50,11 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
         icon.autoMeasure()
         colorLabel.autoMeasure()
         setMeasuredDimension(
-            (text.measuredWidth +
-                icon.marginStart + icon.measuredWidth +
-                colorLabel.marginStart + colorLabel.measuredWidth),
+            (
+                text.measuredWidth +
+                    icon.marginStart + icon.measuredWidth +
+                    colorLabel.marginStart + colorLabel.measuredWidth
+                ),
             text.measuredHeight.coerceAtLeast(icon.measuredHeight)
         )
     }

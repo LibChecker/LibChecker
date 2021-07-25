@@ -42,7 +42,8 @@ private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
 private const val TYPE_TARGET_API = 2
 
-class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
+class ChartFragment :
+    BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pie_chart),
     OnChartValueSelectedListener,
     MaterialButtonToggleGroup.OnButtonCheckedListener {
 
@@ -137,7 +138,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
 
             dataSet.colors = colors
-            //dataSet.setSelectionShift(0f);
+            // dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(chartView as PieChart))
                 setValueTextSize(10f)
@@ -202,7 +203,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
 
             dataSet.colors = colors
-            //dataSet.setSelectionShift(0f);
+            // dataSet.setSelectionShift(0f);
             val data = PieData(dataSet).apply {
                 setValueFormatter(PercentFormatter(chartView as PieChart))
                 setValueTextSize(10f)
@@ -281,7 +282,7 @@ class ChartFragment : BaseFragment<FragmentPieChartBinding>(R.layout.fragment_pi
             for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
 
             dataSet.colors = colors
-            //dataSet.setSelectionShift(0f);
+            // dataSet.setSelectionShift(0f);
             val data = BarData(dataSet).apply {
                 setValueTextSize(10f)
                 setValueTextColor(ContextCompat.getColor(requireContext(), R.color.textNormal))

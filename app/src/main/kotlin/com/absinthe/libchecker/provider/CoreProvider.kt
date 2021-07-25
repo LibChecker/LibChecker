@@ -88,8 +88,8 @@ class CoreProvider : ContentProvider() {
 
     override fun getType(uri: Uri): String {
         return when (MATCHER.match(uri)) {
-            CODE_RULES_DIR -> "vnd.android.cursor.dir/${AUTHORITY}.$RULES_TABLE"
-            CODE_RULES_ITEM -> "vnd.android.cursor.item/${AUTHORITY}.$RULES_TABLE"
+            CODE_RULES_DIR -> "vnd.android.cursor.dir/$AUTHORITY.$RULES_TABLE"
+            CODE_RULES_ITEM -> "vnd.android.cursor.item/$AUTHORITY.$RULES_TABLE"
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
     }
@@ -98,10 +98,12 @@ class CoreProvider : ContentProvider() {
     override fun applyBatch(operations: ArrayList<ContentProviderOperation?>): Array<ContentProviderResult?> {
         val context = context ?: return arrayOfNulls(0)
         val database: LCDatabase = LCDatabase.getDatabase(context)
-        return database.runInTransaction(Callable<Array<ContentProviderResult?>> {
-            super.applyBatch(
-                operations
-            )
-        })
+        return database.runInTransaction(
+            Callable<Array<ContentProviderResult?>> {
+                super.applyBatch(
+                    operations
+                )
+            }
+        )
     }
 }
