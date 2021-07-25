@@ -22,6 +22,8 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: 11
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
       - name: Check style
         run: ./gradlew lintKotlin
 
