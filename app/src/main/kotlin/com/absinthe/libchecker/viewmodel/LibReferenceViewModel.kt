@@ -49,9 +49,10 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
             } else {
                 for (item in items) {
                     try {
-                        if (PackageUtils.getComponentStringList(item.packageName, type, false)
-                            .contains(name)
-                        ) {
+                        val componentStringList = PackageUtils.getComponentStringList(
+                            item.packageName, type, false
+                        )
+                        if (componentStringList.contains(name)) {
                             list.add(item)
                         }
                     } catch (e: Exception) {

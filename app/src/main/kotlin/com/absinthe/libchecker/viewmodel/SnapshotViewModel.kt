@@ -564,13 +564,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         for (item in tempNewList) {
             oldList.find { it.name == item.name }?.let {
                 if (it.size != item.size) {
+                    val extra =
+                        "${it.size.sizeToString(context)} $ARROW ${item.size.sizeToString(context)}"
                     list.add(
                         SnapshotDetailItem(
                             it.name,
                             it.name,
-                            "${sizeToString(context, it.size)} $ARROW ${
-                            sizeToString(context, item.size)
-                            }",
+                            extra,
                             CHANGED,
                             NATIVE
                         )
@@ -707,8 +707,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         return list
     }
 
-    private fun sizeToString(context: Context, size: Long): String {
-        return "${Formatter.formatFileSize(context, size)} ($size Bytes)"
+    private fun Long.sizeToString(context: Context): String {
+        return "${Formatter.formatFileSize(context, this)} ($this Bytes)"
     }
 
     data class CompareDiffNode(

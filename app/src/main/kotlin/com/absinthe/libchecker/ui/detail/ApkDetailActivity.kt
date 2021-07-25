@@ -176,15 +176,13 @@ class ApkDetailActivity : BaseActivity(), IDetailContainer {
                                 if (firstLoop) {
                                     firstLoop = false
                                 }
-                                spanString = SpannableString(
-                                    "  ${
-                                    PackageUtils.getAbiString(
-                                        this@ApkDetailActivity,
-                                        eachAbi,
-                                        false
-                                    )
-                                    }"
-                                )
+                                PackageUtils.getAbiString(
+                                    this@ApkDetailActivity,
+                                    eachAbi,
+                                    false
+                                ).let { str ->
+                                    spanString = SpannableString("  $str")
+                                }
                                 ContextCompat.getDrawable(
                                     this@ApkDetailActivity,
                                     PackageUtils.getAbiBadgeResource(eachAbi)

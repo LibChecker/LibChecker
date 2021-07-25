@@ -286,11 +286,9 @@ class SnapshotDetailActivity : BaseActivity() {
         format: String = "%s"
     ): String {
         return if (diff.old != diff.new && !isNewOrDeleted) {
-            "${String.format(format, diff.old.toString())} $ARROW ${
-            String.format(format, diff.new.toString())
-            }"
+            "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
         } else {
-            String.format(format, diff.old.toString())
+            format.format(diff.old)
         }
     }
 
@@ -301,11 +299,9 @@ class SnapshotDetailActivity : BaseActivity() {
         format: String = "%s"
     ): String {
         return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
-            "${
-            String.format(format, diff1.old.toString(), diff2.old.toString())
-            } $ARROW ${String.format(format, diff1.new.toString(), diff2.new.toString())}"
+            "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
         } else {
-            String.format(format, diff1.old.toString(), diff2.old.toString())
+            format.format(diff1.old, diff2.old)
         }
     }
 }
