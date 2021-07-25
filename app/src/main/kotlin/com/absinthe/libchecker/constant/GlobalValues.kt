@@ -11,7 +11,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
-import java.util.*
+import java.util.Locale
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 

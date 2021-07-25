@@ -10,7 +10,8 @@ import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
 
@@ -24,7 +25,8 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
         (holder.itemView as TimeNodeItemView).apply {
             name.text = getFormatDateString(item.timestamp)
             try {
-                val list: List<String>? = gson.fromJson(item.topApps, object : TypeToken<List<String>?>() {}.type)
+                val list: List<String>? =
+                    gson.fromJson(item.topApps, object : TypeToken<List<String>?>() {}.type)
                 adapter.setList(list)
             } catch (e: JsonSyntaxException) {
                 Timber.e(e)

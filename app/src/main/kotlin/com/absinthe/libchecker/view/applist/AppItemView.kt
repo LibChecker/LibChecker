@@ -34,8 +34,16 @@ class AppItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val appName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        val appName = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = 8.dp
             }
             setTextColor(ContextCompat.getColor(context, R.color.textNormal))
@@ -45,17 +53,29 @@ class AppItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val packageName = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-            maxLines = 1
-            ellipsize = TextUtils.TruncateAt.END
-            addView(this)
-        }
+        val packageName =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+                maxLines = 1
+                ellipsize = TextUtils.TruncateAt.END
+                addView(this)
+            }
 
-        val versionInfo = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val versionInfo = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensed
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             maxLines = 1
@@ -63,8 +83,16 @@ class AppItemView(context: Context) : MaterialCardView(context) {
             addView(this)
         }
 
-        val abiInfo = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        val abiInfo = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifCondensedMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             maxLines = 1
@@ -98,13 +126,29 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
-            val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart
-            appName.measure(textWidth.toExactlyMeasureSpec(), appName.defaultHeightMeasureSpec(this))
-            packageName.measure(textWidth.toExactlyMeasureSpec(), packageName.defaultHeightMeasureSpec(this))
-            versionInfo.measure(textWidth.toExactlyMeasureSpec(), versionInfo.defaultHeightMeasureSpec(this))
-            abiInfo.measure(textWidth.toExactlyMeasureSpec(), abiInfo.defaultHeightMeasureSpec(this))
+            val textWidth =
+                measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart
+            appName.measure(
+                textWidth.toExactlyMeasureSpec(),
+                appName.defaultHeightMeasureSpec(this)
+            )
+            packageName.measure(
+                textWidth.toExactlyMeasureSpec(),
+                packageName.defaultHeightMeasureSpec(this)
+            )
+            versionInfo.measure(
+                textWidth.toExactlyMeasureSpec(),
+                versionInfo.defaultHeightMeasureSpec(this)
+            )
+            abiInfo.measure(
+                textWidth.toExactlyMeasureSpec(),
+                abiInfo.defaultHeightMeasureSpec(this)
+            )
             badge?.autoMeasure()
-            setMeasuredDimension(measuredWidth, paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom)
+            setMeasuredDimension(
+                measuredWidth,
+                paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

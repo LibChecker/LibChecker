@@ -25,7 +25,10 @@ class LibThresholdDialogFragment : DialogFragment() {
                 val threshold = view.slider.value.toInt()
                 GlobalValues.libReferenceThresholdLiveData.value = threshold
                 GlobalValues.libReferenceThreshold = threshold
-                Analytics.trackEvent(Constants.Event.SETTINGS, EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong()))
+                Analytics.trackEvent(
+                    Constants.Event.SETTINGS,
+                    EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())
+                )
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()

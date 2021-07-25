@@ -20,7 +20,8 @@ class DexListEmptyView(context: Context) : AViewGroup(context) {
     }
 
     val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         text = context.getString(R.string.loading)
         setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
         addView(this)

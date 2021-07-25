@@ -43,14 +43,20 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
         }
 
         val title = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
             }
             setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
         }
 
         val subtitle = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
             setTextColor(context.getColor(R.color.textSecondary))
         }
@@ -73,15 +79,25 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
-            val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - title.marginStart
+            val textWidth =
+                measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - title.marginStart
             title.measure(textWidth.toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
-            subtitle.measure(textWidth.toExactlyMeasureSpec(), subtitle.defaultHeightMeasureSpec(this))
-            setMeasuredDimension(measuredWidth, (title.measuredHeight + subtitle.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom)
+            subtitle.measure(
+                textWidth.toExactlyMeasureSpec(),
+                subtitle.defaultHeightMeasureSpec(this)
+            )
+            setMeasuredDimension(
+                measuredWidth,
+                (title.measuredHeight + subtitle.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             icon.layout(paddingStart, icon.toVerticalCenter(this))
-            title.layout(icon.right + title.marginStart, (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2)
+            title.layout(
+                icon.right + title.marginStart,
+                (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2
+            )
             subtitle.layout(title.left, title.bottom)
         }
     }

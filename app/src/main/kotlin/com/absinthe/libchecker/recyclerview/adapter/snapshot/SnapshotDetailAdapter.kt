@@ -4,7 +4,12 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.*
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SNAPSHOT_COMPONENT_PROVIDER
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SNAPSHOT_NATIVE_PROVIDER
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SNAPSHOT_TITLE_PROVIDER
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SnapshotComponentProvider
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SnapshotNativeProvider
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SnapshotTitleProvider
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 

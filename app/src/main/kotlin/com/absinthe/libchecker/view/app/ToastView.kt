@@ -12,7 +12,8 @@ import com.absinthe.libchecker.view.AViewGroup
 class ToastView(context: Context) : AViewGroup(context) {
 
     val message = AppCompatTextView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         maxWidth = 300.dp
         gravity = Gravity.CENTER
         setTextAppearance(android.R.style.TextAppearance_Material_Body2)
@@ -33,7 +34,10 @@ class ToastView(context: Context) : AViewGroup(context) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         message.autoMeasure()
         icon.autoMeasure()
-        setMeasuredDimension(message.measuredWidth, message.measuredHeight + icon.measuredHeight / 2)
+        setMeasuredDimension(
+            message.measuredWidth,
+            message.measuredHeight + icon.measuredHeight / 2
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

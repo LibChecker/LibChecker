@@ -19,7 +19,8 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 @SuppressLint("ViewConstructor")
-class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) : LinearLayout(context) {
+class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) :
+    LinearLayout(context) {
 
     val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
 

@@ -17,7 +17,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
+class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
+    BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
 
     private var loadIconJob: Job? = null
 
@@ -28,7 +29,10 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapt
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(
             TrackItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).also {
                     val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
                     it.setMargins(margin, margin, margin, margin)
                 }
@@ -41,7 +45,8 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseQuickAdapt
             lifecycleScope.launch(Dispatchers.IO) {
                 try {
                     val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-                    loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+                    loadIconJob =
+                        AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
                 } catch (e: PackageManager.NameNotFoundException) {
                     Timber.e(e)
                 }

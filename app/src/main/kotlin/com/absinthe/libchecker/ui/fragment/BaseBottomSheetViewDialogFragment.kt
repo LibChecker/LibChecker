@@ -42,7 +42,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
                     }
                     bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
                 }
-                else -> {}
+                else -> {
+                }
             }
         }
 
@@ -55,7 +56,11 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     abstract fun init()
     abstract fun getHeaderView(): BottomSheetHeaderView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         _root = initRootView()
         init()
         return _root
@@ -66,7 +71,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
         dialog?.window?.let {
             it.attributes?.windowAnimations = R.style.DialogAnimation
             it.decorView.rootView.fitsSystemWindows = false
-            it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
+            it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows =
+                false
             UiUtils.setSystemBarStyle(it)
         }
         behavior.addBottomSheetCallback(bottomSheetCallback)
@@ -89,12 +95,14 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     override fun show(manager: FragmentManager, tag: String?) {
         try {
             super.show(manager, tag)
-        } catch (ignore: IllegalStateException) { }
+        } catch (ignore: IllegalStateException) {
+        }
     }
 
     private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
         //Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
-        val shapeAppearanceModel = ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
+        val shapeAppearanceModel =
+            ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
                 .build()
 
         //Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)

@@ -25,34 +25,53 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
 
     class SnapshotDashboardContainerView(context: Context) : AViewGroup(context) {
 
-        private val tvSnapshotTimestampTitle = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            text = context.getString(R.string.snapshot_current_timestamp)
-        }
+        private val tvSnapshotTimestampTitle =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                text = context.getString(R.string.snapshot_current_timestamp)
+            }
 
-        val tvSnapshotTimestampText = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setTextColor(context.getColor(R.color.textNormal))
-            setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
-        }
+        val tvSnapshotTimestampText =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setTextColor(context.getColor(R.color.textNormal))
+                setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
+            }
 
         val arrow = AppCompatImageView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setImageResource(R.drawable.ic_arrow_drop_down)
             setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
         }
 
-        private val tvSnapshotAppsCountTitle = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-                it.topMargin = 5.dp
+        private val tvSnapshotAppsCountTitle =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).also {
+                    it.topMargin = 5.dp
+                }
+                text = context.getString(R.string.snapshot_apps_count)
             }
-            text = context.getString(R.string.snapshot_apps_count)
-        }
 
-        val tvSnapshotAppsCountText = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            setTextColor(context.getColor(R.color.textNormal))
-        }
+        val tvSnapshotAppsCountText =
+            AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
+                layoutParams = LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                setTextColor(context.getColor(R.color.textNormal))
+            }
 
         private val addedIndicator = SnapshotTypeIndicatorView(context).apply {
             setIndicatorInfo(
@@ -115,27 +134,60 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
             ).maxOrNull()!!
 
             val textWidth = measuredWidth - paddingStart - paddingEnd - indicatorsWidth
-            tvSnapshotTimestampTitle.let { it.measure(textWidth.toExactlyMeasureSpec(), it.defaultHeightMeasureSpec(this)) }
-            tvSnapshotTimestampText.let { it.measure(it.defaultWidthMeasureSpec(this), it.defaultHeightMeasureSpec(this)) }
-            tvSnapshotAppsCountTitle.let { it.measure(textWidth.toExactlyMeasureSpec(), it.defaultHeightMeasureSpec(this)) }
-            tvSnapshotAppsCountText.let { it.measure(it.defaultWidthMeasureSpec(this), it.defaultHeightMeasureSpec(this)) }
+            tvSnapshotTimestampTitle.let {
+                it.measure(
+                    textWidth.toExactlyMeasureSpec(),
+                    it.defaultHeightMeasureSpec(this)
+                )
+            }
+            tvSnapshotTimestampText.let {
+                it.measure(
+                    it.defaultWidthMeasureSpec(this),
+                    it.defaultHeightMeasureSpec(this)
+                )
+            }
+            tvSnapshotAppsCountTitle.let {
+                it.measure(
+                    textWidth.toExactlyMeasureSpec(),
+                    it.defaultHeightMeasureSpec(this)
+                )
+            }
+            tvSnapshotAppsCountText.let {
+                it.measure(
+                    it.defaultWidthMeasureSpec(this),
+                    it.defaultHeightMeasureSpec(this)
+                )
+            }
 
-            setMeasuredDimension(measuredWidth,
+            setMeasuredDimension(
+                measuredWidth,
                 (
-                        tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
-                                tvSnapshotAppsCountTitle.marginTop +
-                                tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight
-                        ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
+                    tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
+                        tvSnapshotAppsCountTitle.marginTop +
+                        tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight
+                    ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
             )
 
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             tvSnapshotTimestampTitle.layout(paddingStart, paddingTop)
-            tvSnapshotTimestampText.layout(tvSnapshotTimestampTitle.left, tvSnapshotTimestampTitle.bottom)
-            arrow.layout(tvSnapshotTimestampText.right, arrow.toViewVerticalCenter(tvSnapshotTimestampText))
-            tvSnapshotAppsCountTitle.layout(tvSnapshotTimestampTitle.left, tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop)
-            tvSnapshotAppsCountText.layout(tvSnapshotTimestampTitle.left, tvSnapshotAppsCountTitle.bottom)
+            tvSnapshotTimestampText.layout(
+                tvSnapshotTimestampTitle.left,
+                tvSnapshotTimestampTitle.bottom
+            )
+            arrow.layout(
+                tvSnapshotTimestampText.right,
+                arrow.toViewVerticalCenter(tvSnapshotTimestampText)
+            )
+            tvSnapshotAppsCountTitle.layout(
+                tvSnapshotTimestampTitle.left,
+                tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop
+            )
+            tvSnapshotAppsCountText.layout(
+                tvSnapshotTimestampTitle.left,
+                tvSnapshotAppsCountTitle.bottom
+            )
             addedIndicator.layout(paddingEnd, paddingTop, fromRight = true)
             removedIndicator.layout(paddingEnd, addedIndicator.bottom, fromRight = true)
             changedIndicator.layout(paddingEnd, removedIndicator.bottom, fromRight = true)

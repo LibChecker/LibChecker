@@ -25,7 +25,7 @@ import java.util.*
 object LCAppUtils {
 
     fun getCurrentSeason(): Int {
-        return when(Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
+        return when (Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
             3, 4, 5 -> SPRING
             6, 7, 8 -> SUMMER
             9, 10, 11 -> AUTUMN
@@ -109,7 +109,7 @@ object LCAppUtils {
                 return ruleEntity
             }
             val isApk = packageName.endsWith("/temp.apk")
-            when(ruleEntity.name) {
+            when (ruleEntity.name) {
                 "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
                     return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util", isApk)) {
                         ruleEntity
@@ -131,20 +131,28 @@ object LCAppUtils {
         }
     }
 
-    suspend fun getRuleWithRegex(name: String, @LibType type: Int, packageName: String? = null): RuleEntity? {
+    suspend fun getRuleWithRegex(
+        name: String,
+        @LibType type: Int,
+        packageName: String? = null
+    ): RuleEntity? {
         return getRuleWithDexChecking(name, packageName) ?: findRuleRegex(name, type)
     }
 
     fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
-        return when(nativeLib) {
-            "libjiagu.so" -> { PackageUtils.hasDexClass(packageName, "com.qihoo.util", false) }
-            "libapp.so" -> { PackageUtils.hasDexClass(packageName, "io.flutter", false) }
+        return when (nativeLib) {
+            "libjiagu.so" -> {
+                PackageUtils.hasDexClass(packageName, "com.qihoo.util", false)
+            }
+            "libapp.so" -> {
+                PackageUtils.hasDexClass(packageName, "io.flutter", false)
+            }
             else -> true
         }
     }
 
     fun getNightMode(nightModeString: String): Int {
-        return when(nightModeString) {
+        return when (nightModeString) {
             Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
             Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
             Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM

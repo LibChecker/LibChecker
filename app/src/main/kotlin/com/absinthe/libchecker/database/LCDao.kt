@@ -1,8 +1,18 @@
 package com.absinthe.libchecker.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
-import com.absinthe.libchecker.database.entity.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import androidx.room.Update
+import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
+import com.absinthe.libchecker.database.entity.SnapshotItem
+import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.database.entity.TrackItem
 
 @Dao
 interface LCDao {

@@ -8,7 +8,7 @@ class ReleaseTree : Timber.DebugTree() {
 
     override fun isLoggable(tag: String?, priority: Int): Boolean {
         return (!(priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO)
-                || GlobalValues.debugMode)
+            || GlobalValues.debugMode)
     }
 
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {

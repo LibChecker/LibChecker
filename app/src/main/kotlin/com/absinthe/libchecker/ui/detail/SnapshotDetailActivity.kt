@@ -119,7 +119,8 @@ class SnapshotDetailActivity : BaseActivity() {
                 load(icon)
                 setOnClickListener {
                     lifecycleScope.launch {
-                        val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+                        val lcItem =
+                            Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
                         startActivity(
                             Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
                                 .putExtras(

@@ -29,7 +29,10 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
     override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return createBaseViewHolder(
             LibReferenceItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                layoutParams = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).also {
                     val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
                     it.setMargins(margin, margin, margin, margin)
                 }
@@ -52,7 +55,8 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
                     setImageResource(it.iconRes)
 
                     if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                        this.drawable.mutate().colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                        this.drawable.mutate().colorFilter =
+                            ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                     }
                 }
 
@@ -65,7 +69,12 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
                 icon.setImageResource(R.drawable.ic_question)
                 val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
                 val colorSpanit = StyleSpan(Typeface.ITALIC)
-                spannableString.setSpan(colorSpanit, 0, spannableString.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(
+                    colorSpanit,
+                    0,
+                    spannableString.length,
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+                )
                 labelName.text = spannableString
             }
         }

@@ -53,7 +53,13 @@ class SnapshotStateIndicatorView(context: Context) : View(context) {
 
     private fun drawItem(@ColorRes color: Int, canvas: Canvas) {
         p.color = ContextCompat.getColor(context, color)
-        canvas.drawRect(0f, drawOverPosition, measuredWidth.toFloat(), drawOverPosition + eachItemHeight, p)
+        canvas.drawRect(
+            0f,
+            drawOverPosition,
+            measuredWidth.toFloat(),
+            drawOverPosition + eachItemHeight,
+            p
+        )
         drawOverPosition += eachItemHeight
     }
 }

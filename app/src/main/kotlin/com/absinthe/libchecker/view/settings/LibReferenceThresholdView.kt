@@ -12,7 +12,8 @@ import com.google.android.material.slider.Slider
 class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
 
     val slider: Slider = Slider(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         valueFrom = 1f
         valueTo = 50f
         stepSize = 1f
@@ -20,7 +21,8 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
         addView(this)
     }
     val count: TextView = TextView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         setTypeface(null, Typeface.BOLD)
         addView(this)

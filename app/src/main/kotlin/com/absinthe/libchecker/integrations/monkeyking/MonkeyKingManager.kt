@@ -4,7 +4,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.showToast
 import com.google.gson.Gson
@@ -32,9 +36,11 @@ class MonkeyKingManager {
         }
     }
 
-    fun addBlockedComponent(context: Context, packageName: String,
-                            componentName: String, @LibType type: Int,
-                            shouldBlock: Boolean) {
+    fun addBlockedComponent(
+        context: Context, packageName: String,
+        componentName: String, @LibType type: Int,
+        shouldBlock: Boolean
+    ) {
         val fullComponentName = if (componentName.startsWith(".")) {
             packageName + componentName
         } else {
@@ -59,7 +65,7 @@ class MonkeyKingManager {
         }
     }
 
-    private fun getType(@LibType type: Int): String = when(type) {
+    private fun getType(@LibType type: Int): String = when (type) {
         ACTIVITY -> TYPE_ACTIVITY
         SERVICE -> TYPE_SERVICE
         RECEIVER -> TYPE_RECEIVER
@@ -70,6 +76,6 @@ class MonkeyKingManager {
     companion object {
         val isSupportInteraction =
             PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID)
-                    && PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+                && PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
     }
 }

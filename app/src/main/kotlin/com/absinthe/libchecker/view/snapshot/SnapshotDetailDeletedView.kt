@@ -18,14 +18,18 @@ class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
         addView(this)
     }
 
-    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.topMargin = 16.dp
+    private val text =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.topMargin = 16.dp
+            }
+            text = context.getString(R.string.snapshot_detail_deleted_title)
+            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+            addView(this)
         }
-        text = context.getString(R.string.snapshot_detail_deleted_title)
-        setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
-        addView(this)
-    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)

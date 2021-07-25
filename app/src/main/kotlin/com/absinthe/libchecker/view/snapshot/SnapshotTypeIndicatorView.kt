@@ -14,11 +14,15 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
 
-    private val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-        addView(this)
-    }
+    private val text =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            addView(this)
+        }
 
     private val icon = AppCompatImageView(context).apply {
         layoutParams = LayoutParams(16.dp, 16.dp).also {
@@ -47,8 +51,8 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
         colorLabel.autoMeasure()
         setMeasuredDimension(
             (text.measuredWidth +
-                    icon.marginStart + icon.measuredWidth +
-                    colorLabel.marginStart + colorLabel.measuredWidth),
+                icon.marginStart + icon.measuredWidth +
+                colorLabel.marginStart + colorLabel.measuredWidth),
             text.measuredHeight.coerceAtLeast(icon.measuredHeight)
         )
     }

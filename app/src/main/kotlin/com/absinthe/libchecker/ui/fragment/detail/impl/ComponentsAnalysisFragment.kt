@@ -34,14 +34,16 @@ import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 
-class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+class ComponentsAnalysisFragment :
+    BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
     private val hasIntegration by lazy {
         !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
     }
     private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
-    override fun initBinding(view: View): FragmentLibComponentBinding = FragmentLibComponentBinding.bind(view)
+    override fun initBinding(view: View): FragmentLibComponentBinding =
+        FragmentLibComponentBinding.bind(view)
 
     override fun getRecyclerView() = binding.list
 
@@ -85,7 +87,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                         }
 
                         if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortWith(compareByDescending<LibStringItemChip>{ it.chip != null }.thenBy { it.item.name })
+                            list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
                         } else {
                             list.sortBy { it.item.name }
                         }
@@ -102,7 +104,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                     }
                 }
                 if (!isListReady) {
-                    viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = componentList.size)
+                    viewModel.itemsCountLiveData.value =
+                        LocatedCount(locate = type, count = componentList.size)
                     viewModel.itemsCountList[type] = componentList.size
                     isListReady = true
                 }
@@ -113,7 +116,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             val name = adapter.getItem(position).item.name
             val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
 
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName).show(childFragmentManager, tag)
+            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+                .show(childFragmentManager, tag)
         }
 
         adapter.apply {
@@ -134,14 +138,19 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
 
     private fun doOnLongClick(componentName: String) {
         if (hasIntegration) {
-            val arrayAdapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
+            val arrayAdapter =
+                ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
             arrayAdapter.add(getString(android.R.string.copy))
 
             //MonkeyKing Purify
             if (integrationMonkeyKingBlockList == null) {
-                integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(requireContext(), viewModel.packageName)
+                integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(
+                    requireContext(),
+                    viewModel.packageName
+                )
             }
-            val monkeyKingShouldBlock = integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
+            val monkeyKingShouldBlock =
+                integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
             if (MonkeyKingManager.isSupportInteraction) {
                 if (monkeyKingShouldBlock) {
                     arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
@@ -171,12 +180,19 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                                         type,
                                         monkeyKingShouldBlock
                                     )
-                                    integrationMonkeyKingBlockList = queryBlockedComponent(requireContext(), viewModel.packageName)
+                                    integrationMonkeyKingBlockList = queryBlockedComponent(
+                                        requireContext(),
+                                        viewModel.packageName
+                                    )
                                 }
                             }
                         }
                         2 -> {
-                            AnywhereManager().launchActivityEditor(requireActivity(), viewModel.packageName, componentName)
+                            AnywhereManager().launchActivityEditor(
+                                requireActivity(),
+                                viewModel.packageName,
+                                componentName
+                            )
                         }
                         else -> { /*Do nothing*/
                         }

@@ -31,7 +31,8 @@ const val VF_NOT_FOUND = 2
 class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
     private val header = BottomSheetHeaderView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         title.text = context.getString(R.string.lib_detail_dialog_title)
     }
 
@@ -43,8 +44,16 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         setBackgroundResource(R.drawable.bg_gray_circle)
     }
 
-    val title = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+    val title = AppCompatTextView(
+        ContextThemeWrapper(
+            context,
+            R.style.TextView_SansSerifCondensedMedium
+        )
+    ).apply {
+        layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
             it.topMargin = 4.dp
         }
         gravity = Gravity.CENTER
@@ -52,7 +61,8 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     }
 
     val viewFlipper = ViewFlipper(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setInAnimation(context, R.anim.anim_fade_in)
         setOutAnimation(context, R.anim.anim_fade_out)
     }
@@ -67,13 +77,19 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     }
 
     private val notFoundView = NotFoundView(context).apply {
-        layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT).also {
+        layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ).also {
             it.gravity = Gravity.CENTER
         }
     }
 
     val libDetailContentView = LibDetailContentView(context).apply {
-        layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
+        )
     }
 
     init {
@@ -95,11 +111,23 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        header.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), header.defaultHeightMeasureSpec(this))
+        header.measure(
+            (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+            header.defaultHeightMeasureSpec(this)
+        )
         icon.autoMeasure()
-        title.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
-        viewFlipper.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), viewFlipper.defaultHeightMeasureSpec(this))
-        setMeasuredDimension(measuredWidth, paddingTop + paddingBottom + header.measuredHeight + title.measuredHeight + icon.measuredHeight + title.marginTop + icon.marginTop + viewFlipper.measuredHeight + 16.dp)
+        title.measure(
+            (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+            title.defaultHeightMeasureSpec(this)
+        )
+        viewFlipper.measure(
+            (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+            viewFlipper.defaultHeightMeasureSpec(this)
+        )
+        setMeasuredDimension(
+            measuredWidth,
+            paddingTop + paddingBottom + header.measuredHeight + title.measuredHeight + icon.measuredHeight + title.marginTop + icon.marginTop + viewFlipper.measuredHeight + 16.dp
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -120,7 +148,10 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         }
 
         val text = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = 8.dp
             }
         }
@@ -135,8 +166,14 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             icon.autoMeasure()
-            text.measure((measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - text.marginStart).toExactlyMeasureSpec(), text.defaultHeightMeasureSpec(this))
-            setMeasuredDimension(measuredWidth, text.measuredHeight.coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom)
+            text.measure(
+                (measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - text.marginStart).toExactlyMeasureSpec(),
+                text.defaultHeightMeasureSpec(this)
+            )
+            setMeasuredDimension(
+                measuredWidth,
+                text.measuredHeight.coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -153,19 +190,26 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         }
 
         private val notFoundText = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             text = context.getString(R.string.not_found)
             setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
         }
 
         private val createNewIssueText = AppCompatTextView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             text = context.getString(R.string.create_an_issue)
             setLinkTextColor(context.getColor(R.color.colorPrimary))
             gravity = Gravity.CENTER_VERTICAL
             setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
             compoundDrawablePadding = 4.dp
-            compoundDrawableTintList = ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
+            compoundDrawableTintList =
+                ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
             isClickable = true
             movementMethod = LinkMovementMethod.getInstance()
             text = HtmlCompat.fromHtml(
@@ -188,44 +232,65 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             icon.autoMeasure()
             notFoundText.autoMeasure()
             createNewIssueText.autoMeasure()
-            setMeasuredDimension(measuredWidth, icon.measuredHeight + notFoundText.measuredHeight + createNewIssueText.marginTop + createNewIssueText.measuredHeight)
+            setMeasuredDimension(
+                measuredWidth,
+                icon.measuredHeight + notFoundText.measuredHeight + createNewIssueText.marginTop + createNewIssueText.measuredHeight
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
             icon.layout(icon.toHorizontalCenter(this), 0)
             notFoundText.layout(notFoundText.toHorizontalCenter(this), icon.bottom)
-            createNewIssueText.layout(createNewIssueText.toHorizontalCenter(this), notFoundText.bottom + createNewIssueText.marginTop)
+            createNewIssueText.layout(
+                createNewIssueText.toHorizontalCenter(this),
+                notFoundText.bottom + createNewIssueText.marginTop
+            )
         }
     }
 
     class LibDetailContentView(context: Context) : AViewGroup(context) {
 
         val label = LibDetailItemView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             icon.setImageResource(R.drawable.ic_label)
             text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
         }
 
         val team = LibDetailItemView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             icon.setImageResource(R.drawable.ic_team)
             text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
         }
 
         val contributor = LibDetailItemView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             icon.setImageResource(R.drawable.ic_github)
             text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
         }
 
         val description = LibDetailItemView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             icon.setImageResource(R.drawable.ic_content)
             text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
         }
 
         val relativeLink = LibDetailItemView(context).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             icon.setImageResource(R.drawable.ic_url)
             text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
         }
@@ -242,12 +307,30 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-            label.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), label.defaultHeightMeasureSpec(this))
-            team.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), team.defaultHeightMeasureSpec(this))
-            contributor.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), contributor.defaultHeightMeasureSpec(this))
-            description.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), description.defaultHeightMeasureSpec(this))
-            relativeLink.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), relativeLink.defaultHeightMeasureSpec(this))
-            setMeasuredDimension(measuredWidth, label.measuredHeight + team.measuredHeight + contributor.measuredHeight + description.measuredHeight + relativeLink.measuredHeight + marginVertical * 4)
+            label.measure(
+                (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+                label.defaultHeightMeasureSpec(this)
+            )
+            team.measure(
+                (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+                team.defaultHeightMeasureSpec(this)
+            )
+            contributor.measure(
+                (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+                contributor.defaultHeightMeasureSpec(this)
+            )
+            description.measure(
+                (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+                description.defaultHeightMeasureSpec(this)
+            )
+            relativeLink.measure(
+                (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+                relativeLink.defaultHeightMeasureSpec(this)
+            )
+            setMeasuredDimension(
+                measuredWidth,
+                label.measuredHeight + team.measuredHeight + contributor.measuredHeight + description.measuredHeight + relativeLink.measuredHeight + marginVertical * 4
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

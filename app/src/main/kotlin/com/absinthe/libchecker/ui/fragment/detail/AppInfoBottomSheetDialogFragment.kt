@@ -29,7 +29,8 @@ import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
  * </pre>
  */
 
-class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
+class AppInfoBottomSheetDialogFragment :
+    BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
     private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
     private val mAdapter = AppInfoAdapter()
@@ -39,7 +40,10 @@ class AppInfoBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<AppIn
 
     override fun init() {
         root.apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setPadding(24.dp, 16.dp, 24.dp, 0)
         }
         root.launch.setOnClickListener {

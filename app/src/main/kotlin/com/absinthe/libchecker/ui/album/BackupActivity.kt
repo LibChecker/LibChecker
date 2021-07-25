@@ -25,7 +25,8 @@ import rikka.widget.borderview.BorderView
 import timber.log.Timber
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class BackupActivity : BaseActivity() {
 
@@ -65,30 +66,33 @@ class BackupActivity : BaseActivity() {
 
         override fun onAttach(context: Context) {
             super.onAttach(context)
-            backupResultLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument()) {
-                it?.let {
-                    try {
-                        requireActivity().contentResolver.openOutputStream(it)?.let { os ->
-                            viewModel.backup(os)
-                        }
-                    } catch (e: IOException) {
-                        Timber.e(e)
-                    }
-                }
-            }
-            restoreResultLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
-                it?.let {
-                    try {
-                        requireActivity().contentResolver.openInputStream(it)?.let { inputStream ->
-                            viewModel.restore(inputStream) {
-                                context.showToast("Backup file error")
+            backupResultLauncher =
+                registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+                    it?.let {
+                        try {
+                            requireActivity().contentResolver.openOutputStream(it)?.let { os ->
+                                viewModel.backup(os)
                             }
+                        } catch (e: IOException) {
+                            Timber.e(e)
                         }
-                    } catch (e: IOException) {
-                        Timber.e(e)
                     }
                 }
-            }
+            restoreResultLauncher =
+                registerForActivityResult(ActivityResultContracts.GetContent()) {
+                    it?.let {
+                        try {
+                            requireActivity().contentResolver.openInputStream(it)
+                                ?.let { inputStream ->
+                                    viewModel.restore(inputStream) {
+                                        context.showToast("Backup file error")
+                                    }
+                                }
+                        } catch (e: IOException) {
+                            Timber.e(e)
+                        }
+                    }
+                }
         }
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -96,7 +100,8 @@ class BackupActivity : BaseActivity() {
 
             findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
                 setOnPreferenceClickListener {
-                    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
+                    val simpleDateFormat =
+                        SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.getDefault())
                     val date = Date()
                     val formatted = simpleDateFormat.format(date)
 
@@ -116,18 +121,31 @@ class BackupActivity : BaseActivity() {
             }
         }
 
-        override fun onCreateRecyclerView(inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
-            val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+        override fun onCreateRecyclerView(
+            inflater: LayoutInflater,
+            parent: ViewGroup,
+            savedInstanceState: Bundle?
+        ): RecyclerView {
+            val recyclerView = super.onCreateRecyclerView(
+                inflater,
+                parent,
+                savedInstanceState
+            ) as BorderRecyclerView
             recyclerView.fixEdgeEffect()
             recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
 
             val lp = recyclerView.layoutParams
             if (lp is FrameLayout.LayoutParams) {
-                lp.rightMargin = recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin).toInt()
+                lp.rightMargin =
+                    recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
+                        .toInt()
                 lp.leftMargin = lp.rightMargin
             }
 
-            recyclerView.borderViewDelegate.borderVisibilityChangedListener = BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean -> (activity as BaseActivity?)?.appBar?.setRaised(!top) }
+            recyclerView.borderViewDelegate.borderVisibilityChangedListener =
+                BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+                    (activity as BaseActivity?)?.appBar?.setRaised(!top)
+                }
             return recyclerView
         }
     }

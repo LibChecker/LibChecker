@@ -22,12 +22,17 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     private var mListener: OnDismissListener? = null
     private lateinit var headerView: BottomSheetHeaderView
 
-    override fun initRootView(): ClassifyDialogView = ClassifyDialogView(requireContext(), lifecycleScope)
+    override fun initRootView(): ClassifyDialogView =
+        ClassifyDialogView(requireContext(), lifecycleScope)
+
     override fun getHeaderView(): BottomSheetHeaderView = headerView
 
     override fun init() {
         headerView = BottomSheetHeaderView(requireContext()).apply {
-            layoutParams = ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            layoutParams = ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.topMargin = 8.dp
                 it.bottomMargin = 24.dp
             }
@@ -36,7 +41,11 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
         root.adapter.setHeaderView(headerView)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         if (savedInstanceState != null) {
             savedInstanceState.getParcelableArrayList<LCItem>(

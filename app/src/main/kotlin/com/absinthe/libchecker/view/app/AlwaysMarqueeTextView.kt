@@ -10,10 +10,16 @@ class AlwaysMarqueeTextView : AppCompatTextView {
     constructor(context: Context?) : super(context!!) {
         init()
     }
+
     constructor(context: Context?, attrs: AttributeSet?) : super(context!!, attrs) {
         init()
     }
-    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context!!, attrs, defStyle) {
+
+    constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
+        context!!,
+        attrs,
+        defStyle
+    ) {
         init()
     }
 

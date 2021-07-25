@@ -66,7 +66,8 @@ object PackageUtils {
     @Throws(PackageManager.NameNotFoundException::class)
     fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
         val packageInfo = SystemServices.packageManager.getPackageInfo(
-            packageName, FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
+            packageName,
+            FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
         )
         if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
             val info = SystemServices.packageManager.getPackageInfo(packageInfo.packageName, 0)
@@ -158,7 +159,11 @@ object PackageUtils {
      * @param needStaticLibrary True if need get static libraries
      * @return List of LibStringItem
      */
-    fun getNativeDirLibs(packageInfo: PackageInfo, is32bit: Boolean = false, needStaticLibrary: Boolean = false): List<LibStringItem> {
+    fun getNativeDirLibs(
+        packageInfo: PackageInfo,
+        is32bit: Boolean = false,
+        needStaticLibrary: Boolean = false
+    ): List<LibStringItem> {
         val nativePath = packageInfo.applicationInfo.nativeLibraryDir
         val realNativePath = if (is32bit && nativePath != null) {
             nativePath.substring(0, nativePath.lastIndexOf("/")) + "/arm"
@@ -196,7 +201,11 @@ object PackageUtils {
      * @param packageInfo PackageInfo
      * @return List of LibStringItem
      */
-    private fun getSourceLibs(packageInfo: PackageInfo, childDir: String, source: String? = null): List<LibStringItem> {
+    private fun getSourceLibs(
+        packageInfo: PackageInfo,
+        childDir: String,
+        source: String? = null
+    ): List<LibStringItem> {
         try {
             ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
                 return zipFile.entries()
@@ -269,7 +278,8 @@ object PackageUtils {
             zipFile.use {
                 if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
                     it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-                    it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null) {
+                    it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
+                ) {
                     true
                 } else {
                     isKotlinUsedInClassDex(file)
@@ -291,7 +301,8 @@ object PackageUtils {
     fun getStaticLibs(packageInfo: PackageInfo): List<LibStringItem> {
         val sharedLibs = packageInfo.applicationInfo.sharedLibraryFiles
         try {
-            val demands = StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
+            val demands =
+                StaticLibraryReader.getStaticLibrary(File(packageInfo.applicationInfo.sourceDir))
             if (demands.isNullOrEmpty() || sharedLibs.isNullOrEmpty()) {
                 return listOf()
             }
@@ -300,7 +311,13 @@ object PackageUtils {
             demands.forEach {
                 val source = sharedLibs.find { shared -> shared.contains(it.key) }
                 if (source != null) {
-                    list.add(LibStringItem(it.key, 0L, "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"))
+                    list.add(
+                        LibStringItem(
+                            it.key,
+                            0L,
+                            "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"
+                        )
+                    )
                 }
             }
             return list
@@ -318,7 +335,9 @@ object PackageUtils {
     private fun isKotlinUsedInClassDex(file: File): Boolean {
         return try {
             ApkFile(file).use { apkFile ->
-                apkFile.dexClasses.asSequence().any { it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/") }
+                apkFile.dexClasses.asSequence().any {
+                    it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/")
+                }
             }
         } catch (e: Exception) {
             false
@@ -332,7 +351,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of StatefulComponent
      */
-    fun getComponentList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
+    fun getComponentList(
+        packageName: String,
+        @LibType type: Int,
+        isSimpleName: Boolean
+    ): List<StatefulComponent> {
         val flag = when (type) {
             SERVICE -> PackageManager.GET_SERVICES
             ACTIVITY -> PackageManager.GET_ACTIVITIES
@@ -355,7 +378,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    fun getComponentStringList(packageName: String, @LibType type: Int, isSimpleName: Boolean): List<String> {
+    fun getComponentStringList(
+        packageName: String,
+        @LibType type: Int,
+        isSimpleName: Boolean
+    ): List<String> {
         val flag = when (type) {
             SERVICE -> PackageManager.GET_SERVICES
             ACTIVITY -> PackageManager.GET_ACTIVITIES
@@ -378,7 +405,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of StatefulComponent
      */
-    private fun getComponentList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<StatefulComponent> {
+    private fun getComponentList(
+        packageInfo: PackageInfo,
+        @LibType type: Int,
+        isSimpleName: Boolean
+    ): List<StatefulComponent> {
         val list: Array<out ComponentInfo>? = when (type) {
             SERVICE -> packageInfo.services
             ACTIVITY -> packageInfo.activities
@@ -397,7 +428,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    private fun getComponentStringList(packageInfo: PackageInfo, @LibType type: Int, isSimpleName: Boolean): List<String> {
+    private fun getComponentStringList(
+        packageInfo: PackageInfo,
+        @LibType type: Int,
+        isSimpleName: Boolean
+    ): List<String> {
         val list: Array<out ComponentInfo>? = when (type) {
             SERVICE -> packageInfo.services
             ACTIVITY -> packageInfo.activities
@@ -416,7 +451,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of StatefulComponent
      */
-    fun getComponentList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<StatefulComponent> {
+    fun getComponentList(
+        packageName: String,
+        list: Array<out ComponentInfo>?,
+        isSimpleName: Boolean
+    ): List<StatefulComponent> {
         if (list.isNullOrEmpty()) {
             return emptyList()
         }
@@ -425,11 +464,16 @@ object PackageUtils {
         return list.asSequence()
             .map {
                 state = try {
-                    SystemServices.packageManager.getComponentEnabledSetting(ComponentName(packageName, it.name))
+                    SystemServices.packageManager.getComponentEnabledSetting(
+                        ComponentName(
+                            packageName,
+                            it.name
+                        )
+                    )
                 } catch (e: IllegalArgumentException) {
                     PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
                 }
-                isEnabled = when(state) {
+                isEnabled = when (state) {
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
                     PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
                     PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> it.enabled
@@ -452,7 +496,11 @@ object PackageUtils {
      * @param isSimpleName Whether to show class name as a simple name
      * @return List of String
      */
-    private fun getComponentStringList(packageName: String, list: Array<out ComponentInfo>?, isSimpleName: Boolean): List<String> {
+    private fun getComponentStringList(
+        packageName: String,
+        list: Array<out ComponentInfo>?,
+        isSimpleName: Boolean
+    ): List<String> {
         if (list.isNullOrEmpty()) {
             return emptyList()
         }
@@ -480,7 +528,13 @@ object PackageUtils {
      * @param ignoreArch Ignore arch so you can get all ABIs
      * @return ABI type
      */
-    fun getAbiSet(file: File, applicationInfo: ApplicationInfo, isApk: Boolean = false, overlay: Boolean, ignoreArch: Boolean = false): Set<Int> {
+    fun getAbiSet(
+        file: File,
+        applicationInfo: ApplicationInfo,
+        isApk: Boolean = false,
+        overlay: Boolean,
+        ignoreArch: Boolean = false
+    ): Set<Int> {
         var elementName: String
 
         val abiSet = mutableSetOf<Int>()
@@ -607,7 +661,10 @@ object PackageUtils {
      */
     fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
         val file = File(applicationInfo.sourceDir)
-        val demands = ManifestReader.getManifestProperties(file, listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray())
+        val demands = ManifestReader.getManifestProperties(
+            file,
+            listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray()
+        )
         val overlay = demands[overlayString] as? Boolean ?: false
 
         if (overlay) {
@@ -660,7 +717,11 @@ object PackageUtils {
     )
 
     private val ABI_BADGE_MAP = mapOf(
-        NO_LIBS to if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) { R.drawable.ic_abi_label_32bit } else { R.drawable.ic_abi_label_64bit },
+        NO_LIBS to if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) {
+            R.drawable.ic_abi_label_32bit
+        } else {
+            R.drawable.ic_abi_label_64bit
+        },
         ERROR to 0,
         ARMV8 to R.drawable.ic_abi_label_64bit,
         X86_64 to R.drawable.ic_abi_label_64bit,
@@ -765,13 +826,16 @@ object PackageUtils {
                             //Merge AndroidX classes
                             splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
                             //Filter classes which paths deep level greater than 4
-                            else -> LibStringItem(splits.subList(0, splits.size.coerceAtMost(4)).joinToString(separator = "."))
+                            else -> LibStringItem(
+                                splits.subList(0, splits.size.coerceAtMost(4))
+                                    .joinToString(separator = ".")
+                            )
                         }
                     }
                     .toSet()
                     .filter {
                         it.name.length > 11 && it.name.contains(".") &&
-                                (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
+                            (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
                     }    //Remove obfuscated classes
                     .toMutableList()
 
@@ -811,7 +875,10 @@ object PackageUtils {
      */
     fun getPermissionsList(packageName: String): List<String> {
         return try {
-            getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+            getPackageInfo(
+                packageName,
+                PackageManager.GET_PERMISSIONS
+            ).requestedPermissions.toList()
         } catch (e: PackageManager.NameNotFoundException) {
             emptyList()
         } catch (e: NullPointerException) {
@@ -857,7 +924,10 @@ object PackageUtils {
         val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
             packageInfo.applicationInfo.minSdkVersion.toString()
         } else {
-            val demands = ManifestReader.getManifestProperties(File(packageInfo.applicationInfo.sourceDir), listOf(minSdkVersion).toTypedArray())
+            val demands = ManifestReader.getManifestProperties(
+                File(packageInfo.applicationInfo.sourceDir),
+                listOf(minSdkVersion).toTypedArray()
+            )
             demands[minSdkVersion]?.toString() ?: "?"
         }
         return "$minSdkVersion $minSdkVersionValue"

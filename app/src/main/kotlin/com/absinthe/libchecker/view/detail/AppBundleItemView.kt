@@ -16,15 +16,25 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
         layoutParams = LayoutParams(24.dp, 24.dp)
     }
 
-    private val name = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            it.marginStart = 8.dp
+    private val name =
+        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
+                it.marginStart = 8.dp
+            }
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         }
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-    }
 
-    private val size = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    private val size = AppCompatTextView(
+        ContextThemeWrapper(
+            context,
+            R.style.TextView_SansSerifCondensedMedium
+        )
+    ).apply {
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
     }
 
@@ -37,7 +47,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     }
 
     fun setIcon(type: Int) {
-        when(type) {
+        when (type) {
             IconType.TYPE_NATIVE_LIBS -> icon.setImageResource(R.drawable.ic_logo)
             IconType.TYPE_MATERIALS -> icon.setImageResource(R.drawable.ic_outline_image)
             IconType.TYPE_STRINGS -> icon.setImageResource(R.drawable.ic_translate)
@@ -57,10 +67,14 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         icon.autoMeasure()
-        val textWidth = measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - name.marginStart
+        val textWidth =
+            measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - name.marginStart
         name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
         size.measure(textWidth.toExactlyMeasureSpec(), size.defaultHeightMeasureSpec(this))
-        setMeasuredDimension(measuredWidth, paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight)
+        setMeasuredDimension(
+            measuredWidth,
+            paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

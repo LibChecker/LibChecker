@@ -41,12 +41,25 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
 
         val typeIcon = AppCompatImageView(context).apply {
             layoutParams = LayoutParams(16.dp, 16.dp)
-            imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.material_blue_grey_700))
+            imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    context,
+                    R.color.material_blue_grey_700
+                )
+            )
             addView(this)
         }
 
-        val name = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
-            layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        val name = AppCompatTextView(
+            ContextThemeWrapper(
+                context,
+                R.style.TextView_SansSerifMedium
+            )
+        ).apply {
+            layoutParams = LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
                 it.marginStart = 8.dp
             }
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -69,7 +82,10 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
             } else {
                 if (chip == null) {
                     chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
-                        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+                        layoutParams = LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).also {
                             it.topMargin = 4.dp
                         }
                         setTextColor(Color.BLACK)
@@ -83,12 +99,17 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
                 chip!!.apply {
                     setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
                     text = entity.label
-                    chipBackgroundColor = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+                    chipBackgroundColor =
+                        ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 
-                    if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(entity.iconIndex)) {
+                    if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
+                            entity.iconIndex
+                        )
+                    ) {
                         val icon = chipIcon
                         icon?.let {
-                            it.mutate().colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+                            it.mutate().colorFilter =
+                                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
                             chipIcon = it
                         }
                     } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
@@ -103,10 +124,20 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             typeIcon.autoMeasure()
-            name.measure((measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
+            name.measure(
+                (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
+                name.defaultHeightMeasureSpec(this)
+            )
             chip?.autoMeasure()
-            val chipHeight = if (chip != null) { chip!!.measuredHeight + chip!!.marginTop } else { 0 }
-            setMeasuredDimension(measuredWidth, paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom)
+            val chipHeight = if (chip != null) {
+                chip!!.measuredHeight + chip!!.marginTop
+            } else {
+                0
+            }
+            setMeasuredDimension(
+                measuredWidth,
+                paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
+            )
         }
 
         override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

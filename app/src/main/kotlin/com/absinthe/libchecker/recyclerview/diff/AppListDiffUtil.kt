@@ -11,8 +11,8 @@ class AppListDiffUtil : DiffUtil.ItemCallback<LCItem>() {
 
     override fun areContentsTheSame(oldItem: LCItem, newItem: LCItem): Boolean {
         return oldItem.label == newItem.label
-                && oldItem.abi == newItem.abi
-                && oldItem.versionName == newItem.versionName
-                && oldItem.lastUpdatedTime == newItem.lastUpdatedTime
+            && oldItem.abi == newItem.abi
+            && oldItem.versionName == newItem.versionName
+            && oldItem.lastUpdatedTime == newItem.lastUpdatedTime
     }
 }

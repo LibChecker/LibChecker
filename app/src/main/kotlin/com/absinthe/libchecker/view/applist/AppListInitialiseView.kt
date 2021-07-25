@@ -12,7 +12,8 @@ import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
 import com.google.android.material.progressindicator.LinearProgressIndicator
 
-class AppListInitialiseView(context: Context, attributeSet: AttributeSet? = null) : AViewGroup(context, attributeSet) {
+class AppListInitialiseView(context: Context, attributeSet: AttributeSet? = null) :
+    AViewGroup(context, attributeSet) {
 
     val loadingView = LottieAnimationView(context).apply {
         val size = context.getDimensionPixelSize(R.dimen.lottie_anim_size)

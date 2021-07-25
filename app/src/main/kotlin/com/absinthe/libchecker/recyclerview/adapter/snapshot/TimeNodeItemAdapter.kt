@@ -25,7 +25,12 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
     override fun convert(holder: BaseViewHolder, item: String) {
         try {
             val ai = PackageUtils.getPackageInfo(item).applicationInfo
-            loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, (holder.itemView as AppCompatImageView))
+            loadIconJob = AppIconCache.loadIconBitmapAsync(
+                context,
+                ai,
+                ai.uid / 100000,
+                (holder.itemView as AppCompatImageView)
+            )
         } catch (e: PackageManager.NameNotFoundException) {
             Timber.e(e)
         }

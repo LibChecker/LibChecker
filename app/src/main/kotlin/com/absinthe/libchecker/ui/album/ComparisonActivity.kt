@@ -87,7 +87,8 @@ class ComparisonActivity : BaseActivity() {
                                 infoLeft.tvSnapshotTimestampText.text =
                                     viewModel.getFormatDateString(leftTimeStamp)
                                 lifecycleScope.launch {
-                                    val count = viewModel.repository.getSnapshots(leftTimeStamp).size
+                                    val count =
+                                        viewModel.repository.getSnapshots(leftTimeStamp).size
                                     infoLeft.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()
@@ -109,7 +110,8 @@ class ComparisonActivity : BaseActivity() {
                                 infoRight.tvSnapshotTimestampText.text =
                                     viewModel.getFormatDateString(rightTimeStamp)
                                 lifecycleScope.launch {
-                                    val count = viewModel.repository.getSnapshots(rightTimeStamp).size
+                                    val count =
+                                        viewModel.repository.getSnapshots(rightTimeStamp).size
                                     infoRight.tvSnapshotAppsCountText.text = count.toString()
                                 }
                                 dismiss()

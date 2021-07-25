@@ -13,11 +13,15 @@ import com.absinthe.libchecker.view.app.IHeaderView
 class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
     private val header = BottomSheetHeaderView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     val launch = AppInfoItemView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+        layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
             it.topMargin = 24.dp
         }
         setIcon(R.drawable.ic_launch)
@@ -27,7 +31,8 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
     }
 
     val setting = AppInfoItemView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setIcon(R.drawable.ic_settings)
         setIconBackgroundTintColor(R.color.material_blue_grey_300)
         setIconTintColor(Color.WHITE)
@@ -35,7 +40,8 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
     }
 
     val list = RecyclerView(context).apply {
-        layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     }
 
@@ -53,8 +59,14 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
         val itemWidth = (measuredWidth - paddingStart - paddingEnd) / 4
         launch.measure(itemWidth.toExactlyMeasureSpec(), launch.defaultHeightMeasureSpec(this))
         setting.measure(itemWidth.toExactlyMeasureSpec(), setting.defaultHeightMeasureSpec(this))
-        list.measure((measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(), list.defaultHeightMeasureSpec(this))
-        setMeasuredDimension(measuredWidth, paddingTop + header.measuredHeight + launch.marginTop + launch.measuredHeight + list.measuredHeight + paddingBottom)
+        list.measure(
+            (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+            list.defaultHeightMeasureSpec(this)
+        )
+        setMeasuredDimension(
+            measuredWidth,
+            paddingTop + header.measuredHeight + launch.marginTop + launch.measuredHeight + list.measuredHeight + paddingBottom
+        )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
