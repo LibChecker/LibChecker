@@ -1,126 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory
-        app:key="normalCategory"
-        app:title="@string/pref_group_normal">
+  <PreferenceCategory
+    app:key="normalCategory"
+    app:title="@string/pref_group_normal">
 
-        <SwitchPreference
-            app:defaultValue="false"
-            app:icon="@drawable/ic_android_outline"
-            app:key="showSystemApps"
-            app:summary="@string/show_system_apps_summary"
-            app:title="@string/show_system_apps" />
+    <SwitchPreference
+      app:defaultValue="false"
+      app:icon="@drawable/ic_android_outline"
+      app:key="showSystemApps"
+      app:summary="@string/show_system_apps_summary"
+      app:title="@string/show_system_apps" />
 
-        <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_apk_analytics"
-            app:key="apkAnalytics"
-            app:summary="@string/apk_analytics_summary"
-            app:title="@string/apk_analytics" />
+    <SwitchPreference
+      app:defaultValue="true"
+      app:icon="@drawable/ic_apk_analytics"
+      app:key="apkAnalytics"
+      app:summary="@string/apk_analytics_summary"
+      app:title="@string/apk_analytics" />
 
-        <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_color_palette"
-            app:key="colorfulIcon"
-            app:summary="@string/colorful_icon_summary"
-            app:title="@string/colorful_icon" />
+    <SwitchPreference
+      app:defaultValue="true"
+      app:icon="@drawable/ic_color_palette"
+      app:key="colorfulIcon"
+      app:summary="@string/colorful_icon_summary"
+      app:title="@string/colorful_icon" />
 
-        <rikka.preference.SimpleMenuPreference
-            app:defaultValue="system"
-            app:entries="@array/list_dark_mode"
-            app:entryValues="@array/list_dark_mode_value"
-            app:icon="@drawable/ic_dark_mode"
-            app:key="darkMode"
-            app:summary="%s"
-            app:title="@string/dark_mode" />
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="system"
+      app:entries="@array/list_dark_mode"
+      app:entryValues="@array/list_dark_mode_value"
+      app:icon="@drawable/ic_dark_mode"
+      app:key="darkMode"
+      app:summary="%s"
+      app:title="@string/dark_mode" />
 
-        <rikka.preference.SimpleMenuPreference
-            app:defaultValue="gitee"
-            app:entries="@array/list_repo"
-            app:entryValues="@array/list_repo_value"
-            app:icon="@drawable/ic_repository"
-            app:key="rulesRepository"
-            app:summary="%s"
-            app:title="@string/rules_repo_title" />
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="gitee"
+      app:entries="@array/list_repo"
+      app:entryValues="@array/list_repo_value"
+      app:icon="@drawable/ic_repository"
+      app:key="rulesRepository"
+      app:summary="%s"
+      app:title="@string/rules_repo_title" />
 
-        <rikka.preference.SimpleMenuPreference
-            app:defaultValue="SYSTEM"
-            app:entries="@array/language"
-            app:entryValues="@array/language_value"
-            app:icon="@drawable/ic_language"
-            app:key="locale"
-            app:summary="%s"
-            app:title="@string/languages" />
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="SYSTEM"
+      app:entries="@array/language"
+      app:entryValues="@array/language_value"
+      app:icon="@drawable/ic_language"
+      app:key="locale"
+      app:summary="%s"
+      app:title="@string/languages" />
 
-        <Preference
-            app:icon="@drawable/ic_cloud_rules"
-            app:key="cloudRules"
-            app:summary="@string/cloud_rules_summary"
-            app:title="@string/cloud_rules" />
+    <Preference
+      app:icon="@drawable/ic_cloud_rules"
+      app:key="cloudRules"
+      app:summary="@string/cloud_rules_summary"
+      app:title="@string/cloud_rules" />
 
-        <Preference
-            app:icon="@drawable/ic_threshold"
-            app:key="libRefThreshold"
-            app:summary="@string/lib_ref_threshold_summary"
-            app:title="@string/lib_ref_threshold" />
+    <Preference
+      app:icon="@drawable/ic_threshold"
+      app:key="libRefThreshold"
+      app:summary="@string/lib_ref_threshold_summary"
+      app:title="@string/lib_ref_threshold" />
 
-        <Preference
-            app:icon="@drawable/ic_refresh"
-            app:key="reloadApps"
-            app:summary="@string/reload_apps_summary"
-            app:title="@string/reload_apps" />
+    <Preference
+      app:icon="@drawable/ic_refresh"
+      app:key="reloadApps"
+      app:summary="@string/reload_apps_summary"
+      app:title="@string/reload_apps" />
 
-    </PreferenceCategory>
+  </PreferenceCategory>
 
-    <PreferenceCategory
-        app:key="othersCategory"
-        app:title="@string/pref_group_others">
+  <PreferenceCategory
+    app:key="othersCategory"
+    app:title="@string/pref_group_others">
 
-        <Preference
-            app:icon="@drawable/ic_logo_setting"
-            app:key="about"
-            app:summary="@string/settings_about_summary"
-            app:title="@string/settings_about">
+    <Preference
+      app:icon="@drawable/ic_logo_setting"
+      app:key="about"
+      app:summary="@string/settings_about_summary"
+      app:title="@string/settings_about">
 
-            <intent
-                android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"
-                android:targetPackage="@string/application_id" />
+      <intent
+        android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"
+        android:targetPackage="@string/application_id" />
 
-        </Preference>
+    </Preference>
 
-        <Preference
-            app:icon="@drawable/ic_help"
-            app:key="help"
-            app:summary="@string/help_docs_summary"
-            app:title="@string/help_docs">
+    <Preference
+      app:icon="@drawable/ic_help"
+      app:key="help"
+      app:summary="@string/help_docs_summary"
+      app:title="@string/help_docs">
 
-        </Preference>
+    </Preference>
 
-        <Preference
-            android:icon="@drawable/ic_favorite"
-            app:key="rate"
-            app:summary="@string/settings_rate_us_summary"
-            app:title="@string/settings_rate_us">
+    <Preference
+      android:icon="@drawable/ic_favorite"
+      app:key="rate"
+      app:summary="@string/settings_rate_us_summary"
+      app:title="@string/settings_rate_us">
 
-        </Preference>
+    </Preference>
 
-        <Preference
-            app:icon="@drawable/ic_telegram"
-            app:key="tg"
-            app:summary="@string/join_telegram_group_summary"
-            app:title="@string/join_telegram_group">
+    <Preference
+      app:icon="@drawable/ic_telegram"
+      app:key="tg"
+      app:summary="@string/join_telegram_group_summary"
+      app:title="@string/join_telegram_group">
 
-        </Preference>
+    </Preference>
 
-        <SwitchPreference
-            app:defaultValue="true"
-            app:icon="@drawable/ic_appcenter"
-            app:key="analytics"
-            app:summary="@string/anonymous_statistics_summary"
-            app:title="@string/anonymous_statistics" />
+    <SwitchPreference
+      app:defaultValue="true"
+      app:icon="@drawable/ic_appcenter"
+      app:key="analytics"
+      app:summary="@string/anonymous_statistics_summary"
+      app:title="@string/anonymous_statistics" />
 
-    </PreferenceCategory>
+  </PreferenceCategory>
 
 </PreferenceScreen>

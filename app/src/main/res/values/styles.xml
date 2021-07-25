@@ -1,92 +1,92 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Light" />
+  <!-- Base application theme. -->
+  <style name="AppTheme" parent="Theme.Light" />
 
-    <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
-        <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>
-        <item name="android:windowExitAnimation">@anim/rd_dialog_exit</item>
-    </style>
+  <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
+    <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>
+    <item name="android:windowExitAnimation">@anim/rd_dialog_exit</item>
+  </style>
 
-    <style name="ThemeOverlay.Material.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-        <item name="android:windowAnimationStyle">@style/Animation.Material.Dialog</item>
-        <item name="android:windowElevation">@dimen/rd_material_dialog_default_elevation</item>
-        <item name="android:backgroundDimAmount">@dimen/rd_material_dialog_default_dim_amount</item>
-    </style>
+  <style name="ThemeOverlay.Material.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+    <item name="android:windowAnimationStyle">@style/Animation.Material.Dialog</item>
+    <item name="android:windowElevation">@dimen/rd_material_dialog_default_elevation</item>
+    <item name="android:backgroundDimAmount">@dimen/rd_material_dialog_default_dim_amount</item>
+  </style>
 
-    <style name="Widget.AppBar" parent="">
-        <item name="android:theme">?actionBarTheme</item>
-        <item name="android:background">?android:colorBackground</item>
-        <item name="android:stateListAnimator">@animator/raise_animator</item>
-        <item name="android:elevation">0dp</item>
-    </style>
+  <style name="Widget.AppBar" parent="">
+    <item name="android:theme">?actionBarTheme</item>
+    <item name="android:background">?android:colorBackground</item>
+    <item name="android:stateListAnimator">@animator/raise_animator</item>
+    <item name="android:elevation">0dp</item>
+  </style>
 
-    <style name="App.LibChip" parent="Widget.MaterialComponents.Chip.Action">
-        <item name="chipMinTouchTargetSize">0dp</item>
-        <item name="chipStartPadding">10dp</item>
-    </style>
+  <style name="App.LibChip" parent="Widget.MaterialComponents.Chip.Action">
+    <item name="chipMinTouchTargetSize">0dp</item>
+    <item name="chipStartPadding">10dp</item>
+  </style>
 
-    <style name="ThemeOverlay.Preference" parent="PreferenceThemeOverlay">
-        <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
-    </style>
+  <style name="ThemeOverlay.Preference" parent="PreferenceThemeOverlay">
+    <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
+  </style>
 
-    <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
-    </style>
+  <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+  </style>
 
-    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
-        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
-    </style>
+  <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+    <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+  </style>
 
-    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSizeTopRight">16dp</item>
-        <item name="cornerSizeTopLeft">16dp</item>
-        <item name="cornerSizeBottomRight">0dp</item>
-        <item name="cornerSizeBottomLeft">0dp</item>
-    </style>
+  <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+    <item name="cornerFamily">rounded</item>
+    <item name="cornerSizeTopRight">16dp</item>
+    <item name="cornerSizeTopLeft">16dp</item>
+    <item name="cornerSizeBottomRight">0dp</item>
+    <item name="cornerSizeBottomLeft">0dp</item>
+  </style>
 
-    <style name="DialogAnimation">
-        <item name="android:windowEnterAnimation">@anim/anim_bottom_sheet_slide_up</item>
-        <item name="android:windowExitAnimation">@anim/anim_bottom_sheet_slide_down</item>
-    </style>
+  <style name="DialogAnimation">
+    <item name="android:windowEnterAnimation">@anim/anim_bottom_sheet_slide_up</item>
+    <item name="android:windowExitAnimation">@anim/anim_bottom_sheet_slide_down</item>
+  </style>
 
-    <style name="GeneralProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
-        <item name="android:width">200dp</item>
-        <item name="trackCornerRadius">3dp</item>
-    </style>
+  <style name="GeneralProgressIndicator" parent="Widget.MaterialComponents.LinearProgressIndicator">
+    <item name="android:width">200dp</item>
+    <item name="trackCornerRadius">3dp</item>
+  </style>
 
-    <style name="TextView.SansSerif" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif</item>
-    </style>
+  <style name="TextView.SansSerif" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">sans-serif</item>
+  </style>
 
-    <style name="TextView.SansSerifBlack" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif-black</item>
-    </style>
+  <style name="TextView.SansSerifBlack" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">sans-serif-black</item>
+  </style>
 
-    <style name="TextView.SansSerifMedium" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif-medium</item>
-    </style>
+  <style name="TextView.SansSerifMedium" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">sans-serif-medium</item>
+  </style>
 
-    <style name="TextView.SansSerifCondensed" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif-condensed</item>
-    </style>
+  <style name="TextView.SansSerifCondensed" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">sans-serif-condensed</item>
+  </style>
 
-    <style name="TextView.SansSerifCondensedMedium" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">sans-serif-condensed-medium</item>
-    </style>
+  <style name="TextView.SansSerifCondensedMedium" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">sans-serif-condensed-medium</item>
+  </style>
 
-    <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">3dp</item>
-        <item name="cardElevation">1dp</item>
-    </style>
+  <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
+    <item name="cardCornerRadius">3dp</item>
+    <item name="cardElevation">1dp</item>
+  </style>
 
-    <style name="AlbumMaterialCard" parent="Widget.MaterialComponents.CardView">
-        <item name="cardCornerRadius">5dp</item>
-        <item name="cardElevation">0dp</item>
-        <item name="strokeColor">@color/cardBorder</item>
-        <item name="strokeWidth">@dimen/album_card_stroke_width</item>
-        <item name="rippleColor">@null</item>
-    </style>
+  <style name="AlbumMaterialCard" parent="Widget.MaterialComponents.CardView">
+    <item name="cardCornerRadius">5dp</item>
+    <item name="cardElevation">0dp</item>
+    <item name="strokeColor">@color/cardBorder</item>
+    <item name="strokeWidth">@dimen/album_card_stroke_width</item>
+    <item name="rippleColor">@null</item>
+  </style>
 
 </resources>

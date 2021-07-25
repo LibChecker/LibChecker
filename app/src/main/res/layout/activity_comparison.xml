@@ -1,74 +1,74 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/container"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="false"
+  app:consumeSystemWindowsInsets="start|end"
+  app:edgeToEdge="true"
+  app:fitsSystemWindowsInsets="start|end">
+
+  <rikka.material.widget.AppBarLayout
+    android:id="@+id/appbar"
+    style="?appBarStyle"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    app:consumeSystemWindowsInsets="start|end"
-    app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end">
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    app:layout_constraintTop_toTopOf="parent">
 
-    <rikka.material.widget.AppBarLayout
-        android:id="@+id/appbar"
-        style="?appBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        app:layout_constraintTop_toTopOf="parent">
+    <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      style="?actionBarStyle"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@null" />
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="?actionBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null" />
+  </rikka.material.widget.AppBarLayout>
 
-    </rikka.material.widget.AppBarLayout>
+  <ViewFlipper
+    android:id="@+id/vf_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <ViewFlipper
-        android:id="@+id/vf_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:orientation="vertical"
+      android:paddingTop="?actionBarSize">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingTop="?actionBarSize">
+      <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading"
+        android:layout_width="@dimen/lottie_anim_size"
+        android:layout_height="@dimen/lottie_anim_size"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="anim_camera.json"
+        app:lottie_loop="true" />
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/loading"
-                android:layout_width="@dimen/lottie_anim_size"
-                android:layout_height="@dimen/lottie_anim_size"
-                app:lottie_autoPlay="true"
-                app:lottie_fileName="anim_camera.json"
-                app:lottie_loop="true" />
+    </LinearLayout>
 
-        </LinearLayout>
+    <rikka.widget.borderview.BorderRecyclerView
+      android:id="@+id/recyclerview"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="?actionBarSize"
+      android:scrollbarAlwaysDrawVerticalTrack="false"
+      android:scrollbars="none"
+      app:borderBottomVisibility="never"
+      app:borderTopDrawable="@null"
+      app:borderTopVisibility="whenTop"
+      app:fitsSystemWindowsInsets="bottom|top" />
 
-        <rikka.widget.borderview.BorderRecyclerView
-            android:id="@+id/recyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="?actionBarSize"
-            android:scrollbarAlwaysDrawVerticalTrack="false"
-            android:scrollbars="none"
-            app:borderBottomVisibility="never"
-            app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop"
-            app:fitsSystemWindowsInsets="bottom|top" />
+  </ViewFlipper>
 
-    </ViewFlipper>
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/extended_fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/album_compare"
-        app:icon="@drawable/ic_compare"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+  <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+    android:id="@+id/extended_fab"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/album_compare"
+    app:icon="@drawable/ic_compare"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

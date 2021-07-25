@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#B1B8DF</color>
-    <color name="aboutHeader">#FF121212</color>
-    <color name="textNormal">#FFFFFFFF</color>
-    <color name="textSecondary">#80BEBEBE</color>
-    <color name="backgroundGray">#FF121212</color>
-    <color name="cardBorder">#FF888888</color>
-    <color name="libIconBackground">#50FFFFFF</color>
-    <color name="renge">#FFBB5E61</color>
-    <color name="highlightComponent">@color/material_blue_800</color>
-    <color name="bottom_sheet_header_handler">#CCBBBBBB</color>
-    <color name="bottom_sheet_header_handler_activated">#FFFFFFFF</color>
+  <color name="colorPrimary">#B1B8DF</color>
+  <color name="aboutHeader">#FF121212</color>
+  <color name="textNormal">#FFFFFFFF</color>
+  <color name="textSecondary">#80BEBEBE</color>
+  <color name="backgroundGray">#FF121212</color>
+  <color name="cardBorder">#FF888888</color>
+  <color name="libIconBackground">#50FFFFFF</color>
+  <color name="renge">#FFBB5E61</color>
+  <color name="highlightComponent">@color/material_blue_800</color>
+  <color name="bottom_sheet_header_handler">#CCBBBBBB</color>
+  <color name="bottom_sheet_header_handler_activated">#FFFFFFFF</color>
 </resources>

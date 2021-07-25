@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--白色/黑色矩形 作为背景色-->
-    <item>
-        <shape android:shape="rectangle">
-            <solid android:color="?android:attr/colorBackground" />
-        </shape>
-    </item>
+  <!--白色/黑色矩形 作为背景色-->
+  <item>
+    <shape android:shape="rectangle">
+      <solid android:color="?android:attr/colorBackground" />
+    </shape>
+  </item>
 
-    <!--单独的 pic_splash 图片 -->
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/pic_splash" />
-    </item>
+  <!--单独的 pic_splash 图片 -->
+  <item>
+    <bitmap
+      android:gravity="center"
+      android:src="@drawable/pic_splash" />
+  </item>
 </layer-list>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ThemeOverlay.Renge">
-        <item name="colorPrimary">@color/renge</item>
-        <item name="colorPrimaryVariant">@color/renge</item>
-        <item name="colorSecondary">@color/renge</item>
-        <item name="colorSecondaryVariant">@color/renge</item>
-    </style>
+
+  <style name="ThemeOverlay.Renge">
+    <item name="colorPrimary">@color/renge</item>
+    <item name="colorPrimaryVariant">@color/renge</item>
+    <item name="colorSecondary">@color/renge</item>
+    <item name="colorSecondaryVariant">@color/renge</item>
+  </style>
 </resources>

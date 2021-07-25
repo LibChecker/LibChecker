@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/container"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/container"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:fitsSystemWindows="false"
+  app:consumeSystemWindowsInsets="start|end"
+  app:edgeToEdge="true"
+  app:fitsSystemWindowsInsets="start|end"
+  tools:context=".ui.album.TrackActivity">
+
+  <rikka.material.widget.AppBarLayout
+    android:id="@+id/appbar"
+    style="?appBarStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <androidx.appcompat.widget.Toolbar
+      android:id="@+id/toolbar"
+      style="?actionBarStyle"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="@null" />
+
+  </rikka.material.widget.AppBarLayout>
+
+  <rikka.widget.borderview.BorderRecyclerView
+    android:id="@android:id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    app:consumeSystemWindowsInsets="start|end"
-    app:edgeToEdge="true"
-    app:fitsSystemWindowsInsets="start|end"
-    tools:context=".ui.album.TrackActivity">
-
-    <rikka.material.widget.AppBarLayout
-        android:id="@+id/appbar"
-        style="?appBarStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            style="?actionBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null" />
-
-    </rikka.material.widget.AppBarLayout>
-
-    <rikka.widget.borderview.BorderRecyclerView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingTop="?actionBarSize"
-        android:scrollbars="none"
-        app:borderBottomVisibility="never"
-        app:borderTopDrawable="@null"
-        app:borderTopVisibility="whenTop"
-        app:fitsSystemWindowsInsets="bottom|top" />
+    android:clipToPadding="false"
+    android:paddingTop="?actionBarSize"
+    android:scrollbars="none"
+    app:borderBottomVisibility="never"
+    app:borderTopDrawable="@null"
+    app:borderTopVisibility="whenTop"
+    app:fitsSystemWindowsInsets="bottom|top" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

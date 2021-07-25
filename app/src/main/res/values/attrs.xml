@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SnapshotClassIndicatorView">
-        <attr name="icon" format="reference" />
-        <attr name="indicator" format="color" />
-        <attr name="text" format="string" />
-    </declare-styleable>
+  <declare-styleable name="SnapshotClassIndicatorView">
+    <attr name="icon" format="reference" />
+    <attr name="indicator" format="color" />
+    <attr name="text" format="string" />
+  </declare-styleable>
 
-    <declare-styleable name="AlbumItemView">
-        <attr name="albumItemTitle" format="string" />
-        <attr name="albumItemSubtitle" format="string" />
-        <attr name="itemIcon" format="reference" />
-        <attr name="itemIconTint" format="color" />
-    </declare-styleable>
+  <declare-styleable name="AlbumItemView">
+    <attr name="albumItemTitle" format="string" />
+    <attr name="albumItemSubtitle" format="string" />
+    <attr name="itemIcon" format="reference" />
+    <attr name="itemIconTint" format="color" />
+  </declare-styleable>
 
-    <declare-styleable name="AppInfoItemView">
-        <attr name="itemTitle" format="string" />
-        <attr name="infoSrc" format="reference" />
-        <attr name="infoBackgroundTint" format="color" />
-    </declare-styleable>
+  <declare-styleable name="AppInfoItemView">
+    <attr name="itemTitle" format="string" />
+    <attr name="infoSrc" format="reference" />
+    <attr name="infoBackgroundTint" format="color" />
+  </declare-styleable>
 </resources>

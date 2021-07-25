@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".ui.fragment.applist.AppListFragment">
+
+  <ViewFlipper
+    android:id="@+id/vf_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragment.applist.AppListFragment">
+    android:layout_height="match_parent">
 
-    <ViewFlipper
-        android:id="@+id/vf_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <com.absinthe.libchecker.view.applist.AppListLoadingView
+      android:id="@+id/loading_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center" />
 
-        <com.absinthe.libchecker.view.applist.AppListLoadingView
-            android:id="@+id/loading_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+    <rikka.widget.borderview.BorderRecyclerView
+      android:id="@android:id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="?actionBarSize"
+      android:scrollbars="none"
+      app:borderBottomVisibility="never"
+      app:borderTopDrawable="@null"
+      app:borderTopVisibility="whenTop"
+      app:fitsSystemWindowsInsets="bottom|top" />
 
-        <rikka.widget.borderview.BorderRecyclerView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="?actionBarSize"
-            android:scrollbars="none"
-            app:borderBottomVisibility="never"
-            app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop"
-            app:fitsSystemWindowsInsets="bottom|top" />
+    <com.absinthe.libchecker.view.applist.AppListInitialiseView
+      android:id="@+id/init_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center" />
 
-        <com.absinthe.libchecker.view.applist.AppListInitialiseView
-            android:id="@+id/init_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-
-    </ViewFlipper>
+  </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

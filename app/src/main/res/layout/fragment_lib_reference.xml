@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".ui.fragment.statistics.LibReferenceFragment">
+
+  <ViewFlipper
+    android:id="@+id/vf_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.fragment.statistics.LibReferenceFragment">
+    android:layout_height="match_parent">
 
-    <ViewFlipper
-        android:id="@+id/vf_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
+      <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loading"
+        android:layout_width="@dimen/lottie_anim_size"
+        android:layout_height="@dimen/lottie_anim_size"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true" />
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/loading"
-                android:layout_width="@dimen/lottie_anim_size"
-                android:layout_height="@dimen/lottie_anim_size"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true" />
+    </LinearLayout>
 
-        </LinearLayout>
+    <rikka.widget.borderview.BorderRecyclerView
+      android:id="@android:id/list"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:clipToPadding="false"
+      android:paddingTop="?actionBarSize"
+      android:scrollbars="none"
+      app:borderBottomVisibility="never"
+      app:borderTopDrawable="@null"
+      app:borderTopVisibility="whenTop"
+      app:fitsSystemWindowsInsets="bottom|top" />
 
-        <rikka.widget.borderview.BorderRecyclerView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingTop="?actionBarSize"
-            android:scrollbars="none"
-            app:borderBottomVisibility="never"
-            app:borderTopDrawable="@null"
-            app:borderTopVisibility="whenTop"
-            app:fitsSystemWindowsInsets="bottom|top" />
-
-    </ViewFlipper>
+  </ViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

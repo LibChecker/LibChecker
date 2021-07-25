@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:targetApi="n_mr1">
+  xmlns:tools="http://schemas.android.com/tools"
+  tools:targetApi="n_mr1">
 
-    <shortcut
-        android:icon="@drawable/ic_sc_app_list"
-        android:shortcutId="start_app_list"
-        android:shortcutShortLabel="@string/title_app_list">
+  <shortcut
+    android:icon="@drawable/ic_sc_app_list"
+    android:shortcutId="start_app_list"
+    android:shortcutShortLabel="@string/title_app_list">
 
-        <intent
-            android:action="com.absinthe.libchecker.intent.action.START_APP_LIST"
-            android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker.debug" />
-    </shortcut>
+    <intent
+      android:action="com.absinthe.libchecker.intent.action.START_APP_LIST"
+      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:targetPackage="com.absinthe.libchecker.debug" />
+  </shortcut>
 
-    <shortcut
-        android:icon="@drawable/ic_sc_statistics"
-        android:shortcutId="start_statistics"
-        android:shortcutShortLabel="@string/title_statistics">
+  <shortcut
+    android:icon="@drawable/ic_sc_statistics"
+    android:shortcutId="start_statistics"
+    android:shortcutShortLabel="@string/title_statistics">
 
-        <intent
-            android:action="com.absinthe.libchecker.intent.action.START_STATISTICS"
-            android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker.debug" />
-    </shortcut>
+    <intent
+      android:action="com.absinthe.libchecker.intent.action.START_STATISTICS"
+      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:targetPackage="com.absinthe.libchecker.debug" />
+  </shortcut>
 
-    <shortcut
-        android:icon="@drawable/ic_sc_snapshot"
-        android:shortcutId="start_snapshot"
-        android:shortcutShortLabel="@string/title_snapshot">
+  <shortcut
+    android:icon="@drawable/ic_sc_snapshot"
+    android:shortcutId="start_snapshot"
+    android:shortcutShortLabel="@string/title_snapshot">
 
-        <intent
-            android:action="com.absinthe.libchecker.intent.action.START_SNAPSHOT"
-            android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
-            android:targetPackage="com.absinthe.libchecker.debug" />
-    </shortcut>
+    <intent
+      android:action="com.absinthe.libchecker.intent.action.START_SNAPSHOT"
+      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:targetPackage="com.absinthe.libchecker.debug" />
+  </shortcut>
 
 </shortcuts>
