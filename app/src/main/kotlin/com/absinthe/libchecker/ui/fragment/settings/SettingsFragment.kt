@@ -175,9 +175,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
                 } catch (e: ActivityNotFoundException) {
                     Timber.e(e)
                     try {
-                        val intent = Intent(Intent.ACTION_VIEW).apply {
-                            data = URLManager.DOCS_PAGE.toUri()
-                        }
+                        val intent = Intent(Intent.ACTION_VIEW)
+                            .setData(URLManager.DOCS_PAGE.toUri())
                         requireActivity().startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
                         Timber.e(e)
@@ -211,15 +210,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
             setOnPreferenceClickListener {
                 try {
                     startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            URLManager.TELEGRAM_GROUP.toUri()
-                        ).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
+                        Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
                 } catch (e: ActivityNotFoundException) {
-
                     Timber.e(e)
                 }
                 true

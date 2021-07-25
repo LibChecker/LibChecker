@@ -58,10 +58,9 @@ class AppInfoBottomSheetDialogFragment :
             }
         }
         root.setting.setOnClickListener {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                data = Uri.parse("package:$packageName")
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.parse("package:$packageName"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)
             dismiss()
         }
@@ -74,13 +73,14 @@ class AppInfoBottomSheetDialogFragment :
         if (LCAppUtils.atLeastN()) {
             mAdapter.setList(getResolveInfoList())
             mAdapter.setOnItemClickListener { _, _, position ->
-                val info = mAdapter.data[position]
-                startActivity(
-                    Intent().apply {
-                        component = ComponentName(info.activityInfo.packageName, info.activityInfo.name)
-                        putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-                    }
-                )
+                mAdapter.data[position].let {
+                    val intent = Intent()
+                        .setComponent(
+                            ComponentName(it.activityInfo.packageName, it.activityInfo.name)
+                        )
+                        .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                    startActivity(intent)
+                }
                 dismiss()
             }
         }
@@ -99,16 +99,15 @@ class AppInfoBottomSheetDialogFragment :
         }
         val launcherActivity: String
         val intent = Intent(Intent.ACTION_MAIN, null)
-        intent.addCategory(Intent.CATEGORY_LAUNCHER)
-        intent.setPackage(packageName)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .setPackage(packageName)
         val pm = requireActivity().packageManager
         val info = pm.queryIntentActivities(intent, 0)
         launcherActivity = if (info.size == 0) "" else info[0].activityInfo.name
-        val launchIntent = Intent(Intent.ACTION_MAIN).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
-            setClassName(packageName, launcherActivity)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
+        val launchIntent = Intent(Intent.ACTION_MAIN)
+            .addCategory(Intent.CATEGORY_LAUNCHER)
+            .setClassName(packageName, launcherActivity)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(launchIntent)
     }
 }

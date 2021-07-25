@@ -349,10 +349,9 @@ class AboutActivity : AbsAboutActivity() {
         if (menuItem.itemId == R.id.toolbar_rate) {
             try {
                 startActivity(
-                    Intent(Intent.ACTION_VIEW).apply {
-                        data = URLManager.MARKET_PAGE.toUri()
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
+                    Intent(Intent.ACTION_VIEW)
+                        .setData(URLManager.MARKET_PAGE.toUri())
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
             } catch (e: ActivityNotFoundException) {
                 Timber.e(e)

@@ -176,11 +176,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                 }
 
                 val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java)
-                    .putExtras(
-                        bundleOf(
-                            EXTRA_ENTITY to getItem(position)
-                        )
-                    )
+                    .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
                 startActivity(intent)
             }
         }
@@ -308,10 +304,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
                 this@SnapshotFragment.dropPrevious = dropPrevious
                 shootBinder?.computeSnapshot(dropPrevious) ?: let {
                     requireContext().bindService(
-                        Intent(
-                            requireContext(),
-                            ShootService::class.java
-                        ),
+                        Intent(requireContext(), ShootService::class.java),
                         shootServiceConnection, Service.BIND_AUTO_CREATE
                     )
                 }
