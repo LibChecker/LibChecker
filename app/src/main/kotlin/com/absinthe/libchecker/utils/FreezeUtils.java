@@ -10,36 +10,36 @@ import java.lang.reflect.Field;
  * Refer to com.catchingnow.icebox.sdk_client
  */
 public class FreezeUtils {
-    public static final int PM_FLAGS_GET_APP_INFO = VersionCompat.INSTANCE.getMATCH_UNINSTALLED_PACKAGES();
-    private static final int PRIVATE_FLAG_HIDDEN = 1;
-    private static final int FLAG_HIDDEN = 1 << 27;
-    @Nullable
-    private static Field AI_FIELD;
+  public static final int PM_FLAGS_GET_APP_INFO = VersionCompat.INSTANCE.getMATCH_UNINSTALLED_PACKAGES();
+  private static final int PRIVATE_FLAG_HIDDEN = 1;
+  private static final int FLAG_HIDDEN = 1 << 27;
+  @Nullable
+  private static Field AI_FIELD;
 
-    static {
-        try {
-            //noinspection JavaReflectionMemberAccess
-            AI_FIELD = ApplicationInfo.class.getDeclaredField("privateFlags");
-            AI_FIELD.setAccessible(true);
-        } catch (Throwable ignored) {
-            AI_FIELD = null;
-        }
+  static {
+    try {
+      //noinspection JavaReflectionMemberAccess
+      AI_FIELD = ApplicationInfo.class.getDeclaredField("privateFlags");
+      AI_FIELD.setAccessible(true);
+    } catch (Throwable ignored) {
+      AI_FIELD = null;
     }
+  }
 
-    private static boolean isAppHidden(ApplicationInfo ai) {
-        if (AI_FIELD != null) {
-            try {
-                int flags = (int) AI_FIELD.get(ai);
-                return (flags | PRIVATE_FLAG_HIDDEN) == flags;
-            } catch (Throwable e) {
-                return (ai.flags | FLAG_HIDDEN) == ai.flags;
-            }
-        } else {
-            return (ai.flags | FLAG_HIDDEN) == ai.flags;
-        }
+  private static boolean isAppHidden(ApplicationInfo ai) {
+    if (AI_FIELD != null) {
+      try {
+        int flags = (int) AI_FIELD.get(ai);
+        return (flags | PRIVATE_FLAG_HIDDEN) == flags;
+      } catch (Throwable e) {
+        return (ai.flags | FLAG_HIDDEN) == ai.flags;
+      }
+    } else {
+      return (ai.flags | FLAG_HIDDEN) == ai.flags;
     }
+  }
 
-    public static boolean isAppFrozen(ApplicationInfo applicationInfo) {
-        return isAppHidden(applicationInfo) || !applicationInfo.enabled;
-    }
+  public static boolean isAppFrozen(ApplicationInfo applicationInfo) {
+    return isAppHidden(applicationInfo) || !applicationInfo.enabled;
+  }
 }
