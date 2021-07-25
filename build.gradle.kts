@@ -1,3 +1,5 @@
+import org.jmailen.gradle.kotlinter.KotlinterExtension
+
 buildscript {
     repositories {
         google()
@@ -13,6 +15,10 @@ buildscript {
 
 allprojects {
     apply(plugin = "org.jmailen.kotlinter")
+
+    configure<KotlinterExtension> {
+        indentSize = 2
+    }
 
     repositories {
         google()
