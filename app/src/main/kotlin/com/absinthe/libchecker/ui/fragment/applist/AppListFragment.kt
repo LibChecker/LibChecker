@@ -311,19 +311,11 @@ class AppListFragment :
                         dbItems.value?.let { updateItems(it) }
                     }
                     STATUS_NOT_START -> {
-                        if ((
-                            HarmonyOsUtil.isHarmonyOs() && !Once.beenDone(
-                                    Once.THIS_APP_INSTALL,
-                                    OnceTag.HARMONY_FIRST_INIT
-                                )
-                            ) ||
-                            (
-                                !isFirstLaunch && !Once.beenDone(
-                                        Once.THIS_APP_INSTALL,
-                                        OnceTag.SHOULD_RELOAD_APP_LIST
-                                    )
-                                )
-                        ) {
+                        val first = HarmonyOsUtil.isHarmonyOs() &&
+                            !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
+                        val second = !isFirstLaunch &&
+                            !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
+                        if (first || second) {
                             flip(VF_INIT)
                             initItems()
                             Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)

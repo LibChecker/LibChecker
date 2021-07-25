@@ -195,15 +195,13 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                             if (firstLoop) {
                                 firstLoop = false
                             }
-                            spanString = SpannableString(
-                                "  ${
-                                PackageUtils.getAbiString(
-                                    this@AppDetailActivity,
-                                    it,
-                                    false
-                                )
-                                }"
-                            )
+                            PackageUtils.getAbiString(
+                                this@AppDetailActivity,
+                                it,
+                                false
+                            ).let { str ->
+                                spanString = SpannableString("  $str")
+                            }
                             ContextCompat.getDrawable(
                                 this@AppDetailActivity,
                                 PackageUtils.getAbiBadgeResource(it)
@@ -374,9 +372,8 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
                 )
             }
             try {
-                if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-                    .isNotEmpty()
-                ) {
+                val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+                if (libs.isNotEmpty()) {
                     types.add(1, STATIC)
                     tabTitles.add(1, getText(R.string.ref_category_static))
                 }
