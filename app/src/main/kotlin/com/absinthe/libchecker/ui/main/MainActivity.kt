@@ -26,7 +26,7 @@ import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
-import com.absinthe.libchecker.viewmodel.*
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.google.android.material.animation.AnimationUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties

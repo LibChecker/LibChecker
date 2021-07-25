@@ -12,7 +12,11 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
