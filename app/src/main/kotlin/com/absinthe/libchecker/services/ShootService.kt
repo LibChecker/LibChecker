@@ -31,10 +31,14 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.google.gson.Gson
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1

@@ -2,7 +2,11 @@ package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -12,7 +16,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.ALL
+import com.absinthe.libchecker.annotation.AUTUMN
+import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.NOT_MARKED
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.SPRING
+import com.absinthe.libchecker.annotation.SUMMER
+import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
@@ -21,7 +37,11 @@ import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
-import com.absinthe.libchecker.ui.main.*
+import com.absinthe.libchecker.ui.main.ChartActivity
+import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.tintHighlightText

@@ -12,7 +12,12 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.AUTUMN
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.SPRING
+import com.absinthe.libchecker.annotation.SUMMER
+import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
@@ -20,7 +25,9 @@ import com.absinthe.libchecker.database.entity.RuleEntity
 import rikka.material.app.DayNightDelegate
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 object LCAppUtils {
 

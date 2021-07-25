@@ -3,7 +3,9 @@ package com.absinthe.libchecker.ui.snapshot
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.ContextThemeWrapper
+import android.view.MenuItem
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.BaseActivity

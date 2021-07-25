@@ -9,9 +9,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.bean.*
+import com.absinthe.libchecker.bean.ADDED
+import com.absinthe.libchecker.bean.CHANGED
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.MOVED
+import com.absinthe.libchecker.bean.REMOVED
+import com.absinthe.libchecker.bean.SnapshotDetailItem
+import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
@@ -34,7 +46,8 @@ import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 const val CURRENT_SNAPSHOT = -1L
 

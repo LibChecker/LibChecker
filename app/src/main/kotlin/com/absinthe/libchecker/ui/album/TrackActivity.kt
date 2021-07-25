@@ -2,7 +2,11 @@ package com.absinthe.libchecker.ui.album
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Checkable
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
