@@ -10,9 +10,9 @@ import rikka.widget.borderview.BorderViewDelegate
  * </pre>
  */
 interface IListController {
-    fun onReturnTop()
-    fun getAppBar(): AppBar?
-    fun getBorderViewDelegate(): BorderViewDelegate?
-    fun scheduleAppbarRaisingStatus()
-    fun isAllowRefreshing(): Boolean
+  fun onReturnTop()
+  fun getAppBar(): AppBar?
+  fun getBorderViewDelegate(): BorderViewDelegate?
+  fun scheduleAppbarRaisingStatus()
+  fun isAllowRefreshing(): Boolean
 }

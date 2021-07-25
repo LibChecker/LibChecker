@@ -20,63 +20,63 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
 
-    var highlightText: String = ""
+  var highlightText: String = ""
 
-    init {
-        addChildClickViewIds(android.R.id.icon)
-    }
+  init {
+    addChildClickViewIds(android.R.id.icon)
+  }
 
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(
-            LibReferenceItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).also {
-                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-                    it.setMargins(margin, margin, margin, margin)
-                }
-            }
-        )
-    }
-
-    override fun convert(holder: BaseViewHolder, item: LibReference) {
-        (holder.itemView as LibReferenceItemView).container.apply {
-            count.text = item.referredCount.toString()
-
-            if (highlightText.isNotBlank()) {
-                libName.tintHighlightText(highlightText, item.libName)
-            } else {
-                libName.text = item.libName
-            }
-
-            item.chip?.let {
-                icon.apply {
-                    setImageResource(it.iconRes)
-
-                    if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-                        this.drawable.mutate().colorFilter =
-                            ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-                    }
-                }
-
-                if (highlightText.isNotBlank()) {
-                    labelName.tintHighlightText(highlightText, it.name)
-                } else {
-                    labelName.text = it.name
-                }
-            } ?: let {
-                icon.setImageResource(R.drawable.ic_question)
-                val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
-                val colorSpanit = StyleSpan(Typeface.ITALIC)
-                spannableString.setSpan(
-                    colorSpanit,
-                    0,
-                    spannableString.length,
-                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-                )
-                labelName.text = spannableString
-            }
+  override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return createBaseViewHolder(
+      LibReferenceItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
+          val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
+          it.setMargins(margin, margin, margin, margin)
         }
+      }
+    )
+  }
+
+  override fun convert(holder: BaseViewHolder, item: LibReference) {
+    (holder.itemView as LibReferenceItemView).container.apply {
+      count.text = item.referredCount.toString()
+
+      if (highlightText.isNotBlank()) {
+        libName.tintHighlightText(highlightText, item.libName)
+      } else {
+        libName.text = item.libName
+      }
+
+      item.chip?.let {
+        icon.apply {
+          setImageResource(it.iconRes)
+
+          if (!GlobalValues.isColorfulIcon.valueUnsafe) {
+            this.drawable.mutate().colorFilter =
+              ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+          }
+        }
+
+        if (highlightText.isNotBlank()) {
+          labelName.tintHighlightText(highlightText, it.name)
+        } else {
+          labelName.text = it.name
+        }
+      } ?: let {
+        icon.setImageResource(R.drawable.ic_question)
+        val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
+        val colorSpanit = StyleSpan(Typeface.ITALIC)
+        spannableString.setSpan(
+          colorSpanit,
+          0,
+          spannableString.length,
+          Spanned.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        labelName.text = spannableString
+      }
     }
+  }
 }

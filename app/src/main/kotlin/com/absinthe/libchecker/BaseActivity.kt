@@ -12,44 +12,44 @@ import rikka.material.app.MaterialActivity
 @SuppressLint("Registered, MissingSuperCall")
 abstract class BaseActivity : MaterialActivity() {
 
-    protected var root: ViewGroup? = null
+  protected var root: ViewGroup? = null
 
-    protected abstract fun setViewBinding(): ViewGroup
+  protected abstract fun setViewBinding(): ViewGroup
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setViewBindingImpl(setViewBinding())
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setViewBindingImpl(setViewBinding())
+  }
+
+  override fun shouldApplyTranslucentSystemBars(): Boolean {
+    return true
+  }
+
+  override fun computeUserThemeKey(): String {
+    return GlobalValues.darkMode + GlobalValues.rengeTheme
+  }
+
+  override fun onApplyTranslucentSystemBars() {
+    super.onApplyTranslucentSystemBars()
+    window.statusBarColor = Color.TRANSPARENT
+    window.decorView.post {
+      window.navigationBarColor = Color.TRANSPARENT
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        window.isNavigationBarContrastEnforced = false
+      }
     }
+  }
 
-    override fun shouldApplyTranslucentSystemBars(): Boolean {
-        return true
+  override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
+    theme.applyStyle(R.style.ThemeOverlay, true)
+
+    if (GlobalValues.rengeTheme) {
+      theme.applyStyle(R.style.ThemeOverlay_Renge, true)
     }
+  }
 
-    override fun computeUserThemeKey(): String {
-        return GlobalValues.darkMode + GlobalValues.rengeTheme
-    }
-
-    override fun onApplyTranslucentSystemBars() {
-        super.onApplyTranslucentSystemBars()
-        window.statusBarColor = Color.TRANSPARENT
-        window.decorView.post {
-            window.navigationBarColor = Color.TRANSPARENT
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                window.isNavigationBarContrastEnforced = false
-            }
-        }
-    }
-
-    override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
-        theme.applyStyle(R.style.ThemeOverlay, true)
-
-        if (GlobalValues.rengeTheme) {
-            theme.applyStyle(R.style.ThemeOverlay_Renge, true)
-        }
-    }
-
-    private fun setViewBindingImpl(root: ViewGroup) {
-        this.root = root
-        setContentView(root)
-    }
+  private fun setViewBindingImpl(root: ViewGroup) {
+    this.root = root
+    setContentView(root)
+  }
 }

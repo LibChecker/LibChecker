@@ -10,4 +10,4 @@ import androidx.lifecycle.MutableLiveData
  */
 
 val <T> MutableLiveData<T>.valueUnsafe: T
-    get() = this.value!!
+  get() = this.value!!

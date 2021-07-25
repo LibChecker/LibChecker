@@ -8,7 +8,7 @@ const val DISABLED = "DISABLED"
 
 @Parcelize
 data class LibStringItem(
-    @SerializedName("name") val name: String,
-    @SerializedName("size") val size: Long = 0,
-    @SerializedName("source") val source: String? = null
+  @SerializedName("name") val name: String,
+  @SerializedName("size") val size: Long = 0,
+  @SerializedName("source") val source: String? = null
 ) : Parcelable

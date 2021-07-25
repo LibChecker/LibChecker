@@ -16,10 +16,10 @@ fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NO
  */
 @OptIn(ExperimentalContracts::class)
 inline fun <T : Closeable?, R> T.use(block: (T) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return kotlinUse(block)
+  contract {
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
+  return kotlinUse(block)
 }
 
 fun <T> Comparator<T>.reversedCompat(): Comparator<T> = kotlinReversed()
@@ -27,12 +27,12 @@ fun <T> Comparator<T>.reversedCompat(): Comparator<T> = kotlinReversed()
 @OptIn(ExperimentalContracts::class)
 @SuppressLint("RestrictedApi")
 inline fun <R> TintTypedArray.use(block: (TintTypedArray) -> R): R {
-    contract {
-        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
-    }
-    return try {
-        block(this)
-    } finally {
-        recycle()
-    }
+  contract {
+    callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+  }
+  return try {
+    block(this)
+  } finally {
+    recycle()
+  }
 }

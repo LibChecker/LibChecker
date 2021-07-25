@@ -13,24 +13,24 @@ import com.microsoft.appcenter.analytics.EventProperties
 
 class LibThresholdDialogFragment : DialogFragment() {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
-        val view = LibReferenceThresholdView(requireContext())
-        view.count.text = GlobalValues.libReferenceThreshold.toString()
+    val view = LibReferenceThresholdView(requireContext())
+    view.count.text = GlobalValues.libReferenceThreshold.toString()
 
-        return AlertDialog.Builder(requireContext())
-            .setView(view)
-            .setTitle(R.string.lib_ref_threshold)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                val threshold = view.slider.value.toInt()
-                GlobalValues.libReferenceThresholdLiveData.value = threshold
-                GlobalValues.libReferenceThreshold = threshold
-                Analytics.trackEvent(
-                    Constants.Event.SETTINGS,
-                    EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())
-                )
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-    }
+    return AlertDialog.Builder(requireContext())
+      .setView(view)
+      .setTitle(R.string.lib_ref_threshold)
+      .setPositiveButton(android.R.string.ok) { _, _ ->
+        val threshold = view.slider.value.toInt()
+        GlobalValues.libReferenceThresholdLiveData.value = threshold
+        GlobalValues.libReferenceThreshold = threshold
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())
+        )
+      }
+      .setNegativeButton(android.R.string.cancel, null)
+      .create()
+  }
 }

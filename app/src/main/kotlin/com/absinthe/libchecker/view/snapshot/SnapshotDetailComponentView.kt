@@ -25,125 +25,125 @@ import com.google.android.material.chip.Chip
 
 class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) {
 
-    val container = SnapshotDetailComponentContainerView(context)
+  val container = SnapshotDetailComponentContainerView(context)
+
+  init {
+    addView(container)
+  }
+
+  class SnapshotDetailComponentContainerView(context: Context) : AViewGroup(context) {
 
     init {
-        addView(container)
+      clipToPadding = false
+      val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
+      setPadding(padding, padding, padding, padding)
     }
 
-    class SnapshotDetailComponentContainerView(context: Context) : AViewGroup(context) {
+    val typeIcon = AppCompatImageView(context).apply {
+      layoutParams = LayoutParams(16.dp, 16.dp)
+      imageTintList = ColorStateList.valueOf(
+        ContextCompat.getColor(
+          context,
+          R.color.material_blue_grey_700
+        )
+      )
+      addView(this)
+    }
 
-        init {
-            clipToPadding = false
-            val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
-            setPadding(padding, padding, padding, padding)
+    val name = AppCompatTextView(
+      ContextThemeWrapper(
+        context,
+        R.style.TextView_SansSerifMedium
+      )
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also {
+        it.marginStart = 8.dp
+      }
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+      setTextColor(Color.BLACK)
+      addView(this)
+    }
+
+    private var chip: Chip? = null
+
+    fun setChipOnClickListener(listener: OnClickListener?) {
+      chip?.setOnClickListener(listener)
+    }
+
+    fun setChip(entity: RuleEntity?, colorRes: Int) {
+      if (entity == null) {
+        if (chip != null) {
+          removeView(chip)
+          chip = null
         }
-
-        val typeIcon = AppCompatImageView(context).apply {
-            layoutParams = LayoutParams(16.dp, 16.dp)
-            imageTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    context,
-                    R.color.material_blue_grey_700
-                )
-            )
-            addView(this)
-        }
-
-        val name = AppCompatTextView(
-            ContextThemeWrapper(
-                context,
-                R.style.TextView_SansSerifMedium
-            )
-        ).apply {
+      } else {
+        if (chip == null) {
+          chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
             layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
             ).also {
-                it.marginStart = 8.dp
+              it.topMargin = 4.dp
             }
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             setTextColor(Color.BLACK)
+            chipStrokeColor = ColorStateList.valueOf((Color.parseColor("#20000000")))
+            chipStrokeWidth = 1.dp.toFloat()
+            chipStartPadding = 10.dp.toFloat()
+            setPadding(paddingStart, 2.dp, paddingEnd, 2.dp)
             addView(this)
+          }
         }
+        chip!!.apply {
+          setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
+          text = entity.label
+          chipBackgroundColor =
+            ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
 
-        private var chip: Chip? = null
-
-        fun setChipOnClickListener(listener: OnClickListener?) {
-            chip?.setOnClickListener(listener)
-        }
-
-        fun setChip(entity: RuleEntity?, colorRes: Int) {
-            if (entity == null) {
-                if (chip != null) {
-                    removeView(chip)
-                    chip = null
-                }
-            } else {
-                if (chip == null) {
-                    chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
-                        layoutParams = LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                        ).also {
-                            it.topMargin = 4.dp
-                        }
-                        setTextColor(Color.BLACK)
-                        chipStrokeColor = ColorStateList.valueOf((Color.parseColor("#20000000")))
-                        chipStrokeWidth = 1.dp.toFloat()
-                        chipStartPadding = 10.dp.toFloat()
-                        setPadding(paddingStart, 2.dp, paddingEnd, 2.dp)
-                        addView(this)
-                    }
-                }
-                chip!!.apply {
-                    setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
-                    text = entity.label
-                    chipBackgroundColor =
-                        ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
-
-                    if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
-                            entity.iconIndex
-                        )
-                    ) {
-                        val icon = chipIcon
-                        icon?.let {
-                            it.mutate().colorFilter =
-                                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-                            chipIcon = it
-                        }
-                    } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
-                        chipIcon?.mutate()?.setTint(Color.BLACK)
-                    } else {
-                        setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
-                    }
-                }
-            }
-        }
-
-        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-            typeIcon.autoMeasure()
-            name.measure(
-                (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
-                name.defaultHeightMeasureSpec(this)
+          if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
+              entity.iconIndex
             )
-            chip?.autoMeasure()
-            val chipHeight = if (chip != null) {
-                chip!!.measuredHeight + chip!!.marginTop
-            } else {
-                0
+          ) {
+            val icon = chipIcon
+            icon?.let {
+              it.mutate().colorFilter =
+                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+              chipIcon = it
             }
-            setMeasuredDimension(
-                measuredWidth,
-                paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
-            )
+          } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
+            chipIcon?.mutate()?.setTint(Color.BLACK)
+          } else {
+            setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
+          }
         }
-
-        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
-            name.layout(typeIcon.right + name.marginStart, paddingTop)
-            chip?.layout(name.left, name.bottom + chip!!.marginTop)
-        }
+      }
     }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+      super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+      typeIcon.autoMeasure()
+      name.measure(
+        (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
+        name.defaultHeightMeasureSpec(this)
+      )
+      chip?.autoMeasure()
+      val chipHeight = if (chip != null) {
+        chip!!.measuredHeight + chip!!.marginTop
+      } else {
+        0
+      }
+      setMeasuredDimension(
+        measuredWidth,
+        paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
+      )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+      typeIcon.layout(paddingStart, typeIcon.toVerticalCenter(this))
+      name.layout(typeIcon.right + name.marginStart, paddingTop)
+      chip?.layout(name.left, name.bottom + chip!!.marginTop)
+    }
+  }
 }

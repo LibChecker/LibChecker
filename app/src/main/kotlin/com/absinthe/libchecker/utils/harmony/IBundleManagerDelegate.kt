@@ -10,14 +10,14 @@ import timber.log.Timber
  */
 class IBundleManagerDelegate(applicationDelegate: ApplicationDelegate) {
 
-    private val mIBundleManager: IBundleManager? = applicationDelegate.iBundleManager
+  private val mIBundleManager: IBundleManager? = applicationDelegate.iBundleManager
 
-    fun getBundleInfo(bundleName: String, flags: Int): BundleInfo? {
-        try {
-            return mIBundleManager!!.getBundleInfo(bundleName, flags)
-        } catch (e: RemoteException) {
-            Timber.w(e, "bundleName: $bundleName")
-        }
-        return null
+  fun getBundleInfo(bundleName: String, flags: Int): BundleInfo? {
+    try {
+      return mIBundleManager!!.getBundleInfo(bundleName, flags)
+    } catch (e: RemoteException) {
+      Timber.w(e, "bundleName: $bundleName")
     }
+    return null
+  }
 }

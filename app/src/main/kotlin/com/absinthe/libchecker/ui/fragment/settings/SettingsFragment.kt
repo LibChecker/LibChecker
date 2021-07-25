@@ -46,284 +46,284 @@ import java.util.Locale
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
-    private lateinit var borderViewDelegate: BorderViewDelegate
-    private val viewModel by activityViewModels<HomeViewModel>()
+  private lateinit var borderViewDelegate: BorderViewDelegate
+  private val viewModel by activityViewModels<HomeViewModel>()
 
-    companion object {
-        init {
-            SimpleMenuPreference.setLightFixEnabled(true)
-        }
+  companion object {
+    init {
+      SimpleMenuPreference.setLightFixEnabled(true)
     }
+  }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.settings, rootKey)
+  override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    setPreferencesFromResource(R.xml.settings, rootKey)
 
-        (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.isShowSystemApps.value = newValue as Boolean
-                Analytics.trackEvent(
-                    Constants.Event.SETTINGS,
-                    EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue)
-                )
-                true
-            }
-        }
-        (findPreference<SwitchPreference>(Constants.PREF_APK_ANALYTICS))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                val flag = if (newValue as Boolean) {
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                } else {
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-                }
-
-                requireActivity().packageManager.setComponentEnabledSetting(
-                    ComponentName(requireActivity(), ApkDetailActivity::class.java),
-                    flag, PackageManager.DONT_KILL_APP
-                )
-                Analytics.trackEvent(
-                    Constants.Event.SETTINGS,
-                    EventProperties().set("PREF_APK_ANALYTICS", newValue)
-                )
-                true
-            }
-        }
-        (findPreference<SwitchPreference>(Constants.PREF_COLORFUL_ICON))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.isColorfulIcon.value = newValue as Boolean
-                activity?.recreate()
-                Analytics.trackEvent(
-                    Constants.Event.SETTINGS,
-                    EventProperties().set("PREF_COLORFUL_ICON", newValue)
-                )
-                true
-            }
-        }
-        (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.repo = newValue as String
-                Analytics.trackEvent(
-                    Constants.Event.SETTINGS,
-                    EventProperties().set("PREF_RULES_REPO", newValue)
-                )
-                true
-            }
-        }
-        val languagePreference =
-            (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
-                setOnPreferenceChangeListener { _, newValue ->
-                    if (newValue is String) {
-                        val locale: Locale = if ("SYSTEM" == newValue) {
-                            LocaleDelegate.systemLocale
-                        } else {
-                            Locale.forLanguageTag(newValue)
-                        }
-                        LocaleDelegate.defaultLocale = locale
-                        Timber.d("Locale = $locale")
-                        activity?.recreate()
-                    }
-                    true
-                }
-            }!!
-        findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.darkMode = newValue.toString()
-                DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(newValue.toString()))
-                activity?.recreate()
-                true
-            }
-        }
-        findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
-            setOnPreferenceClickListener {
-                CloudRulesDialogFragment().show(childFragmentManager, tag)
-                true
-            }
-        }
-        findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
-            setOnPreferenceClickListener {
-                LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
-                true
-            }
-        }
-        findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.apply {
-            setOnPreferenceClickListener {
-                AlertDialog.Builder(requireContext())
-                    .setTitle(R.string.dialog_title_reload_apps)
-                    .setMessage(R.string.dialog_subtitle_reload_apps)
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        viewModel.reloadAppsFlag.value = true
-                        Analytics.trackEvent(
-                            Constants.Event.SETTINGS,
-                            EventProperties().set("PREF_RELOAD_APPS", "Ok")
-                        )
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create()
-                    .show()
-                true
-            }
+    (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.isShowSystemApps.value = newValue as Boolean
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue)
+        )
+        true
+      }
+    }
+    (findPreference<SwitchPreference>(Constants.PREF_APK_ANALYTICS))?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        val flag = if (newValue as Boolean) {
+          PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        } else {
+          PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         }
 
-        findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
-            summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
-        }
-        findPreference<Preference>(Constants.PREF_HELP)?.apply {
-            setOnPreferenceClickListener {
-                try {
-                    CustomTabsIntent.Builder().build().apply {
-                        launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
-                    }
-                } catch (e: ActivityNotFoundException) {
-                    Timber.e(e)
-                    try {
-                        val intent = Intent(Intent.ACTION_VIEW)
-                            .setData(URLManager.DOCS_PAGE.toUri())
-                        requireActivity().startActivity(intent)
-                    } catch (e: ActivityNotFoundException) {
-                        Timber.e(e)
-                    }
-                }
-                true
-            }
-        }
-        findPreference<Preference>(Constants.PREF_RATE)?.apply {
-            setOnPreferenceClickListener {
-                val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
-                val marketUrl = if (hasInstallCoolApk) {
-                    URLManager.COOLAPK_APP_PAGE
-                } else {
-                    URLManager.MARKET_PAGE
-                }
-
-                try {
-                    startActivity(Intent.parseUri(marketUrl, 0))
-                    Analytics.trackEvent(
-                        Constants.Event.SETTINGS,
-                        EventProperties().set("PREF_RATE", "Clicked")
-                    )
-                } catch (e: ActivityNotFoundException) {
-                    Timber.e(e)
-                }
-                true
-            }
-        }
-        findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
-            setOnPreferenceClickListener {
-                try {
-                    startActivity(
-                        Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
-                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    )
-                } catch (e: ActivityNotFoundException) {
-                    Timber.e(e)
-                }
-                true
-            }
-        }
-        (findPreference<SwitchPreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
-            setOnPreferenceChangeListener { _, newValue ->
-                GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
-                true
-            }
-        }
-
-        val tag = languagePreference.value
-        val index = listOf(*languagePreference.entryValues).indexOf(tag)
-        val localeName: MutableList<String> = ArrayList()
-        val localeNameUser: MutableList<String> = ArrayList()
-        val userLocale = GlobalValues.locale
-        for (i in 1 until languagePreference.entries.size) {
-            val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
-            localeName.add(
-                if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(
-                    locale
-                )
-            )
-            localeNameUser.add(
-                if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(
-                    userLocale
-                ) else locale.getDisplayName(userLocale)
-            )
-        }
-
-        for (i in 1 until languagePreference.entries.size) {
-            if (index != i) {
-                languagePreference.entries[i] = HtmlCompat.fromHtml(
-                    String.format(
-                        "%s - %s",
-                        localeName[i - 1],
-                        localeNameUser[i - 1]
-                    ),
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
+        requireActivity().packageManager.setComponentEnabledSetting(
+          ComponentName(requireActivity(), ApkDetailActivity::class.java),
+          flag, PackageManager.DONT_KILL_APP
+        )
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_APK_ANALYTICS", newValue)
+        )
+        true
+      }
+    }
+    (findPreference<SwitchPreference>(Constants.PREF_COLORFUL_ICON))?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.isColorfulIcon.value = newValue as Boolean
+        activity?.recreate()
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_COLORFUL_ICON", newValue)
+        )
+        true
+      }
+    }
+    (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.repo = newValue as String
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_RULES_REPO", newValue)
+        )
+        true
+      }
+    }
+    val languagePreference =
+      (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
+        setOnPreferenceChangeListener { _, newValue ->
+          if (newValue is String) {
+            val locale: Locale = if ("SYSTEM" == newValue) {
+              LocaleDelegate.systemLocale
             } else {
-                languagePreference.entries[i] = localeNameUser[i - 1]
+              Locale.forLanguageTag(newValue)
             }
+            LocaleDelegate.defaultLocale = locale
+            Timber.d("Locale = $locale")
+            activity?.recreate()
+          }
+          true
+        }
+      }!!
+    findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.darkMode = newValue.toString()
+        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(newValue.toString()))
+        activity?.recreate()
+        true
+      }
+    }
+    findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
+      setOnPreferenceClickListener {
+        CloudRulesDialogFragment().show(childFragmentManager, tag)
+        true
+      }
+    }
+    findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
+      setOnPreferenceClickListener {
+        LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
+        true
+      }
+    }
+    findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.apply {
+      setOnPreferenceClickListener {
+        AlertDialog.Builder(requireContext())
+          .setTitle(R.string.dialog_title_reload_apps)
+          .setMessage(R.string.dialog_subtitle_reload_apps)
+          .setPositiveButton(android.R.string.ok) { _, _ ->
+            viewModel.reloadAppsFlag.value = true
+            Analytics.trackEvent(
+              Constants.Event.SETTINGS,
+              EventProperties().set("PREF_RELOAD_APPS", "Ok")
+            )
+          }
+          .setNegativeButton(android.R.string.cancel, null)
+          .create()
+          .show()
+        true
+      }
+    }
+
+    findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
+      summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+    }
+    findPreference<Preference>(Constants.PREF_HELP)?.apply {
+      setOnPreferenceClickListener {
+        try {
+          CustomTabsIntent.Builder().build().apply {
+            launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
+          }
+        } catch (e: ActivityNotFoundException) {
+          Timber.e(e)
+          try {
+            val intent = Intent(Intent.ACTION_VIEW)
+              .setData(URLManager.DOCS_PAGE.toUri())
+            requireActivity().startActivity(intent)
+          } catch (e: ActivityNotFoundException) {
+            Timber.e(e)
+          }
+        }
+        true
+      }
+    }
+    findPreference<Preference>(Constants.PREF_RATE)?.apply {
+      setOnPreferenceClickListener {
+        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+        val marketUrl = if (hasInstallCoolApk) {
+          URLManager.COOLAPK_APP_PAGE
+        } else {
+          URLManager.MARKET_PAGE
         }
 
-        if (TextUtils.isEmpty(tag) || "SYSTEM" == tag) {
-            languagePreference.summary = getString(R.string.follow_system)
-        } else if (index != -1) {
-            val name = localeNameUser[index - 1]
-            languagePreference.summary = name
+        try {
+          startActivity(Intent.parseUri(marketUrl, 0))
+          Analytics.trackEvent(
+            Constants.Event.SETTINGS,
+            EventProperties().set("PREF_RATE", "Clicked")
+          )
+        } catch (e: ActivityNotFoundException) {
+          Timber.e(e)
         }
+        true
+      }
     }
-
-    override fun onResume() {
-        super.onResume()
-        if (this != viewModel.controller) {
-            viewModel.controller = this
-            requireActivity().invalidateOptionsMenu()
+    findPreference<Preference>(Constants.PREF_TELEGRAM)?.apply {
+      setOnPreferenceClickListener {
+        try {
+          startActivity(
+            Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
+              .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+          )
+        } catch (e: ActivityNotFoundException) {
+          Timber.e(e)
         }
-        scheduleAppbarRaisingStatus()
+        true
+      }
+    }
+    (findPreference<SwitchPreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
+        true
+      }
     }
 
-    override fun onCreateRecyclerView(
-        inflater: LayoutInflater,
-        parent: ViewGroup,
-        savedInstanceState: Bundle?
-    ): RecyclerView {
-        val recyclerView =
-            super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
-        recyclerView.fixEdgeEffect()
-        recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
-        recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
-        recyclerView.isVerticalScrollBarEnabled = false
-
-        val lp = recyclerView.layoutParams
-        if (lp is FrameLayout.LayoutParams) {
-            lp.rightMargin =
-                recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
-                    .toInt()
-            lp.leftMargin = lp.rightMargin
-        }
-
-        borderViewDelegate = recyclerView.borderViewDelegate
-        borderViewDelegate.borderVisibilityChangedListener =
-            BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-                (activity as MainActivity?)?.appBar?.setRaised(!top)
-            }
-
-        return recyclerView
+    val tag = languagePreference.value
+    val index = listOf(*languagePreference.entryValues).indexOf(tag)
+    val localeName: MutableList<String> = ArrayList()
+    val localeNameUser: MutableList<String> = ArrayList()
+    val userLocale = GlobalValues.locale
+    for (i in 1 until languagePreference.entries.size) {
+      val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
+      localeName.add(
+        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(
+          locale
+        )
+      )
+      localeNameUser.add(
+        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(
+          userLocale
+        ) else locale.getDisplayName(userLocale)
+      )
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        if (this == viewModel.controller) {
-            viewModel.controller = null
-        }
+    for (i in 1 until languagePreference.entries.size) {
+      if (index != i) {
+        languagePreference.entries[i] = HtmlCompat.fromHtml(
+          String.format(
+            "%s - %s",
+            localeName[i - 1],
+            localeNameUser[i - 1]
+          ),
+          HtmlCompat.FROM_HTML_MODE_LEGACY
+        )
+      } else {
+        languagePreference.entries[i] = localeNameUser[i - 1]
+      }
     }
 
-    override fun onReturnTop() {
-        // Do nothing
+    if (TextUtils.isEmpty(tag) || "SYSTEM" == tag) {
+      languagePreference.summary = getString(R.string.follow_system)
+    } else if (index != -1) {
+      val name = localeNameUser[index - 1]
+      languagePreference.summary = name
+    }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (this != viewModel.controller) {
+      viewModel.controller = this
+      requireActivity().invalidateOptionsMenu()
+    }
+    scheduleAppbarRaisingStatus()
+  }
+
+  override fun onCreateRecyclerView(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    savedInstanceState: Bundle?
+  ): RecyclerView {
+    val recyclerView =
+      super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+    recyclerView.fixEdgeEffect()
+    recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
+    recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    recyclerView.isVerticalScrollBarEnabled = false
+
+    val lp = recyclerView.layoutParams
+    if (lp is FrameLayout.LayoutParams) {
+      lp.rightMargin =
+        recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
+          .toInt()
+      lp.leftMargin = lp.rightMargin
     }
 
-    override fun getAppBar() = (activity as MainActivity?)?.appBar
+    borderViewDelegate = recyclerView.borderViewDelegate
+    borderViewDelegate.borderVisibilityChangedListener =
+      BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+        (activity as MainActivity?)?.appBar?.setRaised(!top)
+      }
 
-    override fun getBorderViewDelegate() = borderViewDelegate
+    return recyclerView
+  }
 
-    override fun scheduleAppbarRaisingStatus() {
-        getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
+  override fun onDetach() {
+    super.onDetach()
+    if (this == viewModel.controller) {
+      viewModel.controller = null
     }
+  }
 
-    override fun isAllowRefreshing() = true
+  override fun onReturnTop() {
+    // Do nothing
+  }
+
+  override fun getAppBar() = (activity as MainActivity?)?.appBar
+
+  override fun getBorderViewDelegate() = borderViewDelegate
+
+  override fun scheduleAppbarRaisingStatus() {
+    getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
+  }
+
+  override fun isAllowRefreshing() = true
 }

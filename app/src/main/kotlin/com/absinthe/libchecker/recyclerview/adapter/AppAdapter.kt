@@ -24,84 +24,84 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) :
-    BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
+  BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
 
-    private var loadIconJob: Job? = null
-    var highlightText: String = ""
+  private var loadIconJob: Job? = null
+  var highlightText: String = ""
 
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return createBaseViewHolder(
-            AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
-                layoutParams = ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).also {
-                    val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-                    it.setMargins(margin, margin, margin, margin)
-                }
-            }
-        )
-    }
-
-    override fun convert(holder: BaseViewHolder, item: LCItem) {
-        (holder.itemView as AppItemView).container.apply {
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-                    loadIconJob =
-                        AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-                } catch (e: PackageManager.NameNotFoundException) {
-                    Timber.e(e)
-                }
-            }
-
-            if (highlightText.isNotBlank()) {
-                appName.tintHighlightText(highlightText, item.label)
-            } else {
-                appName.text = item.label
-            }
-            if (highlightText.isNotBlank()) {
-                packageName.tintHighlightText(highlightText, item.packageName)
-            } else {
-                packageName.text = item.packageName
-            }
-
-            versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
-
-            val str = StringBuilder()
-                .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
-                .append(", ")
-                .append(PackageUtils.getTargetApiString(item.targetApi))
-            val spanString: SpannableString
-            val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
-
-            if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-                spanString = SpannableString("  $str")
-                ContextCompat.getDrawable(context, abiBadgeRes)?.let {
-                    it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-                    val span = CenterAlignImageSpan(it)
-                    spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-                }
-                abiInfo.text = spanString
-            } else {
-                abiInfo.text = str
-            }
-
-            if (item.variant == Constants.VARIANT_HAP) {
-                setBadge(R.drawable.ic_harmony_badge)
-            } else {
-                setBadge(null)
-            }
+  override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return createBaseViewHolder(
+      AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also {
+          val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
+          it.setMargins(margin, margin, margin, margin)
         }
-    }
+      }
+    )
+  }
 
-    override fun getItemId(position: Int): Long {
-        return data[position].hashCode().toLong()
-    }
-
-    fun release() {
-        if (loadIconJob?.isActive == true) {
-            loadIconJob?.cancel()
+  override fun convert(holder: BaseViewHolder, item: LCItem) {
+    (holder.itemView as AppItemView).container.apply {
+      lifecycleScope.launch(Dispatchers.IO) {
+        try {
+          val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
+          loadIconJob =
+            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+        } catch (e: PackageManager.NameNotFoundException) {
+          Timber.e(e)
         }
+      }
+
+      if (highlightText.isNotBlank()) {
+        appName.tintHighlightText(highlightText, item.label)
+      } else {
+        appName.text = item.label
+      }
+      if (highlightText.isNotBlank()) {
+        packageName.tintHighlightText(highlightText, item.packageName)
+      } else {
+        packageName.text = item.packageName
+      }
+
+      versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
+
+      val str = StringBuilder()
+        .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
+        .append(", ")
+        .append(PackageUtils.getTargetApiString(item.targetApi))
+      val spanString: SpannableString
+      val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
+
+      if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
+        spanString = SpannableString("  $str")
+        ContextCompat.getDrawable(context, abiBadgeRes)?.let {
+          it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+          val span = CenterAlignImageSpan(it)
+          spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+        }
+        abiInfo.text = spanString
+      } else {
+        abiInfo.text = str
+      }
+
+      if (item.variant == Constants.VARIANT_HAP) {
+        setBadge(R.drawable.ic_harmony_badge)
+      } else {
+        setBadge(null)
+      }
     }
+  }
+
+  override fun getItemId(position: Int): Long {
+    return data[position].hashCode().toLong()
+  }
+
+  fun release() {
+    if (loadIconJob?.isActive == true) {
+      loadIconJob?.cancel()
+    }
+  }
 }

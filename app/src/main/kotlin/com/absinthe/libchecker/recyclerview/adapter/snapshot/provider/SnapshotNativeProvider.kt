@@ -25,62 +25,62 @@ const val SNAPSHOT_NATIVE_PROVIDER = 2
 
 class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
 
-    override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
-    override val layoutId: Int = 0
+  override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
+  override val layoutId: Int = 0
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return BaseViewHolder(
-            SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard))
-        )
-    }
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return BaseViewHolder(
+      SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard))
+    )
+  }
 
-    override fun convert(helper: BaseViewHolder, item: BaseNode) {
-        (helper.itemView as SnapshotDetailNativeView).container.apply {
-            val snapshotItem = (item as SnapshotNativeNode).item
+  override fun convert(helper: BaseViewHolder, item: BaseNode) {
+    (helper.itemView as SnapshotDetailNativeView).container.apply {
+      val snapshotItem = (item as SnapshotNativeNode).item
 
-            name.text = snapshotItem.title
-            libSize.text = snapshotItem.extra
+      name.text = snapshotItem.title
+      libSize.text = snapshotItem.extra
 
-            val colorRes = when (snapshotItem.diffType) {
-                ADDED -> R.color.material_green_300
-                REMOVED -> R.color.material_red_300
-                CHANGED -> R.color.material_yellow_300
-                else -> Color.TRANSPARENT
-            }
+      val colorRes = when (snapshotItem.diffType) {
+        ADDED -> R.color.material_green_300
+        REMOVED -> R.color.material_red_300
+        CHANGED -> R.color.material_yellow_300
+        else -> Color.TRANSPARENT
+      }
 
-            typeIcon.setImageResource(
-                when (snapshotItem.diffType) {
-                    ADDED -> R.drawable.ic_add
-                    REMOVED -> R.drawable.ic_remove
-                    CHANGED -> R.drawable.ic_changed
-                    else -> Color.TRANSPARENT
-                }
-            )
-
-            helper.itemView.backgroundTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
-
-            lifecycleScope.launch {
-                val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, NATIVE)
-
-                setChip(rule, colorRes)
-                if (rule != null) {
-                    setChipOnClickListener {
-                        val name = item.item.name
-                        val regexName =
-                            LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
-                        LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
-                            .apply {
-                                show(
-                                    (this@SnapshotNativeProvider.context as BaseActivity).supportFragmentManager,
-                                    tag
-                                )
-                            }
-                    }
-                } else {
-                    setChipOnClickListener(null)
-                }
-            }
+      typeIcon.setImageResource(
+        when (snapshotItem.diffType) {
+          ADDED -> R.drawable.ic_add
+          REMOVED -> R.drawable.ic_remove
+          CHANGED -> R.drawable.ic_changed
+          else -> Color.TRANSPARENT
         }
+      )
+
+      helper.itemView.backgroundTintList =
+        ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+
+      lifecycleScope.launch {
+        val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, NATIVE)
+
+        setChip(rule, colorRes)
+        if (rule != null) {
+          setChipOnClickListener {
+            val name = item.item.name
+            val regexName =
+              LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
+            LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
+              .apply {
+                show(
+                  (this@SnapshotNativeProvider.context as BaseActivity).supportFragmentManager,
+                  tag
+                )
+              }
+          }
+        } else {
+          setChipOnClickListener(null)
+        }
+      }
     }
+  }
 }

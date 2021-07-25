@@ -12,34 +12,34 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
 
-    private val image = ImageView(context).apply {
-        layoutParams = LayoutParams(150.dp, 150.dp)
-        setImageResource(R.drawable.ic_no)
-        addView(this)
+  private val image = ImageView(context).apply {
+    layoutParams = LayoutParams(150.dp, 150.dp)
+    setImageResource(R.drawable.ic_no)
+    addView(this)
+  }
+
+  private val text =
+    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also {
+        it.topMargin = 16.dp
+      }
+      text = context.getString(R.string.snapshot_detail_deleted_title)
+      setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
+      addView(this)
     }
 
-    private val text =
-        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-            layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).also {
-                it.topMargin = 16.dp
-            }
-            text = context.getString(R.string.snapshot_detail_deleted_title)
-            setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline6))
-            addView(this)
-        }
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    image.autoMeasure()
+    text.autoMeasure()
+    setMeasuredDimension(measuredWidth, measuredHeight)
+  }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        image.autoMeasure()
-        text.autoMeasure()
-        setMeasuredDimension(measuredWidth, measuredHeight)
-    }
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        image.layout(image.toHorizontalCenter(this), measuredWidth / 2)
-        text.layout(text.toHorizontalCenter(this), image.bottom + text.marginTop)
-    }
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    image.layout(image.toHorizontalCenter(this), measuredWidth / 2)
+    text.layout(text.toHorizontalCenter(this), image.bottom + text.marginTop)
+  }
 }

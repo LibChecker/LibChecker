@@ -24,61 +24,61 @@ private const val FIRST_SUPPORT_VERSION_CODE = 308047
 
 class MonkeyKingManager {
 
-    fun queryBlockedComponent(context: Context, packageName: String): List<ShareCmpInfo.Component> {
-        val contentResolver = context.contentResolver
-        val uri = Uri.parse(URI_AUTHORIZATION)
-        return try {
-            val bundle = contentResolver.call(uri, "cmps", packageName, null)
-            val shareCmpInfoString = bundle?.getString("cmp_list")
-            Gson().fromJson(shareCmpInfoString, ShareCmpInfo::class.java).components
-        } catch (e: Throwable) {
-            emptyList()
-        }
+  fun queryBlockedComponent(context: Context, packageName: String): List<ShareCmpInfo.Component> {
+    val contentResolver = context.contentResolver
+    val uri = Uri.parse(URI_AUTHORIZATION)
+    return try {
+      val bundle = contentResolver.call(uri, "cmps", packageName, null)
+      val shareCmpInfoString = bundle?.getString("cmp_list")
+      Gson().fromJson(shareCmpInfoString, ShareCmpInfo::class.java).components
+    } catch (e: Throwable) {
+      emptyList()
     }
+  }
 
-    fun addBlockedComponent(
-        context: Context,
-        packageName: String,
-        componentName: String,
-        @LibType type: Int,
-        shouldBlock: Boolean
-    ) {
-        val fullComponentName = if (componentName.startsWith(".")) {
-            packageName + componentName
-        } else {
-            componentName
-        }
-        val shareCmpInfo = ShareCmpInfo(
-            packageName,
-            listOf(
-                ShareCmpInfo.Component(
-                    type = getType(type),
-                    name = fullComponentName,
-                    block = shouldBlock
-                )
-            )
+  fun addBlockedComponent(
+    context: Context,
+    packageName: String,
+    componentName: String,
+    @LibType type: Int,
+    shouldBlock: Boolean
+  ) {
+    val fullComponentName = if (componentName.startsWith(".")) {
+      packageName + componentName
+    } else {
+      componentName
+    }
+    val shareCmpInfo = ShareCmpInfo(
+      packageName,
+      listOf(
+        ShareCmpInfo.Component(
+          type = getType(type),
+          name = fullComponentName,
+          block = shouldBlock
         )
-        val bundle = bundleOf(
-            "cmp_list" to Gson().toJson(shareCmpInfo)
-        )
-        try {
-            context.contentResolver.call(URI_AUTHORIZATION.toUri(), "blocks", packageName, bundle)
-        } catch (e: Exception) {
-            context.showToast(e.message.toString())
-        }
+      )
+    )
+    val bundle = bundleOf(
+      "cmp_list" to Gson().toJson(shareCmpInfo)
+    )
+    try {
+      context.contentResolver.call(URI_AUTHORIZATION.toUri(), "blocks", packageName, bundle)
+    } catch (e: Exception) {
+      context.showToast(e.message.toString())
     }
+  }
 
-    private fun getType(@LibType type: Int): String = when (type) {
-        ACTIVITY -> TYPE_ACTIVITY
-        SERVICE -> TYPE_SERVICE
-        RECEIVER -> TYPE_RECEIVER
-        PROVIDER -> TYPE_PROVIDER
-        else -> throw IllegalStateException("wrong type")
-    }
+  private fun getType(@LibType type: Int): String = when (type) {
+    ACTIVITY -> TYPE_ACTIVITY
+    SERVICE -> TYPE_SERVICE
+    RECEIVER -> TYPE_RECEIVER
+    PROVIDER -> TYPE_PROVIDER
+    else -> throw IllegalStateException("wrong type")
+  }
 
-    companion object {
-        val isSupportInteraction =
-            PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID) &&
-                PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
-    }
+  companion object {
+    val isSupportInteraction =
+      PackageUtils.isAppInstalled(MONKEY_KING_APPLICATION_ID) &&
+        PackageUtils.getVersionCode(MONKEY_KING_APPLICATION_ID) >= FIRST_SUPPORT_VERSION_CODE
+  }
 }

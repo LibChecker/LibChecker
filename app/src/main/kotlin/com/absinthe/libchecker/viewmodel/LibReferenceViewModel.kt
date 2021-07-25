@@ -20,54 +20,54 @@ import timber.log.Timber
 
 class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
 
-    val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
-    val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
+  val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
+  val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
 
-    fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
-        val list = mutableListOf<LCItem>()
+  fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
+    val list = mutableListOf<LCItem>()
 
-        dbItems.value?.let { items ->
-            if (type == NATIVE) {
-                var packageInfo: PackageInfo
-                var natives: List<LibStringItem>
+    dbItems.value?.let { items ->
+      if (type == NATIVE) {
+        var packageInfo: PackageInfo
+        var natives: List<LibStringItem>
 
-                for (item in items) {
-                    natives = try {
-                        packageInfo = PackageUtils.getPackageInfo(item.packageName)
-                        PackageUtils.getNativeDirLibs(packageInfo)
-                    } catch (e: Exception) {
-                        Timber.e(e)
-                        emptyList()
-                    }
+        for (item in items) {
+          natives = try {
+            packageInfo = PackageUtils.getPackageInfo(item.packageName)
+            PackageUtils.getNativeDirLibs(packageInfo)
+          } catch (e: Exception) {
+            Timber.e(e)
+            emptyList()
+          }
 
-                    natives.find { it.name == name }?.run {
-                        if (LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
-                            list.add(item)
-                        }
-                    }
-                }
-            } else {
-                for (item in items) {
-                    try {
-                        val componentStringList = PackageUtils.getComponentStringList(
-                            item.packageName, type, false
-                        )
-                        if (componentStringList.contains(name)) {
-                            list.add(item)
-                        }
-                    } catch (e: Exception) {
-                        continue
-                    }
-                }
+          natives.find { it.name == name }?.run {
+            if (LCAppUtils.checkNativeLibValidation(item.packageName, name)) {
+              list.add(item)
             }
+          }
         }
-
-        val filterList = if (GlobalValues.isShowSystemApps.value == true) {
-            list
-        } else {
-            list.filter { !it.isSystem }
+      } else {
+        for (item in items) {
+          try {
+            val componentStringList = PackageUtils.getComponentStringList(
+              item.packageName, type, false
+            )
+            if (componentStringList.contains(name)) {
+              list.add(item)
+            }
+          } catch (e: Exception) {
+            continue
+          }
         }
-
-        libRefList.postValue(filterList)
+      }
     }
+
+    val filterList = if (GlobalValues.isShowSystemApps.value == true) {
+      list
+    } else {
+      list.filter { !it.isSystem }
+    }
+
+    libRefList.postValue(filterList)
+  }
 }

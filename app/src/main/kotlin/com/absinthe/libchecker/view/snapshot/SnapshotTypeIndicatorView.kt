@@ -14,54 +14,54 @@ import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
 
-    private val text =
-        AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
-            layoutParams = LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            addView(this)
-        }
-
-    private val icon = AppCompatImageView(context).apply {
-        layoutParams = LayoutParams(16.dp, 16.dp).also {
-            it.marginStart = 4.dp
-        }
-        addView(this)
+  private val text =
+    AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+      addView(this)
     }
 
-    private val colorLabel = View(context).apply {
-        layoutParams = LayoutParams(20.dp, 5.dp).also {
-            it.marginStart = 4.dp
-        }
-        addView(this)
+  private val icon = AppCompatImageView(context).apply {
+    layoutParams = LayoutParams(16.dp, 16.dp).also {
+      it.marginStart = 4.dp
     }
+    addView(this)
+  }
 
-    fun setIndicatorInfo(str: String, iconDrawable: Drawable?, labelColorRes: Int) {
-        text.text = str
-        icon.setImageDrawable(iconDrawable)
-        colorLabel.setBackgroundColor(labelColorRes)
+  private val colorLabel = View(context).apply {
+    layoutParams = LayoutParams(20.dp, 5.dp).also {
+      it.marginStart = 4.dp
     }
+    addView(this)
+  }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        text.autoMeasure()
-        icon.autoMeasure()
-        colorLabel.autoMeasure()
-        setMeasuredDimension(
-            (
-                text.measuredWidth +
-                    icon.marginStart + icon.measuredWidth +
-                    colorLabel.marginStart + colorLabel.measuredWidth
-                ),
-            text.measuredHeight.coerceAtLeast(icon.measuredHeight)
-        )
-    }
+  fun setIndicatorInfo(str: String, iconDrawable: Drawable?, labelColorRes: Int) {
+    text.text = str
+    icon.setImageDrawable(iconDrawable)
+    colorLabel.setBackgroundColor(labelColorRes)
+  }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        text.layout(0, text.toVerticalCenter(this))
-        icon.layout(text.right + icon.marginStart, icon.toVerticalCenter(this))
-        colorLabel.layout(icon.right + colorLabel.marginStart, colorLabel.toVerticalCenter(this))
-    }
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    text.autoMeasure()
+    icon.autoMeasure()
+    colorLabel.autoMeasure()
+    setMeasuredDimension(
+      (
+        text.measuredWidth +
+          icon.marginStart + icon.measuredWidth +
+          colorLabel.marginStart + colorLabel.measuredWidth
+        ),
+      text.measuredHeight.coerceAtLeast(icon.measuredHeight)
+    )
+  }
+
+  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    text.layout(0, text.toVerticalCenter(this))
+    icon.layout(text.right + icon.marginStart, icon.toVerticalCenter(this))
+    colorLabel.layout(icon.right + colorLabel.marginStart, colorLabel.toVerticalCenter(this))
+  }
 }

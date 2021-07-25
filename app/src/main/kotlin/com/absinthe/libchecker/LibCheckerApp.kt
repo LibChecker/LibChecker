@@ -23,42 +23,42 @@ import timber.log.Timber
 
 class LibCheckerApp : Application() {
 
-    override fun onCreate() {
-        super.onCreate()
+  override fun onCreate() {
+    super.onCreate()
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            HiddenApiBypass.addHiddenApiExemptions("L")
-        }
-
-        app = this
-        if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
-            AppCenter.start(
-                this, Constants.APP_CENTER_SECRET,
-                Analytics::class.java, Crashes::class.java
-            )
-        }
-
-        if (BuildConfig.DEBUG) {
-            Timber.plant(ThreadAwareDebugTree())
-        } else {
-            Timber.plant(ReleaseTree())
-        }
-
-        Utility.init(this)
-        LocaleDelegate.defaultLocale = GlobalValues.locale
-        DayNightDelegate.setApplicationContext(this)
-        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
-        Once.initialise(this)
-        Repositories.init(this)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      HiddenApiBypass.addHiddenApiExemptions("L")
     }
 
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        Global.start()
+    app = this
+    if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
+      AppCenter.start(
+        this, Constants.APP_CENTER_SECRET,
+        Analytics::class.java, Crashes::class.java
+      )
     }
 
-    companion object {
-        @SuppressLint("StaticFieldLeak")
-        lateinit var app: Application
+    if (BuildConfig.DEBUG) {
+      Timber.plant(ThreadAwareDebugTree())
+    } else {
+      Timber.plant(ReleaseTree())
     }
+
+    Utility.init(this)
+    LocaleDelegate.defaultLocale = GlobalValues.locale
+    DayNightDelegate.setApplicationContext(this)
+    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
+    Once.initialise(this)
+    Repositories.init(this)
+  }
+
+  override fun attachBaseContext(base: Context?) {
+    super.attachBaseContext(base)
+    Global.start()
+  }
+
+  companion object {
+    @SuppressLint("StaticFieldLeak")
+    lateinit var app: Application
+  }
 }

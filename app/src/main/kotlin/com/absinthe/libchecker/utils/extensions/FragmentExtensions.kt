@@ -8,12 +8,12 @@ import androidx.fragment.app.Fragment
 
 @MainThread
 fun <T : Fragment> T.putArguments(bundle: Bundle): T {
-    arguments = bundle
-    return this
+  arguments = bundle
+  return this
 }
 
 @MainThread
 fun <T : Fragment> T.putArguments(vararg pairs: Pair<String, Any?>): T =
-    putArguments(bundleOf(*pairs))
+  putArguments(bundleOf(*pairs))
 
 fun DialogFragment.isShowing() = this.dialog?.isShowing == true && !this.isRemoving

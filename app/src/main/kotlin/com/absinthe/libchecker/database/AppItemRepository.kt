@@ -7,13 +7,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
 object AppItemRepository {
-    var allApplicationInfoItems: List<ApplicationInfo> = emptyList()
-    var trackItemsChanged = false
-    var shouldRefreshAppList = false
-    var rulesRegexList = ConcurrentHashMap<Pattern, RuleEntity>()
+  var allApplicationInfoItems: List<ApplicationInfo> = emptyList()
+  var trackItemsChanged = false
+  var shouldRefreshAppList = false
+  var rulesRegexList = ConcurrentHashMap<Pattern, RuleEntity>()
 
-    suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
-        Global.applicationListJob?.join()
-        return allApplicationInfoItems
-    }
+  suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
+    Global.applicationListJob?.join()
+    return allApplicationInfoItems
+  }
 }

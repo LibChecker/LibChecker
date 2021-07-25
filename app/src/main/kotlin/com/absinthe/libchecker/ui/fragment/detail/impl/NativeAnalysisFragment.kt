@@ -17,66 +17,66 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
 class NativeAnalysisFragment :
-    BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
+  BaseDetailFragment<FragmentLibNativeBinding>(R.layout.fragment_lib_native) {
 
-    override fun initBinding(view: View): FragmentLibNativeBinding =
-        FragmentLibNativeBinding.bind(view)
+  override fun initBinding(view: View): FragmentLibNativeBinding =
+    FragmentLibNativeBinding.bind(view)
 
-    override fun getRecyclerView() = binding.list
+  override fun getRecyclerView() = binding.list
 
-    override fun init() {
-        binding.apply {
-            list.apply {
-                adapter = this@NativeAnalysisFragment.adapter
-            }
-        }
-
-        viewModel.nativeLibItems.observe(viewLifecycleOwner) {
-            if (it.isEmpty()) {
-                emptyView.text.text = getString(R.string.empty_list)
-            } else {
-                adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
-            }
-
-            if (!isListReady) {
-                viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
-                viewModel.itemsCountList[type] = it.size
-                isListReady = true
-            }
-        }
-
-        fun openLibDetailDialog(position: Int) {
-            val name = adapter.getItem(position).item.name
-            val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
-            LibDetailDialogFragment.newInstance(name, type, regexName)
-                .show(childFragmentManager, tag)
-        }
-
-        adapter.apply {
-            animationEnable = true
-            setOnItemClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemClickListener
-                }
-                openLibDetailDialog(position)
-            }
-            setOnItemLongClickListener { _, _, position ->
-                ClipboardUtils.put(requireContext(), getItem(position).item.name)
-                context.showToast(R.string.toast_copied_to_clipboard)
-                true
-            }
-            setDiffCallback(LibStringDiffUtil())
-            setEmptyView(emptyView)
-        }
-        viewModel.initSoAnalysisData(packageName)
+  override fun init() {
+    binding.apply {
+      list.apply {
+        adapter = this@NativeAnalysisFragment.adapter
+      }
     }
 
-    companion object {
-        fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
-            return NativeAnalysisFragment().putArguments(
-                EXTRA_PACKAGE_NAME to packageName,
-                EXTRA_TYPE to type
-            )
-        }
+    viewModel.nativeLibItems.observe(viewLifecycleOwner) {
+      if (it.isEmpty()) {
+        emptyView.text.text = getString(R.string.empty_list)
+      } else {
+        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
+      }
+
+      if (!isListReady) {
+        viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
+        viewModel.itemsCountList[type] = it.size
+        isListReady = true
+      }
     }
+
+    fun openLibDetailDialog(position: Int) {
+      val name = adapter.getItem(position).item.name
+      val regexName = LCAppUtils.findRuleRegex(name, type)?.regexName
+      LibDetailDialogFragment.newInstance(name, type, regexName)
+        .show(childFragmentManager, tag)
+    }
+
+    adapter.apply {
+      animationEnable = true
+      setOnItemClickListener { _, view, position ->
+        if (AntiShakeUtils.isInvalidClick(view)) {
+          return@setOnItemClickListener
+        }
+        openLibDetailDialog(position)
+      }
+      setOnItemLongClickListener { _, _, position ->
+        ClipboardUtils.put(requireContext(), getItem(position).item.name)
+        context.showToast(R.string.toast_copied_to_clipboard)
+        true
+      }
+      setDiffCallback(LibStringDiffUtil())
+      setEmptyView(emptyView)
+    }
+    viewModel.initSoAnalysisData(packageName)
+  }
+
+  companion object {
+    fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
+      return NativeAnalysisFragment().putArguments(
+        EXTRA_PACKAGE_NAME to packageName,
+        EXTRA_TYPE to type
+      )
+    }
+  }
 }
