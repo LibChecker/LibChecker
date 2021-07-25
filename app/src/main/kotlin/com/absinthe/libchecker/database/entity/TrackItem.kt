@@ -6,5 +6,5 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "track_table")
 data class TrackItem(
-    @PrimaryKey @ColumnInfo(name = "packageName") val packageName: String
+  @PrimaryKey @ColumnInfo(name = "packageName") val packageName: String
 )

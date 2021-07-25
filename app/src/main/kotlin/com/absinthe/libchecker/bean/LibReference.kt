@@ -6,8 +6,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class LibReference(
-    val libName: String,
-    val chip: LibChip?,
-    val referredCount: Int,
-    @LibType val type: Int
+  val libName: String,
+  val chip: LibChip?,
+  val referredCount: Int,
+  @LibType val type: Int
 ) : Parcelable

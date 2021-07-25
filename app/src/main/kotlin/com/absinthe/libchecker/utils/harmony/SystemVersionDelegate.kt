@@ -7,5 +7,5 @@ import ohos.system.version.SystemVersion
  */
 object SystemVersionDelegate {
 
-    fun getVersion(): String? = HarmonyOsUtil.wrapperStub { SystemVersion.getVersion() }
+  fun getVersion(): String? = HarmonyOsUtil.wrapperStub { SystemVersion.getVersion() }
 }

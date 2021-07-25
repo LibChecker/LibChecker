@@ -22,22 +22,22 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
  */
 class SnapshotDetailCountAdapter : BaseQuickAdapter<SnapshotDetailCountNode, BaseViewHolder>(0) {
 
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return BaseViewHolder(SnapshotDetailCountView(context))
+  override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return BaseViewHolder(SnapshotDetailCountView(context))
+  }
+
+  override fun convert(holder: BaseViewHolder, item: SnapshotDetailCountNode) {
+    val colorRes = when (item.status) {
+      ADDED -> R.color.material_green_200
+      REMOVED -> R.color.material_red_200
+      CHANGED -> R.color.material_yellow_200
+      MOVED -> R.color.material_blue_200
+      else -> Color.TRANSPARENT
     }
 
-    override fun convert(holder: BaseViewHolder, item: SnapshotDetailCountNode) {
-        val colorRes = when (item.status) {
-            ADDED -> R.color.material_green_200
-            REMOVED -> R.color.material_red_200
-            CHANGED -> R.color.material_yellow_200
-            MOVED -> R.color.material_blue_200
-            else -> Color.TRANSPARENT
-        }
-
-        (holder.itemView as SnapshotDetailCountView).apply {
-            text = item.count.toString()
-            backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
-        }
+    (holder.itemView as SnapshotDetailCountView).apply {
+      text = item.count.toString()
+      backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
     }
+  }
 }

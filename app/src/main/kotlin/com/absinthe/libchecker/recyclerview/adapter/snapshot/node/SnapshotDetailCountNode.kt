@@ -7,6 +7,6 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot.node
  * </pre>
  */
 data class SnapshotDetailCountNode(
-    val count: Int,
-    val status: Int
+  val count: Int,
+  val status: Int
 )

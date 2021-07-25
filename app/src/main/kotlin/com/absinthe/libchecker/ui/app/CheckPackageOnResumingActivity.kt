@@ -5,16 +5,16 @@ import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.utils.PackageUtils
 
 abstract class CheckPackageOnResumingActivity : BaseActivity() {
-    abstract fun requirePackageName(): String?
+  abstract fun requirePackageName(): String?
 
-    override fun onResume() {
-        super.onResume()
-        requirePackageName()?.let {
-            try {
-                PackageUtils.getPackageInfo(it)
-            } catch (e: PackageManager.NameNotFoundException) {
-                finish()
-            }
-        } ?: finish()
-    }
+  override fun onResume() {
+    super.onResume()
+    requirePackageName()?.let {
+      try {
+        PackageUtils.getPackageInfo(it)
+      } catch (e: PackageManager.NameNotFoundException) {
+        finish()
+      }
+    } ?: finish()
+  }
 }

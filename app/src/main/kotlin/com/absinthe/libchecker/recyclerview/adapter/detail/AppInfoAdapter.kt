@@ -15,14 +15,14 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
  */
 class AppInfoAdapter : BaseQuickAdapter<ResolveInfo, BaseViewHolder>(0) {
 
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return BaseViewHolder(AppInfoItemView(context))
-    }
+  override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return BaseViewHolder(AppInfoItemView(context))
+  }
 
-    override fun convert(holder: BaseViewHolder, item: ResolveInfo) {
-        (holder.itemView as AppInfoItemView).apply {
-            setIconBackground(LCAppUtils.getAppIcon(item.activityInfo.packageName))
-            setText(item.activityInfo.loadLabel(context.packageManager))
-        }
+  override fun convert(holder: BaseViewHolder, item: ResolveInfo) {
+    (holder.itemView as AppInfoItemView).apply {
+      setIconBackground(LCAppUtils.getAppIcon(item.activityInfo.packageName))
+      setText(item.activityInfo.loadLabel(context.packageManager))
     }
+  }
 }

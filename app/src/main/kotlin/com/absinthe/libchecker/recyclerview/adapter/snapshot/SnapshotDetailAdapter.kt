@@ -15,18 +15,18 @@ import com.chad.library.adapter.base.entity.node.BaseNode
 
 class SnapshotDetailAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeAdapter() {
 
-    init {
-        addNodeProvider(SnapshotTitleProvider(lifecycleScope))
-        addNodeProvider(SnapshotNativeProvider(lifecycleScope))
-        addNodeProvider(SnapshotComponentProvider(lifecycleScope))
-    }
+  init {
+    addNodeProvider(SnapshotTitleProvider(lifecycleScope))
+    addNodeProvider(SnapshotNativeProvider(lifecycleScope))
+    addNodeProvider(SnapshotComponentProvider(lifecycleScope))
+  }
 
-    override fun getItemType(data: List<BaseNode>, position: Int): Int {
-        return when (data[position]) {
-            is SnapshotTitleNode -> SNAPSHOT_TITLE_PROVIDER
-            is SnapshotNativeNode -> SNAPSHOT_NATIVE_PROVIDER
-            is SnapshotComponentNode -> SNAPSHOT_COMPONENT_PROVIDER
-            else -> throw IllegalArgumentException("wrong snapshot provider item type")
-        }
+  override fun getItemType(data: List<BaseNode>, position: Int): Int {
+    return when (data[position]) {
+      is SnapshotTitleNode -> SNAPSHOT_TITLE_PROVIDER
+      is SnapshotNativeNode -> SNAPSHOT_NATIVE_PROVIDER
+      is SnapshotComponentNode -> SNAPSHOT_COMPONENT_PROVIDER
+      else -> throw IllegalArgumentException("wrong snapshot provider item type")
     }
+  }
 }

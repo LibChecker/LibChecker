@@ -30,84 +30,84 @@ import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
  */
 
 class AppInfoBottomSheetDialogFragment :
-    BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
+  BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
-    private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-    private val mAdapter = AppInfoAdapter()
+  private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
+  private val mAdapter = AppInfoAdapter()
 
-    override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
-    override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
+  override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
+  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-    override fun init() {
-        root.apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
+  override fun init() {
+    root.apply {
+      layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setPadding(24.dp, 16.dp, 24.dp, 0)
+    }
+    root.launch.setOnClickListener {
+      try {
+        startLaunchAppActivity(packageName)
+      } catch (e: ActivityNotFoundException) {
+        context?.showToast(R.string.toast_cant_open_app)
+      } catch (e: NullPointerException) {
+        context?.showToast(R.string.toast_package_name_null)
+      } finally {
+        dismiss()
+      }
+    }
+    root.setting.setOnClickListener {
+      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        .setData(Uri.parse("package:$packageName"))
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      startActivity(intent)
+      dismiss()
+    }
+    root.list.apply {
+      adapter = mAdapter
+      layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
+      setHasFixedSize(true)
+    }
+
+    if (LCAppUtils.atLeastN()) {
+      mAdapter.setList(getResolveInfoList())
+      mAdapter.setOnItemClickListener { _, _, position ->
+        mAdapter.data[position].let {
+          val intent = Intent()
+            .setComponent(
+              ComponentName(it.activityInfo.packageName, it.activityInfo.name)
             )
-            setPadding(24.dp, 16.dp, 24.dp, 0)
+            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+          startActivity(intent)
         }
-        root.launch.setOnClickListener {
-            try {
-                startLaunchAppActivity(packageName)
-            } catch (e: ActivityNotFoundException) {
-                context?.showToast(R.string.toast_cant_open_app)
-            } catch (e: NullPointerException) {
-                context?.showToast(R.string.toast_package_name_null)
-            } finally {
-                dismiss()
-            }
-        }
-        root.setting.setOnClickListener {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                .setData(Uri.parse("package:$packageName"))
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(intent)
-            dismiss()
-        }
-        root.list.apply {
-            adapter = mAdapter
-            layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
-            setHasFixedSize(true)
-        }
-
-        if (LCAppUtils.atLeastN()) {
-            mAdapter.setList(getResolveInfoList())
-            mAdapter.setOnItemClickListener { _, _, position ->
-                mAdapter.data[position].let {
-                    val intent = Intent()
-                        .setComponent(
-                            ComponentName(it.activityInfo.packageName, it.activityInfo.name)
-                        )
-                        .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-                    startActivity(intent)
-                }
-                dismiss()
-            }
-        }
+        dismiss()
+      }
     }
+  }
 
-    @RequiresApi(Build.VERSION_CODES.N)
-    private fun getResolveInfoList(): List<ResolveInfo> {
-        return requireContext().packageManager.queryIntentActivities(
-            Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
-        ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
-    }
+  @RequiresApi(Build.VERSION_CODES.N)
+  private fun getResolveInfoList(): List<ResolveInfo> {
+    return requireContext().packageManager.queryIntentActivities(
+      Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
+    ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
+  }
 
-    private fun startLaunchAppActivity(packageName: String?) {
-        if (packageName == null) {
-            return
-        }
-        val launcherActivity: String
-        val intent = Intent(Intent.ACTION_MAIN, null)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-            .setPackage(packageName)
-        val pm = requireActivity().packageManager
-        val info = pm.queryIntentActivities(intent, 0)
-        launcherActivity = if (info.size == 0) "" else info[0].activityInfo.name
-        val launchIntent = Intent(Intent.ACTION_MAIN)
-            .addCategory(Intent.CATEGORY_LAUNCHER)
-            .setClassName(packageName, launcherActivity)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        startActivity(launchIntent)
+  private fun startLaunchAppActivity(packageName: String?) {
+    if (packageName == null) {
+      return
     }
+    val launcherActivity: String
+    val intent = Intent(Intent.ACTION_MAIN, null)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setPackage(packageName)
+    val pm = requireActivity().packageManager
+    val info = pm.queryIntentActivities(intent, 0)
+    launcherActivity = if (info.size == 0) "" else info[0].activityInfo.name
+    val launchIntent = Intent(Intent.ACTION_MAIN)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setClassName(packageName, launcherActivity)
+      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    startActivity(launchIntent)
+  }
 }

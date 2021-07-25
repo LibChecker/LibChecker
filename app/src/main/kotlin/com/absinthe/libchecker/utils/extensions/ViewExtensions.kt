@@ -24,104 +24,104 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
 fun View.setLongClickCopiedToClipboard(text: String) {
-    setOnLongClickListener {
-        ClipboardUtils.put(context, text)
-        context.showToast(R.string.toast_copied_to_clipboard)
-        true
-    }
+  setOnLongClickListener {
+    ClipboardUtils.put(context, text)
+    context.showToast(R.string.toast_copied_to_clipboard)
+    true
+  }
 }
 
 val Number.dp: Int get() = (toInt() * Resources.getSystem().displayMetrics.density).toInt()
 
 var View.paddingStartCompat: Int
-    set(value) {
-        setPadding(value, paddingTop, paddingEnd, paddingBottom)
-    }
-    get() = paddingStart
+  set(value) {
+    setPadding(value, paddingTop, paddingEnd, paddingBottom)
+  }
+  get() = paddingStart
 
 fun View.addPaddingStart(padding: Int) {
-    addPaddingStart(padding)
+  addPaddingStart(padding)
 }
 
 var View.paddingTopCompat: Int
-    set(value) {
-        setPadding(paddingStart, value, paddingEnd, paddingBottom)
-    }
-    get() = paddingTop
+  set(value) {
+    setPadding(paddingStart, value, paddingEnd, paddingBottom)
+  }
+  get() = paddingTop
 
 fun View.addPaddingTop(padding: Int) {
-    addPaddingTop(padding)
+  addPaddingTop(padding)
 }
 
 var View.paddingEndCompat: Int
-    set(value) {
-        setPadding(paddingStart, paddingTop, value, paddingBottom)
-    }
-    get() = paddingEnd
+  set(value) {
+    setPadding(paddingStart, paddingTop, value, paddingBottom)
+  }
+  get() = paddingEnd
 
 fun View.addPaddingEnd(padding: Int) {
-    addPaddingEnd(padding)
+  addPaddingEnd(padding)
 }
 
 var View.paddingBottomCompat: Int
-    set(value) {
-        setPadding(paddingStart, paddingTop, paddingEnd, value)
-    }
-    get() = paddingBottom
+  set(value) {
+    setPadding(paddingStart, paddingTop, paddingEnd, value)
+  }
+  get() = paddingBottom
 
 fun View.addPaddingBottom(padding: Int) {
-    addPaddingBottom(padding)
+  addPaddingBottom(padding)
 }
 
 fun ViewGroup.setSystemPadding() {
-    val isOrientationLandscape = context.isOrientationLandscape
-    fitsSystemWindows = isOrientationLandscape
-    setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
+  val isOrientationLandscape = context.isOrientationLandscape
+  fitsSystemWindows = isOrientationLandscape
+  setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
 }
 
 fun TextView.tintHighlightText(highlightText: String, rawText: String) {
-    text = rawText
-    if (text.contains(highlightText, true)) {
-        val builder = SpannableStringBuilder()
-        val spannableString = SpannableString(text.toString())
-        val start = text.indexOf(highlightText, 0, true)
-        spannableString.setSpan(
-            ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
-            start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-        builder.append(spannableString)
-        text = builder
-    }
+  text = rawText
+  if (text.contains(highlightText, true)) {
+    val builder = SpannableStringBuilder()
+    val spannableString = SpannableString(text.toString())
+    val start = text.indexOf(highlightText, 0, true)
+    spannableString.setSpan(
+      ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+      start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+    )
+    builder.append(spannableString)
+    text = builder
+  }
 }
 
 fun ViewPager2.setCurrentItem(
-    item: Int,
-    duration: Long,
-    interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
-    pagePxWidth: Int = width
+  item: Int,
+  duration: Long,
+  interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
+  pagePxWidth: Int = width
 ) {
-    val pxToDrag: Int = pagePxWidth * (item - currentItem)
-    val animator = ValueAnimator.ofInt(0, pxToDrag)
-    var previousValue = 0
-    animator.addUpdateListener { valueAnimator ->
-        val currentValue = valueAnimator.animatedValue as Int
-        val currentPxToDrag = (currentValue - previousValue).toFloat()
-        fakeDragBy(-currentPxToDrag)
-        previousValue = currentValue
+  val pxToDrag: Int = pagePxWidth * (item - currentItem)
+  val animator = ValueAnimator.ofInt(0, pxToDrag)
+  var previousValue = 0
+  animator.addUpdateListener { valueAnimator ->
+    val currentValue = valueAnimator.animatedValue as Int
+    val currentPxToDrag = (currentValue - previousValue).toFloat()
+    fakeDragBy(-currentPxToDrag)
+    previousValue = currentValue
+  }
+  animator.addListener(object : Animator.AnimatorListener {
+    override fun onAnimationStart(animation: Animator?) {
+      beginFakeDrag()
     }
-    animator.addListener(object : Animator.AnimatorListener {
-        override fun onAnimationStart(animation: Animator?) {
-            beginFakeDrag()
-        }
 
-        override fun onAnimationEnd(animation: Animator?) {
-            endFakeDrag()
-        }
+    override fun onAnimationEnd(animation: Animator?) {
+      endFakeDrag()
+    }
 
-        override fun onAnimationCancel(animation: Animator?) {}
-        override fun onAnimationRepeat(animation: Animator?) {}
-    })
-    animator.interpolator = interpolator
-    animator.duration = duration
-    animator.start()
+    override fun onAnimationCancel(animation: Animator?) {}
+    override fun onAnimationRepeat(animation: Animator?) {}
+  })
+  animator.interpolator = interpolator
+  animator.duration = duration
+  animator.start()
 }

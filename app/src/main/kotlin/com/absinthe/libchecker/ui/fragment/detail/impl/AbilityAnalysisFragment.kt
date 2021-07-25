@@ -24,102 +24,102 @@ import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
-    R.layout.fragment_lib_component
+  R.layout.fragment_lib_component
 ) {
 
-    override fun initBinding(view: View): FragmentLibComponentBinding =
-        FragmentLibComponentBinding.bind(view)
+  override fun initBinding(view: View): FragmentLibComponentBinding =
+    FragmentLibComponentBinding.bind(view)
 
-    override fun getRecyclerView() = binding.list
+  override fun getRecyclerView() = binding.list
 
-    override fun init() {
-        binding.apply {
-            list.apply {
-                adapter = this@AbilityAnalysisFragment.adapter
+  override fun init() {
+    binding.apply {
+      list.apply {
+        adapter = this@AbilityAnalysisFragment.adapter
+      }
+    }
+
+    viewModel.apply {
+      abilitiesMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
+        if (componentList.isEmpty()) {
+          emptyView.text.text = getString(R.string.empty_list)
+        } else {
+          lifecycleScope.launch(Dispatchers.IO) {
+            val list = mutableListOf<LibStringItemChip>()
+
+            for (item in componentList) {
+              list += if (item.enabled) {
+                LibStringItemChip(LibStringItem(item.componentName), null)
+              } else {
+                LibStringItemChip(
+                  LibStringItem(
+                    name = item.componentName,
+                    source = DISABLED
+                  ),
+                  null
+                )
+              }
             }
-        }
 
-        viewModel.apply {
-            abilitiesMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
-                if (componentList.isEmpty()) {
-                    emptyView.text.text = getString(R.string.empty_list)
-                } else {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val list = mutableListOf<LibStringItemChip>()
-
-                        for (item in componentList) {
-                            list += if (item.enabled) {
-                                LibStringItemChip(LibStringItem(item.componentName), null)
-                            } else {
-                                LibStringItemChip(
-                                    LibStringItem(
-                                        name = item.componentName,
-                                        source = DISABLED
-                                    ),
-                                    null
-                                )
-                            }
-                        }
-
-                        if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortByDescending { it.chip != null }
-                        } else {
-                            adapter.data.sortedByDescending { it.item.name }
-                        }
-
-                        withContext(Dispatchers.Main) {
-                            binding.list.addItemDecoration(
-                                DividerItemDecoration(
-                                    requireContext(), DividerItemDecoration.VERTICAL
-                                )
-                            )
-                            adapter.setDiffNewData(list, navigateToComponentTask)
-                        }
-                    }
-                }
-                if (!isListReady) {
-                    viewModel.itemsCountLiveData.value =
-                        LocatedCount(locate = type, count = componentList.size)
-                    viewModel.itemsCountList[type] = componentList.size
-                    isListReady = true
-                }
+            if (sortMode == MODE_SORT_BY_LIB) {
+              list.sortByDescending { it.chip != null }
+            } else {
+              adapter.data.sortedByDescending { it.item.name }
             }
+
+            withContext(Dispatchers.Main) {
+              binding.list.addItemDecoration(
+                DividerItemDecoration(
+                  requireContext(), DividerItemDecoration.VERTICAL
+                )
+              )
+              adapter.setDiffNewData(list, navigateToComponentTask)
+            }
+          }
         }
-
-        fun openLibDetailDialog(position: Int) {
-            val name = adapter.getItem(position).item.name
-            val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
-
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-                .show(childFragmentManager, tag)
+        if (!isListReady) {
+          viewModel.itemsCountLiveData.value =
+            LocatedCount(locate = type, count = componentList.size)
+          viewModel.itemsCountList[type] = componentList.size
+          isListReady = true
         }
+      }
+    }
 
-        adapter.apply {
+    fun openLibDetailDialog(position: Int) {
+      val name = adapter.getItem(position).item.name
+      val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
+
+      LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+        .show(childFragmentManager, tag)
+    }
+
+    adapter.apply {
 //            setOnItemClickListener { _, view, position ->
 //                if (AntiShakeUtils.isInvalidClick(view)) {
 //                    return@setOnItemClickListener
 //                }
 //                openLibDetailDialog(position)
 //            }
-            setOnItemLongClickListener { _, _, position ->
-                doOnLongClick(getItem(position).item.name)
-                true
-            }
-            setDiffCallback(LibStringDiffUtil())
-            setEmptyView(emptyView)
-        }
+      setOnItemLongClickListener { _, _, position ->
+        doOnLongClick(getItem(position).item.name)
+        true
+      }
+      setDiffCallback(LibStringDiffUtil())
+      setEmptyView(emptyView)
     }
+  }
 
-    private fun doOnLongClick(componentName: String) {
-        ClipboardUtils.put(requireContext(), componentName)
-        context?.showToast(R.string.toast_copied_to_clipboard)
-    }
+  private fun doOnLongClick(componentName: String) {
+    ClipboardUtils.put(requireContext(), componentName)
+    context?.showToast(R.string.toast_copied_to_clipboard)
+  }
 
-    companion object {
-        fun newInstance(@LibType type: Int): AbilityAnalysisFragment {
-            return AbilityAnalysisFragment().putArguments(
-                EXTRA_TYPE to type
-            )
-        }
+  companion object {
+    fun newInstance(@LibType type: Int): AbilityAnalysisFragment {
+      return AbilityAnalysisFragment().putArguments(
+        EXTRA_TYPE to type
+      )
     }
+  }
 }

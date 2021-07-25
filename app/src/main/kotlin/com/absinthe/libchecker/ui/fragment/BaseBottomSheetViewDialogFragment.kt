@@ -16,105 +16,105 @@ import com.google.android.material.shape.ShapeAppearanceModel
 
 abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
 
-    private var _root: T? = null
-    private var isHandlerActivated = false
-    private val behavior by unsafeLazy { BottomSheetBehavior.from(root.parent as View) }
-    private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            when (newState) {
-                BottomSheetBehavior.STATE_DRAGGING -> {
-                    if (!isHandlerActivated) {
-                        isHandlerActivated = true
-                        getHeaderView().onHandlerActivated(true)
-                    }
-                }
-                BottomSheetBehavior.STATE_COLLAPSED -> {
-                    if (isHandlerActivated) {
-                        isHandlerActivated = false
-                        getHeaderView().onHandlerActivated(false)
-                    }
-                }
-                BottomSheetBehavior.STATE_EXPANDED -> {
-                    if (isHandlerActivated) {
-                        isHandlerActivated = false
-                        getHeaderView().onHandlerActivated(false)
-                    }
-                    bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
-                }
-                else -> {
-                }
-            }
+  private var _root: T? = null
+  private var isHandlerActivated = false
+  private val behavior by unsafeLazy { BottomSheetBehavior.from(root.parent as View) }
+  private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+    override fun onStateChanged(bottomSheet: View, newState: Int) {
+      when (newState) {
+        BottomSheetBehavior.STATE_DRAGGING -> {
+          if (!isHandlerActivated) {
+            isHandlerActivated = true
+            getHeaderView().onHandlerActivated(true)
+          }
         }
-
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {}
-    }
-
-    val root get() = _root!!
-
-    abstract fun initRootView(): T
-    abstract fun init()
-    abstract fun getHeaderView(): BottomSheetHeaderView
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _root = initRootView()
-        init()
-        return _root
-    }
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.let {
-            it.attributes?.windowAnimations = R.style.DialogAnimation
-            it.decorView.rootView.fitsSystemWindows = false
-            it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows =
-                false
-            UiUtils.setSystemBarStyle(it)
+        BottomSheetBehavior.STATE_COLLAPSED -> {
+          if (isHandlerActivated) {
+            isHandlerActivated = false
+            getHeaderView().onHandlerActivated(false)
+          }
         }
-        behavior.addBottomSheetCallback(bottomSheetCallback)
-
-        if (requireActivity().window.decorView.measuredHeight < 1200) {
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        BottomSheetBehavior.STATE_EXPANDED -> {
+          if (isHandlerActivated) {
+            isHandlerActivated = false
+            getHeaderView().onHandlerActivated(false)
+          }
+          bottomSheet.background = createMaterialShapeDrawable(bottomSheet)
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        behavior.removeBottomSheetCallback(bottomSheetCallback)
-    }
-
-    override fun onDestroyView() {
-        _root = null
-        super.onDestroyView()
-    }
-
-    override fun show(manager: FragmentManager, tag: String?) {
-        try {
-            super.show(manager, tag)
-        } catch (ignore: IllegalStateException) {
+        else -> {
         }
+      }
     }
 
-    private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
-        // Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
-        val shapeAppearanceModel =
-            ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
-                .build()
+    override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+  }
 
-        // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
-        val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
-        val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+  val root get() = _root!!
 
-        // Copy the attributes in the new MaterialShapeDrawable
-        newMaterialShapeDrawable.initializeElevationOverlay(context)
-        newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
-        newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList
-        newMaterialShapeDrawable.elevation = currentMaterialShapeDrawable.elevation
-        newMaterialShapeDrawable.strokeWidth = currentMaterialShapeDrawable.strokeWidth
-        newMaterialShapeDrawable.strokeColor = currentMaterialShapeDrawable.strokeColor
-        return newMaterialShapeDrawable
+  abstract fun initRootView(): T
+  abstract fun init()
+  abstract fun getHeaderView(): BottomSheetHeaderView
+
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View? {
+    _root = initRootView()
+    init()
+    return _root
+  }
+
+  override fun onStart() {
+    super.onStart()
+    dialog?.window?.let {
+      it.attributes?.windowAnimations = R.style.DialogAnimation
+      it.decorView.rootView.fitsSystemWindows = false
+      it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows =
+        false
+      UiUtils.setSystemBarStyle(it)
     }
+    behavior.addBottomSheetCallback(bottomSheetCallback)
+
+    if (requireActivity().window.decorView.measuredHeight < 1200) {
+      behavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+  }
+
+  override fun onStop() {
+    super.onStop()
+    behavior.removeBottomSheetCallback(bottomSheetCallback)
+  }
+
+  override fun onDestroyView() {
+    _root = null
+    super.onDestroyView()
+  }
+
+  override fun show(manager: FragmentManager, tag: String?) {
+    try {
+      super.show(manager, tag)
+    } catch (ignore: IllegalStateException) {
+    }
+  }
+
+  private fun createMaterialShapeDrawable(bottomSheet: View): MaterialShapeDrawable {
+    // Create a ShapeAppearanceModel with the same shapeAppearanceOverlay used in the style
+    val shapeAppearanceModel =
+      ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
+        .build()
+
+    // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
+    val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
+    val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+
+    // Copy the attributes in the new MaterialShapeDrawable
+    newMaterialShapeDrawable.initializeElevationOverlay(context)
+    newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
+    newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList
+    newMaterialShapeDrawable.elevation = currentMaterialShapeDrawable.elevation
+    newMaterialShapeDrawable.strokeWidth = currentMaterialShapeDrawable.strokeWidth
+    newMaterialShapeDrawable.strokeColor = currentMaterialShapeDrawable.strokeColor
+    return newMaterialShapeDrawable
+  }
 }

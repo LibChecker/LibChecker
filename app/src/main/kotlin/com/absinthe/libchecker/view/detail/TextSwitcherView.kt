@@ -20,27 +20,27 @@ import com.absinthe.libchecker.R
  */
 class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
 
-    constructor(context: Context?) : super(context, null)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        init()
-    }
+  constructor(context: Context?) : super(context, null)
+  constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+    init()
+  }
 
-    private fun init() {
-        setFactory(this)
-        this.setInAnimation(context, R.anim.anim_text_switcher_in)
-        this.setOutAnimation(context, R.anim.anim_text_switcher_out)
-    }
+  private fun init() {
+    setFactory(this)
+    this.setInAnimation(context, R.anim.anim_text_switcher_in)
+    this.setOutAnimation(context, R.anim.anim_text_switcher_out)
+  }
 
-    override fun makeView(): View {
-        return TextView(context).apply {
-            layoutParams = LayoutParams(
-                LayoutParams.MATCH_PARENT,
-                LayoutParams.MATCH_PARENT
-            )
-            gravity = Gravity.START or Gravity.CENTER
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-            setTypeface(null, Typeface.BOLD)
-            setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-        }
+  override fun makeView(): View {
+    return TextView(context).apply {
+      layoutParams = LayoutParams(
+        LayoutParams.MATCH_PARENT,
+        LayoutParams.MATCH_PARENT
+      )
+      gravity = Gravity.START or Gravity.CENTER
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+      setTypeface(null, Typeface.BOLD)
+      setTextColor(ContextCompat.getColor(context, R.color.textNormal))
     }
+  }
 }

@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DetailExtraBean(
-    val isSplitApk: Boolean,
-    val isKotlinUsed: Boolean,
-    val variant: Short
+  val isSplitApk: Boolean,
+  val isKotlinUsed: Boolean,
+  val variant: Short
 ) : Parcelable

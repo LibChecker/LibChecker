@@ -15,28 +15,28 @@ import java.util.Locale
 
 class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
 
-    private val gson by lazy { Gson() }
+  private val gson by lazy { Gson() }
 
-    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return BaseViewHolder(TimeNodeItemView(context))
-    }
+  override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+    return BaseViewHolder(TimeNodeItemView(context))
+  }
 
-    override fun convert(holder: BaseViewHolder, item: TimeStampItem) {
-        (holder.itemView as TimeNodeItemView).apply {
-            name.text = getFormatDateString(item.timestamp)
-            try {
-                val list: List<String>? =
-                    gson.fromJson(item.topApps, object : TypeToken<List<String>?>() {}.type)
-                adapter.setList(list)
-            } catch (e: JsonSyntaxException) {
-                Timber.e(e)
-            }
-        }
+  override fun convert(holder: BaseViewHolder, item: TimeStampItem) {
+    (holder.itemView as TimeNodeItemView).apply {
+      name.text = getFormatDateString(item.timestamp)
+      try {
+        val list: List<String>? =
+          gson.fromJson(item.topApps, object : TypeToken<List<String>?>() {}.type)
+        adapter.setList(list)
+      } catch (e: JsonSyntaxException) {
+        Timber.e(e)
+      }
     }
+  }
 
-    fun getFormatDateString(timestamp: Long): String {
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
-        val date = Date(timestamp)
-        return simpleDateFormat.format(date)
-    }
+  fun getFormatDateString(timestamp: Long): String {
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+    val date = Date(timestamp)
+    return simpleDateFormat.format(date)
+  }
 }

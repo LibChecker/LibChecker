@@ -34,182 +34,182 @@ import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 class ComponentsAnalysisFragment :
-    BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+  BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
 
-    private val hasIntegration by lazy {
-        !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
-    }
-    private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
+  private val hasIntegration by lazy {
+    !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
+  }
+  private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
-    override fun initBinding(view: View): FragmentLibComponentBinding =
-        FragmentLibComponentBinding.bind(view)
+  override fun initBinding(view: View): FragmentLibComponentBinding =
+    FragmentLibComponentBinding.bind(view)
 
-    override fun getRecyclerView() = binding.list
+  override fun getRecyclerView() = binding.list
 
-    override fun init() {
-        binding.apply {
-            list.apply {
-                adapter = this@ComponentsAnalysisFragment.adapter
-            }
-        }
-
-        viewModel.apply {
-            componentsMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
-                if (componentList.isEmpty()) {
-                    emptyView.text.text = getString(R.string.empty_list)
-                } else {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        val list = mutableListOf<LibStringItemChip>()
-                        var chip: LibChip?
-                        var rule: RuleEntity?
-
-                        for (item in componentList) {
-                            rule = LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
-                            chip = null
-                            if (rule != null) {
-                                chip = LibChip(
-                                    iconRes = IconResMap.getIconRes(rule.iconIndex),
-                                    name = rule.label,
-                                    regexName = rule.regexName
-                                )
-                            }
-                            list += if (item.enabled) {
-                                LibStringItemChip(LibStringItem(item.componentName), chip)
-                            } else {
-                                LibStringItemChip(
-                                    LibStringItem(
-                                        name = item.componentName,
-                                        source = DISABLED
-                                    ),
-                                    chip
-                                )
-                            }
-                        }
-
-                        if (sortMode == MODE_SORT_BY_LIB) {
-                            list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
-                        } else {
-                            list.sortBy { it.item.name }
-                        }
-
-                        withContext(Dispatchers.Main) {
-                            binding.list.addItemDecoration(
-                                DividerItemDecoration(
-                                    requireContext(),
-                                    DividerItemDecoration.VERTICAL
-                                )
-                            )
-                            adapter.setDiffNewData(list, navigateToComponentTask)
-                        }
-                    }
-                }
-                if (!isListReady) {
-                    viewModel.itemsCountLiveData.value =
-                        LocatedCount(locate = type, count = componentList.size)
-                    viewModel.itemsCountList[type] = componentList.size
-                    isListReady = true
-                }
-            }
-        }
-
-        fun openLibDetailDialog(position: Int) {
-            val name = adapter.getItem(position).item.name
-            val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
-
-            LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-                .show(childFragmentManager, tag)
-        }
-
-        adapter.apply {
-            setOnItemClickListener { _, view, position ->
-                if (AntiShakeUtils.isInvalidClick(view)) {
-                    return@setOnItemClickListener
-                }
-                openLibDetailDialog(position)
-            }
-            setOnItemLongClickListener { _, _, position ->
-                doOnLongClick(getItem(position).item.name)
-                true
-            }
-            setDiffCallback(LibStringDiffUtil())
-            setEmptyView(emptyView)
-        }
+  override fun init() {
+    binding.apply {
+      list.apply {
+        adapter = this@ComponentsAnalysisFragment.adapter
+      }
     }
 
-    private fun doOnLongClick(componentName: String) {
-        if (hasIntegration) {
-            val arrayAdapter =
-                ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
-            arrayAdapter.add(getString(android.R.string.copy))
+    viewModel.apply {
+      componentsMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
+        if (componentList.isEmpty()) {
+          emptyView.text.text = getString(R.string.empty_list)
+        } else {
+          lifecycleScope.launch(Dispatchers.IO) {
+            val list = mutableListOf<LibStringItemChip>()
+            var chip: LibChip?
+            var rule: RuleEntity?
 
-            // MonkeyKing Purify
-            if (integrationMonkeyKingBlockList == null) {
-                integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(
+            for (item in componentList) {
+              rule = LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
+              chip = null
+              if (rule != null) {
+                chip = LibChip(
+                  iconRes = IconResMap.getIconRes(rule.iconIndex),
+                  name = rule.label,
+                  regexName = rule.regexName
+                )
+              }
+              list += if (item.enabled) {
+                LibStringItemChip(LibStringItem(item.componentName), chip)
+              } else {
+                LibStringItemChip(
+                  LibStringItem(
+                    name = item.componentName,
+                    source = DISABLED
+                  ),
+                  chip
+                )
+              }
+            }
+
+            if (sortMode == MODE_SORT_BY_LIB) {
+              list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
+            } else {
+              list.sortBy { it.item.name }
+            }
+
+            withContext(Dispatchers.Main) {
+              binding.list.addItemDecoration(
+                DividerItemDecoration(
+                  requireContext(),
+                  DividerItemDecoration.VERTICAL
+                )
+              )
+              adapter.setDiffNewData(list, navigateToComponentTask)
+            }
+          }
+        }
+        if (!isListReady) {
+          viewModel.itemsCountLiveData.value =
+            LocatedCount(locate = type, count = componentList.size)
+          viewModel.itemsCountList[type] = componentList.size
+          isListReady = true
+        }
+      }
+    }
+
+    fun openLibDetailDialog(position: Int) {
+      val name = adapter.getItem(position).item.name
+      val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
+
+      LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+        .show(childFragmentManager, tag)
+    }
+
+    adapter.apply {
+      setOnItemClickListener { _, view, position ->
+        if (AntiShakeUtils.isInvalidClick(view)) {
+          return@setOnItemClickListener
+        }
+        openLibDetailDialog(position)
+      }
+      setOnItemLongClickListener { _, _, position ->
+        doOnLongClick(getItem(position).item.name)
+        true
+      }
+      setDiffCallback(LibStringDiffUtil())
+      setEmptyView(emptyView)
+    }
+  }
+
+  private fun doOnLongClick(componentName: String) {
+    if (hasIntegration) {
+      val arrayAdapter =
+        ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
+      arrayAdapter.add(getString(android.R.string.copy))
+
+      // MonkeyKing Purify
+      if (integrationMonkeyKingBlockList == null) {
+        integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(
+          requireContext(),
+          viewModel.packageName
+        )
+      }
+      val monkeyKingShouldBlock =
+        integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
+      if (MonkeyKingManager.isSupportInteraction) {
+        if (monkeyKingShouldBlock) {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
+        } else {
+          arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+        }
+      }
+      // Anywhere-
+      if (AnywhereManager.isSupportInteraction && type == ACTIVITY) {
+        arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
+      }
+
+      AlertDialog.Builder(requireContext())
+        .setAdapter(arrayAdapter) { _, which ->
+          when (which) {
+            0 -> {
+              ClipboardUtils.put(requireContext(), componentName)
+              context?.showToast(R.string.toast_copied_to_clipboard)
+            }
+            1 -> {
+              if (MonkeyKingManager.isSupportInteraction) {
+                MonkeyKingManager().apply {
+                  addBlockedComponent(
+                    requireContext(),
+                    viewModel.packageName,
+                    componentName,
+                    type,
+                    monkeyKingShouldBlock
+                  )
+                  integrationMonkeyKingBlockList = queryBlockedComponent(
                     requireContext(),
                     viewModel.packageName
-                )
-            }
-            val monkeyKingShouldBlock =
-                integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
-            if (MonkeyKingManager.isSupportInteraction) {
-                if (monkeyKingShouldBlock) {
-                    arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
-                } else {
-                    arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
+                  )
                 }
+              }
             }
-            // Anywhere-
-            if (AnywhereManager.isSupportInteraction && type == ACTIVITY) {
-                arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
+            2 -> {
+              AnywhereManager().launchActivityEditor(
+                requireActivity(),
+                viewModel.packageName,
+                componentName
+              )
             }
-
-            AlertDialog.Builder(requireContext())
-                .setAdapter(arrayAdapter) { _, which ->
-                    when (which) {
-                        0 -> {
-                            ClipboardUtils.put(requireContext(), componentName)
-                            context?.showToast(R.string.toast_copied_to_clipboard)
-                        }
-                        1 -> {
-                            if (MonkeyKingManager.isSupportInteraction) {
-                                MonkeyKingManager().apply {
-                                    addBlockedComponent(
-                                        requireContext(),
-                                        viewModel.packageName,
-                                        componentName,
-                                        type,
-                                        monkeyKingShouldBlock
-                                    )
-                                    integrationMonkeyKingBlockList = queryBlockedComponent(
-                                        requireContext(),
-                                        viewModel.packageName
-                                    )
-                                }
-                            }
-                        }
-                        2 -> {
-                            AnywhereManager().launchActivityEditor(
-                                requireActivity(),
-                                viewModel.packageName,
-                                componentName
-                            )
-                        }
-                        else -> { /*Do nothing*/
-                        }
-                    }
-                }
-                .show()
-        } else {
-            ClipboardUtils.put(requireContext(), componentName)
-            context?.showToast(R.string.toast_copied_to_clipboard)
+            else -> { /*Do nothing*/
+            }
+          }
         }
+        .show()
+    } else {
+      ClipboardUtils.put(requireContext(), componentName)
+      context?.showToast(R.string.toast_copied_to_clipboard)
     }
+  }
 
-    companion object {
-        fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
-            return ComponentsAnalysisFragment().putArguments(
-                EXTRA_TYPE to type
-            )
-        }
+  companion object {
+    fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
+      return ComponentsAnalysisFragment().putArguments(
+        EXTRA_TYPE to type
+      )
     }
+  }
 }

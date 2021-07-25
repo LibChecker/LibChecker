@@ -9,5 +9,5 @@ import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
  * </pre>
  */
 interface IDetailContainer {
-    var detailFragmentManager: DetailFragmentManager
+  var detailFragmentManager: DetailFragmentManager
 }
