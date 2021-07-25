@@ -23,10 +23,9 @@ class AnywhereManager {
         }
         try {
             context.startActivity(
-                Intent(ACTION_EDITOR).apply {
-                    putExtra(EXTRA_PACKAGE_NAME, packageName)
-                    putExtra(EXTRA_CLASS_NAME, fullClassName)
-                }
+                Intent(ACTION_EDITOR)
+                    .putExtra(EXTRA_PACKAGE_NAME, packageName)
+                    .putExtra(EXTRA_CLASS_NAME, fullClassName)
             )
         } catch (e: ActivityNotFoundException) {
             Timber.e(e)

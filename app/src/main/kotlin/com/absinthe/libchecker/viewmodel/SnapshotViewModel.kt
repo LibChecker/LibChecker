@@ -569,10 +569,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                             it.name,
                             it.name,
                             "${sizeToString(context, it.size)} $ARROW ${
-                            sizeToString(
-                                context,
-                                item.size
-                            )
+                            sizeToString(context, item.size)
                             }",
                             CHANGED,
                             NATIVE

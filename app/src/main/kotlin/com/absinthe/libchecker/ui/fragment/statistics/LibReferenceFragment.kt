@@ -111,11 +111,10 @@ class LibReferenceFragment :
                     return@setOnItemClickListener
                 }
 
-                val intent = Intent(requireContext(), LibReferenceActivity::class.java).apply {
-                    val item = this@LibReferenceFragment.adapter.data[position]
-                    putExtra(EXTRA_REF_NAME, item.libName)
-                    putExtra(EXTRA_REF_TYPE, item.type)
-                }
+                val item = this@LibReferenceFragment.adapter.data[position]
+                val intent = Intent(requireContext(), LibReferenceActivity::class.java)
+                    .putExtra(EXTRA_REF_NAME, item.libName)
+                    .putExtra(EXTRA_REF_TYPE, item.type)
                 startActivity(intent)
             }
             setOnItemChildClickListener { _, view, position ->

@@ -195,11 +195,7 @@ class ComparisonActivity : BaseActivity() {
                 }
 
                 val intent = Intent(this@ComparisonActivity, SnapshotDetailActivity::class.java)
-                    .putExtras(
-                        bundleOf(
-                            EXTRA_ENTITY to getItem(position)
-                        )
-                    )
+                    .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
 
                 startActivity(intent)
             }
