@@ -33,6 +33,7 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import rikka.material.app.AppBar
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
@@ -317,13 +318,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     // Do nothing
   }
 
-  override fun getAppBar() = (activity as MainActivity?)?.appBar
+  override fun getAppBar(): AppBar? = (activity as MainActivity?)?.appBar
 
-  override fun getBorderViewDelegate() = borderViewDelegate
+  override fun getBorderViewDelegate(): BorderViewDelegate = borderViewDelegate
 
   override fun scheduleAppbarRaisingStatus() {
     getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
   }
 
-  override fun isAllowRefreshing() = true
+  override fun isAllowRefreshing(): Boolean = true
 }
