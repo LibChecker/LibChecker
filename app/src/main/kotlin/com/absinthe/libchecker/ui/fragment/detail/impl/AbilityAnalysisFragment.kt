@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
@@ -23,12 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
-  R.layout.fragment_lib_component
-) {
-
-  override fun initBinding(view: View): FragmentLibComponentBinding =
-    FragmentLibComponentBinding.bind(view)
+class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
 

@@ -11,7 +11,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
@@ -59,9 +58,7 @@ import rikka.widget.borderview.BorderView
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
-  R.layout.fragment_snapshot
-) {
+class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   private val viewModel by activityViewModels<SnapshotViewModel>()
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
@@ -102,9 +99,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
       shootBinder = null
     }
   }
-
-  override fun initBinding(view: View): FragmentSnapshotBinding =
-    FragmentSnapshotBinding.bind(view)
 
   override fun init() {
     setHasOptionsMenu(true)

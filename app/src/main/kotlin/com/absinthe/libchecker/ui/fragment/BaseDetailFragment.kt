@@ -39,9 +39,7 @@ import timber.log.Timber
 
 const val EXTRA_TYPE = "EXTRA_TYPE"
 
-abstract class BaseDetailFragment<T : ViewBinding>(layoutId: Int) :
-  BaseFragment<T>(layoutId),
-  Sortable {
+abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable {
 
   protected val viewModel by activityViewModels<DetailViewModel>()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }

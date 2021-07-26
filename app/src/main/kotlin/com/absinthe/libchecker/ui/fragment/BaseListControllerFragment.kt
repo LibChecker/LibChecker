@@ -9,8 +9,7 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import rikka.material.app.AppBar
 import rikka.widget.borderview.BorderViewDelegate
 
-abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) :
-  BaseFragment<T>(layoutId), IListController {
+abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController {
 
   protected var borderDelegate: BorderViewDelegate? = null
   protected val homeViewModel by activityViewModels<HomeViewModel>()
