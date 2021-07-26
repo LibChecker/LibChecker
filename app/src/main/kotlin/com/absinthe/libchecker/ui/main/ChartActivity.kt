@@ -8,13 +8,7 @@ import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.databinding.ActivityChartBinding
 import com.absinthe.libchecker.ui.fragment.statistics.ChartFragment
 
-class ChartActivity : BaseActivity() {
-  private lateinit var binding: ActivityChartBinding
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityChartBinding.inflate(layoutInflater)
-    return binding.root
-  }
+class ChartActivity : BaseActivity<ActivityChartBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

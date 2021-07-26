@@ -1,8 +1,12 @@
 package com.absinthe.libchecker.utils.extensions
 
 import android.annotation.SuppressLint
+import android.view.LayoutInflater
 import androidx.appcompat.widget.TintTypedArray
+import androidx.lifecycle.LifecycleOwner
+import androidx.viewbinding.ViewBinding
 import java.io.Closeable
+import java.lang.reflect.ParameterizedType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -10,6 +14,15 @@ import kotlin.comparisons.reversed as kotlinReversed
 import kotlin.io.use as kotlinUse
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
+
+@Suppress("UNCHECKED_CAST")
+fun <T : ViewBinding> LifecycleOwner.inflateBinding(inflater: LayoutInflater): T {
+  return (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
+    .filterIsInstance<Class<T>>()
+    .first()
+    .getDeclaredMethod("inflate", LayoutInflater::class.java)
+    .invoke(null, inflater) as T
+}
 
 /**
  * [issue](https://youtrack.jetbrains.com/issue/KT-35216)

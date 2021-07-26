@@ -28,14 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class BackupActivity : BaseActivity() {
-
-  private lateinit var binding: ActivityBackupBinding
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityBackupBinding.inflate(layoutInflater)
-    return binding.root
-  }
+class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -144,7 +137,7 @@ class BackupActivity : BaseActivity() {
 
       recyclerView.borderViewDelegate.borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-          (activity as BaseActivity?)?.appBar?.setRaised(!top)
+          (activity as? BaseActivity<*>)?.appBar?.setRaised(!top)
         }
       return recyclerView
     }

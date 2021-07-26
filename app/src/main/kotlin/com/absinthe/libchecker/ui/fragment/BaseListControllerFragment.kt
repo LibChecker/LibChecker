@@ -39,7 +39,7 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) :
     }
   }
 
-  override fun getAppBar() = (activity as BaseActivity?)?.appBar
+  override fun getAppBar() = (activity as? BaseActivity<*>)?.appBar
 
   override fun getBorderViewDelegate() = borderDelegate
 

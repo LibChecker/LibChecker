@@ -72,7 +72,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
             LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
               .apply {
                 show(
-                  (this@SnapshotNativeProvider.context as BaseActivity).supportFragmentManager,
+                  (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager,
                   tag
                 )
               }

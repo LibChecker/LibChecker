@@ -23,15 +23,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AlbumActivity : BaseActivity() {
+class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
-  private lateinit var binding: ActivityAlbumBinding
   private val viewModel by viewModels<SnapshotViewModel>()
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityAlbumBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

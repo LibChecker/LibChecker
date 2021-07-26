@@ -73,7 +73,7 @@ class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : B
             LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
               .apply {
                 show(
-                  (this@SnapshotComponentProvider.context as BaseActivity).supportFragmentManager,
+                  (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager,
                   tag
                 )
               }

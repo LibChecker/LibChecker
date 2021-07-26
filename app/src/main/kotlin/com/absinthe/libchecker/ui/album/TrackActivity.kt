@@ -31,19 +31,13 @@ import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-class TrackActivity : BaseActivity(), SearchView.OnQueryTextListener {
+class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTextListener {
 
-  private lateinit var binding: ActivityTrackBinding
   private val repository = Repositories.lcRepository
   private val adapter by unsafeLazy { TrackAdapter(lifecycleScope) }
   private val list = mutableListOf<TrackListItem>()
   private var menu: Menu? = null
   private var isListReady = false
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityTrackBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

@@ -5,21 +5,21 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.extensions.inflateBinding
 import rikka.material.app.MaterialActivity
 
 @SuppressLint("Registered, MissingSuperCall")
-abstract class BaseActivity : MaterialActivity() {
+abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
-  protected var root: ViewGroup? = null
-
-  protected abstract fun setViewBinding(): ViewGroup
+  protected lateinit var binding: VB
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setViewBindingImpl(setViewBinding())
+    binding = inflateBinding(layoutInflater)
+    setContentView(binding.root)
   }
 
   override fun shouldApplyTranslucentSystemBars(): Boolean {
@@ -47,10 +47,5 @@ abstract class BaseActivity : MaterialActivity() {
     if (GlobalValues.rengeTheme) {
       theme.applyStyle(R.style.ThemeOverlay_Renge, true)
     }
-  }
-
-  private fun setViewBindingImpl(root: ViewGroup) {
-    this.root = root
-    setContentView(root)
   }
 }
