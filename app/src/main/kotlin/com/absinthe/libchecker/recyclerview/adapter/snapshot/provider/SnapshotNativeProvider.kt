@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -45,7 +44,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
         ADDED -> R.color.material_green_300
         REMOVED -> R.color.material_red_300
         CHANGED -> R.color.material_yellow_300
-        else -> Color.TRANSPARENT
+        else -> throw IllegalArgumentException("wrong diff type")
       }
 
       typeIcon.setImageResource(
@@ -53,7 +52,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
           ADDED -> R.drawable.ic_add
           REMOVED -> R.drawable.ic_remove
           CHANGED -> R.drawable.ic_changed
-          else -> Color.TRANSPARENT
+          else -> throw IllegalArgumentException("wrong diff type")
         }
       )
 
