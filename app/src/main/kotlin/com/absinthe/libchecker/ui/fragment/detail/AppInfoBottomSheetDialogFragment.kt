@@ -17,10 +17,12 @@ import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
+import java.lang.Exception
 
 /**
  * <pre>
@@ -109,6 +111,10 @@ class AppInfoBottomSheetDialogFragment :
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setClassName(packageName, launcherActivity)
       .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    startActivity(launchIntent)
+    try {
+      startActivity(launchIntent)
+    } catch (e: Exception) {
+      Toasty.showShort(requireContext(), R.string.toast_cant_open_app)
+    }
   }
 }
