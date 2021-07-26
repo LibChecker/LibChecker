@@ -2,9 +2,9 @@ package com.absinthe.libchecker.ui.fragment.detail
 
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.bean.AppBundleItemBean
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView

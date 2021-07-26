@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME

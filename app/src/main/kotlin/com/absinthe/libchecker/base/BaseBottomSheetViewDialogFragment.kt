@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment
+package com.absinthe.libchecker.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

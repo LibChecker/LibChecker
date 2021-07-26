@@ -1,4 +1,4 @@
-package com.absinthe.libchecker
+package com.absinthe.libchecker.base
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.ViewGroup
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import rikka.material.app.MaterialActivity
 

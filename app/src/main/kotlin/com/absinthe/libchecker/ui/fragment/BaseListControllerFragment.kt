@@ -3,7 +3,8 @@ package com.absinthe.libchecker.ui.fragment
 import android.view.Menu
 import androidx.fragment.app.activityViewModels
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
