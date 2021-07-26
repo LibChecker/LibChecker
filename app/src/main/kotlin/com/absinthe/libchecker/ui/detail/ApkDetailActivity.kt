@@ -54,7 +54,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
 
   private var tempFile: File? = null
 
-  private val viewModel by viewModels<DetailViewModel>()
+  private val viewModel: DetailViewModel by viewModels()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 

@@ -41,7 +41,7 @@ const val EXTRA_TYPE = "EXTRA_TYPE"
 
 abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable {
 
-  protected val viewModel by activityViewModels<DetailViewModel>()
+  protected val viewModel: DetailViewModel by activityViewModels()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
   protected val adapter by lazy { LibStringAdapter(type) }

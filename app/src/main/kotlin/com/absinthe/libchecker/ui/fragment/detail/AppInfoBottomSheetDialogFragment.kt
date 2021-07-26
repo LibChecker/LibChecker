@@ -36,6 +36,7 @@ class AppInfoBottomSheetDialogFragment :
   private val mAdapter = AppInfoAdapter()
 
   override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
+
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {

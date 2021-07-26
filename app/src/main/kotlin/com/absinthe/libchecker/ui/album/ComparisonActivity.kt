@@ -37,7 +37,7 @@ const val VF_LIST = 1
 
 class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
-  private val viewModel by viewModels<SnapshotViewModel>()
+  private val viewModel: SnapshotViewModel by viewModels()
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L

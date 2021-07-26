@@ -12,7 +12,7 @@ import rikka.widget.borderview.BorderViewDelegate
 abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController {
 
   protected var borderDelegate: BorderViewDelegate? = null
-  protected val homeViewModel by activityViewModels<HomeViewModel>()
+  protected val homeViewModel: HomeViewModel by activityViewModels()
   protected var isListReady = false
   protected var allowRefreshing = true
   protected var menu: Menu? = null
