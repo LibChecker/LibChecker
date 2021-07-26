@@ -13,12 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.*
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.REMOVED
@@ -36,6 +31,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNative
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
@@ -50,6 +46,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import rikka.insets.setInitialPadding
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -255,6 +252,22 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
               )
             )
         )
+      }
+    }
+
+    lifecycleScope.launchWhenStarted {
+      if (!LCAppUtils.atLeastR()) {
+        binding.list.also {
+          it.post {
+            it.setInitialPadding(
+              0,
+              0,
+              0,
+              window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                ?: 0
+            )
+          }
+        }
       }
     }
   }

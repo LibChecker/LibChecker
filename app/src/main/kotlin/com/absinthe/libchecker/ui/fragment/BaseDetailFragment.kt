@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -73,20 +74,18 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       }
       DetailFragmentManager.resetNavigationParams()
     }
-  }
-
-  override fun onStart() {
-    super.onStart()
-    if (!LCAppUtils.atLeastR()) {
-      getRecyclerView().also {
-        it.post {
-          it.setInitialPadding(
-            0,
-            0,
-            0,
-            requireActivity().window.decorView.rootWindowInsets?.systemWindowInsetBottom
-              ?: 0
-          )
+    lifecycleScope.launchWhenStarted {
+      if (!LCAppUtils.atLeastR()) {
+        getRecyclerView().also {
+          it.post {
+            it.setInitialPadding(
+              0,
+              0,
+              0,
+              requireActivity().window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                ?: 0
+            )
+          }
         }
       }
     }
