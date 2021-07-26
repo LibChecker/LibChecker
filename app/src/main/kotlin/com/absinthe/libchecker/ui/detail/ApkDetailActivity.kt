@@ -10,7 +10,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.MenuItem
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -51,19 +50,13 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 
-class ApkDetailActivity : BaseActivity(), IDetailContainer {
+class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
-  private lateinit var binding: ActivityAppDetailBinding
   private var tempFile: File? = null
 
   private val viewModel by viewModels<DetailViewModel>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityAppDetailBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
@@ -54,19 +53,13 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : BaseActivity() {
+class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
 
-  private lateinit var binding: ActivitySnapshotDetailBinding
   private lateinit var entity: SnapshotDiffItem
 
   private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
   private val viewModel by viewModels<SnapshotViewModel>()
   private val _entity by unsafeLazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivitySnapshotDetailBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

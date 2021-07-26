@@ -321,7 +321,7 @@ class LibReferenceFragment :
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      (requireActivity() as BaseActivity).appBar?.setRaised(false)
+      (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
     } else {
       binding.loading.pauseAnimation()
       binding.list.scrollToPosition(0)

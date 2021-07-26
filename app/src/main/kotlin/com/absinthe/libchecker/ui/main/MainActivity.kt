@@ -38,16 +38,10 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity() {
+class MainActivity : BaseActivity<ActivityMainBinding>() {
 
-  private lateinit var binding: ActivityMainBinding
   private var clickBottomItemFlag = false
   private val appViewModel by viewModels<HomeViewModel>()
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityMainBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

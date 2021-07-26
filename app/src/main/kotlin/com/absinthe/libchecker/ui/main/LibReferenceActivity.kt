@@ -35,18 +35,12 @@ import rikka.widget.borderview.BorderView
 const val EXTRA_REF_NAME = "REF_NAME"
 const val EXTRA_REF_TYPE = "REF_TYPE"
 
-class LibReferenceActivity : BaseActivity() {
+class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
-  private lateinit var binding: ActivityLibReferenceBinding
   private val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
   private val viewModel by viewModels<LibReferenceViewModel>()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityLibReferenceBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

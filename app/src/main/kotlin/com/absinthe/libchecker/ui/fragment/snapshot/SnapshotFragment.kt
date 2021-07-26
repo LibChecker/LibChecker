@@ -190,7 +190,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (requireActivity() as BaseActivity).appBar?.setRaised(!top)
+            (requireActivity() as BaseActivity<*>).appBar?.setRaised(!top)
           }
 
         if (itemDecorationCount == 0) {
@@ -343,7 +343,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>(
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      (requireActivity() as BaseActivity).appBar?.setRaised(false)
+      (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
     } else {
       binding.loading.pauseAnimation()
       binding.list.scrollToPosition(0)

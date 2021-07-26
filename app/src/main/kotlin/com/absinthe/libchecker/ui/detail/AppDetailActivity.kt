@@ -13,7 +13,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.MenuItem
-import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -69,9 +68,8 @@ import java.io.File
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
-class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
+class AppDetailActivity : CheckPackageOnResumingActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
-  private lateinit var binding: ActivityAppDetailBinding
   private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
   private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
   private val refType by unsafeLazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
@@ -84,11 +82,6 @@ class AppDetailActivity : CheckPackageOnResumingActivity(), IDetailContainer {
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
   override fun requirePackageName() = pkgName
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityAppDetailBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

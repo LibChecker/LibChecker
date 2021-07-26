@@ -35,18 +35,12 @@ import rikka.widget.borderview.BorderView
 const val VF_LOADING = 0
 const val VF_LIST = 1
 
-class ComparisonActivity : BaseActivity() {
+class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
-  private lateinit var binding: ActivityComparisonBinding
   private val viewModel by viewModels<SnapshotViewModel>()
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L
-
-  override fun setViewBinding(): ViewGroup {
-    binding = ActivityComparisonBinding.inflate(layoutInflater)
-    return binding.root
-  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
