@@ -6,6 +6,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.viewmodel.HomeViewModel
+import rikka.material.app.AppBar
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) :
@@ -39,13 +40,13 @@ abstract class BaseListControllerFragment<T : ViewBinding>(layoutId: Int) :
     }
   }
 
-  override fun getAppBar() = (activity as? BaseActivity<*>)?.appBar
+  override fun getAppBar(): AppBar? = (activity as? BaseActivity<*>)?.appBar
 
-  override fun getBorderViewDelegate() = borderDelegate
+  override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 
   override fun scheduleAppbarRaisingStatus() {
     getAppBar()?.setRaised(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
   }
 
-  override fun isAllowRefreshing() = allowRefreshing
+  override fun isAllowRefreshing(): Boolean = allowRefreshing
 }
