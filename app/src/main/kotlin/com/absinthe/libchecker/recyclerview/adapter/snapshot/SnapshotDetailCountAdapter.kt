@@ -31,7 +31,7 @@ class SnapshotDetailCountAdapter : BaseQuickAdapter<SnapshotDetailCountNode, Bas
       REMOVED -> R.color.material_red_200
       CHANGED -> R.color.material_yellow_200
       MOVED -> R.color.material_blue_200
-      else -> Color.TRANSPARENT
+      else -> throw IllegalArgumentException("wrong diff type")
     }
 
     (holder.itemView as SnapshotDetailCountView).apply {

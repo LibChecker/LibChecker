@@ -127,6 +127,7 @@
 
 -dontwarn java.lang.ClassValue
 
+# OkHttp
 -dontwarn org.conscrypt.**
 -dontwarn org.conscrypt.ConscryptHostnameVerifier
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
@@ -138,3 +139,6 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+
+# ViewBinding
+-keep public class * extends androidx.viewbinding.ViewBinding {*;}

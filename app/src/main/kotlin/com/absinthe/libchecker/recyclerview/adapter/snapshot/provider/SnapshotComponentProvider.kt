@@ -44,7 +44,7 @@ class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : B
         REMOVED -> R.color.material_red_300
         CHANGED -> R.color.material_yellow_300
         MOVED -> R.color.material_blue_300
-        else -> Color.TRANSPARENT
+        else -> throw IllegalArgumentException("wrong diff type")
       }
 
       typeIcon.setImageResource(
@@ -53,7 +53,7 @@ class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : B
           REMOVED -> R.drawable.ic_remove
           CHANGED -> R.drawable.ic_changed
           MOVED -> R.drawable.ic_move
-          else -> Color.TRANSPARENT
+          else -> throw IllegalArgumentException("wrong diff type")
         }
       )
 
