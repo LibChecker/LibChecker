@@ -6,9 +6,9 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.absinthe.libchecker.BaseActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.REMOVED

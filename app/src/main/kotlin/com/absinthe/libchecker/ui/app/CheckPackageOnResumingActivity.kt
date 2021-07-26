@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.ui.app
 
 import android.content.pm.PackageManager
-import com.absinthe.libchecker.BaseActivity
+import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.utils.PackageUtils
 
 abstract class CheckPackageOnResumingActivity : BaseActivity() {
