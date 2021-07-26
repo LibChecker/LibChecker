@@ -56,7 +56,6 @@ class ShootService : LifecycleService() {
   private val gson = Gson()
   private val repository = Repositories.lcRepository
   private val listenerList = RemoteCallbackList<OnShootListener>()
-  private var isSendingBroadcast = false
 
   @DelicateCoroutinesApi
   private val binder = object : IShootService.Stub() {
@@ -107,24 +106,22 @@ class ShootService : LifecycleService() {
     }
   }
 
+  @Synchronized
   private fun notifyFinished(timestamp: Long) {
-    if (!isSendingBroadcast) {
-      isSendingBroadcast = true
-      Timber.i("notifyFinished start")
-      val count = listenerList.beginBroadcast()
-      for (i in 0 until count) {
-        try {
-          Timber.i("notifyFinished $i")
-          listenerList.getBroadcastItem(i).onShootFinished(timestamp)
-        } catch (e: RemoteException) {
-          Timber.e(e)
-        }
+    Timber.i("notifyFinished start")
+    val count = listenerList.beginBroadcast()
+    for (i in 0 until count) {
+      try {
+        Timber.i("notifyFinished $i")
+        listenerList.getBroadcastItem(i).onShootFinished(timestamp)
+      } catch (e: RemoteException) {
+        Timber.e(e)
       }
-      listenerList.finishBroadcast()
-      isSendingBroadcast = false
     }
+    listenerList.finishBroadcast()
   }
 
+  @Synchronized
   private fun notifyProgress(progress: Int) {
     val count = listenerList.beginBroadcast()
     for (i in 0 until count) {
