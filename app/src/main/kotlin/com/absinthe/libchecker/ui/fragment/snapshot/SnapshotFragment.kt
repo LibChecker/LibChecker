@@ -60,7 +60,7 @@ const val VF_LIST = 1
 
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
-  private val viewModel by activityViewModels<SnapshotViewModel>()
+  private val viewModel: SnapshotViewModel by activityViewModels()
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false

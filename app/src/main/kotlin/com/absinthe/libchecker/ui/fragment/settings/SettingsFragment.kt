@@ -48,7 +48,7 @@ import java.util.Locale
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
   private lateinit var borderViewDelegate: BorderViewDelegate
-  private val viewModel by activityViewModels<HomeViewModel>()
+  private val viewModel: HomeViewModel by activityViewModels()
 
   companion object {
     init {

@@ -20,6 +20,7 @@ class TimeNodeBottomSheetDialogFragment :
   private var customTitle: String? = null
 
   override fun initRootView(): TimeNodeBottomSheetView = TimeNodeBottomSheetView(requireContext())
+
   override fun getHeaderView(): BottomSheetHeaderView = headerView
 
   override fun init() {

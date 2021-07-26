@@ -41,7 +41,7 @@ const val PAGE_TRANSFORM_DURATION = 300L
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 
   private var clickBottomItemFlag = false
-  private val appViewModel by viewModels<HomeViewModel>()
+  private val appViewModel: HomeViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

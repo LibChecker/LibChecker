@@ -52,7 +52,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
   class BackupFragment : PreferenceFragmentCompat() {
 
-    private val viewModel by viewModels<SnapshotViewModel>()
+    private val viewModel: SnapshotViewModel by viewModels()
 
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>

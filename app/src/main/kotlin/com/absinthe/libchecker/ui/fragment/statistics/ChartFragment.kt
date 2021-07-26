@@ -52,7 +52,7 @@ class ChartFragment :
   OnChartValueSelectedListener,
   MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-  private val viewModel by activityViewModels<HomeViewModel>()
+  private val viewModel: HomeViewModel by activityViewModels()
   private val legendList = mutableListOf<String>()
   private val existApiList = mutableListOf<Int>()
   private var chartType = TYPE_ABI

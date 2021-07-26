@@ -26,6 +26,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
   private val request: CloudRuleBundleRequest = ApiManager.create()
 
   override fun initRootView(): CloudRulesDialogView = CloudRulesDialogView(requireContext())
+
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {

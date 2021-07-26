@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
-  private val viewModel by viewModels<SnapshotViewModel>()
+  private val viewModel: SnapshotViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

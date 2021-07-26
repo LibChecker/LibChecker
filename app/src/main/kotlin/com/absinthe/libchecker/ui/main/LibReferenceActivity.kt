@@ -38,7 +38,7 @@ const val EXTRA_REF_TYPE = "REF_TYPE"
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
   private val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
-  private val viewModel by viewModels<LibReferenceViewModel>()
+  private val viewModel: LibReferenceViewModel by viewModels()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
 

@@ -31,11 +31,10 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME).orEmpty() }
   private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
-  private val viewModel by activityViewModels<DetailViewModel>()
+  private val viewModel: DetailViewModel by activityViewModels()
   private var isStickyEventReceived = false
 
-  override fun initRootView(): LibDetailBottomSheetView =
-    LibDetailBottomSheetView(requireContext())
+  override fun initRootView(): LibDetailBottomSheetView = LibDetailBottomSheetView(requireContext())
 
   override fun init() {
     root.apply {
@@ -59,7 +58,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
   override fun onStart() {
     super.onStart()
-    viewModel.detailBean.observe(this) {
+    viewModel.detailBean.observe(viewLifecycleOwner) {
       if (it != null) {
         root.apply {
           libDetailContentView.apply {

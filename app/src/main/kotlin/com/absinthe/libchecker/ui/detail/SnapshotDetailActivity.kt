@@ -58,7 +58,7 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
   private lateinit var entity: SnapshotDiffItem
 
   private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
-  private val viewModel by viewModels<SnapshotViewModel>()
+  private val viewModel: SnapshotViewModel by viewModels()
   private val _entity by unsafeLazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
 
   override fun onCreate(savedInstanceState: Bundle?) {
