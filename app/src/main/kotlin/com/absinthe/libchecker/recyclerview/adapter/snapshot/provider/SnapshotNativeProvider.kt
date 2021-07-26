@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
-import android.graphics.Color
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -65,8 +64,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
         if (rule != null) {
           setChipOnClickListener {
             val name = item.item.name
-            val regexName =
-              LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
+            val regexName = LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
             LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
               .apply {
                 show(

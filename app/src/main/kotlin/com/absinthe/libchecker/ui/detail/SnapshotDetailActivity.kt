@@ -13,7 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.*
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.REMOVED
@@ -114,8 +119,7 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
         load(icon)
         setOnClickListener {
           lifecycleScope.launch {
-            val lcItem =
-              Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
+            val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
             startActivity(
               Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
                 .putExtras(

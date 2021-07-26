@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.graphics.Color
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
