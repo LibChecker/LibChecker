@@ -5,8 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 
 class SnapshotStateIndicatorView(context: Context) : View(context) {
   var added: Boolean = false
@@ -52,7 +52,7 @@ class SnapshotStateIndicatorView(context: Context) : View(context) {
   }
 
   private fun drawItem(@ColorRes color: Int, canvas: Canvas) {
-    p.color = ContextCompat.getColor(context, color)
+    p.color = color.getColor(context)
     canvas.drawRect(
       0f,
       drawOverPosition,

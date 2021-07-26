@@ -1,8 +1,13 @@
 package com.absinthe.libchecker.utils.extensions
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.appcompat.widget.TintTypedArray
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
 import java.io.Closeable
@@ -14,6 +19,13 @@ import kotlin.comparisons.reversed as kotlinReversed
 import kotlin.io.use as kotlinUse
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
+
+@ColorInt
+fun @receiver:ColorRes Int.getColor(context: Context): Int = ContextCompat.getColor(context, this)
+
+fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
+  return ColorStateList.valueOf(getColor(context))
+}
 
 @Suppress("UNCHECKED_CAST")
 fun <T : ViewBinding> LifecycleOwner.inflateBinding(inflater: LayoutInflater): T {

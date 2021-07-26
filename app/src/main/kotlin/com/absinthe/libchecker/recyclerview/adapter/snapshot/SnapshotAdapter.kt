@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -18,6 +17,8 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -57,7 +58,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
           val bitmap = ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
-            setTint(ContextCompat.getColor(context, R.color.textNormal))
+            setTint(R.color.textNormal.getColor(context))
           }?.toBitmap(40.dp, 40.dp)
           icon.post { icon.setImageBitmap(bitmap) }
         }
@@ -73,45 +74,24 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
       when {
         item.deleted -> {
-          holder.itemView.backgroundTintList =
-            ColorStateList.valueOf(
-              ContextCompat.getColor(context, R.color.material_red_300)
-            )
-          versionInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-          targetApiInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-          abiInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+          holder.itemView.backgroundTintList = R.color.material_red_300.toColorStateList(context)
+          versionInfo.setTextColor(R.color.textNormal.getColor(context))
+          targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
+          abiInfo.setTextColor(R.color.textNormal.getColor(context))
           isNewOrDeleted = true
         }
         item.newInstalled -> {
-          holder.itemView.backgroundTintList =
-            ColorStateList.valueOf(
-              ContextCompat.getColor(context, R.color.material_green_300)
-            )
-          versionInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-          targetApiInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
-          abiInfo.setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+          holder.itemView.backgroundTintList = R.color.material_green_300.toColorStateList(context)
+          versionInfo.setTextColor(R.color.textNormal.getColor(context))
+          targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
+          abiInfo.setTextColor(R.color.textNormal.getColor(context))
           isNewOrDeleted = true
         }
         else -> {
           holder.itemView.backgroundTintList = null
-          versionInfo.setTextColor(
-            ContextCompat.getColor(
-              context,
-              android.R.color.darker_gray
-            )
-          )
-          targetApiInfo.setTextColor(
-            ContextCompat.getColor(
-              context,
-              android.R.color.darker_gray
-            )
-          )
-          abiInfo.setTextColor(
-            ContextCompat.getColor(
-              context,
-              android.R.color.darker_gray
-            )
-          )
+          versionInfo.setTextColor(android.R.color.darker_gray.getColor(context))
+          targetApiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
+          abiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
         }
       }
 

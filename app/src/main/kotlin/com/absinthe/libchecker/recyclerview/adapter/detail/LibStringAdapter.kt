@@ -12,7 +12,6 @@ import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -21,6 +20,7 @@ import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
 import com.absinthe.libchecker.view.detail.StaticLibItemView
@@ -121,7 +121,7 @@ class LibStringAdapter(@LibType val type: Int) :
       val drawable = TransitionDrawable(
         listOf(
           ColorDrawable(Color.TRANSPARENT),
-          ColorDrawable(ContextCompat.getColor(context, R.color.highlightComponent))
+          ColorDrawable(R.color.highlightComponent.getColor(context))
         ).toTypedArray()
       )
       holder.itemView.background = drawable

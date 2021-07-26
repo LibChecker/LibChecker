@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColor
 
 class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
 
@@ -21,6 +22,6 @@ class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
     background = ContextCompat.getDrawable(context, R.drawable.bg_snapshot_detail_count)
     setPadding(8.dp, 2.dp, 8.dp, 2.dp)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-    setTextColor(ContextCompat.getColor(context, R.color.grey_600))
+    setTextColor(R.color.grey_600.getColor(context))
   }
 }

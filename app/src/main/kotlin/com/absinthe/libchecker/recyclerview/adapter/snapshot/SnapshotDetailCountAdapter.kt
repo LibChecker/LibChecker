@@ -1,15 +1,14 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.MOVED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotDetailCountNode
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailCountView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -37,7 +36,7 @@ class SnapshotDetailCountAdapter : BaseQuickAdapter<SnapshotDetailCountNode, Bas
 
     (holder.itemView as SnapshotDetailCountView).apply {
       text = item.count.toString()
-      backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+      backgroundTintList = colorRes.toColorStateList(context)
     }
   }
 }

@@ -10,14 +10,15 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -42,10 +43,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
     val typeIcon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(16.dp, 16.dp)
       imageTintList = ColorStateList.valueOf(
-        ContextCompat.getColor(
-          context,
-          R.color.material_blue_grey_700
-        )
+        R.color.material_blue_grey_700.getColor(context)
       )
       addView(this)
     }
@@ -114,8 +112,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
         chip!!.apply {
           setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
           text = entity.label
-          chipBackgroundColor =
-            ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
+          chipBackgroundColor = colorRes.toColorStateList(context)
 
           if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
               entity.iconIndex
