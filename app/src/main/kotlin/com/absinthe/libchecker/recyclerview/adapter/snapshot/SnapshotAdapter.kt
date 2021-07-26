@@ -18,6 +18,7 @@ import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
@@ -121,7 +122,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       var abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt())
       if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
         oldAbiSpanString = SpannableString("  $oldAbiString")
-        ContextCompat.getDrawable(context, abiBadgeRes)?.let {
+        abiBadgeRes.getDrawable(context)?.let {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
           val span = CenterAlignImageSpan(it)
           oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
@@ -138,7 +139,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt())
         if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
           newAbiSpanString = SpannableString("  $newAbiString")
-          ContextCompat.getDrawable(context, abiBadgeRes)?.let {
+          abiBadgeRes.getDrawable(context)?.let {
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val span = CenterAlignImageSpan(it)
             newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)

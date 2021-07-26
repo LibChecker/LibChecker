@@ -3,9 +3,11 @@ package com.absinthe.libchecker.utils.extensions
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -22,6 +24,9 @@ fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NO
 
 @ColorInt
 fun @receiver:ColorRes Int.getColor(context: Context): Int = ContextCompat.getColor(context, this)
+
+fun @receiver:DrawableRes Int.getDrawable(context: Context): Drawable? =
+  ContextCompat.getDrawable(context, this)
 
 fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
   return ColorStateList.valueOf(getColor(context))

@@ -5,7 +5,6 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -13,6 +12,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
@@ -77,7 +77,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
       if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
         spanString = SpannableString("  $str")
-        ContextCompat.getDrawable(context, abiBadgeRes)?.let {
+        abiBadgeRes.getDrawable(context)?.let {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
           val span = CenterAlignImageSpan(it)
           spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
