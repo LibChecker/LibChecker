@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import android.view.View
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -33,16 +32,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-class ComponentsAnalysisFragment :
-  BaseDetailFragment<FragmentLibComponentBinding>(R.layout.fragment_lib_component) {
+class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by lazy {
     !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
-
-  override fun initBinding(view: View): FragmentLibComponentBinding =
-    FragmentLibComponentBinding.bind(view)
 
   override fun getRecyclerView() = binding.list
 

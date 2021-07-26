@@ -57,7 +57,7 @@ const val VF_LIST = 1
 const val VF_INIT = 2
 
 class AppListFragment :
-  BaseListControllerFragment<FragmentAppListBinding>(R.layout.fragment_app_list),
+  BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
 
   private val mAdapter by lazy { AppAdapter(lifecycleScope) }
@@ -65,8 +65,6 @@ class AppListFragment :
   private var popup: PopupMenu? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
-
-  override fun initBinding(view: View): FragmentAppListBinding = FragmentAppListBinding.bind(view)
 
   override fun init() {
     setHasOptionsMenu(true)
