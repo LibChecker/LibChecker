@@ -1,2 +1,4 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+* text eol=lf
+
+*.bat text eol=crlf
+*.jar binary
