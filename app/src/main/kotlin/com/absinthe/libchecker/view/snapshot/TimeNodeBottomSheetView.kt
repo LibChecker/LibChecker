@@ -51,11 +51,11 @@ class TimeNodeBottomSheetView(context: Context) : AViewGroup(context), IHeaderVi
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop
-        + header.measuredHeight
-        + list.marginTop
-        + list.measuredHeight
-        + paddingBottom
+      paddingTop +
+        header.measuredHeight +
+        list.marginTop +
+        list.measuredHeight +
+        paddingBottom
     )
   }
 

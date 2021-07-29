@@ -152,7 +152,8 @@ class AboutActivity : AbsAboutActivity() {
       } else {
         URLManager.GITHUB_PAGE
       }
-      add(Contributor(R.mipmap.pic_rabbit, Absinthe.ME, "Developer & Designer", developerUrl))
+      add(Contributor(R.drawable.pic_rabbit, Absinthe.ME, "Developer & Designer", developerUrl))
+      add(Contributor(R.drawable.goooler, "Goooler", "Code Tidy & Optimize", "https://github.com/Goooler"))
       add(
         Contributor(
           R.drawable.ic_github,

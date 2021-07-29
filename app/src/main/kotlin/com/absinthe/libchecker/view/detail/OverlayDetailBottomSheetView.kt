@@ -76,15 +76,15 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop
-        + header.measuredHeight
-        + detailsTitleView.marginTop
-        + detailsTitleView.measuredHeight
-        + targetTitleView.marginTop
-        + targetTitleView.measuredHeight
-        + targetPackageView.marginTop
-        + targetPackageView.measuredHeight
-        + paddingBottom
+      paddingTop +
+        header.measuredHeight +
+        detailsTitleView.marginTop +
+        detailsTitleView.measuredHeight +
+        targetTitleView.marginTop +
+        targetTitleView.measuredHeight +
+        targetPackageView.marginTop +
+        targetPackageView.measuredHeight +
+        paddingBottom
     )
   }
 

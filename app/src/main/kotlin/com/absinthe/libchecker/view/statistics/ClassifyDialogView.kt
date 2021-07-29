@@ -65,11 +65,11 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop
-        + header.measuredHeight
-        + list.marginTop
-        + list.measuredHeight
-        + paddingBottom
+      paddingTop +
+        header.measuredHeight +
+        list.marginTop +
+        list.measuredHeight +
+        paddingBottom
     )
   }
 

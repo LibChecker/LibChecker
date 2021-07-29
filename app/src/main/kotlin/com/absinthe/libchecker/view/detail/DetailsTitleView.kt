@@ -104,12 +104,12 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop
-        + appNameView.measuredHeight
-        + packageNameView.measuredHeight
-        + versionInfoView.measuredHeight
-        + extraInfoView.measuredHeight
-        + paddingBottom
+      paddingTop +
+        appNameView.measuredHeight +
+        packageNameView.measuredHeight +
+        versionInfoView.measuredHeight +
+        extraInfoView.measuredHeight +
+        paddingBottom
     )
   }
 

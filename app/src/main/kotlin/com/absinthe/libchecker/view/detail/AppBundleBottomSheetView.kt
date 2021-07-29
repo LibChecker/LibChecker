@@ -51,11 +51,11 @@ class AppBundleBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop
-        + header.measuredHeight
-        + list.marginTop
-        + list.measuredHeight
-        + paddingBottom
+      paddingTop +
+        header.measuredHeight +
+        list.marginTop +
+        list.measuredHeight +
+        paddingBottom
     )
   }
 
