@@ -22,7 +22,7 @@ import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
 import rikka.core.util.ClipboardUtils
 
-fun View.setLongClickCopiedToClipboard(text: String) {
+fun View.setLongClickCopiedToClipboard(text: CharSequence) {
   setOnLongClickListener {
     ClipboardUtils.put(context, text)
     context.showToast(R.string.toast_copied_to_clipboard)

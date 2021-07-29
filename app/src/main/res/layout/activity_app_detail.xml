@@ -34,70 +34,11 @@
         android:paddingBottom="@dimen/normal_padding"
         app:layout_collapseMode="parallax">
 
-        <ImageView
-          android:id="@+id/iv_app_icon"
-          android:layout_width="@dimen/lib_detail_icon_size"
-          android:layout_height="@dimen/lib_detail_icon_size"
-          android:contentDescription="App icon"
-          android:transitionName="app_icon"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          tools:background="@drawable/pic_splash"
-          tools:ignore="HardcodedText" />
-
-        <com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
-          android:id="@+id/tv_app_name"
-          android:layout_width="0dp"
+        <com.absinthe.libchecker.view.detail.DetailsTitleView
+          android:id="@+id/details_title"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginStart="@dimen/normal_padding"
-          android:layout_marginEnd="8dp"
-          android:fontFamily="sans-serif-medium"
-          android:textColor="@color/textNormal"
-          android:textSize="16sp"
-          android:transitionName="app_name"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toEndOf="@id/iv_app_icon"
-          app:layout_constraintTop_toTopOf="@id/iv_app_icon"
-          tools:text="LibChecker" />
-
-        <TextView
-          android:id="@+id/tv_package_name"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif"
-          android:textColor="@color/textNormal"
-          android:textSize="14sp"
-          android:transitionName="package_name"
-          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-          app:layout_constraintStart_toStartOf="@id/tv_app_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_app_name"
-          tools:text="com.absinthe.libchecker" />
-
-        <TextView
-          android:id="@+id/tv_version"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif-condensed"
-          android:textColor="@android:color/darker_gray"
-          android:textSize="12sp"
-          android:transitionName="version_name"
-          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-          app:layout_constraintStart_toStartOf="@id/tv_package_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_package_name"
-          tools:text="1.2.0(120)" />
-
-        <TextView
-          android:id="@+id/tv_extra_info"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif-condensed-medium"
-          android:textColor="@android:color/darker_gray"
-          android:textSize="12sp"
-          android:transitionName="abi_and_api"
-          app:layout_constraintEnd_toEndOf="@id/tv_app_name"
-          app:layout_constraintStart_toStartOf="@id/tv_package_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_version"
-          tools:text="arm64-v8, Target API 30" />
+          app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.chip.ChipGroup
           android:id="@+id/chipGroup"
@@ -109,7 +50,7 @@
           android:visibility="gone"
           app:chipSpacing="@dimen/normal_padding"
           app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/tv_extra_info"
+          app:layout_constraintTop_toBottomOf="@id/details_title"
           tools:visibility="visible">
 
           <com.google.android.material.chip.Chip

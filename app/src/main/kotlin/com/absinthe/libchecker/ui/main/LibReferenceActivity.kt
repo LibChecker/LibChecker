@@ -1,12 +1,10 @@
 package com.absinthe.libchecker.ui.main
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -15,13 +13,9 @@ import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
-import com.absinthe.libchecker.ui.detail.AppDetailActivity
-import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
@@ -135,21 +129,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       if (AntiShakeUtils.isInvalidClick(view)) {
         return@setOnItemClickListener
       }
-      val item = adapter.getItem(position)
-      val intent = Intent(this, AppDetailActivity::class.java)
-        .putExtras(
-          bundleOf(
-            EXTRA_PACKAGE_NAME to item.packageName,
-            EXTRA_REF_NAME to refName,
-            EXTRA_REF_TYPE to refType,
-            EXTRA_DETAIL_BEAN to DetailExtraBean(
-              item.isSplitApk,
-              item.isKotlinUsed,
-              item.variant
-            )
-          )
-        )
-      startActivity(intent)
+      LCAppUtils.launchDetailPage(this, adapter.getItem(position))
     }
   }
 }

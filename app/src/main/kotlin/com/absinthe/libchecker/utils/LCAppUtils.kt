@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -9,6 +10,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
@@ -18,10 +21,18 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.ui.detail.AppDetailActivity
+import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
+import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
 import rikka.material.app.DayNightDelegate
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -164,6 +175,30 @@ object LCAppUtils {
       Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
       Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
       else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    }
+  }
+
+  fun launchDetailPage(context: FragmentActivity, item: LCItem) {
+    if (item.abi.toInt() == OVERLAY) {
+      OverlayDetailBottomSheetDialogFragment().apply {
+        arguments = bundleOf(
+          EXTRA_LC_ITEM to item
+        )
+        show(context.supportFragmentManager, tag)
+      }
+    } else {
+      val intent = Intent(context, AppDetailActivity::class.java)
+        .putExtras(
+          bundleOf(
+            EXTRA_PACKAGE_NAME to item.packageName,
+            EXTRA_DETAIL_BEAN to DetailExtraBean(
+              item.isSplitApk,
+              item.isKotlinUsed,
+              item.variant
+            )
+          )
+        )
+      context.startActivity(intent)
     }
   }
 }

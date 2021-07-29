@@ -667,7 +667,7 @@ object PackageUtils {
     val file = File(applicationInfo.sourceDir)
     val demands = ManifestReader.getManifestProperties(
       file,
-      listOf(use32bitAbiString, multiArchString, overlayString).toTypedArray()
+      arrayOf(use32bitAbiString, multiArchString, overlayString)
     )
     val overlay = demands[overlayString] as? Boolean ?: false
 
@@ -930,7 +930,7 @@ object PackageUtils {
     } else {
       val demands = ManifestReader.getManifestProperties(
         File(packageInfo.applicationInfo.sourceDir),
-        listOf(minSdkVersion).toTypedArray()
+        arrayOf(minSdkVersion)
       )
       demands[minSdkVersion]?.toString() ?: "?"
     }

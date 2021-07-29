@@ -121,29 +121,31 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
               false,
               this@ApkDetailActivity
             )
-            ivAppIcon.load(appIconLoader.loadIcon(it.applicationInfo))
-            tvAppName.apply {
-              text = it.applicationInfo.loadLabel(packageManager)
-              setLongClickCopiedToClipboard(text.toString())
-            }
-            tvPackageName.apply {
-              text = packageInfo.packageName
-              setLongClickCopiedToClipboard(text.toString())
-            }
-            tvVersion.apply {
-              text = PackageUtils.getVersionString(it)
-              setLongClickCopiedToClipboard(text.toString())
+            detailsTitle.apply {
+              iconView.load(appIconLoader.loadIcon(it.applicationInfo))
+              appNameView.apply {
+                text = it.applicationInfo.loadLabel(packageManager)
+                setLongClickCopiedToClipboard(text)
+              }
+              packageNameView.apply {
+                text = packageInfo.packageName
+                setLongClickCopiedToClipboard(text)
+              }
+              versionInfoView.apply {
+                text = PackageUtils.getVersionString(it)
+                setLongClickCopiedToClipboard(text)
+              }
             }
 
             val extraInfo = SpannableStringBuilder()
             val file = File(packageInfo.applicationInfo.sourceDir)
             val demands = ManifestReader.getManifestProperties(
               file,
-              listOf(
+              arrayOf(
                 PackageUtils.use32bitAbiString,
                 PackageUtils.multiArchString,
                 PackageUtils.overlayString
-              ).toTypedArray()
+              )
             )
             val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
             val abiSet = PackageUtils.getAbiSet(
@@ -231,7 +233,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
                 appendLine().append("sharedUserId = $sharedUid")
               }
             }
-            tvExtraInfo.text = extraInfo
+            detailsTitle.extraInfoView.text = extraInfo
           } catch (e: Exception) {
             Timber.e(e)
             finish()

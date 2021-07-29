@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.utils
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.Toast
 import androidx.annotation.AnyThread
@@ -59,7 +59,7 @@ object Toasty {
     toast?.get()?.cancel()
     toast = null
 
-    if (LCAppUtils.atLeastR() && context !is Activity) {
+    if (LCAppUtils.atLeastR() && context !is ContextThemeWrapper) {
       Toast(context).also {
         it.duration = duration
         it.setText(message)

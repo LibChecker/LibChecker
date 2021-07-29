@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 
@@ -20,26 +19,13 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   var item: ArrayList<LCItem> = ArrayList()
   private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE).orEmpty() }
   private var mListener: OnDismissListener? = null
-  private lateinit var headerView: BottomSheetHeaderView
 
   override fun initRootView(): ClassifyDialogView =
     ClassifyDialogView(requireContext(), lifecycleScope)
 
-  override fun getHeaderView(): BottomSheetHeaderView = headerView
+  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  override fun init() {
-    headerView = BottomSheetHeaderView(requireContext()).apply {
-      layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.topMargin = 8.dp
-        it.bottomMargin = 24.dp
-      }
-      title.text = dialogTitle
-    }
-    root.adapter.setHeaderView(headerView)
-  }
+  override fun init() { }
 
   override fun onCreateView(
     inflater: LayoutInflater,

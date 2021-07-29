@@ -16,7 +16,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.entity.RuleEntity
-import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
@@ -42,7 +41,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
 
     val typeIcon = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(16.dp, 16.dp)
-      imageTintList = ColorStateList.valueOf(R.color.material_blue_grey_700.getColor(context))
+      imageTintList = R.color.material_blue_grey_700.toColorStateList(context)
       addView(this)
     }
 

@@ -1,14 +1,12 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.activity.viewModels
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
@@ -20,7 +18,6 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -34,8 +31,6 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -120,19 +115,7 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-            startActivity(
-              Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
-                .putExtras(
-                  bundleOf(
-                    EXTRA_PACKAGE_NAME to entity.packageName,
-                    EXTRA_DETAIL_BEAN to DetailExtraBean(
-                      lcItem.isSplitApk,
-                      lcItem.isKotlinUsed,
-                      lcItem.variant
-                    )
-                  )
-                )
-            )
+            LCAppUtils.launchDetailPage(this@SnapshotDetailActivity, lcItem)
           }
         }
       }
@@ -241,21 +224,7 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
 
       lifecycleScope.launch {
         val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-        startActivity(
-          Intent(this@SnapshotDetailActivity, AppDetailActivity::class.java)
-            .putExtras(
-              bundleOf(
-                EXTRA_PACKAGE_NAME to entity.packageName,
-                EXTRA_REF_NAME to item.name,
-                EXTRA_REF_TYPE to item.itemType,
-                EXTRA_DETAIL_BEAN to DetailExtraBean(
-                  lcItem.isSplitApk,
-                  lcItem.isKotlinUsed,
-                  lcItem.variant
-                )
-              )
-            )
-        )
+        LCAppUtils.launchDetailPage(this@SnapshotDetailActivity, lcItem)
       }
     }
 

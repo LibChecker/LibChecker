@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -52,6 +51,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -127,44 +127,46 @@ class AppDetailActivity :
               getString(R.string.detail_label)
             }
           }
-          ivAppIcon.apply {
-            val appIconLoader = AppIconLoader(
-              resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
-              false,
-              this@AppDetailActivity
-            )
-            load(appIconLoader.loadIcon(packageInfo.applicationInfo))
-            setOnClickListener {
-              AppInfoBottomSheetDialogFragment().apply {
-                arguments = bundleOf(
-                  EXTRA_PACKAGE_NAME to pkgName
-                )
-                show(supportFragmentManager, tag)
+          detailsTitle.apply {
+            iconView.apply {
+              val appIconLoader = AppIconLoader(
+                resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
+                false,
+                this@AppDetailActivity
+              )
+              load(appIconLoader.loadIcon(packageInfo.applicationInfo))
+              setOnClickListener {
+                AppInfoBottomSheetDialogFragment().apply {
+                  arguments = bundleOf(
+                    EXTRA_PACKAGE_NAME to pkgName
+                  )
+                  show(supportFragmentManager, tag)
+                }
               }
             }
-          }
-          tvAppName.apply {
-            text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
-            setLongClickCopiedToClipboard(text.toString())
-          }
-          tvPackageName.apply {
-            text = packageName
-            setLongClickCopiedToClipboard(text.toString())
-          }
-          tvVersion.apply {
-            text = PackageUtils.getVersionString(packageInfo)
-            setLongClickCopiedToClipboard(text.toString())
+            appNameView.apply {
+              text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
+              setLongClickCopiedToClipboard(text)
+            }
+            packageNameView.apply {
+              text = packageName
+              setLongClickCopiedToClipboard(text)
+            }
+            versionInfoView.apply {
+              text = PackageUtils.getVersionString(packageInfo)
+              setLongClickCopiedToClipboard(text)
+            }
           }
 
           val extraInfo = SpannableStringBuilder()
           val file = File(packageInfo.applicationInfo.sourceDir)
           val demands = ManifestReader.getManifestProperties(
             file,
-            listOf(
+            arrayOf(
               PackageUtils.use32bitAbiString,
               PackageUtils.multiArchString,
               PackageUtils.overlayString
-            ).toTypedArray()
+            )
           )
           val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
           val abiSet = PackageUtils.getAbiSet(
@@ -268,7 +270,7 @@ class AppDetailActivity :
               }
             }
           }
-          tvExtraInfo.text = extraInfo
+          detailsTitle.extraInfoView.text = extraInfo
 
           extraBean?.let {
             if (it.isSplitApk || it.isKotlinUsed) {
@@ -304,8 +306,10 @@ class AppDetailActivity :
             }
           }
         } catch (e: PackageManager.NameNotFoundException) {
-          ivAppIcon.load(R.drawable.ic_app_list)
-          ivAppIcon.imageTintList = ColorStateList.valueOf(getColor(R.color.textNormal))
+          detailsTitle.iconView.apply {
+            load(R.drawable.ic_app_list)
+            imageTintList = R.color.textNormal.toColorStateList(this@AppDetailActivity)
+          }
         } catch (e: Exception) {
           Timber.e(e)
           finish()

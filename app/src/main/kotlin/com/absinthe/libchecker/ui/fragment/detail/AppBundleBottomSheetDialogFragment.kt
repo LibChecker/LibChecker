@@ -1,12 +1,9 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.view.ViewGroup
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.bean.AppBundleItemBean
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppBundleBottomSheetView
 import com.absinthe.libchecker.view.detail.AppBundleItemView
@@ -17,24 +14,13 @@ class AppBundleBottomSheetDialogFragment :
   BaseBottomSheetViewDialogFragment<AppBundleBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-  private lateinit var headerView: BottomSheetHeaderView
 
   override fun initRootView(): AppBundleBottomSheetView =
     AppBundleBottomSheetView(requireContext())
 
-  override fun getHeaderView(): BottomSheetHeaderView = headerView
+  override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    headerView = BottomSheetHeaderView(requireContext()).apply {
-      layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also {
-        it.bottomMargin = 24.dp
-      }
-      title.text = getString(R.string.app_bundle)
-    }
-    root.adapter.setHeaderView(headerView)
     packageName?.let {
       val packageInfo = PackageUtils.getPackageInfo(it)
       val list = packageInfo.applicationInfo.splitSourceDirs

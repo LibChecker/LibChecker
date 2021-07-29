@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.applist
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.view.Menu
@@ -12,7 +11,6 @@ import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -24,7 +22,6 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
-import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -33,11 +30,9 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
-import com.absinthe.libchecker.ui.detail.AppDetailActivity
-import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
@@ -74,19 +69,7 @@ class AppListFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        val item = mAdapter.getItem(position)
-        val intent = Intent(requireActivity(), AppDetailActivity::class.java)
-          .putExtras(
-            bundleOf(
-              EXTRA_PACKAGE_NAME to item.packageName,
-              EXTRA_DETAIL_BEAN to DetailExtraBean(
-                item.isSplitApk,
-                item.isKotlinUsed,
-                item.variant
-              )
-            )
-          )
-        startActivity(intent)
+        LCAppUtils.launchDetailPage(requireActivity(), mAdapter.getItem(position))
       }
       setDiffCallback(AppListDiffUtil())
       setHasStableIds(true)

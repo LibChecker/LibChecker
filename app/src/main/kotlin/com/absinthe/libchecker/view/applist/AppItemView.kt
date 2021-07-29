@@ -5,11 +5,13 @@ import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
+import android.view.Gravity
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -23,8 +25,34 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     setPadding(padding, padding, padding, padding)
   }
 
+  private val floatView by lazy {
+    AppCompatTextView(
+      ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also {
+        it.gravity = Gravity.CENTER
+        it.topMargin = 24.dp
+        it.bottomMargin = 24.dp
+      }
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+    }
+  }
+
   init {
     addView(container)
+  }
+
+  fun addFloatView(text: String) {
+    if (container.parent != null) {
+      removeView(container)
+    }
+    if (floatView.parent == null) {
+      addView(floatView)
+    }
+    floatView.text = text
   }
 
   class AppItemContainerView(context: Context) : AViewGroup(context) {
