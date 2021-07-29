@@ -14,7 +14,7 @@ class SnapshotStateIndicatorView(context: Context) : View(context) {
   var changed: Boolean = false
   var moved: Boolean = false
 
-  private var trueValueCount = 0
+  private val trueValueCount: Int
     get() {
       var count = 0
       if (added) count++
