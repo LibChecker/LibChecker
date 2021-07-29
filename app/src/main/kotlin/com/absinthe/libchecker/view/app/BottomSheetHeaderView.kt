@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -16,7 +17,12 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
 
   private val handler = View(context).apply {
     layoutParams = LayoutParams(36.dp, 4.dp)
-    setBackgroundResource(R.drawable.bg_dialog_handler)
+    background = TransitionDrawable(
+      arrayOf(
+        R.drawable.bg_dialog_handler.getDrawable(context),
+        R.drawable.bg_dialog_handler_activated.getDrawable(context)
+      )
+    )
     addView(this)
   }
 
@@ -35,9 +41,6 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
       addView(this)
     }
 
-  private val handlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler) }
-  private val activatedHandlerDrawable by lazy { context.getDrawable(R.drawable.bg_dialog_handler_activated) }
-
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     handler.autoMeasure()
@@ -54,13 +57,10 @@ class BottomSheetHeaderView(context: Context) : AViewGroup(context) {
   }
 
   fun onHandlerActivated(activated: Boolean) {
-    val handlerArray = if (activated) {
-      arrayOf(handlerDrawable, activatedHandlerDrawable)
+    if (activated) {
+      (handler.background as TransitionDrawable).startTransition(150)
     } else {
-      arrayOf(activatedHandlerDrawable, handlerDrawable)
+      (handler.background as TransitionDrawable).reverseTransition(150)
     }
-    val transitionDrawable = TransitionDrawable(handlerArray)
-    handler.background = transitionDrawable
-    transitionDrawable.startTransition(150)
   }
 }
