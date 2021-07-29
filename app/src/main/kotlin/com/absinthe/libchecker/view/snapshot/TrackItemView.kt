@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -46,7 +46,7 @@ class TrackItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       addView(this)
     }
@@ -57,7 +57,7 @@ class TrackItemView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+        setTextColor(R.color.textNormal.getColor(context))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         addView(this)
       }

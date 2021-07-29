@@ -11,7 +11,6 @@ import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -36,6 +35,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -176,24 +176,22 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
                 ).let { str ->
                   spanString = SpannableString("  $str")
                 }
-                ContextCompat.getDrawable(
-                  this@ApkDetailActivity,
-                  PackageUtils.getAbiBadgeResource(eachAbi)
-                )?.mutate()?.let { drawable ->
-                  drawable.setBounds(
-                    0,
-                    0,
-                    drawable.intrinsicWidth,
-                    drawable.intrinsicHeight
-                  )
-                  if (eachAbi != abi % Constants.MULTI_ARCH) {
-                    drawable.alpha = 128
-                  } else {
-                    drawable.alpha = 255
+                PackageUtils.getAbiBadgeResource(eachAbi).getDrawable(this@ApkDetailActivity)
+                  ?.mutate()?.let { drawable ->
+                    drawable.setBounds(
+                      0,
+                      0,
+                      drawable.intrinsicWidth,
+                      drawable.intrinsicHeight
+                    )
+                    if (eachAbi != abi % Constants.MULTI_ARCH) {
+                      drawable.alpha = 128
+                    } else {
+                      drawable.alpha = 255
+                    }
+                    val span = CenterAlignImageSpan(drawable)
+                    spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                   }
-                  val span = CenterAlignImageSpan(drawable)
-                  spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-                }
                 if (eachAbi != abi % Constants.MULTI_ARCH) {
                   spanString.setSpan(
                     StrikethroughSpan(),
@@ -206,7 +204,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
                 if (itemCount < abiSet.size) {
                   spanStringBuilder.append(", ")
                 }
-                if (itemCount == 3 && isOrientationPortrait) {
+                if (itemCount == 3 && abiSet.size > 3 && isOrientationPortrait) {
                   spanStringBuilder.appendLine()
                 }
               }

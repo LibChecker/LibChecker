@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.showToast
@@ -86,7 +85,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: String) {
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
     spannableString.setSpan(
-      ForegroundColorSpan(ContextCompat.getColor(context, R.color.colorPrimary)),
+      ForegroundColorSpan(R.color.colorPrimary.getColor(context)),
       start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
     builder.append(spannableString)
