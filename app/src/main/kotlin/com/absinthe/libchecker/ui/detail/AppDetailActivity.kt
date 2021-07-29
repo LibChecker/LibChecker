@@ -225,7 +225,7 @@ class AppDetailActivity :
               if (itemCount < abiSet.size) {
                 spanStringBuilder.append(", ")
               }
-              if (itemCount == 3 && isOrientationPortrait) {
+              if (itemCount == 3 && abiSet.size > 3 && isOrientationPortrait) {
                 spanStringBuilder.appendLine()
               }
             }
