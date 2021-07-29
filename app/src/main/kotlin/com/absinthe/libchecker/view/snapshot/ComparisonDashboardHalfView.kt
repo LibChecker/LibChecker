@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
@@ -31,7 +32,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) 
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(context.getColor(R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       text = context.getString(R.string.album_click_to_choose)
@@ -55,7 +56,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) 
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(context.getColor(R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       text = "0"
     }

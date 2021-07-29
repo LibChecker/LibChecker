@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.ColorRes
@@ -10,8 +9,10 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -58,7 +59,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
-      setTextColor(context.getColor(R.color.textSecondary))
+      setTextColor(R.color.textSecondary.getColor(context))
     }
 
     init {
@@ -73,7 +74,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     }
 
     fun setIconBackgroundColor(@ColorRes res: Int) {
-      icon.backgroundTintList = ColorStateList.valueOf(context.getColor(res))
+      icon.backgroundTintList = res.toColorStateList(context)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

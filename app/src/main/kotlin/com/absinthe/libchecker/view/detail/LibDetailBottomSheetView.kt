@@ -16,6 +16,7 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -204,7 +205,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       text = context.getString(R.string.create_an_issue)
-      setLinkTextColor(context.getColor(R.color.colorPrimary))
+      setLinkTextColor(R.color.colorPrimary.getColor(context))
       gravity = Gravity.CENTER_VERTICAL
       setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
       compoundDrawablePadding = 4.dp

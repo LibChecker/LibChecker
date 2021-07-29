@@ -32,6 +32,10 @@ fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
   return ColorStateList.valueOf(getColor(context))
 }
 
+fun @receiver:ColorInt Int.toColorStateListByColor(context: Context): ColorStateList {
+  return ColorStateList.valueOf(this)
+}
+
 @Suppress("UNCHECKED_CAST")
 fun <T : ViewBinding> LifecycleOwner.inflateBinding(inflater: LayoutInflater): T {
   return (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments

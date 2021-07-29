@@ -8,7 +8,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
@@ -58,7 +57,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           loadIconJob =
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
-          val bitmap = ContextCompat.getDrawable(context, R.drawable.ic_app_list)?.apply {
+          val bitmap = R.drawable.ic_app_list.getDrawable(context)?.apply {
             setTint(R.color.textNormal.getColor(context))
           }?.toBitmap(40.dp, 40.dp)
           icon.post { icon.setImageBitmap(bitmap) }

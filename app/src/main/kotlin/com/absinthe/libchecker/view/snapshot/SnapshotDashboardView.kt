@@ -7,7 +7,9 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -40,7 +42,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(context.getColor(R.color.textNormal))
+        setTextColor(R.color.textNormal.getColor(context))
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       }
 
@@ -70,38 +72,38 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(context.getColor(R.color.textNormal))
+        setTextColor(R.color.textNormal.getColor(context))
       }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_added),
-        context.getDrawable(R.drawable.ic_add),
-        context.getColor(R.color.material_green_300)
+        R.drawable.ic_add.getDrawable(context),
+        R.color.material_green_300.getColor(context)
       )
     }
 
     private val removedIndicator = SnapshotTypeIndicatorView(context).apply {
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_removed),
-        context.getDrawable(R.drawable.ic_remove),
-        context.getColor(R.color.material_red_300)
+        R.drawable.ic_remove.getDrawable(context),
+        R.color.material_red_300.getColor(context)
       )
     }
 
     private val changedIndicator = SnapshotTypeIndicatorView(context).apply {
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_changed),
-        context.getDrawable(R.drawable.ic_changed),
-        context.getColor(R.color.material_yellow_300)
+        R.drawable.ic_changed.getDrawable(context),
+        R.color.material_yellow_300.getColor(context)
       )
     }
 
     private val movedIndicator = SnapshotTypeIndicatorView(context).apply {
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_moved),
-        context.getDrawable(R.drawable.ic_move),
-        context.getColor(R.color.material_blue_300)
+        R.drawable.ic_move.getDrawable(context),
+        R.color.material_blue_300.getColor(context)
       )
     }
 

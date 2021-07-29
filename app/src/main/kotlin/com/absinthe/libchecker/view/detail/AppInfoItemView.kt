@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.view.detail
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -18,6 +17,8 @@ import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.utils.extensions.toColorStateList
+import com.absinthe.libchecker.utils.extensions.toColorStateListByColor
 import com.absinthe.libchecker.view.AViewGroup
 
 /**
@@ -89,15 +90,15 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
   }
 
   fun setIconTintColorResource(@ColorRes res: Int) {
-    icon.imageTintList = ColorStateList.valueOf(context.getColor(res))
+    icon.imageTintList = res.toColorStateList(context)
   }
 
   fun setIconTintColor(@ColorInt res: Int) {
-    icon.imageTintList = ColorStateList.valueOf(res)
+    icon.imageTintList = res.toColorStateListByColor(context)
   }
 
   fun setIconBackgroundTintColor(@ColorRes res: Int) {
-    icon.backgroundTintList = ColorStateList.valueOf(context.getColor(res))
+    icon.backgroundTintList = res.toColorStateList(context)
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

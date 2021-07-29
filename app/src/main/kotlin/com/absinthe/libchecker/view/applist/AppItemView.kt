@@ -12,6 +12,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -103,7 +104,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     var badge: AppCompatImageView? = null
 
     fun setBadge(res: Int) {
-      setBadge(context.getDrawable(res))
+      setBadge(res.getDrawable(context))
     }
 
     fun setBadge(drawable: Drawable?) {
