@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
@@ -46,7 +46,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
       addView(this)
     }
@@ -54,10 +54,9 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+        setTextColor(R.color.textNormal.getColor(context))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         addView(this)
       }
@@ -72,7 +71,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+      setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -87,7 +86,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+      setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -102,7 +101,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+      setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)
     }
@@ -121,7 +120,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
           )
-          setBackgroundColor(ContextCompat.getColor(context, R.color.material_red_300))
+          setBackgroundColor(R.color.material_red_300.getColor(context))
           alpha = 0.5f
           addView(this)
         }

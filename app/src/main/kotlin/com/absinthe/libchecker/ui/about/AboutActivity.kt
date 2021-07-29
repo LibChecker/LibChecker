@@ -15,7 +15,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
@@ -26,6 +25,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -114,19 +114,12 @@ class AboutActivity : AbsAboutActivity() {
           val drawable = TransitionDrawable(
             arrayOf(
               headerContentLayout.background,
-              ColorDrawable(ContextCompat.getColor(this, R.color.renge))
+              ColorDrawable(R.color.renge.getColor(this))
             )
           )
           setHeaderBackground(drawable)
-          setHeaderContentScrim(
-            ColorDrawable(
-              ContextCompat.getColor(
-                this,
-                R.color.renge
-              )
-            )
-          )
-          window.statusBarColor = ContextCompat.getColor(this, R.color.renge)
+          setHeaderContentScrim(ColorDrawable(R.color.renge.getColor(this)))
+          window.statusBarColor = R.color.renge.getColor(this)
           drawable.startTransition(250)
 
           val fd = assets.openFd("renge_no_koe.aac")

@@ -15,7 +15,6 @@ import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -50,6 +49,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -68,7 +68,9 @@ import java.io.File
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
-class AppDetailActivity : CheckPackageOnResumingActivity<ActivityAppDetailBinding>(), IDetailContainer {
+class AppDetailActivity :
+  CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
+  IDetailContainer {
 
   private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
   private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
@@ -195,24 +197,22 @@ class AppDetailActivity : CheckPackageOnResumingActivity<ActivityAppDetailBindin
               ).let { str ->
                 spanString = SpannableString("  $str")
               }
-              ContextCompat.getDrawable(
-                this@AppDetailActivity,
-                PackageUtils.getAbiBadgeResource(it)
-              )?.mutate()?.let { drawable ->
-                drawable.setBounds(
-                  0,
-                  0,
-                  drawable.intrinsicWidth,
-                  drawable.intrinsicHeight
-                )
-                if (it != abi % Constants.MULTI_ARCH) {
-                  drawable.alpha = 128
-                } else {
-                  drawable.alpha = 255
+              PackageUtils.getAbiBadgeResource(it)
+                .getDrawable(this@AppDetailActivity)?.mutate()?.let { drawable ->
+                  drawable.setBounds(
+                    0,
+                    0,
+                    drawable.intrinsicWidth,
+                    drawable.intrinsicHeight
+                  )
+                  if (it != abi % Constants.MULTI_ARCH) {
+                    drawable.alpha = 128
+                  } else {
+                    drawable.alpha = 255
+                  }
+                  val span = CenterAlignImageSpan(drawable)
+                  spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                 }
-                val span = CenterAlignImageSpan(drawable)
-                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-              }
               if (it != abi % Constants.MULTI_ARCH) {
                 spanString.setSpan(
                   StrikethroughSpan(),

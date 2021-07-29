@@ -1,18 +1,18 @@
 package com.absinthe.libchecker.view.detail
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.chip.Chip
@@ -34,7 +34,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }
@@ -71,12 +71,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
 
         if (!GlobalValues.isColorfulIcon.valueUnsafe) {
           if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-            chipIconTint = ColorStateList.valueOf(
-              ContextCompat.getColor(
-                context,
-                R.color.textNormal
-              )
-            )
+            chipIconTint = R.color.textNormal.toColorStateList(context)
           } else {
             val icon = chipIcon
             icon?.let {

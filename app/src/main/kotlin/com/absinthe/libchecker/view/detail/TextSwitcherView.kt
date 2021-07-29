@@ -9,8 +9,8 @@ import android.view.View
 import android.widget.TextSwitcher
 import android.widget.TextView
 import android.widget.ViewSwitcher
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.getColor
 
 /**
  * <pre>
@@ -40,7 +40,7 @@ class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
       gravity = Gravity.START or Gravity.CENTER
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       setTypeface(null, Typeface.BOLD)
-      setTextColor(ContextCompat.getColor(context, R.color.textNormal))
+      setTextColor(R.color.textNormal.getColor(context))
     }
   }
 }
