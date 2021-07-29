@@ -222,8 +222,7 @@ class ChartFragment :
   }
 
   private fun setTargetApiData() {
-    val parties = mutableListOf<String>()
-    OS_NAME_MAP.forEach { parties.add(it.value) }
+    val parties = osNameMap.map { it.value }.toMutableList()
 
     val entries: ArrayList<BarEntry> = ArrayList()
     var packageInfo: PackageInfo
@@ -493,7 +492,7 @@ class ChartFragment :
     }
   }
 
-  private val OS_NAME_MAP by lazy {
+  private val osNameMap by lazy {
     hashMapOf(
       1 to "1.0",
       2 to "1.1",
