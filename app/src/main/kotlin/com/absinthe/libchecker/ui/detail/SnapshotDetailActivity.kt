@@ -224,7 +224,12 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
 
       lifecycleScope.launch {
         val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-        LCAppUtils.launchDetailPage(this@SnapshotDetailActivity, lcItem)
+        LCAppUtils.launchDetailPage(
+          this@SnapshotDetailActivity,
+          item = lcItem,
+          refName = item.name,
+          refType = item.itemType
+        )
       }
     }
 

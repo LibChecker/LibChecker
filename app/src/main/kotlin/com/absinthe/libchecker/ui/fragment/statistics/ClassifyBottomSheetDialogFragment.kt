@@ -1,22 +1,18 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.DialogInterface
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
+import com.absinthe.libchecker.viewmodel.ChartViewModel
 
 const val EXTRA_TITLE = "EXTRA_TITLE"
-const val EXTRA_ITEM_LIST = "EXTRA_ITEM_LIST"
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
-  var item: ArrayList<LCItem> = ArrayList()
+  private val viewModel: ChartViewModel by activityViewModels()
   private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE).orEmpty() }
   private var mListener: OnDismissListener? = null
 
@@ -27,32 +23,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
 
   override fun init() {
     getHeaderView().title.text = dialogTitle
-  }
-
-  override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
-  ): View? {
-    val view = super.onCreateView(inflater, container, savedInstanceState)
-    if (savedInstanceState != null) {
-      savedInstanceState.getParcelableArrayList<LCItem>(
-        EXTRA_ITEM_LIST
-      )?.toList()?.let {
-        root.adapter.setList(it)
-        item = ArrayList(it)
-      }
-    } else {
-      root.adapter.setList(item)
+    viewModel.filteredList.observe(viewLifecycleOwner) {
+      root.adapter.setList(it)
     }
-
-    return view
-  }
-
-  override fun onSaveInstanceState(outState: Bundle) {
-    outState.putParcelableArrayList(EXTRA_ITEM_LIST, item)
-    outState.putString(EXTRA_TITLE, dialogTitle)
-    super.onSaveInstanceState(outState)
   }
 
   override fun onDismiss(dialog: DialogInterface) {

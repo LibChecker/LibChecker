@@ -129,7 +129,12 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       if (AntiShakeUtils.isInvalidClick(view)) {
         return@setOnItemClickListener
       }
-      LCAppUtils.launchDetailPage(this, adapter.getItem(position))
+      LCAppUtils.launchDetailPage(
+        this,
+        item = adapter.getItem(position),
+        refName = refName,
+        refType = refType
+      )
     }
   }
 }

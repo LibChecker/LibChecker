@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.constant.Constants.ARMV5
@@ -23,7 +24,7 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
-import com.absinthe.libchecker.viewmodel.HomeViewModel
+import com.absinthe.libchecker.viewmodel.ChartViewModel
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -41,6 +42,8 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.button.MaterialButtonToggleGroup
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val TYPE_ABI = 0
@@ -52,7 +55,7 @@ class ChartFragment :
   OnChartValueSelectedListener,
   MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-  private val viewModel: HomeViewModel by activityViewModels()
+  private val viewModel: ChartViewModel by activityViewModels()
   private val legendList = mutableListOf<String>()
   private val existApiList = mutableListOf<Int>()
   private var chartType = TYPE_ABI
@@ -311,78 +314,83 @@ class ChartFragment :
     }
 
     var dialogTitle = ""
-    var item: List<LCItem> = emptyList()
 
-    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-      viewModel.dbItems.value
-    } else {
-      viewModel.dbItems.value?.filter { !it.isSystem }
-    }
+    lifecycleScope.launch(Dispatchers.IO) {
+      var item: List<LCItem> = emptyList()
 
-    when (chartType) {
-      TYPE_ABI -> {
-        when (legendList[h.x.toInt()]) {
-          getString(R.string.string_64_bit) -> {
-            dialogTitle = String.format(
-              getString(R.string.title_statistics_dialog),
-              getString(R.string.string_64_bit)
-            )
-            filteredList?.filter { it.abi == ARMV8.toShort() }
-              ?.let { filter ->
-                item = ArrayList(filter)
-              }
-          }
-          getString(R.string.string_32_bit) -> {
-            dialogTitle = String.format(
-              getString(R.string.title_statistics_dialog),
-              getString(R.string.string_32_bit)
-            )
-            filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
-              ?.let { filter ->
-                item = ArrayList(filter)
-              }
-          }
-          getString(R.string.no_libs) -> {
-            dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
-            filteredList?.filter { it.abi == NO_LIBS.toShort() }
-              ?.let { filter ->
-                item = ArrayList(filter)
-              }
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
+      } else {
+        viewModel.dbItems.value?.filter { !it.isSystem }
+      }
+
+      when (chartType) {
+        TYPE_ABI -> {
+          when (legendList[h.x.toInt()]) {
+            getString(R.string.string_64_bit) -> {
+              dialogTitle = String.format(
+                getString(R.string.title_statistics_dialog),
+                getString(R.string.string_64_bit)
+              )
+              filteredList?.filter { it.abi == ARMV8.toShort() }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
+            getString(R.string.string_32_bit) -> {
+              dialogTitle = String.format(
+                getString(R.string.title_statistics_dialog),
+                getString(R.string.string_32_bit)
+              )
+              filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
+            getString(R.string.no_libs) -> {
+              dialogTitle = getString(R.string.title_statistics_dialog_no_native_libs)
+              filteredList?.filter { it.abi == NO_LIBS.toShort() }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
           }
         }
-      }
-      TYPE_KOTLIN -> {
-        when (legendList[h.x.toInt()]) {
-          getString(R.string.string_kotlin_used) -> {
-            dialogTitle = getString(R.string.string_kotlin_used)
-            filteredList?.filter { it.isKotlinUsed }
-              ?.let { filter ->
-                item = ArrayList(filter)
-              }
-          }
-          getString(R.string.string_kotlin_unused) -> {
-            dialogTitle = getString(R.string.string_kotlin_unused)
-            filteredList?.filter { !it.isKotlinUsed }
-              ?.let { filter ->
-                item = ArrayList(filter)
-              }
+        TYPE_KOTLIN -> {
+          when (legendList[h.x.toInt()]) {
+            getString(R.string.string_kotlin_used) -> {
+              dialogTitle = getString(R.string.string_kotlin_used)
+              filteredList?.filter { it.isKotlinUsed }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
+            getString(R.string.string_kotlin_unused) -> {
+              dialogTitle = getString(R.string.string_kotlin_unused)
+              filteredList?.filter { !it.isKotlinUsed }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
           }
         }
-      }
-      TYPE_TARGET_API -> {
-        val targetApi = legendList[h.x.toInt()].toInt()
-        var packageInfo: PackageInfo?
+        TYPE_TARGET_API -> {
+          val targetApi = legendList[h.x.toInt()].toInt()
+          var packageInfo: PackageInfo?
 
-        dialogTitle = "Target API $targetApi"
-        filteredList?.filter {
-          packageInfo = try {
-            PackageUtils.getPackageInfo(it.packageName)
-          } catch (e: PackageManager.NameNotFoundException) {
-            null
-          }
-          packageInfo?.applicationInfo?.targetSdkVersion == targetApi
-        }?.let { filter -> item = ArrayList(filter) }
+          dialogTitle = "Target API $targetApi"
+          filteredList?.filter {
+            packageInfo = try {
+              PackageUtils.getPackageInfo(it.packageName)
+            } catch (e: PackageManager.NameNotFoundException) {
+              null
+            }
+            packageInfo?.applicationInfo?.targetSdkVersion == targetApi
+          }?.let { filter -> item = ArrayList(filter) }
+        }
       }
+
+      viewModel.filteredList.postValue(item)
     }
 
     mDialog = ClassifyBottomSheetDialogFragment().apply {
@@ -394,10 +402,8 @@ class ChartFragment :
           mDialog = null
         }
       })
-    }
-    mDialog?.let {
+    }.also {
       it.show(requireActivity().supportFragmentManager, tag)
-      it.item = ArrayList(item)
     }
   }
 

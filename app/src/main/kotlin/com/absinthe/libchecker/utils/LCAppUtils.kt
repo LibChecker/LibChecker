@@ -33,6 +33,8 @@ import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
 import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
+import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import rikka.material.app.DayNightDelegate
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -178,7 +180,7 @@ object LCAppUtils {
     }
   }
 
-  fun launchDetailPage(context: FragmentActivity, item: LCItem) {
+  fun launchDetailPage(context: FragmentActivity, item: LCItem, refName: String? = null, refType: Int = NATIVE) {
     if (item.abi.toInt() == OVERLAY) {
       OverlayDetailBottomSheetDialogFragment().apply {
         arguments = bundleOf(
@@ -191,6 +193,8 @@ object LCAppUtils {
         .putExtras(
           bundleOf(
             EXTRA_PACKAGE_NAME to item.packageName,
+            EXTRA_REF_NAME to refName,
+            EXTRA_REF_TYPE to refType,
             EXTRA_DETAIL_BEAN to DetailExtraBean(
               item.isSplitApk,
               item.isKotlinUsed,
