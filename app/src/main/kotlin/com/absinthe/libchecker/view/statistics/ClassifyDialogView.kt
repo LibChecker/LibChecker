@@ -7,7 +7,6 @@ import androidx.core.view.marginTop
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -27,7 +26,6 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    title.text = context.getString(R.string.app_bundle)
   }
 
   private val list = RecyclerView(context).apply {

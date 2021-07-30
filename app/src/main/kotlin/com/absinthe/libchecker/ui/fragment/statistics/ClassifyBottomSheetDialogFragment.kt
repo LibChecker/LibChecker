@@ -25,7 +25,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  override fun init() { }
+  override fun init() {
+    getHeaderView().title.text = dialogTitle
+  }
 
   override fun onCreateView(
     inflater: LayoutInflater,
