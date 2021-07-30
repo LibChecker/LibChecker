@@ -1,15 +1,18 @@
 package com.absinthe.libchecker.base
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
@@ -55,6 +58,22 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
   abstract fun init()
   abstract fun getHeaderView(): BottomSheetHeaderView
 
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+    object : BottomSheetDialog(requireContext(), theme) {
+      override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        window?.let {
+          WindowCompat.setDecorFitsSystemWindows(it, false)
+          it.attributes?.windowAnimations = R.style.DialogAnimation
+          UiUtils.setSystemBarStyle(it)
+        }
+
+        findViewById<View>(com.google.android.material.R.id.container)?.fitsSystemWindows = false
+        findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
+      }
+    }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -67,13 +86,6 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
 
   override fun onStart() {
     super.onStart()
-    dialog?.window?.let {
-      it.attributes?.windowAnimations = R.style.DialogAnimation
-      it.decorView.rootView.fitsSystemWindows = false
-      it.findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows =
-        false
-      UiUtils.setSystemBarStyle(it)
-    }
     behavior.addBottomSheetCallback(bottomSheetCallback)
 
     if (requireActivity().window.decorView.measuredHeight < 1200) {
