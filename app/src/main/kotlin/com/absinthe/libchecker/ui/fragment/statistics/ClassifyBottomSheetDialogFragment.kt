@@ -8,12 +8,9 @@ import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 import com.absinthe.libchecker.viewmodel.ChartViewModel
 
-const val EXTRA_TITLE = "EXTRA_TITLE"
-
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
   private val viewModel: ChartViewModel by activityViewModels()
-  private val dialogTitle by lazy { arguments?.getString(EXTRA_TITLE).orEmpty() }
   private var mListener: OnDismissListener? = null
 
   override fun initRootView(): ClassifyDialogView =
@@ -22,7 +19,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
-    getHeaderView().title.text = dialogTitle
+    viewModel.dialogTitle.observe(viewLifecycleOwner) {
+      getHeaderView().title.text = it
+    }
     viewModel.filteredList.observe(viewLifecycleOwner) {
       root.adapter.setList(it)
     }

@@ -11,19 +11,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <com.absinthe.libchecker.view.statistics.LibReferenceLoadingView
+      android:id="@+id/loading_view"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:gravity="center">
-
-      <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/loading"
-        android:layout_width="@dimen/lottie_anim_size"
-        android:layout_height="@dimen/lottie_anim_size"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true" />
-
-    </LinearLayout>
+      android:layout_height="match_parent" />
 
     <rikka.widget.borderview.BorderRecyclerView
       android:id="@android:id/list"

@@ -17,7 +17,6 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ALL
-import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -25,9 +24,6 @@ import com.absinthe.libchecker.annotation.NOT_MARKED
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.annotation.SPRING
-import com.absinthe.libchecker.annotation.SUMMER
-import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -85,19 +81,6 @@ class LibReferenceFragment :
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
-      }
-      loading.apply {
-        imageAssetsFolder = "/"
-
-        val assetName = when (GlobalValues.season) {
-          SPRING -> "lib_reference_spring.json"
-          SUMMER -> "lib_reference_summer.json"
-          AUTUMN -> "lib_reference_autumn.json"
-          WINTER -> "lib_reference_winter.json"
-          else -> "lib_reference_summer.json"
-        }
-
-        setAnimation(assetName)
       }
     }
 
@@ -317,10 +300,10 @@ class LibReferenceFragment :
       return
     }
     if (child == VF_LOADING) {
-      binding.loading.resumeAnimation()
+      binding.loadingView.loadingView.resumeAnimation()
       (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
     } else {
-      binding.loading.pauseAnimation()
+      binding.loadingView.loadingView.pauseAnimation()
       binding.list.scrollToPosition(0)
     }
 

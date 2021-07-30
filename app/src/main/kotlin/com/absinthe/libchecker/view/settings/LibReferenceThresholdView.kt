@@ -3,6 +3,7 @@ package com.absinthe.libchecker.view.settings
 import android.content.Context
 import android.graphics.Typeface
 import android.util.TypedValue
+import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.TextView
 import com.absinthe.libchecker.constant.GlobalValues
@@ -31,6 +32,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
   init {
     slider.addOnChangeListener { _, value, _ ->
       count.text = value.toInt().toString()
+      slider.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
     }
   }
 

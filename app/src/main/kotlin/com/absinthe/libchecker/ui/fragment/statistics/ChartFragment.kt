@@ -7,7 +7,6 @@ import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -19,6 +18,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.isShowing
@@ -309,11 +309,12 @@ class ChartFragment :
     if (h == null) return
     if (mDialog != null && mDialog!!.isShowing()) return
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    if (LCAppUtils.atLeastR()) {
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
     var dialogTitle = ""
+    viewModel.filteredList.postValue(emptyList())
 
     lifecycleScope.launch(Dispatchers.IO) {
       var item: List<LCItem> = emptyList()
@@ -390,13 +391,11 @@ class ChartFragment :
         }
       }
 
+      viewModel.dialogTitle.postValue(dialogTitle)
       viewModel.filteredList.postValue(item)
     }
 
     mDialog = ClassifyBottomSheetDialogFragment().apply {
-      arguments = bundleOf(
-        EXTRA_TITLE to dialogTitle
-      )
       setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
         override fun onDismiss() {
           mDialog = null

@@ -10,4 +10,5 @@ import com.absinthe.libchecker.database.entity.LCItem
 class ChartViewModel(application: Application) : AndroidViewModel(application) {
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
   val filteredList: MutableLiveData<List<LCItem>> = MutableLiveData()
+  val dialogTitle: MutableLiveData<String> = MutableLiveData()
 }
