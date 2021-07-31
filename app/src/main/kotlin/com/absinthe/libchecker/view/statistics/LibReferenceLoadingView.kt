@@ -49,4 +49,14 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     loadingView.layout(loadingView.toHorizontalCenter(this), loadingView.toVerticalCenter(this))
   }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    loadingView.playAnimation()
+  }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    loadingView.pauseAnimation()
+  }
 }

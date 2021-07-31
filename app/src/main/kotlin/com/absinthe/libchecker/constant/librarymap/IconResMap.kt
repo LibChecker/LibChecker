@@ -90,12 +90,15 @@ object IconResMap {
       put(77, R.drawable.ic_lib_zbar)
       put(78, R.drawable.ic_lib_opus)
       put(79, R.drawable.ic_lib_live2d)
+      put(80, R.drawable.ic_lib_google_ml_kit)
+      put(81, R.drawable.ic_lib_yandex_speech_kit)
     }
 
     SINGLE_COLOR_ICON_SET = setOf(
       -1, 1, 2, 3, 4, 5, 6, 9, 10, 11, 13, 14, 15, 16, 17,
       25, 27, 30, 31, 40, 42, 43, 44, 46, 47, 48, 50, 51,
-      52, 53, 54, 55, 56, 59, 63, 64, 66, 67
+      52, 53, 54, 55, 56, 59, 63, 64, 66, 67, 69, 74, 76,
+      81
     )
   }
 
