@@ -3,6 +3,7 @@ package com.absinthe.libchecker.utils
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.graphics.Bitmap
+import android.view.ContextThemeWrapper
 import android.widget.ImageView
 import androidx.annotation.IntRange
 import androidx.collection.LruCache
@@ -116,7 +117,12 @@ object AppIconCache : CoroutineScope {
 
       val bitmap = try {
         withContext(dispatcher) {
-          getOrLoadBitmap(context, info, userId, size)
+          getOrLoadBitmap(
+            ContextThemeWrapper(context.applicationContext, R.style.AppTheme),
+            info,
+            userId,
+            size
+          )
         }
       } catch (e: CancellationException) {
         // do nothing if canceled

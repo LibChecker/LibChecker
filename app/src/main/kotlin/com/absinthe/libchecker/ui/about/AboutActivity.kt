@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
@@ -41,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Locale
 
 private const val RENGE_CHECKER = "RengeChecker"
 
@@ -56,8 +56,8 @@ class AboutActivity : AbsAboutActivity() {
   }
   private val mediaPlayer by lazy { MediaPlayer() }
 
-  override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-    super.onCreate(savedInstanceState, persistentState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
     initView()
     Analytics.trackEvent(
       Constants.Event.SETTINGS,
@@ -162,6 +162,27 @@ class AboutActivity : AbsAboutActivity() {
           URLManager.GITHUB_REPO_PAGE
         )
       )
+
+      if (Locale.getDefault() == Locale.CHINA) {
+        add(Category("Help Each Other"))
+        add(
+          Card(
+            """
+              （帮转）
+              很抱歉有个事需要大家帮忙。
+              求推荐一个心理咨询师/治疗师，有以下要求：
+              •在北京地区可面对面咨询
+              •认知行为疗法（CBT）取向或偏向于CBT的整合取向
+              •最好有海外的心理学硕士及以上学历
+              •持有中国心理学会注册心理师执照或海外的相关执照
+              •有长期的督导
+              •良好的伦理操守
+              如您认识有符合以上要求的心理咨询师/治疗师，请通过邮箱：temp1@linesoft.top与我联系（广告、骗子、其他事宜勿扰）
+              特别感谢！
+            """.trimIndent()
+          )
+        )
+      }
 
       add(Category("Other Works"))
       addAll(
@@ -357,9 +378,7 @@ class AboutActivity : AbsAboutActivity() {
 
   private fun initView() {
     UiUtils.setSystemBarStyle(window, false)
-
-    val appbar = findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout)
-    appbar.fitsSystemWindows = true
+    findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
   }
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {

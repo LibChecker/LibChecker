@@ -34,7 +34,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     isClickable = true
     isFocusable = true
-    setPadding(8.dp, 24.dp, 8.dp, 0)
+    setPadding(4.dp, 12.dp, 4.dp, 12.dp)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
   }
 
@@ -59,6 +59,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
       it.topMargin = 12.dp
     }
     gravity = Gravity.CENTER_HORIZONTAL
+    maxLines = 2
     setLines(2)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     addView(this)
@@ -110,9 +111,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     )
     setMeasuredDimension(
       measuredWidth,
-      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom).coerceAtLeast(
-        135.dp
-      )
+      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom)
     )
   }
 
