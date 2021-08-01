@@ -83,7 +83,6 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                 root.cloudRulesContentView.remoteVersion.version.text.toString()
                   .toInt()
               context?.let {
-                it.showToast("Rebirth")
                 ProcessPhoenix.triggerRebirth(it)
               }
             } catch (e: NumberFormatException) {

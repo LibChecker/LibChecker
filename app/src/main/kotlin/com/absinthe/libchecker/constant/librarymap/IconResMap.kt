@@ -76,7 +76,7 @@ object IconResMap {
       put(63, R.drawable.ic_lib_xunfei)
       put(64, R.drawable.ic_lib_zhihu)
       put(65, R.drawable.ic_kotlin_logo)
-      put(66, R.drawable.ic_telegram)
+      put(66, R.drawable.ic_lib_telegram)
       put(67, R.drawable.ic_lib_ffmpeg)
       put(68, R.drawable.ic_lib_vlc)
       put(69, R.drawable.ic_lib_paypal)

@@ -159,7 +159,7 @@
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">Версия локального репозитория</string>
   <string name="rules_remote_repo_version">Версия удаленного репозитория</string>
-  <string name="rules_btn_update">Обновить</string>
+  <string name="rules_btn_update">Перезагрузите, чтобы обновить</string>
   <string name="languages">Язык</string>
 
 </resources>
