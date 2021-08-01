@@ -130,7 +130,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       val lp = recyclerView.layoutParams
       if (lp is FrameLayout.LayoutParams) {
         lp.rightMargin =
-          recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
+          recyclerView.context.resources.getDimension(rikka.material.R.dimen.rd_activity_horizontal_margin)
             .toInt()
         lp.leftMargin = lp.rightMargin
       }

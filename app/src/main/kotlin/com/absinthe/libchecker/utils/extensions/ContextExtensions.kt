@@ -28,7 +28,6 @@ import androidx.annotation.StyleableRes
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.res.ResourcesCompat
-import com.absinthe.libchecker.R
 
 val Context.activity: Activity?
   get() {
@@ -175,7 +174,7 @@ val Context.isOrientationPortrait: Boolean
   get() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
 val Context.isLightTheme: Boolean
-  get() = getBooleanByAttr(R.attr.isLightTheme)
+  get() = getBooleanByAttr(androidx.appcompat.R.attr.isLightTheme)
 
 val Context.layoutInflater: LayoutInflater
   get() = LayoutInflater.from(this)

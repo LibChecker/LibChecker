@@ -262,7 +262,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
 
     if (TextUtils.isEmpty(tag) || "SYSTEM" == tag) {
-      languagePreference.summary = getString(R.string.follow_system)
+      languagePreference.summary = getString(rikka.core.R.string.follow_system)
     } else if (index != -1) {
       val name = localeNameUser[index - 1]
       languagePreference.summary = name
@@ -293,7 +293,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     val lp = recyclerView.layoutParams
     if (lp is FrameLayout.LayoutParams) {
       lp.rightMargin =
-        recyclerView.context.resources.getDimension(R.dimen.rd_activity_horizontal_margin)
+        recyclerView.context.resources.getDimension(rikka.material.R.dimen.rd_activity_horizontal_margin)
           .toInt()
       lp.leftMargin = lp.rightMargin
     }
