@@ -77,8 +77,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_collapseMode="pin"
-        app:titleTextColor="@color/textNormal" />
+        app:layout_collapseMode="pin" />
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -118,7 +117,7 @@
           android:layout_marginStart="@dimen/normal_padding"
           android:gravity="center"
           android:text="@string/items_count"
-          android:textColor="@color/textNormal"
+          android:textColor="?attr/colorControlNormal"
           app:layout_constraintStart_toStartOf="parent" />
 
         <com.absinthe.libchecker.view.detail.TextSwitcherView

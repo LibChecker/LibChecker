@@ -51,7 +51,7 @@
           android:layout_height="wrap_content"
           android:layout_marginHorizontal="@dimen/normal_padding"
           android:fontFamily="sans-serif-medium"
-          android:textColor="@color/textNormal"
+          android:textColor="?attr/colorOnSurface"
           android:textSize="16sp"
           android:transitionName="app_name"
           app:layout_constraintEnd_toStartOf="@id/tv_target_api"
@@ -64,7 +64,7 @@
           android:layout_width="0dp"
           android:layout_height="wrap_content"
           android:fontFamily="sans-serif"
-          android:textColor="@color/textNormal"
+          android:textColor="?attr/colorOnSurface"
           android:textSize="14sp"
           android:transitionName="package_name"
           app:layout_constraintEnd_toEndOf="parent"
@@ -103,8 +103,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:layout_collapseMode="pin"
-        app:titleTextColor="@color/textNormal" />
+        app:layout_collapseMode="pin" />
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
 
