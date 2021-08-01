@@ -32,7 +32,7 @@ fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
   return ColorStateList.valueOf(getColor(context))
 }
 
-fun @receiver:ColorInt Int.toColorStateListByColor(context: Context): ColorStateList {
+fun @receiver:ColorInt Int.toColorStateListByColor(): ColorStateList {
   return ColorStateList.valueOf(this)
 }
 

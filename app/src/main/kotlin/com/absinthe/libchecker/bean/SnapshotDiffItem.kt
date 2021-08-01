@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.bean
 
-import androidx.annotation.Keep
+import com.squareup.moshi.JsonClass
 import java.io.Serializable
 
-@Keep
+@JsonClass(generateAdapter = true)
 data class SnapshotDiffItem(
   val packageName: String,
   val updateTime: Long,
@@ -26,6 +26,6 @@ data class SnapshotDiffItem(
   var deleted: Boolean = false,
   var isTrackItem: Boolean = false
 ) : Serializable {
-  @Keep
+  @JsonClass(generateAdapter = true)
   data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
 }

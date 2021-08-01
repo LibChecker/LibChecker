@@ -7,6 +7,7 @@ import android.view.ContextThemeWrapper
 import android.widget.ImageView
 import androidx.annotation.IntRange
 import androidx.collection.LruCache
+import coil.load
 import com.absinthe.libchecker.R
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -111,7 +112,9 @@ object AppIconCache : CoroutineScope {
       }
       val cachedBitmap = get(info.packageName, userId, size)
       if (cachedBitmap != null) {
-        view.setImageBitmap(cachedBitmap)
+        view.load(cachedBitmap) {
+          crossfade(true)
+        }
         return@launch
       }
 
@@ -132,9 +135,13 @@ object AppIconCache : CoroutineScope {
       }
 
       if (bitmap != null) {
-        view.setImageBitmap(bitmap)
+        view.load(bitmap) {
+          crossfade(true)
+        }
       } else {
-        view.setImageDrawable(info.loadIcon(context.packageManager))
+        view.load(info.loadIcon(context.packageManager)) {
+          crossfade(true)
+        }
       }
     }
   }

@@ -16,7 +16,6 @@ object Libs {
   const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
   const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.7"
   const val okHttp = "com.squareup.okhttp3:okhttp:4.9.1"
-  const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
   const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
   const val browser = "androidx.browser:browser:1.3.0"
   const val coil = "io.coil-kt:coil:1.3.1"
@@ -42,8 +41,8 @@ object Libs {
     "androidx.room:room-runtime:$roomVersion",
     "androidx.room:room-ktx:$roomVersion"
   )
-  val gson = arrayOf(
-    "com.google.code.gson:gson:2.8.7",
-    "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+  val retrofit = arrayOf(
+    "com.squareup.retrofit2:retrofit:$retrofitVersion",
+    "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
   )
 }

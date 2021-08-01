@@ -109,8 +109,8 @@ dependencies {
     Libs.recyclerView,
     Libs.material,
     Libs.coil,
-    *Libs.gson,
-    Libs.okHttp
+    Libs.okHttp,
+    *Libs.retrofit
   )
 
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
@@ -131,14 +131,17 @@ dependencies {
   implementation("com.drakeet.multitype:multitype:4.3.0")
   implementation("com.airbnb.android:lottie:4.0.0")
   implementation("com.jakewharton.timber:timber:4.7.1")
+  implementation("com.jakewharton:process-phoenix:2.1.1")
   implementation("com.jonathanfinerty.once:once:1.3.1")
   implementation("net.dongliu:apk-parser:2.6.10")
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
-  implementation("com.jakewharton:process-phoenix:2.1.1")
 
+  //Serialization
   implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
+  implementation("com.squareup.moshi:moshi:1.12.0")
+  kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
   implementation("dev.rikka.rikkax.core:core:1.3.2")

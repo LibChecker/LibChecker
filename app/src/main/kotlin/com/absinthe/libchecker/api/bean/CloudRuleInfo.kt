@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.api.bean
 
-import androidx.annotation.Keep
+import com.squareup.moshi.Json
 
-@Keep
 data class CloudRuleInfo(
-  val version: Int,
-  val count: Int,
-  val bundles: Int
+  @field:Json(name = "version") val version: Int,
+  @field:Json(name = "count") val count: Int,
+  @field:Json(name = "bundles") val bundles: Int
 )
