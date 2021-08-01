@@ -9,6 +9,7 @@ import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.RuleDatabase
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
+import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -70,21 +72,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
       object : DownloadUtils.OnDownloadListener {
         override fun onDownloadSuccess() {
           RuleDatabase.getDatabase(requireContext()).close()
-          val databaseDir = File(requireContext().filesDir.parent, "databases")
-          if (databaseDir.exists()) {
-            var file = File(databaseDir, Constants.RULES_DATABASE_NAME)
-            if (file.exists()) {
-              file.delete()
-            }
-            file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm")
-            if (file.exists()) {
-              file.delete()
-            }
-            file = File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal")
-            if (file.exists()) {
-              file.delete()
-            }
-          }
+          Repositories.deleteRulesDatabase()
 
           lifecycleScope.launch(Dispatchers.Main) {
             root.cloudRulesContentView.localVersion.version.text =
@@ -94,6 +82,10 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
               GlobalValues.localRulesVersion =
                 root.cloudRulesContentView.remoteVersion.version.text.toString()
                   .toInt()
+              context?.let {
+                it.showToast("Rebirth")
+                ProcessPhoenix.triggerRebirth(it)
+              }
             } catch (e: NumberFormatException) {
             }
           }

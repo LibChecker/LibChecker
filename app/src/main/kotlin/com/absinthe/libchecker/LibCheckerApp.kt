@@ -12,6 +12,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
+import com.jakewharton.processphoenix.ProcessPhoenix
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
@@ -25,6 +26,10 @@ class LibCheckerApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
+
+    if (ProcessPhoenix.isPhoenixProcess(this)) {
+      return
+    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       HiddenApiBypass.addHiddenApiExemptions("L")
@@ -50,6 +55,7 @@ class LibCheckerApp : Application() {
     DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
     Once.initialise(this)
     Repositories.init(this)
+    Repositories.checkRulesDatabase()
   }
 
   override fun attachBaseContext(base: Context?) {

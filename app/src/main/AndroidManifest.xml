@@ -96,6 +96,13 @@
       android:label="@string/settings_about"
       android:theme="@style/AppTheme.About" />
 
+    <!--  Override  -->
+    <activity
+      android:name="com.jakewharton.processphoenix.ProcessPhoenix"
+      android:exported="false"
+      android:theme="@android:style/Theme.Translucent.NoTitleBar"
+      android:process=":phoenix" />
+
     <service android:name=".services.ShootService" />
 
     <provider

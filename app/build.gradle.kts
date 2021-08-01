@@ -182,6 +182,7 @@ dependencies {
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
+  implementation("com.jakewharton:process-phoenix:2.1.1")
 
   //Serialization
   implementation("com.google.code.gson:gson:2.8.7")
