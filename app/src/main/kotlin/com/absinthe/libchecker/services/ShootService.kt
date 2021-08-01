@@ -28,10 +28,9 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import com.google.gson.Gson
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -53,11 +52,9 @@ class ShootService : LifecycleService() {
       setLocale(GlobalValues.locale)
     }
   }
-  private val gson = Gson()
   private val repository = Repositories.lcRepository
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
-  @DelicateCoroutinesApi
   private val binder = object : IShootService.Stub() {
     override fun computeSnapshot(dropPrevious: Boolean) {
       Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
@@ -75,7 +72,6 @@ class ShootService : LifecycleService() {
     }
   }
 
-  @DelicateCoroutinesApi
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
     return binder
@@ -183,22 +179,16 @@ class ShootService : LifecycleService() {
               isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
               abi = PackageUtils.getAbi(info).toShort(),
               targetApi = info.targetSdkVersion.toShort(),
-              nativeLibs = gson.toJson(
-                PackageUtils.getNativeDirLibs(it)
-              ),
-              services = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
-              ),
-              activities = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
-              ),
-              receivers = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
-              ),
-              providers = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
-              ),
-              permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
+              nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
+              services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
+                .toJson().orEmpty(),
+              activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
+                .toJson().orEmpty(),
+              receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
+                .toJson().orEmpty(),
+              providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
+                .toJson().orEmpty(),
+              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty()
             )
           )
         }
@@ -238,22 +228,16 @@ class ShootService : LifecycleService() {
               isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
               abi = abiValue.toShort(),
               targetApi = info.targetSdkVersion.toShort(),
-              nativeLibs = gson.toJson(
-                PackageUtils.getNativeDirLibs(it, PackageUtils.is32bit(abiValue))
-              ),
-              services = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
-              ),
-              activities = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
-              ),
-              receivers = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
-              ),
-              providers = gson.toJson(
-                PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
-              ),
-              permissions = gson.toJson(PackageUtils.getPermissionsList(it.packageName))
+              nativeLibs = PackageUtils.getNativeDirLibs(it, PackageUtils.is32bit(abiValue)).toJson().orEmpty(),
+              services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
+                .toJson().orEmpty(),
+              activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
+                .toJson().orEmpty(),
+              receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
+                .toJson().orEmpty(),
+              providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
+                .toJson().orEmpty(),
+              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty()
             )
           )
         }

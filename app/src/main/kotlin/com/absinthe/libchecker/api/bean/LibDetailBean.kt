@@ -1,13 +1,12 @@
 package com.absinthe.libchecker.api.bean
 
-import androidx.annotation.Keep
+import com.squareup.moshi.Json
 
-@Keep
 data class LibDetailBean(
-  val label: String,
-  val team: String,
-  val iconUrl: String,
-  val contributors: List<String>,
-  val description: String,
-  val relativeUrl: String
+  @field:Json(name = "label") val label: String,
+  @field:Json(name = "team") val team: String,
+  @field:Json(name = "iconUrl") val iconUrl: String,
+  @field:Json(name = "contributors") val contributors: List<String>,
+  @field:Json(name = "description") val description: String,
+  @field:Json(name = "relativeUrl") val relativeUrl: String
 )

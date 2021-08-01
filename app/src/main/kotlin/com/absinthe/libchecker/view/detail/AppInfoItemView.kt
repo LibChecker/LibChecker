@@ -95,7 +95,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
   }
 
   fun setIconTintColor(@ColorInt res: Int) {
-    icon.imageTintList = res.toColorStateListByColor(context)
+    icon.imageTintList = res.toColorStateListByColor()
   }
 
   fun setIconBackgroundTintColor(@ColorRes res: Int) {

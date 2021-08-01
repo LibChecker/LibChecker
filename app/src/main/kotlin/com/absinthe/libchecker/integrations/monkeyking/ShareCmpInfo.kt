@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.integrations.monkeyking
 
-import androidx.annotation.Keep
+import com.squareup.moshi.JsonClass
 
-@Keep
+@JsonClass(generateAdapter = true)
 data class ShareCmpInfo(
   val pkg: String,
   val components: List<Component>
 ) {
-  @Keep
+  @JsonClass(generateAdapter = true)
   data class Component(
     val type: String,
     val name: String,

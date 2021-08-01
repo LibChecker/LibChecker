@@ -249,9 +249,22 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/drakeet/about-page"
         )
       )
-      add(License("AndroidX", "Google", License.APACHE_2, "https://source.google.com"))
-      add(License("Android Jetpack", "Google", License.APACHE_2, "https://source.google.com"))
-      add(License("gson", "Google", License.APACHE_2, "https://github.com/google/gson"))
+      add(
+        License(
+          "AndroidX",
+          "Google",
+          License.APACHE_2,
+          "https://source.google.com"
+        )
+      )
+      add(
+        License(
+          "Android Jetpack",
+          "Google",
+          License.APACHE_2,
+          "https://source.google.com"
+        )
+      )
       add(
         License(
           "protobuf",
@@ -268,7 +281,14 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/material-components/material-components-android"
         )
       )
-      add(License("RikkaX", "RikkaApps", License.MIT, "https://github.com/RikkaApps/RikkaX"))
+      add(
+        License(
+          "RikkaX",
+          "RikkaApps",
+          License.MIT,
+          "https://github.com/RikkaApps/RikkaX"
+        )
+      )
       add(
         License(
           "lottie-android",
@@ -301,13 +321,28 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"
         )
       )
-      add(License("OkHttp", "Square", License.APACHE_2, "https://github.com/square/okhttp"))
+      add(
+        License(
+          "OkHttp",
+          "Square",
+          License.APACHE_2,
+          "https://github.com/square/okhttp"
+        )
+      )
       add(
         License(
           "Retrofit",
           "Square",
           License.APACHE_2,
           "https://github.com/square/retrofit"
+        )
+      )
+      add(
+        License(
+          "Moshi",
+          "Square",
+          License.APACHE_2,
+          "https://github.com/square/moshi"
         )
       )
       add(
@@ -326,7 +361,14 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/hsiafan/apk-parser"
         )
       )
-      add(License("coil", "coil-kt", License.APACHE_2, "https://github.com/coil-kt/coil"))
+      add(
+        License(
+          "coil",
+          "coil-kt",
+          License.APACHE_2,
+          "https://github.com/coil-kt/coil"
+        )
+      )
       add(
         License(
           "AndroidFastScroll",
@@ -343,7 +385,14 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/zhanghai/AppIconLoader"
         )
       )
-      add(License("LSPosed", "LSPosed", License.GPL_V3, "https://github.com/LSPosed/LSPosed"))
+      add(
+        License(
+          "LSPosed",
+          "LSPosed",
+          License.GPL_V3,
+          "https://github.com/LSPosed/LSPosed"
+        )
+      )
       add(
         License(
           "AndroidHiddenApiBypass",
