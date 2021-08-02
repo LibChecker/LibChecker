@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.api.bean
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 data class LibDetailBean(
   @field:Json(name = "label") val label: String,
   @field:Json(name = "team") val team: String,

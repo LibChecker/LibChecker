@@ -463,9 +463,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       list.addAll(
         getNativeDiffList(
           context,
-          entity.nativeLibsDiff.old.fromJson() ?: emptyList(),
+          entity.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
+            List::class.java,
+            LibStringItem::class.java
+          ) ?: emptyList(),
           if (entity.nativeLibsDiff.new != null) {
-            entity.nativeLibsDiff.new.fromJson()
+            entity.nativeLibsDiff.new.fromJson<List<LibStringItem>>(
+              List::class.java,
+              LibStringItem::class.java
+            )
           } else {
             null
           }
@@ -478,9 +484,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
       list.addAll(
         getPermissionsDiffList(
-          entity.permissionsDiff.old.fromJson() ?: emptyList(),
+          entity.permissionsDiff.old.fromJson<List<String>>(
+            List::class.java,
+            String::class.java
+          ) ?: emptyList(),
           if (entity.permissionsDiff.new != null) {
-            entity.permissionsDiff.new.fromJson()
+            entity.permissionsDiff.new.fromJson<List<String>>(
+              List::class.java,
+              String::class.java
+            )
           } else {
             null
           }
@@ -497,9 +509,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   ) {
     list.addAll(
       getComponentsDiffList(
-        diffNode.old.fromJson() ?: emptyList(),
+        diffNode.old.fromJson<List<String>>(
+          List::class.java,
+          String::class.java
+        ) ?: emptyList(),
         if (diffNode.new != null) {
-          diffNode.new.fromJson()
+          diffNode.new.fromJson<List<String>>(
+            List::class.java,
+            String::class.java
+          )
         } else {
           null
         },
@@ -688,9 +706,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun compareNativeAndComponentDiff(item: SnapshotDiffItem): CompareDiffNode {
     val nativeCompareNode = compareNativeDiff(
-      item.nativeLibsDiff.old.fromJson() ?: emptyList(),
+      item.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
+        List::class.java,
+        LibStringItem::class.java
+      ) ?: emptyList(),
       if (item.nativeLibsDiff.new != null) {
-        item.nativeLibsDiff.new.fromJson()
+        item.nativeLibsDiff.new.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
+        )
       } else {
         null
       }
@@ -700,9 +724,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val receiversCompareNode = compareComponentsDiff(item.receiversDiff)
     val providersCompareNode = compareComponentsDiff(item.providersDiff)
     val permissionsCompareNode = comparePermissionsDiff(
-      item.permissionsDiff.old.fromJson() ?: emptyList(),
+      item.permissionsDiff.old.fromJson<List<String>>(
+        List::class.java,
+        String::class.java
+      ) ?: emptyList(),
       if (item.permissionsDiff.new != null) {
-        item.permissionsDiff.new.fromJson()
+        item.permissionsDiff.new.fromJson<List<String>>(
+          List::class.java,
+          String::class.java
+        )
       } else {
         null
       }
@@ -760,8 +790,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return CompareDiffNode(removed = true)
     }
 
-    val oldList = diffNode.old.fromJson<List<String>>() ?: emptyList()
-    val newList = diffNode.new.fromJson<List<String>>() ?: emptyList()
+    val oldList = diffNode.old.fromJson<List<String>>(
+      List::class.java,
+      String::class.java
+    ) ?: emptyList()
+    val newList = diffNode.new.fromJson<List<String>>(
+      List::class.java,
+      String::class.java
+    ) ?: emptyList()
     val tempOldList = oldList.toMutableList()
     val tempNewList = newList.toMutableList()
     val sameList = mutableListOf<String>()
