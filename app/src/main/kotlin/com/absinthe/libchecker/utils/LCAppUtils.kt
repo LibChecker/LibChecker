@@ -9,7 +9,10 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
+import android.view.ContextThemeWrapper
+import android.view.ViewGroup
 import androidx.annotation.ChecksSdkIntAtLeast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
@@ -35,6 +38,8 @@ import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
 import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.utils.extensions.dp
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import timber.log.Timber
 import java.text.SimpleDateFormat
@@ -204,6 +209,21 @@ object LCAppUtils {
         )
       context.startActivity(intent)
     }
+  }
+
+  fun createLoadingDialog(context: ContextThemeWrapper) : AlertDialog {
+    return AlertDialog.Builder(context)
+      .setView(
+        LinearProgressIndicator(context).apply {
+          layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            setPadding(24.dp, 24.dp, 24.dp, 24.dp)
+          }
+          trackCornerRadius = 3.dp
+          isIndeterminate = true
+        }
+      )
+      .setCancelable(false)
+      .create()
   }
 }
 

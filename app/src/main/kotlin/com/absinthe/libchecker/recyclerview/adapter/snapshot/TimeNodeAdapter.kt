@@ -23,10 +23,12 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
       name.text = getFormatDateString(item.timestamp)
       try {
         item.topApps?.let {
-          adapter.setList(it.fromJson<List<String>>(
-            List::class.java,
-            String::class.java
-          ))
+          adapter.setList(
+            it.fromJson<List<String>>(
+              List::class.java,
+              String::class.java
+            )
+          )
         }
       } catch (e: IOException) {
         Timber.e(e)

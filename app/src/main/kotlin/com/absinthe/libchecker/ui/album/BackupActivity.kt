@@ -16,6 +16,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -63,8 +64,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
           it?.let {
             try {
+              val dialog = LCAppUtils.createLoadingDialog(requireActivity())
+              dialog.show()
               requireActivity().contentResolver.openOutputStream(it)?.let { os ->
-                viewModel.backup(os)
+                viewModel.backup(os) {
+                  dialog.dismiss()
+                }
               }
             } catch (e: IOException) {
               Timber.e(e)
@@ -77,8 +82,13 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
             try {
               requireActivity().contentResolver.openInputStream(it)
                 ?.let { inputStream ->
-                  viewModel.restore(inputStream) {
-                    context.showToast("Backup file error")
+                  val dialog = LCAppUtils.createLoadingDialog(requireActivity())
+                  dialog.show()
+                  viewModel.restore(inputStream) { success ->
+                    if (!success) {
+                      context.showToast("Backup file error")
+                    }
+                    dialog.dismiss()
                   }
                 }
             } catch (e: IOException) {

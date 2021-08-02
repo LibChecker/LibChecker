@@ -871,7 +871,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     return node
   }
 
-  fun backup(os: OutputStream) = viewModelScope.launch(Dispatchers.IO) {
+  fun backup(os: OutputStream, resultAction: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
     val builder: SnapshotList.Builder = SnapshotList.newBuilder()
     val backupList = repository.getSnapshots()
 
@@ -906,16 +906,20 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     os.write(str)
     os.close()
+
+    withContext(Dispatchers.Main) {
+      resultAction()
+    }
   }
 
-  fun restore(inputStream: InputStream, failedAction: () -> Unit) {
+  fun restore(inputStream: InputStream, resultAction: (success: Boolean) -> Unit) {
     viewModelScope.launch(Dispatchers.IO) {
       inputStream.use {
         val list: SnapshotList = try {
           SnapshotList.parseFrom(inputStream)
         } catch (e: InvalidProtocolBufferException) {
           withContext(Dispatchers.Main) {
-            failedAction()
+            resultAction(false)
           }
           SnapshotList.newBuilder().build()
         }
@@ -960,6 +964,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         count = 0
         timeStampSet.forEach { insertTimeStamp(it) }
         timeStampSet.maxOrNull()?.let { GlobalValues.snapshotTimestamp = it }
+        withContext(Dispatchers.Main) {
+          resultAction(true)
+        }
       }
     }
   }

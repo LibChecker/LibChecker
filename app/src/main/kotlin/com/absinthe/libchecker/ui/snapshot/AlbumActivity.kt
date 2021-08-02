@@ -1,12 +1,12 @@
 package com.absinthe.libchecker.ui.snapshot
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
@@ -16,6 +16,7 @@ import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -79,13 +80,10 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
               setOnItemClickListener { position ->
                 val item = timeStampList[position]
                 lifecycleScope.launch(Dispatchers.IO) {
-                  val progressDialog: ProgressDialog
+                  val dialog: AlertDialog
                   withContext(Dispatchers.Main) {
-                    progressDialog = ProgressDialog(this@AlbumActivity).apply {
-                      setMessage(getString(R.string.album_dialog_delete_snapshot_message))
-                      setCancelable(false)
-                    }
-                    progressDialog.show()
+                    dialog = LCAppUtils.createLoadingDialog(this@AlbumActivity)
+                    dialog.show()
                   }
                   viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
                   timeStampList.removeAt(position)
@@ -96,7 +94,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                   }
                   withContext(Dispatchers.Main) {
                     root.adapter.remove(item)
-                    progressDialog.dismiss()
+                    dialog.dismiss()
                   }
                 }
               }
