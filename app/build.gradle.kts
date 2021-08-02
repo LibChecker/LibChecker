@@ -5,7 +5,6 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
-import java.nio.charset.Charset
 import java.nio.file.Paths
 
 plugins {
@@ -16,23 +15,9 @@ plugins {
   id("com.google.protobuf")
 }
 
-android {
-  compileSdk = 31
-  buildToolsVersion = "31.0.0"
-
-  val gitCommitId = "git rev-parse --short HEAD".exec()
-  val baseVersionName = "2.1.4"
-  val verName = "${baseVersionName}.${gitCommitId}"
-  val verCode = "git rev-list --count HEAD".exec().toInt()
-
+setupAppModule {
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
-    minSdk = 23
-    targetSdk = 31
-    versionCode = verCode
-    versionName = verName
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
   }
 
   buildFeatures {
@@ -44,30 +29,6 @@ android {
       arg("room.incremental", "true")
       arg("room.schemaLocation", "$projectDir/schemas")
     }
-  }
-
-  compileOptions {
-    targetCompatibility(JavaVersion.VERSION_11)
-    sourceCompatibility(JavaVersion.VERSION_11)
-  }
-
-  buildTypes {
-    debug {
-      applicationIdSuffix = ".debug"
-    }
-    release {
-      isMinifyEnabled = true
-      isShrinkResources = true
-      proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
-      )
-    }
-  }
-
-  kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11.toString()
-    freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
   }
 
   sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -250,7 +211,4 @@ protobuf {
     }
   }
 }
-
-fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
-  .toString(Charset.defaultCharset()).trim()
 

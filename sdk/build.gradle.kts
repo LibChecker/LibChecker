@@ -4,40 +4,7 @@ plugins {
   kotlin("kapt")
 }
 
-android {
-  compileSdk = 31
-  buildToolsVersion = "31.0.0"
-
-  defaultConfig {
-    minSdk = 23
-    targetSdk = 31
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-  }
-
-  buildFeatures {
-    viewBinding = true
-  }
-
-  buildTypes {
-    release {
-      isMinifyEnabled = true
-      proguardFiles(
-        getDefaultProguardFile("proguard-android-optimize.txt"),
-        "proguard-rules.pro"
-      )
-    }
-  }
-
-  kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11.toString()
-    freeCompilerArgs = listOf("-Xopt-in=kotlin.RequiresOptIn", "-XXLanguage:+InlineClasses")
-  }
-
-  compileOptions {
-    targetCompatibility(JavaVersion.VERSION_11)
-    sourceCompatibility(JavaVersion.VERSION_11)
-  }
-
+setupLibraryModule {
   packagingOptions.resources.excludes += setOf(
     "META-INF/atomicfu.kotlin_module"
   )
