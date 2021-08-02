@@ -3,7 +3,10 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
 
@@ -56,6 +59,20 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
       targetCompatibility(JavaVersion.VERSION_11)
       sourceCompatibility(JavaVersion.VERSION_11)
     }
+    dependencies {
+      implementations(
+        fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))),
+        "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt",
+        "androidx.appcompat:appcompat:1.3.1",
+        "androidx.core:core-ktx:1.6.0"
+      )
+
+      testImplementations("junit:junit:4.13.2")
+      androidTestImplementations(
+        "androidx.test.ext:junit:1.1.3",
+        "androidx.test.espresso:espresso-core:3.4.0"
+      )
+    }
     (this as T).block()
   }
 }
@@ -66,3 +83,15 @@ private fun BaseExtension.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
 
 fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
   .toString(Charset.defaultCharset()).trim()
+
+fun DependencyHandler.implementations(vararg names: Any): Array<Dependency?> =
+  config("implementation", *names)
+
+fun DependencyHandler.androidTestImplementations(vararg names: Any): Array<Dependency?> =
+  config("androidTestImplementation", *names)
+
+fun DependencyHandler.testImplementations(vararg names: Any): Array<Dependency?> =
+  config("testImplementation", *names)
+
+private fun DependencyHandler.config(operation: String, vararg names: Any): Array<Dependency?> =
+  names.map { add(operation, it) }.toTypedArray()

@@ -96,9 +96,7 @@ val grpcVersion by extra("1.39.0")
 val protocVersion by extra("3.17.3")
 
 dependencies {
-  implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   compileOnly(fileTree("ohos"))
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt")
 
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
@@ -128,7 +126,6 @@ dependencies {
   implementation("androidx.preference:preference-ktx:1.1.1")
   implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
   implementation("androidx.recyclerview:recyclerview:1.2.1")
-  implementation("androidx.core:core-ktx:1.6.0")
 
   implementation("com.google.android.material:material:1.5.0-alpha01")
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
@@ -169,10 +166,7 @@ dependencies {
   implementation("io.grpc:grpc-stub:$grpcVersion")
   implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-  testImplementation("junit:junit:4.13.2")
   debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
-  androidTestImplementation("androidx.test.ext:junit:1.1.3")
-  androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 }
 
 protobuf {
