@@ -1,0 +1,49 @@
+@file:Suppress("SpellCheckingInspection")
+
+private const val lifecycleVersion = "2.3.1"
+private const val retrofitVersion = "2.9.0"
+private const val roomVersion = "2.3.0"
+
+object Libs {
+  const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
+  const val core = "androidx.core:core-ktx:1.6.0"
+  const val appCompat = "androidx.appcompat:appcompat:1.3.1"
+  const val annotation = "androidx.annotation:annotation:1.2.0"
+  const val activity = "androidx.activity:activity-ktx:1.3.0"
+  const val fragment = "androidx.fragment:fragment-ktx:1.3.6"
+  const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.0"
+  const val material = "com.google.android.material:material:1.5.0-alpha01"
+  const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
+  const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.7"
+  const val okHttp = "com.squareup.okhttp3:okhttp:4.9.1"
+  const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
+  const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
+  const val browser = "androidx.browser:browser:1.3.0"
+  const val coil = "io.coil-kt:coil:1.3.1"
+
+  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.4.5"
+
+  const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
+
+  val tests = arrayOf(
+    "junit:junit:4.13.2"
+  )
+  val androidTests = arrayOf(
+    "androidx.test.ext:junit:1.1.3",
+    "androidx.test.espresso:espresso-core:3.4.0"
+  )
+  val lifecycle = arrayOf(
+    "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion",
+    "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion",
+    "androidx.lifecycle:lifecycle-service:$lifecycleVersion",
+    "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+  )
+  val room = arrayOf(
+    "androidx.room:room-runtime:$roomVersion",
+    "androidx.room:room-ktx:$roomVersion"
+  )
+  val gson = arrayOf(
+    "com.google.code.gson:gson:2.8.7",
+    "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+  )
+}

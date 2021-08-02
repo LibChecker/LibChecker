@@ -98,6 +98,21 @@ val protocVersion by extra("3.17.3")
 dependencies {
   compileOnly(fileTree("ohos"))
 
+  implementations(
+    Libs.activity,
+    Libs.fragment,
+    *Libs.lifecycle,
+    *Libs.room,
+    Libs.constraintLayout,
+    Libs.browser,
+    Libs.viewPager2,
+    Libs.recyclerView,
+    Libs.material,
+    Libs.coil,
+    *Libs.gson,
+    Libs.okHttp
+  )
+
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
@@ -105,29 +120,11 @@ dependencies {
   implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
   implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
 
-  implementation("androidx.fragment:fragment-ktx:1.3.6")
-  implementation("androidx.activity:activity-ktx:1.3.0")
-  // Lifecycle
-  val lifecycleVersion = "2.3.1"
-  implementation("androidx.lifecycle:lifecycle-common-java8:${lifecycleVersion}")
-  implementation("androidx.lifecycle:lifecycle-livedata-ktx:${lifecycleVersion}")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:${lifecycleVersion}")
-  implementation("androidx.lifecycle:lifecycle-service:${lifecycleVersion}")
-
-  // Room components
-  val roomVersion = "2.3.0"
-  implementation("androidx.room:room-runtime:$roomVersion")
-  implementation("androidx.room:room-ktx:$roomVersion")
   kapt("org.xerial:sqlite-jdbc:3.36.0.1") //Work around on Apple Silicon
-  kapt("androidx.room:room-compiler:$roomVersion")
+  kapt(Libs.roomCompiler)
 
-  implementation("androidx.constraintlayout:constraintlayout:2.0.4")
-  implementation("androidx.browser:browser:1.3.0")
   implementation("androidx.preference:preference-ktx:1.1.1")
-  implementation("androidx.viewpager2:viewpager2:1.1.0-alpha01")
-  implementation("androidx.recyclerview:recyclerview:1.2.1")
 
-  implementation("com.google.android.material:material:1.5.0-alpha01")
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
   implementation("com.drakeet.about:about:2.4.1")
@@ -136,14 +133,11 @@ dependencies {
   implementation("com.jakewharton.timber:timber:4.7.1")
   implementation("com.jonathanfinerty.once:once:1.3.1")
   implementation("net.dongliu:apk-parser:2.6.10")
-  implementation("io.coil-kt:coil:1.3.1")
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
   implementation("com.jakewharton:process-phoenix:2.1.1")
 
-  //Serialization
-  implementation("com.google.code.gson:gson:2.8.7")
   implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
@@ -154,19 +148,13 @@ dependencies {
   implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
   implementation("dev.rikka.rikkax.insets:insets:1.1.0")
 
-  //Network
-  implementation("com.squareup.okhttp3:okhttp:4.9.1")
-  implementation("com.squareup.retrofit2:retrofit:2.9.0")
-  implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-  implementation("com.squareup.okio:okio:2.10.0")
-
   // gRPC
   implementation("io.grpc:grpc-okhttp:$grpcVersion")
   implementation("io.grpc:grpc-protobuf-lite:$grpcVersion")
   implementation("io.grpc:grpc-stub:$grpcVersion")
   implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-  debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+  debugImplementation(Libs.leakCanary)
 }
 
 protobuf {

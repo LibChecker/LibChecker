@@ -12,7 +12,7 @@ buildscript {
     classpath(rootProject.extra["androidPlugin"].toString())
     classpath(rootProject.extra["kotlinPlugin"].toString())
     classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.17")
-    classpath("org.jmailen.gradle:kotlinter-gradle:3.4.5")
+    classpath(Libs.kotlinterPlugin)
   }
 }
 
