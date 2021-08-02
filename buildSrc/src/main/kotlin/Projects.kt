@@ -62,16 +62,13 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
     dependencies {
       implementations(
         fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))),
-        "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt",
-        "androidx.appcompat:appcompat:1.3.1",
-        "androidx.core:core-ktx:1.6.0"
+        Libs.coroutines,
+        Libs.appCompat,
+        Libs.core
       )
 
-      testImplementations("junit:junit:4.13.2")
-      androidTestImplementations(
-        "androidx.test.ext:junit:1.1.3",
-        "androidx.test.espresso:espresso-core:3.4.0"
-      )
+      testImplementations(*Libs.tests)
+      androidTestImplementations(*Libs.androidTests)
     }
     (this as T).block()
   }
