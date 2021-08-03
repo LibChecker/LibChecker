@@ -211,7 +211,7 @@ object LCAppUtils {
     }
   }
 
-  fun createLoadingDialog(context: ContextThemeWrapper) : AlertDialog {
+  fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
     return AlertDialog.Builder(context)
       .setView(
         LinearProgressIndicator(context).apply {
