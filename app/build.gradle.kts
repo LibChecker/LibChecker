@@ -92,13 +92,11 @@ configurations.all {
   exclude(group = "androidx.appcompat", module = "appcompat")
 }
 
-val grpcVersion by extra("1.39.0")
-val protocVersion by extra("3.17.3")
-
 dependencies {
   compileOnly(fileTree("ohos"))
 
   implementations(
+    // UI
     Libs.activity,
     Libs.fragment,
     *Libs.lifecycle,
@@ -107,25 +105,32 @@ dependencies {
     Libs.browser,
     Libs.viewPager2,
     Libs.recyclerView,
+    Libs.preference,
     Libs.material,
+
+    // Net
     Libs.coil,
     Libs.okHttp,
     Libs.retrofit,
-    *Libs.moshi
+
+    // Serialization
+    *Libs.moshi,
+    Libs.protobufJavaLite,
+
+    // gRPC
+    *Libs.grpc,
+
+    // Debug
+    *Libs.appCenter
   )
 
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
-  val appCenterSdkVersion = "4.2.0"
-  implementation("com.microsoft.appcenter:appcenter-analytics:${appCenterSdkVersion}")
-  implementation("com.microsoft.appcenter:appcenter-crashes:${appCenterSdkVersion}")
-
-  kapt("org.xerial:sqlite-jdbc:3.36.0.1") //Work around on Apple Silicon
+  // Work around on Apple Silicon
+  kapt("org.xerial:sqlite-jdbc:3.36.0.1")
   kapt(Libs.roomCompiler)
   kapt(Libs.moshiCompiler)
-
-  implementation("androidx.preference:preference-ktx:1.1.1")
 
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
@@ -140,10 +145,6 @@ dependencies {
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
 
-  //Serialization
-  implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
-  kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
-
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
   implementation("dev.rikka.rikkax.core:core:1.3.2")
   implementation("dev.rikka.rikkax.material:material:1.6.5")
@@ -152,33 +153,19 @@ dependencies {
   implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
   implementation("dev.rikka.rikkax.insets:insets:1.1.0")
 
-  // gRPC
-  implementation("io.grpc:grpc-okhttp:$grpcVersion")
-  implementation("io.grpc:grpc-protobuf-lite:$grpcVersion")
-  implementation("io.grpc:grpc-stub:$grpcVersion")
-  implementation("javax.annotation:javax.annotation-api:1.3.2")
-
   debugImplementation(Libs.leakCanary)
 }
 
 protobuf {
   protoc {
-    artifact = if (osdetector.os == "osx") {
-      "com.google.protobuf:protoc:$protocVersion:osx-x86_64"
-    } else {
-      "com.google.protobuf:protoc:$protocVersion"
-    }
+    artifact = if (osdetector.os == "osx") Libs.protocMac else Libs.protoc
   }
   plugins {
     // Optional: an artifact spec for a protoc plugin, with "grpc" as
     // the identifier, which can be referred to in the "plugins"
     // container of the "generateProtoTasks" closure.
     id("grpc") {
-      artifact = if (osdetector.os == "osx") {
-        "io.grpc:protoc-gen-grpc-java:$grpcVersion:osx-x86_64"
-      } else {
-        "io.grpc:protoc-gen-grpc-java:$grpcVersion"
-      }
+      artifact = if (osdetector.os == "osx") Libs.genGrpcMac else Libs.genGrpc
     }
     generateProtoTasks {
       all().forEach {
