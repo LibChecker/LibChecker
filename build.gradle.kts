@@ -11,7 +11,7 @@ buildscript {
   dependencies {
     classpath(rootProject.extra["androidPlugin"].toString())
     classpath(rootProject.extra["kotlinPlugin"].toString())
-    classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.17")
+    classpath(Libs.protobufPlugin)
     classpath(Libs.kotlinterPlugin)
   }
 }
