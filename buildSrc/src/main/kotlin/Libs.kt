@@ -3,6 +3,7 @@
 private const val lifecycleVersion = "2.3.1"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
+private const val moshiVersion = "1.12.0"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
@@ -19,10 +20,12 @@ object Libs {
   const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
   const val browser = "androidx.browser:browser:1.3.0"
   const val coil = "io.coil-kt:coil:1.3.1"
+  const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"
 
   const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.4.5"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
+  const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 
   val tests = arrayOf(
     "junit:junit:4.13.2"
@@ -41,8 +44,8 @@ object Libs {
     "androidx.room:room-runtime:$roomVersion",
     "androidx.room:room-ktx:$roomVersion"
   )
-  val retrofit = arrayOf(
-    "com.squareup.retrofit2:retrofit:$retrofitVersion",
+  val moshi = arrayOf(
+    "com.squareup.moshi:moshi:$moshiVersion",
     "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
   )
 }

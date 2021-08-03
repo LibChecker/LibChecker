@@ -110,7 +110,8 @@ dependencies {
     Libs.material,
     Libs.coil,
     Libs.okHttp,
-    *Libs.retrofit
+    Libs.retrofit,
+    *Libs.moshi
   )
 
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
@@ -122,6 +123,7 @@ dependencies {
 
   kapt("org.xerial:sqlite-jdbc:3.36.0.1") //Work around on Apple Silicon
   kapt(Libs.roomCompiler)
+  kapt(Libs.moshiCompiler)
 
   implementation("androidx.preference:preference-ktx:1.1.1")
 
@@ -140,7 +142,6 @@ dependencies {
 
   //Serialization
   implementation("com.google.protobuf:protobuf-javalite:$protocVersion")
-  implementation("com.squareup.moshi:moshi:1.12.0")
   kapt("com.squareup.moshi:moshi-kotlin-codegen:1.12.0")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
