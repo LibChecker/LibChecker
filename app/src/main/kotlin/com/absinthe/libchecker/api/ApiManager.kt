@@ -3,6 +3,7 @@ package com.absinthe.libchecker.api
 import com.absinthe.libchecker.api.request.VERSION
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.JsonUtil
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -31,13 +32,14 @@ object ApiManager {
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 
   private val retrofit by lazy {
-    val okhttpBuilder = OkHttpClient.Builder()
+    val okHttpClient = OkHttpClient.Builder()
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
+      .build()
     Retrofit.Builder()
-      .addConverterFactory(MoshiConverterFactory.create())
-      .client(okhttpBuilder.build())
+      .addConverterFactory(MoshiConverterFactory.create(JsonUtil.moshi))
+      .client(okHttpClient)
       .baseUrl(root)
       .build()
   }
