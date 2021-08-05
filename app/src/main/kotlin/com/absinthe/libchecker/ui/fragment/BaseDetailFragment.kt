@@ -102,6 +102,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     val list = mutableListOf<LibStringItemChip>().also {
       it += adapter.data
     }
+    val itemChip = if (adapter.highlightPosition != -1) {
+      adapter.data[adapter.highlightPosition]
+    } else {
+      null
+    }
+
     if (viewModel.sortMode == MODE_SORT_BY_LIB) {
       if (type == NATIVE) {
         list.sortByDescending { it.item.size }
@@ -111,6 +117,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     } else {
       list.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
     }
+
+    if (itemChip != null) {
+      val newHighlightPosition = list.indexOf(itemChip)
+      adapter.setHighlightBackgroundItem(newHighlightPosition)
+    }
+
     withContext(Dispatchers.Main) {
       adapter.setDiffNewData(list)
     }

@@ -12,6 +12,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.MenuItem
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -48,6 +49,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -56,6 +58,7 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
+import com.absinthe.libchecker.view.detail.ChipGroupView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -274,10 +277,20 @@ class AppDetailActivity :
 
           extraBean?.let {
             if (it.isSplitApk || it.isKotlinUsed) {
-              chipGroup.isVisible = true
-              chipAppBundle.apply {
-                isVisible = it.isSplitApk
-                setOnClickListener {
+              val chipGroup = ChipGroupView(this@AppDetailActivity).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                  LinearLayout.LayoutParams.MATCH_PARENT,
+                  LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { cg ->
+                  cg.topMargin = 16.dp
+                }
+              }
+              headerContentLayout.addView(chipGroup)
+              if (it.isSplitApk) {
+                chipGroup.addChip(
+                  icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
+                  text = getString(R.string.app_bundle)
+                ) {
                   AppBundleBottomSheetDialogFragment().apply {
                     arguments = bundleOf(
                       EXTRA_PACKAGE_NAME to pkgName
@@ -286,9 +299,11 @@ class AppDetailActivity :
                   }
                 }
               }
-              chipKotlinUsed.apply {
-                isVisible = it.isKotlinUsed
-                setOnClickListener {
+              if (it.isKotlinUsed) {
+                chipGroup.addChip(
+                  icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
+                  text = getString(R.string.kotlin_used)
+                ) {
                   AlertDialog.Builder(this@AppDetailActivity)
                     .setIcon(R.drawable.ic_kotlin_logo)
                     .setTitle(R.string.kotlin_string)
@@ -297,8 +312,6 @@ class AppDetailActivity :
                     .show()
                 }
               }
-            } else {
-              chipGroup.isVisible = false
             }
             if (it.variant == Constants.VARIANT_HAP) {
               ibHarmonyBadge.isVisible = true

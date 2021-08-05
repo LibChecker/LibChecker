@@ -484,11 +484,12 @@ object PackageUtils {
           else -> false
         }
 
-        if (isSimpleName) {
-          StatefulComponent(it.name.removePrefix(packageName), isEnabled)
+        val name = if (isSimpleName) {
+          it.name.removePrefix(packageName)
         } else {
-          StatefulComponent(it.name, isEnabled)
+          it.name
         }
+        StatefulComponent(name, isEnabled, it.processName.removePrefix(it.packageName))
       }
       .toList()
   }

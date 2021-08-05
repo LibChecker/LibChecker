@@ -289,19 +289,43 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       )?.abilityInfos?.let { abilities ->
         val pages = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.PAGE }
-          .map { StatefulComponent(it.className, it.enabled) }
+          .map {
+            StatefulComponent(
+              it.className,
+              it.enabled,
+              it.process.removePrefix((it.bundleName))
+            )
+          }
           .toList()
         val services = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.SERVICE }
-          .map { StatefulComponent(it.className, it.enabled) }
+          .map {
+            StatefulComponent(
+              it.className,
+              it.enabled,
+              it.process.removePrefix((it.bundleName))
+            )
+          }
           .toList()
         val webs = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.WEB }
-          .map { StatefulComponent(it.className, it.enabled) }
+          .map {
+            StatefulComponent(
+              it.className,
+              it.enabled,
+              it.process.removePrefix((it.bundleName))
+            )
+          }
           .toList()
         val datas = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.DATA }
-          .map { StatefulComponent(it.className, it.enabled) }
+          .map {
+            StatefulComponent(
+              it.className,
+              it.enabled,
+              it.process.removePrefix((it.bundleName))
+            )
+          }
           .toList()
 
         abilitiesMap[AbilityType.PAGE]?.postValue(pages)

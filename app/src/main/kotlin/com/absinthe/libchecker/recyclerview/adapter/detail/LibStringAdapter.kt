@@ -32,7 +32,8 @@ private const val HIGHLIGHT_TRANSITION_DURATION = 250
 class LibStringAdapter(@LibType val type: Int) :
   BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
 
-  private var highlightPosition: Int = -1
+  var highlightPosition: Int = -1
+    private set
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return when (type) {

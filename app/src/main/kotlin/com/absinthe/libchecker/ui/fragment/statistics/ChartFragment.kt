@@ -20,6 +20,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
@@ -282,8 +283,9 @@ class ChartFragment :
 
       // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
-      for (c in ColorTemplate.COLORFUL_COLORS) colors.add(c)
-      for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+      (0..30).forEach { _ ->
+        colors.add(UiUtils.getRandomColor())
+      }
 
       dataSet.colors = colors
       // dataSet.setSelectionShift(0f);

@@ -25,10 +25,11 @@
       app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-      <androidx.constraintlayout.widget.ConstraintLayout
+      <LinearLayout
         android:id="@+id/header_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingHorizontal="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
         android:paddingBottom="@dimen/normal_padding"
@@ -37,41 +38,9 @@
         <com.absinthe.libchecker.view.detail.DetailsTitleView
           android:id="@+id/details_title"
           android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          app:layout_constraintTop_toTopOf="parent" />
+          android:layout_height="wrap_content" />
 
-        <com.google.android.material.chip.ChipGroup
-          android:id="@+id/chipGroup"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="@dimen/normal_padding"
-          android:clipToPadding="false"
-          android:paddingVertical="4dp"
-          android:visibility="gone"
-          app:chipSpacing="@dimen/normal_padding"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/details_title"
-          tools:visibility="visible">
-
-          <com.google.android.material.chip.Chip
-            android:id="@+id/chip_app_bundle"
-            style="@style/App.LibChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_bundle"
-            app:chipIcon="@drawable/ic_aab" />
-
-          <com.google.android.material.chip.Chip
-            android:id="@+id/chip_kotlin_used"
-            style="@style/App.LibChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/kotlin_used"
-            app:chipIcon="@drawable/ic_kotlin_logo" />
-
-        </com.google.android.material.chip.ChipGroup>
-
-      </androidx.constraintlayout.widget.ConstraintLayout>
+      </LinearLayout>
 
       <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
