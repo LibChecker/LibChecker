@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
-import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,7 +27,8 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
-import com.google.android.material.animation.AnimationUtils
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
@@ -38,10 +39,11 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity<ActivityMainBinding>() {
+class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
 
   private var clickBottomItemFlag = false
   private val appViewModel: HomeViewModel by viewModels()
+  private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -76,17 +78,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     unregisterPackageBroadcast()
   }
 
-  fun showNavigationView() {
-    binding.navView
-      .animate()
-      .translationY(0F)
-      .setDuration(225)
-      .interpolator = AnimationUtils.LINEAR_OUT_SLOW_IN_INTERPOLATOR
+  override fun showNavigationView() {
+    navViewBehavior.slideUp(binding.navView)
+  }
+
+  override fun hideNavigationView() {
+    navViewBehavior.slideDown(binding.navView)
   }
 
   private fun initView() {
     setAppBar(binding.appbar, binding.toolbar)
-    (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+    binding.root.bringChildToFront(binding.appbar)
     supportActionBar?.title = LCAppUtils.setTitle(this)
 
     binding.apply {
@@ -119,37 +121,43 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         offscreenPageLimit = 2
       }
 
-      // 当 ViewPager 切换页面时，改变 ViewPager 的显示
-      navView.setOnItemSelectedListener {
+      navView.apply {
+        (layoutParams as CoordinatorLayout.LayoutParams).also {
+          it.behavior = navViewBehavior
+        }
+        requestLayout()
+        // 当 ViewPager 切换页面时，改变 ViewPager 的显示
+        setOnItemSelectedListener {
 
-        fun performClickNavigationItem(index: Int) {
-          if (binding.viewpager.currentItem != index) {
-            if (!binding.viewpager.isFakeDragging) {
-              binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
-            }
-          } else {
-            if (!clickBottomItemFlag) {
-              clickBottomItemFlag = true
-
-              lifecycleScope.launch {
-                delay(200)
-                clickBottomItemFlag = false
+          fun performClickNavigationItem(index: Int) {
+            if (binding.viewpager.currentItem != index) {
+              if (!binding.viewpager.isFakeDragging) {
+                binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
               }
-            } else if (appViewModel.controller?.isAllowRefreshing() == true) {
-              appViewModel.controller?.onReturnTop()
+            } else {
+              if (!clickBottomItemFlag) {
+                clickBottomItemFlag = true
+
+                lifecycleScope.launch {
+                  delay(200)
+                  clickBottomItemFlag = false
+                }
+              } else if (appViewModel.controller?.isAllowRefreshing() == true) {
+                appViewModel.controller?.onReturnTop()
+              }
             }
           }
-        }
 
-        when (it.itemId) {
-          R.id.navigation_app_list -> performClickNavigationItem(0)
-          R.id.navigation_classify -> performClickNavigationItem(1)
-          R.id.navigation_snapshot -> performClickNavigationItem(2)
-          R.id.navigation_settings -> performClickNavigationItem(3)
+          when (it.itemId) {
+            R.id.navigation_app_list -> performClickNavigationItem(0)
+            R.id.navigation_classify -> performClickNavigationItem(1)
+            R.id.navigation_snapshot -> performClickNavigationItem(2)
+            R.id.navigation_settings -> performClickNavigationItem(3)
+          }
+          true
         }
-        true
+        setOnClickListener { /*Do nothing*/ }
       }
-      navView.setOnClickListener { /*Do nothing*/ }
     }
   }
 

@@ -35,7 +35,7 @@ import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
-import com.absinthe.libchecker.ui.main.MainActivity
+import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingBottom
@@ -245,13 +245,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
 
-          doOnMainThreadIdle({
-            if (this@SnapshotFragment == homeViewModel.controller &&
-              !binding.list.canScrollVertically(-1)
-            ) {
-              (requireActivity() as MainActivity).showNavigationView()
+          doOnMainThreadIdle(
+            {
+              if (this@SnapshotFragment == homeViewModel.controller &&
+                !binding.list.canScrollVertically(-1)
+              ) {
+                (activity as? INavViewContainer)?.showNavigationView()
+              }
             }
-          })
+          )
         }
       }
       comparingProgressLiveData.observe(viewLifecycleOwner) {
@@ -261,6 +263,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     homeViewModel.apply {
       packageChangedLiveData.observe(viewLifecycleOwner) {
         if (allowRefreshing) {
+          flip(VF_LOADING)
           viewModel.compareDiff(GlobalValues.snapshotTimestamp)
         }
       }

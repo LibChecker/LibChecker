@@ -24,6 +24,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.addPaddingBottom
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
@@ -428,6 +429,7 @@ class AboutActivity : AbsAboutActivity() {
   private fun initView() {
     UiUtils.setSystemBarStyle(window, false)
     findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
+    window.decorView.addPaddingBottom(window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0)
   }
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {
