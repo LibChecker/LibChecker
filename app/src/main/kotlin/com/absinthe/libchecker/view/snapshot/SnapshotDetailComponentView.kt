@@ -25,7 +25,9 @@ import com.google.android.material.chip.Chip
 
 class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotDetailComponentContainerView(context)
+  val container = SnapshotDetailComponentContainerView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
 
   init {
     addView(container)
@@ -122,12 +124,10 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
         (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
         name.defaultHeightMeasureSpec(this)
       )
-      chip?.autoMeasure()
-      val chipHeight = if (chip != null) {
-        chip!!.measuredHeight + chip!!.marginTop
-      } else {
-        0
-      }
+      val chipHeight = chip?.let {
+        it.autoMeasure()
+        it.measuredHeight + it.marginTop
+      } ?: 0
       setMeasuredDimension(
         measuredWidth,
         paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom

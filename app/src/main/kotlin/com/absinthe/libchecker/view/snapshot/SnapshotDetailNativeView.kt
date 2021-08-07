@@ -25,7 +25,9 @@ import com.google.android.material.chip.Chip
 
 class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
 
-  val container = SnapshotDetailNativeContainerView(context)
+  val container = SnapshotDetailNativeContainerView(context).apply {
+    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+  }
 
   init {
     addView(container)
@@ -140,12 +142,10 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
         textWidth.toExactlyMeasureSpec(),
         libSize.defaultHeightMeasureSpec(this)
       )
-      chip?.autoMeasure()
-      val chipHeight = if (chip != null) {
-        chip!!.measuredHeight + chip!!.marginTop
-      } else {
-        0
-      }
+      val chipHeight = chip?.let {
+        it.autoMeasure()
+        it.measuredHeight + it.marginTop
+      } ?: 0
       setMeasuredDimension(
         measuredWidth,
         paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
