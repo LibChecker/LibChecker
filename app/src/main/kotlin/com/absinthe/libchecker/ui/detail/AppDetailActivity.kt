@@ -83,6 +83,7 @@ class AppDetailActivity :
   private val viewModel: DetailViewModel by viewModels()
 
   private var isHarmonyMode = false
+  private var chipGroup: ChipGroupView? = null
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
@@ -275,47 +276,49 @@ class AppDetailActivity :
           }
           detailsTitle.extraInfoView.text = extraInfo
 
-          extraBean?.let {
-            if (it.isSplitApk || it.isKotlinUsed) {
-              val chipGroup = ChipGroupView(this@AppDetailActivity).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                  LinearLayout.LayoutParams.MATCH_PARENT,
-                  LinearLayout.LayoutParams.WRAP_CONTENT
-                ).also { cg ->
-                  cg.topMargin = 16.dp
+          if (chipGroup == null) {
+            extraBean?.let {
+              if (it.isSplitApk || it.isKotlinUsed) {
+                chipGroup = ChipGroupView(this@AppDetailActivity).apply {
+                  layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                  ).also { cg ->
+                    cg.topMargin = 16.dp
+                  }
                 }
-              }
-              headerContentLayout.addView(chipGroup)
-              if (it.isSplitApk) {
-                chipGroup.addChip(
-                  icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
-                  text = getString(R.string.app_bundle)
-                ) {
-                  AppBundleBottomSheetDialogFragment().apply {
-                    arguments = bundleOf(
-                      EXTRA_PACKAGE_NAME to pkgName
-                    )
-                    show(supportFragmentManager, tag)
+                headerContentLayout.addView(chipGroup)
+                if (it.isSplitApk) {
+                  chipGroup!!.addChip(
+                    icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
+                    text = getString(R.string.app_bundle)
+                  ) {
+                    AppBundleBottomSheetDialogFragment().apply {
+                      arguments = bundleOf(
+                        EXTRA_PACKAGE_NAME to pkgName
+                      )
+                      show(supportFragmentManager, tag)
+                    }
+                  }
+                }
+                if (it.isKotlinUsed) {
+                  chipGroup!!.addChip(
+                    icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
+                    text = getString(R.string.kotlin_used)
+                  ) {
+                    AlertDialog.Builder(this@AppDetailActivity)
+                      .setIcon(R.drawable.ic_kotlin_logo)
+                      .setTitle(R.string.kotlin_string)
+                      .setMessage(R.string.kotlin_details)
+                      .setPositiveButton(android.R.string.ok, null)
+                      .show()
                   }
                 }
               }
-              if (it.isKotlinUsed) {
-                chipGroup.addChip(
-                  icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
-                  text = getString(R.string.kotlin_used)
-                ) {
-                  AlertDialog.Builder(this@AppDetailActivity)
-                    .setIcon(R.drawable.ic_kotlin_logo)
-                    .setTitle(R.string.kotlin_string)
-                    .setMessage(R.string.kotlin_details)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show()
-                }
+              if (it.variant == Constants.VARIANT_HAP) {
+                ibHarmonyBadge.isVisible = true
+                ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
               }
-            }
-            if (it.variant == Constants.VARIANT_HAP) {
-              ibHarmonyBadge.isVisible = true
-              ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
             }
           }
         } catch (e: PackageManager.NameNotFoundException) {
