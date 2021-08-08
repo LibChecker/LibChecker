@@ -1,5 +1,3 @@
-import org.jmailen.gradle.kotlinter.KotlinterExtension
-
 buildscript {
   apply("gradle/extra.gradle.kts")
 
@@ -20,10 +18,6 @@ allprojects {
   apply("$rootDir/gradle/extra.gradle.kts")
 
   apply(plugin = "org.jmailen.kotlinter")
-
-  configure<KotlinterExtension> {
-    indentSize = 2
-  }
 }
 
 task<Delete>("clean") {
