@@ -1,0 +1,26 @@
+def isNonStable = { String version ->
+  def stableKeyword = ['RELEASE', 'FINAL', 'GA'].any { it -> version.toUpperCase().contains(it) }
+  def regex = /^[0-9,.v-]+(-r)?$/
+  return !stableKeyword && !(version ==~ regex)
+}
+
+initscript {
+  repositories {
+    gradlePluginPortal()
+  }
+
+  dependencies {
+    //noinspection GradleDynamicVersion
+    classpath "com.github.ben-manes:gradle-versions-plugin:+"
+  }
+}
+
+allprojects {
+  apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+
+  tasks.named("dependencyUpdates").configure {
+    rejectVersionIf {
+      isNonStable(it.candidate.version)
+    }
+  }
+}
