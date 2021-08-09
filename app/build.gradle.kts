@@ -11,7 +11,7 @@ plugins {
   id("com.android.application")
   kotlin("android")
   kotlin("kapt")
-  id("kotlin-parcelize")
+  kotlin("plugin.parcelize")
   id("com.google.protobuf")
 }
 
@@ -184,4 +184,3 @@ protobuf {
     }
   }
 }
-
