@@ -137,7 +137,7 @@ dependencies {
   implementation("com.drakeet.about:about:2.4.1")
   implementation("com.drakeet.multitype:multitype:4.3.0")
   implementation("com.airbnb.android:lottie:4.0.0")
-  implementation("com.jakewharton.timber:timber:4.7.1")
+  implementation("com.jakewharton.timber:timber:5.0.0")
   implementation("com.jakewharton:process-phoenix:2.1.1")
   implementation("com.jonathanfinerty.once:once:1.3.1")
   implementation("net.dongliu:apk-parser:2.6.10")
