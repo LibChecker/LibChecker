@@ -54,7 +54,7 @@ jobs:
       - name: Build with Gradle
         run: bash ./gradlew -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         id: sign
         uses: r0adkll/sign-android-release@v1.0.4
         env:
@@ -78,7 +78,7 @@ jobs:
           name: mappings
           path: "app/build/outputs/mapping/release"
       - name: Upload mappings to App Center
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: zhaobozhen/AppCenter-Github-Action@v1
         with:
           appName: zhaobozhen2025-gmail.com/LibChecker
@@ -89,7 +89,7 @@ jobs:
           notifyTesters: false
           debug: false
       - name: Send commit to telegram
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
