@@ -28,7 +28,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
   }
 
-  private val list = RecyclerView(context).apply {
+  private val list = ClassifyRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.MATCH_PARENT,
