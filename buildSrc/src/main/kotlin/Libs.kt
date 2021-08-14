@@ -32,7 +32,7 @@ object Libs {
   const val genGrpcMac = "io.grpc:protoc-gen-grpc-java:$grpcVersion:osx-x86_64"
 
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.17"
-  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.4.5"
+  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.5.0"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
