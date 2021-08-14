@@ -28,7 +28,12 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
-      SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard))
+      SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).also {
+        it.layoutParams = ViewGroup.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+      }
     )
   }
 
