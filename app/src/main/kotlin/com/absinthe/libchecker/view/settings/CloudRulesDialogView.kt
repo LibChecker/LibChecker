@@ -115,6 +115,20 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
       addView(updateButton)
     }
 
+    fun setUpdateButtonStatus(isEnable: Boolean) {
+      if (isEnable) {
+        updateButton.apply {
+          isEnabled = true
+          text = context.getString(R.string.rules_btn_restart_to_update)
+        }
+      } else {
+        updateButton.apply {
+          isEnabled = false
+          text = context.getString(R.string.rules_btn_update)
+        }
+      }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       localVersion.autoMeasure()

@@ -49,7 +49,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
             root.cloudRulesContentView.remoteVersion.version.text =
               it.version.toString()
             if (GlobalValues.localRulesVersion < it.version) {
-              root.cloudRulesContentView.updateButton.isEnabled = true
+              root.cloudRulesContentView.setUpdateButtonStatus(true)
             }
             root.viewFlipper.displayedChild = 1
           } catch (e: Exception) {
@@ -77,7 +77,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           lifecycleScope.launch(Dispatchers.Main) {
             root.cloudRulesContentView.localVersion.version.text =
               root.cloudRulesContentView.remoteVersion.version.text
-            root.cloudRulesContentView.updateButton.isEnabled = false
+            root.cloudRulesContentView.setUpdateButtonStatus(false)
             try {
               GlobalValues.localRulesVersion =
                 root.cloudRulesContentView.remoteVersion.version.text.toString()

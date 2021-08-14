@@ -166,6 +166,7 @@
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">Local repo version</string>
   <string name="rules_remote_repo_version">Remote repo version</string>
-  <string name="rules_btn_update">Restart to Update</string>
+  <string name="rules_btn_restart_to_update">Restart to Update</string>
+  <string name="rules_btn_update">Update</string>
 
 </resources>
