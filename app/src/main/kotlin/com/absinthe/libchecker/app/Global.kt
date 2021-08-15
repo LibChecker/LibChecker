@@ -31,7 +31,8 @@ object Global {
     val stack = Log.getStackTraceString(e)
 
     if (stack.contains("Service.startForeground()") ||
-      stack.contains("com.swift.sandhook")
+      stack.contains("com.swift.sandhook") ||
+      stack.contains("updateForceDarkMode")
     ) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {

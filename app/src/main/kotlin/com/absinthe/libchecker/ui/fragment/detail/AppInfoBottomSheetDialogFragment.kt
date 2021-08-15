@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,7 +21,6 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
-import java.lang.Exception
 
 /**
  * <pre>
@@ -52,10 +50,10 @@ class AppInfoBottomSheetDialogFragment :
     root.launch.setOnClickListener {
       try {
         startLaunchAppActivity(packageName)
-      } catch (e: ActivityNotFoundException) {
-        context?.showToast(R.string.toast_cant_open_app)
       } catch (e: NullPointerException) {
         context?.showToast(R.string.toast_package_name_null)
+      } catch (e: RuntimeException) {
+        context?.showToast(R.string.toast_cant_open_app)
       } finally {
         dismiss()
       }
