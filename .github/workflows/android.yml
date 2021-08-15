@@ -66,7 +66,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built apk
-        if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v2
         with:
           name: snapshot
