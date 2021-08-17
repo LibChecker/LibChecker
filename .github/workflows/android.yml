@@ -1,15 +1,6 @@
 name: Android CI
 
-on:
-  push:
-    paths:
-      - 'app/**'
-      - '.github/workflows/android.yml'
-      - 'gradle.properties'
-  pull_request:
-    paths:
-      - 'app/**'
-      - '.github/workflows/android.yml'
+on: [ push, pull_request ]
 
 jobs:
   check:
