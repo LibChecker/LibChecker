@@ -4,7 +4,7 @@ private const val lifecycleVersion = "2.3.1"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
-private const val grpcVersion = "1.39.0"
+private const val grpcVersion = "1.40.0"
 private const val protocVersion = "3.17.3"
 private const val appCenterVersion = "4.2.0"
 
