@@ -13,8 +13,8 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: 11
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v1
       - name: Check style
         run: ./gradlew lintKotlin
 
