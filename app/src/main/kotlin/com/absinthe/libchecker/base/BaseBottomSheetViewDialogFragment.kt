@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -88,7 +89,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     super.onStart()
     behavior.addBottomSheetCallback(bottomSheetCallback)
 
-    if (requireActivity().window.decorView.measuredHeight < 1200) {
+    if (requireActivity().isOrientationLandscape) {
       behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
   }
