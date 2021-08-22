@@ -50,7 +50,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
       }
     }
 
-    override fun onSlide(bottomSheet: View, slideOffset: Float) {}
+    override fun onSlide(bottomSheet: View, slideOffset: Float) {
+    }
   }
 
   val root get() = _root!!
@@ -90,7 +91,14 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     behavior.addBottomSheetCallback(bottomSheetCallback)
 
     if (requireActivity().isOrientationLandscape) {
-      behavior.state = BottomSheetBehavior.STATE_EXPANDED
+      root.post {
+        Class.forName(behavior::class.java.name).apply {
+          getDeclaredMethod("setStateInternal", Int::class.java).apply {
+            isAccessible = true
+            invoke(behavior, BottomSheetBehavior.STATE_EXPANDED)
+          }
+        }
+      }
     }
   }
 
@@ -117,7 +125,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
       ShapeAppearanceModel.builder(context, 0, R.style.CustomShapeAppearanceBottomSheetDialog)
         .build()
 
-    // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottoSheet)
+    // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottomSheet)
     val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
     val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
 
