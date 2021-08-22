@@ -1,0 +1,36 @@
+{
+  "easyGoVersion": "1.0",
+  "client": "com.absinthe.libchecker",
+  "logicEntities": [
+    {
+      "head": {
+        "function": "magicwindow",
+        "required": "true"
+      },
+      "body": {
+        "mode": "1",
+        "defaultDualActivities": {
+          "mainPages": "com.absinthe.libchecker.ui.main.MainActivity",
+          "relatedPage": ""
+        },
+        "transActivities": [],
+        "Activities": [
+          {
+            "name": "com.absinthe.libchecker.ui.main.MainActivity",
+            "defaultFullScreen": "true"
+          }
+        ],
+        "UX": {
+          "windowsRatio": [
+            {
+              "device": "PAD",
+              "ratio": "3|2"
+            }
+          ],
+          "supportRotationUxCompat": "true",
+          "isDraggable": "true"
+        }
+      }
+    }
+  ]
+}

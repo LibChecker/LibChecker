@@ -56,7 +56,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
         openLibDetailDialog(position)
       }
       setOnItemLongClickListener { _, _, position ->
-        ClipboardUtils.put(requireContext(), getItem(position).item.name)
+        ClipboardUtils.put(context, getItem(position).item.name)
         context.showToast(R.string.toast_copied_to_clipboard)
         true
       }

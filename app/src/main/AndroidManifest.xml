@@ -105,6 +105,10 @@
       android:exported="true"
       android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
 
+<!--    <meta-data-->
+<!--      android:name="EasyGoClient"-->
+<!--      android:value="true" />-->
+
   </application>
 
 </manifest>

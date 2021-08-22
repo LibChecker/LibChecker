@@ -26,10 +26,10 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
     val assetName = when (GlobalValues.season) {
-      SPRING -> "lib_reference_spring.json"
-      SUMMER -> "lib_reference_summer.json"
-      AUTUMN -> "lib_reference_autumn.json"
-      WINTER -> "lib_reference_winter.json"
+      SPRING -> "anim/lib_reference_spring.json"
+      SUMMER -> "anim/lib_reference_summer.json"
+      AUTUMN -> "anim/lib_reference_autumn.json"
+      WINTER -> "anim/lib_reference_winter.json"
       else -> throw IllegalArgumentException("Are you living on earth?")
     }
 

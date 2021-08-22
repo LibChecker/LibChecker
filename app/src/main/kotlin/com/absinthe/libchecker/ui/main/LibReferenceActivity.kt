@@ -109,11 +109,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         imageAssetsFolder = "/"
 
         val assetName = when (GlobalValues.season) {
-          SPRING -> "lib_reference_spring.json"
-          SUMMER -> "lib_reference_summer.json"
-          AUTUMN -> "lib_reference_autumn.json"
-          WINTER -> "lib_reference_winter.json"
-          else -> "lib_reference_summer.json"
+          SPRING -> "anim/lib_reference_spring.json"
+          SUMMER -> "anim/lib_reference_summer.json"
+          AUTUMN -> "anim/lib_reference_autumn.json"
+          WINTER -> "anim/lib_reference_winter.json"
+          else -> "anim/lib_reference_summer.json"
         }
 
         setAnimation(assetName)

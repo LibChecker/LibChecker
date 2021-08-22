@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
+import android.content.Context
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -88,12 +89,11 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             }
 
             withContext(Dispatchers.Main) {
-              binding.list.addItemDecoration(
-                DividerItemDecoration(
-                  requireContext(),
-                  DividerItemDecoration.VERTICAL
+              context?.let {
+                binding.list.addItemDecoration(
+                  DividerItemDecoration(it, DividerItemDecoration.VERTICAL)
                 )
-              )
+              }
               adapter.setDiffNewData(list, navigateToComponentTask)
             }
           }
@@ -123,7 +123,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         openLibDetailDialog(position)
       }
       setOnItemLongClickListener { _, _, position ->
-        doOnLongClick(getItem(position).item.name)
+        doOnLongClick(context, getItem(position).item.name)
         true
       }
       setDiffCallback(LibStringDiffUtil())
@@ -131,18 +131,16 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     }
   }
 
-  private fun doOnLongClick(componentName: String) {
+  private fun doOnLongClick(context: Context, componentName: String) {
     if (hasIntegration) {
       val arrayAdapter =
-        ArrayAdapter<String>(requireContext(), android.R.layout.simple_list_item_1)
+        ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
       arrayAdapter.add(getString(android.R.string.copy))
 
       // MonkeyKing Purify
       if (integrationMonkeyKingBlockList == null) {
-        integrationMonkeyKingBlockList = MonkeyKingManager().queryBlockedComponent(
-          requireContext(),
-          viewModel.packageName
-        )
+        integrationMonkeyKingBlockList =
+          MonkeyKingManager().queryBlockedComponent(context, viewModel.packageName)
       }
       val monkeyKingShouldBlock =
         integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
@@ -158,33 +156,31 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
       }
 
-      AlertDialog.Builder(requireContext())
+      AlertDialog.Builder(context)
         .setAdapter(arrayAdapter) { _, which ->
           when (which) {
             0 -> {
-              ClipboardUtils.put(requireContext(), componentName)
-              context?.showToast(R.string.toast_copied_to_clipboard)
+              ClipboardUtils.put(context, componentName)
+              context.showToast(R.string.toast_copied_to_clipboard)
             }
             1 -> {
               if (MonkeyKingManager.isSupportInteraction) {
                 MonkeyKingManager().apply {
                   addBlockedComponent(
-                    requireContext(),
+                    context,
                     viewModel.packageName,
                     componentName,
                     type,
                     monkeyKingShouldBlock
                   )
-                  integrationMonkeyKingBlockList = queryBlockedComponent(
-                    requireContext(),
-                    viewModel.packageName
-                  )
+                  integrationMonkeyKingBlockList =
+                    queryBlockedComponent(context, viewModel.packageName)
                 }
               }
             }
             2 -> {
               AnywhereManager().launchActivityEditor(
-                requireActivity(),
+                context,
                 viewModel.packageName,
                 componentName
               )
@@ -195,8 +191,8 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         }
         .show()
     } else {
-      ClipboardUtils.put(requireContext(), componentName)
-      context?.showToast(R.string.toast_copied_to_clipboard)
+      ClipboardUtils.put(context, componentName)
+      context.showToast(R.string.toast_copied_to_clipboard)
     }
   }
 
