@@ -60,6 +60,7 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.ChipGroupView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -140,6 +141,9 @@ class AppDetailActivity :
               )
               load(appIconLoader.loadIcon(packageInfo.applicationInfo))
               setOnClickListener {
+                if (AntiShakeUtils.isInvalidClick(it)) {
+                  return@setOnClickListener
+                }
                 AppInfoBottomSheetDialogFragment().apply {
                   arguments = bundleOf(
                     EXTRA_PACKAGE_NAME to pkgName
@@ -306,6 +310,9 @@ class AppDetailActivity :
                     icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
                     text = getString(R.string.kotlin_used)
                   ) {
+                    if (AntiShakeUtils.isInvalidClick(chipGroup!!)) {
+                      return@addChip
+                    }
                     AlertDialog.Builder(this@AppDetailActivity)
                       .setIcon(R.drawable.ic_kotlin_logo)
                       .setTitle(R.string.kotlin_string)

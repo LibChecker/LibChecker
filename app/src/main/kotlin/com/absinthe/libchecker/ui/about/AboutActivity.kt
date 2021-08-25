@@ -348,14 +348,6 @@ class AboutActivity : AbsAboutActivity() {
       )
       add(
         License(
-          "AndResGuard",
-          "shwenzhang",
-          License.APACHE_2,
-          "https://github.com/shwenzhang/AndResGuard"
-        )
-      )
-      add(
-        License(
           "apk-parser",
           "hsiafan",
           "BSD-2-Clause",

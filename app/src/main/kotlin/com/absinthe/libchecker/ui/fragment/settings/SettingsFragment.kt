@@ -30,6 +30,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -48,6 +49,7 @@ import java.util.Locale
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
   private lateinit var borderViewDelegate: BorderViewDelegate
+  private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
 
   companion object {
@@ -135,32 +137,44 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
       setOnPreferenceClickListener {
-        CloudRulesDialogFragment().show(childFragmentManager, tag)
-        true
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          CloudRulesDialogFragment().show(childFragmentManager, tag)
+          true
+        }
       }
     }
     findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {
       setOnPreferenceClickListener {
-        LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
-        true
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
+          true
+        }
       }
     }
     findPreference<Preference>(Constants.PREF_RELOAD_APPS)?.apply {
       setOnPreferenceClickListener {
-        AlertDialog.Builder(requireContext())
-          .setTitle(R.string.dialog_title_reload_apps)
-          .setMessage(R.string.dialog_subtitle_reload_apps)
-          .setPositiveButton(android.R.string.ok) { _, _ ->
-            viewModel.reloadAppsFlag.value = true
-            Analytics.trackEvent(
-              Constants.Event.SETTINGS,
-              EventProperties().set("PREF_RELOAD_APPS", "Ok")
-            )
-          }
-          .setNegativeButton(android.R.string.cancel, null)
-          .create()
-          .show()
-        true
+        if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
+          false
+        } else {
+          AlertDialog.Builder(requireContext())
+            .setTitle(R.string.dialog_title_reload_apps)
+            .setMessage(R.string.dialog_subtitle_reload_apps)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+              viewModel.reloadAppsFlag.value = true
+              Analytics.trackEvent(
+                Constants.Event.SETTINGS,
+                EventProperties().set("PREF_RELOAD_APPS", "Ok")
+              )
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .show()
+          true
+        }
       }
     }
 
@@ -304,6 +318,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         (activity as MainActivity?)?.appBar?.setRaised(!top)
       }
 
+    prefRecyclerView = recyclerView
     return recyclerView
   }
 

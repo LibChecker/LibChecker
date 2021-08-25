@@ -141,9 +141,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
 
       tvSnapshotTimestampText.setOnClickListener {
+        if (AntiShakeUtils.isInvalidClick(it)) {
+          return@setOnClickListener
+        }
         changeTimeNode()
       }
       arrow.setOnClickListener {
+        if (AntiShakeUtils.isInvalidClick(it)) {
+          return@setOnClickListener
+        }
         changeTimeNode()
       }
     }
