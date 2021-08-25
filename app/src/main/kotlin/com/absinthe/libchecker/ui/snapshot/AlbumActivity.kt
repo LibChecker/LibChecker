@@ -20,6 +20,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -71,6 +72,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       startActivity(Intent(this, ComparisonActivity::class.java))
     }
     itemManagement.setOnClickListener {
+      if (AntiShakeUtils.isInvalidClick(it)) {
+        return@setOnClickListener
+      }
       lifecycleScope.launch(Dispatchers.IO) {
         val timeStampList = viewModel.repository.getTimeStamps().toMutableList()
         withContext(Dispatchers.Main) {

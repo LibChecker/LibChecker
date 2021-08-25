@@ -14,6 +14,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailComponentView
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -69,6 +70,9 @@ class SnapshotComponentProvider(val lifecycleScope: LifecycleCoroutineScope) : B
         setChip(rule, colorRes)
         if (rule != null) {
           setChipOnClickListener {
+            if (AntiShakeUtils.isInvalidClick(it)) {
+              return@setChipOnClickListener
+            }
             val name = item.item.name
             val regexName = LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
             LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)

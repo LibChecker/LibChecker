@@ -70,6 +70,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     dashboardBinding.apply {
       infoLeft.horizontalGravity = Gravity.START
       infoLeft.setOnClickListener {
+        if (AntiShakeUtils.isInvalidClick(it)) {
+          return@setOnClickListener
+        }
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.repository.getTimeStamps()
           val dialog = TimeNodeBottomSheetDialogFragment
@@ -93,6 +96,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       }
       infoRight.horizontalGravity = Gravity.END
       infoRight.setOnClickListener {
+        if (AntiShakeUtils.isInvalidClick(it)) {
+          return@setOnClickListener
+        }
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.repository.getTimeStamps()
           val dialog = TimeNodeBottomSheetDialogFragment
