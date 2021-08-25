@@ -83,8 +83,18 @@ class ShootService : LifecycleService() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    showNotification()
+    if (intent?.`package` != packageName) {
+      stopForeground(true)
+      stopSelf()
+    } else {
+      showNotification()
+    }
     return super.onStartCommand(intent, flags, startId)
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    stopForeground(true)
   }
 
   private fun showNotification() {

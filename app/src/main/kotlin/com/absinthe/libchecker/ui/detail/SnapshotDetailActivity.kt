@@ -17,7 +17,6 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -31,6 +30,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.BaseSnapshotNo
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
+import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -50,13 +50,15 @@ import rikka.insets.setInitialPadding
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
+class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>() {
 
   private lateinit var entity: SnapshotDiffItem
 
   private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
   private val viewModel: SnapshotViewModel by viewModels()
   private val _entity by unsafeLazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
+
+  override fun requirePackageName() = entity.packageName
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -66,7 +68,7 @@ class SnapshotDetailActivity : BaseActivity<ActivitySnapshotDetailBinding>() {
       initView()
       viewModel.computeDiffDetail(this, entity)
     } else {
-      onBackPressed()
+      finish()
     }
   }
 

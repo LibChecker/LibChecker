@@ -88,7 +88,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
   private val shootServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      shootBinder = service as? IShootService
+      shootBinder = IShootService.Stub.asInterface(service)
       shootBinder?.apply {
         registerOnShootOverListener(shootListener)
         computeSnapshot(dropPrevious)
@@ -309,7 +309,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         this@SnapshotFragment.dropPrevious = dropPrevious
         shootBinder?.computeSnapshot(dropPrevious) ?: let {
           requireContext().bindService(
-            Intent(requireContext(), ShootService::class.java),
+            Intent(requireContext(), ShootService::class.java).apply {
+              setPackage(requireContext().packageName)
+            },
             shootServiceConnection, Service.BIND_AUTO_CREATE
           )
         }

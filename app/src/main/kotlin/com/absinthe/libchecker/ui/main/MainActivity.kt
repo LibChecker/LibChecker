@@ -1,10 +1,11 @@
 package com.absinthe.libchecker.ui.main
 
-import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
@@ -12,13 +13,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.ActivityMainBinding
+import com.absinthe.libchecker.services.IWorkerService
+import com.absinthe.libchecker.services.OnWorkerListener
+import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -32,7 +34,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -45,13 +46,38 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
 
+  private var workerBinder: IWorkerService? = null
+  private val workerListener = object : OnWorkerListener.Stub() {
+    override fun onReceivePackagesChanged() {
+      appViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
+    }
+  }
+  private val workerServiceConnection = object : ServiceConnection {
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+      workerBinder = IWorkerService.Stub.asInterface(service)
+      workerBinder?.apply {
+        registerOnWorkerListener(workerListener)
+      }
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+      workerBinder = null
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
     initView()
+    bindService(
+      Intent(this, WorkerService::class.java).apply {
+        setPackage(packageName)
+      },
+      workerServiceConnection,
+      Context.BIND_AUTO_CREATE
+    )
     handleIntentFromShortcuts(intent)
     initObserver()
-    initAllApplicationInfoItems()
     clearApkCache()
     appViewModel.initRegexRules()
   }
@@ -61,21 +87,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     handleIntentFromShortcuts(intent)
   }
 
-  override fun onStart() {
-    super.onStart()
-    registerPackageBroadcast()
-  }
-
   override fun onResume() {
     super.onResume()
     if (GlobalValues.shouldRequestChange.value == true) {
       appViewModel.requestChange(true)
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    unregisterPackageBroadcast()
   }
 
   override fun showNavigationView() {
@@ -161,27 +177,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     }
   }
 
-  private val requestPackageReceiver = object : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-      appViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
-    }
-  }
-
-  private fun registerPackageBroadcast() {
-    val intentFilter = IntentFilter().apply {
-      addAction(Intent.ACTION_PACKAGE_ADDED)
-      addAction(Intent.ACTION_PACKAGE_REPLACED)
-      addAction(Intent.ACTION_PACKAGE_REMOVED)
-      addDataScheme("package")
-    }
-
-    registerReceiver(requestPackageReceiver, intentFilter)
-  }
-
-  private fun unregisterPackageBroadcast() {
-    unregisterReceiver(requestPackageReceiver)
-  }
-
   private fun handleIntentFromShortcuts(intent: Intent) {
     when (intent.action) {
       Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
@@ -192,15 +187,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       Constants.Event.LAUNCH_ACTION,
       EventProperties().set("Action", intent.action)
     )
-  }
-
-  private fun initAllApplicationInfoItems() {
-    Global.applicationListJob = lifecycleScope.launch(Dispatchers.IO) {
-      AppItemRepository.allApplicationInfoItems = appViewModel.getAppsList()
-      Global.applicationListJob = null
-    }.also {
-      it.start()
-    }
   }
 
   private fun initObserver() {

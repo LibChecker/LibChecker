@@ -97,6 +97,7 @@
       android:theme="@style/AppTheme.About" />
 
     <service android:name=".services.ShootService" />
+    <service android:name=".services.WorkerService" />
 
     <provider
       android:name=".provider.CoreProvider"
