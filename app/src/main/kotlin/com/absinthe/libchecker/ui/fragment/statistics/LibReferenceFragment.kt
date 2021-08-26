@@ -233,6 +233,7 @@ class LibReferenceFragment :
   }
 
   private fun computeRef() {
+    menu?.findItem(R.id.search)?.isVisible = false
     flip(VF_LOADING)
     homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
