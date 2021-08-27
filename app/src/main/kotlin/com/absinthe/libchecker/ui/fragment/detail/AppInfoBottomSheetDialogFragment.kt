@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import android.os.RemoteException
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -52,6 +53,8 @@ class AppInfoBottomSheetDialogFragment :
         startLaunchAppActivity(packageName)
       } catch (e: NullPointerException) {
         context?.showToast(R.string.toast_package_name_null)
+      } catch (e: RemoteException) {
+        context?.showToast(R.string.toast_cant_open_app)
       } catch (e: RuntimeException) {
         context?.showToast(R.string.toast_cant_open_app)
       } finally {

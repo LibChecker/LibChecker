@@ -82,6 +82,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
             .newInstance(ArrayList(timeStampList)).apply {
               setTitle(this@AlbumActivity.getString(R.string.dialog_title_select_to_delete))
               setOnItemClickListener { position ->
+                if (position >= timeStampList.size) {
+                  return@setOnItemClickListener
+                }
                 val item = timeStampList[position]
                 lifecycleScope.launch(Dispatchers.IO) {
                   val dialog: AlertDialog
