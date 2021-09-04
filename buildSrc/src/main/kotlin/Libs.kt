@@ -4,12 +4,12 @@ private const val lifecycleVersion = "2.3.1"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
-private const val grpcVersion = "1.40.0"
+private const val grpcVersion = "1.40.1"
 private const val protocVersion = "3.17.3"
 private const val appCenterVersion = "4.2.0"
 
 object Libs {
-  const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1"
+  const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
   const val core = "androidx.core:core-ktx:1.6.0"
   const val appCompat = "androidx.appcompat:appcompat:1.3.1"
   const val annotation = "androidx.annotation:annotation:1.2.0"
@@ -32,7 +32,7 @@ object Libs {
   const val genGrpcMac = "io.grpc:protoc-gen-grpc-java:$grpcVersion:osx-x86_64"
 
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.17"
-  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.5.0"
+  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.6.0"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
