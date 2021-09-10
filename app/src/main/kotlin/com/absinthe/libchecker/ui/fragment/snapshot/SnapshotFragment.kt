@@ -349,9 +349,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
       (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
+      menu?.findItem(R.id.save)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()
       binding.list.scrollToPosition(0)
+      menu?.findItem(R.id.save)?.isVisible = true
     }
 
     binding.vfContainer.displayedChild = child
