@@ -93,7 +93,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                     dialog.show()
                   }
                   viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
-                  timeStampList.removeAt(position)
+                  if (position < timeStampList.size) {
+                    timeStampList.removeAt(position)
+                  }
                   GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
                     0L
                   } else {

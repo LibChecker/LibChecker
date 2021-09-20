@@ -83,7 +83,13 @@ class AppInfoBottomSheetDialogFragment :
               ComponentName(it.activityInfo.packageName, it.activityInfo.name)
             )
             .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-          startActivity(intent)
+          try {
+            startActivity(intent)
+          } catch (e: Exception) {
+            context?.let {
+              Toasty.showShort(it, R.string.toast_cant_open_app)
+            }
+          }
         }
         dismiss()
       }
