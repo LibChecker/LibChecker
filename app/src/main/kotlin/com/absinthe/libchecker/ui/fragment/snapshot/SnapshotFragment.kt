@@ -299,6 +299,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.snapshot_menu, menu)
+    this.menu = menu
+
     super.onCreateOptionsMenu(menu, inflater)
   }
 

@@ -5,8 +5,8 @@ private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
 private const val grpcVersion = "1.40.1"
-private const val protocVersion = "3.17.3"
-private const val appCenterVersion = "4.2.0"
+private const val protocVersion = "3.18.0"
+private const val appCenterVersion = "4.3.1"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"

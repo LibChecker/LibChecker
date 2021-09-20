@@ -121,7 +121,7 @@ object PackageUtils {
    */
   fun getVersionString(packageInfo: PackageInfo): String {
     return try {
-      "${packageInfo.versionName ?: "<unknown>"}(${getVersionCode(packageInfo)})"
+      "${packageInfo.versionName ?: "<unknown>"} (${getVersionCode(packageInfo)})"
     } catch (e: PackageManager.NameNotFoundException) {
       "Unknown"
     }
@@ -134,7 +134,7 @@ object PackageUtils {
    * @return version code as String
    */
   fun getVersionString(versionName: String, versionCode: Long): String {
-    return "$versionName($versionCode)"
+    return "$versionName ($versionCode)"
   }
 
   /**

@@ -55,9 +55,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
       workerBinder = IWorkerService.Stub.asInterface(service)
-      workerBinder?.apply {
-        registerOnWorkerListener(workerListener)
-      }
+      workerBinder?.registerOnWorkerListener(workerListener)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -92,6 +90,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     if (GlobalValues.shouldRequestChange.value == true) {
       appViewModel.requestChange(true)
     }
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    workerBinder?.unregisterOnWorkerListener(workerListener)
+    unbindService(workerServiceConnection)
   }
 
   override fun showNavigationView() {
