@@ -282,6 +282,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       AppItemRepository.trackItemsChanged = false
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
+    if (viewModel.timestamp.value != GlobalValues.snapshotTimestamp) {
+      viewModel.timestamp.value = GlobalValues.snapshotTimestamp
+      flip(VF_LOADING)
+      viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
+    }
     if (GlobalValues.hasFinishedShoot) {
       flip(VF_LIST)
     }

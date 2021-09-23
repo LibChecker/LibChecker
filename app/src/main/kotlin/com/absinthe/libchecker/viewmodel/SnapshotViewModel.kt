@@ -99,7 +99,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val preList = repository.getSnapshots(preTimeStamp)
     val diffList = mutableListOf<SnapshotDiffItem>()
 
-    if (preList.isNullOrEmpty()) {
+    if (preList.isNullOrEmpty() || preTimeStamp == 0L) {
       snapshotDiffItems.postValue(diffList)
       return
     }

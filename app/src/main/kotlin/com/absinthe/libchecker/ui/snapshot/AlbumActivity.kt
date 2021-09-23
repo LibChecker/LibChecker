@@ -104,6 +104,10 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                   withContext(Dispatchers.Main) {
                     root.adapter.remove(item)
                     dialog.dismiss()
+
+                    if (timeStampList.isEmpty()) {
+                      dismiss()
+                    }
                   }
                 }
               }
