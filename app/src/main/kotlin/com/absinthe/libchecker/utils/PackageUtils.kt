@@ -74,13 +74,11 @@ object PackageUtils {
       FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      val info = SystemServices.packageManager.getPackageInfo(packageInfo.packageName, 0)
-
       return SystemServices.packageManager.getPackageArchiveInfo(
-        info.applicationInfo.sourceDir, VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+        packageInfo.applicationInfo.sourceDir, VersionCompat.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
-        applicationInfo.sourceDir = info.applicationInfo.sourceDir
-        applicationInfo.nativeLibraryDir = info.applicationInfo.nativeLibraryDir
+        applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
+        applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
       } ?: throw PackageManager.NameNotFoundException()
     }
     return packageInfo

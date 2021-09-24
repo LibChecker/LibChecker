@@ -33,6 +33,7 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
       else -> throw IllegalArgumentException("Are you living on earth?")
     }
 
+    enableMergePathsForKitKatAndAbove(true)
     setAnimation(assetName)
     addView(this)
   }

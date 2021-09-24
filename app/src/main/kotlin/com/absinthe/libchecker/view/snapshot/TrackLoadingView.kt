@@ -15,6 +15,7 @@ class TrackLoadingView(context: Context) : AViewGroup(context) {
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
     setAnimation("anim/track_target.json")
+    enableMergePathsForKitKatAndAbove(true)
     addView(this)
   }
 

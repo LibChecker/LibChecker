@@ -45,7 +45,8 @@
         android:layout_width="@dimen/lottie_anim_size"
         android:layout_height="@dimen/lottie_anim_size"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true" />
+        app:lottie_loop="true"
+        app:lottie_enableMergePathsForKitKatAndAbove="true" />
 
     </LinearLayout>
 

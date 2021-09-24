@@ -78,7 +78,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           publicSourceDir = packageName
         }
       } else {
-        context.packageManager.getApplicationInfo(packageName, 0)
+        PackageUtils.getPackageInfo(packageName).applicationInfo
       }
 
       info?.let {
