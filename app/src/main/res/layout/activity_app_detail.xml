@@ -105,6 +105,20 @@
           android:src="@drawable/ic_harmonyos_logo"
           android:tooltipText="@string/ability"
           android:visibility="gone"
+          app:layout_constraintEnd_toStartOf="@id/ib_processes"
+          app:layout_constraintTop_toTopOf="parent"
+          app:layout_constraintBottom_toBottomOf="parent"
+          tools:targetApi="o" />
+
+        <androidx.appcompat.widget.AppCompatImageButton
+          android:id="@+id/ib_processes"
+          android:layout_width="@dimen/detail_toolbar_size"
+          android:layout_height="@dimen/detail_toolbar_size"
+          android:background="?attr/selectableItemBackgroundBorderless"
+          android:scaleType="center"
+          android:src="@drawable/ic_processes"
+          android:tooltipText="@string/menu_sort"
+          app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toStartOf="@id/ib_sort"
           app:layout_constraintTop_toTopOf="parent"
           tools:targetApi="o" />
@@ -114,14 +128,13 @@
           android:layout_width="@dimen/detail_toolbar_size"
           android:layout_height="@dimen/detail_toolbar_size"
           android:background="?attr/selectableItemBackgroundBorderless"
-          android:contentDescription="Sort"
+          android:contentDescription="@string/menu_sort"
           android:scaleType="center"
           android:src="@drawable/ic_lib_sort"
           android:tooltipText="@string/menu_sort"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          tools:ignore="HardcodedText"
           tools:targetApi="o" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>

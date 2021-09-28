@@ -51,6 +51,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
   val itemsCountList = MutableList(7) { 0 }
+  val processesSet = mutableSetOf<String>()
+
   var sortMode = GlobalValues.libSortMode
   var packageName: String = ""
   var is32bit = false
@@ -118,13 +120,14 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           applicationInfo.publicSourceDir = packageName
         }?.let {
           val services = PackageUtils.getComponentList(it.packageName, it.services, true)
-          val activities =
-            PackageUtils.getComponentList(it.packageName, it.activities, true)
-          val receivers =
-            PackageUtils.getComponentList(it.packageName, it.receivers, true)
-          val providers =
-            PackageUtils.getComponentList(it.packageName, it.providers, true)
+          val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
+          val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
+          val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
 
+          services.forEach { sc -> processesSet.add(sc.processName) }
+          activities.forEach { sc -> processesSet.add(sc.processName) }
+          receivers.forEach { sc -> processesSet.add(sc.processName) }
+          providers.forEach { sc -> processesSet.add(sc.processName) }
           componentsMap[SERVICE]?.postValue(services)
           componentsMap[ACTIVITY]?.postValue(activities)
           componentsMap[RECEIVER]?.postValue(receivers)
@@ -137,12 +140,18 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           val receivers = PackageUtils.getComponentList(it.packageName, RECEIVER, true)
           val providers = PackageUtils.getComponentList(it.packageName, PROVIDER, true)
 
+          services.forEach { sc -> processesSet.add(sc.processName) }
+          activities.forEach { sc -> processesSet.add(sc.processName) }
+          receivers.forEach { sc -> processesSet.add(sc.processName) }
+          providers.forEach { sc -> processesSet.add(sc.processName) }
           componentsMap[SERVICE]?.postValue(services)
           componentsMap[ACTIVITY]?.postValue(activities)
           componentsMap[RECEIVER]?.postValue(receivers)
           componentsMap[PROVIDER]?.postValue(providers)
         }
       }
+      processesSet.filter { it.isBlank() }
+      Timber.d("processesSet=$processesSet")
     } catch (e: Exception) {
       Timber.e(e)
     }

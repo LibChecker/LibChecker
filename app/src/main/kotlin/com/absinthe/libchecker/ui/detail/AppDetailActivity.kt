@@ -49,6 +49,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
@@ -348,6 +349,9 @@ class AppDetailActivity :
             }
             detailFragmentManager.changeSortMode(viewModel.sortMode)
           }
+        }
+        ibProcesses.setOnClickListener {
+          Toasty.showLong(this@AppDetailActivity, viewModel.processesSet.toString())
         }
 
         if (ibHarmonyBadge.isVisible) {
