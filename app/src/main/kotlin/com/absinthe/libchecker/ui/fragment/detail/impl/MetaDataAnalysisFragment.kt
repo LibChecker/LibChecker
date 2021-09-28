@@ -12,7 +12,6 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
 class MetaDataAnalysisFragment: BaseDetailFragment<FragmentLibNativeBinding>() {
@@ -50,13 +49,13 @@ class MetaDataAnalysisFragment: BaseDetailFragment<FragmentLibNativeBinding>() {
     adapter.apply {
       animationEnable = true
       setOnItemClickListener { _, view, position ->
-        if (AntiShakeUtils.isInvalidClick(view)) {
-          return@setOnItemClickListener
-        }
-        openLibDetailDialog(position)
+        // if (AntiShakeUtils.isInvalidClick(view)) {
+        //   return@setOnItemClickListener
+        // }
+        // openLibDetailDialog(position)
       }
       setOnItemLongClickListener { _, _, position ->
-        ClipboardUtils.put(requireContext(), getItem(position).item.name)
+        ClipboardUtils.put(requireContext(), getItem(position).item.name + ": " + getItem(position).item.source)
         context.showToast(R.string.toast_copied_to_clipboard)
         true
       }
