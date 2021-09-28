@@ -1,9 +1,8 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
+import com.absinthe.libchecker.annotation.METADATA
+import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -16,27 +15,21 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
 
-class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+class MetaDataAnalysisFragment: BaseDetailFragment<FragmentLibNativeBinding>() {
 
   override fun getRecyclerView() = binding.list
 
   override fun init() {
     binding.apply {
       list.apply {
-        adapter = this@DexAnalysisFragment.adapter
+        adapter = this@MetaDataAnalysisFragment.adapter
       }
     }
 
-    viewModel.dexLibItems.observe(viewLifecycleOwner) {
+    viewModel.metaDataItems.observe(viewLifecycleOwner) {
       if (it.isEmpty()) {
-        emptyView.text.text = getString(R.string.uncharted_territory)
+        emptyView.text.text = getString(R.string.empty_list)
       } else {
-        binding.list.addItemDecoration(
-          DividerItemDecoration(
-            requireContext(),
-            DividerItemDecoration.VERTICAL
-          )
-        )
         adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
       }
 
@@ -70,14 +63,14 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initDexData(packageName)
+    viewModel.initMetaDataData(packageName)
   }
 
   companion object {
-    fun newInstance(packageName: String): DexAnalysisFragment {
-      return DexAnalysisFragment().putArguments(
+    fun newInstance(packageName: String): MetaDataAnalysisFragment {
+      return MetaDataAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to DEX
+        EXTRA_TYPE to METADATA
       )
     }
   }

@@ -145,7 +145,7 @@ dependencies {
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
-  implementation("dev.rikka.rikkax.core:core:1.3.2")
+  implementation("dev.rikka.rikkax.core:core:1.3.3")
   implementation("dev.rikka.rikkax.material:material:1.6.6")
   implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.2.2")
   implementation("dev.rikka.rikkax.widget:borderview:1.0.1")

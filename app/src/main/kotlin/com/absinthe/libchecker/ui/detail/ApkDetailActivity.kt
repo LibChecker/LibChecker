@@ -18,6 +18,7 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
@@ -31,6 +32,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
@@ -265,7 +267,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
     }
 
     val types = mutableListOf(
-      NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
+      NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, METADATA, DEX
     )
     val tabTitles = mutableListOf(
       getText(R.string.ref_category_native),
@@ -273,6 +275,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
       getText(R.string.ref_category_activity),
       getText(R.string.ref_category_br),
       getText(R.string.ref_category_cp),
+      getText(R.string.ref_category_metadata),
       getText(R.string.ref_category_dex)
     )
     if (packageInfo != null && PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
@@ -287,9 +290,10 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
 
       override fun createFragment(position: Int): Fragment {
         return when (position) {
-          types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path, NATIVE)
-          types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(path, STATIC)
-          types.indexOf(DEX) -> DexAnalysisFragment.newInstance(path, DEX)
+          types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path)
+          types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(path)
+          types.indexOf(METADATA) -> MetaDataAnalysisFragment.newInstance(path)
+          types.indexOf(DEX) -> DexAnalysisFragment.newInstance(path)
           else -> ComponentsAnalysisFragment.newInstance(types[position])
         }
       }

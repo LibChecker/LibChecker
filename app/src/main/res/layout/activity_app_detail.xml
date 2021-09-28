@@ -118,6 +118,7 @@
           android:scaleType="center"
           android:src="@drawable/ic_processes"
           android:tooltipText="@string/menu_sort"
+          android:visibility="gone"
           app:layout_constraintBottom_toBottomOf="parent"
           app:layout_constraintEnd_toStartOf="@id/ib_sort"
           app:layout_constraintTop_toTopOf="parent"

@@ -330,6 +330,19 @@ object PackageUtils {
   }
 
   /**
+   * Get all meta data in an app
+   * @param packageInfo PackageInfo
+   * @return meta data list
+   */
+  fun getMetaDataLibs(packageInfo: PackageInfo): List<LibStringItem> {
+    packageInfo.applicationInfo.metaData?.let {
+      return it.keySet().asSequence()
+        .map { key -> LibStringItem(key, 0, it.get(key).toString()) }
+        .toList()
+    } ?: return emptyList()
+  }
+
+  /**
    * Judge that whether an app uses Kotlin language from classes.dex
    * @param file APK file of the app
    * @return true if it uses Kotlin language
