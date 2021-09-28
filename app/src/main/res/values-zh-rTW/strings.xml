@@ -46,6 +46,7 @@
   <string name="ref_category_dex" translatable="false">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
+  <string name="ref_category_metadata">元數據</string>
 
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>

@@ -25,6 +25,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
@@ -44,6 +45,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
@@ -350,8 +352,11 @@ class AppDetailActivity :
             detailFragmentManager.changeSortMode(viewModel.sortMode)
           }
         }
-        ibProcesses.setOnClickListener {
-          Toasty.showLong(this@AppDetailActivity, viewModel.processesSet.toString())
+        if (GlobalValues.debugMode) {
+          ibProcesses.isVisible = true
+          ibProcesses.setOnClickListener {
+            Toasty.showLong(this@AppDetailActivity, viewModel.processesSet.toString())
+          }
         }
 
         if (ibHarmonyBadge.isVisible) {
@@ -364,7 +369,7 @@ class AppDetailActivity :
 
       val types = if (!isHarmonyMode) {
         mutableListOf(
-          NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, DEX
+          NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, METADATA, DEX
         )
       } else {
         mutableListOf(
@@ -383,6 +388,7 @@ class AppDetailActivity :
           getText(R.string.ref_category_activity),
           getText(R.string.ref_category_br),
           getText(R.string.ref_category_cp),
+          getText(R.string.ref_category_metadata),
           getText(R.string.ref_category_dex)
         )
       } else {
@@ -413,9 +419,10 @@ class AppDetailActivity :
 
           override fun createFragment(position: Int): Fragment {
             return when (val type = types[position]) {
-              NATIVE -> NativeAnalysisFragment.newInstance(packageName, NATIVE)
-              STATIC -> StaticAnalysisFragment.newInstance(packageName, STATIC)
-              DEX -> DexAnalysisFragment.newInstance(packageName, DEX)
+              NATIVE -> NativeAnalysisFragment.newInstance(packageName)
+              STATIC -> StaticAnalysisFragment.newInstance(packageName)
+              METADATA -> MetaDataAnalysisFragment.newInstance(packageName)
+              DEX -> DexAnalysisFragment.newInstance(packageName)
               else -> if (!isHarmonyMode) {
                 ComponentsAnalysisFragment.newInstance(type)
               } else {

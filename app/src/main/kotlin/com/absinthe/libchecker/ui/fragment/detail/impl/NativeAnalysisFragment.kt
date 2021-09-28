@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -67,10 +67,10 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
   }
 
   companion object {
-    fun newInstance(packageName: String, @LibType type: Int): NativeAnalysisFragment {
+    fun newInstance(packageName: String): NativeAnalysisFragment {
       return NativeAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to type
+        EXTRA_TYPE to NATIVE
       )
     }
   }

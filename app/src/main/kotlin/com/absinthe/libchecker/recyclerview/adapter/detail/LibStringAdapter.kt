@@ -14,6 +14,7 @@ import android.text.style.StyleSpan
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
@@ -37,7 +38,7 @@ class LibStringAdapter(@LibType val type: Int) :
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return when (type) {
-      NATIVE -> createBaseViewHolder(NativeLibItemView(context))
+      NATIVE, METADATA -> createBaseViewHolder(NativeLibItemView(context))
       STATIC -> createBaseViewHolder(StaticLibItemView(context))
       else -> createBaseViewHolder(ComponentLibItemView(context))
     }
@@ -68,6 +69,13 @@ class LibStringAdapter(@LibType val type: Int) :
         (holder.itemView as NativeLibItemView).apply {
           libName.text = itemName
           libSize.text = PackageUtils.sizeToString(context, item.item)
+          setChip(item.chip)
+        }
+      }
+      METADATA -> {
+        (holder.itemView as NativeLibItemView).apply {
+          libName.text = itemName
+          libSize.text = item.item.source
           setChip(item.chip)
         }
       }
