@@ -19,6 +19,7 @@ jobs:
         run: ./gradlew lintKotlin
 
   build:
+    name: Build
     runs-on: ubuntu-latest
     if: ${{ !startsWith(github.event.head_commit.message, '[skip ci]') }}
 
