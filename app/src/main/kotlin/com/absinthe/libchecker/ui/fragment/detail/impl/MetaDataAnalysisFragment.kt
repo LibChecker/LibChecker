@@ -14,7 +14,7 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import rikka.core.util.ClipboardUtils
 
-class MetaDataAnalysisFragment: BaseDetailFragment<FragmentLibNativeBinding>() {
+class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
 
   override fun getRecyclerView() = binding.list
 
