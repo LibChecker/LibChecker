@@ -20,6 +20,7 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -34,6 +35,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragmen
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -266,7 +268,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
     }
 
     val types = mutableListOf(
-      NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, METADATA, DEX
+      NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA, DEX
     )
     val tabTitles = mutableListOf(
       getText(R.string.ref_category_native),
@@ -274,6 +276,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
       getText(R.string.ref_category_activity),
       getText(R.string.ref_category_br),
       getText(R.string.ref_category_cp),
+      getText(R.string.ref_category_perm),
       getText(R.string.ref_category_metadata),
       getText(R.string.ref_category_dex)
     )
@@ -291,6 +294,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
         return when (position) {
           types.indexOf(NATIVE) -> NativeAnalysisFragment.newInstance(path)
           types.indexOf(STATIC) -> StaticAnalysisFragment.newInstance(path)
+          types.indexOf(PERMISSION) -> PermissionAnalysisFragment.newInstance(path)
           types.indexOf(METADATA) -> MetaDataAnalysisFragment.newInstance(path)
           types.indexOf(DEX) -> DexAnalysisFragment.newInstance(path)
           else -> ComponentsAnalysisFragment.newInstance(types[position])
