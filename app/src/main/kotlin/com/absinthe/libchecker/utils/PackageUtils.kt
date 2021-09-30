@@ -335,10 +335,23 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return meta data list
    */
-  fun getMetaDataLibs(packageInfo: PackageInfo): List<LibStringItem> {
+  fun getMetaDataItems(packageInfo: PackageInfo): List<LibStringItem> {
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
         .map { key -> LibStringItem(key, 0, it.get(key).toString()) }
+        .toList()
+    } ?: return emptyList()
+  }
+
+  /**
+   * Get all permissions in an app
+   * @param packageInfo PackageInfo
+   * @return permissions list
+   */
+  fun getPermissionsItems(packageInfo: PackageInfo): List<LibStringItem> {
+    packageInfo.requestedPermissions?.let {
+      return it.asSequence()
+        .map { perm -> LibStringItem(perm, 0) }
         .toList()
     } ?: return emptyList()
   }

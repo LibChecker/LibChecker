@@ -23,6 +23,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
   }
 
   init {
+    layoutParams = ViewGroup.LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
     addView(container)
   }
 

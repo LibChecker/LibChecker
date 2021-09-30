@@ -2,8 +2,8 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -15,18 +15,18 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import rikka.core.util.ClipboardUtils
 
-class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
+class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
 
   override fun init() {
     binding.apply {
       list.apply {
-        adapter = this@MetaDataAnalysisFragment.adapter
+        adapter = this@PermissionAnalysisFragment.adapter
       }
     }
 
-    viewModel.metaDataItems.observe(viewLifecycleOwner) {
+    viewModel.permissionsItems.observe(viewLifecycleOwner) {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
@@ -61,21 +61,21 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
         // openLibDetailDialog(position)
       }
       setOnItemLongClickListener { _, _, position ->
-        ClipboardUtils.put(requireContext(), getItem(position).item.name + ": " + getItem(position).item.source)
+        ClipboardUtils.put(requireContext(), getItem(position).item.name)
         context.showToast(R.string.toast_copied_to_clipboard)
         true
       }
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initMetaDataData(packageName)
+    viewModel.initPermissionData(packageName)
   }
 
   companion object {
-    fun newInstance(packageName: String): MetaDataAnalysisFragment {
-      return MetaDataAnalysisFragment().putArguments(
+    fun newInstance(packageName: String): PermissionAnalysisFragment {
+      return PermissionAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to METADATA
+        EXTRA_TYPE to PERMISSION
       )
     }
   }

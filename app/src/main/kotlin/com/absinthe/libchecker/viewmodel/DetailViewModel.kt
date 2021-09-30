@@ -47,6 +47,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val nativeLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val staticLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val metaDataItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
+  val permissionsItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
@@ -101,6 +102,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   fun initMetaDataData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     metaDataItems.postValue(getMetaDataChipList(packageName))
+  }
+
+  fun initPermissionData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+    permissionsItems.postValue(getPermissionChipList(packageName))
   }
 
   fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -259,7 +264,36 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getMetaDataChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val list = PackageUtils.getMetaDataLibs(PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA))
+    val list = PackageUtils.getMetaDataItems(PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA))
+    val chipList = mutableListOf<LibStringItemChip>()
+    var chip: LibChip?
+
+    if (list.isEmpty()) {
+      return chipList
+    } else {
+      list.forEach {
+        chip = null
+        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+          chip = LibChip(
+            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            name = rule.label,
+            regexName = rule.regexName
+          )
+        }
+        chipList.add(LibStringItemChip(it, chip))
+      }
+      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
+        chipList.sortByDescending { it.item.name }
+      } else {
+        chipList.sortByDescending { it.chip != null }
+      }
+    }
+    return chipList
+  }
+
+  private suspend fun getPermissionChipList(packageName: String): List<LibStringItemChip> {
+    Timber.d("getPermissionChipList")
+    val list = PackageUtils.getPermissionsItems(PackageUtils.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS))
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 
