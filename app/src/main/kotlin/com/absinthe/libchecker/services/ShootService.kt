@@ -238,7 +238,7 @@ class ShootService : LifecycleService() {
               isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
               abi = abiValue.toShort(),
               targetApi = info.targetSdkVersion.toShort(),
-              nativeLibs = PackageUtils.getNativeDirLibs(it, PackageUtils.is32bit(abiValue)).toJson().orEmpty(),
+              nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
               services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
                 .toJson().orEmpty(),
               activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)

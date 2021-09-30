@@ -6,7 +6,6 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
@@ -181,7 +180,14 @@ object PackageUtils {
     }
 
     if (list.isEmpty()) {
-      val abi = getAbi(packageInfo.applicationInfo, false)
+      var abi = getAbi(packageInfo.applicationInfo, false)
+      if (abi == NO_LIBS) {
+        abi = if (Process.is64Bit()) {
+          ARMV8
+        } else {
+          ARMV7
+        }
+      }
       list.addAll(getSourceLibs(packageInfo, "lib/${getAbiString(LibCheckerApp.app, abi, false)}"))
     }
     list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
@@ -610,11 +616,7 @@ object PackageUtils {
         abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
 
         if (abiSet.isEmpty()) {
-          if (Process.is64Bit()) {
-            abiSet.add(ARMV8)
-          } else {
-            abiSet.add(ARMV7)
-          }
+          abiSet.add(NO_LIBS)
         }
       }
       return abiSet
@@ -635,11 +637,14 @@ object PackageUtils {
    * @return ABI type
    */
   fun getAbi(abiSet: Set<Int>, demands: Map<String, Any?>): Int {
-    var abi = NO_LIBS
-
     if (abiSet.contains(OVERLAY)) {
       return OVERLAY
     }
+    if (abiSet.contains(NO_LIBS)) {
+      return NO_LIBS
+    }
+
+    var abi = NO_LIBS
 
     try {
       val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
@@ -694,8 +699,6 @@ object PackageUtils {
     return getAbi(abiSet, demands)
   }
 
-  fun is32bit(abi: Int): Boolean = abi == ARMV7 || abi == ARMV5 || abi == X86
-
   /**
    * Get ABI type of an app from native path
    * @param nativePath Native path of the app
@@ -738,10 +741,10 @@ object PackageUtils {
   )
 
   private val ABI_BADGE_MAP = mapOf(
-    NO_LIBS to if (Build.SUPPORTED_64_BIT_ABIS.isEmpty()) {
-      R.drawable.ic_abi_label_32bit
-    } else {
+    NO_LIBS to if (Process.is64Bit()) {
       R.drawable.ic_abi_label_64bit
+    } else {
+      R.drawable.ic_abi_label_32bit
     },
     ERROR to 0,
     ARMV8 to R.drawable.ic_abi_label_64bit,
