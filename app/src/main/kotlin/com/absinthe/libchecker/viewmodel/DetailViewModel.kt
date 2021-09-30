@@ -56,7 +56,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   var sortMode = GlobalValues.libSortMode
   var packageName: String = ""
-  var is32bit = false
   var isApk = false
 
   init {
@@ -86,7 +85,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
       info?.let {
         list.addAll(
-          getNativeChipList(info, is32bit, isApk)
+          getNativeChipList(info, isApk)
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {
@@ -193,7 +192,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getNativeChipList(
     info: ApplicationInfo,
-    is32bit: Boolean,
     isApk: Boolean
   ): List<LibStringItemChip> {
     val packageInfo = if (!isApk) {
@@ -204,7 +202,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         applicationInfo = info
       }
     }
-    val list = PackageUtils.getNativeDirLibs(packageInfo, is32bit).toMutableList()
+    val list = PackageUtils.getNativeDirLibs(packageInfo).toMutableList()
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 

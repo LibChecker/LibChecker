@@ -7,9 +7,11 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.core.content.pm.PackageInfoCompat
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -157,37 +159,30 @@ object PackageUtils {
   /**
    * Get native libraries of an app
    * @param packageInfo PackageInfo
-   * @param is32bit True if system is 32bit
    * @param needStaticLibrary True if need get static libraries
    * @return List of LibStringItem
    */
   fun getNativeDirLibs(
     packageInfo: PackageInfo,
-    is32bit: Boolean = false,
     needStaticLibrary: Boolean = false
   ): List<LibStringItem> {
     val nativePath = packageInfo.applicationInfo.nativeLibraryDir
-    val realNativePath = if (is32bit && nativePath != null) {
-      nativePath.substring(0, nativePath.lastIndexOf("/")) + "/arm"
-    } else {
-      nativePath
-    }
     val list = mutableListOf<LibStringItem>()
 
-    if (realNativePath != null) {
-      val file = File(realNativePath)
-      list.addAll(
-        file.listFiles()
-          ?.asSequence()
-          ?.distinctBy { it.name }
-          ?.map { LibStringItem(it.name, it.length()) }
-          ?.toMutableList()
-          .orEmpty()
-      )
+    if (nativePath != null) {
+      File(nativePath).listFiles()?.let { files ->
+        list.addAll(
+          files.asSequence()
+            .distinctBy { it.name }
+            .map { LibStringItem(it.name, it.length()) }
+            .toMutableList()
+        )
+      }
     }
 
     if (list.isEmpty()) {
-      list.addAll(getSourceLibs(packageInfo, "lib/"))
+      val abi = getAbi(packageInfo.applicationInfo, false)
+      list.addAll(getSourceLibs(packageInfo, "lib/${getAbiString(LibCheckerApp.app, abi, false)}"))
     }
     list.addAll(getSourceLibs(packageInfo, "assets/", "/assets"))
 
@@ -212,7 +207,7 @@ object PackageUtils {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         return zipFile.entries()
           .asSequence()
-          .filter { (it.name.contains(childDir)) && it.name.endsWith(".so") }
+          .filter { (it.name.startsWith(childDir)) && it.name.endsWith(".so") }
           .distinctBy { it.name.split("/").last() }
           .map { LibStringItem(it.name.split("/").last(), it.size, source) }
           .toList()
@@ -613,6 +608,14 @@ object PackageUtils {
 
       if (abiSet.isEmpty() && !isApk) {
         abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
+
+        if (abiSet.isEmpty()) {
+          if (Process.is64Bit()) {
+            abiSet.add(ARMV8)
+          } else {
+            abiSet.add(ARMV7)
+          }
+        }
       }
       return abiSet
     } catch (e: Throwable) {
@@ -706,11 +709,13 @@ object PackageUtils {
 
     fileList.asSequence()
       .forEach {
-        when {
-          it.name.contains("arm64") -> abis.add(ARMV8)
-          it.name.contains("arm") -> abis.add(ARMV7)
-          it.name.contains("x86_64") -> abis.add(X86_64)
-          it.name.contains("x86") -> abis.add(X86)
+        if (it.isDirectory) {
+          when (it.name) {
+            "arm64" -> abis.add(ARMV8)
+            "arm" -> abis.add(ARMV7)
+            "x86_64" -> abis.add(X86_64)
+            "x86" -> abis.add(X86)
+          }
         }
       }
 

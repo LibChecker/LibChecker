@@ -188,7 +188,6 @@ class AppDetailActivity :
             ignoreArch = true
           )
           val abi = PackageUtils.getAbi(abiSet, demands)
-          viewModel.is32bit = PackageUtils.is32bit(abi)
 
           if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
               Constants.ERROR
