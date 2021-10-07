@@ -90,6 +90,7 @@ class AppDetailActivity :
 
   private var isHarmonyMode = false
   private var chipGroup: ChipGroupView? = null
+  private var typeList = mutableListOf<Int>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
 
@@ -368,7 +369,7 @@ class AppDetailActivity :
         }
       }
 
-      val types = if (!isHarmonyMode) {
+      typeList = if (!isHarmonyMode) {
         mutableListOf(
           NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA, DEX
         )
@@ -406,7 +407,7 @@ class AppDetailActivity :
       try {
         val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
         if (libs.isNotEmpty()) {
-          types.add(1, STATIC)
+          typeList.add(1, STATIC)
           tabTitles.add(1, getText(R.string.ref_category_static))
         }
       } catch (e: PackageManager.NameNotFoundException) {
@@ -416,11 +417,11 @@ class AppDetailActivity :
       binding.viewpager.apply {
         adapter = object : FragmentStateAdapter(this@AppDetailActivity) {
           override fun getItemCount(): Int {
-            return types.size
+            return typeList.size
           }
 
           override fun createFragment(position: Int): Fragment {
-            return when (val type = types[position]) {
+            return when (val type = typeList[position]) {
               NATIVE -> NativeAnalysisFragment.newInstance(packageName)
               STATIC -> StaticAnalysisFragment.newInstance(packageName)
               PERMISSION -> PermissionAnalysisFragment.newInstance(packageName)
@@ -442,7 +443,7 @@ class AppDetailActivity :
         }
         addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
           override fun onTabSelected(tab: TabLayout.Tab) {
-            val count = viewModel.itemsCountList[types[tab.position]]
+            val count = viewModel.itemsCountList[typeList[tab.position]]
             if (detailFragmentManager.currentItemsCount != count) {
               binding.tsComponentCount.setText(count.toString())
               detailFragmentManager.currentItemsCount = count
@@ -463,7 +464,7 @@ class AppDetailActivity :
       mediator.attach()
 
       viewModel.itemsCountLiveData.observe(this) {
-        if (detailFragmentManager.currentItemsCount != it.count && types[binding.tabLayout.selectedTabPosition] == it.locate) {
+        if (detailFragmentManager.currentItemsCount != it.count && typeList[binding.tabLayout.selectedTabPosition] == it.locate) {
           binding.tsComponentCount.setText(it.count.toString())
           detailFragmentManager.currentItemsCount = it.count
         }
@@ -474,7 +475,7 @@ class AppDetailActivity :
       } else {
         viewModel.initAbilities(packageName)
       }
-    } ?: supportFinishAfterTransition()
+    } ?: finish()
   }
 
   private fun resolveReferenceExtras() {
@@ -485,8 +486,14 @@ class AppDetailActivity :
   }
 
   private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
-    binding.viewpager.currentItem = refType
-    detailFragmentManager.navigateToComponent(refType, refName.removePrefix(packageName))
+    binding.viewpager.currentItem = typeList.indexOf(refType)
+
+    val componentName = if (refType == PERMISSION) {
+      refName
+    } else {
+      refName.removePrefix(packageName)
+    }
+    detailFragmentManager.navigateToComponent(refType, componentName)
   }
 
   private val requestPackageReceiver = object : BroadcastReceiver() {

@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -264,7 +265,19 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getMetaDataChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val list = PackageUtils.getMetaDataItems(PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA))
+    val isApk = packageName.endsWith("/temp.apk")
+    val info = if (isApk) {
+      SystemServices.packageManager.getPackageArchiveInfo(
+        packageName,
+        PackageManager.GET_META_DATA
+      )
+    } else {
+      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+    }
+    if (info == null) {
+      return emptyList()
+    }
+    val list = PackageUtils.getMetaDataItems(info)
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 
@@ -293,7 +306,20 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getPermissionChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
-    val list = PackageUtils.getPermissionsItems(PackageUtils.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS))
+    val isApk = packageName.endsWith("/temp.apk")
+    val info = if (isApk) {
+      SystemServices.packageManager.getPackageArchiveInfo(
+        packageName,
+        PackageManager.GET_PERMISSIONS
+      )
+    } else {
+      PackageUtils.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+    }
+    if (info == null) {
+      return emptyList()
+    }
+
+    val list = PackageUtils.getPermissionsItems(info)
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 

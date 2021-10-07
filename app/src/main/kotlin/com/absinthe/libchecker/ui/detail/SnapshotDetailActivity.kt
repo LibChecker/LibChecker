@@ -220,7 +220,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
       }
 
       val item = (adapter.data[position] as BaseSnapshotNode).item
-      if (item.diffType == REMOVED || item.itemType == PERMISSION) {
+      if (item.diffType == REMOVED) {
         return@setOnItemClickListener
       }
 
