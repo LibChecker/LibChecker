@@ -76,15 +76,17 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
     lifecycleScope.launchWhenStarted {
       if (!LCAppUtils.atLeastR()) {
-        getRecyclerView().also {
-          it.post {
-            it.setInitialPadding(
-              0,
-              0,
-              0,
-              requireActivity().window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                ?: 0
-            )
+        activity?.let { activity ->
+          getRecyclerView().also {
+            it.post {
+              it.setInitialPadding(
+                0,
+                0,
+                0,
+                activity.window.decorView.rootWindowInsets?.systemWindowInsetBottom
+                  ?: 0
+              )
+            }
           }
         }
       }
@@ -93,8 +95,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   override fun onDetach() {
     super.onDetach()
-    if (requireContext() is IDetailContainer) {
-      (requireContext() as IDetailContainer).detailFragmentManager.unregister(type)
+    activity?.let {
+      if (it is IDetailContainer) {
+        (it as IDetailContainer).detailFragmentManager.unregister(type)
+      }
     }
   }
 
