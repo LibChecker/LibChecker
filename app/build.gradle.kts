@@ -10,9 +10,9 @@ import java.nio.file.Paths
 plugins {
   id("com.android.application")
   kotlin("android")
-  kotlin("kapt")
   kotlin("plugin.parcelize")
   id("com.google.protobuf")
+  id("com.google.devtools.ksp").version("1.5.31-1.0.0")
 }
 
 setupAppModule {
@@ -24,11 +24,9 @@ setupAppModule {
     viewBinding = true
   }
 
-  kapt {
-    arguments {
-      arg("room.incremental", "true")
-      arg("room.schemaLocation", "$projectDir/schemas")
-    }
+  ksp {
+    arg("room.incremental", "true")
+    arg("room.schemaLocation", "$projectDir/schemas")
   }
 
   sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -126,10 +124,8 @@ dependencies {
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
-  // Work around on Apple Silicon
-  kapt("org.xerial:sqlite-jdbc:3.36.0.3")
-  kapt(Libs.roomCompiler)
-  kapt(Libs.moshiCompiler)
+  ksp(Libs.roomCompiler)
+  ksp(Libs.moshiCompiler)
 
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
