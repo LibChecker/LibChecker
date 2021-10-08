@@ -4,7 +4,6 @@ private const val lifecycleVersion = "2.3.1"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
-private const val moshiKspVersion = "0.14.1"
 private const val grpcVersion = "1.41.0"
 private const val protocVersion = "3.18.1"
 private const val appCenterVersion = "4.3.1"
@@ -36,7 +35,7 @@ object Libs {
   const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.6.0"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
-  const val moshiCompiler = "dev.zacsweers.moshix:moshi-ksp:$moshiKspVersion"
+  const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
 
   val tests = arrayOf(
     "junit:junit:4.13.2"
