@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
@@ -35,15 +36,12 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -596,27 +594,27 @@ object PackageUtils {
         if (elementName.contains("lib/") && !elementName.contains("assets/")) {
           when {
             elementName.contains(ARMV8_STRING) -> {
-              if (GlobalValues.deviceSupportedAbis.contains(ARMV8_STRING) || ignoreArch) {
+              if (Build.SUPPORTED_ABIS.contains(ARMV8_STRING) || ignoreArch) {
                 abiSet.add(ARMV8)
               }
             }
             elementName.contains(ARMV7_STRING) -> {
-              if (GlobalValues.deviceSupportedAbis.contains(ARMV7_STRING) || ignoreArch) {
+              if (Build.SUPPORTED_ABIS.contains(ARMV7_STRING) || ignoreArch) {
                 abiSet.add(ARMV7)
               }
             }
             elementName.contains(ARMV5_STRING) -> {
-              if (GlobalValues.deviceSupportedAbis.contains(ARMV5_STRING) || ignoreArch) {
+              if (Build.SUPPORTED_ABIS.contains(ARMV5_STRING) || ignoreArch) {
                 abiSet.add(ARMV5)
               }
             }
             elementName.contains(X86_64_STRING) -> {
-              if (GlobalValues.deviceSupportedAbis.contains(X86_64_STRING) || ignoreArch) {
+              if (Build.SUPPORTED_ABIS.contains(X86_64_STRING) || ignoreArch) {
                 abiSet.add(X86_64)
               }
             }
             elementName.contains(X86_STRING) -> {
-              if (GlobalValues.deviceSupportedAbis.contains(X86_STRING) || ignoreArch) {
+              if (Build.SUPPORTED_ABIS.contains(X86_STRING) || ignoreArch) {
                 abiSet.add(X86)
               }
             }
@@ -888,20 +886,6 @@ object PackageUtils {
       emptyList()
     } catch (e: NullPointerException) {
       emptyList()
-    }
-  }
-
-  /**
-   * Judge that whether the device ships an Intel CPU
-   * @return true if it ships an Intel CPU
-   */
-  fun isIntelCpu(): Boolean {
-    return try {
-      BufferedReader(FileReader("/proc/cpuinfo")).use {
-        it.readLine().contains("Intel")
-      }
-    } catch (e: Exception) {
-      false
     }
   }
 

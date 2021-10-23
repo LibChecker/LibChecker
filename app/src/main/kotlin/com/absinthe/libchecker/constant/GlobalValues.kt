@@ -1,14 +1,12 @@
 package com.absinthe.libchecker.constant
 
 import android.content.SharedPreferences
-import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import java.util.Locale
@@ -59,12 +57,6 @@ object GlobalValues {
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
   val season = LCAppUtils.getCurrentSeason()
-
-  val deviceSupportedAbis = if (PackageUtils.isIntelCpu()) {
-    Build.SUPPORTED_ABIS.filter { it.startsWith("x86") }
-  } else {
-    Build.SUPPORTED_ABIS.toList()
-  }
 
   var hasFinishedShoot: Boolean = false
 

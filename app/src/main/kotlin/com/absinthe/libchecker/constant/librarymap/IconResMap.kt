@@ -94,6 +94,8 @@ object IconResMap {
       put(81, R.drawable.ic_lib_yandex_speech_kit)
       put(82, R.drawable.ic_lib_getui)
       put(83, R.drawable.ic_lib_dx_risk)
+      put(84, R.drawable.ic_lib_clash)
+      put(85, R.drawable.ic_lib_jetpack_compose)
     }
 
     SINGLE_COLOR_ICON_SET = setOf(
