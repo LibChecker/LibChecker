@@ -22,6 +22,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -83,7 +84,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
                 leftTimeStamp = item.timestamp
                 infoLeft.tvSnapshotTimestampText.text =
                   viewModel.getFormatDateString(leftTimeStamp)
-                lifecycleScope.launch {
+
+                this@ComparisonActivity.lifecycleScope.launch {
                   val count =
                     viewModel.repository.getSnapshots(leftTimeStamp).size
                   infoLeft.tvSnapshotAppsCountText.text = count.toString()
@@ -109,7 +111,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
                 rightTimeStamp = item.timestamp
                 infoRight.tvSnapshotTimestampText.text =
                   viewModel.getFormatDateString(rightTimeStamp)
-                lifecycleScope.launch {
+                this@ComparisonActivity.lifecycleScope.launch {
                   val count =
                     viewModel.repository.getSnapshots(rightTimeStamp).size
                   infoRight.tvSnapshotAppsCountText.text = count.toString()
@@ -140,6 +142,10 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
             return@setOnClickListener
           }
           if (leftTimeStamp == rightTimeStamp || leftTimeStamp == 0L || rightTimeStamp == 0L) {
+            Toasty.showShort(
+              this@ComparisonActivity,
+              R.string.album_item_comparison_invalid_compare
+            )
             return@setOnClickListener
           }
           viewModel.compareDiff(

@@ -146,6 +146,7 @@
   <string name="album_compare">对比</string>
   <string name="album_item_comparison_title">对比</string>
   <string name="album_item_comparison_subtitle">对比两个快照</string>
+  <string name="album_item_comparison_invalid_compare">无效的对比</string>
   <string name="album_item_management_title">管理</string>
   <string name="album_item_management_subtitle">管理所有快照</string>
   <string name="album_item_backup_restore_title">备份与恢复</string>

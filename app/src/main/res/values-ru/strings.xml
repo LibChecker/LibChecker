@@ -122,8 +122,10 @@
   <string name="snapshot_indicator_changed">Изменено</string>
   <string name="snapshot_indicator_moved">Перемещено</string>
   <string name="snapshot_empty_list_title">Нет изменений</string>
+  <string name="snapshot_no_snapshot">Немає знімка</string>
   <string name="snapshot_detail_new_install_title">Это приложение недавно установлено</string>
   <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
+  <string name="snapshot_time_node_uninitialized">(неініціалізований)</string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>
@@ -139,6 +141,7 @@
   <string name="album_compare">Сравнить</string>
   <string name="album_item_comparison_title">Сравнение</string>
   <string name="album_item_comparison_subtitle">Сравнение двух снимков</string>
+  <string name="album_item_comparison_invalid_compare">Недійсне порівняння</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Управление всеми снимками</string>
   <string name="album_item_backup_restore_title">Бекап и восстановление</string>
