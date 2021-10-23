@@ -116,6 +116,10 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.updateSnapshotDiff(item)
   }
 
+  suspend fun deleteSnapshotDiff(packageName: String) {
+    lcDao.deleteSnapshotDiff(packageName)
+  }
+
   fun deleteAllSnapshotDiffItems() {
     lcDao.deleteAllSnapshotDiffItems()
   }

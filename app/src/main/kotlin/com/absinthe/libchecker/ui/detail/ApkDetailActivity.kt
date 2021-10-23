@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
 import android.net.Uri
 import android.os.Bundle
-import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
-import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -159,7 +157,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
               overlay = overlay,
               ignoreArch = true
             )
-            val abi = PackageUtils.getAbi(abiSet, demands)
+            val abi = PackageUtils.getAbi(packageInfo.applicationInfo)
 
             if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
                 Constants.ERROR
@@ -189,22 +187,9 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
                       drawable.intrinsicWidth,
                       drawable.intrinsicHeight
                     )
-                    if (eachAbi != abi % Constants.MULTI_ARCH) {
-                      drawable.alpha = 128
-                    } else {
-                      drawable.alpha = 255
-                    }
                     val span = CenterAlignImageSpan(drawable)
                     spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
                   }
-                if (eachAbi != abi % Constants.MULTI_ARCH) {
-                  spanString.setSpan(
-                    StrikethroughSpan(),
-                    2,
-                    spanString.length,
-                    Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-                  )
-                }
                 spanStringBuilder.append(spanString)
                 if (itemCount < abiSet.size) {
                   spanStringBuilder.append(", ")

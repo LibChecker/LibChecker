@@ -5,7 +5,7 @@ private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
 private const val grpcVersion = "1.41.0"
-private const val protocVersion = "3.18.1"
+private const val protocVersion = "3.19.0"
 private const val appCenterVersion = "4.3.1"
 
 object Libs {

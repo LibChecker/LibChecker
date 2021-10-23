@@ -62,10 +62,12 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
 
       fun doSaveItemState(pos: Int, state: Boolean) {
         lifecycleScope.launch {
+          val item = TrackItem(data[pos].packageName)
           if (state) {
-            repository.insert(TrackItem(data[pos].packageName))
+            repository.insert(item)
           } else {
-            repository.delete(TrackItem(data[pos].packageName))
+            repository.delete(item)
+            repository.deleteSnapshotDiff(item.packageName)
           }
           list.find { it.packageName == data[pos].packageName }?.switchState = state
         }

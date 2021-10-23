@@ -113,6 +113,9 @@ interface LCDao {
   @Update
   suspend fun updateSnapshotDiff(item: SnapshotDiffStoringItem)
 
+  @Query("DELETE FROM diff_table WHERE packageName = :packageName")
+  suspend fun deleteSnapshotDiff(packageName: String)
+
   @Query("DELETE FROM diff_table")
   fun deleteAllSnapshotDiffItems()
 

@@ -190,7 +190,7 @@ class AppDetailActivity :
             overlay = overlay,
             ignoreArch = true
           )
-          val abi = PackageUtils.getAbi(abiSet, demands)
+          val abi = PackageUtils.getAbi(packageInfo.applicationInfo)
 
           if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
               Constants.ERROR

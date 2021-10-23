@@ -180,7 +180,7 @@ object PackageUtils {
     }
 
     if (list.isEmpty()) {
-      var abi = getAbi(packageInfo.applicationInfo, false)
+      var abi = getAbi(packageInfo.applicationInfo)
       if (abi == NO_LIBS) {
         abi = if (Process.is64Bit()) {
           ARMV8
@@ -276,9 +276,8 @@ object PackageUtils {
     return try {
       val path = packageInfo.applicationInfo.sourceDir
       val file = File(path)
-      val zipFile = ZipFile(file)
 
-      zipFile.use {
+      ZipFile(file).use {
         if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
@@ -368,7 +367,7 @@ object PackageUtils {
           it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/")
         }
       }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       false
     }
   }
@@ -644,75 +643,6 @@ object PackageUtils {
   }
 
   /**
-   * Get ABI type of an app
-   * @param abiSet ABIs set
-   * @param demands Requested manifest properties
-   * @return ABI type
-   */
-  fun getAbi(abiSet: Set<Int>, demands: Map<String, Any?>): Int {
-    if (abiSet.contains(OVERLAY)) {
-      return OVERLAY
-    }
-    if (abiSet.contains(NO_LIBS)) {
-      return NO_LIBS
-    }
-
-    var abi = NO_LIBS
-
-    try {
-      val use32bitAbi = demands[use32bitAbiString] as? Boolean ?: false
-      val multiArch = demands[multiArchString] as? Boolean ?: false
-
-      if (use32bitAbi) {
-        when {
-          abiSet.contains(ARMV7) -> abi = ARMV7
-          abiSet.contains(ARMV5) -> abi = ARMV5
-          abiSet.contains(X86) -> abi = X86
-        }
-      } else {
-        when {
-          abiSet.contains(ARMV8) -> abi = ARMV8
-          abiSet.contains(ARMV7) -> abi = ARMV7
-          abiSet.contains(ARMV5) -> abi = ARMV5
-          abiSet.contains(X86_64) -> abi = X86_64
-          abiSet.contains(X86) -> abi = X86
-        }
-      }
-
-      if (multiArch) {
-        abi += MULTI_ARCH
-      }
-
-      return abi
-    } catch (e: Exception) {
-      Timber.e(e)
-      return ERROR
-    }
-  }
-
-  /**
-   * Get ABI type of an app
-   * @param applicationInfo ApplicationInfo
-   * @param isApk Whether is an APK file
-   * @return ABI type
-   */
-  fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
-    val file = File(applicationInfo.sourceDir)
-    val demands = ManifestReader.getManifestProperties(
-      file,
-      arrayOf(use32bitAbiString, multiArchString, overlayString)
-    )
-    val overlay = demands[overlayString] as? Boolean ?: false
-
-    if (overlay) {
-      return OVERLAY
-    }
-
-    val abiSet = getAbiSet(file, applicationInfo, isApk, overlay)
-    return getAbi(abiSet, demands)
-  }
-
-  /**
    * Get ABI type of an app from native path
    * @param nativePath Native path of the app
    * @return ABI type
@@ -736,6 +666,44 @@ object PackageUtils {
       }
 
     return abis
+  }
+
+  /**
+   * Get ABI type of an app
+   * @param applicationInfo ApplicationInfo
+   * @return ABI type
+   */
+  fun getAbi(applicationInfo: ApplicationInfo): Int {
+    val file = File(applicationInfo.sourceDir)
+    val demands = ManifestReader.getManifestProperties(
+      file,
+      arrayOf(use32bitAbiString, multiArchString, overlayString)
+    )
+    val overlay = demands[overlayString] as? Boolean ?: false
+    val multiArch = demands[multiArchString] as? Boolean ?: false
+
+    if (overlay) {
+      return OVERLAY
+    }
+
+    val primaryCpuAbi: String? =
+      Class.forName(ApplicationInfo::class.java.name).getField("primaryCpuAbi")
+        .get(applicationInfo) as? String
+
+    var abi = when (primaryCpuAbi) {
+      null -> NO_LIBS
+      ARMV8_STRING -> ARMV8
+      ARMV7_STRING -> ARMV7
+      ARMV5_STRING -> ARMV5
+      X86_64_STRING -> X86_64
+      X86_STRING -> X86
+      else -> ERROR
+    }
+
+    if (multiArch) {
+      abi += MULTI_ARCH
+    }
+    return abi
   }
 
   private val ABI_STRING_RES_MAP = hashMapOf(
