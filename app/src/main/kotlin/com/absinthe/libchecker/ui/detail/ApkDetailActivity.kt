@@ -157,7 +157,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
               overlay = overlay,
               ignoreArch = true
             )
-            val abi = PackageUtils.getAbi(packageInfo.applicationInfo)
+            val abi = PackageUtils.getAbi(packageInfo.applicationInfo, true)
 
             if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
                 Constants.ERROR

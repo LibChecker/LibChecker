@@ -671,7 +671,7 @@ object PackageUtils {
    * @param applicationInfo ApplicationInfo
    * @return ABI type
    */
-  fun getAbi(applicationInfo: ApplicationInfo): Int {
+  fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
     val file = File(applicationInfo.sourceDir)
     val demands = ManifestReader.getManifestProperties(
       file,
@@ -682,6 +682,11 @@ object PackageUtils {
 
     if (overlay) {
       return OVERLAY
+    }
+
+    val abiSet = getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
+    if (abiSet.contains(NO_LIBS)) {
+      return NO_LIBS
     }
 
     val primaryCpuAbi: String? =
