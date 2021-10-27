@@ -58,28 +58,29 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             val list = mutableListOf<LibStringItemChip>()
             var chip: LibChip?
             var rule: RuleEntity?
+            var source: String?
 
             for (item in componentList) {
-              rule = LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
-              chip = null
-              if (rule != null) {
-                chip = LibChip(
+              rule = if (!item.componentName.startsWith(".")) {
+                LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
+              } else {
+                null
+              }
+              chip = if (rule != null) {
+                LibChip(
                   iconRes = IconResMap.getIconRes(rule.iconIndex),
                   name = rule.label,
                   regexName = rule.regexName
                 )
-              }
-              list += if (item.enabled) {
-                LibStringItemChip(LibStringItem(item.componentName), chip)
               } else {
-                LibStringItemChip(
-                  LibStringItem(
-                    name = item.componentName,
-                    source = DISABLED
-                  ),
-                  chip
-                )
+                null
               }
+              source = if (item.enabled) null else DISABLED
+
+              list += LibStringItemChip(
+                LibStringItem(name = item.componentName, source = source),
+                chip
+              )
             }
 
             if (sortMode == MODE_SORT_BY_LIB) {
