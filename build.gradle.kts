@@ -11,6 +11,7 @@ buildscript {
     classpath(rootProject.extra["kotlinPlugin"].toString())
     classpath(Libs.protobufPlugin)
     classpath(Libs.kotlinterPlugin)
+    classpath(Libs.hiddenApiRefinePlugin)
   }
 }
 

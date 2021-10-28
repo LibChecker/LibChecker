@@ -3,6 +3,7 @@ package com.absinthe.libchecker.utils
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -39,6 +40,7 @@ import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
+import dev.rikka.tools.refine.Refine
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
 import java.io.File
@@ -689,11 +691,7 @@ object PackageUtils {
       return NO_LIBS
     }
 
-    val primaryCpuAbi: String? =
-      Class.forName(ApplicationInfo::class.java.name).getField("primaryCpuAbi")
-        .get(applicationInfo) as? String
-
-    var abi = when (primaryCpuAbi) {
+    var abi = when (Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi) {
       null -> NO_LIBS
       ARMV8_STRING -> ARMV8
       ARMV7_STRING -> ARMV7

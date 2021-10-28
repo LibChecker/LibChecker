@@ -13,6 +13,7 @@ plugins {
   kotlin("kapt")
   kotlin("plugin.parcelize")
   id("com.google.protobuf")
+  id("dev.rikka.tools.refine.gradle-plugin")
 }
 
 setupAppModule {
@@ -93,6 +94,7 @@ configurations.all {
 
 dependencies {
   compileOnly(fileTree("ohos"))
+  compileOnly(project(":hidden-api"))
 
   implementations(
     // UI
@@ -120,7 +122,9 @@ dependencies {
     *Libs.grpc,
 
     // Debug
-    *Libs.appCenter
+    *Libs.appCenter,
+
+    Libs.refineRuntime
   )
 
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")

@@ -7,6 +7,7 @@ private const val moshiVersion = "1.12.0"
 private const val grpcVersion = "1.41.0"
 private const val protocVersion = "3.19.0"
 private const val appCenterVersion = "4.3.1"
+private const val hiddenApiRefineVersion = "3.0.3"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
@@ -30,12 +31,16 @@ object Libs {
   const val protocMac = "com.google.protobuf:protoc:$protocVersion:osx-x86_64"
   const val genGrpc = "io.grpc:protoc-gen-grpc-java:$grpcVersion"
   const val genGrpcMac = "io.grpc:protoc-gen-grpc-java:$grpcVersion:osx-x86_64"
+  const val refineAnnotation = "dev.rikka.tools.refine:annotation:$hiddenApiRefineVersion"
+  const val refineRuntime = "dev.rikka.tools.refine:runtime:$hiddenApiRefineVersion"
 
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.17"
   const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.6.0"
+  const val hiddenApiRefinePlugin = "dev.rikka.tools.refine:gradle-plugin:$hiddenApiRefineVersion"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
+  const val refineAnnotationCompiler = "dev.rikka.tools.refine:annotation-processor:$hiddenApiRefineVersion"
 
   val tests = arrayOf(
     "junit:junit:4.13.2"
