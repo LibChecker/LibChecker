@@ -62,7 +62,7 @@ const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
-  val libReference: MutableLiveData<List<LibReference>> = MutableLiveData()
+  val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
   val reloadAppsFlag = MutableLiveData(false)
   val initProgressLiveData = MutableLiveData(0)
   val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
@@ -70,7 +70,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   var controller: IListController? = null
 
-  suspend fun getAppsList(): List<ApplicationInfo> {
+  private suspend fun getAppsList(): List<ApplicationInfo> {
     var appList: List<ApplicationInfo>?
 
     do {
@@ -87,6 +87,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     val pmList = mutableListOf<String>()
     try {
+      @Suppress("BlockingMethodInNonBlockingContext")
       val process = Runtime.getRuntime().exec("pm list packages")
       InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
         BufferedReader(isr).use { br ->
