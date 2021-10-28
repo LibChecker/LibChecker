@@ -1,6 +1,6 @@
 @file:Suppress("SpellCheckingInspection")
 
-private const val lifecycleVersion = "2.3.1"
+private const val lifecycleVersion = "2.4.0"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.3.0"
 private const val moshiVersion = "1.12.0"
@@ -11,10 +11,10 @@ private const val hiddenApiRefineVersion = "3.0.3"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2"
-  const val core = "androidx.core:core-ktx:1.6.0"
+  const val core = "androidx.core:core-ktx:1.7.0"
   const val appCompat = "androidx.appcompat:appcompat:1.3.1"
   const val annotation = "androidx.annotation:annotation:1.2.0"
-  const val activity = "androidx.activity:activity-ktx:1.3.1"
+  const val activity = "androidx.activity:activity-ktx:1.4.0"
   const val fragment = "androidx.fragment:fragment-ktx:1.3.6"
   const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.1"
   const val material = "com.google.android.material:material:1.5.0-alpha04"

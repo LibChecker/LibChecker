@@ -12,15 +12,11 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.statistics.LibReferenceItemView
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
-
-  var highlightText: String = ""
+class LibReferenceAdapter : HighlightAdapter<LibReference>() {
 
   init {
     addChildClickViewIds(android.R.id.icon)
@@ -44,11 +40,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
     (holder.itemView as LibReferenceItemView).container.apply {
       count.text = item.referredCount.toString()
 
-      if (highlightText.isNotBlank()) {
-        libName.tintHighlightText(highlightText, item.libName)
-      } else {
-        libName.text = item.libName
-      }
+      setOrHighlightText(libName, item.libName)
 
       item.chip?.let {
         icon.apply {
@@ -60,11 +52,7 @@ class LibReferenceAdapter : BaseQuickAdapter<LibReference, BaseViewHolder>(0) {
           }
         }
 
-        if (highlightText.isNotBlank()) {
-          labelName.tintHighlightText(highlightText, it.name)
-        } else {
-          labelName.text = it.name
-        }
+        setOrHighlightText(labelName, it.name)
       } ?: let {
         icon.setImageResource(R.drawable.ic_question)
         val spannableString = SpannableString(context.getString(R.string.not_marked_lib))

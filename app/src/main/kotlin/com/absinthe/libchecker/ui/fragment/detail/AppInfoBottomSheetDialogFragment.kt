@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
+import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -62,11 +63,16 @@ class AppInfoBottomSheetDialogFragment :
       }
     }
     root.setting.setOnClickListener {
-      val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-        .setData(Uri.parse("package:$packageName"))
-        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-      startActivity(intent)
-      dismiss()
+      try {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+          .setData(Uri.parse("package:$packageName"))
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+      } catch (e: ActivityNotFoundException) {
+        context?.showToast(R.string.toast_cant_open_app)
+      } finally {
+        dismiss()
+      }
     }
     root.list.apply {
       adapter = mAdapter
@@ -86,8 +92,8 @@ class AppInfoBottomSheetDialogFragment :
           try {
             startActivity(intent)
           } catch (e: Exception) {
-            context?.let {
-              Toasty.showShort(it, R.string.toast_cant_open_app)
+            context?.let { ctx ->
+              Toasty.showShort(ctx, R.string.toast_cant_open_app)
             }
           }
         }

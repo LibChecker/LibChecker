@@ -1,0 +1,19 @@
+package com.absinthe.libchecker.recyclerview.adapter
+
+import android.widget.TextView
+import com.absinthe.libchecker.utils.extensions.tintHighlightText
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
+
+abstract class HighlightAdapter<T> : BaseQuickAdapter<T, BaseViewHolder>(0) {
+
+  var highlightText: String = ""
+
+  protected fun setOrHighlightText(view: TextView, text: String) {
+    if (highlightText.isNotBlank()) {
+      view.tintHighlightText(highlightText, text)
+    } else {
+      view.text = text
+    }
+  }
+}

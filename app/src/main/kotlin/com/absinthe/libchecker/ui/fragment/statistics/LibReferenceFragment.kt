@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.view.Gravity
@@ -39,11 +40,8 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
-import com.absinthe.libchecker.view.statistics.LibReferenceItemView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -243,6 +241,7 @@ class LibReferenceFragment :
     return false
   }
 
+  @SuppressLint("NotifyDataSetChanged")
   override fun onQueryTextChange(newText: String): Boolean {
     homeViewModel.libReference.value?.let { list ->
       val filter = list.filter {
@@ -252,18 +251,9 @@ class LibReferenceFragment :
         ) ?: false
       }
       adapter.highlightText = newText
-      adapter.setDiffNewData(filter.toMutableList())
-      doOnMainThreadIdle({
-        val first = layoutManager.findFirstVisibleItemPosition()
-        val last = layoutManager.findLastVisibleItemPosition() + 3
-
-        for (i in first..last) {
-          (layoutManager.getChildAt(i) as? LibReferenceItemView)?.container?.apply {
-            labelName.apply { tintHighlightText(newText, text.toString()) }
-            libName.apply { tintHighlightText(newText, text.toString()) }
-          }
-        }
-      })
+      adapter.setDiffNewData(filter.toMutableList()) {
+        adapter.notifyDataSetChanged()
+      }
 
       if (newText.equals("Easter Egg", true)) {
         context?.showToast("🥚")

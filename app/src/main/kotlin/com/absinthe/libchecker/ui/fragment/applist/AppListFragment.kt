@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
@@ -35,7 +34,6 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -160,38 +158,7 @@ class AppListFragment :
       }
 
       mAdapter.highlightText = newText
-      updateItems(filter)
-      doOnMainThreadIdle({
-        val first: Int
-        val last: Int
-        when (layoutManager) {
-          is LinearLayoutManager -> {
-            first = (layoutManager as LinearLayoutManager)
-              .findFirstVisibleItemPosition()
-            last = (layoutManager as LinearLayoutManager)
-              .findLastVisibleItemPosition() + 3
-          }
-          is StaggeredGridLayoutManager -> {
-            first = (layoutManager as StaggeredGridLayoutManager)
-              .findFirstVisibleItemPositions(null).first()
-            last = (layoutManager as StaggeredGridLayoutManager)
-              .findLastVisibleItemPositions(null).last() + 3
-          }
-          else -> {
-            first = 0
-            last = 0
-          }
-        }
-
-        for (i in first..last) {
-          (mAdapter.getViewByPosition(i, R.id.tv_app_name) as? TextView)?.apply {
-            tintHighlightText(newText, text.toString())
-          }
-          (mAdapter.getViewByPosition(i, R.id.tv_package_name) as? TextView)?.apply {
-            tintHighlightText(newText, text.toString())
-          }
-        }
-      })
+      updateItems(filter, highlightRefresh = true)
 
       when {
         newText.equals("Easter Egg", true) -> {
@@ -346,7 +313,8 @@ class AppListFragment :
     }
   }
 
-  private fun updateItems(newItems: List<LCItem>, needReturnTop: Boolean = true) {
+  @SuppressLint("NotifyDataSetChanged")
+  private fun updateItems(newItems: List<LCItem>, needReturnTop: Boolean = true, highlightRefresh: Boolean = false) {
     Timber.d("updateItems")
     val filterList = mutableListOf<LCItem>()
 
@@ -373,6 +341,10 @@ class AppListFragment :
 
       menu?.findItem(R.id.search)?.isVisible = true
       isListReady = true
+
+      if (highlightRefresh) {
+        mAdapter.notifyDataSetChanged()
+      }
     }
   }
 

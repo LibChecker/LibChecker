@@ -13,21 +13,17 @@ import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
-import com.absinthe.libchecker.utils.extensions.tintHighlightText
 import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) :
-  BaseQuickAdapter<LCItem, BaseViewHolder>(0) {
+class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter<LCItem>() {
 
   private var loadIconJob: Job? = null
-  var highlightText: String = ""
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -55,16 +51,8 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         }
       }
 
-      if (highlightText.isNotBlank()) {
-        appName.tintHighlightText(highlightText, item.label)
-      } else {
-        appName.text = item.label
-      }
-      if (highlightText.isNotBlank()) {
-        packageName.tintHighlightText(highlightText, item.packageName)
-      } else {
-        packageName.text = item.packageName
-      }
+      setOrHighlightText(appName, item.label)
+      setOrHighlightText(packageName, item.packageName)
 
       versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 

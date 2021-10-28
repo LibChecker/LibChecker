@@ -132,7 +132,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
     return super.onOptionsItemSelected(item)
   }
 
-  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.track_menu, menu)
     this.menu = menu
 
@@ -147,7 +147,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
       }
     }
 
-    menu?.findItem(R.id.search)?.apply {
+    menu.findItem(R.id.search)?.apply {
       setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
       actionView = searchView
 
