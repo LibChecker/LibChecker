@@ -58,7 +58,6 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -333,13 +332,9 @@ class AppDetailActivity :
               }
             }
           }
-        } catch (e: PackageManager.NameNotFoundException) {
-          detailsTitle.iconView.apply {
-            load(R.drawable.ic_app_list)
-            imageTintList = R.color.textNormal.toColorStateList(this@AppDetailActivity)
-          }
         } catch (e: Exception) {
           Timber.e(e)
+          Toasty.showLong(this@AppDetailActivity, e.toString())
           finish()
         }
 

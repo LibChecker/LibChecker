@@ -47,5 +47,8 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
     if (GlobalValues.rengeTheme) {
       theme.applyStyle(R.style.ThemeOverlay_Renge, true)
     }
+    if (GlobalValues.md3Theme) {
+      theme.applyStyle(R.style.Base_AppTheme_Material3, true)
+    }
   }
 }

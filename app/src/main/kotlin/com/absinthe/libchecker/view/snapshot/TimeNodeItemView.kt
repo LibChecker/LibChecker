@@ -48,7 +48,7 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
       ).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 24.dp)
         gravity = Gravity.CENTER
-        text = context.getString(R.string.snapshot_time_node_uninitialized)
+        text = context.getString(R.string.empty_list)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
       }
     )

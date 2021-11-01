@@ -28,6 +28,7 @@ object Constants {
   const val PREF_APK_ANALYTICS = "apkAnalytics"
   const val PREF_RULES_REPO = "rulesRepository"
   const val PREF_COLORFUL_ICON = "colorfulIcon"
+  const val PREF_MD3 = "md3"
   const val PREF_LIB_REF_THRESHOLD = "libRefThreshold"
   const val PREF_RELOAD_APPS = "reloadApps"
   const val PREF_ABOUT = "about"

@@ -23,6 +23,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
+import com.absinthe.libchecker.ui.about.AboutActivity
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
@@ -97,6 +98,18 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_COLORFUL_ICON", newValue)
+        )
+        true
+      }
+    }
+    (findPreference<SwitchPreference>(Constants.PREF_MD3))?.apply {
+      isVisible = GlobalValues.debugMode
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.md3Theme = newValue as Boolean
+        activity?.recreate()
+        Analytics.trackEvent(
+          Constants.Event.SETTINGS,
+          EventProperties().set("PREF_MD3", newValue)
         )
         true
       }
@@ -180,6 +193,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
     findPreference<Preference>(Constants.PREF_ABOUT)?.apply {
       summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+      setOnPreferenceClickListener {
+        startActivity(Intent(requireContext(), AboutActivity::class.java))
+        true
+      }
     }
     findPreference<Preference>(Constants.PREF_HELP)?.apply {
       setOnPreferenceClickListener {

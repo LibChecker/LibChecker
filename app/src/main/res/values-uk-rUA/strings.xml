@@ -1,7 +1,7 @@
 <resources>
   <!--  General  -->
   <string name="app_name">LibChecker</string>
-  <string name="title_app_list">Список додатків</string>
+  <string name="title_app_list">Приложения</string>
   <string name="title_statistics">Статистика</string>
   <string name="title_snapshot">Знімок</string>
   <string name="title_settings">Налаштування</string>

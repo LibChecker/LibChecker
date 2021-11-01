@@ -39,6 +39,8 @@ object GlobalValues {
 
   var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
+  var md3Theme: Boolean by SPDelegates(Constants.PREF_MD3, false)
+
   val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(false)
 
   val isShowSystemApps: MutableLiveData<Boolean> =

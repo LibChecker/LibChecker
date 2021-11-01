@@ -27,6 +27,13 @@
       app:summary="@string/colorful_icon_summary"
       app:title="@string/colorful_icon" />
 
+    <SwitchPreference
+      app:defaultValue="false"
+      app:icon="@drawable/ic_material"
+      app:key="md3"
+      app:summary="(Alpha)"
+      app:title="Material Design 3" />
+
     <rikka.preference.SimpleMenuPreference
       app:defaultValue="system"
       app:entries="@array/list_dark_mode"
@@ -83,10 +90,6 @@
       app:key="about"
       app:summary="@string/settings_about_summary"
       app:title="@string/settings_about">
-
-      <intent
-        android:targetClass="com.absinthe.libchecker.ui.about.AboutActivity"
-        android:targetPackage="@string/application_id" />
 
     </Preference>
 

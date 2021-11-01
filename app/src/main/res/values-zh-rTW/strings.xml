@@ -1,7 +1,7 @@
 <resources>
   <!--  General  -->
   <string name="app_name">LibChecker</string>
-  <string name="title_app_list">程式清單</string>
+  <string name="title_app_list">程式</string>
   <string name="title_statistics">統計</string>
   <string name="title_snapshot">快照</string>
   <string name="title_settings">設定</string>
