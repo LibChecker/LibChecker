@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
+import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.lifecycleScope
@@ -24,17 +25,14 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.addPaddingBottom
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
-import com.absinthe.libraries.utils.utils.UiUtils
 import com.drakeet.about.AbsAboutActivity
 import com.drakeet.about.Card
 import com.drakeet.about.Category
 import com.drakeet.about.Contributor
 import com.drakeet.about.License
-import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -419,9 +417,7 @@ class AboutActivity : AbsAboutActivity() {
   }
 
   private fun initView() {
-    UiUtils.setSystemBarStyle(window, false)
-    findViewById<AppBarLayout>(com.drakeet.about.R.id.header_layout).fitsSystemWindows = true
-    window.decorView.addPaddingBottom(window.decorView.rootWindowInsets?.systemWindowInsetBottom ?: 0)
+    findViewById<Toolbar>(R.id.toolbar)?.background = null
   }
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {
