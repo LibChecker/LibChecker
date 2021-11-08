@@ -110,7 +110,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      background = null
     }
 
     dashboard.setOnClickListener {

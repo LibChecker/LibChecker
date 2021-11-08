@@ -8,7 +8,7 @@
   app:cardCornerRadius="5dp"
   app:cardElevation="0dp"
   app:rippleColor="@null"
-  app:strokeColor="@color/cardBorder"
+  app:strokeColor="?albumCardBorderColor"
   app:strokeWidth="@dimen/album_card_stroke_width">
 
   <LinearLayout

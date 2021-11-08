@@ -103,7 +103,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     (findPreference<SwitchPreference>(Constants.PREF_MD3))?.apply {
-      isVisible = GlobalValues.debugMode
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.md3Theme = newValue as Boolean
         activity?.recreate()

@@ -33,6 +33,11 @@
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+
+    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
+    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
+    <item name="albumCardViewColorSurface">?colorSurface</item>
+    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
   </style>
 
   <style name="Theme.Light" parent="Base.AppTheme.Light" />
@@ -67,6 +72,11 @@
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+
+    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
+    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
+    <item name="albumCardViewColorSurface">?colorSurface</item>
+    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
   </style>
 
   <style name="Theme" parent="Base.AppTheme" />
@@ -115,6 +125,11 @@
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
     <item name="chipStyle">@style/Widget.Material3.Chip.Assist.Elevated</item>
+    <item name="materialCardViewStyle">@style/App.Material3.CardView</item>
+    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler_md3</item>
+    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated_md3</item>
+    <item name="albumCardViewColorSurface">@color/material_blue_grey_300</item>
+    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler_md3</item>
   </style>
 
   <style name="Widget.AppBar.Surface.Raisable">

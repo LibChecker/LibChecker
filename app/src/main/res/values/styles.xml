@@ -83,10 +83,18 @@
 
   <style name="AlbumMaterialCard" parent="Widget.MaterialComponents.CardView">
     <item name="cardCornerRadius">5dp</item>
+    <item name="cardBackgroundColor">?albumCardViewColorSurface</item>
     <item name="cardElevation">0dp</item>
-    <item name="strokeColor">@color/cardBorder</item>
+    <item name="strokeColor">?albumCardBorderColor</item>
     <item name="strokeWidth">@dimen/album_card_stroke_width</item>
     <item name="rippleColor">@null</item>
+  </style>
+
+  <style name="App.Material3.CardView" parent="Widget.Material3.CardView.Elevated">
+    <item name="android:stateListAnimator">@null</item>
+    <item name="android:clickable">true</item>
+    <item name="android:focusable">true</item>
+    <item name="cardPreventCornerOverlap">false</item>
   </style>
 
 </resources>

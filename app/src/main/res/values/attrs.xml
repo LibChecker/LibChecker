@@ -18,4 +18,14 @@
     <attr name="infoSrc" format="reference" />
     <attr name="infoBackgroundTint" format="color" />
   </declare-styleable>
+
+  <declare-styleable name="BottomSheetHeaderView">
+    <attr name="bottomSheetHeaderHandlerColor" format="color" />
+    <attr name="bottomSheetHeaderHandlerColorActivated" format="color" />
+  </declare-styleable>
+
+  <declare-styleable name="AlbumMaterialCard">
+    <attr name="albumCardViewColorSurface" format="color" />
+    <attr name="albumCardBorderColor" format="color" />
+  </declare-styleable>
 </resources>

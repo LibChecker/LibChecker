@@ -5,7 +5,6 @@
   <color name="textNormal">#FF000000</color>
   <color name="textSecondary">#80464646</color>
   <color name="backgroundGray">#FFDFDFDF</color>
-  <color name="cardBorder">#FFDDDDDD</color>
   <color name="libIconBackground">#10000000</color>
   <color name="grey_600">#757575</color>
 
@@ -14,5 +13,6 @@
   <color name="highlightComponent">@color/material_blue_100</color>
   <color name="bottom_sheet_header_handler">#CCDFDFDF</color>
   <color name="bottom_sheet_header_handler_activated">#CC444444</color>
-
+  <color name="bottom_sheet_header_handler_md3">#CC888888</color>
+  <color name="bottom_sheet_header_handler_activated_md3">#CC444444</color>
 </resources>
