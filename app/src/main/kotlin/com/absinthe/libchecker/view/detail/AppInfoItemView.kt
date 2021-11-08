@@ -2,6 +2,7 @@ package com.absinthe.libchecker.view.detail
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -59,8 +60,8 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
       it.topMargin = 12.dp
     }
     gravity = Gravity.CENTER_HORIZONTAL
-    maxLines = 2
-    setLines(2)
+    maxLines = 1
+    ellipsize = TextUtils.TruncateAt.END
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     addView(this)
   }

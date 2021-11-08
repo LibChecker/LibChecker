@@ -14,7 +14,6 @@ import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import android.widget.LinearLayout
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -65,6 +64,7 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.ChipGroupView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -317,7 +317,7 @@ class AppDetailActivity :
                     if (AntiShakeUtils.isInvalidClick(chipGroup!!)) {
                       return@addChip
                     }
-                    AlertDialog.Builder(this@AppDetailActivity)
+                    MaterialAlertDialogBuilder(this@AppDetailActivity)
                       .setIcon(R.drawable.ic_kotlin_logo)
                       .setTitle(R.string.kotlin_string)
                       .setMessage(R.string.kotlin_details)

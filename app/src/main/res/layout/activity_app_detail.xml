@@ -23,6 +23,7 @@
       android:background="@null"
       app:contentScrim="?android:colorBackground"
       app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
+      app:titleCollapseMode="scale"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
       <LinearLayout

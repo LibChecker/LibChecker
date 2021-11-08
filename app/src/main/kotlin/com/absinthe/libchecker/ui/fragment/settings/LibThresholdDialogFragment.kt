@@ -2,12 +2,12 @@ package com.absinthe.libchecker.ui.fragment.settings
 
 import android.app.Dialog
 import android.os.Bundle
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.view.settings.LibReferenceThresholdView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 
@@ -18,7 +18,7 @@ class LibThresholdDialogFragment : DialogFragment() {
     val view = LibReferenceThresholdView(requireContext())
     view.count.text = GlobalValues.libReferenceThreshold.toString()
 
-    return AlertDialog.Builder(requireContext())
+    return MaterialAlertDialogBuilder(requireContext())
       .setView(view)
       .setTitle(R.string.lib_ref_threshold)
       .setPositiveButton(android.R.string.ok) { _, _ ->

@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.content.Context
 import android.widget.ArrayAdapter
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
@@ -28,6 +27,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -157,7 +157,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
       }
 
-      AlertDialog.Builder(context)
+      MaterialAlertDialogBuilder(context)
         .setAdapter(arrayAdapter) { _, which ->
           when (which) {
             0 -> {

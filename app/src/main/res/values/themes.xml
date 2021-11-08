@@ -113,6 +113,8 @@
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
+
+    <item name="chipStyle">@style/Widget.Material3.Chip.Assist.Elevated</item>
   </style>
 
   <style name="Widget.AppBar.Surface.Raisable">

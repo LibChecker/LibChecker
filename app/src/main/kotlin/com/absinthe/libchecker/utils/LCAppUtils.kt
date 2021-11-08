@@ -39,6 +39,7 @@ import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialog
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import timber.log.Timber
@@ -212,7 +213,7 @@ object LCAppUtils {
   }
 
   fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
-    return AlertDialog.Builder(context)
+    return MaterialAlertDialogBuilder(context)
       .setView(
         LinearProgressIndicator(context).apply {
           layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
