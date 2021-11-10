@@ -110,6 +110,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      if (!GlobalValues.md3Theme) {
+        background = null
+      }
     }
 
     dashboard.setOnClickListener {
@@ -277,6 +280,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onResume() {
     super.onResume()
+    menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
     if (AppItemRepository.trackItemsChanged) {
       AppItemRepository.trackItemsChanged = false
       flip(VF_LOADING)

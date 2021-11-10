@@ -34,6 +34,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.VersionCompat
+import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -72,7 +73,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val list = ArrayList<LibStringItemChip>()
 
     try {
-      val isApk = packageName.endsWith("/temp.apk")
+      val isApk = packageName.isTempApk()
       val info = if (isApk) {
         context.packageManager.getPackageArchiveInfo(
           packageName,
@@ -117,7 +118,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val context: Context = getApplication<LibCheckerApp>()
 
     try {
-      if (packageName.endsWith("/temp.apk")) {
+      if (packageName.isTempApk()) {
         context.packageManager.getPackageArchiveInfo(
           packageName,
           PackageManager.GET_SERVICES
@@ -265,7 +266,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getMetaDataChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
-    val isApk = packageName.endsWith("/temp.apk")
+    val isApk = packageName.isTempApk()
     val info = if (isApk) {
       SystemServices.packageManager.getPackageArchiveInfo(
         packageName,
@@ -306,14 +307,18 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getPermissionChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
-    val isApk = packageName.endsWith("/temp.apk")
+    val isApk = packageName.isTempApk()
     val info = if (isApk) {
       SystemServices.packageManager.getPackageArchiveInfo(
         packageName,
         PackageManager.GET_PERMISSIONS
       )
     } else {
-      PackageUtils.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+      try {
+        PackageUtils.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+      } catch (e: PackageManager.NameNotFoundException) {
+        null
+      }
     }
     if (info == null) {
       return emptyList()
@@ -349,7 +354,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getDexChipList")
     val list =
-      PackageUtils.getDexList(packageName, packageName.endsWith("/temp.apk")).toMutableList()
+      PackageUtils.getDexList(packageName, packageName.isTempApk()).toMutableList()
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 

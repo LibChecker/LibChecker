@@ -267,7 +267,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
     if (list.isEmpty()) return returnList
 
-    when(list[0].itemType) {
+    when (list[0].itemType) {
       NATIVE, METADATA -> list.forEach { returnList.add(SnapshotNativeNode(it)) }
       else -> list.forEach { returnList.add(SnapshotComponentNode(it)) }
     }

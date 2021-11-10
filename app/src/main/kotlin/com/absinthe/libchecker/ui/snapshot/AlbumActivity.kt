@@ -146,6 +146,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertical)
       it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
     }
+    if (!GlobalValues.md3Theme) {
+      background = null
+    }
     container.apply {
       setIcon(iconRes)
       setIconBackgroundColor(iconBackgroundColorRes)

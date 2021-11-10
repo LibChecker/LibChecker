@@ -24,6 +24,8 @@ object Constants {
   const val X86_64_STRING = "x86_64"
   const val OVERLAY_STRING = "Overlay"
 
+  const val TEMP_PACKAGE = "temp.apk"
+
   const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
   const val PREF_APK_ANALYTICS = "apkAnalytics"
   const val PREF_RULES_REPO = "rulesRepository"

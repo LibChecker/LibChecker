@@ -203,8 +203,8 @@ class AppListFragment :
                 R.id.sort_default -> Constants.SORT_MODE_DEFAULT
                 else -> Constants.SORT_MODE_DEFAULT
               }
-              GlobalValues.appSortModeLiveData.value = mode
               GlobalValues.appSortMode = mode
+              GlobalValues.appSortModeLiveData.value = mode
               true
             }
             setOnDismissListener {
@@ -314,7 +314,11 @@ class AppListFragment :
   }
 
   @SuppressLint("NotifyDataSetChanged")
-  private fun updateItems(newItems: List<LCItem>, needReturnTop: Boolean = true, highlightRefresh: Boolean = false) {
+  private fun updateItems(
+    newItems: List<LCItem>,
+    needReturnTop: Boolean = true,
+    highlightRefresh: Boolean = false
+  ) {
     Timber.d("updateItems")
     val filterList = mutableListOf<LCItem>()
 
@@ -335,9 +339,11 @@ class AppListFragment :
     mAdapter.setDiffNewData(filterList) {
       flip(VF_LIST)
 
-      if (shouReturnTopOfList() && needReturnTop) {
-        returnTopOfList()
-      }
+      doOnMainThreadIdle({
+        if (shouReturnTopOfList() && needReturnTop) {
+          returnTopOfList()
+        }
+      })
 
       menu?.findItem(R.id.search)?.isVisible = true
       isListReady = true
