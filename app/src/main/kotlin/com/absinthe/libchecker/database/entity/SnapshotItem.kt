@@ -22,5 +22,6 @@ data class SnapshotItem(
   @ColumnInfo(name = "activities") val activities: String,
   @ColumnInfo(name = "receivers") val receivers: String,
   @ColumnInfo(name = "providers") val providers: String,
-  @ColumnInfo(name = "permissions") val permissions: String
+  @ColumnInfo(name = "permissions") val permissions: String,
+  @ColumnInfo(name = "metadata") val metadata: String
 )

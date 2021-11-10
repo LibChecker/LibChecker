@@ -27,6 +27,7 @@ message Snapshot {
   string receivers = 14;
   string providers = 15;
   string permissions = 16;
+  string metadata = 17;
 }
 
 message CloudRulesBundle {

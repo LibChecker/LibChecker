@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -191,9 +193,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             dbItem.permissions,
             PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
           ),
+          metadataDiff = SnapshotDiffItem.DiffNode(
+            dbItem.metadata,
+            PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+          ),
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
         )
-        compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
+        compareDiffNode = compareDiffIndicator(snapshotDiffItem)
         snapshotDiffItem.added = compareDiffNode.added
         snapshotDiffItem.removed = compareDiffNode.removed
         snapshotDiffItem.changed = compareDiffNode.changed
@@ -216,7 +222,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       for (dbItem in dbItems) {
         appMap[dbItem.packageName]?.let {
           try {
-            packageInfo = PackageUtils.getPackageInfo(it)
+            packageInfo = PackageUtils.getPackageInfo(it, PackageManager.GET_META_DATA)
             versionCode = PackageUtils.getVersionCode(packageInfo)
             snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
 
@@ -257,6 +263,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               SnapshotDiffItem.DiffNode(dbItem.receivers),
               SnapshotDiffItem.DiffNode(dbItem.providers),
               SnapshotDiffItem.DiffNode(dbItem.permissions),
+              SnapshotDiffItem.DiffNode(dbItem.metadata),
               deleted = true,
               isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
             )
@@ -267,7 +274,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       appMap.forEach { entry ->
         val info = entry.value
         try {
-          packageInfo = PackageUtils.getPackageInfo(info)
+          packageInfo = PackageUtils.getPackageInfo(info, PackageManager.GET_META_DATA)
           versionCode = PackageUtils.getVersionCode(packageInfo)
 
           diffList.add(
@@ -312,6 +319,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               ),
               SnapshotDiffItem.DiffNode(
                 PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+              ),
+              SnapshotDiffItem.DiffNode(
+                PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
               ),
               newInstalled = true,
               isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
@@ -385,9 +395,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               preItem.permissions,
               it.permissions
             ),
+            metadataDiff = SnapshotDiffItem.DiffNode(
+              preItem.metadata,
+              it.metadata
+            ),
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
           )
-          compareDiffNode = compareNativeAndComponentDiff(snapshotDiffItem)
+          compareDiffNode = compareDiffIndicator(snapshotDiffItem)
           snapshotDiffItem.added = compareDiffNode.added
           snapshotDiffItem.removed = compareDiffNode.removed
           snapshotDiffItem.changed = compareDiffNode.changed
@@ -412,6 +426,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             SnapshotDiffItem.DiffNode(preItem.receivers),
             SnapshotDiffItem.DiffNode(preItem.providers),
             SnapshotDiffItem.DiffNode(preItem.permissions),
+            SnapshotDiffItem.DiffNode(preItem.metadata),
             deleted = true,
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
           )
@@ -436,6 +451,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(info.receivers),
           SnapshotDiffItem.DiffNode(info.providers),
           SnapshotDiffItem.DiffNode(info.permissions),
+          SnapshotDiffItem.DiffNode(info.metadata),
           newInstalled = true,
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
         )
@@ -492,6 +508,23 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             entity.permissionsDiff.new.fromJson<List<String>>(
               List::class.java,
               String::class.java
+            )
+          } else {
+            null
+          }
+        )
+      )
+
+      list.addAll(
+        getMetadataDiffList(
+          entity.metadataDiff.old.fromJson<List<LibStringItem>>(
+            List::class.java,
+            LibStringItem::class.java
+          ) ?: emptyList(),
+          if (entity.metadataDiff.new != null) {
+            entity.metadataDiff.new.fromJson<List<LibStringItem>>(
+              List::class.java,
+              LibStringItem::class.java
             )
           } else {
             null
@@ -693,6 +726,58 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     return list
   }
 
+  private fun getMetadataDiffList(
+    oldList: List<LibStringItem>,
+    newList: List<LibStringItem>?
+  ): List<SnapshotDetailItem> {
+    val list = mutableListOf<SnapshotDetailItem>()
+
+    if (newList == null) {
+      return list
+    }
+
+    val tempOldList = oldList.toMutableList()
+    val tempNewList = newList.toMutableList()
+    val sameList = mutableListOf<LibStringItem>()
+
+    for (item in tempNewList) {
+      oldList.find { it.name == item.name }?.let {
+        if (it.source != item.source) {
+          val extra =
+            "${it.source.orEmpty()} $ARROW ${item.source.orEmpty()}"
+          list.add(
+            SnapshotDetailItem(
+              it.name,
+              it.name,
+              extra,
+              CHANGED,
+              METADATA
+            )
+          )
+        }
+        sameList.add(item)
+      }
+    }
+
+    for (item in sameList) {
+      tempOldList.remove(tempOldList.find { it.name == item.name })
+      tempNewList.remove(tempNewList.find { it.name == item.name })
+    }
+
+    for (item in tempOldList) {
+      list.add(
+        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), REMOVED, METADATA)
+      )
+    }
+    for (item in tempNewList) {
+      list.add(
+        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), ADDED, METADATA)
+      )
+    }
+
+    return list
+  }
+
   private fun Long.sizeToString(context: Context): String {
     return "${Formatter.formatFileSize(context, this)} ($this Bytes)"
   }
@@ -704,7 +789,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     var moved: Boolean = false
   )
 
-  private fun compareNativeAndComponentDiff(item: SnapshotDiffItem): CompareDiffNode {
+  private fun compareDiffIndicator(item: SnapshotDiffItem): CompareDiffNode {
     val nativeCompareNode = compareNativeDiff(
       item.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
         List::class.java,
@@ -737,13 +822,27 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         null
       }
     )
+    val metadataCompareNode = compareNativeDiff(
+      item.metadataDiff.old.fromJson<List<LibStringItem>>(
+        List::class.java,
+        LibStringItem::class.java
+      ) ?: emptyList(),
+      if (item.metadataDiff.new != null) {
+        item.metadataDiff.new.fromJson<List<LibStringItem>>(
+          List::class.java,
+          LibStringItem::class.java
+        )
+      } else {
+        null
+      }
+    )
 
     val totalNode = CompareDiffNode()
     totalNode.added =
-      nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added or permissionsCompareNode.added
+      nativeCompareNode.added or servicesCompareNode.added or activitiesCompareNode.added or receiversCompareNode.added or providersCompareNode.added or permissionsCompareNode.added or metadataCompareNode.added
     totalNode.removed =
-      nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed or permissionsCompareNode.removed
-    totalNode.changed = nativeCompareNode.changed
+      nativeCompareNode.removed or servicesCompareNode.removed or activitiesCompareNode.removed or receiversCompareNode.removed or providersCompareNode.removed or permissionsCompareNode.removed or metadataCompareNode.removed
+    totalNode.changed = nativeCompareNode.changed or metadataCompareNode.changed
     totalNode.moved =
       servicesCompareNode.moved or activitiesCompareNode.moved or receiversCompareNode.moved or providersCompareNode.moved
 
@@ -896,6 +995,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         receivers = it.receivers
         providers = it.providers
         permissions = it.permissions
+        metadata = it.metadata
       }
 
       snapshotList.add(snapshotBuilder.build())
@@ -947,7 +1047,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               it.activities,
               it.receivers,
               it.providers,
-              it.permissions
+              it.permissions,
+              it.metadata
             )
             count++
           }

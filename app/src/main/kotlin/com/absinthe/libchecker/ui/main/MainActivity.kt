@@ -17,6 +17,8 @@ import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
@@ -67,6 +69,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     super.onCreate(savedInstanceState)
 
     initView()
+    preWork()
     bindService(
       Intent(this, WorkerService::class.java).apply {
         setPackage(packageName)
@@ -209,5 +212,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
 
   private fun clearApkCache() {
     FileUtils.delete(File(externalCacheDir, "temp.apk"))
+  }
+
+  private fun preWork() {
+    if (AppItemRepository.shouldClearDiffItemsInDatabase) {
+      Repositories.lcRepository.deleteAllSnapshotDiffItems()
+    }
   }
 }

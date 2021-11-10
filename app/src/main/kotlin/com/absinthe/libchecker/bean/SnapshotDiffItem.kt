@@ -18,6 +18,7 @@ data class SnapshotDiffItem(
   val receiversDiff: DiffNode<String>,
   val providersDiff: DiffNode<String>,
   val permissionsDiff: DiffNode<String>,
+  val metadataDiff: DiffNode<String>,
   var added: Boolean = false,
   var removed: Boolean = false,
   var changed: Boolean = false,

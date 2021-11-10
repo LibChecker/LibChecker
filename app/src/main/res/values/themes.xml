@@ -36,7 +36,7 @@
 
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
-    <item name="albumCardViewColorSurface">?colorSurface</item>
+    <item name="albumCardViewColorSurface">@android:color/transparent</item>
     <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
   </style>
 
@@ -75,7 +75,7 @@
 
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
-    <item name="albumCardViewColorSurface">?colorSurface</item>
+    <item name="albumCardViewColorSurface">@android:color/transparent</item>
     <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
   </style>
 

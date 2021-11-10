@@ -3,6 +3,7 @@ package com.absinthe.libchecker.database
 import android.content.pm.ApplicationInfo
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.entity.RuleEntity
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 
@@ -11,6 +12,7 @@ object AppItemRepository {
   var trackItemsChanged = false
   var shouldRefreshAppList = false
   var rulesRegexList = ConcurrentHashMap<Pattern, RuleEntity>()
+  var shouldClearDiffItemsInDatabase = false
 
   suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
     Global.applicationListJob?.join()

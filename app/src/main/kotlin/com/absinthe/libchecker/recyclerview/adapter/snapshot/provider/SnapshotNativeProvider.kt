@@ -4,7 +4,6 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.ADDED
 import com.absinthe.libchecker.bean.CHANGED
@@ -64,7 +63,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
 
       lifecycleScope.launch {
-        val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, NATIVE)
+        val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, snapshotItem.itemType)
 
         setChip(rule, colorRes)
         if (rule != null) {

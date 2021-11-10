@@ -18,7 +18,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 16, exportSchema = true
+  version = 17, exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
 
@@ -56,7 +56,8 @@ abstract class LCDatabase : RoomDatabase() {
             MIGRATION_12_13,
             MIGRATION_13_14,
             MIGRATION_14_15,
-            MIGRATION_15_16
+            MIGRATION_15_16,
+            MIGRATION_16_17
           )
           .createFromAsset("database/rules.db")
           .build()
@@ -198,6 +199,15 @@ abstract class LCDatabase : RoomDatabase() {
         database.execSQL(
           "ALTER TABLE item_table ADD COLUMN variant INTEGER NOT NULL DEFAULT 0"
         )
+      }
+    }
+
+    private val MIGRATION_16_17: Migration = object : Migration(16, 17) {
+      override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+          "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'"
+        )
+        AppItemRepository.shouldClearDiffItemsInDatabase = true;
       }
     }
   }

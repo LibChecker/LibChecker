@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -175,7 +176,7 @@ class ShootService : LifecycleService() {
 
     for (info in appList) {
       try {
-        PackageUtils.getPackageInfo(info.packageName).let {
+        PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_META_DATA).let {
           dbList.add(
             SnapshotItem(
               id = null,
@@ -198,7 +199,8 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                 .toJson().orEmpty(),
-              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty()
+              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
+              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty()
             )
           )
         }
@@ -247,7 +249,8 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                 .toJson().orEmpty(),
-              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty()
+              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
+              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty()
             )
           )
         }

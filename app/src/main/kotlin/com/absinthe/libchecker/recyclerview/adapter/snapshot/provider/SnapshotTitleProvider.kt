@@ -9,7 +9,9 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -51,7 +53,9 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
       ACTIVITY -> R.string.ref_category_activity
       RECEIVER -> R.string.ref_category_br
       PROVIDER -> R.string.ref_category_cp
-      else -> R.string.ref_category_perm
+      PERMISSION -> R.string.ref_category_perm
+      METADATA -> R.string.ref_category_metadata
+      else -> android.R.string.untitled
     }
     itemView.title.text = context.getString(titleRes)
     itemView.list.apply {

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -189,6 +190,15 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
           )
         }
       }
+      getNodeList(details.filter { it.itemType == METADATA }).apply {
+        if (isNotEmpty()) {
+          titleList.add(SnapshotTitleNode(this, METADATA))
+          Analytics.trackEvent(
+            Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
+            EventProperties().set("Metadata", this.size.toLong())
+          )
+        }
+      }
 
       if (titleList.isNotEmpty()) {
         adapter.setList(titleList)
@@ -257,10 +267,9 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
     if (list.isEmpty()) return returnList
 
-    if (list[0].itemType == NATIVE) {
-      list.forEach { returnList.add(SnapshotNativeNode(it)) }
-    } else {
-      list.forEach { returnList.add(SnapshotComponentNode(it)) }
+    when(list[0].itemType) {
+      NATIVE, METADATA -> list.forEach { returnList.add(SnapshotNativeNode(it)) }
+      else -> list.forEach { returnList.add(SnapshotComponentNode(it)) }
     }
 
     return returnList
