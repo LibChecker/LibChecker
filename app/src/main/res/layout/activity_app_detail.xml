@@ -14,7 +14,7 @@
     android:id="@+id/header_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@null">
+    android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.CollapsingToolbarLayout
       android:id="@+id/collapsing_toolbar"
@@ -23,7 +23,6 @@
       android:background="@null"
       app:contentScrim="?android:colorBackground"
       app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
-      app:titleCollapseMode="scale"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
       <LinearLayout
