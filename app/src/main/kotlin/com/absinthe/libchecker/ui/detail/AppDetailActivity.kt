@@ -60,10 +60,12 @@ import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
+import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.ChipGroupView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -132,13 +134,17 @@ class AppDetailActivity :
       binding.apply {
         try {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
-          supportActionBar?.apply {
-            title = try {
-              packageInfo.applicationInfo.loadLabel(packageManager).toString()
-            } catch (e: PackageManager.NameNotFoundException) {
-              getString(R.string.detail_label)
-            }
+          supportActionBar?.title = null
+          collapsingToolbar.title = try {
+            packageInfo.applicationInfo.loadLabel(packageManager).toString()
+          } catch (e: PackageManager.NameNotFoundException) {
+            getString(R.string.detail_label)
           }
+          headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
+            override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
+              collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
+            }
+          })
           detailsTitle.apply {
             iconView.apply {
               val appIconLoader = AppIconLoader(

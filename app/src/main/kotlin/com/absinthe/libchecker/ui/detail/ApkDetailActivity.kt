@@ -43,8 +43,10 @@ import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
@@ -116,11 +118,15 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
         it.applicationInfo.sourceDir = path
         it.applicationInfo.publicSourceDir = path
 
-        supportActionBar?.apply {
-          title = it.applicationInfo.loadLabel(packageManager)
-        }
+        supportActionBar?.title = null
         binding.apply {
           try {
+            collapsingToolbar.title = it.applicationInfo.loadLabel(packageManager)
+            headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
+              override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
+                collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
+              }
+            })
             val appIconLoader = AppIconLoader(
               resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
               false,
