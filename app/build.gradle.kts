@@ -135,7 +135,7 @@ dependencies {
   kapt(Libs.roomCompiler)
   kapt(Libs.moshiCompiler)
 
-  implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.6")
+  implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
   implementation("com.drakeet.about:about:2.5.0")
   implementation("com.drakeet.multitype:multitype:4.3.0")
