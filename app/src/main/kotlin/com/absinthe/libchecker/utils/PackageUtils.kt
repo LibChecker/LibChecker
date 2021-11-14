@@ -673,21 +673,27 @@ object PackageUtils {
    * @param applicationInfo ApplicationInfo
    * @return ABI type
    */
-  fun getAbi(applicationInfo: ApplicationInfo, isApk: Boolean = false): Int {
+  fun getAbi(
+    applicationInfo: ApplicationInfo,
+    isApk: Boolean = false,
+    abiSet: Set<Int>? = null,
+    demands: Map<String, Any>? = null
+  ): Int {
     val file = File(applicationInfo.sourceDir)
-    val demands = ManifestReader.getManifestProperties(
+    val realDemands = demands ?: ManifestReader.getManifestProperties(
       file,
       arrayOf(use32bitAbiString, multiArchString, overlayString)
     )
-    val overlay = demands[overlayString] as? Boolean ?: false
-    val multiArch = demands[multiArchString] as? Boolean ?: false
+    val overlay = realDemands[overlayString] as? Boolean ?: false
+    val multiArch = realDemands[multiArchString] as? Boolean ?: false
 
     if (overlay) {
       return OVERLAY
     }
 
-    val abiSet = getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
-    if (abiSet.contains(NO_LIBS)) {
+    val realAbiSet =
+      abiSet ?: getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
+    if (realAbiSet.contains(NO_LIBS)) {
       return NO_LIBS
     }
 

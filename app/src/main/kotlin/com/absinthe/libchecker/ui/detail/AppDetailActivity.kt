@@ -67,7 +67,9 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
 import timber.log.Timber
@@ -189,7 +191,12 @@ class AppDetailActivity :
             overlay = overlay,
             ignoreArch = true
           )
-          val abi = PackageUtils.getAbi(packageInfo.applicationInfo)
+          val abi = PackageUtils.getAbi(
+            packageInfo.applicationInfo,
+            isApk = false,
+            abiSet = abiSet,
+            demands = demands
+          )
 
           if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
               Constants.ERROR
@@ -399,14 +406,23 @@ class AppDetailActivity :
           getText(R.string.ref_category_dex)
         )
       }
-      try {
-        val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-        if (libs.isNotEmpty()) {
-          typeList.add(1, STATIC)
-          tabTitles.add(1, getText(R.string.ref_category_static))
+
+      lifecycleScope.launch(Dispatchers.IO) {
+        try {
+          val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+          if (libs.isNotEmpty()) {
+            withContext(Dispatchers.Main) {
+              typeList.add(1, STATIC)
+              tabTitles.add(1, getText(R.string.ref_category_static))
+              binding.tabLayout.addTab(
+                binding.tabLayout.newTab().also { it.text = getText(R.string.ref_category_static) },
+                1
+              )
+            }
+          }
+        } catch (e: PackageManager.NameNotFoundException) {
+          Timber.e(e)
         }
-      } catch (e: PackageManager.NameNotFoundException) {
-        Timber.e(e)
       }
 
       binding.viewpager.apply {

@@ -211,7 +211,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   }
 
   private fun clearApkCache() {
-    FileUtils.delete(File(externalCacheDir, "temp.apk"))
+    FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
   private fun preWork() {

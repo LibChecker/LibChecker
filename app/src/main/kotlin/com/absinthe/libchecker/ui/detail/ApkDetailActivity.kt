@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.detail
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableString
@@ -46,7 +47,9 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
 import java.io.File
@@ -97,7 +100,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
 
   @SuppressLint("SetTextI18n")
   private fun initData(uri: Uri) {
-    tempFile = File(externalCacheDir, "temp.apk")
+    tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE)
 
     val path = tempFile!!.path
     var inputStream: InputStream? = null
@@ -265,9 +268,26 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
       getText(R.string.ref_category_metadata),
       getText(R.string.ref_category_dex)
     )
-    if (packageInfo != null && PackageUtils.getStaticLibs(packageInfo).isNotEmpty()) {
-      types.add(1, STATIC)
-      tabTitles.add(1, getText(R.string.ref_category_static))
+    lifecycleScope.launch(Dispatchers.IO) {
+      try {
+        if (packageInfo != null && PackageUtils.getStaticLibs(
+            PackageUtils.getPackageInfo(
+              packageName
+            )
+          ).isNotEmpty()
+        ) {
+          withContext(Dispatchers.Main) {
+            types.add(1, STATIC)
+            tabTitles.add(1, getText(R.string.ref_category_static))
+            binding.tabLayout.addTab(
+              binding.tabLayout.newTab().also { it.text = getText(R.string.ref_category_static) },
+              1
+            )
+          }
+        }
+      } catch (e: PackageManager.NameNotFoundException) {
+        Timber.e(e)
+      }
     }
 
     binding.viewpager.adapter = object : FragmentStateAdapter(this) {

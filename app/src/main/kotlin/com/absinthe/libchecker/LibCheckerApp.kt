@@ -3,7 +3,6 @@ package com.absinthe.libchecker
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.os.Build
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -31,8 +30,8 @@ class LibCheckerApp : Application() {
       return
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-      HiddenApiBypass.addHiddenApiExemptions("L")
+    if (LCAppUtils.atLeastP()) {
+      HiddenApiBypass.addHiddenApiExemptions("")
     }
 
     app = this
