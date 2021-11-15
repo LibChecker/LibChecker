@@ -37,12 +37,14 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailNewInstallView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.chad.library.adapter.base.entity.node.BaseNode
+import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
@@ -86,10 +88,16 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
       setDisplayShowHomeEnabled(true)
-      title = entity.labelDiff.new ?: entity.labelDiff.old
+      title = null
     }
 
     binding.apply {
+      collapsingToolbar.title = entity.labelDiff.new ?: entity.labelDiff.old
+      headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
+        override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
+          collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
+        }
+      })
       list.apply {
         adapter = this@SnapshotDetailActivity.adapter
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false

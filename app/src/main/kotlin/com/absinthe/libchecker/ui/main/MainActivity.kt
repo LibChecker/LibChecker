@@ -36,6 +36,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -215,8 +216,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   }
 
   private fun preWork() {
-    if (AppItemRepository.shouldClearDiffItemsInDatabase) {
-      Repositories.lcRepository.deleteAllSnapshotDiffItems()
+    lifecycleScope.launch(Dispatchers.IO) {
+      if (AppItemRepository.shouldClearDiffItemsInDatabase) {
+        Repositories.lcRepository.deleteAllSnapshotDiffItems()
+      }
     }
   }
 }
