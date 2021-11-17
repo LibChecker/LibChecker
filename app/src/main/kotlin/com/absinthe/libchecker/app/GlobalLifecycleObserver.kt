@@ -1,19 +1,18 @@
 package com.absinthe.libchecker.app
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.absinthe.libchecker.constant.GlobalValues
 
-class GlobalLifecycleObserver : LifecycleObserver {
+class GlobalLifecycleObserver : DefaultLifecycleObserver {
 
-  @OnLifecycleEvent(Lifecycle.Event.ON_START)
-  fun onForeground() {
+  override fun onStart(owner: LifecycleOwner) {
+    super.onStart(owner)
     GlobalValues.shouldRequestChange.value = true
   }
 
-  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-  fun onBackground() {
+  override fun onStop(owner: LifecycleOwner) {
+    super.onStop(owner)
     GlobalValues.shouldRequestChange.value = true
   }
 }

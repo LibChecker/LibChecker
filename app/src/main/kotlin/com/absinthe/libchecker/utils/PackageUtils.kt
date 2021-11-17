@@ -686,6 +686,7 @@ object PackageUtils {
     )
     val overlay = realDemands[overlayString] as? Boolean ?: false
     val multiArch = realDemands[multiArchString] as? Boolean ?: false
+    val use32bitAbi = realDemands[use32bitAbiString] as? Boolean ?: false
 
     if (overlay) {
       return OVERLAY
@@ -698,12 +699,35 @@ object PackageUtils {
     }
 
     var abi = when (Refine.unsafeCast<ApplicationInfoHidden>(applicationInfo).primaryCpuAbi) {
-      null -> NO_LIBS
       ARMV8_STRING -> ARMV8
       ARMV7_STRING -> ARMV7
       ARMV5_STRING -> ARMV5
       X86_64_STRING -> X86_64
       X86_STRING -> X86
+      null -> {
+        if (FreezeUtils.isAppFrozen(applicationInfo.packageName)) {
+          val supportedAbiSet = realAbiSet.toMutableSet()
+          realAbiSet.forEach {
+            if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
+              supportedAbiSet.add(it)
+            }
+          }
+          if (use32bitAbi) {
+            supportedAbiSet.remove(ARMV8)
+            supportedAbiSet.remove(X86_64)
+          }
+          when {
+            supportedAbiSet.contains(ARMV8) -> ARMV8
+            supportedAbiSet.contains(ARMV7) -> ARMV7
+            supportedAbiSet.contains(ARMV5) -> ARMV5
+            supportedAbiSet.contains(X86_64) -> X86_64
+            supportedAbiSet.contains(X86) -> X86
+            else -> ERROR
+          }
+        } else {
+          NO_LIBS
+        }
+      }
       else -> ERROR
     }
 
