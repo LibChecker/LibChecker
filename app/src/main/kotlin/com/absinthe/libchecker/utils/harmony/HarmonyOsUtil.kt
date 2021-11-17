@@ -16,17 +16,12 @@ object HarmonyOsUtil {
   }
 
   fun isHarmonyOs(): Boolean {
-    if (sHarmonyOs != null) {
-      return sHarmonyOs!!
-    }
     return try {
-      Class.forName("ohos.app.Application")
-      Class.forName("ohos.system.version.SystemVersion")
-      sHarmonyOs = true
-      sHarmonyOs!!
-    } catch (e: ClassNotFoundException) {
-      sHarmonyOs = false
-      sHarmonyOs!!
+      val clz = Class.forName("com.huawei.system.BuildEx")
+      val method = clz.getMethod("getOsBrand")
+      return "harmony".equals(method.invoke(clz) as String?, ignoreCase = true)
+    } catch (e: Exception) {
+      false
     }
   }
 }
