@@ -822,7 +822,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         null
       }
     )
-    val metadataCompareNode = compareNativeDiff(
+    val metadataCompareNode = compareMetadataDiff(
       item.metadataDiff.old.fromJson<List<LibStringItem>>(
         List::class.java,
         LibStringItem::class.java
@@ -959,6 +959,41 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     for (item in sameList) {
       tempOldList.remove(item)
       tempNewList.remove(item)
+    }
+
+    if (tempOldList.isNotEmpty()) {
+      node.removed = true
+    }
+    if (tempNewList.isNotEmpty()) {
+      node.added = true
+    }
+    return node
+  }
+
+  private fun compareMetadataDiff(
+    oldList: List<LibStringItem>,
+    newList: List<LibStringItem>?
+  ): CompareDiffNode {
+    if (newList == null) {
+      return CompareDiffNode(removed = true)
+    }
+
+    val tempOldList = oldList.toMutableList()
+    val tempNewList = newList.toMutableList()
+    val node = CompareDiffNode()
+
+    val iterator = tempNewList.iterator()
+    var nextItem: LibStringItem
+
+    while (iterator.hasNext()) {
+      nextItem = iterator.next()
+      oldList.find { it.name == nextItem.name }?.let {
+        if (it.source != nextItem.source) {
+          node.changed = true
+        }
+        iterator.remove()
+        tempOldList.remove(tempOldList.find { item -> item.name == nextItem.name })
+      }
     }
 
     if (tempOldList.isNotEmpty()) {
