@@ -35,7 +35,7 @@ object Libs {
   const val refineRuntime = "dev.rikka.tools.refine:runtime:$hiddenApiRefineVersion"
 
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.18"
-  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.7.0"
+  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.6.0"
   const val hiddenApiRefinePlugin = "dev.rikka.tools.refine:gradle-plugin:$hiddenApiRefineVersion"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
