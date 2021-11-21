@@ -37,6 +37,13 @@
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data
+          android:host="action"
+          android:scheme="lcsc" />
+      </intent-filter>
 
       <meta-data
         android:name="android.app.shortcuts"

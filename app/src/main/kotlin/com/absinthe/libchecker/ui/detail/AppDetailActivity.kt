@@ -426,6 +426,9 @@ class AppDetailActivity :
               )
             }
           }
+          withContext(Dispatchers.Main) {
+            resolveReferenceExtras()
+          }
         } catch (e: PackageManager.NameNotFoundException) {
           Timber.e(e)
         }
