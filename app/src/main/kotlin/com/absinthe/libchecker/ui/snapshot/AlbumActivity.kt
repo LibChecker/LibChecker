@@ -25,6 +25,7 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import rikka.material.app.DayNightDelegate
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
@@ -40,27 +41,33 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+    val isDarkMode = when(DayNightDelegate.getDefaultNightMode()) {
+      DayNightDelegate.MODE_NIGHT_YES -> true
+      DayNightDelegate.MODE_NIGHT_NO -> false
+      DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM, DayNightDelegate.MODE_NIGHT_UNSPECIFIED, DayNightDelegate.MODE_NIGHT_AUTO_BATTERY -> UiUtils.isDarkModeOnSystem()
+      else -> false
+    }
     val itemComparison = generateAlbumItemView(
       R.drawable.ic_compare,
-      if (UiUtils.isDarkMode()) R.color.material_red_300 else R.color.material_red_900,
+      if (isDarkMode) R.color.material_red_900 else R.color.material_red_300,
       R.string.album_item_comparison_title,
       R.string.album_item_comparison_subtitle
     )
     val itemManagement = generateAlbumItemView(
       R.drawable.ic_manage,
-      if (UiUtils.isDarkMode()) R.color.material_blue_300 else R.color.material_blue_900,
+      if (isDarkMode) R.color.material_blue_900 else R.color.material_blue_300,
       R.string.album_item_management_title,
       R.string.album_item_management_subtitle
     )
     val itemBackupRestore = generateAlbumItemView(
       R.drawable.ic_backup,
-      if (UiUtils.isDarkMode()) R.color.material_green_300 else R.color.material_green_900,
+      if (isDarkMode) R.color.material_green_900 else R.color.material_green_300,
       R.string.album_item_backup_restore_title,
       R.string.album_item_backup_restore_subtitle
     )
     val itemTrack = generateAlbumItemView(
       R.drawable.ic_track,
-      if (UiUtils.isDarkMode()) R.color.material_orange_300 else R.color.material_orange_900,
+      if (isDarkMode) R.color.material_orange_900 else R.color.material_orange_300,
       R.string.album_item_track_title,
       R.string.album_item_track_subtitle
     )

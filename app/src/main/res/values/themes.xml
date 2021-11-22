@@ -34,6 +34,7 @@
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
+    <item name="chipStyle">@style/App.LibChip</item>
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
     <item name="albumCardViewColorSurface">@android:color/transparent</item>
@@ -73,6 +74,7 @@
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
+    <item name="chipStyle">@style/App.LibChip</item>
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
     <item name="albumCardViewColorSurface">@android:color/transparent</item>
@@ -124,7 +126,7 @@
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
-    <item name="chipStyle">@style/Widget.Material3.Chip.Assist.Elevated</item>
+    <item name="chipStyle">@style/App.LibChip.Material3</item>
     <item name="materialCardViewStyle">@style/App.Material3.CardView</item>
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler_md3</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated_md3</item>

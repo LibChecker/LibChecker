@@ -26,6 +26,10 @@
     <item name="chipStartPadding">10dp</item>
   </style>
 
+  <style name="App.LibChip.Material3" parent="Widget.Material3.Chip.Assist.Elevated">
+    <item name="chipIconTint">@null</item>
+  </style>
+
   <style name="ThemeOverlay.Preference" parent="PreferenceThemeOverlay">
     <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
   </style>
