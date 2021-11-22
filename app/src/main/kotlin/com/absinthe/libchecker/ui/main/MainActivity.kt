@@ -38,6 +38,7 @@ import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -51,8 +52,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
 
   private var workerBinder: IWorkerService? = null
   private val workerListener = object : OnWorkerListener.Stub() {
-    override fun onReceivePackagesChanged() {
-      appViewModel.packageChangedLiveData.postValue(intent.data?.encodedSchemeSpecificPart)
+    override fun onReceivePackagesChanged(packageName: String?, action: String?) {
+      appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
     }
   }
   private val workerServiceConnection = object : ServiceConnection {
@@ -203,9 +204,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
         initItems()
       }
 
-      reloadAppsFlag.observe(this@MainActivity) {
-        if (it) {
-          binding.viewpager.setCurrentItem(0, true)
+      lifecycleScope.launchWhenStarted {
+        effect.collect {
+          when(it) {
+            is HomeViewModel.Effect.ReloadApps -> {
+              binding.viewpager.setCurrentItem(0, true)
+            }
+            is HomeViewModel.Effect.UpdateInitProgress -> { }
+            is HomeViewModel.Effect.PackageChanged -> { }
+          }
         }
       }
     }

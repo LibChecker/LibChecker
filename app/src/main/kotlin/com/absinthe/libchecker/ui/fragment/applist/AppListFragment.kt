@@ -36,11 +36,13 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.flow.collect
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
@@ -220,14 +222,26 @@ class AppListFragment :
 
   private fun initObserver() {
     homeViewModel.apply {
-      reloadAppsFlag.observe(viewLifecycleOwner) {
-        if (it && appListStatusLiveData.value == STATUS_NOT_START) {
-          Once.clearDone(OnceTag.FIRST_LAUNCH)
-          isFirstLaunch = true
-          doOnMainThreadIdle({
-            flip(VF_INIT)
-            initItems()
-          })
+      lifecycleScope.launchWhenStarted {
+        effect.collect {
+          when (it) {
+            is HomeViewModel.Effect.ReloadApps -> {
+              if (appListStatusLiveData.value == STATUS_NOT_START) {
+                Once.clearDone(OnceTag.FIRST_LAUNCH)
+                isFirstLaunch = true
+                doOnMainThreadIdle {
+                  flip(VF_INIT)
+                  initItems()
+                }
+              }
+            }
+            is HomeViewModel.Effect.UpdateInitProgress -> {
+              binding.initView.progressIndicator.setProgressCompat(it.progress, true)
+            }
+            is HomeViewModel.Effect.PackageChanged -> {
+              requestChange(true)
+            }
+          }
         }
       }
 
@@ -271,12 +285,6 @@ class AppListFragment :
             }
           }
         }
-      }
-      initProgressLiveData.observe(viewLifecycleOwner) {
-        binding.initView.progressIndicator.setProgressCompat(it, true)
-      }
-      packageChangedLiveData.observe(viewLifecycleOwner) {
-        requestChange(true)
       }
     }
 
@@ -339,11 +347,11 @@ class AppListFragment :
     mAdapter.setDiffNewData(filterList) {
       flip(VF_LIST)
 
-      doOnMainThreadIdle({
+      doOnMainThreadIdle {
         if (shouReturnTopOfList() && needReturnTop) {
           returnTopOfList()
         }
-      })
+      }
 
       menu?.findItem(R.id.search)?.isVisible = true
       isListReady = true

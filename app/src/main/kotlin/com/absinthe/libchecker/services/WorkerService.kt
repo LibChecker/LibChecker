@@ -30,7 +30,10 @@ class WorkerService : LifecycleService() {
       override fun onReceive(context: Context, intent: Intent?) {
         Timber.d("package receiver received: ${intent?.action}")
         initAllApplicationInfoItems()
-        notifyPackagesChanged()
+        notifyPackagesChanged(
+          intent?.data?.encodedSchemeSpecificPart.orEmpty(),
+          intent?.action.orEmpty()
+        )
       }
     }
   }
@@ -76,8 +79,8 @@ class WorkerService : LifecycleService() {
 
   override fun onDestroy() {
     Timber.d("onDestroy")
-    super.onDestroy()
     unregisterReceiver(packageReceiver)
+    super.onDestroy()
   }
 
   private fun initAllApplicationInfoItems() {
@@ -135,11 +138,11 @@ class WorkerService : LifecycleService() {
   }
 
   @Synchronized
-  private fun notifyPackagesChanged() {
+  private fun notifyPackagesChanged(packageName: String, action: String) {
     val count = listenerList.beginBroadcast()
     for (i in 0 until count) {
       try {
-        listenerList.getBroadcastItem(i).onReceivePackagesChanged()
+        listenerList.getBroadcastItem(i).onReceivePackagesChanged(packageName, action)
       } catch (e: RemoteException) {
         Timber.e(e)
       }

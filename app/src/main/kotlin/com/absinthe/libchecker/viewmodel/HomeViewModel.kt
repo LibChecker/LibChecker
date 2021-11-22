@@ -48,6 +48,8 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
@@ -63,12 +65,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
   val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
-  val reloadAppsFlag = MutableLiveData(false)
-  val initProgressLiveData = MutableLiveData(0)
   val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
-  val packageChangedLiveData = MutableLiveData<String?>()
+
+  private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
+  val effect = _effect.asSharedFlow()
 
   var controller: IListController? = null
+
+  fun reloadApps() {
+    setEffect {
+      Effect.ReloadApps()
+    }
+  }
+
+  fun packageChanged(packageName: String, action: String) {
+    setEffect {
+      Effect.PackageChanged(packageName, action)
+    }
+  }
+
+  private fun updateInitProgress(progress: Int) {
+    setEffect {
+      Effect.UpdateInitProgress(progress)
+    }
+  }
+
+  private fun setEffect(builder: () -> Effect) {
+    val newEffect = builder()
+    viewModelScope.launch {
+      _effect.emit(newEffect)
+    }
+  }
 
   private suspend fun getAppsList(): List<ApplicationInfo> {
     var appList: List<ApplicationInfo>?
@@ -127,7 +154,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       appListStatusLiveData.value = STATUS_START_INIT
     }
     Repositories.lcRepository.deleteAllItems()
-    initProgressLiveData.postValue(0)
+    updateInitProgress(0)
 
     val appList = getAppsList()
     val lcItems = mutableListOf<LCItem>()
@@ -182,7 +209,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         lcItems.add(lcItem)
         count++
         progressCount++
-        initProgressLiveData.postValue(progressCount * 100 / appList.size)
+        updateInitProgress(progressCount * 100 / appList.size)
       } catch (e: Throwable) {
         Timber.e(e, "initItems")
         continue
@@ -735,5 +762,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     list.forEach {
       AppItemRepository.rulesRegexList[Pattern.compile(it.name)] = it
     }
+  }
+
+  sealed class Effect {
+    data class ReloadApps(val obj: Any? = null) : Effect()
+    data class UpdateInitProgress(val progress: Int) : Effect()
+    data class PackageChanged(val packageName: String, val action: String) : Effect()
   }
 }

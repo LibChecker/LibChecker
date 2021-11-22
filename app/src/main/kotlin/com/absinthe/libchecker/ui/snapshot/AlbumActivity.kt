@@ -21,6 +21,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.libraries.utils.utils.UiUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,25 +42,25 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
     val itemComparison = generateAlbumItemView(
       R.drawable.ic_compare,
-      R.color.material_red_300,
+      if (UiUtils.isDarkMode()) R.color.material_red_300 else R.color.material_red_900,
       R.string.album_item_comparison_title,
       R.string.album_item_comparison_subtitle
     )
     val itemManagement = generateAlbumItemView(
       R.drawable.ic_manage,
-      R.color.material_blue_300,
+      if (UiUtils.isDarkMode()) R.color.material_blue_300 else R.color.material_blue_900,
       R.string.album_item_management_title,
       R.string.album_item_management_subtitle
     )
     val itemBackupRestore = generateAlbumItemView(
       R.drawable.ic_backup,
-      R.color.material_green_300,
+      if (UiUtils.isDarkMode()) R.color.material_green_300 else R.color.material_green_900,
       R.string.album_item_backup_restore_title,
       R.string.album_item_backup_restore_subtitle
     )
     val itemTrack = generateAlbumItemView(
       R.drawable.ic_track,
-      R.color.material_orange_300,
+      if (UiUtils.isDarkMode()) R.color.material_orange_300 else R.color.material_orange_900,
       R.string.album_item_track_title,
       R.string.album_item_track_subtitle
     )

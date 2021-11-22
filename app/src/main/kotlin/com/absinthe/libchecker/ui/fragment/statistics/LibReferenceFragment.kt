@@ -42,9 +42,11 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
@@ -117,6 +119,17 @@ class LibReferenceFragment :
     }
 
     homeViewModel.apply {
+      lifecycleScope.launchWhenStarted {
+        effect.collect {
+          when(it) {
+            is HomeViewModel.Effect.PackageChanged -> {
+              computeRef()
+            }
+            is HomeViewModel.Effect.ReloadApps -> { }
+            is HomeViewModel.Effect.UpdateInitProgress -> { }
+          }
+        }
+      }
       libReference.observe(viewLifecycleOwner) {
         if (it == null) {
           return@observe
@@ -126,9 +139,6 @@ class LibReferenceFragment :
         flip(VF_LIST)
         isListReady = true
         menu?.findItem(R.id.search)?.isVisible = true
-      }
-      packageChangedLiveData.observe(viewLifecycleOwner) {
-        computeRef()
       }
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {

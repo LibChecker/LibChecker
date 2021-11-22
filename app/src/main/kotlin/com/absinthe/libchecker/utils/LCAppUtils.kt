@@ -15,7 +15,6 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -43,7 +42,6 @@ import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -232,7 +230,7 @@ object LCAppUtils {
 /**
  * From drakeet
  */
-fun doOnMainThreadIdle(action: () -> Unit, timeout: Long? = null) {
+fun doOnMainThreadIdle(action: () -> Unit) {
   val handler = Handler(Looper.getMainLooper())
 
   val idleHandler = MessageQueue.IdleHandler {
@@ -242,18 +240,6 @@ fun doOnMainThreadIdle(action: () -> Unit, timeout: Long? = null) {
   }
 
   fun setupIdleHandler(queue: MessageQueue) {
-    if (timeout != null) {
-      handler.postDelayed(
-        {
-          queue.removeIdleHandler(idleHandler)
-          action()
-          if (BuildConfig.DEBUG) {
-            Timber.d("doOnMainThreadIdle: ${timeout}ms timeout!")
-          }
-        },
-        timeout
-      )
-    }
     queue.addIdleHandler(idleHandler)
   }
 

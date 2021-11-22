@@ -27,18 +27,6 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
   }
 
   val adapter = TimeNodeItemAdapter().apply {
-    setFooterView(
-      AppCompatTextView(context).apply {
-        layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
-        ).also {
-          gravity = Gravity.CENTER_VERTICAL
-        }
-        text = "…"
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-      }
-    )
     setEmptyView(
       AppCompatTextView(
         ContextThemeWrapper(

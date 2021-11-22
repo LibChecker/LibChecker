@@ -504,7 +504,12 @@ class AppDetailActivity :
   }
 
   private fun navigateToReferenceComponentPosition(packageName: String, refName: String) {
-    binding.viewpager.currentItem = typeList.indexOf(refType)
+    val position = typeList.indexOf(refType)
+    binding.viewpager.currentItem = position
+    val targetTab = binding.tabLayout.getTabAt(position)
+    if (targetTab?.isSelected == false) {
+      targetTab.select()
+    }
 
     val componentName = if (refType == PERMISSION) {
       refName

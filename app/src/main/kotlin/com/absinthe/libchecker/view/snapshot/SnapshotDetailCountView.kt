@@ -22,6 +22,6 @@ class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
     background = R.drawable.bg_snapshot_detail_count.getDrawable(context)
     setPadding(8.dp, 2.dp, 8.dp, 2.dp)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-    setTextColor(R.color.grey_600.getColor(context))
+    setTextColor(R.color.material_grey_600.getColor(context))
   }
 }

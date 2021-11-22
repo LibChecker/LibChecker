@@ -176,7 +176,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
             .setTitle(R.string.dialog_title_reload_apps)
             .setMessage(R.string.dialog_subtitle_reload_apps)
             .setPositiveButton(android.R.string.ok) { _, _ ->
-              viewModel.reloadAppsFlag.value = true
+              viewModel.reloadApps()
               Analytics.trackEvent(
                 Constants.Event.SETTINGS,
                 EventProperties().set("PREF_RELOAD_APPS", "Ok")

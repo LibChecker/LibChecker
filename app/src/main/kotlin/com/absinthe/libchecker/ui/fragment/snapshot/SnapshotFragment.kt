@@ -43,6 +43,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
+import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,6 +51,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -253,15 +255,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
 
-          doOnMainThreadIdle(
-            {
-              if (this@SnapshotFragment == homeViewModel.controller &&
-                !binding.list.canScrollVertically(-1)
-              ) {
-                (activity as? INavViewContainer)?.showNavigationView()
-              }
+          doOnMainThreadIdle {
+            if (this@SnapshotFragment == homeViewModel.controller &&
+              !binding.list.canScrollVertically(-1)
+            ) {
+              (activity as? INavViewContainer)?.showNavigationView()
             }
-          )
+          }
         }
       }
       comparingProgressLiveData.observe(viewLifecycleOwner) {
@@ -269,10 +269,18 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
     homeViewModel.apply {
-      packageChangedLiveData.observe(viewLifecycleOwner) {
-        if (allowRefreshing) {
-          flip(VF_LOADING)
-          viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+      lifecycleScope.launchWhenStarted {
+        effect.collect {
+          when(it) {
+            is HomeViewModel.Effect.PackageChanged -> {
+              if (allowRefreshing) {
+                flip(VF_LOADING)
+                viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+              }
+            }
+            is HomeViewModel.Effect.ReloadApps -> { }
+            is HomeViewModel.Effect.UpdateInitProgress -> { }
+          }
         }
       }
     }

@@ -401,7 +401,11 @@ class ChartFragment :
       setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
         override fun onDismiss() {
           mDialog = null
-          chartView.isSelected = false
+          if (chartView is PieChart) {
+            (chartView as PieChart).highlightValue(null)
+          } else if (chartView is HorizontalBarChart) {
+            (chartView as HorizontalBarChart).highlightValue(null)
+          }
         }
       })
     }.also {
