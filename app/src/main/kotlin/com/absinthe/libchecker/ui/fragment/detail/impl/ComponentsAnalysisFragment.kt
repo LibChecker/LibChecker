@@ -36,7 +36,7 @@ import rikka.core.util.ClipboardUtils
 class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by lazy {
-    !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || (AnywhereManager.isSupportInteraction && type == ACTIVITY))
+    !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction)
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
