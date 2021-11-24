@@ -101,4 +101,9 @@
     <item name="cardPreventCornerOverlap">false</item>
   </style>
 
+  <style name="Widget.LC.PopupMenu" parent="Widget.AppCompat.ListView.DropDown">
+    <item name="android:paddingEnd">-16dp</item>
+    <item name="android:clipToPadding">false</item>
+  </style>
+
 </resources>

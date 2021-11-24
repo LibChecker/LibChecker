@@ -17,6 +17,7 @@
     <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 
     <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
     <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
@@ -56,6 +57,7 @@
     <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 
     <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
     <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
@@ -107,6 +109,7 @@
     <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 
     <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
     <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
