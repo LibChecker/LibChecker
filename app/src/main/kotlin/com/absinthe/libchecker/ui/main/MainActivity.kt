@@ -206,12 +206,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
 
       lifecycleScope.launchWhenStarted {
         effect.collect {
-          when(it) {
+          when (it) {
             is HomeViewModel.Effect.ReloadApps -> {
               binding.viewpager.setCurrentItem(0, true)
             }
-            is HomeViewModel.Effect.UpdateInitProgress -> { }
-            is HomeViewModel.Effect.PackageChanged -> { }
+            is HomeViewModel.Effect.UpdateInitProgress -> {}
+            is HomeViewModel.Effect.PackageChanged -> {}
           }
         }
       }

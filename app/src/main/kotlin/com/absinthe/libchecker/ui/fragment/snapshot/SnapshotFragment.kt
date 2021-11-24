@@ -271,15 +271,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     homeViewModel.apply {
       lifecycleScope.launchWhenStarted {
         effect.collect {
-          when(it) {
+          when (it) {
             is HomeViewModel.Effect.PackageChanged -> {
               if (allowRefreshing) {
                 flip(VF_LOADING)
                 viewModel.compareDiff(GlobalValues.snapshotTimestamp)
               }
             }
-            is HomeViewModel.Effect.ReloadApps -> { }
-            is HomeViewModel.Effect.UpdateInitProgress -> { }
+            is HomeViewModel.Effect.ReloadApps -> {}
+            is HomeViewModel.Effect.UpdateInitProgress -> {}
           }
         }
       }

@@ -121,12 +121,12 @@ class LibReferenceFragment :
     homeViewModel.apply {
       lifecycleScope.launchWhenStarted {
         effect.collect {
-          when(it) {
+          when (it) {
             is HomeViewModel.Effect.PackageChanged -> {
               computeRef()
             }
-            is HomeViewModel.Effect.ReloadApps -> { }
-            is HomeViewModel.Effect.UpdateInitProgress -> { }
+            is HomeViewModel.Effect.ReloadApps -> {}
+            is HomeViewModel.Effect.UpdateInitProgress -> {}
           }
         }
       }

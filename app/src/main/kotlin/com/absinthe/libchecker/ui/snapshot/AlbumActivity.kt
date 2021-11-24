@@ -41,7 +41,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-    val isDarkMode = when(DayNightDelegate.getDefaultNightMode()) {
+    val isDarkMode = when (DayNightDelegate.getDefaultNightMode()) {
       DayNightDelegate.MODE_NIGHT_YES -> true
       DayNightDelegate.MODE_NIGHT_NO -> false
       DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM, DayNightDelegate.MODE_NIGHT_UNSPECIFIED, DayNightDelegate.MODE_NIGHT_AUTO_BATTERY -> UiUtils.isDarkModeOnSystem()
