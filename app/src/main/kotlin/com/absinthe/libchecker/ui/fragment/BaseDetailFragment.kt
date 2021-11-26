@@ -5,7 +5,6 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -20,7 +19,6 @@ import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -28,7 +26,6 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import rikka.insets.setInitialPadding
 import timber.log.Timber
 
 /**
@@ -73,23 +70,6 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         navigateToComponentTask = Runnable { navigateToComponentImpl(it) }
       }
       DetailFragmentManager.resetNavigationParams()
-    }
-    lifecycleScope.launchWhenStarted {
-      if (!LCAppUtils.atLeastR()) {
-        activity?.let { activity ->
-          getRecyclerView().also {
-            it.post {
-              it.setInitialPadding(
-                0,
-                0,
-                0,
-                activity.window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                  ?: 0
-              )
-            }
-          }
-        }
-      }
     }
   }
 

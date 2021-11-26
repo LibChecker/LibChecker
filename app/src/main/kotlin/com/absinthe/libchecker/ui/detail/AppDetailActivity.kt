@@ -135,10 +135,13 @@ class AppDetailActivity :
         try {
           val packageInfo = PackageUtils.getPackageInfo(packageName)
           supportActionBar?.title = null
-          collapsingToolbar.title = try {
-            packageInfo.applicationInfo.loadLabel(packageManager).toString()
-          } catch (e: PackageManager.NameNotFoundException) {
-            getString(R.string.detail_label)
+          collapsingToolbar.also {
+            it.setOnApplyWindowInsetsListener(null)
+            it.title = try {
+              packageInfo.applicationInfo.loadLabel(packageManager).toString()
+            } catch (e: PackageManager.NameNotFoundException) {
+              getString(R.string.detail_label)
+            }
           }
           headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
             override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {

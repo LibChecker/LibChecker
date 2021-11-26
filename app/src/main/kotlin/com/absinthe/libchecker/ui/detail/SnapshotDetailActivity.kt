@@ -49,7 +49,6 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
-import rikka.insets.setInitialPadding
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -92,7 +91,10 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     }
 
     binding.apply {
-      collapsingToolbar.title = entity.labelDiff.new ?: entity.labelDiff.old
+      collapsingToolbar.also {
+        it.setOnApplyWindowInsetsListener(null)
+        it.title = entity.labelDiff.new ?: entity.labelDiff.old
+      }
       headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
         override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
           collapsingToolbar.isTitleEnabled = state == State.COLLAPSED
@@ -250,22 +252,6 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
           refName = item.name,
           refType = item.itemType
         )
-      }
-    }
-
-    lifecycleScope.launchWhenStarted {
-      if (!LCAppUtils.atLeastR()) {
-        binding.list.also {
-          it.post {
-            it.setInitialPadding(
-              0,
-              0,
-              0,
-              window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                ?: 0
-            )
-          }
-        }
       }
     }
   }
