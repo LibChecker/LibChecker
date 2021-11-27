@@ -96,13 +96,14 @@ object IconResMap {
       put(83, R.drawable.ic_lib_dx_risk)
       put(84, R.drawable.ic_lib_clash)
       put(85, R.drawable.ic_lib_jetpack_compose)
+      put(86, R.drawable.ic_lib_douyin)
     }
 
     SINGLE_COLOR_ICON_SET = setOf(
       -1, 1, 2, 3, 4, 5, 6, 9, 10, 11, 13, 14, 15, 16, 17,
       25, 27, 30, 31, 40, 42, 43, 44, 46, 47, 48, 50, 51,
       52, 53, 54, 55, 56, 59, 63, 64, 66, 67, 69, 74, 76,
-      81, 82, 83, 84
+      81, 82, 83, 84, 86
     )
   }
 

@@ -130,8 +130,6 @@ dependencies {
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
-  // Work around on Apple Silicon
-  kapt("org.xerial:sqlite-jdbc:3.36.0.3")
   kapt(Libs.roomCompiler)
   kapt(Libs.moshiCompiler)
 
