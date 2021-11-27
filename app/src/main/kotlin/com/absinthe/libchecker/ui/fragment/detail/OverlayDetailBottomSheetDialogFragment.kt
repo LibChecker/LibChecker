@@ -15,6 +15,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -41,7 +42,13 @@ class OverlayDetailBottomSheetDialogFragment :
   @SuppressLint("SetTextI18n")
   override fun init() {
     val lcItem = (arguments?.getParcelable(EXTRA_LC_ITEM) as? LCItem) ?: return
-    val packageInfo = PackageUtils.getPackageInfo(lcItem.packageName)
+    val packageInfo = try {
+      PackageUtils.getPackageInfo(lcItem.packageName)
+    } catch (e: PackageManager.NameNotFoundException) {
+      Timber.e(e)
+      Toasty.showShort(requireContext(), e.toString())
+      return
+    }
 
     root.apply {
       detailsTitleView.apply {

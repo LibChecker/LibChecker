@@ -30,6 +30,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -42,7 +43,12 @@ import com.absinthe.libraries.utils.utils.UiUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
@@ -55,29 +61,31 @@ class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val mAdapter by lazy { AppAdapter(lifecycleScope) }
+  private val appAdapter by lazy { AppAdapter(lifecycleScope) }
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var popup: PopupMenu? = null
+  private var delayShowNavigationJob: Job? = null
+  private var firstScrollFlag = false
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
     setHasOptionsMenu(true)
 
-    mAdapter.apply {
-      setOnItemClickListener { _, view, position ->
+    appAdapter.also {
+      it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        LCAppUtils.launchDetailPage(requireActivity(), mAdapter.getItem(position))
+        LCAppUtils.launchDetailPage(requireActivity(), it.getItem(position))
       }
-      setDiffCallback(AppListDiffUtil())
-      setHasStableIds(true)
+      it.setDiffCallback(AppListDiffUtil())
+      it.setHasStableIds(true)
     }
 
     binding.apply {
       list.apply {
-        adapter = mAdapter
+        adapter = appAdapter
         borderDelegate = borderViewDelegate
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
@@ -87,6 +95,46 @@ class AppListFragment :
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
         addPaddingTop(UiUtils.getStatusBarHeight())
+        addOnScrollListener(object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (dx == 0 && dy == 0) {
+              //scrolled by dragging scrolling bar
+              if (!firstScrollFlag) {
+                firstScrollFlag = true
+                return
+              }
+              if (delayShowNavigationJob?.isActive == true) {
+                delayShowNavigationJob?.cancel()
+                delayShowNavigationJob = null
+              }
+              (activity as? INavViewContainer)?.hideNavigationView()
+
+              val position = when (layoutManager) {
+                is LinearLayoutManager -> {
+                  (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                }
+                is StaggeredGridLayoutManager -> {
+                  val counts = IntArray(4)
+                  (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
+                  counts[0]
+                }
+                else -> {
+                  0
+                }
+              }
+              if (position < appAdapter.itemCount - 1) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
+                  delay(400)
+                  withContext(Dispatchers.Main) {
+                    (activity as? INavViewContainer)?.showNavigationView()
+                  }
+                }.also {
+                  it.start()
+                }
+              }
+            }
+          }
+        })
       }
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
@@ -159,7 +207,7 @@ class AppListFragment :
         filter.addAll(allDatabaseItems.filter { it.variant == Constants.VARIANT_HAP })
       }
 
-      mAdapter.highlightText = newText
+      appAdapter.highlightText = newText
       updateItems(filter, highlightRefresh = true)
 
       when {
@@ -266,6 +314,7 @@ class AppListFragment :
           STATUS_INIT_END -> {
             if (isFirstLaunch) {
               Once.markDone(OnceTag.FIRST_LAUNCH)
+              Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
             }
             requestChange()
           }
@@ -344,7 +393,7 @@ class AppListFragment :
       Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
     }
 
-    mAdapter.setDiffNewData(filterList) {
+    appAdapter.setDiffNewData(filterList) {
       flip(VF_LIST)
 
       doOnMainThreadIdle {
@@ -357,7 +406,7 @@ class AppListFragment :
       isListReady = true
 
       if (highlightRefresh) {
-        mAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
       }
     }
   }

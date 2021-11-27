@@ -14,6 +14,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -37,6 +39,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
+import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -46,8 +49,12 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -58,25 +65,65 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val adapter = LibReferenceAdapter()
+  private val refAdapter = LibReferenceAdapter()
   private var popup: PopupMenu? = null
+  private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
-  private lateinit var layoutManager: LinearLayoutManager
+  private var firstScrollFlag = false
 
   override fun init() {
     setHasOptionsMenu(true)
 
-    layoutManager = LinearLayoutManager(requireContext())
     binding.apply {
       list.apply {
-        adapter = this@LibReferenceFragment.adapter
-        layoutManager = this@LibReferenceFragment.layoutManager
+        adapter = refAdapter
+        layoutManager = LinearLayoutManager(requireContext())
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             (requireActivity() as MainActivity).appBar?.setRaised(!top)
           }
         FastScrollerBuilder(this).useMd2Style().build()
+        addOnScrollListener(object : RecyclerView.OnScrollListener() {
+          override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            if (dx == 0 && dy == 0) {
+              //scrolled by dragging scrolling bar
+              if (!firstScrollFlag) {
+                firstScrollFlag = true
+                return
+              }
+              if (delayShowNavigationJob?.isActive == true) {
+                delayShowNavigationJob?.cancel()
+                delayShowNavigationJob = null
+              }
+              (activity as? INavViewContainer)?.hideNavigationView()
+
+              val position = when (layoutManager) {
+                is LinearLayoutManager -> {
+                  (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+                }
+                is StaggeredGridLayoutManager -> {
+                  val counts = IntArray(4)
+                  (layoutManager as StaggeredGridLayoutManager).findLastVisibleItemPositions(counts)
+                  counts[0]
+                }
+                else -> {
+                  0
+                }
+              }
+              if (position < refAdapter.itemCount - 1) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
+                  delay(400)
+                  withContext(Dispatchers.Main) {
+                    (activity as? INavViewContainer)?.showNavigationView()
+                  }
+                }.also {
+                  it.start()
+                }
+              }
+            }
+          }
+        })
       }
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
@@ -84,14 +131,14 @@ class LibReferenceFragment :
       }
     }
 
-    adapter.apply {
+    refAdapter.apply {
       setDiffCallback(RefListDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
 
-        val item = this@LibReferenceFragment.adapter.data[position]
+        val item = refAdapter.data[position]
         val intent = Intent(requireContext(), LibReferenceActivity::class.java)
           .putExtra(EXTRA_REF_NAME, item.libName)
           .putExtra(EXTRA_REF_TYPE, item.type)
@@ -99,7 +146,7 @@ class LibReferenceFragment :
       }
       setOnItemChildClickListener { _, view, position ->
         if (view.id == android.R.id.icon) {
-          val ref = this@LibReferenceFragment.adapter.getItem(position)
+          val ref = refAdapter.getItem(position)
           val name = ref.libName
           val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
           LibDetailDialogFragment.newInstance(name, ref.type, regexName)
@@ -134,7 +181,7 @@ class LibReferenceFragment :
         if (it == null) {
           return@observe
         }
-        adapter.setList(it)
+        refAdapter.setList(it)
 
         flip(VF_LIST)
         isListReady = true
@@ -149,7 +196,7 @@ class LibReferenceFragment :
     }
 
     lifecycleScope.launch {
-      if (adapter.data.isEmpty() &&
+      if (refAdapter.data.isEmpty() &&
         AppItemRepository.getApplicationInfoItems().isNotEmpty()
       ) {
         computeRef()
@@ -260,9 +307,9 @@ class LibReferenceFragment :
           ignoreCase = true
         ) ?: false
       }
-      adapter.highlightText = newText
-      adapter.setDiffNewData(filter.toMutableList()) {
-        adapter.notifyDataSetChanged()
+      refAdapter.highlightText = newText
+      refAdapter.setDiffNewData(filter.toMutableList()) {
+        refAdapter.notifyDataSetChanged()
       }
 
       if (newText.equals("Easter Egg", true)) {

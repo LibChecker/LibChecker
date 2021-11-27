@@ -40,17 +40,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
 
-  private var clickBottomItemFlag = false
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
-
-  private var workerBinder: IWorkerService? = null
   private val workerListener = object : OnWorkerListener.Stub() {
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
       appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
@@ -66,6 +64,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       workerBinder = null
     }
   }
+  private var workerBinder: IWorkerService? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -104,10 +103,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   }
 
   override fun showNavigationView() {
+    Timber.d("showNavigationView")
     navViewBehavior.slideUp(binding.navView)
   }
 
   override fun hideNavigationView() {
+    Timber.d("hideNavigationView")
     navViewBehavior.slideDown(binding.navView)
   }
 
@@ -160,12 +161,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
                 binding.viewpager.setCurrentItem(index, PAGE_TRANSFORM_DURATION)
               }
             } else {
-              if (!clickBottomItemFlag) {
-                clickBottomItemFlag = true
+              val clickFlag =
+                binding.viewpager.getTag(R.id.viewpager_tab_click) as? Boolean ?: false
+              if (!clickFlag) {
+                binding.viewpager.setTag(R.id.viewpager_tab_click, true)
 
                 lifecycleScope.launch {
                   delay(200)
-                  clickBottomItemFlag = false
+                  binding.viewpager.setTag(R.id.viewpager_tab_click, false)
                 }
               } else if (appViewModel.controller?.isAllowRefreshing() == true) {
                 appViewModel.controller?.onReturnTop()

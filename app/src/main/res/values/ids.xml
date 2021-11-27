@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <item name="last_click_time" type="id" />
+  <item name="viewpager_tab_click" type="id" />
 </resources>

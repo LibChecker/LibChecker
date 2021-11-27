@@ -10,7 +10,7 @@ import org.gradle.kotlin.dsl.dependencies
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
 
-const val baseVersionName = "2.1.11"
+const val baseVersionName = "2.1.12"
 val verName: String by lazy { "${baseVersionName}.${"git rev-parse --short HEAD".exec()}" }
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
 
