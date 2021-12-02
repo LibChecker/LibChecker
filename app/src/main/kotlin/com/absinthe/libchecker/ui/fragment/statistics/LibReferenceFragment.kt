@@ -87,7 +87,7 @@ class LibReferenceFragment :
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
           override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dx == 0 && dy == 0) {
-              //scrolled by dragging scrolling bar
+              // scrolled by dragging scrolling bar
               if (!firstScrollFlag) {
                 firstScrollFlag = true
                 return
