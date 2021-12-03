@@ -17,7 +17,7 @@ object Libs {
   const val activity = "androidx.activity:activity-ktx:1.4.0"
   const val fragment = "androidx.fragment:fragment-ktx:1.4.0"
   const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.2"
-  const val material = "com.google.android.material:material:1.5.0-beta01"
+  const val material = "com.google.android.material:material:1.6.0-alpha01"
   const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
   const val preference = "androidx.preference:preference-ktx:1.1.1"
   const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.7"

@@ -90,10 +90,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
   private val shootServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      shootBinder = IShootService.Stub.asInterface(service)
-      shootBinder?.apply {
-        registerOnShootOverListener(shootListener)
-        computeSnapshot(dropPrevious)
+      if (shootBinder == null) {
+        shootBinder = IShootService.Stub.asInterface(service).also {
+          it.registerOnShootOverListener(shootListener)
+          it.computeSnapshot(dropPrevious)
+        }
       }
     }
 
@@ -307,6 +308,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   override fun onDestroyView() {
     super.onDestroyView()
     adapter.release()
+    shootBinder?.let {
+      context?.unbindService(shootServiceConnection)
+      shootBinder = null
+    }
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {

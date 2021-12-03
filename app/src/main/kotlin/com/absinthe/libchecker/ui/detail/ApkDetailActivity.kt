@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -100,7 +99,6 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
     initData(uri)
   }
 
-  @SuppressLint("SetTextI18n")
   private fun initData(uri: Uri) {
     tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE)
 

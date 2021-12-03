@@ -290,6 +290,14 @@ class AboutActivity : AbsAboutActivity() {
       )
       add(
         License(
+          "HiddenApiRefinePlugin",
+          "RikkaApps",
+          License.MIT,
+          "https://github.com/RikkaApps/HiddenApiRefinePlugin"
+        )
+      )
+      add(
+        License(
           "lottie-android",
           "Airbnb",
           License.APACHE_2,

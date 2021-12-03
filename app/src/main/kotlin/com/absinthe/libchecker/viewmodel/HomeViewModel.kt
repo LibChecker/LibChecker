@@ -143,95 +143,104 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     return appList!!
   }
 
-  fun initItems() = viewModelScope.launch(Dispatchers.IO) {
-    Timber.d("initItems: START")
+  private var initJob: Job? = null
 
-    val context: Context = getApplication<LibCheckerApp>()
-    val timeRecorder = TimeRecorder()
-    timeRecorder.start()
+  fun initItems() {
+    if (initJob == null || initJob!!.isActive.not()) {
+      initJob = viewModelScope.launch(Dispatchers.IO) {
+        Timber.d("initItems: START")
 
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_START_INIT
-    }
-    Repositories.lcRepository.deleteAllItems()
-    updateInitProgress(0)
+        val context: Context = getApplication<LibCheckerApp>()
+        val timeRecorder = TimeRecorder()
+        timeRecorder.start()
 
-    val appList = getAppsList()
-    val lcItems = mutableListOf<LCItem>()
-    val isHarmony = HarmonyOsUtil.isHarmonyOs()
-    val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
+        withContext(Dispatchers.Main) {
+          appListStatusLiveData.value = STATUS_START_INIT
+        }
+        Repositories.lcRepository.deleteAllItems()
+        updateInitProgress(0)
 
-    var packageInfo: PackageInfo
-    var versionCode: Long
-    var abiType: Int
-    var variant: Short
-    var isSystemType: Boolean
-    var isKotlinType: Boolean
+        val appList = getAppsList()
+        val lcItems = mutableListOf<LCItem>()
+        val isHarmony = HarmonyOsUtil.isHarmonyOs()
+        val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
 
-    var lcItem: LCItem
-    var count = 0
-    var progressCount = 0
+        var packageInfo: PackageInfo
+        var versionCode: Long
+        var abiType: Int
+        var variant: Short
+        var isSystemType: Boolean
+        var isKotlinType: Boolean
 
-    for (info in appList) {
-      try {
-        packageInfo = PackageUtils.getPackageInfo(info)
-        versionCode = PackageUtils.getVersionCode(packageInfo)
-        abiType = PackageUtils.getAbi(info)
-        isSystemType =
-          (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
-        isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
+        var lcItem: LCItem
+        var count = 0
+        var progressCount = 0
 
-        variant = if (isHarmony && bundleManager?.getBundleInfo(
-            info.packageName,
-            IBundleManager.GET_BUNDLE_DEFAULT
-          ) != null
-        ) {
-          Constants.VARIANT_HAP
-        } else {
-          Constants.VARIANT_APK
+        for (info in appList) {
+          try {
+            packageInfo = PackageUtils.getPackageInfo(info)
+            versionCode = PackageUtils.getVersionCode(packageInfo)
+            abiType = PackageUtils.getAbi(info)
+            isSystemType =
+              (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+            isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
+
+            variant = if (isHarmony && bundleManager?.getBundleInfo(
+                info.packageName,
+                IBundleManager.GET_BUNDLE_DEFAULT
+              ) != null
+            ) {
+              Constants.VARIANT_HAP
+            } else {
+              Constants.VARIANT_APK
+            }
+
+            lcItem = LCItem(
+              info.packageName,
+              info.loadLabel(context.packageManager).toString(),
+              packageInfo.versionName.orEmpty(),
+              versionCode,
+              packageInfo.firstInstallTime,
+              packageInfo.lastUpdateTime,
+              isSystemType,
+              abiType.toShort(),
+              PackageUtils.isSplitsApk(packageInfo),
+              isKotlinType,
+              packageInfo.applicationInfo.targetSdkVersion.toShort(),
+              variant
+            )
+
+            lcItems.add(lcItem)
+            count++
+            progressCount++
+            updateInitProgress(progressCount * 100 / appList.size)
+          } catch (e: Throwable) {
+            Timber.e(e, "initItems")
+            continue
+          }
+
+          if (count == 50) {
+            insert(lcItems)
+            lcItems.clear()
+            count = 0
+          }
         }
 
-        lcItem = LCItem(
-          info.packageName,
-          info.loadLabel(context.packageManager).toString(),
-          packageInfo.versionName.orEmpty(),
-          versionCode,
-          packageInfo.firstInstallTime,
-          packageInfo.lastUpdateTime,
-          isSystemType,
-          abiType.toShort(),
-          PackageUtils.isSplitsApk(packageInfo),
-          isKotlinType,
-          packageInfo.applicationInfo.targetSdkVersion.toShort(),
-          variant
-        )
-
-        lcItems.add(lcItem)
-        count++
-        progressCount++
-        updateInitProgress(progressCount * 100 / appList.size)
-      } catch (e: Throwable) {
-        Timber.e(e, "initItems")
-        continue
-      }
-
-      if (count == 50) {
         insert(lcItems)
         lcItems.clear()
-        count = 0
+        withContext(Dispatchers.Main) {
+          appListStatusLiveData.value = STATUS_INIT_END
+        }
+
+        timeRecorder.end()
+        Timber.d("initItems: END, $timeRecorder")
+        withContext(Dispatchers.Main) {
+          appListStatusLiveData.value = STATUS_NOT_START
+        }
+        initJob = null
+      }.also {
+        it.start()
       }
-    }
-
-    insert(lcItems)
-    lcItems.clear()
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_INIT_END
-    }
-
-    timeRecorder.end()
-    Timber.d("initItems: END, $timeRecorder")
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_NOT_START
     }
   }
 
