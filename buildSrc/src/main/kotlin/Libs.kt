@@ -20,6 +20,7 @@ object Libs {
   const val material = "com.google.android.material:material:1.6.0-alpha01"
   const val recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
   const val preference = "androidx.preference:preference-ktx:1.1.1"
+  const val coreSplashScreen = "androidx.core:core-splashscreen:1.0.0-alpha02"
   const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.7"
   const val okHttp = "com.squareup.okhttp3:okhttp:4.9.3"
   const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"

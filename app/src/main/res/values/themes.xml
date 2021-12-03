@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
+  <style name="Theme.LC.Splash" parent="Theme.SplashScreen">
+    <item name="windowSplashScreenBackground">?android:attr/colorBackground</item>
+    <item name="windowSplashScreenAnimatedIcon">@drawable/pic_splash</item>
+    <item name="postSplashScreenTheme">@style/Theme.Light</item>
+  </style>
+
   <style name="Base.AppTheme.Light" parent="Theme.Material.Light.LightStatusBar">
     <item name="android:statusBarColor">?android:colorBackground</item>
 
@@ -26,9 +32,6 @@
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
     <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
     </item>
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
@@ -66,9 +69,6 @@
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
     <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
     </item>
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
@@ -118,9 +118,6 @@
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
     <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
     </item>
     <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>

@@ -5,9 +5,11 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.extensions.inflateBinding
 import rikka.material.app.MaterialActivity
 
@@ -18,6 +20,11 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    if (this is MainActivity) {
+      installSplashScreen()
+    }
+
     binding = inflateBinding(layoutInflater)
     setContentView(binding.root)
   }
