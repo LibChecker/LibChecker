@@ -54,9 +54,7 @@ class AppInfoBottomSheetDialogFragment :
         startLaunchAppActivity(packageName)
       } catch (e: NullPointerException) {
         context?.showToast(R.string.toast_package_name_null)
-      } catch (e: RemoteException) {
-        context?.showToast(R.string.toast_cant_open_app)
-      } catch (e: RuntimeException) {
+      } catch (e: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
       } finally {
         dismiss()
@@ -68,7 +66,7 @@ class AppInfoBottomSheetDialogFragment :
           .setData(Uri.parse("package:$packageName"))
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
-      } catch (e: ActivityNotFoundException) {
+      } catch (e: Exception) {
         context?.showToast(R.string.toast_cant_open_app)
       } finally {
         dismiss()
