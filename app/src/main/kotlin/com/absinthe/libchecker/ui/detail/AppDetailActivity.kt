@@ -317,6 +317,9 @@ class AppDetailActivity :
                     icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
                     text = getString(R.string.app_bundle)
                   ) {
+                    if (AntiShakeUtils.isInvalidClick(chipGroup!!)) {
+                      return@addChip
+                    }
                     AppBundleBottomSheetDialogFragment().apply {
                       arguments = bundleOf(
                         EXTRA_PACKAGE_NAME to pkgName

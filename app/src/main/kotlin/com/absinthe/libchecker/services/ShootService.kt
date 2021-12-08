@@ -73,6 +73,8 @@ class ShootService : LifecycleService() {
     }
   }
 
+  private var isComputing = false
+
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
     return binder
@@ -142,6 +144,11 @@ class ShootService : LifecycleService() {
   }
 
   private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+    if (isComputing) {
+      Timber.w("computeSnapshots isComputing, ignored")
+      return
+    }
+    isComputing = true
     Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
     GlobalValues.hasFinishedShoot = false
     notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
@@ -288,6 +295,7 @@ class ShootService : LifecycleService() {
     stopForeground(true)
     stopSelf()
     Timber.i("computeSnapshots end")
+    isComputing = false
   }
 
   private fun getFormatDateString(timestamp: Long): String {
