@@ -1,13 +1,11 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
-import android.os.RemoteException
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
