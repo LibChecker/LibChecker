@@ -307,43 +307,38 @@ class AppDetailActivity :
                   layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                  ).also { cg ->
-                    cg.topMargin = 16.dp
+                  ).also { lp ->
+                    lp.topMargin = 16.dp
+                  }
+                }.also { cg ->
+                  if (it.isSplitApk) {
+                    cg.addChip(
+                      icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
+                      text = getString(R.string.app_bundle)
+                    ) {
+                      AppBundleBottomSheetDialogFragment().apply {
+                        arguments = bundleOf(
+                          EXTRA_PACKAGE_NAME to pkgName
+                        )
+                        show(supportFragmentManager, tag)
+                      }
+                    }
+                  }
+                  if (it.isKotlinUsed) {
+                    cg.addChip(
+                      icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
+                      text = getString(R.string.kotlin_used)
+                    ) {
+                      MaterialAlertDialogBuilder(this@AppDetailActivity)
+                        .setIcon(R.drawable.ic_kotlin_logo)
+                        .setTitle(R.string.kotlin_string)
+                        .setMessage(R.string.kotlin_details)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show()
+                    }
                   }
                 }
                 headerContentLayout.addView(chipGroup)
-                if (it.isSplitApk) {
-                  chipGroup!!.addChip(
-                    icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
-                    text = getString(R.string.app_bundle)
-                  ) {
-                    if (AntiShakeUtils.isInvalidClick(chipGroup!!)) {
-                      return@addChip
-                    }
-                    AppBundleBottomSheetDialogFragment().apply {
-                      arguments = bundleOf(
-                        EXTRA_PACKAGE_NAME to pkgName
-                      )
-                      show(supportFragmentManager, tag)
-                    }
-                  }
-                }
-                if (it.isKotlinUsed) {
-                  chipGroup!!.addChip(
-                    icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
-                    text = getString(R.string.kotlin_used)
-                  ) {
-                    if (AntiShakeUtils.isInvalidClick(chipGroup!!)) {
-                      return@addChip
-                    }
-                    MaterialAlertDialogBuilder(this@AppDetailActivity)
-                      .setIcon(R.drawable.ic_kotlin_logo)
-                      .setTitle(R.string.kotlin_string)
-                      .setMessage(R.string.kotlin_details)
-                      .setPositiveButton(android.R.string.ok, null)
-                      .show()
-                  }
-                }
               }
               if (it.variant == Constants.VARIANT_HAP) {
                 ibHarmonyBadge.isVisible = true
