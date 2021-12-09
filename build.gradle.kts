@@ -12,6 +12,7 @@ buildscript {
     classpath(Libs.protobufPlugin)
     classpath(Libs.kotlinterPlugin)
     classpath(Libs.hiddenApiRefinePlugin)
+    classpath(Libs.kspPlugin)
   }
 }
 

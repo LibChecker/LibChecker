@@ -68,7 +68,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
-  private var shouldCompare = true
+  private var shouldCompare = true and ShootService.isComputing.not()
   private var hasAddedListBottomPadding = false
 
   private var shootBinder: IShootService? = null
@@ -83,6 +83,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
     override fun onProgressUpdated(progress: Int) {
       lifecycleScope.launch(Dispatchers.Main) {
+        flip(VF_LOADING)
         runCatching {
           binding.progressIndicator.setProgressCompat(progress, true)
         }
@@ -107,12 +108,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     setHasOptionsMenu(true)
 
     requireContext().applicationContext.also {
+      val intent = Intent(it, ShootService::class.java).apply {
+        setPackage(it.packageName)
+      }
       it.bindService(
-        Intent(it, ShootService::class.java).apply {
-          setPackage(it.packageName)
-        },
+        intent,
         shootServiceConnection, Service.BIND_AUTO_CREATE
       )
+      it.startService(intent)
     }
 
     val dashboard = SnapshotDashboardView(
@@ -318,7 +321,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     super.onDestroyView()
     adapter.release()
     shootBinder?.let {
-      context?.applicationContext?.unbindService(shootServiceConnection)
+      context?.applicationContext?.let { ctx ->
+        it.unregisterOnShootOverListener(shootListener)
+        ctx.unbindService(shootServiceConnection)
+        if (ShootService.isComputing.not()) {
+          ctx.stopService(
+            Intent(
+              ctx, ShootService::class.java
+            )
+          )
+        }
+      }
       shootBinder = null
     }
   }

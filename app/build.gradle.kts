@@ -10,10 +10,10 @@ import java.nio.file.Paths
 plugins {
   id("com.android.application")
   kotlin("android")
-  kotlin("kapt")
   kotlin("plugin.parcelize")
   id("com.google.protobuf")
   id("dev.rikka.tools.refine.gradle-plugin")
+  id("com.google.devtools.ksp")
 }
 
 setupAppModule {
@@ -25,11 +25,10 @@ setupAppModule {
     viewBinding = true
   }
 
-  kapt {
-    arguments {
-      arg("room.incremental", "true")
-      arg("room.schemaLocation", "$projectDir/schemas")
-    }
+  ksp {
+    arg("moshi.generated", "javax.annotation.Generated")
+    arg("room.incremental", "true")
+    arg("room.schemaLocation", "$projectDir/schemas")
   }
 
   sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -130,8 +129,8 @@ dependencies {
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
-  kapt(Libs.roomCompiler)
-  kapt(Libs.moshiCompiler)
+  ksp(Libs.roomCompiler)
+  ksp(Libs.moshiCompiler)
 
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
