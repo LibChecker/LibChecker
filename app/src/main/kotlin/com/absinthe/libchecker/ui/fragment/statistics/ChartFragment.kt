@@ -238,14 +238,14 @@ class ChartFragment :
     }
 
     filteredList?.let {
-      val list = IntArray(Build.VERSION_CODES.S) { 0 }
+      val list = IntArray(Build.VERSION_CODES.S + 1) { 0 }
 
       var targetApi: Int
       for (item in it) {
         try {
           packageInfo = PackageUtils.getPackageInfo(item.packageName)
           targetApi = packageInfo.applicationInfo.targetSdkVersion
-          if (targetApi > 0 && targetApi <= Build.VERSION_CODES.S) {
+          if (targetApi > 0 && targetApi <= Build.VERSION_CODES.S + 1) {
             list[targetApi - 1]++
           }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -493,7 +493,7 @@ class ChartFragment :
         setDrawZeroLine(false)
         textColor = R.color.textNormal.getColor(requireContext())
       }
-      setMaxVisibleValueCount(Build.VERSION_CODES.S)
+      setMaxVisibleValueCount(Build.VERSION_CODES.S + 1)
       setDrawGridBackground(false)
       setDrawBorders(false)
       setDrawMarkers(false)
@@ -536,7 +536,8 @@ class ChartFragment :
       28 to "Pie",
       29 to "Android10",
       30 to "Android11",
-      31 to "Android12"
+      31 to "Android12",
+      32 to "Sv2"
     )
   }
 }
