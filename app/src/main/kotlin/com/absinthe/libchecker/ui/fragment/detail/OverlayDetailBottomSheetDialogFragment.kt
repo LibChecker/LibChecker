@@ -89,7 +89,9 @@ class OverlayDetailBottomSheetDialogFragment :
             val targetLCItem = Repositories.lcRepository.getItem(targetPackage)
 
             if (targetLCItem == null) {
-              addFloatView(targetPackage)
+              withContext(Dispatchers.Main) {
+                addFloatView(targetPackage)
+              }
               return@launch
             }
 
