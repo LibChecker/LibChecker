@@ -6,7 +6,7 @@ private const val roomVersion = "2.4.0-rc01"
 private const val moshiVersion = "1.12.0"
 private const val grpcVersion = "1.42.1"
 private const val protocVersion = "3.19.1"
-private const val appCenterVersion = "4.4.1"
+private const val appCenterVersion = "4.3.1"
 private const val hiddenApiRefineVersion = "3.0.3"
 
 object Libs {
