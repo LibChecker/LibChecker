@@ -75,26 +75,22 @@ class ShootService : LifecycleService() {
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
+    Timber.d("onBind")
     return binder
   }
 
-  override fun onCreate() {
-    super.onCreate()
-    showNotification()
-  }
-
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    Timber.d("onStartCommand")
     if (intent?.`package` != packageName) {
       stopForeground(true)
       stopSelf()
-    } else {
-      showNotification()
     }
     return super.onStartCommand(intent, flags, startId)
   }
 
   override fun onDestroy() {
     super.onDestroy()
+    Timber.d("onDestroy")
     stopForeground(true)
   }
 
@@ -142,10 +138,16 @@ class ShootService : LifecycleService() {
   }
 
   private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+    if (isComputing) {
+      Timber.w("computeSnapshots isComputing, ignored")
+      return
+    }
+    isComputing = true
     Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
     GlobalValues.hasFinishedShoot = false
     notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
     initBuilder()
+    showNotification()
 
     val timer = TimeRecorder()
     timer.start()
@@ -173,6 +175,9 @@ class ShootService : LifecycleService() {
 
     builder.setProgress(size, count, false)
     notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+
+    var currentProgress: Int
+    var lastProgress = 0
 
     for (info in appList) {
       try {
@@ -205,7 +210,11 @@ class ShootService : LifecycleService() {
           )
         }
         count++
-        notifyProgress(count * 100 / size)
+        currentProgress = count * 100 / size
+        if (currentProgress > lastProgress) {
+          lastProgress = currentProgress
+          notifyProgress(currentProgress)
+        }
       } catch (e: Exception) {
         Timber.e(e)
         exceptionInfoList.add(info)
@@ -288,6 +297,7 @@ class ShootService : LifecycleService() {
     stopForeground(true)
     stopSelf()
     Timber.i("computeSnapshots end")
+    isComputing = false
   }
 
   private fun getFormatDateString(timestamp: Long): String {
@@ -313,5 +323,9 @@ class ShootService : LifecycleService() {
       .setSilent(true)
       .setOngoing(true)
       .setAutoCancel(false)
+  }
+
+  companion object {
+    var isComputing = false
   }
 }

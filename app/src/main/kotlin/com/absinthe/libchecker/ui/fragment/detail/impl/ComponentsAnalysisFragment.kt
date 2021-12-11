@@ -20,13 +20,11 @@ import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
-import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +39,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
 
   override fun getRecyclerView() = binding.list
+  override val needShowLibDetailDialog = true
 
   override fun init() {
     binding.apply {
@@ -108,21 +107,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       }
     }
 
-    fun openLibDetailDialog(position: Int) {
-      val name = adapter.getItem(position).item.name
-      val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
-
-      LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-        .show(childFragmentManager, tag)
-    }
-
     adapter.apply {
-      setOnItemClickListener { _, view, position ->
-        if (AntiShakeUtils.isInvalidClick(view)) {
-          return@setOnItemClickListener
-        }
-        openLibDetailDialog(position)
-      }
       setOnItemLongClickListener { _, _, position ->
         doOnLongClick(context, getItem(position).item.name)
         true

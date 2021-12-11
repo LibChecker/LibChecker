@@ -126,7 +126,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     appList.clear()
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
-      if (versionCode > dbItem.versionCode || packageInfo.lastUpdateTime > dbItem.lastUpdatedTime ||
+      if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(

@@ -77,7 +77,9 @@ class AppListFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        LCAppUtils.launchDetailPage(requireActivity(), it.getItem(position))
+        activity?.let { a ->
+          LCAppUtils.launchDetailPage(a, it.getItem(position))
+        }
       }
       it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
@@ -90,7 +92,7 @@ class AppListFragment :
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (requireActivity() as MainActivity).appBar?.setRaised(!top)
+            (activity as? MainActivity)?.appBar?.setRaised(!top)
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
@@ -237,8 +239,8 @@ class AppListFragment :
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.sort -> {
-        popup =
-          PopupMenu(requireContext(), requireActivity().findViewById(R.id.sort)).apply {
+        activity?.let { a ->
+          popup = PopupMenu(a, a.findViewById(R.id.sort)).apply {
             menuInflater.inflate(R.menu.sort_menu, menu)
 
             if (menu is MenuBuilder) {
@@ -260,8 +262,10 @@ class AppListFragment :
             setOnDismissListener {
               popup = null
             }
+          }.also {
+            it.show()
           }
-        popup?.show()
+        }
       }
     }
 

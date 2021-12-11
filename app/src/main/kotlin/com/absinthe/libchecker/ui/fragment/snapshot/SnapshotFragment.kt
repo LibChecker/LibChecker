@@ -36,6 +36,7 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingBottom
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -56,6 +57,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import rikka.widget.borderview.BorderView
+import timber.log.Timber
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -66,7 +68,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
-  private var shouldCompare = true
+  private var shouldCompare = true and ShootService.isComputing.not()
   private var hasAddedListBottomPadding = false
 
   private var shootBinder: IShootService? = null
@@ -81,9 +83,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
     override fun onProgressUpdated(progress: Int) {
       lifecycleScope.launch(Dispatchers.Main) {
-        try {
+        flip(VF_LOADING)
+        runCatching {
           binding.progressIndicator.setProgressCompat(progress, true)
-        } catch (e: NullPointerException) {
         }
       }
     }
@@ -93,7 +95,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (shootBinder == null) {
         shootBinder = IShootService.Stub.asInterface(service).also {
           it.registerOnShootOverListener(shootListener)
-          it.computeSnapshot(dropPrevious)
         }
       }
     }
@@ -105,6 +106,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun init() {
     setHasOptionsMenu(true)
+
+    requireContext().applicationContext.also {
+      val intent = Intent(it, ShootService::class.java).apply {
+        setPackage(it.packageName)
+      }
+      it.bindService(
+        intent,
+        shootServiceConnection, Service.BIND_AUTO_CREATE
+      )
+      it.startService(intent)
+    }
 
     val dashboard = SnapshotDashboardView(
       ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)
@@ -309,7 +321,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     super.onDestroyView()
     adapter.release()
     shootBinder?.let {
-      context?.unbindService(shootServiceConnection)
+      context?.applicationContext?.let { ctx ->
+        it.unregisterOnShootOverListener(shootListener)
+        ctx.unbindService(shootServiceConnection)
+        if (ShootService.isComputing.not()) {
+          ctx.stopService(
+            Intent(
+              ctx, ShootService::class.java
+            )
+          )
+        }
+      }
       shootBinder = null
     }
   }
@@ -331,13 +353,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
-        shootBinder?.computeSnapshot(dropPrevious) ?: let {
-          requireContext().bindService(
-            Intent(requireContext(), ShootService::class.java).apply {
-              setPackage(requireContext().packageName)
-            },
-            shootServiceConnection, Service.BIND_AUTO_CREATE
-          )
+        shootBinder?.computeSnapshot(dropPrevious) ?: run {
+          Timber.w("shoot binder is null")
+          Toasty.showShort(requireContext(), "Snapshot service error")
         }
         shouldCompare = false
         Analytics.trackEvent(

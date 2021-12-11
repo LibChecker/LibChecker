@@ -10,10 +10,10 @@ import java.nio.file.Paths
 plugins {
   id("com.android.application")
   kotlin("android")
-  kotlin("kapt")
   kotlin("plugin.parcelize")
   id("com.google.protobuf")
   id("dev.rikka.tools.refine.gradle-plugin")
+  id("com.google.devtools.ksp")
 }
 
 setupAppModule {
@@ -25,11 +25,10 @@ setupAppModule {
     viewBinding = true
   }
 
-  kapt {
-    arguments {
-      arg("room.incremental", "true")
-      arg("room.schemaLocation", "$projectDir/schemas")
-    }
+  ksp {
+    arg("moshi.generated", "javax.annotation.Generated")
+    arg("room.incremental", "true")
+    arg("room.schemaLocation", "$projectDir/schemas")
   }
 
   sourceSets["main"].java.srcDirs("src/main/kotlin")
@@ -59,7 +58,7 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
     "build-tools/${project.android.buildToolsVersion}/aapt2"
   )
   val zip = Paths.get(
-    project.buildDir.path,
+    buildDir.path,
     "intermediates",
     "optimized_processed_res",
     "release",
@@ -90,6 +89,8 @@ tasks.whenTaskAdded {
 
 configurations.all {
   exclude(group = "androidx.appcompat", module = "appcompat")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 dependencies {
@@ -130,8 +131,8 @@ dependencies {
   implementation("com.github.zhaobozhen.libraries:me:1.0.2")
   implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
-  kapt(Libs.roomCompiler)
-  kapt(Libs.moshiCompiler)
+  ksp(Libs.roomCompiler)
+  ksp(Libs.moshiCompiler)
 
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7")
   implementation("com.github.PhilJay:MPAndroidChart:3.1.0")
@@ -144,7 +145,7 @@ dependencies {
   implementation("net.dongliu:apk-parser:2.6.10")
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
-  implementation("org.lsposed.hiddenapibypass:hiddenapibypass:2.0")
+  implementation("org.lsposed.hiddenapibypass:hiddenapibypass:3.0")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
   implementation("dev.rikka.rikkax.core:core:1.3.3")

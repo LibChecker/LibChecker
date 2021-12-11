@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.utils
 
-import android.util.Log
+import timber.log.Timber
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -54,7 +54,7 @@ object FileUtils {
     `is`: InputStream?
   ): Boolean {
     if (`is` == null || !createOrExistsFile(file)) {
-      Log.e("FileIOUtils", "create file <$file> failed.")
+      Timber.e("create file <$file> failed.")
       return false
     }
     var os: OutputStream? = null
@@ -89,7 +89,7 @@ object FileUtils {
    * @param file The file.
    * @return `true`: exists or creates successfully<br></br>`false`: otherwise
    */
-  fun createOrExistsFile(file: File?): Boolean {
+  private fun createOrExistsFile(file: File?): Boolean {
     if (file == null) return false
     if (file.exists()) return file.isFile
     return if (!createOrExistsDir(file.parentFile)) false else try {
@@ -100,7 +100,7 @@ object FileUtils {
     }
   }
 
-  fun createOrExistsDir(file: File?): Boolean {
+  private fun createOrExistsDir(file: File?): Boolean {
     return file != null && if (file.exists()) file.isDirectory else file.mkdirs()
   }
 }

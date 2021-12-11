@@ -11,10 +11,8 @@ import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
-import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +23,7 @@ import rikka.core.util.ClipboardUtils
 class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
+  override val needShowLibDetailDialog = false
 
   override fun init() {
     binding.apply {
@@ -80,21 +79,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
       }
     }
 
-    fun openLibDetailDialog(position: Int) {
-      val name = adapter.getItem(position).item.name
-      val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
-
-      LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-        .show(childFragmentManager, tag)
-    }
-
     adapter.apply {
-//            setOnItemClickListener { _, view, position ->
-//                if (AntiShakeUtils.isInvalidClick(view)) {
-//                    return@setOnItemClickListener
-//                }
-//                openLibDetailDialog(position)
-//            }
       setOnItemLongClickListener { _, _, position ->
         doOnLongClick(getItem(position).item.name)
         true

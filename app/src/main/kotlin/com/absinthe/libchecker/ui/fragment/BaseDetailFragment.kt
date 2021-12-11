@@ -17,13 +17,16 @@ import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
+import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -60,6 +63,8 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   abstract fun getRecyclerView(): RecyclerView
 
+  protected abstract val needShowLibDetailDialog: Boolean
+
   override fun onAttach(context: Context) {
     super.onAttach(context)
     if (context is IDetailContainer) {
@@ -70,6 +75,16 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         navigateToComponentTask = Runnable { navigateToComponentImpl(it) }
       }
       DetailFragmentManager.resetNavigationParams()
+    }
+    adapter.apply {
+      if (needShowLibDetailDialog) {
+        setOnItemClickListener { _, view, position ->
+          if (AntiShakeUtils.isInvalidClick(view)) {
+            return@setOnItemClickListener
+          }
+          openLibDetailDialog(position)
+        }
+      }
     }
   }
 
@@ -134,5 +149,13 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
     adapter.setHighlightBackgroundItem(componentPosition)
     adapter.notifyDataSetChanged()
+  }
+
+  private fun openLibDetailDialog(position: Int) {
+    val name = adapter.getItem(position).item.name
+    val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
+
+    LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+      .show(childFragmentManager, tag)
   }
 }

@@ -155,7 +155,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           flip(VF_LOADING)
         }
         setOnLongClickListener {
-          hide()
+          if (adapter.data.isNotEmpty()) {
+            hide()
+          }
           true
         }
       }

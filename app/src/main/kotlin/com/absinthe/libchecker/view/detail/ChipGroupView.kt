@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.view.ContextThemeWrapper
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 
@@ -21,7 +22,12 @@ class ChipGroupView(context: Context) : ChipGroup(context) {
       Chip(ContextThemeWrapper(context, R.style.App_LibChip)).also {
         it.chipIcon = icon
         it.text = text
-        it.setOnClickListener { clickAction() }
+        it.setOnClickListener { view ->
+          if (AntiShakeUtils.isInvalidClick(view)) {
+            return@setOnClickListener
+          }
+          clickAction()
+        }
       }
     )
   }

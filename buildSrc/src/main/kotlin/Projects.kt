@@ -44,10 +44,10 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(31)
+    compileSdkVersion(32)
     defaultConfig {
       minSdk = 23
-      targetSdk = 31
+      targetSdk = 32
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     kotlinOptions {

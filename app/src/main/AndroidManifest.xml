@@ -67,10 +67,13 @@
       android:label="@string/detail_label">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
-
         <category android:name="android.intent.category.DEFAULT" />
-
         <data android:scheme="content" />
+        <data android:mimeType="application/vnd.android.package-archive" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.SEND" />
+        <category android:name="android.intent.category.DEFAULT" />
         <data android:mimeType="application/vnd.android.package-archive" />
       </intent-filter>
     </activity>
@@ -86,7 +89,14 @@
       android:label="@string/album_item_backup_restore_title" />
     <activity
       android:name=".ui.album.ComparisonActivity"
-      android:label="@string/album_item_comparison_title" />
+      android:label="@string/album_item_comparison_title"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.SEND_MULTIPLE" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:mimeType="application/vnd.android.package-archive" />
+      </intent-filter>
+    </activity>
     <activity
       android:name=".ui.album.TrackActivity"
       android:label="@string/album_item_track_title" />

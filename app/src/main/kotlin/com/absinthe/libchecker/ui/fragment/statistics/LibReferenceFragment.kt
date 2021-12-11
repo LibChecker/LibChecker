@@ -206,7 +206,10 @@ class LibReferenceFragment :
 
   override fun onPause() {
     super.onPause()
-    popup?.dismiss()
+    popup?.let {
+      it.dismiss()
+      popup = null
+    }
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

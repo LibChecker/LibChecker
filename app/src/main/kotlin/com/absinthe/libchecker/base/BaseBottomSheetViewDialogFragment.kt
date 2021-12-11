@@ -113,9 +113,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
   }
 
   override fun show(manager: FragmentManager, tag: String?) {
-    try {
+    runCatching {
       super.show(manager, tag)
-    } catch (ignore: IllegalStateException) {
     }
   }
 
