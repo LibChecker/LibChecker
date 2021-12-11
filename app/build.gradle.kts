@@ -58,7 +58,7 @@ val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
     "build-tools/${project.android.buildToolsVersion}/aapt2"
   )
   val zip = Paths.get(
-    project.buildDir.path,
+    buildDir.path,
     "intermediates",
     "optimized_processed_res",
     "release",
@@ -89,6 +89,8 @@ tasks.whenTaskAdded {
 
 configurations.all {
   exclude(group = "androidx.appcompat", module = "appcompat")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
+  exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 dependencies {
