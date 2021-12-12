@@ -33,7 +33,7 @@ class AppInfoBottomSheetDialogFragment :
   BaseBottomSheetViewDialogFragment<AppInfoBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
-  private val mAdapter = AppInfoAdapter()
+  private val aiAdapter = AppInfoAdapter()
 
   override fun initRootView(): AppInfoBottomSheetView = AppInfoBottomSheetView(requireContext())
 
@@ -71,29 +71,31 @@ class AppInfoBottomSheetDialogFragment :
       }
     }
     root.list.apply {
-      adapter = mAdapter
+      adapter = aiAdapter
       layoutManager = StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL)
       setHasFixedSize(true)
     }
 
     if (LCAppUtils.atLeastN()) {
-      mAdapter.setList(getResolveInfoList())
-      mAdapter.setOnItemClickListener { _, _, position ->
-        mAdapter.data[position].let {
-          val intent = Intent()
-            .setComponent(
-              ComponentName(it.activityInfo.packageName, it.activityInfo.name)
-            )
-            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-          try {
-            startActivity(intent)
-          } catch (e: Exception) {
-            context?.let { ctx ->
-              Toasty.showShort(ctx, R.string.toast_cant_open_app)
+      aiAdapter.also { adapter ->
+        adapter.setList(getResolveInfoList())
+        adapter.setOnItemClickListener { _, _, position ->
+          adapter.data[position].let {
+            val intent = Intent()
+              .setComponent(
+                ComponentName(it.activityInfo.packageName, it.activityInfo.name)
+              )
+              .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+            try {
+              startActivity(intent)
+            } catch (e: Exception) {
+              context?.let { ctx ->
+                Toasty.showShort(ctx, R.string.toast_cant_open_app)
+              }
             }
           }
+          dismiss()
         }
-        dismiss()
       }
     }
   }

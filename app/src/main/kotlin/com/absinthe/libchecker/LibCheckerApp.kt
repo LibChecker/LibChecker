@@ -3,6 +3,8 @@ package com.absinthe.libchecker
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import androidx.window.core.ExperimentalWindowApi
+import androidx.window.embedding.SplitController
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -55,11 +57,17 @@ class LibCheckerApp : Application() {
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()
+    initSplitController()
   }
 
   override fun attachBaseContext(base: Context?) {
     super.attachBaseContext(base)
     Global.start()
+  }
+
+  @OptIn(ExperimentalWindowApi::class)
+  private fun initSplitController() {
+    SplitController.initialize(this, R.xml.main_split_config)
   }
 
   companion object {

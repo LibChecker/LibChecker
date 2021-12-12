@@ -108,6 +108,7 @@ dependencies {
     Libs.viewPager2,
     Libs.recyclerView,
     Libs.preference,
+    Libs.window,
     Libs.material,
 
     // Net

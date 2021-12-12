@@ -189,7 +189,10 @@ class LibReferenceFragment :
       }
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
-      computeRef()
+      if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
+        computeRef()
+        homeViewModel.libRefSystemApps = it
+      }
     }
     GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
       homeViewModel.refreshRef()
@@ -199,7 +202,10 @@ class LibReferenceFragment :
       if (refAdapter.data.isEmpty() &&
         AppItemRepository.getApplicationInfoItems().isNotEmpty()
       ) {
-        computeRef()
+        if (homeViewModel.libRefType == null) {
+          computeRef()
+          homeViewModel.libRefType = category
+        }
       }
     }
   }

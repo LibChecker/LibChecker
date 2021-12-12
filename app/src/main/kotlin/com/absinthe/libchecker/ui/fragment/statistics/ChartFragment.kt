@@ -59,6 +59,8 @@ class ChartFragment :
   private val viewModel: ChartViewModel by activityViewModels()
   private val legendList = mutableListOf<String>()
   private val existApiList = mutableListOf<Int>()
+  private val apiScope = Build.VERSION_CODES.S + 1
+
   private var chartType = TYPE_ABI
   private var mDialog: ClassifyBottomSheetDialogFragment? = null
   private lateinit var chartView: ViewGroup
@@ -238,14 +240,14 @@ class ChartFragment :
     }
 
     filteredList?.let {
-      val list = IntArray(Build.VERSION_CODES.S + 1) { 0 }
+      val list = IntArray(apiScope) { 0 }
 
       var targetApi: Int
       for (item in it) {
         try {
           packageInfo = PackageUtils.getPackageInfo(item.packageName)
           targetApi = packageInfo.applicationInfo.targetSdkVersion
-          if (targetApi > 0 && targetApi <= Build.VERSION_CODES.S + 1) {
+          if (targetApi in 1..apiScope) {
             list[targetApi - 1]++
           }
         } catch (e: PackageManager.NameNotFoundException) {
@@ -283,7 +285,7 @@ class ChartFragment :
 
       // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
-      (0..30).forEach { _ ->
+      (0..apiScope).forEach { _ ->
         colors.add(UiUtils.getRandomColor())
       }
 
@@ -493,7 +495,7 @@ class ChartFragment :
         setDrawZeroLine(false)
         textColor = R.color.textNormal.getColor(requireContext())
       }
-      setMaxVisibleValueCount(Build.VERSION_CODES.S + 1)
+      setMaxVisibleValueCount(apiScope)
       setDrawGridBackground(false)
       setDrawBorders(false)
       setDrawMarkers(false)

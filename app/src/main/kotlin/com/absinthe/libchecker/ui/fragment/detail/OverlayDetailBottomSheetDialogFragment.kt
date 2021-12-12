@@ -81,11 +81,12 @@ class OverlayDetailBottomSheetDialogFragment :
         container.let {
           lifecycleScope.launch(Dispatchers.IO) {
             val file = File(packageInfo.applicationInfo.sourceDir)
+            val targetPackageLabel = "targetPackage"
             val demands = ManifestReader.getManifestProperties(
               file,
-              arrayOf("targetPackage")
+              arrayOf(targetPackageLabel)
             )
-            val targetPackage = (demands["targetPackage"] as? String).orEmpty()
+            val targetPackage = (demands[targetPackageLabel] as? String).orEmpty()
             val targetLCItem = Repositories.lcRepository.getItem(targetPackage)
 
             if (targetLCItem == null) {

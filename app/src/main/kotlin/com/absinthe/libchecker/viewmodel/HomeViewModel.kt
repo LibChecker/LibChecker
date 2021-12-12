@@ -71,6 +71,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   val effect = _effect.asSharedFlow()
 
   var controller: IListController? = null
+  var libRefSystemApps: Boolean? = null
+  var libRefType: Int? = null
 
   fun reloadApps() {
     setEffect {

@@ -52,6 +52,7 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
     }
     kotlinOptions {
       jvmTarget = JavaVersion.VERSION_11.toString()
+      freeCompilerArgs = freeCompilerArgs + arrayOf("-Xopt-in=kotlin.RequiresOptIn")
     }
     compileOptions {
       targetCompatibility(JavaVersion.VERSION_11)
