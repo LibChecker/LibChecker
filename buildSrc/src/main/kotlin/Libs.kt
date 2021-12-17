@@ -2,9 +2,9 @@
 
 private const val lifecycleVersion = "2.4.0"
 private const val retrofitVersion = "2.9.0"
-private const val roomVersion = "2.4.0-rc01"
+private const val roomVersion = "2.4.0"
 private const val moshiVersion = "1.13.0"
-private const val grpcVersion = "1.42.1"
+private const val grpcVersion = "1.43.0"
 private const val protocVersion = "3.19.1"
 private const val appCenterVersion = "4.3.1"
 private const val hiddenApiRefineVersion = "3.0.3"
@@ -39,7 +39,7 @@ object Libs {
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.18"
   const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.7.0"
   const val hiddenApiRefinePlugin = "dev.rikka.tools.refine:gradle-plugin:$hiddenApiRefineVersion"
-  const val kspPlugin = "com.google.devtools.ksp:symbol-processing-gradle-plugin:1.6.0-1.0.1"
+  const val kspPlugin = "com.google.devtools.ksp:symbol-processing-gradle-plugin:1.6.10-1.0.2"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
