@@ -42,7 +42,7 @@
           android:transitionName="app_icon"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
-          tools:background="@drawable/pic_splash"
+          tools:background="@drawable/pic_launcher"
           tools:ignore="HardcodedText" />
 
         <TextView

@@ -26,7 +26,7 @@ class ToastView(context: Context) : AViewGroup(context) {
 
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
-    setImageResource(R.drawable.pic_splash)
+    setImageResource(R.drawable.pic_logo)
     addView(this)
   }
 

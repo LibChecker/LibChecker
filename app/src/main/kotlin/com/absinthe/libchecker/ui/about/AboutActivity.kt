@@ -72,7 +72,7 @@ class AboutActivity : AbsAboutActivity() {
   }
 
   override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
-    icon.load(R.drawable.pic_splash)
+    icon.load(R.drawable.pic_logo)
     slogan.setText(R.string.app_name)
     version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
 
