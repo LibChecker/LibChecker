@@ -41,7 +41,12 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           context,
           R.style.AppListMaterialCard
         )
-      )
+      ).also {
+        it.layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+      }
     )
   }
 

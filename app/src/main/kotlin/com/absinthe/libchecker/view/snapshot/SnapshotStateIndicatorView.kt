@@ -2,13 +2,16 @@ package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Outline
 import android.graphics.Paint
 import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.annotation.ColorRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
 
 class SnapshotStateIndicatorView(context: Context) : View(context) {
+  var enableRoundCorner: Boolean = false
   var added: Boolean = false
   var removed: Boolean = false
   var changed: Boolean = false
@@ -28,6 +31,18 @@ class SnapshotStateIndicatorView(context: Context) : View(context) {
   }
   private var eachItemHeight: Float = 0f
   private var drawOverPosition: Float = 0f
+
+  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    if (enableRoundCorner) {
+      outlineProvider = object : ViewOutlineProvider() {
+        override fun getOutline(view: View?, outline: Outline?) {
+          outline?.setRoundRect(0, 0, measuredWidth, measuredHeight, (measuredWidth / 2).toFloat())
+        }
+      }
+      clipToOutline = true
+    }
+  }
 
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)

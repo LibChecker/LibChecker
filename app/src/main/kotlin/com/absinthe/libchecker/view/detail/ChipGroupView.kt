@@ -13,13 +13,14 @@ class ChipGroupView(context: Context) : ChipGroup(context) {
 
   init {
     clipToPadding = false
+    clipChildren = false
     setPadding(0, 4.dp, 0, 4.dp)
     chipSpacingHorizontal = 16.dp
   }
 
   fun addChip(icon: Drawable, text: String, clickAction: () -> Unit) {
     addView(
-      Chip(ContextThemeWrapper(context, R.style.App_LibChip)).also {
+      Chip(context).also {
         it.chipIcon = icon
         it.text = text
         it.setOnClickListener { view ->

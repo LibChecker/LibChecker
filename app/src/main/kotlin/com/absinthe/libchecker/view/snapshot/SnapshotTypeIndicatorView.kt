@@ -1,11 +1,13 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
+import android.graphics.Outline
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
@@ -13,6 +15,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
+  var enableRoundCorner: Boolean = false
 
   private val text =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
@@ -57,6 +60,22 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
         ),
       text.measuredHeight.coerceAtLeast(icon.measuredHeight)
     )
+    if (enableRoundCorner) {
+      colorLabel.apply {
+        outlineProvider = object : ViewOutlineProvider() {
+          override fun getOutline(view: View?, outline: Outline?) {
+            outline?.setRoundRect(
+              0,
+              0,
+              measuredWidth,
+              measuredHeight,
+              (measuredWidth / 2).toFloat()
+            )
+          }
+        }
+        clipToOutline = true
+      }
+    }
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

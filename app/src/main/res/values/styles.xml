@@ -23,7 +23,7 @@
 
   <style name="App.LibChip" parent="Widget.MaterialComponents.Chip.Action">
     <item name="chipMinTouchTargetSize">0dp</item>
-    <item name="chipStartPadding">10dp</item>
+    <item name="chipStartPadding">12dp</item>
   </style>
 
   <style name="App.LibChip.Material3" parent="Widget.Material3.Chip.Assist.Elevated">

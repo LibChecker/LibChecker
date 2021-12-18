@@ -32,6 +32,8 @@
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         app:layout_collapseMode="parallax">
 
         <com.absinthe.libchecker.view.detail.DetailsTitleView

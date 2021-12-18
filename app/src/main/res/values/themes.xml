@@ -35,6 +35,7 @@
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
+    <item name="chipStyle">@style/App.LibChip</item>
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
     <item name="albumCardViewColorSurface">@android:color/transparent</item>
@@ -75,6 +76,7 @@
     <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
     <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
+    <item name="chipStyle">@style/App.LibChip</item>
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
     <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
     <item name="albumCardViewColorSurface">@android:color/transparent</item>

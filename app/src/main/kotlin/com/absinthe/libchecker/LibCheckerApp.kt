@@ -13,6 +13,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
+import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
@@ -58,6 +59,10 @@ class LibCheckerApp : Application() {
     Repositories.init(this)
     Repositories.checkRulesDatabase()
     initSplitController()
+
+    if (GlobalValues.md3Theme) {
+      DynamicColors.applyToActivitiesIfAvailable(this)
+    }
   }
 
   override fun attachBaseContext(base: Context?) {

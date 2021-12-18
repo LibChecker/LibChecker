@@ -186,7 +186,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
     adapter.apply {
       headerWithEmptyEnable = true
-      setHeaderView(dashboard)
+      dashboard.also {
+        setHeaderView(it)
+        (it.parent as? ViewGroup)?.apply {
+          clipToPadding = false
+          clipChildren = false
+        }
+      }
       setEmptyView(emptyView)
       setDiffCallback(SnapshotDiffUtil())
       setOnItemClickListener { _, view, position ->
@@ -325,11 +331,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         it.unregisterOnShootOverListener(shootListener)
         ctx.unbindService(shootServiceConnection)
         if (ShootService.isComputing.not()) {
-          ctx.stopService(
-            Intent(
-              ctx, ShootService::class.java
+          runCatching {
+            ctx.stopService(
+              Intent(
+                ctx, ShootService::class.java
+              )
             )
-          )
+          }
         }
       }
       shootBinder = null
