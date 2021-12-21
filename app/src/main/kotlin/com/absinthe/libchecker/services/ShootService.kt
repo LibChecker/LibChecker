@@ -32,10 +32,12 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -56,22 +58,7 @@ class ShootService : LifecycleService() {
   private val repository = Repositories.lcRepository
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
-  private val binder = object : IShootService.Stub() {
-    override fun computeSnapshot(dropPrevious: Boolean) {
-      Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
-      lifecycleScope.launch(Dispatchers.IO) { this@ShootService.computeSnapshots(dropPrevious) }
-    }
-
-    override fun registerOnShootOverListener(listener: OnShootListener?) {
-      Timber.i("registerOnShootOverListener $listener")
-      listener?.let { listenerList.register(listener) }
-    }
-
-    override fun unregisterOnShootOverListener(listener: OnShootListener?) {
-      Timber.i("unregisterOnShootOverListener $listener")
-      listenerList.unregister(listener)
-    }
-  }
+  private val binder by lazy { ShootBinder(this, lifecycleScope) }
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
@@ -146,8 +133,8 @@ class ShootService : LifecycleService() {
     Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
     GlobalValues.hasFinishedShoot = false
     notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
-    initBuilder()
     showNotification()
+    notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
 
     val timer = TimeRecorder()
     timer.start()
@@ -327,5 +314,29 @@ class ShootService : LifecycleService() {
 
   companion object {
     var isComputing = false
+  }
+
+  class ShootBinder(service: ShootService, private val lifecycleScope: CoroutineScope) : IShootService.Stub() {
+
+    private val serviceRef: WeakReference<ShootService> = WeakReference(service)
+
+    override fun computeSnapshot(dropPrevious: Boolean) {
+      Timber.i("computeSnapshot: dropPrevious = $dropPrevious")
+      lifecycleScope.launch(Dispatchers.IO) {
+        serviceRef.get()?.computeSnapshots(dropPrevious)
+      }
+    }
+
+    override fun registerOnShootOverListener(listener: OnShootListener?) {
+      Timber.i("registerOnShootOverListener $listener")
+      listener?.let {
+        serviceRef.get()?.listenerList?.register(listener)
+      }
+    }
+
+    override fun unregisterOnShootOverListener(listener: OnShootListener?) {
+      Timber.i("unregisterOnShootOverListener $listener")
+      serviceRef.get()?.listenerList?.unregister(listener)
+    }
   }
 }

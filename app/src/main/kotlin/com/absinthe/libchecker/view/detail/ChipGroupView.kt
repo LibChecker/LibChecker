@@ -2,8 +2,6 @@ package com.absinthe.libchecker.view.detail
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.view.ContextThemeWrapper
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.chip.Chip

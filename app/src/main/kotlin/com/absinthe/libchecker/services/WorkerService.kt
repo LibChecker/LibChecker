@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.ref.WeakReference
 import java.nio.charset.StandardCharsets
 
 class WorkerService : LifecycleService() {
@@ -39,17 +40,7 @@ class WorkerService : LifecycleService() {
   }
 
   private val listenerList = RemoteCallbackList<OnWorkerListener>()
-  private val binder = object : IWorkerService.Stub() {
-    override fun registerOnWorkerListener(listener: OnWorkerListener?) {
-      Timber.d("registerOnWorkerListener")
-      listener?.let { listenerList.register(listener) }
-    }
-
-    override fun unregisterOnWorkerListener(listener: OnWorkerListener?) {
-      Timber.d("unregisterOnWorkerListener")
-      listenerList.unregister(listener)
-    }
-  }
+  private val binder by lazy { WorkerBinder(this) }
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
@@ -92,6 +83,7 @@ class WorkerService : LifecycleService() {
     }
   }
 
+  @Suppress("BlockingMethodInNonBlockingContext")
   private suspend fun getAppsList(): List<ApplicationInfo> {
     var appList: List<ApplicationInfo>?
 
@@ -148,5 +140,22 @@ class WorkerService : LifecycleService() {
       }
     }
     listenerList.finishBroadcast()
+  }
+
+  class WorkerBinder(service: WorkerService) : IWorkerService.Stub() {
+
+    private val serviceRef: WeakReference<WorkerService> = WeakReference(service)
+
+    override fun registerOnWorkerListener(listener: OnWorkerListener?) {
+      Timber.d("registerOnWorkerListener")
+      listener?.let {
+        serviceRef.get()?.listenerList?.register(listener)
+      }
+    }
+
+    override fun unregisterOnWorkerListener(listener: OnWorkerListener?) {
+      Timber.d("unregisterOnWorkerListener")
+      serviceRef.get()?.listenerList?.unregister(listener)
+    }
   }
 }
