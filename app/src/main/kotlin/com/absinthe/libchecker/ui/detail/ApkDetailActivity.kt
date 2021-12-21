@@ -191,6 +191,18 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
           )
           val abi = PackageUtils.getAbi(it.applicationInfo, true)
 
+          extraInfo.apply {
+            if (abi >= Constants.MULTI_ARCH) {
+              append(getString(R.string.multiArch))
+              append(", ")
+            }
+            append(PackageUtils.getTargetApiString(it))
+            append(", ").append(PackageUtils.getMinSdkVersion(it))
+            it.sharedUserId?.let { sharedUid ->
+              appendLine().append("sharedUserId = $sharedUid")
+            }
+            appendLine()
+          }
           if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
               Constants.ERROR
             )
@@ -238,21 +250,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
             Constants.OVERLAY -> Constants.OVERLAY_STRING
             else -> ""
           }
-          extraInfo.apply {
-            append(advanced)
-            if (abi >= Constants.MULTI_ARCH) {
-              if (advanced.isNotEmpty()) {
-                append(", ")
-              }
-              append(getString(R.string.multiArch))
-              append(", ")
-            }
-            append(PackageUtils.getTargetApiString(it))
-            append(", ").append(PackageUtils.getMinSdkVersion(it))
-            it.sharedUserId?.let { sharedUid ->
-              appendLine().append("sharedUserId = $sharedUid")
-            }
-          }
+          extraInfo.append(advanced)
           detailsTitle.extraInfoView.text = extraInfo
         } catch (e: Exception) {
           Timber.e(e)

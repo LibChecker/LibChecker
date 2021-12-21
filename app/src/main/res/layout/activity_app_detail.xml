@@ -31,6 +31,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/normal_padding"
+        android:layout_marginVertical="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
         android:clipToPadding="false"
         android:clipChildren="false"

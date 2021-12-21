@@ -53,7 +53,6 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -193,20 +192,49 @@ class AppDetailActivity :
             )
           )
           val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
-          val abiSet = PackageUtils.getAbiSet(
+          var abiSet = PackageUtils.getAbiSet(
             file,
             packageInfo.applicationInfo,
             isApk = false,
             overlay = overlay,
             ignoreArch = true
-          )
+          ).toSet()
           val abi = PackageUtils.getAbi(
             packageInfo.applicationInfo,
             isApk = false,
             abiSet = abiSet,
             demands = demands
           )
+          abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
+          extraInfo.apply {
+            if (abi >= Constants.MULTI_ARCH) {
+              append(getString(R.string.multiArch))
+              append(", ")
+            }
+            if (!isHarmonyMode) {
+              append(PackageUtils.getTargetApiString(packageName))
+              append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
+              packageInfo.sharedUserId?.let {
+                appendLine().append("sharedUserId = $it")
+              }
+            } else {
+              if (extraBean != null && extraBean!!.variant == Constants.VARIANT_HAP) {
+                bundleManager?.let {
+                  val hapBundle = it.getBundleInfo(
+                    packageName,
+                    IBundleManager.GET_BUNDLE_DEFAULT
+                  )
+                  append("targetVersion ${hapBundle.targetVersion}")
+                  append(", ").append("minSdkVersion ${hapBundle.minSdkVersion}")
+                  if (!hapBundle.jointUserId.isNullOrEmpty()) {
+                    appendLine().append("jointUserId = ${hapBundle.jointUserId}")
+                  }
+                }
+              }
+            }
+            appendLine()
+          }
           if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(
               Constants.ERROR
             )
@@ -267,37 +295,7 @@ class AppDetailActivity :
             Constants.OVERLAY -> Constants.OVERLAY_STRING
             else -> ""
           }
-          extraInfo.apply {
-            append(advanced)
-            if (abi >= Constants.MULTI_ARCH) {
-              if (advanced.isNotEmpty()) {
-                append(", ")
-              }
-              append(getString(R.string.multiArch))
-              append(", ")
-            }
-            if (!isHarmonyMode) {
-              append(PackageUtils.getTargetApiString(packageName))
-              append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
-              packageInfo.sharedUserId?.let {
-                appendLine().append("sharedUserId = $it")
-              }
-            } else {
-              if (extraBean != null && extraBean!!.variant == Constants.VARIANT_HAP) {
-                bundleManager?.let {
-                  val hapBundle = it.getBundleInfo(
-                    packageName,
-                    IBundleManager.GET_BUNDLE_DEFAULT
-                  )
-                  append("targetVersion ${hapBundle.targetVersion}")
-                  append(", ").append("minSdkVersion ${hapBundle.minSdkVersion}")
-                  if (!hapBundle.jointUserId.isNullOrEmpty()) {
-                    appendLine().append("jointUserId = ${hapBundle.jointUserId}")
-                  }
-                }
-              }
-            }
-          }
+          extraInfo.append(advanced)
           detailsTitle.extraInfoView.text = extraInfo
 
           if (chipGroup == null) {
@@ -307,9 +305,7 @@ class AppDetailActivity :
                   layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                  ).also { lp ->
-                    lp.topMargin = 16.dp
-                  }
+                  )
                 }.also { cg ->
                   if (it.isSplitApk) {
                     cg.addChip(
