@@ -567,7 +567,7 @@ class AppDetailActivity :
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_gradle) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
-                .setIcon(R.drawable.ic_kotlin_logo)
+                .setIcon(R.drawable.ic_gradle)
                 .setTitle(Html.fromHtml("${getString(R.string.agp)} <b>$it</b>"))
                 .setMessage(R.string.agp_details)
                 .setPositiveButton(android.R.string.ok, null)
