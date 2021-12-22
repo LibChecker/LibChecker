@@ -58,18 +58,19 @@ object Toasty {
   private fun show(context: Context, message: String, duration: Int) {
     toast?.get()?.cancel()
     toast = null
+    val ctxRef = WeakReference(context)
 
     if (LCAppUtils.atLeastR() && context !is ContextThemeWrapper) {
-      Toast(context).also {
+      Toast(ctxRef.get()).also {
         it.duration = duration
         it.setText(message)
         toast = WeakReference(it)
       }.show()
     } else {
-      val view = ToastView(context).also {
+      val view = ToastView(ctxRef.get()!!).also {
         it.message.text = message
       }
-      Toast(context).also {
+      Toast(ctxRef.get()).also {
         it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
         it.duration = duration
         it.view = view

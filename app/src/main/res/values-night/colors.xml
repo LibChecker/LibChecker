@@ -6,6 +6,9 @@
   <color name="textSecondary">#80BEBEBE</color>
   <color name="backgroundGray">#FF121212</color>
   <color name="libIconBackground">#50FFFFFF</color>
+  <color name="featureBackground">#25000000</color>
+  <color name="featureRipple">#25FFFFFF</color>
+
   <color name="renge">#FFBB5E61</color>
   <color name="highlightComponent">@color/material_blue_800</color>
   <color name="bottom_sheet_header_handler">#CCBBBBBB</color>

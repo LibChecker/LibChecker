@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
  * time : 2020/08/19
  * </pre>
  */
-class HorizontalSpacesItemDecoration(private val space: Int) : RecyclerView.ItemDecoration() {
+class HorizontalSpacesItemDecoration(
+  private val space: Int,
+  private val influenceParent: Boolean = false
+) : RecyclerView.ItemDecoration() {
 
   override fun getItemOffsets(
     outRect: Rect,
@@ -19,7 +22,7 @@ class HorizontalSpacesItemDecoration(private val space: Int) : RecyclerView.Item
     state: RecyclerView.State
   ) {
 
-    if (parent.paddingLeft != space) {
+    if (influenceParent && parent.paddingLeft != space) {
       parent.setPadding(space, parent.paddingTop, space, parent.paddingBottom)
       parent.clipToPadding = false
     }

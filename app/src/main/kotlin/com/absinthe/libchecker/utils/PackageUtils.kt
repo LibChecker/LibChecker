@@ -43,7 +43,9 @@ import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -953,5 +955,29 @@ object PackageUtils {
       demands[minSdkVersion]?.toString() ?: "?"
     }
     return "$minSdkVersion $minSdkVersionValue"
+  }
+
+  private const val AGP_KEYWORD = "androidGradlePluginVersion="
+  private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
+
+  fun getAGPVersion(packageInfo: PackageInfo): String? {
+    ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+      zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
+        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
+          seq.find { it.contains(AGP_KEYWORD) }?.let {
+            return it.removePrefix(AGP_KEYWORD)
+          }
+        }
+      }
+      zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
+        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
+          seq.find { it.contains(AGP_KEYWORD2) }?.let {
+            return it.removePrefix(AGP_KEYWORD2)
+          }
+        }
+      }
+    }
+
+    return null
   }
 }

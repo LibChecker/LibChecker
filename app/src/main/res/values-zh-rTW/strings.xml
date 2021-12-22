@@ -108,6 +108,7 @@
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
   <string name="lib_detail_dialog_title">庫詳情</string>
+  <string name="agp_details">Android Studio 構建系統以 Gradle 為基礎，並且 Android Gradle 插件添加了幾項專用於構建 Android 應用的功能。雖然 Android 插件通常會與 Android Studio 的更新步調保持一致，但插件（以及 Gradle 系統的其餘部分）可獨立於 Android Studio 運行並單獨更新。</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼板</string>

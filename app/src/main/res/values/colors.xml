@@ -6,6 +6,8 @@
   <color name="textSecondary">#80464646</color>
   <color name="backgroundGray">#FFDFDFDF</color>
   <color name="libIconBackground">#10000000</color>
+  <color name="featureBackground">#15000000</color>
+  <color name="featureRipple">#40000000</color>
 
   <color name="appColorDark">#B1B8DF</color>
   <color name="renge">#FFAB373A</color>

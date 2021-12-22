@@ -4,20 +4,24 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.MenuItem
-import android.widget.LinearLayout
+import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.R
@@ -32,10 +36,12 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DetailExtraBean
+import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
@@ -61,7 +67,6 @@ import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
-import com.absinthe.libchecker.view.detail.ChipGroupView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
@@ -89,9 +94,10 @@ class AppDetailActivity :
   private val extraBean by unsafeLazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
   private val viewModel: DetailViewModel by viewModels()
+  private val featureAdapter by unsafeLazy { FeatureAdapter() }
 
   private var isHarmonyMode = false
-  private var chipGroup: ChipGroupView? = null
+  private var featureListView: RecyclerView? = null
   private var typeList = mutableListOf<Int>()
 
   override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
@@ -298,48 +304,40 @@ class AppDetailActivity :
           extraInfo.append(advanced)
           detailsTitle.extraInfoView.text = extraInfo
 
-          if (chipGroup == null) {
-            extraBean?.let {
-              if (it.isSplitApk || it.isKotlinUsed) {
-                chipGroup = ChipGroupView(this@AppDetailActivity).apply {
-                  layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                  )
-                }.also { cg ->
-                  if (it.isSplitApk) {
-                    cg.addChip(
-                      icon = R.drawable.ic_aab.getDrawable(this@AppDetailActivity)!!,
-                      text = getString(R.string.app_bundle)
-                    ) {
-                      AppBundleBottomSheetDialogFragment().apply {
-                        arguments = bundleOf(
-                          EXTRA_PACKAGE_NAME to pkgName
-                        )
-                        show(supportFragmentManager, tag)
-                      }
-                    }
-                  }
-                  if (it.isKotlinUsed) {
-                    cg.addChip(
-                      icon = R.drawable.ic_kotlin_logo.getDrawable(this@AppDetailActivity)!!,
-                      text = getString(R.string.kotlin_used)
-                    ) {
-                      MaterialAlertDialogBuilder(this@AppDetailActivity)
-                        .setIcon(R.drawable.ic_kotlin_logo)
-                        .setTitle(R.string.kotlin_string)
-                        .setMessage(R.string.kotlin_details)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show()
-                    }
+          extraBean?.let {
+            if (it.isSplitApk) {
+              initFeatureListView()
+              featureAdapter.addData(
+                FeatureItem(R.drawable.ic_aab) {
+                  AppBundleBottomSheetDialogFragment().apply {
+                    arguments = bundleOf(
+                      EXTRA_PACKAGE_NAME to pkgName
+                    )
+                    show(supportFragmentManager, tag)
                   }
                 }
-                headerContentLayout.addView(chipGroup)
-              }
-              if (it.variant == Constants.VARIANT_HAP) {
-                ibHarmonyBadge.isVisible = true
-                ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
-              }
+              )
+            }
+            if (it.isKotlinUsed) {
+              initFeatureListView()
+              featureAdapter.addData(
+                FeatureItem(R.drawable.ic_kotlin_logo) {
+                  MaterialAlertDialogBuilder(this@AppDetailActivity)
+                    .setIcon(R.drawable.ic_kotlin_logo)
+                    .setTitle(R.string.kotlin_string)
+                    .setMessage(R.string.kotlin_details)
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+                }
+              )
+            }
+
+            featureListView?.let { flv -> headerContentLayout.addView(flv) }
+            initMoreFeatures(packageInfo)
+
+            if (it.variant == Constants.VARIANT_HAP) {
+              ibHarmonyBadge.isVisible = true
+              ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
             }
           }
         } catch (e: Exception) {
@@ -540,5 +538,44 @@ class AppDetailActivity :
 
   private fun unregisterPackageBroadcast() {
     unregisterReceiver(requestPackageReceiver)
+  }
+
+  private fun initFeatureListView(): Boolean {
+    if (featureListView != null) {
+      return false
+    }
+
+    featureListView = RecyclerView(this).also {
+      it.layoutParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+      it.adapter = featureAdapter
+      it.clipChildren = false
+    }
+    return true
+  }
+
+  private fun initMoreFeatures(packageInfo: PackageInfo) {
+    lifecycleScope.launch(Dispatchers.IO) {
+      PackageUtils.getAGPVersion(packageInfo)?.let {
+        withContext(Dispatchers.Main) {
+          if (initFeatureListView()) {
+            binding.headerContentLayout.addView(featureListView)
+          }
+          featureAdapter.addData(
+            FeatureItem(R.drawable.ic_gradle) {
+              MaterialAlertDialogBuilder(this@AppDetailActivity)
+                .setIcon(R.drawable.ic_kotlin_logo)
+                .setTitle(Html.fromHtml("${getString(R.string.agp)} <b>$it</b>"))
+                .setMessage(R.string.agp_details)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            }
+          )
+        }
+      }
+    }
   }
 }

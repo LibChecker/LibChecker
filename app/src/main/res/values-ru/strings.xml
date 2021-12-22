@@ -104,6 +104,7 @@
   <string name="app_info_launch">Запустить</string>
   <string name="app_info_settings">Настройки</string>
   <string name="lib_detail_dialog_title">Library Details</string>
+  <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
