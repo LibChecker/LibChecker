@@ -110,6 +110,10 @@
   <string name="lib_detail_dialog_title">Library Details</string>
   <string name="agp" translatable="false">Android Gradle Plugin</string>
   <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
+  <string name="xposed_module">Xposed Module</string>
+  <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes (as long as the original code was not changed too much).</string>
+  <string name="play_app_signing">Play App Signing</string>
+  <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

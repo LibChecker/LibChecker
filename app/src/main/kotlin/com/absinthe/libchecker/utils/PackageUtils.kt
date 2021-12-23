@@ -980,4 +980,13 @@ object PackageUtils {
 
     return null
   }
+
+  fun PackageInfo.isXposedModule(): Boolean {
+    return applicationInfo.metaData?.getBoolean("xposedmodule") == true
+  }
+
+  fun PackageInfo.isPlayAppSigning(): Boolean {
+    return applicationInfo.metaData?.getString("com.android.stamp.type") == "STAMP_TYPE_DISTRIBUTION_APK" &&
+      applicationInfo.metaData?.getString("com.android.stamp.source") == "https://play.google.com/store"
+  }
 }

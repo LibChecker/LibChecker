@@ -109,6 +109,10 @@
   <string name="app_info_settings">設定</string>
   <string name="lib_detail_dialog_title">庫詳情</string>
   <string name="agp_details">Android Studio 構建系統以 Gradle 為基礎，並且 Android Gradle 插件添加了幾項專用於構建 Android 應用的功能。雖然 Android 插件通常會與 Android Studio 的更新步調保持一致，但插件（以及 Gradle 系統的其餘部分）可獨立於 Android Studio 運行並單獨更新。</string>
+  <string name="xposed_module">Xposed 模塊</string>
+  <string name="xposed_module_details">Xposed 是一個模塊框架，可以在不接觸任何 APK 的情況下更改系統和應用程序的行為。這很棒，因為這意味著模塊可以在不同版本甚至 ROM 上工作而無需任何更改（只要原始代碼沒有更改太多）。</string>
+  <string name="play_app_signing">Play App Signing</string>
+  <string name="play_app_signing_details">借助 Play 應用簽名，Google 可以為您管理和保護您應用的簽名密鑰，並使用它對從您的 app bundle 生成的優化分發 APK 進行簽名。Play App Signing 將您的應用簽名密鑰存儲在 Google 的安全基礎架構中，並提供升級選項以提高安全性。</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼板</string>
