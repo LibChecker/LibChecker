@@ -38,14 +38,18 @@ import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
+import kotlinx.coroutines.delay
 import net.dongliu.apk.parser.ApkFile
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
+import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 
@@ -957,15 +961,17 @@ object PackageUtils {
     return "$minSdkVersion $minSdkVersionValue"
   }
 
-  private const val AGP_KEYWORD = "androidGradlePluginVersion="
+  private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
   fun getAGPVersion(packageInfo: PackageInfo): String? {
     ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
       zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
-        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
-          seq.find { it.contains(AGP_KEYWORD) }?.let {
-            return it.removePrefix(AGP_KEYWORD)
+        Properties().apply {
+          load(zipFile.getInputStream(ze))
+        }.also {
+          it.getProperty(AGP_KEYWORD)?.run {
+            return this
           }
         }
       }
@@ -979,6 +985,64 @@ object PackageUtils {
     }
 
     return null
+  }
+
+  fun getAppListByShell(): List<String> {
+    try {
+      val pmList = mutableListOf<String>()
+      val process = Runtime.getRuntime().exec("pm list packages")
+      InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
+        BufferedReader(isr).use { br ->
+          br.forEachLine { line ->
+            line.trim().let { trimLine ->
+              if (trimLine.startsWith("package:")) {
+                trimLine.removePrefix("package:").let {
+                  if (it.isNotEmpty()) {
+                    pmList.add(it)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return pmList
+    } catch (t: Throwable) {
+      Timber.w(t)
+      return emptyList()
+    }
+  }
+
+  suspend fun getAppsList(): List<ApplicationInfo> {
+    var appList: List<ApplicationInfo>
+    var retry: Boolean
+
+    do {
+      retry = false
+      appList = try {
+        getInstallApplications()
+      } catch (e: Exception) {
+        Timber.w(e)
+        delay(200)
+        retry = true
+        emptyList()
+      }.also {
+        AppItemRepository.allApplicationInfoItems = it
+      }
+    } while (retry)
+
+    val pmList = getAppListByShell()
+    try {
+      if (pmList.size > appList.size) {
+        appList = pmList.asSequence()
+          .map { getPackageInfo(it).applicationInfo }
+          .toList()
+      }
+    } catch (t: Throwable) {
+      Timber.w(t)
+      appList = emptyList()
+    }
+    return appList
   }
 
   fun PackageInfo.isXposedModule(): Boolean {

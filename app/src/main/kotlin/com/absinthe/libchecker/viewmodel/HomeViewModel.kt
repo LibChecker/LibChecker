@@ -54,12 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
-
-const val GET_INSTALL_APPS_RETRY_PERIOD = 200L
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -99,52 +94,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private suspend fun getAppsList(): List<ApplicationInfo> {
-    var appList: List<ApplicationInfo>?
-
-    do {
-      appList = try {
-        PackageUtils.getInstallApplications()
-      } catch (e: Exception) {
-        Timber.w(e)
-        delay(GET_INSTALL_APPS_RETRY_PERIOD)
-        null
-      }?.also {
-        AppItemRepository.allApplicationInfoItems = it
-      }
-    } while (appList == null)
-
-    val pmList = mutableListOf<String>()
-    try {
-      @Suppress("BlockingMethodInNonBlockingContext")
-      val process = Runtime.getRuntime().exec("pm list packages")
-      InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
-        BufferedReader(isr).use { br ->
-          br.forEachLine { line ->
-            line.trim().let { trimLine ->
-              if (trimLine.length > 8 && trimLine.startsWith("package:")) {
-                trimLine.substring(8).let {
-                  if (it.isNotEmpty()) {
-                    pmList.add(it)
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      if (pmList.size > appList.size) {
-        appList = pmList.asSequence()
-          .map { PackageUtils.getPackageInfo(it).applicationInfo }
-          .toList()
-      }
-    } catch (t: Throwable) {
-      Timber.w(t)
-      appList = emptyList()
-    }
-    return appList!!
-  }
-
   private var initJob: Job? = null
 
   fun initItems() {
@@ -162,7 +111,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         Repositories.lcRepository.deleteAllItems()
         updateInitProgress(0)
 
-        val appList = getAppsList()
+        val appList = PackageUtils.getAppsList()
         val lcItems = mutableListOf<LCItem>()
         val isHarmony = HarmonyOsUtil.isHarmonyOs()
         val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
@@ -270,7 +219,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     if (appList.isNullOrEmpty() || needRefresh) {
-      appList = getAppsList().toMutableList()
+      appList = PackageUtils.getAppsList().toMutableList()
     }
 
     dbItems.value?.let { value ->
@@ -493,7 +442,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       var appList: List<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems()
 
       if (appList.isNullOrEmpty()) {
-        appList = getAppsList()
+        appList = PackageUtils.getAppsList()
       }
 
       val map = HashMap<String, RefCountType>()

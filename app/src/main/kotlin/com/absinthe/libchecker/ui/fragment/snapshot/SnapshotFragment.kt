@@ -38,7 +38,6 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.addPaddingBottom
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -52,7 +51,6 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -69,7 +67,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
-  private var hasAddedListBottomPadding = false
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -256,19 +253,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
             .toMutableList()
-        ) {
-          if (!binding.list.canScrollVertically(-1)) {
-            if (!hasAddedListBottomPadding) {
-              binding.list.addPaddingBottom(20.dp)
-              hasAddedListBottomPadding = true
-            }
-          } else {
-            if (hasAddedListBottomPadding) {
-              binding.list.addPaddingBottom((-20).dp)
-              hasAddedListBottomPadding = false
-            }
-          }
-        }
+        )
         flip(VF_LIST)
 
         lifecycleScope.launch(Dispatchers.IO) {

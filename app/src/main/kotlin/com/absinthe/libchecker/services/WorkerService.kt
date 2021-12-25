@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
 import android.os.IBinder
 import android.os.RemoteCallbackList
 import android.os.RemoteException
@@ -13,15 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.lang.ref.WeakReference
-import java.nio.charset.StandardCharsets
 
 class WorkerService : LifecycleService() {
 
@@ -76,57 +70,11 @@ class WorkerService : LifecycleService() {
 
   private fun initAllApplicationInfoItems() {
     Global.applicationListJob = lifecycleScope.launch(Dispatchers.IO) {
-      AppItemRepository.allApplicationInfoItems = getAppsList()
+      AppItemRepository.allApplicationInfoItems = PackageUtils.getAppsList()
       Global.applicationListJob = null
     }.also {
       it.start()
     }
-  }
-
-  @Suppress("BlockingMethodInNonBlockingContext")
-  private suspend fun getAppsList(): List<ApplicationInfo> {
-    var appList: List<ApplicationInfo>?
-
-    do {
-      appList = try {
-        PackageUtils.getInstallApplications()
-      } catch (e: Exception) {
-        Timber.w(e)
-        delay(GET_INSTALL_APPS_RETRY_PERIOD)
-        null
-      }?.also {
-        AppItemRepository.allApplicationInfoItems = it
-      }
-    } while (appList == null)
-
-    val pmList = mutableListOf<String>()
-    try {
-      val process = runtime.exec("pm list packages")
-      InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
-        BufferedReader(isr).use { br ->
-          br.forEachLine { line ->
-            line.trim().let { trimLine ->
-              if (trimLine.length > 8 && trimLine.startsWith("package:")) {
-                trimLine.substring(8).let {
-                  if (it.isNotEmpty()) {
-                    pmList.add(it)
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      if (pmList.size > appList.size) {
-        appList = pmList.asSequence()
-          .map { PackageUtils.getPackageInfo(it).applicationInfo }
-          .toList()
-      }
-    } catch (t: Throwable) {
-      Timber.w(t)
-      appList = emptyList()
-    }
-    return appList!!
   }
 
   @Synchronized

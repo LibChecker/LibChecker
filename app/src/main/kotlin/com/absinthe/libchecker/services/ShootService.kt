@@ -30,7 +30,6 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
-import com.absinthe.libchecker.viewmodel.GET_INSTALL_APPS_RETRY_PERIOD
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -136,22 +135,11 @@ class ShootService : LifecycleService() {
     showNotification()
     notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
 
-    val timer = TimeRecorder()
-    timer.start()
-    val ts = System.currentTimeMillis()
-
-    var appList: List<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems()
-
-    if (appList.isNullOrEmpty()) {
-      do {
-        appList = try {
-          PackageUtils.getInstallApplications()
-        } catch (e: Exception) {
-          delay(GET_INSTALL_APPS_RETRY_PERIOD)
-          null
-        }
-      } while (appList == null)
+    val timer = TimeRecorder().also {
+      it.start()
     }
+    val ts = System.currentTimeMillis()
+    val appList = PackageUtils.getAppsList()
 
     repository.deleteAllSnapshotDiffItems()
 
