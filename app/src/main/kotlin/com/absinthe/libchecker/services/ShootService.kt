@@ -255,6 +255,8 @@ class ShootService : LifecycleService() {
       repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
     }
 
+    notificationManager.cancel(SHOOT_NOTIFICATION_ID)
+
     builder.setProgress(0, 0, false)
       .setOngoing(false)
       .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))

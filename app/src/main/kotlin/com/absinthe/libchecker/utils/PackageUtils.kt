@@ -1029,7 +1029,8 @@ object PackageUtils {
   }
 
   fun PackageInfo.isXposedModule(): Boolean {
-    return applicationInfo.metaData?.getBoolean("xposedmodule") == true
+    return applicationInfo.metaData?.getBoolean("xposedmodule") == true ||
+      applicationInfo.metaData?.containsKey("xposedminversion") == true
   }
 
   fun PackageInfo.isPlayAppSigning(): Boolean {
