@@ -141,14 +141,14 @@ object LCAppUtils {
       val isApk = packageName.isTempApk()
       when (ruleEntity.name) {
         "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util", isApk)) {
+          return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", isApk)) {
             ruleEntity
           } else {
             null
           }
         }
         "libapp.so" -> {
-          return if (PackageUtils.hasDexClass(packageName, "io.flutter", isApk)) {
+          return if (PackageUtils.hasDexClass(packageName, "io.flutter.FlutterInjector", isApk)) {
             ruleEntity
           } else {
             null
@@ -172,10 +172,10 @@ object LCAppUtils {
   fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
     return when (nativeLib) {
       "libjiagu.so" -> {
-        PackageUtils.hasDexClass(packageName, "com.qihoo.util", false)
+        PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", false)
       }
       "libapp.so" -> {
-        PackageUtils.hasDexClass(packageName, "io.flutter", false)
+        PackageUtils.hasDexClass(packageName, "io.flutter.FlutterInjector", false)
       }
       else -> true
     }

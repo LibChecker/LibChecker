@@ -290,7 +290,7 @@ object PackageUtils {
         ) {
           true
         } else {
-          isKotlinUsedInClassDex(file)
+          isKotlinUsedInClasses(packageInfo)
         }
       }
     } catch (e: Exception) {
@@ -362,17 +362,17 @@ object PackageUtils {
   }
 
   /**
-   * Judge that whether an app uses Kotlin language from classes.dex
-   * @param file APK file of the app
+   * Judge that whether an app uses Kotlin language from classes
+   * @param packageInfo package info of the app
    * @return true if it uses Kotlin language
    */
-  private fun isKotlinUsedInClassDex(file: File): Boolean {
+  private fun isKotlinUsedInClasses(packageInfo: PackageInfo): Boolean {
     return try {
-      ApkFile(file).use { apkFile ->
-        apkFile.dexClasses.asSequence().any {
-          it.toString().startsWith("Lkotlin/") || it.toString().startsWith("Lkotlinx/")
-        }
-      }
+      LibCheckerApp.app.createPackageContext(
+        packageInfo.packageName,
+        Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+      ).classLoader.loadClass("kotlin.jvm.internal.DefaultConstructorMarker")
+      true
     } catch (e: Throwable) {
       false
     }
@@ -817,7 +817,7 @@ object PackageUtils {
     return "(${Formatter.formatFileSize(context, item.size)}$source)"
   }
 
-  fun hasDexClass(packageName: String, dexClassPrefix: String, isApk: Boolean = false): Boolean {
+  fun hasDexClass(packageName: String, className: String, isApk: Boolean = false): Boolean {
     try {
       val path = if (isApk) {
         packageName
@@ -828,8 +828,16 @@ object PackageUtils {
       if (path.isNullOrEmpty()) {
         return false
       }
-      ApkFile(File(path)).use { apkFile ->
-        return apkFile.dexClasses.any { it.packageName.startsWith(dexClassPrefix) }
+      if (isApk) {
+        ApkFile(File(path)).use { apkFile ->
+          return apkFile.dexClasses.any { it.packageName.startsWith(className) }
+        }
+      } else {
+        LibCheckerApp.app.createPackageContext(
+          packageName,
+          Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+        ).classLoader.loadClass(className)
+        return true
       }
     } catch (e: Exception) {
       return false
