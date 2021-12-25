@@ -43,7 +43,8 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.delay
-import net.dongliu.apk.parser.ApkFile
+import org.jf.dexlib2.DexFileFactory
+import org.jf.dexlib2.Opcodes
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
@@ -368,11 +369,10 @@ object PackageUtils {
    */
   private fun isKotlinUsedInClassDex(file: File): Boolean {
     return try {
-      ApkFile(file).use { apkFile ->
-        apkFile.dexClasses.asSequence().any {
-          it.classType.startsWith("Lkotlin") || it.classType.startsWith("Lkotlinx")
+      DexFileFactory.loadDexFile(file, Opcodes.getDefault()).classes
+        .any {
+          it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
         }
-      }
     } catch (e: Throwable) {
       false
     }
@@ -828,17 +828,11 @@ object PackageUtils {
       if (path.isNullOrEmpty()) {
         return false
       }
-      if (isApk) {
-        ApkFile(File(path)).use { apkFile ->
-          return apkFile.dexClasses.any { it.packageName.startsWith(className) }
+      val typeName = "L${className.replace(".", "/")};"
+      return DexFileFactory.loadDexFile(path, Opcodes.getDefault()).classes
+        .any {
+          it.type == typeName
         }
-      } else {
-        LibCheckerApp.app.createPackageContext(
-          packageName,
-          Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
-        ).classLoader.loadClass(className)
-        return true
-      }
     } catch (e: Exception) {
       return false
     }
@@ -864,54 +858,52 @@ object PackageUtils {
       }
       var splits: List<String>
 
-      ApkFile(File(path)).use { apkFile ->
-        val primaryList = apkFile.dexClasses
-          .map { it.packageName }
-          .filter { !it.startsWith(packageName) }
-          .map { item ->
-            splits = item.split(".")
-            when {
-              // Remove obfuscated classes
-              splits.any { it.length == 1 } -> LibStringItem("")
-              // Merge AndroidX classes
-              splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
-              // Filter classes which paths deep level greater than 4
-              else -> LibStringItem(
-                splits.subList(0, splits.size.coerceAtMost(4))
-                  .joinToString(separator = ".")
-              )
-            }
-          }
-          .toSet()
-          .filter {
-            it.name.length > 11 && it.name.contains(".") &&
-              (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
-          } // Remove obfuscated classes
-          .toMutableList()
-
-        // Merge path deep level 3 classes
-        primaryList.filter { it.name.split(".").size == 3 }.forEach {
-          primaryList.removeAll { item -> item.name.startsWith(it.name) }
-          primaryList.add(it)
-        }
-        // Merge path deep level 4 classes
-        var pathLevel3Item: String
-        var filter: List<LibStringItem>
-        primaryList.filter { it.name.split(".").size == 4 }.forEach {
-          if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
-            return@forEach
-          }
-
-          pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
-          filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
-
-          if (filter.isNotEmpty()) {
-            primaryList.removeAll(filter)
-            primaryList.add(LibStringItem(pathLevel3Item))
+      val primaryList = DexFileFactory.loadDexFile(path, Opcodes.getDefault()).classes
+        .asSequence()
+        .map { it.substring(1, it.length - 1).replace("/", ".") }
+        .filter { !it.startsWith(packageName) }
+        .map { item ->
+          splits = item.split(".")
+          when {
+            // Remove obfuscated classes
+            splits.any { it.length == 1 } -> LibStringItem("")
+            // Merge AndroidX classes
+            splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
+            // Filter classes which paths deep level greater than 4
+            else -> LibStringItem(
+              splits.subList(0, splits.size.coerceAtMost(4))
+                .joinToString(separator = ".")
+            )
           }
         }
-        return primaryList
+        .toSet()
+        .filter {
+          it.name.length > 11 && it.name.contains(".") &&
+            (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
+        } // Remove obfuscated classes
+        .toMutableList()
+      // Merge path deep level 3 classes
+      primaryList.filter { it.name.split(".").size == 3 }.forEach {
+        primaryList.removeAll { item -> item.name.startsWith(it.name) }
+        primaryList.add(it)
       }
+      // Merge path deep level 4 classes
+      var pathLevel3Item: String
+      var filter: List<LibStringItem>
+      primaryList.filter { it.name.split(".").size == 4 }.forEach {
+        if (DexLibMap.DEEP_LEVEL_3_SET.contains(it.name)) {
+          return@forEach
+        }
+
+        pathLevel3Item = it.name.split(".").subList(0, 3).joinToString(separator = ".")
+        filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
+
+        if (filter.isNotEmpty()) {
+          primaryList.removeAll(filter)
+          primaryList.add(LibStringItem(pathLevel3Item))
+        }
+      }
+      return primaryList
     } catch (e: Exception) {
       Timber.e(e)
       return emptyList()

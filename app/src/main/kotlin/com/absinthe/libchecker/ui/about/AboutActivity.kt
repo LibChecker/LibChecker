@@ -354,10 +354,10 @@ class AboutActivity : AbsAboutActivity() {
       )
       add(
         License(
-          "apk-parser",
-          "hsiafan",
-          "BSD-2-Clause",
-          "https://github.com/hsiafan/apk-parser"
+          "dexlib2",
+          "JesusFreke",
+          License.APACHE_2,
+          "https://github.com/JesusFreke/smali"
         )
       )
       add(

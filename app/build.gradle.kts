@@ -145,8 +145,8 @@ dependencies {
   implementation("com.jonathanfinerty.once:once:1.3.1")
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
-  implementation("net.dongliu:apk-parser:2.6.10")
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:3.0")
+  implementation("org.smali:dexlib2:2.5.2")
 
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.2.0-rc01")
   implementation("dev.rikka.rikkax.core:core:1.3.3")
