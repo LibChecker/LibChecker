@@ -13,6 +13,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -112,7 +113,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         intent,
         shootServiceConnection, Service.BIND_AUTO_CREATE
       )
-      it.startService(intent)
     }
 
     val dashboard = SnapshotDashboardView(
@@ -346,6 +346,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
+        ContextCompat.startForegroundService(
+          requireContext(),
+          Intent(requireContext(), ShootService::class.java)
+        )
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")
           Toasty.showShort(requireContext(), "Snapshot service error")

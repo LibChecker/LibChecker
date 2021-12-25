@@ -280,20 +280,12 @@ object PackageUtils {
    */
   fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
     return try {
-      val path = packageInfo.applicationInfo.sourceDir
-      val file = File(path)
-
-      ZipFile(file).use {
-        if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
-          it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-          it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
-        ) {
-          true
-        } else {
-          isKotlinUsedInClasses(packageInfo)
-        }
-      }
-    } catch (e: Exception) {
+      LibCheckerApp.app.createPackageContext(
+        packageInfo.packageName,
+        Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
+      ).classLoader.loadClass("kotlin.jvm.internal.DefaultConstructorMarker")
+      true
+    } catch (e: Throwable) {
       false
     }
   }
@@ -359,23 +351,6 @@ object PackageUtils {
         .map { perm -> LibStringItem(perm, 0) }
         .toList()
     } ?: return emptyList()
-  }
-
-  /**
-   * Judge that whether an app uses Kotlin language from classes
-   * @param packageInfo package info of the app
-   * @return true if it uses Kotlin language
-   */
-  private fun isKotlinUsedInClasses(packageInfo: PackageInfo): Boolean {
-    return try {
-      LibCheckerApp.app.createPackageContext(
-        packageInfo.packageName,
-        Context.CONTEXT_INCLUDE_CODE or Context.CONTEXT_IGNORE_SECURITY
-      ).classLoader.loadClass("kotlin.jvm.internal.DefaultConstructorMarker")
-      true
-    } catch (e: Throwable) {
-      false
-    }
   }
 
   /**

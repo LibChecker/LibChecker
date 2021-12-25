@@ -19,7 +19,6 @@ import java.lang.ref.WeakReference
 
 class WorkerService : LifecycleService() {
 
-  private val runtime by lazy { Runtime.getRuntime() }
   private val packageReceiver by lazy {
     object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent?) {
