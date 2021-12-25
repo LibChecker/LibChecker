@@ -40,6 +40,7 @@ import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
@@ -321,21 +322,21 @@ class AppDetailActivity :
                 }
               )
             }
-            if (it.isKotlinUsed) {
-              initFeatureListView()
-              featureAdapter.addData(
-                FeatureItem(R.drawable.ic_kotlin_logo) {
-                  MaterialAlertDialogBuilder(this@AppDetailActivity)
-                    .setIcon(R.drawable.ic_kotlin_logo)
-                    .setTitle(R.string.kotlin_string)
-                    .setMessage(R.string.kotlin_details)
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show()
+            if (it.isKotlinUsed == null) {
+              lifecycleScope.launch(Dispatchers.IO) {
+                val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+                Repositories.lcRepository.updateKotlinUsage(packageName, isKotlinUsed)
+
+                if (isKotlinUsed) {
+                  withContext(Dispatchers.Main) {
+                    showKotlinUsedLabel()
+                  }
                 }
-              )
+              }
+            } else if (it.isKotlinUsed) {
+              showKotlinUsedLabel()
             }
 
-            featureListView?.let { flv -> headerContentLayout.addView(flv) }
             initMoreFeatures(packageInfo)
 
             if (it.variant == Constants.VARIANT_HAP) {
@@ -543,6 +544,20 @@ class AppDetailActivity :
     unregisterReceiver(requestPackageReceiver)
   }
 
+  private fun showKotlinUsedLabel() {
+    initFeatureListView()
+    featureAdapter.addData(
+      FeatureItem(R.drawable.ic_kotlin_logo) {
+        MaterialAlertDialogBuilder(this)
+          .setIcon(R.drawable.ic_kotlin_logo)
+          .setTitle(R.string.kotlin_string)
+          .setMessage(R.string.kotlin_details)
+          .setPositiveButton(android.R.string.ok, null)
+          .show()
+      }
+    )
+  }
+
   private fun initFeatureListView(): Boolean {
     if (featureListView != null) {
       return false
@@ -557,6 +572,7 @@ class AppDetailActivity :
       it.adapter = featureAdapter
       it.clipChildren = false
     }
+    binding.headerContentLayout.addView(featureListView)
     return true
   }
 
@@ -564,9 +580,7 @@ class AppDetailActivity :
     lifecycleScope.launch(Dispatchers.IO) {
       PackageUtils.getAGPVersion(packageInfo)?.let {
         withContext(Dispatchers.Main) {
-          if (initFeatureListView()) {
-            binding.headerContentLayout.addView(featureListView)
-          }
+          initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_gradle) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
@@ -582,9 +596,7 @@ class AppDetailActivity :
 
       if (packageInfo.isXposedModule()) {
         withContext(Dispatchers.Main) {
-          if (initFeatureListView()) {
-            binding.headerContentLayout.addView(featureListView)
-          }
+          initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_xposed) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
@@ -600,9 +612,7 @@ class AppDetailActivity :
 
       if (packageInfo.isPlayAppSigning()) {
         withContext(Dispatchers.Main) {
-          if (initFeatureListView()) {
-            binding.headerContentLayout.addView(featureListView)
-          }
+          initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_lib_play_store) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
@@ -618,9 +628,7 @@ class AppDetailActivity :
 
       if (packageInfo.isPWA()) {
         withContext(Dispatchers.Main) {
-          if (initFeatureListView()) {
-            binding.headerContentLayout.addView(featureListView)
-          }
+          initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_pwa) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)

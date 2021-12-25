@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -38,7 +39,6 @@ import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
@@ -205,6 +205,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     appViewModel.apply {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems()
+      } else {
+        lifecycleScope.launch(Dispatchers.IO) {
+          do {
+            workerBinder?.initKotlinUsage()
+            delay(300)
+          } while (workerBinder == null)
+        }
       }
 
       lifecycleScope.launchWhenStarted {
@@ -213,8 +220,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
             is HomeViewModel.Effect.ReloadApps -> {
               binding.viewpager.setCurrentItem(0, true)
             }
-            is HomeViewModel.Effect.UpdateInitProgress -> {}
-            is HomeViewModel.Effect.PackageChanged -> {}
+            is HomeViewModel.Effect.UpdateAppListStatus -> {
+              if (it.status == STATUS_INIT_END) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                  do {
+                    workerBinder?.initKotlinUsage()
+                    delay(300)
+                  } while (workerBinder == null)
+                }
+              }
+            }
+            else -> {}
           }
         }
       }

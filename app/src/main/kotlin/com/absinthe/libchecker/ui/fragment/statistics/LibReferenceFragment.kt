@@ -52,7 +52,6 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -172,8 +171,7 @@ class LibReferenceFragment :
             is HomeViewModel.Effect.PackageChanged -> {
               computeRef()
             }
-            is HomeViewModel.Effect.ReloadApps -> {}
-            is HomeViewModel.Effect.UpdateInitProgress -> {}
+            else -> {}
           }
         }
       }

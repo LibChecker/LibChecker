@@ -18,7 +18,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 17, exportSchema = true
+  version = 18, exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
 
@@ -57,7 +57,8 @@ abstract class LCDatabase : RoomDatabase() {
             MIGRATION_13_14,
             MIGRATION_14_15,
             MIGRATION_15_16,
-            MIGRATION_16_17
+            MIGRATION_16_17,
+            MIGRATION_17_18
           )
           .createFromAsset("database/rules.db")
           .build()
@@ -70,7 +71,22 @@ abstract class LCDatabase : RoomDatabase() {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("DROP TABLE IF EXISTS native_lib_table")
         database.execSQL(
-          "CREATE TABLE snapshot_table (packageName TEXT NOT NULL, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, PRIMARY KEY(packageName))"
+          "CREATE TABLE snapshot_table (" +
+            "packageName TEXT NOT NULL, " +
+            "label TEXT NOT NULL, " +
+            "versionName TEXT NOT NULL, " +
+            "versionCode INTEGER NOT NULL, " +
+            "installedTime INTEGER NOT NULL, " +
+            "lastUpdatedTime INTEGER NOT NULL, " +
+            "isSystem INTEGER NOT NULL, " +
+            "abi INTEGER NOT NULL, " +
+            "targetApi INTEGER NOT NULL, " +
+            "nativeLibs TEXT NOT NULL, " +
+            "services TEXT NOT NULL, " +
+            "activities TEXT NOT NULL, " +
+            "receivers TEXT NOT NULL, " +
+            "providers TEXT NOT NULL, " +
+            "PRIMARY KEY(packageName))"
         )
       }
     }
@@ -115,11 +131,38 @@ abstract class LCDatabase : RoomDatabase() {
       override fun migrate(database: SupportSQLiteDatabase) {
         // Create the new table
         database.execSQL(
-          "CREATE TABLE snapshot_new (id INTEGER, packageName TEXT NOT NULL, timeStamp INTEGER NOT NULL DEFAULT 0, label TEXT NOT NULL, versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, services TEXT NOT NULL, activities TEXT NOT NULL, receivers TEXT NOT NULL, providers TEXT NOT NULL, permissions TEXT NOT NULL, PRIMARY KEY(id))"
+          "CREATE TABLE snapshot_new (" +
+            "id INTEGER, packageName TEXT NOT NULL, " +
+            "timeStamp INTEGER NOT NULL DEFAULT 0, label TEXT NOT NULL, " +
+            "versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, " +
+            "installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, " +
+            "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
+            "targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, " +
+            "services TEXT NOT NULL, activities TEXT NOT NULL, " +
+            "receivers TEXT NOT NULL, providers TEXT NOT NULL, " +
+            "permissions TEXT NOT NULL, PRIMARY KEY(id))"
         )
         // Copy the data
         database.execSQL(
-          "INSERT INTO snapshot_new (packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions) SELECT packageName, timeStamp, label, versionName, versionCode, installedTime, lastUpdatedTime, isSystem, abi, targetApi, nativeLibs, services, activities, receivers, providers, permissions FROM snapshot_table"
+          "INSERT INTO snapshot_new (" +
+            "packageName, timeStamp, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, targetApi, " +
+            "nativeLibs, services, " +
+            "activities, receivers, " +
+            "providers, permissions) " +
+            "SELECT " +
+            "packageName, timeStamp, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, targetApi, " +
+            "nativeLibs, services, " +
+            "activities, receivers, " +
+            "providers, permissions " +
+            "FROM snapshot_table"
         )
         // Remove the old table
         database.execSQL("DROP TABLE snapshot_table")
@@ -208,6 +251,45 @@ abstract class LCDatabase : RoomDatabase() {
           "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'"
         )
         AppItemRepository.shouldClearDiffItemsInDatabase = true
+      }
+    }
+
+    private val MIGRATION_17_18: Migration = object : Migration(17, 18) {
+      override fun migrate(database: SupportSQLiteDatabase) {
+        // Create the new table
+        database.execSQL(
+          "CREATE TABLE item_table_new (" +
+            "packageName TEXT NOT NULL, label TEXT NOT NULL, " +
+            "versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, " +
+            "installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, " +
+            "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
+            "isSplitApk INTEGER NOT NULL, isKotlinUsed INTEGER, " +
+            "targetApi INTEGER NOT NULL, variant INTEGER NOT NULL, " +
+            "PRIMARY KEY(packageName))"
+        )
+        // Copy the data
+        database.execSQL(
+          "INSERT INTO item_table_new (" +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, isSplitApk, " +
+            "isKotlinUsed, targetApi, " +
+            "variant) " +
+            "SELECT " +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, isSplitApk, " +
+            "isKotlinUsed, targetApi, variant " +
+            "FROM item_table"
+        )
+        // Remove the old table
+        database.execSQL("DROP TABLE item_table")
+        // Change the table name to the correct one
+        database.execSQL("ALTER TABLE item_table_new RENAME TO item_table")
       }
     }
   }

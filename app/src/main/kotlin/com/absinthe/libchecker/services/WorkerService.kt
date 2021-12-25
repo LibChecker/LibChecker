@@ -11,8 +11,10 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -89,9 +91,44 @@ class WorkerService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
+  private fun initKotlinUsage() {
+    val map = mutableMapOf<String, Boolean>()
+    var count = 0
+
+    initializingKotlinUsage = true
+
+    lifecycleScope.launch(Dispatchers.IO) {
+      while (Repositories.lcRepository.allDatabaseItems.value == null) {
+        delay(300)
+      }
+
+      Repositories.lcRepository.allDatabaseItems.value!!.forEach { lcItem ->
+        if (lcItem.isKotlinUsed == null) {
+          map[lcItem.packageName] = PackageUtils.isKotlinUsed(
+            PackageUtils.getPackageInfo(lcItem.packageName)
+          )
+          count++
+        }
+
+        if (count == 20) {
+          Repositories.lcRepository.updateKotlinUsage(map)
+          map.clear()
+          count = 0
+        }
+      }
+
+      initializingKotlinUsage = false
+    }
+  }
+
   class WorkerBinder(service: WorkerService) : IWorkerService.Stub() {
 
     private val serviceRef: WeakReference<WorkerService> = WeakReference(service)
+
+    override fun initKotlinUsage() {
+      Timber.d("initKotlinUsage")
+      serviceRef.get()?.initKotlinUsage()
+    }
 
     override fun registerOnWorkerListener(listener: OnWorkerListener?) {
       Timber.d("registerOnWorkerListener")
@@ -104,5 +141,9 @@ class WorkerService : LifecycleService() {
       Timber.d("unregisterOnWorkerListener")
       serviceRef.get()?.listenerList?.unregister(listener)
     }
+  }
+
+  companion object {
+    var initializingKotlinUsage: Boolean = false
   }
 }

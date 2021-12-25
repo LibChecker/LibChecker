@@ -7,6 +7,7 @@ import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
+import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -73,6 +75,7 @@ class ChartFragment :
       addOnButtonCheckedListener(this@ChartFragment)
       check(R.id.btn_abi)
     }
+    binding.btnKotlin.isVisible = !WorkerService.initializingKotlinUsage
 
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {
@@ -185,7 +188,7 @@ class ChartFragment :
       val list = mutableListOf(0, 0)
 
       for (item in it) {
-        if (item.isKotlinUsed) {
+        if (item.isKotlinUsed == true) {
           list[0]++
         } else {
           list[1]++
@@ -365,14 +368,14 @@ class ChartFragment :
           when (legendList[h.x.toInt()]) {
             getString(R.string.string_kotlin_used) -> {
               dialogTitle = getString(R.string.string_kotlin_used)
-              filteredList?.filter { it.isKotlinUsed }
+              filteredList?.filter { it.isKotlinUsed == true }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
             }
             getString(R.string.string_kotlin_unused) -> {
               dialogTitle = getString(R.string.string_kotlin_unused)
-              filteredList?.filter { !it.isKotlinUsed }
+              filteredList?.filter { it.isKotlinUsed == false }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }

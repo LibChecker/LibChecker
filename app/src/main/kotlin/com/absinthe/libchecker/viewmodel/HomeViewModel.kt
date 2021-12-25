@@ -51,7 +51,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ohos.bundle.IBundleManager
 import timber.log.Timber
 import java.util.regex.Pattern
@@ -60,7 +59,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
   val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
-  val appListStatusLiveData = MutableLiveData(STATUS_NOT_START)
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
@@ -68,6 +66,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   var controller: IListController? = null
   var libRefSystemApps: Boolean? = null
   var libRefType: Int? = null
+  var appListStatus: Int = STATUS_NOT_START
 
   fun reloadApps() {
     setEffect {
@@ -85,6 +84,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     setEffect {
       Effect.UpdateInitProgress(progress)
     }
+  }
+
+  private fun updateAppListStatus(status: Int) {
+    setEffect {
+      Effect.UpdateAppListStatus(status)
+    }
+    appListStatus = status
   }
 
   private fun setEffect(builder: () -> Effect) {
@@ -105,9 +111,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val timeRecorder = TimeRecorder()
         timeRecorder.start()
 
-        withContext(Dispatchers.Main) {
-          appListStatusLiveData.value = STATUS_START_INIT
-        }
+        updateAppListStatus(STATUS_START_INIT)
         Repositories.lcRepository.deleteAllItems()
         updateInitProgress(0)
 
@@ -121,7 +125,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         var abiType: Int
         var variant: Short
         var isSystemType: Boolean
-        var isKotlinType: Boolean
 
         var lcItem: LCItem
         var count = 0
@@ -134,7 +137,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             abiType = PackageUtils.getAbi(info)
             isSystemType =
               (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
-            isKotlinType = PackageUtils.isKotlinUsed(packageInfo)
 
             variant = if (isHarmony && bundleManager?.getBundleInfo(
                 info.packageName,
@@ -156,7 +158,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               isSystemType,
               abiType.toShort(),
               PackageUtils.isSplitsApk(packageInfo),
-              isKotlinType,
+              null,
               packageInfo.applicationInfo.targetSdkVersion.toShort(),
               variant
             )
@@ -179,15 +181,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         insert(lcItems)
         lcItems.clear()
-        withContext(Dispatchers.Main) {
-          appListStatusLiveData.value = STATUS_INIT_END
-        }
+        updateAppListStatus(STATUS_INIT_END)
 
         timeRecorder.end()
         Timber.d("initItems: END, $timeRecorder")
-        withContext(Dispatchers.Main) {
-          appListStatusLiveData.value = STATUS_NOT_START
-        }
+        updateAppListStatus(STATUS_NOT_START)
         initJob = null
       }.also {
         it.start()
@@ -196,7 +194,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-    if (appListStatusLiveData.value == STATUS_START_REQUEST_CHANGE || appListStatusLiveData.value == STATUS_START_INIT) {
+    if (appListStatus == STATUS_START_REQUEST_CHANGE || appListStatus == STATUS_START_INIT) {
       Timber.d("Request change appListStatusLiveData not equals STATUS_START")
       return@launch
     }
@@ -214,9 +212,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       AppItemRepository.getApplicationInfoItems().toMutableList()
 
     timeRecorder.start()
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE
-    }
+    updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
     if (appList.isNullOrEmpty() || needRefresh) {
       appList = PackageUtils.getAppsList().toMutableList()
@@ -321,14 +317,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       GlobalValues.shouldRequestChange.postValue(true)
     }
 
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_START_REQUEST_CHANGE_END
-    }
+    updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
     timeRecorder.end()
     Timber.d("Request change: END, $timeRecorder")
-    withContext(Dispatchers.Main) {
-      appListStatusLiveData.value = STATUS_NOT_START
-    }
+    updateAppListStatus(STATUS_NOT_START)
 
     if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
       delay(10000)
@@ -727,6 +719,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   sealed class Effect {
     data class ReloadApps(val obj: Any? = null) : Effect()
     data class UpdateInitProgress(val progress: Int) : Effect()
+    data class UpdateAppListStatus(val status: Int) : Effect()
     data class PackageChanged(val packageName: String, val action: String) : Effect()
   }
 }

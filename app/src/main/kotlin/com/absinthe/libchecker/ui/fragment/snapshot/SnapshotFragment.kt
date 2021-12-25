@@ -282,8 +282,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                 viewModel.compareDiff(GlobalValues.snapshotTimestamp)
               }
             }
-            is HomeViewModel.Effect.ReloadApps -> {}
-            is HomeViewModel.Effect.UpdateInitProgress -> {}
+            else -> {}
           }
         }
       }

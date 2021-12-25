@@ -46,7 +46,6 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -278,7 +277,7 @@ class AppListFragment :
         effect.collect {
           when (it) {
             is HomeViewModel.Effect.ReloadApps -> {
-              if (appListStatusLiveData.value == STATUS_NOT_START) {
+              if (appListStatus == STATUS_NOT_START) {
                 Once.clearDone(OnceTag.FIRST_LAUNCH)
                 isFirstLaunch = true
                 doOnMainThreadIdle {
@@ -293,6 +292,35 @@ class AppListFragment :
             is HomeViewModel.Effect.PackageChanged -> {
               requestChange(true)
             }
+            is HomeViewModel.Effect.UpdateAppListStatus -> {
+              Timber.d("AppList status updates to ${it.status}")
+              when (it.status) {
+                STATUS_START_INIT -> {
+                  flip(VF_INIT)
+                }
+                STATUS_INIT_END -> {
+                  if (isFirstLaunch) {
+                    Once.markDone(OnceTag.FIRST_LAUNCH)
+                    Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                  }
+                }
+                STATUS_START_REQUEST_CHANGE_END -> {
+                  dbItems.value?.let { dbItems -> updateItems(dbItems) }
+                }
+                STATUS_NOT_START -> {
+                  val first = HarmonyOsUtil.isHarmonyOs() &&
+                    !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
+                  val second = !isFirstLaunch &&
+                    !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
+                  if (first || second) {
+                    flip(VF_INIT)
+                    initItems()
+                    Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                    Once.markDone(OnceTag.HARMONY_FIRST_INIT)
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -302,41 +330,11 @@ class AppListFragment :
           flip(VF_INIT)
           initItems()
         } else if (
-          appListStatusLiveData.value != STATUS_START_INIT &&
-          appListStatusLiveData.value != STATUS_START_REQUEST_CHANGE
+          appListStatus != STATUS_START_INIT &&
+          appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
           updateItems(it)
           homeViewModel.requestChange()
-        }
-      }
-      appListStatusLiveData.observe(viewLifecycleOwner) { status ->
-        Timber.d("AppList status updates to $status")
-        when (status) {
-          STATUS_START_INIT -> {
-            flip(VF_INIT)
-          }
-          STATUS_INIT_END -> {
-            if (isFirstLaunch) {
-              Once.markDone(OnceTag.FIRST_LAUNCH)
-              Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-            }
-            requestChange()
-          }
-          STATUS_START_REQUEST_CHANGE_END -> {
-            dbItems.value?.let { updateItems(it) }
-          }
-          STATUS_NOT_START -> {
-            val first = HarmonyOsUtil.isHarmonyOs() &&
-              !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
-            val second = !isFirstLaunch &&
-              !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
-            if (first || second) {
-              flip(VF_INIT)
-              initItems()
-              Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-              Once.markDone(OnceTag.HARMONY_FIRST_INIT)
-            }
-          }
         }
       }
     }
