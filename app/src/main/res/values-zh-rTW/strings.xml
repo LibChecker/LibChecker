@@ -43,7 +43,6 @@
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
   <string name="ref_category_cp">内容提供者</string>
-  <string name="ref_category_dex" translatable="false">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">元數據</string>
@@ -98,11 +97,9 @@
   <string name="detail_label">查看 App 詳情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">協助我們來補充訊息</string>
-  <string name="app_bundle" translatable="false">App Bundles</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一種官方發布格式，可讓您以更高效的方式開發和發布應用。借助 Android App Bundle，您可以更輕鬆地以更小的應用提供優質的使用體驗，從而提升安裝成功率並減少卸載量。轉換過程輕鬆便捷。您無需重構代碼即可開始獲享較小應用的優勢。改用這種格式後，您可以體驗模塊化應用開發和可自定義功能交付，並從中受益。</string>
   <string name="kotlin_used">使用了 Kotlin</string>
   <string name="kotlin_details">Kotlin 是一種在 Java 虛擬機上運行的靜態類型編程語言。雖然與 Java 語法並不兼容，但在 JVM 環境中 Kotlin 被設計成可以和 Java 代碼相互運作，並可以重複使用如 Java 集合框架等的現有 Java 引用的函數庫。</string>
-  <string name="kotlin_string" translatable="false">Kotlin</string>
   <string name="items_count">項數：</string>
   <string name="further_operation">進一步操作</string>
   <string name="app_info_launch">啟動</string>
@@ -110,7 +107,7 @@
   <string name="lib_detail_dialog_title">庫詳情</string>
   <string name="agp_details">Android Studio 構建系統以 Gradle 為基礎，並且 Android Gradle 插件添加了幾項專用於構建 Android 應用的功能。雖然 Android 插件通常會與 Android Studio 的更新步調保持一致，但插件（以及 Gradle 系統的其餘部分）可獨立於 Android Studio 運行並單獨更新。</string>
   <string name="xposed_module">Xposed 模塊</string>
-  <string name="xposed_module_details">Xposed 是一個模塊框架，可以在不接觸任何 APK 的情況下更改系統和應用程序的行為。這很棒，因為這意味著模塊可以在不同版本甚至 ROM 上工作而無需任何更改（只要原始代碼沒有更改太多）。</string>
+  <string name="xposed_module_details">Xposed 是一個模塊框架，可以在不接觸任何 APK 的情況下更改系統和應用程序的行為。這很棒，因為這意味著模塊可以在不同版本甚至 ROM 上工作而無需任何更改。</string>
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 應用簽名，Google 可以為您管理和保護您應用的簽名密鑰，並使用它對從您的 app bundle 生成的優化分發 APK 進行簽名。Play App Signing 將您的應用簽名密鑰存儲在 Google 的安全基礎架構中，並提供升級選項以提高安全性。</string>
 
@@ -123,7 +120,6 @@
   <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
 
   <!--  Snapshot  -->
-  <string name="snapshot_none" translatable="false">None</string>
   <string name="snapshot_btn_save_current">保存當前快照</string>
   <string name="snapshot_current_timestamp">當前快照時間戳</string>
   <string name="snapshot_apps_count">快照應用程式數量</string>
@@ -175,5 +171,6 @@
   <string name="rules_remote_repo_version">遠端規則庫版本</string>
   <string name="rules_btn_restart_to_update">重啟以更新</string>
   <string name="rules_btn_update">更新</string>
+  <string name="pwa_details">漸進式 Web 應用程序 (PWA) 使用現代 API 構建和增強，以提供增強的功能、可靠性和可安裝性，同時使用單個代碼庫在任何設備上訪問任何人、任何地方。</string>
 
 </resources>

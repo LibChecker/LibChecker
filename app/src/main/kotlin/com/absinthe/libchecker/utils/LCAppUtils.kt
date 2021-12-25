@@ -67,11 +67,11 @@ object LCAppUtils {
       date.endsWith("1225") -> {
         sb.append("\uD83C\uDF84")
       }
-      date == "20210211" -> {
+      date == "20220131" -> {
         sb.append("\uD83C\uDFEE")
       }
-      date == "20210212" -> {
-        sb.append("\uD83D\uDC2E")
+      date == "20220201" -> {
+        sb.append("\uD83D\uDC2F")
       }
     }
     return sb.toString()

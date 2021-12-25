@@ -987,7 +987,7 @@ object PackageUtils {
     return null
   }
 
-  fun getAppListByShell(): List<String> {
+  private fun getAppListByShell(): List<String> {
     try {
       val pmList = mutableListOf<String>()
       val process = Runtime.getRuntime().exec("pm list packages")
@@ -1052,5 +1052,10 @@ object PackageUtils {
   fun PackageInfo.isPlayAppSigning(): Boolean {
     return applicationInfo.metaData?.getString("com.android.stamp.type") == "STAMP_TYPE_DISTRIBUTION_APK" &&
       applicationInfo.metaData?.getString("com.android.stamp.source") == "https://play.google.com/store"
+  }
+
+  fun PackageInfo.isPWA(): Boolean {
+    return applicationInfo.metaData?.keySet()
+      ?.any { it.startsWith("org.chromium.webapk.shell_apk") } == true
   }
 }

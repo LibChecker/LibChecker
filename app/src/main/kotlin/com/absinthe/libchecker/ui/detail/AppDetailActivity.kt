@@ -58,6 +58,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
 import com.absinthe.libchecker.utils.Toasty
@@ -608,6 +609,24 @@ class AppDetailActivity :
                 .setIcon(R.drawable.ic_lib_play_store)
                 .setTitle(R.string.play_app_signing)
                 .setMessage(R.string.play_app_signing_details)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            }
+          )
+        }
+      }
+
+      if (packageInfo.isPWA()) {
+        withContext(Dispatchers.Main) {
+          if (initFeatureListView()) {
+            binding.headerContentLayout.addView(featureListView)
+          }
+          featureAdapter.addData(
+            FeatureItem(R.drawable.ic_pwa) {
+              MaterialAlertDialogBuilder(this@AppDetailActivity)
+                .setIcon(R.drawable.ic_pwa)
+                .setTitle(R.string.pwa)
+                .setMessage(R.string.pwa_details)
                 .setPositiveButton(android.R.string.ok, null)
                 .show()
             }
