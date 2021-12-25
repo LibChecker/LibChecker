@@ -53,6 +53,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   @SuppressLint("SetTextI18n")
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
+      icon.setTag(R.id.app_item_icon_id, item.packageName)
       lifecycleScope.launch(Dispatchers.IO) {
         try {
           val ai = PackageUtils.getPackageInfo(

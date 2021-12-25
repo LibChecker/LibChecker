@@ -151,7 +151,7 @@ class AppListFragment :
 
     if (!isFirstLaunch && isListReady && AppItemRepository.shouldRefreshAppList) {
       homeViewModel.dbItems.value?.let {
-        updateItems(it, false)
+        updateItems(it)
         AppItemRepository.shouldRefreshAppList = false
       }
     }
@@ -375,7 +375,6 @@ class AppListFragment :
   @SuppressLint("NotifyDataSetChanged")
   private fun updateItems(
     newItems: List<LCItem>,
-    needReturnTop: Boolean = true,
     highlightRefresh: Boolean = false
   ) {
     Timber.d("updateItems")
@@ -397,13 +396,6 @@ class AppListFragment :
 
     appAdapter.setDiffNewData(filterList) {
       flip(VF_LIST)
-
-      doOnMainThreadIdle {
-        if (shouReturnTopOfList() && needReturnTop) {
-          returnTopOfList()
-        }
-      }
-
       menu?.findItem(R.id.search)?.isVisible = true
       isListReady = true
 
@@ -411,12 +403,6 @@ class AppListFragment :
         appAdapter.notifyDataSetChanged()
       }
     }
-  }
-
-  private fun shouReturnTopOfList(): Boolean {
-    return binding.list.canScrollVertically(-1) &&
-      (GlobalValues.appSortMode == Constants.SORT_MODE_UPDATE_TIME_DESC) &&
-      binding.list.scrollState != RecyclerView.SCROLL_STATE_DRAGGING
   }
 
   private fun returnTopOfList() {

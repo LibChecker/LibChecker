@@ -111,7 +111,11 @@ object AppIconCache : CoroutineScope {
       }
       val cachedBitmap = get(info.packageName, userId, size)
       if (cachedBitmap != null) {
-        view.setImageBitmap(cachedBitmap)
+        val bindPackageName = view.getTag(R.id.app_item_icon_id) as? String
+
+        if (info.packageName == bindPackageName) {
+          view.setImageBitmap(cachedBitmap)
+        }
         return@launch
       }
 
@@ -131,10 +135,14 @@ object AppIconCache : CoroutineScope {
         null
       }
 
-      if (bitmap != null) {
-        view.setImageBitmap(bitmap)
-      } else {
-        view.setImageDrawable(info.loadIcon(context.packageManager))
+      val bindPackageName = view.getTag(R.id.app_item_icon_id) as? String
+
+      if (info.packageName == bindPackageName) {
+        if (bitmap != null) {
+          view.setImageBitmap(bitmap)
+        } else {
+          view.setImageDrawable(info.loadIcon(context.packageManager))
+        }
       }
     }
   }

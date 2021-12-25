@@ -3,6 +3,7 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 import android.content.pm.PackageManager
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
@@ -25,16 +26,14 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
   }
 
   override fun convert(holder: BaseViewHolder, item: String) {
-    try {
-      val ai = PackageUtils.getPackageInfo(item).applicationInfo
-      loadIconJob = AppIconCache.loadIconBitmapAsync(
-        context,
-        ai,
-        ai.uid / 100000,
-        (holder.itemView as AppCompatImageView)
-      )
-    } catch (e: PackageManager.NameNotFoundException) {
-      Timber.e(e)
+    (holder.itemView as AppCompatImageView).also {
+      try {
+        it.setTag(R.id.app_item_icon_id, item)
+        val ai = PackageUtils.getPackageInfo(item).applicationInfo
+        loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, it)
+      } catch (e: PackageManager.NameNotFoundException) {
+        Timber.e(e)
+      }
     }
   }
 }

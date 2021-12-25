@@ -42,6 +42,7 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
   override fun convert(holder: BaseViewHolder, item: TrackListItem) {
     (holder.itemView as TrackItemView).container.apply {
+      icon.setTag(R.id.app_item_icon_id, item.packageName)
       lifecycleScope.launch(Dispatchers.IO) {
         try {
           val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo

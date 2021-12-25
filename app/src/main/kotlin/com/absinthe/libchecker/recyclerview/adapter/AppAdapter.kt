@@ -41,6 +41,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
 
   override fun convert(holder: BaseViewHolder, item: LCItem) {
     (holder.itemView as AppItemView).container.apply {
+      icon.setTag(R.id.app_item_icon_id, item.packageName)
       lifecycleScope.launch(Dispatchers.IO) {
         try {
           val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo

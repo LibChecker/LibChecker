@@ -117,6 +117,12 @@ class WorkerService : LifecycleService() {
         }
       }
 
+      if (count > 0) {
+        Repositories.lcRepository.updateKotlinUsage(map)
+        map.clear()
+        count = 0
+      }
+
       initializingKotlinUsage = false
     }
   }

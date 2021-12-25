@@ -2,4 +2,5 @@
 <resources>
   <item name="last_click_time" type="id" />
   <item name="viewpager_tab_click" type="id" />
+  <item name="app_item_icon_id" type="id" />
 </resources>

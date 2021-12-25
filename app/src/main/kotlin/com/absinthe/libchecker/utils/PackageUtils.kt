@@ -370,7 +370,7 @@ object PackageUtils {
     return try {
       ApkFile(file).use { apkFile ->
         apkFile.dexClasses.asSequence().any {
-          it.classType == "Lkotlin/jvm/internal/DefaultConstructorMarker;"
+          it.classType.startsWith("Lkotlin") || it.classType.startsWith("Lkotlinx")
         }
       }
     } catch (e: Throwable) {
