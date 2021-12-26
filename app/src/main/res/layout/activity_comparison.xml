@@ -69,6 +69,7 @@
     android:text="@string/album_compare"
     app:icon="@drawable/ic_compare"
     app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent" />
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_fitsSystemWindowsInsets="bottom|end" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

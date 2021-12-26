@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -17,6 +16,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -585,7 +585,12 @@ class AppDetailActivity :
             FeatureItem(R.drawable.ic_gradle) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_gradle)
-                .setTitle(Html.fromHtml("${getString(R.string.agp)} <b>$it</b>"))
+                .setTitle(
+                  HtmlCompat.fromHtml(
+                    "${getString(R.string.agp)} <b>$it</b>",
+                    HtmlCompat.FROM_HTML_MODE_COMPACT
+                  )
+                )
                 .setMessage(R.string.agp_details)
                 .setPositiveButton(android.R.string.ok, null)
                 .show()

@@ -8,6 +8,7 @@ private const val grpcVersion = "1.43.1"
 private const val protocVersion = "3.19.1"
 private const val appCenterVersion = "4.4.2"
 private const val hiddenApiRefineVersion = "3.0.3"
+private const val myLib = "1.0.3"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
@@ -75,5 +76,10 @@ object Libs {
     "io.grpc:grpc-protobuf-lite:$grpcVersion",
     "io.grpc:grpc-stub:$grpcVersion",
     "javax.annotation:javax.annotation-api:1.3.2"
+  )
+  val myLibs = arrayOf(
+    "com.github.zhaobozhen.libraries:me:$myLib",
+    "com.github.zhaobozhen.libraries:utils:$myLib",
+    "com.github.zhaobozhen.libraries:axml:$myLib"
   )
 }

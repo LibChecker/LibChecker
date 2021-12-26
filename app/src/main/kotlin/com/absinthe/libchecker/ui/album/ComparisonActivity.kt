@@ -126,17 +126,6 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
     binding.apply {
       extendedFab.apply {
-        post {
-          (layoutParams as ViewGroup.MarginLayoutParams).setMargins(
-            0,
-            0,
-            16.dp,
-            paddingBottom + (
-              window.decorView.rootWindowInsets?.systemWindowInsetBottom
-                ?: 0
-              )
-          )
-        }
         setOnClickListener {
           if (AntiShakeUtils.isInvalidClick(it)) {
             return@setOnClickListener

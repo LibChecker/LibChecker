@@ -1,5 +1,9 @@
 package com.absinthe.libchecker.utils.manifest;
 
+import com.absinthe.libraries.axml.axml.AxmlReader;
+import com.absinthe.libraries.axml.axml.AxmlVisitor;
+import com.absinthe.libraries.axml.axml.NodeVisitor;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -7,10 +11,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
-
-import pxb.android.axml.AxmlReader;
-import pxb.android.axml.AxmlVisitor;
-import pxb.android.axml.NodeVisitor;
 
 public class StaticLibraryReader {
   private final HashMap<String, Object> staticLibs = new HashMap<>();

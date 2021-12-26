@@ -126,11 +126,9 @@ dependencies {
     // Debug
     *Libs.appCenter,
 
-    Libs.refineRuntime
+    Libs.refineRuntime,
+    *Libs.myLibs
   )
-
-  implementation("com.github.zhaobozhen.libraries:me:1.0.2")
-  implementation("com.github.zhaobozhen.libraries:utils:1.0.2")
 
   ksp(Libs.roomCompiler)
   ksp(Libs.moshiCompiler)

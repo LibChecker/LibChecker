@@ -15,6 +15,7 @@ import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV7
 import com.absinthe.libchecker.constant.Constants.ARMV8
+import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
@@ -340,7 +341,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_64_bit)
               )
-              filteredList?.filter { it.abi == ARMV8.toShort() }
+              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV8 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
@@ -350,7 +351,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_32_bit)
               )
-              filteredList?.filter { it.abi == ARMV7.toShort() || it.abi == ARMV5.toShort() }
+              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV7 || (it.abi % MULTI_ARCH) == ARMV5 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }

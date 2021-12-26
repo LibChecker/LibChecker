@@ -14,6 +14,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import androidx.core.widget.TextViewCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.utils.extensions.getColor
@@ -209,8 +210,12 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       gravity = Gravity.CENTER_VERTICAL
       setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
       compoundDrawablePadding = 4.dp
-      compoundDrawableTintList =
-        ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
+      TextViewCompat.setCompoundDrawableTintList(
+        this,
+        ColorStateList.valueOf(
+          context.getColorByAttr(android.R.attr.colorControlNormal)
+        )
+      )
       isClickable = true
       movementMethod = LinkMovementMethod.getInstance()
       text = HtmlCompat.fromHtml(
