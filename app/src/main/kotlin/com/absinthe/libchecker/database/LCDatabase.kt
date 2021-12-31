@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -66,6 +67,8 @@ abstract class LCDatabase : RoomDatabase() {
         return instance
       }
     }
+
+    fun isClosed() = getDatabase(context = LibCheckerApp.app).isOpen.not()
 
     private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
       override fun migrate(database: SupportSQLiteDatabase) {

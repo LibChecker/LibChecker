@@ -9,6 +9,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.inflateBinding
+import com.google.android.material.color.DynamicColors
 import rikka.material.app.MaterialActivity
 
 @SuppressLint("Registered, MissingSuperCall")
@@ -18,6 +19,9 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    if (GlobalValues.md3Theme && DynamicColors.isDynamicColorAvailable()) {
+      DynamicColors.applyIfAvailable(this)
+    }
     binding = inflateBinding(layoutInflater)
     setContentView(binding.root)
   }
@@ -27,7 +31,7 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
   }
 
   override fun computeUserThemeKey(): String {
-    return GlobalValues.darkMode + GlobalValues.rengeTheme
+    return GlobalValues.darkMode + GlobalValues.rengeTheme + GlobalValues.md3Theme
   }
 
   override fun onApplyTranslucentSystemBars() {
@@ -44,11 +48,11 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
   override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
     theme.applyStyle(R.style.ThemeOverlay, true)
 
-    if (GlobalValues.rengeTheme) {
-      theme.applyStyle(R.style.ThemeOverlay_Renge, true)
-    }
     if (GlobalValues.md3Theme) {
       theme.applyStyle(R.style.Base_AppTheme_Material3, true)
+    }
+    if (GlobalValues.rengeTheme) {
+      theme.applyStyle(R.style.ThemeOverlay_Renge, true)
     }
   }
 }

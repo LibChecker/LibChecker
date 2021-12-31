@@ -987,17 +987,19 @@ object PackageUtils {
     return null
   }
 
+  private val runtime by lazy { Runtime.getRuntime() }
+
   private fun getAppListByShell(): List<String> {
     try {
       val pmList = mutableListOf<String>()
-      val process = Runtime.getRuntime().exec("pm list packages")
+      val process = runtime.exec("pm list packages")
       InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
         BufferedReader(isr).use { br ->
           br.forEachLine { line ->
             line.trim().let { trimLine ->
               if (trimLine.startsWith("package:")) {
                 trimLine.removePrefix("package:").let {
-                  if (it.isNotEmpty()) {
+                  if (it.isNotBlank()) {
                     pmList.add(it)
                   }
                 }

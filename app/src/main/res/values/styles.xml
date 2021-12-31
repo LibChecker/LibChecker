@@ -38,7 +38,15 @@
     <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
   </style>
 
+  <style name="CustomBottomSheetDialog.Md3" parent="@style/ThemeOverlay.Material3.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/CustomBottomSheet.Md3</item>
+  </style>
+
   <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+    <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+  </style>
+
+  <style name="CustomBottomSheet.Md3" parent="Widget.Material3.BottomSheet">
     <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
   </style>
 

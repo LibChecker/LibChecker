@@ -65,8 +65,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   private fun requestBundle() {
     val saveFile = File(requireContext().cacheDir, Constants.RULES_DB_FILE_NAME)
-    DownloadUtils.get().download(
-      requireContext(),
+    DownloadUtils.download(
       ApiManager.rulesBundleUrl,
       saveFile,
       object : DownloadUtils.OnDownloadListener {
