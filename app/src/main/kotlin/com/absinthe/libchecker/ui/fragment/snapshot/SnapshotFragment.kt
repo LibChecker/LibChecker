@@ -105,7 +105,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   override fun init() {
     setHasOptionsMenu(true)
 
-    requireContext().applicationContext.also {
+    val context = (this.context as? BaseActivity<*>) ?: return
+    context.applicationContext.also {
       val intent = Intent(it, ShootService::class.java).apply {
         setPackage(it.packageName)
       }
@@ -116,7 +117,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
 
     val dashboard = SnapshotDashboardView(
-      ContextThemeWrapper(requireContext(), R.style.AlbumMaterialCard)
+      ContextThemeWrapper(context, R.style.AlbumMaterialCard)
     ).apply {
       layoutParams = ViewGroup.MarginLayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -128,7 +129,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
 
     dashboard.setOnClickListener {
-      startActivity(Intent(requireContext(), AlbumActivity::class.java))
+      startActivity(Intent(context, AlbumActivity::class.java))
     }
 
     dashboard.container.apply {
@@ -150,7 +151,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
             }
-          dialog.show(requireActivity().supportFragmentManager, dialog.tag)
+          dialog.show(context.supportFragmentManager, dialog.tag)
         }
       }
 
@@ -168,7 +169,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
 
-    val emptyView = SnapshotEmptyView(requireContext()).apply {
+    val emptyView = SnapshotEmptyView(context).apply {
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
         FrameLayout.LayoutParams.WRAP_CONTENT
@@ -197,7 +198,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           return@setOnItemClickListener
         }
 
-        val intent = Intent(requireActivity(), SnapshotDetailActivity::class.java)
+        val intent = Intent(context, SnapshotDetailActivity::class.java)
           .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
         startActivity(intent)
       }
@@ -210,7 +211,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (requireActivity() as BaseActivity<*>).appBar?.setRaised(!top)
+            context.appBar?.setRaised(!top)
           }
 
         if (itemDecorationCount == 0) {
@@ -341,17 +342,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    val context = (this.context as? BaseActivity<*>) ?: return false
     if (item.itemId == R.id.save) {
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
-          requireContext(),
-          Intent(requireContext(), ShootService::class.java)
+          context, Intent(context, ShootService::class.java)
         )
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")
-          Toasty.showShort(requireContext(), "Snapshot service error")
+          Toasty.showShort(context, "Snapshot service error")
         }
         shouldCompare = false
         Analytics.trackEvent(
@@ -363,7 +364,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
-        MaterialAlertDialogBuilder(requireContext())
+        MaterialAlertDialogBuilder(context)
           .setTitle(R.string.dialog_title_keep_previous_snapshot)
           .setMessage(R.string.dialog_message_keep_previous_snapshot)
           .setPositiveButton(R.string.btn_keep) { _, _ ->
@@ -380,13 +381,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
 
   private fun flip(child: Int) {
+    val context = (this.context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
+      context.appBar?.setRaised(false)
       menu?.findItem(R.id.save)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()

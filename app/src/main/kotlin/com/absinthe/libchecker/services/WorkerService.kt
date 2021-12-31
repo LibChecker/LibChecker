@@ -104,9 +104,13 @@ class WorkerService : LifecycleService() {
 
       Repositories.lcRepository.allDatabaseItems.value!!.forEach { lcItem ->
         if (lcItem.isKotlinUsed == null) {
-          map[lcItem.packageName] = PackageUtils.isKotlinUsed(
-            PackageUtils.getPackageInfo(lcItem.packageName)
-          )
+          runCatching {
+            map[lcItem.packageName] = PackageUtils.isKotlinUsed(
+              PackageUtils.getPackageInfo(lcItem.packageName)
+            )
+          }.onFailure {
+            Timber.w(it)
+          }
           count++
         }
 
