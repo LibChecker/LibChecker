@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
@@ -184,6 +185,12 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         textWidth.toExactlyMeasureSpec(),
         abiInfo.defaultHeightMeasureSpec(this)
       )
+
+      val packageSizeHeight = if (packageSizeInfo.isVisible) {
+        packageSizeInfo.measuredHeight
+      } else {
+        0
+      }
       setMeasuredDimension(
         measuredWidth,
         (
@@ -191,7 +198,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             appName.measuredHeight +
             packageName.measuredHeight +
             versionInfo.measuredHeight +
-            packageSizeInfo.measuredHeight +
+            packageSizeHeight +
             targetApiInfo.measuredHeight +
             abiInfo.measuredHeight +
             paddingBottom
@@ -210,7 +217,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       packageName.layout(appName.left, appName.bottom)
       versionInfo.layout(appName.left, packageName.bottom)
       packageSizeInfo.layout(appName.left, versionInfo.bottom)
-      targetApiInfo.layout(appName.left, packageSizeInfo.bottom)
+      targetApiInfo.layout(
+        appName.left,
+        if (packageSizeInfo.isVisible) packageSizeInfo.bottom else versionInfo.bottom
+      )
       abiInfo.layout(appName.left, targetApiInfo.bottom)
       stateIndicator.layout(
         paddingEnd,

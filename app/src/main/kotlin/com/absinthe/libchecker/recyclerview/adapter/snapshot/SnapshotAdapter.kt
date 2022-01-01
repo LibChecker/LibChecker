@@ -9,6 +9,7 @@ import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
@@ -134,7 +135,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         )
         packageSizeInfo.text = getDiffString(sizeDiff, isNewOrDeleted)
       } else {
-        packageSizeInfo.isVisible = false
+        packageSizeInfo.isGone = true
       }
 
       targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
