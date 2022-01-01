@@ -34,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.File
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -178,7 +179,8 @@ class ShootService : LifecycleService() {
               providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                 .toJson().orEmpty(),
               permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty()
+              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
+              packageSize = File(it.applicationInfo.sourceDir).length()
             )
           )
         }
@@ -232,7 +234,8 @@ class ShootService : LifecycleService() {
               providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                 .toJson().orEmpty(),
               permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty()
+              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
+              packageSize = File(it.applicationInfo.sourceDir).length()
             )
           )
         }

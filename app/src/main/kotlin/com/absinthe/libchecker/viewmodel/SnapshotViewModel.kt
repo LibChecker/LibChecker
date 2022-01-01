@@ -5,11 +5,11 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.text.format.Formatter
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -36,6 +36,7 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -45,6 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -127,6 +129,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
       if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
+        (dbItem.packageSize != 0L && File(packageInfo.applicationInfo.sourceDir).length() != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
@@ -197,6 +200,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             dbItem.metadata,
             PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
           ),
+          packageSizeDiff = SnapshotDiffItem.DiffNode(
+            dbItem.packageSize,
+            File(packageInfo.applicationInfo.sourceDir).length()
+          ),
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
         )
         compareDiffNode = compareDiffIndicator(snapshotDiffItem)
@@ -264,6 +271,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               SnapshotDiffItem.DiffNode(dbItem.providers),
               SnapshotDiffItem.DiffNode(dbItem.permissions),
               SnapshotDiffItem.DiffNode(dbItem.metadata),
+              SnapshotDiffItem.DiffNode(dbItem.packageSize),
               deleted = true,
               isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
             )
@@ -322,6 +330,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               ),
               SnapshotDiffItem.DiffNode(
                 PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+              ),
+              SnapshotDiffItem.DiffNode(
+                File(packageInfo.applicationInfo.sourceDir).length()
               ),
               newInstalled = true,
               isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
@@ -399,6 +410,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               preItem.metadata,
               it.metadata
             ),
+            packageSizeDiff = SnapshotDiffItem.DiffNode(
+              preItem.packageSize,
+              it.packageSize
+            ),
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
           )
           compareDiffNode = compareDiffIndicator(snapshotDiffItem)
@@ -427,6 +442,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             SnapshotDiffItem.DiffNode(preItem.providers),
             SnapshotDiffItem.DiffNode(preItem.permissions),
             SnapshotDiffItem.DiffNode(preItem.metadata),
+            SnapshotDiffItem.DiffNode(preItem.packageSize),
             deleted = true,
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
           )
@@ -452,6 +468,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(info.providers),
           SnapshotDiffItem.DiffNode(info.permissions),
           SnapshotDiffItem.DiffNode(info.metadata),
+          SnapshotDiffItem.DiffNode(info.packageSize),
           newInstalled = true,
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
         )
@@ -463,6 +480,167 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
+
+  fun compareItemDiff(timeStamp: Long = GlobalValues.snapshotTimestamp, packageName: String) =
+    viewModelScope.launch(Dispatchers.IO) {
+      val info = try {
+        PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      } catch (e: Exception) {
+        null
+      }
+      var diffItem: SnapshotDiffItem? = null
+      val allTrackItems = repository.getTrackItems()
+      repository.getSnapshot(timeStamp, packageName)?.let {
+        info?.let { packageInfo ->
+          diffItem = SnapshotDiffItem(
+            packageInfo.packageName,
+            packageInfo.lastUpdateTime,
+            SnapshotDiffItem.DiffNode(
+              it.label,
+              packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+            ),
+            SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
+            SnapshotDiffItem.DiffNode(it.versionCode, PackageUtils.getVersionCode(packageInfo)),
+            SnapshotDiffItem.DiffNode(
+              it.abi,
+              PackageUtils.getAbi(packageInfo.applicationInfo).toShort()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.targetApi,
+              packageInfo.applicationInfo.targetSdkVersion.toShort()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.nativeLibs,
+              PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.services, PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                SERVICE,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.activities, PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                ACTIVITY,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.receivers, PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                RECEIVER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.providers, PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                PROVIDER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.permissions,
+              PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.metadata,
+              PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              it.packageSize,
+              File(packageInfo.applicationInfo.sourceDir).length()
+            ),
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
+          )
+        } ?: run {
+          diffItem = SnapshotDiffItem(
+            it.packageName,
+            it.lastUpdatedTime,
+            SnapshotDiffItem.DiffNode(it.label),
+            SnapshotDiffItem.DiffNode(it.versionName),
+            SnapshotDiffItem.DiffNode(it.versionCode),
+            SnapshotDiffItem.DiffNode(it.abi),
+            SnapshotDiffItem.DiffNode(it.targetApi),
+            SnapshotDiffItem.DiffNode(it.nativeLibs),
+            SnapshotDiffItem.DiffNode(it.services),
+            SnapshotDiffItem.DiffNode(it.activities),
+            SnapshotDiffItem.DiffNode(it.receivers),
+            SnapshotDiffItem.DiffNode(it.providers),
+            SnapshotDiffItem.DiffNode(it.permissions),
+            SnapshotDiffItem.DiffNode(it.metadata),
+            SnapshotDiffItem.DiffNode(it.packageSize),
+            deleted = true,
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
+          )
+        }
+      } ?: run {
+        info?.let { packageInfo ->
+          diffItem = SnapshotDiffItem(
+            packageInfo.packageName,
+            packageInfo.lastUpdateTime,
+            SnapshotDiffItem.DiffNode(
+              packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+            ),
+            SnapshotDiffItem.DiffNode(packageInfo.versionName),
+            SnapshotDiffItem.DiffNode(PackageUtils.getVersionCode(packageInfo)),
+            SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo.applicationInfo).toShort()),
+            SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                SERVICE,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                ACTIVITY,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                RECEIVER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                PROVIDER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              File(packageInfo.applicationInfo.sourceDir).length()
+            ),
+            newInstalled = true,
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
+          )
+        }
+      }
+
+      diffItem?.let { diff ->
+        val diffList = snapshotDiffItems.value?.toMutableList() ?: mutableListOf()
+        diffList.removeAll { it.packageName == diff.packageName }
+        diffList.add(diff)
+        snapshotDiffItems.postValue(diffList)
+      }
+    }
 
   private suspend fun updateTopApps(timestamp: Long, list: List<SnapshotDiffItem>) {
     val appsList = list.asSequence()
@@ -778,10 +956,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     return list
   }
 
-  private fun Long.sizeToString(context: Context): String {
-    return "${Formatter.formatFileSize(context, this)} ($this Bytes)"
-  }
-
   data class CompareDiffNode(
     var added: Boolean = false,
     var removed: Boolean = false,
@@ -1083,7 +1257,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               it.receivers,
               it.providers,
               it.permissions,
-              it.metadata
+              it.metadata,
+              it.packageSize
             )
             count++
           }

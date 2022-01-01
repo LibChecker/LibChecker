@@ -88,6 +88,10 @@
     <item name="fontFamily">sans-serif-condensed-medium</item>
   </style>
 
+  <style name="TextView.MonoSpace" parent="Widget.MaterialComponents.TextView">
+    <item name="fontFamily">monospace</item>
+  </style>
+
   <style name="AppListMaterialCard" parent="Widget.MaterialComponents.CardView">
     <item name="cardCornerRadius">3dp</item>
     <item name="cardElevation">1dp</item>

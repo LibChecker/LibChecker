@@ -19,7 +19,7 @@ import com.absinthe.libchecker.database.entity.TrackItem
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 18, exportSchema = true
+  version = 19, exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
 
@@ -43,23 +43,12 @@ abstract class LCDatabase : RoomDatabase() {
           "lc_database"
         )
           .addMigrations(
-            MIGRATION_1_2,
-            MIGRATION_2_3,
-            MIGRATION_3_4,
-            MIGRATION_4_5,
-            MIGRATION_5_6,
-            MIGRATION_6_7,
-            MIGRATION_7_8,
-            MIGRATION_8_9,
-            MIGRATION_9_10,
-            MIGRATION_10_11,
-            MIGRATION_11_12,
-            MIGRATION_12_13,
-            MIGRATION_13_14,
-            MIGRATION_14_15,
-            MIGRATION_15_16,
-            MIGRATION_16_17,
-            MIGRATION_17_18
+            MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
+            MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7,
+            MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
+            MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
+            MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
+            MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19
           )
           .createFromAsset("database/rules.db")
           .build()
@@ -293,6 +282,14 @@ abstract class LCDatabase : RoomDatabase() {
         database.execSQL("DROP TABLE item_table")
         // Change the table name to the correct one
         database.execSQL("ALTER TABLE item_table_new RENAME TO item_table")
+      }
+    }
+
+    private val MIGRATION_18_19: Migration = object : Migration(18, 19) {
+      override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+          "ALTER TABLE snapshot_table ADD COLUMN packageSize INTEGER NOT NULL"
+        )
       }
     }
   }

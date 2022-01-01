@@ -280,7 +280,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             is HomeViewModel.Effect.PackageChanged -> {
               if (allowRefreshing) {
                 flip(VF_LOADING)
-                viewModel.compareDiff(GlobalValues.snapshotTimestamp)
+                viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it.packageName)
               }
             }
             else -> {}

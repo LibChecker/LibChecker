@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
@@ -36,6 +37,7 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailDeletedView
@@ -141,6 +143,17 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
         "%s (%s)"
       )
       tvTargetApi.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
+
+      if (entity.packageSizeDiff.old > 0L) {
+        tvPackageSize.isVisible = true
+        val sizeDiff = SnapshotDiffItem.DiffNode(
+          entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
+          entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
+        )
+        tvPackageSize.text = getDiffString(sizeDiff, isNewOrDeleted)
+      } else {
+        tvPackageSize.isVisible = false
+      }
     }
 
     viewModel.snapshotDetailItems.observe(this) { details ->

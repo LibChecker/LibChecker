@@ -9,6 +9,7 @@ import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.graphics.drawable.toBitmap
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
@@ -82,6 +84,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         item.deleted -> {
           holder.itemView.backgroundTintList = R.color.material_red_300.toColorStateList(context)
           versionInfo.setTextColor(R.color.textNormal.getColor(context))
+          packageSizeInfo.setTextColor(R.color.textNormal.getColor(context))
           targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
           abiInfo.setTextColor(R.color.textNormal.getColor(context))
           isNewOrDeleted = true
@@ -89,6 +92,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         item.newInstalled -> {
           holder.itemView.backgroundTintList = R.color.material_green_300.toColorStateList(context)
           versionInfo.setTextColor(R.color.textNormal.getColor(context))
+          packageSizeInfo.setTextColor(R.color.textNormal.getColor(context))
           targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
           abiInfo.setTextColor(R.color.textNormal.getColor(context))
           isNewOrDeleted = true
@@ -96,6 +100,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         else -> {
           holder.itemView.backgroundTintList = null
           versionInfo.setTextColor(android.R.color.darker_gray.getColor(context))
+          packageSizeInfo.setTextColor(android.R.color.darker_gray.getColor(context))
           targetApiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
           abiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
         }
@@ -120,6 +125,18 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       packageName.text = item.packageName
       versionInfo.text =
         getDiffString(item.versionNameDiff, item.versionCodeDiff, isNewOrDeleted, "%s (%s)")
+
+      if (item.packageSizeDiff.old > 0L) {
+        packageSizeInfo.isVisible = true
+        val sizeDiff = SnapshotDiffItem.DiffNode(
+          item.packageSizeDiff.old.sizeToString(context),
+          item.packageSizeDiff.new?.sizeToString(context)
+        )
+        packageSizeInfo.text = getDiffString(sizeDiff, isNewOrDeleted)
+      } else {
+        packageSizeInfo.isVisible = false
+      }
+
       targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
 
       val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)

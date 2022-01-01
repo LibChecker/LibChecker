@@ -28,6 +28,7 @@ message Snapshot {
   string providers = 15;
   string permissions = 16;
   string metadata = 17;
+  int64 packageSize = 18;
 }
 
 message CloudRulesBundle {

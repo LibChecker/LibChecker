@@ -57,6 +57,9 @@ interface LCDao {
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   suspend fun getSnapshots(timestamp: Long): List<SnapshotItem>
 
+  @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp AND packageName LIKE :packageName ORDER BY packageName ASC")
+  suspend fun getSnapshot(timestamp: Long, packageName: String): SnapshotItem?
+
   @Transaction
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   fun getSnapshotsFlow(timestamp: Long): Flow<List<SnapshotItem>>

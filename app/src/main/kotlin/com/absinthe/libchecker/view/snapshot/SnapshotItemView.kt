@@ -81,6 +81,21 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
+    val packageSizeInfo = AppCompatTextView(
+      ContextThemeWrapper(
+        context,
+        R.style.TextView_SansSerifCondensed
+      )
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+      addView(this)
+    }
+
     val targetApiInfo = AppCompatTextView(
       ContextThemeWrapper(
         context,
@@ -157,6 +172,10 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         textWidth.toExactlyMeasureSpec(),
         versionInfo.defaultHeightMeasureSpec(this)
       )
+      packageSizeInfo.measure(
+        textWidth.toExactlyMeasureSpec(),
+        packageSizeInfo.defaultHeightMeasureSpec(this)
+      )
       targetApiInfo.measure(
         textWidth.toExactlyMeasureSpec(),
         targetApiInfo.defaultHeightMeasureSpec(this)
@@ -172,6 +191,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
             appName.measuredHeight +
             packageName.measuredHeight +
             versionInfo.measuredHeight +
+            packageSizeInfo.measuredHeight +
             targetApiInfo.measuredHeight +
             abiInfo.measuredHeight +
             paddingBottom
@@ -189,7 +209,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       appName.layout(icon.right + appName.marginStart, paddingTop)
       packageName.layout(appName.left, appName.bottom)
       versionInfo.layout(appName.left, packageName.bottom)
-      targetApiInfo.layout(appName.left, versionInfo.bottom)
+      packageSizeInfo.layout(appName.left, versionInfo.bottom)
+      targetApiInfo.layout(appName.left, packageSizeInfo.bottom)
       abiInfo.layout(appName.left, targetApiInfo.bottom)
       stateIndicator.layout(
         paddingEnd,

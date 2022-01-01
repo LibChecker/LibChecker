@@ -86,6 +86,19 @@
           tools:text="1.2.0(120)" />
 
         <TextView
+          android:id="@+id/tv_package_size"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:fontFamily="sans-serif-condensed"
+          android:textColor="@android:color/darker_gray"
+          android:textSize="12sp"
+          android:transitionName="package_size"
+          app:layout_constraintEnd_toEndOf="parent"
+          app:layout_constraintStart_toStartOf="@id/tv_package_name"
+          app:layout_constraintTop_toBottomOf="@id/tv_version"
+          tools:text="11.09 MB (11091889 Bytes)" />
+
+        <TextView
           android:id="@+id/tv_target_api"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
