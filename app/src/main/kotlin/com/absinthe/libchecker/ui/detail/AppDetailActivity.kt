@@ -308,40 +308,42 @@ class AppDetailActivity :
           extraInfo.append(advanced)
           detailsTitle.extraInfoView.text = extraInfo
 
-          extraBean?.let {
-            if (it.isSplitApk) {
-              initFeatureListView()
-              featureAdapter.addData(
-                FeatureItem(R.drawable.ic_aab) {
-                  AppBundleBottomSheetDialogFragment().apply {
-                    arguments = bundleOf(
-                      EXTRA_PACKAGE_NAME to pkgName
-                    )
-                    show(supportFragmentManager, tag)
+          if (featureListView == null) {
+            extraBean?.let {
+              if (it.isSplitApk) {
+                initFeatureListView()
+                featureAdapter.addData(
+                  FeatureItem(R.drawable.ic_aab) {
+                    AppBundleBottomSheetDialogFragment().apply {
+                      arguments = bundleOf(
+                        EXTRA_PACKAGE_NAME to pkgName
+                      )
+                      show(supportFragmentManager, tag)
+                    }
                   }
-                }
-              )
-            }
-            if (it.isKotlinUsed == null) {
-              lifecycleScope.launch(Dispatchers.IO) {
-                val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
-                Repositories.lcRepository.updateKotlinUsage(packageName, isKotlinUsed)
-
-                if (isKotlinUsed) {
-                  withContext(Dispatchers.Main) {
-                    showKotlinUsedLabel()
-                  }
-                }
+                )
               }
-            } else if (it.isKotlinUsed) {
-              showKotlinUsedLabel()
-            }
+              if (it.isKotlinUsed == null) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                  val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+                  Repositories.lcRepository.updateKotlinUsage(packageName, isKotlinUsed)
 
-            initMoreFeatures(packageInfo)
+                  if (isKotlinUsed) {
+                    withContext(Dispatchers.Main) {
+                      showKotlinUsedLabel()
+                    }
+                  }
+                }
+              } else if (it.isKotlinUsed) {
+                showKotlinUsedLabel()
+              }
 
-            if (it.variant == Constants.VARIANT_HAP) {
-              ibHarmonyBadge.isVisible = true
-              ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
+              initMoreFeatures(packageInfo)
+
+              if (it.variant == Constants.VARIANT_HAP) {
+                ibHarmonyBadge.isVisible = true
+                ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
+              }
             }
           }
         } catch (e: Exception) {

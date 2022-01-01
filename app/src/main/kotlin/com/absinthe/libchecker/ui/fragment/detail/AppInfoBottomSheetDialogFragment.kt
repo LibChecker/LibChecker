@@ -81,7 +81,7 @@ class AppInfoBottomSheetDialogFragment :
         adapter.setList(getResolveInfoList())
         adapter.setOnItemClickListener { _, _, position ->
           adapter.data[position].let {
-            val intent = Intent()
+            val intent = Intent(Intent.ACTION_SHOW_APP_INFO)
               .setComponent(
                 ComponentName(it.activityInfo.packageName, it.activityInfo.name)
               )
