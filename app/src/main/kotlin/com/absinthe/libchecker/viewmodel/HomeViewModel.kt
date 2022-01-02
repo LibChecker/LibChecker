@@ -3,8 +3,10 @@ package com.absinthe.libchecker.viewmodel
 import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -160,7 +162,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               isSystemType,
               abiType.toShort(),
               PackageUtils.isSplitsApk(packageInfo),
-              null,
+              null/* delay init */,
               packageInfo.applicationInfo.targetSdkVersion.toShort(),
               variant
             )
@@ -449,75 +451,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(item.packageName)
-              libList = PackageUtils.getNativeDirLibs(packageInfo)
-
-              for (lib in libList) {
-                if (map[lib.name] == null) {
-                  map[lib.name] = mutableListOf<String>() to NATIVE
-                }
-                map[lib.name]!!.first.add(item.packageName)
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
-
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_SERVICES
-              )
-              packageInfo.services?.let {
-                for (service in it) {
-                  if (map[service.name] == null) {
-                    map[service.name] = mutableListOf<String>() to SERVICE
-                  }
-                  map[service.name]!!.first.add(item.packageName)
-                }
-              }
-
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_ACTIVITIES
-              )
-              packageInfo.activities?.let {
-                for (activity in it) {
-                  if (map[activity.name] == null) {
-                    map[activity.name] = mutableListOf<String>() to ACTIVITY
-                  }
-                  map[activity.name]!!.first.add(item.packageName)
-                }
-              }
-
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_RECEIVERS
-              )
-              packageInfo.receivers?.let {
-                for (receiver in it) {
-                  if (map[receiver.name] == null) {
-                    map[receiver.name] = mutableListOf<String>() to RECEIVER
-                  }
-                  map[receiver.name]!!.first.add(item.packageName)
-                }
-              }
-
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_PROVIDERS
-              )
-              packageInfo.providers?.let {
-                for (provider in it) {
-                  if (map[provider.name] == null) {
-                    map[provider.name] = mutableListOf<String>() to PROVIDER
-                  }
-                  map[provider.name]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, NATIVE)
+            computeComponentReference(map, item.packageName, SERVICE)
+            computeComponentReference(map, item.packageName, ACTIVITY)
+            computeComponentReference(map, item.packageName, RECEIVER)
+            computeComponentReference(map, item.packageName, PROVIDER)
+            computeComponentReference(map, item.packageName, PERMISSION)
+            computeComponentReference(map, item.packageName, METADATA)
           }
         }
         NATIVE -> {
@@ -527,19 +467,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(item.packageName)
-              libList = PackageUtils.getNativeDirLibs(packageInfo)
-
-              for (lib in libList) {
-                if (map[lib.name] == null) {
-                  map[lib.name] = mutableListOf<String>() to NATIVE
-                }
-                map[lib.name]!!.first.add(item.packageName)
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, NATIVE)
           }
         }
         SERVICE -> {
@@ -549,22 +477,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_SERVICES
-              )
-              packageInfo.services?.let {
-                for (service in it) {
-                  if (map[service.name] == null) {
-                    map[service.name] = mutableListOf<String>() to SERVICE
-                  }
-                  map[service.name]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, SERVICE)
           }
         }
         ACTIVITY -> {
@@ -574,22 +487,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_ACTIVITIES
-              )
-              packageInfo.activities?.let {
-                for (activity in it) {
-                  if (map[activity.name] == null) {
-                    map[activity.name] = mutableListOf<String>() to ACTIVITY
-                  }
-                  map[activity.name]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, ACTIVITY)
           }
         }
         RECEIVER -> {
@@ -599,22 +497,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_RECEIVERS
-              )
-              packageInfo.receivers?.let {
-                for (receiver in it) {
-                  if (map[receiver.name] == null) {
-                    map[receiver.name] = mutableListOf<String>() to RECEIVER
-                  }
-                  map[receiver.name]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, RECEIVER)
           }
         }
         PROVIDER -> {
@@ -624,22 +507,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_PROVIDERS
-              )
-              packageInfo.providers?.let {
-                for (provider in it) {
-                  if (map[provider.name] == null) {
-                    map[provider.name] = mutableListOf<String>() to PROVIDER
-                  }
-                  map[provider.name]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, PROVIDER)
           }
         }
         DEX -> {
@@ -649,14 +517,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            libList = PackageUtils.getDexList(item.packageName)
-
-            for (lib in libList) {
-              if (map[lib.name] == null) {
-                map[lib.name] = mutableListOf<String>() to DEX
-              }
-              map[lib.name]!!.first.add(item.packageName)
-            }
+            computeComponentReference(map, item.packageName, DEX)
           }
         }
         PERMISSION -> {
@@ -666,22 +527,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_PERMISSIONS
-              )
-              packageInfo.requestedPermissions?.let {
-                for (permission in it) {
-                  if (map[permission] == null) {
-                    map[permission] = mutableListOf<String>() to PERMISSION
-                  }
-                  map[permission]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, PERMISSION)
           }
         }
         METADATA -> {
@@ -691,22 +537,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            try {
-              packageInfo = PackageUtils.getPackageInfo(
-                item.packageName,
-                PackageManager.GET_META_DATA
-              )
-              packageInfo.applicationInfo.metaData?.let {
-                for (meta in it.keySet()) {
-                  if (map[meta] == null) {
-                    map[meta] = mutableListOf<String>() to METADATA
-                  }
-                  map[meta]!!.first.add(item.packageName)
-                }
-              }
-            } catch (e: Exception) {
-              Timber.e(e)
-            }
+            computeComponentReference(map, item.packageName, METADATA)
           }
         }
       }
@@ -756,6 +587,150 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   fun cancelComputingLibReference() {
     computeLibReferenceJob?.cancel()
     computeLibReferenceJob = null
+  }
+
+  private fun computeComponentReference(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    @LibType type: Int
+  ) {
+    try {
+      when (type) {
+        NATIVE -> {
+          val packageInfo = PackageUtils.getPackageInfo(packageName)
+          computeNativeReferenceInternal(
+            referenceMap,
+            packageName,
+            PackageUtils.getNativeDirLibs(packageInfo)
+          )
+        }
+        SERVICE -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_SERVICES
+          )
+          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.services)
+        }
+        ACTIVITY -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_ACTIVITIES
+          )
+          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.activities)
+        }
+        RECEIVER -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_RECEIVERS
+          )
+          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.receivers)
+        }
+        PROVIDER -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_PROVIDERS
+          )
+          computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.providers)
+        }
+        DEX -> {
+          computeDexReferenceInternal(
+            referenceMap,
+            packageName,
+            PackageUtils.getDexList(packageName)
+          )
+        }
+        PERMISSION -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_PERMISSIONS
+          )
+          computePermissionReferenceInternal(
+            referenceMap,
+            packageName,
+            packageInfo.requestedPermissions
+          )
+        }
+        METADATA -> {
+          val packageInfo = PackageUtils.getPackageInfo(
+            packageName,
+            PackageManager.GET_META_DATA
+          )
+          computeMetadataReferenceInternal(
+            referenceMap,
+            packageName,
+            packageInfo.applicationInfo.metaData
+          )
+        }
+      }
+    } catch (e: Exception) {
+      Timber.e(e)
+    }
+  }
+
+  private fun computeNativeReferenceInternal(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    list: List<LibStringItem>
+  ) {
+    list.forEach {
+      if (referenceMap[it.name] == null) {
+        referenceMap[it.name] = mutableListOf<String>() to NATIVE
+      }
+      referenceMap[it.name]!!.first.add(packageName)
+    }
+  }
+
+  private fun computeComponentReferenceInternal(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    @LibType type: Int,
+    components: Array<out ComponentInfo>
+  ) {
+    components.forEach {
+      if (referenceMap[it.name] == null) {
+        referenceMap[it.name] = mutableListOf<String>() to type
+      }
+      referenceMap[it.name]!!.first.add(packageName)
+    }
+  }
+
+  private fun computeDexReferenceInternal(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    list: List<LibStringItem>
+  ) {
+    list.forEach {
+      if (referenceMap[it.name] == null) {
+        referenceMap[it.name] = mutableListOf<String>() to DEX
+      }
+      referenceMap[it.name]!!.first.add(packageName)
+    }
+  }
+
+  private fun computePermissionReferenceInternal(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    list: Array<out String>
+  ) {
+    list.forEach {
+      if (referenceMap[it] == null) {
+        referenceMap[it] = mutableListOf<String>() to PERMISSION
+      }
+      referenceMap[it]!!.first.add(packageName)
+    }
+  }
+
+  private fun computeMetadataReferenceInternal(
+    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    packageName: String,
+    bundle: Bundle
+  ) {
+    bundle.keySet().forEach {
+      if (referenceMap[it] == null) {
+        referenceMap[it] = mutableListOf<String>() to METADATA
+      }
+      referenceMap[it]!!.first.add(packageName)
+    }
   }
 
   fun refreshRef() {

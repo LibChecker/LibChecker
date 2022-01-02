@@ -153,10 +153,12 @@ class LibReferenceFragment :
       setOnItemChildClickListener { _, view, position ->
         if (view.id == android.R.id.icon) {
           val ref = refAdapter.getItem(position)
-          val name = ref.libName
-          val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
-          LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-            .show(childFragmentManager, tag)
+          if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
+            val name = ref.libName
+            val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
+            LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+              .show(childFragmentManager, tag)
+          }
         }
       }
       setEmptyView(

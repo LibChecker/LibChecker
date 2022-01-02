@@ -126,15 +126,14 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
 
     // Create a new MaterialShapeDrawable (you can't use the original MaterialShapeDrawable in the BottomSheet)
     val currentMaterialShapeDrawable = bottomSheet.background as MaterialShapeDrawable
-    val newMaterialShapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
-
-    // Copy the attributes in the new MaterialShapeDrawable
-    newMaterialShapeDrawable.initializeElevationOverlay(context)
-    newMaterialShapeDrawable.fillColor = currentMaterialShapeDrawable.fillColor
-    newMaterialShapeDrawable.tintList = currentMaterialShapeDrawable.tintList
-    newMaterialShapeDrawable.elevation = currentMaterialShapeDrawable.elevation
-    newMaterialShapeDrawable.strokeWidth = currentMaterialShapeDrawable.strokeWidth
-    newMaterialShapeDrawable.strokeColor = currentMaterialShapeDrawable.strokeColor
-    return newMaterialShapeDrawable
+    return MaterialShapeDrawable(shapeAppearanceModel).apply {
+      // Copy the attributes in the new MaterialShapeDrawable
+      initializeElevationOverlay(context)
+      fillColor = currentMaterialShapeDrawable.fillColor
+      tintList = currentMaterialShapeDrawable.tintList
+      elevation = currentMaterialShapeDrawable.elevation
+      strokeWidth = currentMaterialShapeDrawable.strokeWidth
+      strokeColor = currentMaterialShapeDrawable.strokeColor
+    }
   }
 }
