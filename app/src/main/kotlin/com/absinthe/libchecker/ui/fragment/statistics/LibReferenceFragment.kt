@@ -3,15 +3,17 @@ package com.absinthe.libchecker.ui.fragment.statistics
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Typeface
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.StyleSpan
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
-import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,8 +24,10 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.NOT_MARKED
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -37,11 +41,11 @@ import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.ChartActivity
+import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
@@ -54,6 +58,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -65,22 +70,23 @@ class LibReferenceFragment :
   SearchView.OnQueryTextListener {
 
   private val refAdapter = LibReferenceAdapter()
-  private var popup: PopupMenu? = null
+  private var popup: CascadePopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
 
   override fun init() {
     setHasOptionsMenu(true)
+    val context = (context as? BaseActivity<*>) ?: return
 
     binding.apply {
       list.apply {
         adapter = refAdapter
-        layoutManager = LinearLayoutManager(requireContext())
+        layoutManager = LinearLayoutManager(context)
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (requireActivity() as MainActivity).appBar?.setRaised(!top)
+            context.appBar?.setRaised(!top)
           }
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -138,9 +144,10 @@ class LibReferenceFragment :
         }
 
         val item = refAdapter.data[position]
-        val intent = Intent(requireContext(), LibReferenceActivity::class.java)
+        val intent = Intent(context, LibReferenceActivity::class.java)
           .putExtra(EXTRA_REF_NAME, item.libName)
           .putExtra(EXTRA_REF_TYPE, item.type)
+          .putExtra(EXTRA_REF_LIST, item.referredList.toTypedArray())
         startActivity(intent)
       }
       setOnItemChildClickListener { _, view, position ->
@@ -153,7 +160,7 @@ class LibReferenceFragment :
         }
       }
       setEmptyView(
-        EmptyListView(requireContext()).apply {
+        EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
@@ -220,7 +227,8 @@ class LibReferenceFragment :
     inflater.inflate(R.menu.lib_ref_menu, menu)
     this.menu = menu
 
-    val searchView = SearchView(requireContext()).apply {
+    val context = (context as? BaseActivity<*>) ?: return
+    val searchView = SearchView(context).apply {
       setIconifiedByDefault(false)
       setOnQueryTextListener(this@LibReferenceFragment)
       queryHint = getText(R.string.search_hint)
@@ -244,54 +252,80 @@ class LibReferenceFragment :
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    val context = (context as? BaseActivity<*>) ?: return false
     if (item.itemId == R.id.filter) {
-      popup = PopupMenu(requireContext(), requireActivity().findViewById(R.id.filter)).apply {
-        menuInflater.inflate(R.menu.lib_ref_type_menu, menu)
-
-        menu.findItem(R.id.ref_category_dex)?.apply {
-          isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
-        }
-        menu.findItem(R.id.ref_category_not_marked)?.apply {
-          isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
-        }
-
-        menu[getMenuIndex(category)].isChecked = true
-        setOnMenuItemClickListener { menuItem ->
-          when (menuItem.itemId) {
-            R.id.ref_category_all -> doSaveLibRefType(ALL)
-            R.id.ref_category_native -> doSaveLibRefType(NATIVE)
-            R.id.ref_category_service -> doSaveLibRefType(SERVICE)
-            R.id.ref_category_activity -> doSaveLibRefType(ACTIVITY)
-            R.id.ref_category_br -> doSaveLibRefType(RECEIVER)
-            R.id.ref_category_cp -> doSaveLibRefType(PROVIDER)
-            R.id.ref_category_dex -> doSaveLibRefType(DEX)
-            R.id.ref_category_not_marked -> doSaveLibRefType(NOT_MARKED)
+      val styler = CascadePopupMenu.Styler()
+      popup = CascadePopupMenu(
+        context,
+        context.findViewById(R.id.filter),
+        defStyleAttr = R.style.Widget_LC_PopupMenu,
+        styler = styler
+      ).apply {
+        menu.also {
+          it.add(R.string.ref_category_all).initMenu(ALL)
+          it.add(R.string.ref_category_native).initMenu(NATIVE)
+          it.addSubMenu(R.string.submenu_title_component).also { componentMenu ->
+            componentMenu.setHeaderTitle(R.string.submenu_title_component)
+            componentMenu.add(R.string.ref_category_service).initMenu(SERVICE)
+            componentMenu.add(R.string.ref_category_activity).initMenu(ACTIVITY)
+            componentMenu.add(R.string.ref_category_br).initMenu(RECEIVER)
+            componentMenu.add(R.string.ref_category_cp).initMenu(PROVIDER)
           }
-          computeRef()
-          Analytics.trackEvent(
-            Constants.Event.LIB_REFERENCE_FILTER_TYPE,
-            EventProperties().set(
-              "Type",
-              category.toLong()
-            )
-          )
-          true
+          it.addSubMenu(R.string.submenu_title_manifest).also { manifestMenu ->
+            manifestMenu.setHeaderTitle(R.string.submenu_title_manifest)
+            manifestMenu.add(R.string.ref_category_perm).initMenu(PERMISSION)
+            manifestMenu.add(R.string.ref_category_metadata).initMenu(METADATA)
+          }
+          it.add(R.string.ref_category_dex).also { dexMenu ->
+            dexMenu.isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
+            dexMenu.initMenu(DEX)
+          }
+          it.add(R.string.not_marked_lib).also { notMarkedMenu ->
+            notMarkedMenu.isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
+            notMarkedMenu.initMenu(NOT_MARKED)
+          }
         }
-        setOnDismissListener {
-          popup = null
+
+        popup.setOnDismissListener {
+          this@LibReferenceFragment.popup = null
         }
       }
       popup?.show()
     } else if (item.itemId == R.id.chart) {
-      startActivity(Intent(requireContext(), ChartActivity::class.java))
+      startActivity(Intent(context, ChartActivity::class.java))
     }
 
     return super.onOptionsItemSelected(item)
   }
 
-  private fun doSaveLibRefType(@LibType type: Int) {
+  private fun MenuItem.initMenu(@LibType type: Int) {
+    if (GlobalValues.currentLibRefType == type) {
+      val title = SpannableStringBuilder(this.title)
+      title.setSpan(
+        StyleSpan(Typeface.BOLD),
+        0,
+        this.title.length,
+        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      )
+      this.title = title
+    }
+    this.setOnMenuItemClickListener {
+      doSaveLibRefType(type)
+    }
+  }
+
+  private fun doSaveLibRefType(@LibType type: Int): Boolean {
     category = type
     GlobalValues.currentLibRefType = type
+    computeRef()
+    Analytics.trackEvent(
+      Constants.Event.LIB_REFERENCE_FILTER_TYPE,
+      EventProperties().set(
+        "Type",
+        category.toLong()
+      )
+    )
+    return true
   }
 
   private fun computeRef() {
@@ -338,25 +372,15 @@ class LibReferenceFragment :
     }
   }
 
-  private fun getMenuIndex(@LibType type: Int) = when (type) {
-    ALL -> 0
-    NATIVE -> 1
-    SERVICE -> 2
-    ACTIVITY -> 3
-    RECEIVER -> 4
-    PROVIDER -> 5
-    DEX -> 6
-    else -> 0
-  }
-
   private fun flip(child: Int) {
+    val context = (context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
     }
     if (child == VF_LOADING) {
       binding.loadingView.loadingView.resumeAnimation()
-      (requireActivity() as BaseActivity<*>).appBar?.setRaised(false)
+      context.appBar?.setRaised(false)
     } else {
       binding.loadingView.loadingView.pauseAnimation()
       binding.list.scrollToPosition(0)

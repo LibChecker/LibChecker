@@ -28,6 +28,7 @@ import rikka.widget.borderview.BorderView
 
 const val EXTRA_REF_NAME = "REF_NAME"
 const val EXTRA_REF_TYPE = "REF_TYPE"
+const val EXTRA_REF_LIST = "REF_LIST"
 
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
@@ -35,6 +36,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   private val viewModel: LibReferenceViewModel by viewModels()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
+  private val refList by lazy { intent.extras?.getStringArray(EXTRA_REF_LIST) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -42,7 +44,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     refName?.let { name ->
       initView()
       viewModel.dbItems.observe(this) {
-        viewModel.setData(name, refType)
+        refList?.let {
+          viewModel.setData(it.toList())
+        } ?: run {
+          viewModel.setData(name, refType)
+        }
       }
 
       lifecycleScope.launch {

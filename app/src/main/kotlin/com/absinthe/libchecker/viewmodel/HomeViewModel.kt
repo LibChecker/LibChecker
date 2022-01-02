@@ -15,8 +15,10 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.NOT_MARKED
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -421,29 +423,19 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  data class RefCountType(
-    val count: Int,
-    @LibType val type: Int
-  )
-
   private var computeLibReferenceJob: Job? = null
 
   fun computeLibReference(@LibType type: Int) {
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
       libReference.postValue(null)
-      var appList: List<ApplicationInfo>? = AppItemRepository.getApplicationInfoItems()
-
-      if (appList.isNullOrEmpty()) {
-        appList = PackageUtils.getAppsList()
-      }
-
-      val map = HashMap<String, RefCountType>()
+      val appList: List<ApplicationInfo> =
+        AppItemRepository.getApplicationInfoItems().ifEmpty { PackageUtils.getAppsList() }
+      val map = HashMap<String, Pair<MutableList<String>, Int>>()
       val refList = mutableListOf<LibReference>()
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
       var libList: List<LibStringItem>
       var packageInfo: PackageInfo
-      var count: Int
       var onlyShowNotMarked = false
 
       when (type) {
@@ -462,8 +454,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               libList = PackageUtils.getNativeDirLibs(packageInfo)
 
               for (lib in libList) {
-                count = map[lib.name]?.count ?: 0
-                map[lib.name] = RefCountType(count + 1, NATIVE)
+                if (map[lib.name] == null) {
+                  map[lib.name] = mutableListOf<String>() to NATIVE
+                }
+                map[lib.name]!!.first.add(item.packageName)
               }
             } catch (e: Exception) {
               Timber.e(e)
@@ -476,8 +470,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.services?.let {
                 for (service in it) {
-                  count = map[service.name]?.count ?: 0
-                  map[service.name] = RefCountType(count + 1, SERVICE)
+                  if (map[service.name] == null) {
+                    map[service.name] = mutableListOf<String>() to SERVICE
+                  }
+                  map[service.name]!!.first.add(item.packageName)
                 }
               }
 
@@ -487,8 +483,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.activities?.let {
                 for (activity in it) {
-                  count = map[activity.name]?.count ?: 0
-                  map[activity.name] = RefCountType(count + 1, ACTIVITY)
+                  if (map[activity.name] == null) {
+                    map[activity.name] = mutableListOf<String>() to ACTIVITY
+                  }
+                  map[activity.name]!!.first.add(item.packageName)
                 }
               }
 
@@ -498,8 +496,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.receivers?.let {
                 for (receiver in it) {
-                  count = map[receiver.name]?.count ?: 0
-                  map[receiver.name] = RefCountType(count + 1, RECEIVER)
+                  if (map[receiver.name] == null) {
+                    map[receiver.name] = mutableListOf<String>() to RECEIVER
+                  }
+                  map[receiver.name]!!.first.add(item.packageName)
                 }
               }
 
@@ -509,8 +509,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.providers?.let {
                 for (provider in it) {
-                  count = map[provider.name]?.count ?: 0
-                  map[provider.name] = RefCountType(count + 1, PROVIDER)
+                  if (map[provider.name] == null) {
+                    map[provider.name] = mutableListOf<String>() to PROVIDER
+                  }
+                  map[provider.name]!!.first.add(item.packageName)
                 }
               }
             } catch (e: Exception) {
@@ -530,8 +532,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               libList = PackageUtils.getNativeDirLibs(packageInfo)
 
               for (lib in libList) {
-                count = map[lib.name]?.count ?: 0
-                map[lib.name] = RefCountType(count + 1, NATIVE)
+                if (map[lib.name] == null) {
+                  map[lib.name] = mutableListOf<String>() to NATIVE
+                }
+                map[lib.name]!!.first.add(item.packageName)
               }
             } catch (e: Exception) {
               Timber.e(e)
@@ -552,8 +556,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.services?.let {
                 for (service in it) {
-                  count = map[service.name]?.count ?: 0
-                  map[service.name] = RefCountType(count + 1, SERVICE)
+                  if (map[service.name] == null) {
+                    map[service.name] = mutableListOf<String>() to SERVICE
+                  }
+                  map[service.name]!!.first.add(item.packageName)
                 }
               }
             } catch (e: Exception) {
@@ -575,8 +581,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.activities?.let {
                 for (activity in it) {
-                  count = map[activity.name]?.count ?: 0
-                  map[activity.name] = RefCountType(count + 1, ACTIVITY)
+                  if (map[activity.name] == null) {
+                    map[activity.name] = mutableListOf<String>() to ACTIVITY
+                  }
+                  map[activity.name]!!.first.add(item.packageName)
                 }
               }
             } catch (e: Exception) {
@@ -598,8 +606,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.receivers?.let {
                 for (receiver in it) {
-                  count = map[receiver.name]?.count ?: 0
-                  map[receiver.name] = RefCountType(count + 1, RECEIVER)
+                  if (map[receiver.name] == null) {
+                    map[receiver.name] = mutableListOf<String>() to RECEIVER
+                  }
+                  map[receiver.name]!!.first.add(item.packageName)
                 }
               }
             } catch (e: Exception) {
@@ -621,8 +631,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
               packageInfo.providers?.let {
                 for (provider in it) {
-                  count = map[provider.name]?.count ?: 0
-                  map[provider.name] = RefCountType(count + 1, PROVIDER)
+                  if (map[provider.name] == null) {
+                    map[provider.name] = mutableListOf<String>() to PROVIDER
+                  }
+                  map[provider.name]!!.first.add(item.packageName)
                 }
               }
             } catch (e: Exception) {
@@ -640,8 +652,60 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             libList = PackageUtils.getDexList(item.packageName)
 
             for (lib in libList) {
-              count = map[lib.name]?.count ?: 0
-              map[lib.name] = RefCountType(count + 1, DEX)
+              if (map[lib.name] == null) {
+                map[lib.name] = mutableListOf<String>() to DEX
+              }
+              map[lib.name]!!.first.add(item.packageName)
+            }
+          }
+        }
+        PERMISSION -> {
+          for (item in appList) {
+
+            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              continue
+            }
+
+            try {
+              packageInfo = PackageUtils.getPackageInfo(
+                item.packageName,
+                PackageManager.GET_PERMISSIONS
+              )
+              packageInfo.requestedPermissions?.let {
+                for (permission in it) {
+                  if (map[permission] == null) {
+                    map[permission] = mutableListOf<String>() to PERMISSION
+                  }
+                  map[permission]!!.first.add(item.packageName)
+                }
+              }
+            } catch (e: Exception) {
+              Timber.e(e)
+            }
+          }
+        }
+        METADATA -> {
+          for (item in appList) {
+
+            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              continue
+            }
+
+            try {
+              packageInfo = PackageUtils.getPackageInfo(
+                item.packageName,
+                PackageManager.GET_META_DATA
+              )
+              packageInfo.applicationInfo.metaData?.let {
+                for (meta in it.keySet()) {
+                  if (map[meta] == null) {
+                    map[meta] = mutableListOf<String>() to METADATA
+                  }
+                  map[meta]!!.first.add(item.packageName)
+                }
+              }
+            } catch (e: Exception) {
+              Timber.e(e)
             }
           }
         }
@@ -650,8 +714,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       var chip: LibChip?
       var rule: RuleEntity?
       for (entry in map) {
-        if (entry.value.count >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
-          rule = LCAppUtils.getRuleWithRegex(entry.key, entry.value.type)
+        if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
+          rule = LCAppUtils.getRuleWithRegex(entry.key, entry.value.second)
           chip = null
           rule?.let {
             chip = LibChip(
@@ -665,8 +729,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               LibReference(
                 entry.key,
                 chip,
-                entry.value.count,
-                entry.value.type
+                entry.value.first,
+                entry.value.second
               )
             )
           } else {
@@ -675,8 +739,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 LibReference(
                   entry.key,
                   chip,
-                  entry.value.count,
-                  entry.value.type
+                  entry.value.first,
+                  entry.value.second
                 )
               )
             }
@@ -684,7 +748,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
       }
 
-      refList.sortByDescending { it.referredCount }
+      refList.sortByDescending { it.referredList.size }
       libReference.postValue(refList)
     }
   }
@@ -697,7 +761,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   fun refreshRef() {
     libReference.value?.let { ref ->
       libReference.value =
-        ref.filter { it.referredCount >= GlobalValues.libReferenceThreshold }
+        ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold }
     }
   }
 

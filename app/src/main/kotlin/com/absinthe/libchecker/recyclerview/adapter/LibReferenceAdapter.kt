@@ -38,7 +38,7 @@ class LibReferenceAdapter : HighlightAdapter<LibReference>() {
 
   override fun convert(holder: BaseViewHolder, item: LibReference) {
     (holder.itemView as LibReferenceItemView).container.apply {
-      count.text = item.referredCount.toString()
+      count.text = item.referredList.size.toString()
 
       setOrHighlightText(libName, item.libName)
 

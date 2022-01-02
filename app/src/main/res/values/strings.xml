@@ -37,6 +37,8 @@
   <string name="tab_lib_reference_statistics">Lib reference</string>
   <string name="not_marked_lib">Not marked library</string>
 
+  <string name="submenu_title_component">Component</string>
+  <string name="submenu_title_manifest">Manifest</string>
   <string name="ref_category_all">All</string>
   <string name="ref_category_native">Native Libraries</string>
   <string name="ref_category_service">Services</string>

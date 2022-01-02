@@ -514,28 +514,32 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              it.services, PackageUtils.getComponentStringList(
+              it.services,
+              PackageUtils.getComponentStringList(
                 packageInfo.packageName,
                 SERVICE,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              it.activities, PackageUtils.getComponentStringList(
+              it.activities,
+              PackageUtils.getComponentStringList(
                 packageInfo.packageName,
                 ACTIVITY,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              it.receivers, PackageUtils.getComponentStringList(
+              it.receivers,
+              PackageUtils.getComponentStringList(
                 packageInfo.packageName,
                 RECEIVER,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              it.providers, PackageUtils.getComponentStringList(
+              it.providers,
+              PackageUtils.getComponentStringList(
                 packageInfo.packageName,
                 PROVIDER,
                 false
@@ -554,7 +558,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               File(packageInfo.applicationInfo.sourceDir).length()
             ),
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
-          )
+          ).also { diffItem ->
+            val compareDiffNode = compareDiffIndicator(diffItem)
+            diffItem.added = compareDiffNode.added
+            diffItem.removed = compareDiffNode.removed
+            diffItem.changed = compareDiffNode.changed
+            diffItem.moved = compareDiffNode.moved
+          }
         } ?: run {
           diffItem = SnapshotDiffItem(
             it.packageName,

@@ -37,6 +37,8 @@
   <string name="tab_lib_reference_statistics">庫引用統計</string>
   <string name="not_marked_lib">未標示的庫</string>
 
+  <string name="submenu_title_component">組件</string>
+  <string name="submenu_title_manifest">清單</string>
   <string name="ref_category_all">全部</string>
   <string name="ref_category_native">原生庫</string>
   <string name="ref_category_service">服務</string>

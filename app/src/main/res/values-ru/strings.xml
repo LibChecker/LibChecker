@@ -37,6 +37,8 @@
   <string name="tab_lib_reference_statistics">Ссылка на библиотеку</string>
   <string name="not_marked_lib">Не отмеченная библиотека</string>
 
+  <string name="submenu_title_component">Component</string>
+  <string name="submenu_title_manifest">Manifest</string>
   <string name="ref_category_all">Все</string>
   <string name="ref_category_native">Нативные библиотеки</string>
   <string name="ref_category_service">Службы</string>
