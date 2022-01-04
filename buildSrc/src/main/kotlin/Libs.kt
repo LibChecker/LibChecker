@@ -25,7 +25,7 @@ object Libs {
   const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
   const val material = "com.google.android.material:material:1.6.0-alpha01"
 
-  const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.7"
+  const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.8"
   const val okHttp = "com.squareup.okhttp3:okhttp:4.9.3"
   const val coil = "io.coil-kt:coil:1.4.0"
   const val retrofit = "com.squareup.retrofit2:retrofit:$retrofitVersion"

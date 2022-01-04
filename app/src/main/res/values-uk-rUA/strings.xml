@@ -133,6 +133,7 @@
   <string name="snapshot_detail_new_install_title">Цей додаток нещодавно встановлено</string>
   <string name="snapshot_detail_deleted_title">Цей додаток був видалений</string>
   <string name="snapshot_time_node_uninitialized">(неініціалізований)</string>
+  <string name="snapshot_generate_text_report">Generate Text Report</string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Ви впевнені, що хочете перезавантажити весь список додатків?</string>

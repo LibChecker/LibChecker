@@ -278,12 +278,14 @@ class LibReferenceFragment :
             manifestMenu.add(R.string.ref_category_perm).initMenu(PERMISSION)
             manifestMenu.add(R.string.ref_category_metadata).initMenu(METADATA)
           }
+          it.add("Package").onlyVisibleInDebugMode()
+          it.add("Shared UID").onlyVisibleInDebugMode()
           it.add(R.string.ref_category_dex).also { dexMenu ->
-            dexMenu.isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
+            dexMenu.onlyVisibleInDebugMode()
             dexMenu.initMenu(DEX)
           }
           it.add(R.string.not_marked_lib).also { notMarkedMenu ->
-            notMarkedMenu.isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
+            notMarkedMenu.onlyVisibleInDebugMode()
             notMarkedMenu.initMenu(NOT_MARKED)
           }
         }
@@ -314,6 +316,10 @@ class LibReferenceFragment :
     this.setOnMenuItemClickListener {
       doSaveLibRefType(type)
     }
+  }
+
+  private fun MenuItem.onlyVisibleInDebugMode() {
+    isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
   }
 
   private fun doSaveLibRefType(@LibType type: Int): Boolean {

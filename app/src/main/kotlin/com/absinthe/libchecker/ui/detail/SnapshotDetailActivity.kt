@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.activity.viewModels
@@ -13,12 +14,16 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.bean.ADDED
+import com.absinthe.libchecker.bean.CHANGED
+import com.absinthe.libchecker.bean.MOVED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -35,6 +40,7 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleN
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -51,6 +57,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
+import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -76,9 +83,16 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     }
   }
 
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.snapshot_detail_menu, menu)
+    return super.onCreateOptionsMenu(menu)
+  }
+
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
       finish()
+    } else if (item.itemId == R.id.report_generate) {
+      generateReport()
     }
     return super.onOptionsItemSelected(item)
   }
@@ -304,6 +318,58 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
       "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
     } else {
       format.format(diff1.old, diff2.old)
+    }
+  }
+
+  private fun generateReport() {
+    val sb = StringBuilder()
+    adapter.data.forEach {
+      when (it) {
+        is SnapshotTitleNode -> {
+          sb.append("[${getComponentName(it.type)}]").appendLine()
+        }
+        is SnapshotComponentNode -> {
+          sb.append(getDiffTypeLabel(it.item.diffType))
+            .append(" ")
+            .append(it.item.title)
+            .appendLine()
+        }
+        is SnapshotNativeNode -> {
+          sb.append(getDiffTypeLabel(it.item.diffType))
+            .append(" ")
+            .append(it.item.title)
+            .appendLine()
+            .append("\t")
+            .append(it.item.extra)
+            .appendLine()
+        }
+      }
+    }
+    ClipboardUtils.put(this, sb.toString())
+    Toasty.showShort(this, R.string.toast_copied_to_clipboard)
+  }
+
+  private fun getComponentName(@LibType type: Int): String {
+    val titleRes = when (type) {
+      NATIVE -> R.string.ref_category_native
+      SERVICE -> R.string.ref_category_service
+      ACTIVITY -> R.string.ref_category_activity
+      RECEIVER -> R.string.ref_category_br
+      PROVIDER -> R.string.ref_category_cp
+      PERMISSION -> R.string.ref_category_perm
+      METADATA -> R.string.ref_category_metadata
+      else -> android.R.string.untitled
+    }
+    return getString(titleRes)
+  }
+
+  private fun getDiffTypeLabel(diffType: Int): String {
+    return when (diffType) {
+      ADDED -> "🟢+"
+      REMOVED -> "🔴-"
+      CHANGED -> "🟡~"
+      MOVED -> "🔵<->"
+      else -> throw IllegalArgumentException("wrong diff type")
     }
   }
 }

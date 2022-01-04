@@ -436,8 +436,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       val refList = mutableListOf<LibReference>()
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
-      var libList: List<LibStringItem>
-      var packageInfo: PackageInfo
       var onlyShowNotMarked = false
 
       when (type) {
@@ -451,13 +449,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               continue
             }
 
-            computeComponentReference(map, item.packageName, NATIVE)
-            computeComponentReference(map, item.packageName, SERVICE)
-            computeComponentReference(map, item.packageName, ACTIVITY)
-            computeComponentReference(map, item.packageName, RECEIVER)
-            computeComponentReference(map, item.packageName, PROVIDER)
-            computeComponentReference(map, item.packageName, PERMISSION)
-            computeComponentReference(map, item.packageName, METADATA)
+            arrayOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA).forEach {
+              computeComponentReference(map, item.packageName, it)
+            }
           }
         }
         NATIVE -> {
