@@ -323,13 +323,13 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private fun generateReport() {
     val sb = StringBuilder()
-    sb.append(binding.tvAppName).appendLine()
-      .append(binding.tvPackageName).appendLine()
-      .append(binding.tvVersion).appendLine()
-      .append(binding.tvTargetApi).appendLine()
+    sb.append(binding.tvAppName.text).appendLine()
+      .append(binding.tvPackageName.text).appendLine()
+      .append(binding.tvVersion.text).appendLine()
+      .append(binding.tvTargetApi.text).appendLine()
 
     if (binding.tvPackageSize.isVisible) {
-      sb.append(binding.tvPackageSize).appendLine()
+      sb.append(binding.tvPackageSize.text).appendLine()
     }
 
     sb.appendLine()
