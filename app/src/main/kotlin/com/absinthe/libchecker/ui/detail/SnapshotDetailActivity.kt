@@ -323,6 +323,17 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private fun generateReport() {
     val sb = StringBuilder()
+    sb.append(binding.tvAppName).appendLine()
+      .append(binding.tvPackageName).appendLine()
+      .append(binding.tvVersion).appendLine()
+      .append(binding.tvTargetApi).appendLine()
+
+    if (binding.tvPackageSize.isVisible) {
+      sb.append(binding.tvPackageSize).appendLine()
+    }
+
+    sb.appendLine()
+    
     adapter.data.forEach {
       when (it) {
         is SnapshotTitleNode -> {
