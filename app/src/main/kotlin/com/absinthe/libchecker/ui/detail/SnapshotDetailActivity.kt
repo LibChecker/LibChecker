@@ -333,7 +333,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     }
 
     sb.appendLine()
-    
+
     adapter.data.forEach {
       when (it) {
         is SnapshotTitleNode -> {

@@ -1061,7 +1061,7 @@ object PackageUtils {
       return size
     }
 
-    packageInfo.applicationInfo.splitSourceDirs.forEach {
+    packageInfo.applicationInfo.splitSourceDirs?.forEach {
       runCatching {
         size += File(it).length()
       }
