@@ -50,7 +50,7 @@ jobs:
         id: sign
         uses: r0adkll/sign-android-release@v1.0.4
         env:
-          BUILD_TOOLS_VERSION: "31.0.0"
+          BUILD_TOOLS_VERSION: "32.0.0"
         with:
           releaseDirectory: app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
@@ -58,7 +58,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built apk
-        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v2
         with:
           name: snapshot
