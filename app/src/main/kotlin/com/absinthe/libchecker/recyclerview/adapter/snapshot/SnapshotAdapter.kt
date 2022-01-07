@@ -140,15 +140,26 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
       targetApiInfo.text = getDiffString(item.targetApiDiff, isNewOrDeleted, "API %s")
 
-      val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), true)
+      val oldAbiString = PackageUtils.getAbiString(context, item.abiDiff.old.toInt(), false)
       val oldAbiSpanString: SpannableString
       var abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.old.toInt())
       if (item.abiDiff.old.toInt() != Constants.ERROR && item.abiDiff.old.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
-        oldAbiSpanString = SpannableString("  $oldAbiString")
+        var oldPaddingString = "  $oldAbiString"
+        if (item.abiDiff.old / Constants.MULTI_ARCH == 1) {
+          oldPaddingString = "  $oldPaddingString"
+        }
+        oldAbiSpanString = SpannableString(oldPaddingString)
         abiBadgeRes.getDrawable(context)?.let {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
           val span = CenterAlignImageSpan(it)
           oldAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+        }
+        if (item.abiDiff.old / Constants.MULTI_ARCH == 1) {
+          R.drawable.ic_multi_arch.getDrawable(context)?.let {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+            val span = CenterAlignImageSpan(it)
+            oldAbiSpanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
+          }
         }
       } else {
         oldAbiSpanString = SpannableString(oldAbiString)
@@ -158,14 +169,25 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       val newAbiSpanString: SpannableString
       if (item.abiDiff.new != null) {
         val newAbiString =
-          PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), true)
+          PackageUtils.getAbiString(context, item.abiDiff.new.toInt(), false)
         abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abiDiff.new.toInt())
         if (item.abiDiff.new.toInt() != Constants.ERROR && item.abiDiff.new.toInt() != Constants.OVERLAY && abiBadgeRes != 0) {
-          newAbiSpanString = SpannableString("  $newAbiString")
+          var newPaddingString = "  $newAbiString"
+          if (item.abiDiff.new / Constants.MULTI_ARCH == 1) {
+            newPaddingString = "  $newPaddingString"
+          }
+          newAbiSpanString = SpannableString(newPaddingString)
           abiBadgeRes.getDrawable(context)?.let {
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val span = CenterAlignImageSpan(it)
             newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+          }
+          if (item.abiDiff.new / Constants.MULTI_ARCH == 1) {
+            R.drawable.ic_multi_arch.getDrawable(context)?.let {
+              it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+              val span = CenterAlignImageSpan(it)
+              newAbiSpanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
+            }
           }
         } else {
           newAbiSpanString = SpannableString(newAbiString)

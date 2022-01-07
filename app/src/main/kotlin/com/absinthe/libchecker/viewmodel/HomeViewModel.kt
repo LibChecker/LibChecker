@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -353,6 +354,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         val properties: MutableMap<String, String> = HashMap()
+        properties["Version"] = Build.VERSION.SDK_INT.toString()
+        Analytics.trackEvent("OS Version", properties)
 
         for (entry in map) {
           if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {

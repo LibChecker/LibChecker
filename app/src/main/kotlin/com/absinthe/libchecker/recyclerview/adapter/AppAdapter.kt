@@ -58,18 +58,30 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
       versionInfo.text = PackageUtils.getVersionString(item.versionName, item.versionCode)
 
       val str = StringBuilder()
-        .append(PackageUtils.getAbiString(context, item.abi.toInt(), true))
+        .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
         .append(", ")
         .append(PackageUtils.getTargetApiString(item.targetApi))
       val spanString: SpannableString
       val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
 
       if (item.abi.toInt() != Constants.OVERLAY && item.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-        spanString = SpannableString("  $str")
+        var paddingString = "  $str"
+        if (item.abi / Constants.MULTI_ARCH == 1) {
+          paddingString = "  $paddingString"
+        }
+        spanString = SpannableString(paddingString)
+
         abiBadgeRes.getDrawable(context)?.let {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
           val span = CenterAlignImageSpan(it)
           spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+        }
+        if (item.abi / Constants.MULTI_ARCH == 1) {
+          R.drawable.ic_multi_arch.getDrawable(context)?.let {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+            val span = CenterAlignImageSpan(it)
+            spanString.setSpan(span, 2, 3, ImageSpan.ALIGN_BOTTOM)
+          }
         }
         abiInfo.text = spanString
       } else {

@@ -257,7 +257,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           list.sortedByDescending { it.updateTime }
             .toMutableList()
         ) {
-          if (!binding.list.canScrollVertically(-1)) {
+          if (shouldAddListBottomPadding()) {
             if (!hasAddedListBottomPadding) {
               binding.list.addPaddingBottom(20.dp)
               hasAddedListBottomPadding = true
@@ -432,6 +432,21 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       )
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }
+  }
+
+  private fun shouldAddListBottomPadding(): Boolean {
+    getSuitableLayoutManager().apply {
+      if (this is LinearLayoutManager) {
+        return findFirstVisibleItemPosition() == 0 && findLastVisibleItemPosition() == adapter.data.size - 1
+      } else if (this is StaggeredGridLayoutManager) {
+        val firstLine = IntArray(4)
+        findFirstVisibleItemPositions(firstLine)
+        val lastLine = IntArray(4)
+        findLastVisibleItemPositions(lastLine)
+        return firstLine[0] == 0 && lastLine.last() == adapter.data.size - 1
+      }
+    }
+    return false
   }
 
   override fun onReturnTop() {
