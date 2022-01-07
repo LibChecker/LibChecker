@@ -166,11 +166,13 @@ object PackageUtils {
    * Get native libraries of an app
    * @param packageInfo PackageInfo
    * @param needStaticLibrary True if need get static libraries
+   * @param specifiedAbi Specify an ABI
    * @return List of LibStringItem
    */
   fun getNativeDirLibs(
     packageInfo: PackageInfo,
-    needStaticLibrary: Boolean = false
+    needStaticLibrary: Boolean = false,
+    specifiedAbi: Int? = null
   ): List<LibStringItem> {
     val nativePath = packageInfo.applicationInfo.nativeLibraryDir
     val list = mutableListOf<LibStringItem>()
@@ -187,12 +189,17 @@ object PackageUtils {
     }
 
     if (list.isEmpty()) {
-      var abi = getAbi(packageInfo.applicationInfo)
-      if (abi == NO_LIBS) {
-        abi = if (Process.is64Bit()) {
-          ARMV8
-        } else {
-          ARMV7
+      var abi: Int
+      if (specifiedAbi != null) {
+        abi = specifiedAbi
+      } else {
+        abi = getAbi(packageInfo.applicationInfo)
+        if (abi == NO_LIBS) {
+          abi = if (Process.is64Bit()) {
+            ARMV8
+          } else {
+            ARMV7
+          }
         }
       }
       list.addAll(getSourceLibs(packageInfo, "lib/${getAbiString(LibCheckerApp.app, abi, false)}"))

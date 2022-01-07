@@ -60,6 +60,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var sortMode = GlobalValues.libSortMode
   var packageName: String = ""
   var isApk = false
+  var abiSet: Set<Int>? = null
 
   init {
     componentsMap.put(SERVICE, MutableLiveData())
@@ -88,7 +89,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
       info?.let {
         list.addAll(
-          getNativeChipList(info, isApk)
+          getNativeChipList(info, isApk, abiSet?.first())
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {
@@ -199,7 +200,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getNativeChipList(
     info: ApplicationInfo,
-    isApk: Boolean
+    isApk: Boolean,
+    specifiedAbi: Int? = null
   ): List<LibStringItemChip> {
     val packageInfo = if (!isApk) {
       PackageUtils.getPackageInfo(info.packageName)
@@ -209,7 +211,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         applicationInfo = info
       }
     }
-    val list = PackageUtils.getNativeDirLibs(packageInfo).toMutableList()
+    val list =
+      PackageUtils.getNativeDirLibs(packageInfo, specifiedAbi = specifiedAbi).toMutableList()
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 

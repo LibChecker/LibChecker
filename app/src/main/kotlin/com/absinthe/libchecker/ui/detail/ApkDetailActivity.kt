@@ -190,6 +190,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
             ignoreArch = true
           )
           val abi = PackageUtils.getAbi(it.applicationInfo, true)
+          viewModel.abiSet = abiSet
 
           extraInfo.apply {
             if (abi >= Constants.MULTI_ARCH) {
