@@ -1054,6 +1054,21 @@ object PackageUtils {
     return appList
   }
 
+  fun getPackageSize(packageInfo: PackageInfo, includeSplits: Boolean): Long {
+    var size: Long = File(packageInfo.applicationInfo.sourceDir).length()
+
+    if (!includeSplits) {
+      return size
+    }
+
+    packageInfo.applicationInfo.splitSourceDirs.forEach {
+      runCatching {
+        size += File(it).length()
+      }
+    }
+    return size
+  }
+
   fun PackageInfo.isXposedModule(): Boolean {
     return applicationInfo.metaData?.getBoolean("xposedmodule") == true ||
       applicationInfo.metaData?.containsKey("xposedminversion") == true

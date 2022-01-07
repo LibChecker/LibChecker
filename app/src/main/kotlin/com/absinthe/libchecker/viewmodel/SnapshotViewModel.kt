@@ -46,7 +46,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -129,7 +128,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
       if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (dbItem.packageSize != 0L && File(packageInfo.applicationInfo.sourceDir).length() != dbItem.packageSize) ||
+        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(packageInfo, true) != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
@@ -202,7 +201,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           packageSizeDiff = SnapshotDiffItem.DiffNode(
             dbItem.packageSize,
-            File(packageInfo.applicationInfo.sourceDir).length()
+            PackageUtils.getPackageSize(packageInfo, true)
           ),
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
         )
@@ -332,7 +331,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
               ),
               SnapshotDiffItem.DiffNode(
-                File(packageInfo.applicationInfo.sourceDir).length()
+                PackageUtils.getPackageSize(packageInfo, true)
               ),
               newInstalled = true,
               isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
@@ -555,7 +554,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             ),
             SnapshotDiffItem.DiffNode(
               it.packageSize,
-              File(packageInfo.applicationInfo.sourceDir).length()
+              PackageUtils.getPackageSize(packageInfo, true)
             ),
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
           ).also { diffItem ->
@@ -636,7 +635,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              File(packageInfo.applicationInfo.sourceDir).length()
+              PackageUtils.getPackageSize(packageInfo, true)
             ),
             newInstalled = true,
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
