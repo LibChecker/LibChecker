@@ -45,6 +45,7 @@
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
   <string name="ref_category_cp">内容提供者</string>
+  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">元數據</string>
@@ -112,6 +113,8 @@
   <string name="xposed_module_details">Xposed 是一個模塊框架，可以在不接觸任何 APK 的情況下更改系統和應用程序的行為。這很棒，因為這意味著模塊可以在不同版本甚至 ROM 上工作而無需任何更改。</string>
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 應用簽名，Google 可以為您管理和保護您應用的簽名密鑰，並使用它對從您的 app bundle 生成的優化分發 APK 進行簽名。Play App Signing 將您的應用簽名密鑰存儲在 Google 的安全基礎架構中，並提供升級選項以提高安全性。</string>
+  <string name="pwa_details">漸進式 Web 應用程序 (PWA) 使用現代 API 構建和增強，以提供增強的功能、可靠性和可安裝性，同時使用單個代碼庫在任何設備上訪問任何人、任何地方。</string>
+  <string name="extract_native_libs_tip_part_a">該應用聲明了 </string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼板</string>
@@ -174,6 +177,5 @@
   <string name="rules_remote_repo_version">遠端規則庫版本</string>
   <string name="rules_btn_restart_to_update">重啟以更新</string>
   <string name="rules_btn_update">更新</string>
-  <string name="pwa_details">漸進式 Web 應用程序 (PWA) 使用現代 API 構建和增強，以提供增強的功能、可靠性和可安裝性，同時使用單個代碼庫在任何設備上訪問任何人、任何地方。</string>
 
 </resources>

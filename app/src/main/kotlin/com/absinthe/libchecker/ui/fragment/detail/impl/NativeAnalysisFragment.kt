@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
+import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
@@ -10,6 +11,7 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.detail.NativeLibExtractTipView
 import rikka.core.util.ClipboardUtils
 
 class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
@@ -29,6 +31,19 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
         adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
+
+        if (viewModel.extractNativeLibs == false) {
+          context?.let { ctx ->
+            adapter.setHeaderView(
+              NativeLibExtractTipView(ctx).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                  ViewGroup.LayoutParams.MATCH_PARENT,
+                  ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+              }
+            )
+          }
+        }
       }
 
       if (!isListReady) {

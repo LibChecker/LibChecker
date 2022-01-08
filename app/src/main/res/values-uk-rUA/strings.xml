@@ -45,6 +45,7 @@
   <string name="ref_category_activity">Activity</string>
   <string name="ref_category_br">Ресівери</string>
   <string name="ref_category_cp">Провайдери</string>
+  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">Дозволи</string>
   <string name="ref_category_static">Static Libraries</string>
   <string name="ref_category_metadata">Meta Data</string>
@@ -111,6 +112,8 @@
   <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes.</string>
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
+  <string name="pwa_details">"Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. "</string>
+  <string name="extract_native_libs_tip_part_a">The app declares </string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>
@@ -174,6 +177,5 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">поновити</string>
   <string name="languages">Мова</string>
-  <string name="pwa_details">"Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. "</string>
 
 </resources>

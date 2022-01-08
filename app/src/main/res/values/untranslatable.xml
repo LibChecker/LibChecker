@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_bundle" translatable="false">App Bundles</string>
+  <string name="kotlin_string" translatable="false">Kotlin</string>
+  <string name="agp" translatable="false">Android Gradle Plugin</string>
+  <string name="pwa" translatable="false">Progressive Web Apps</string>
+
+  <string name="snapshot_none" translatable="false">None</string>
+
+  <string name="extract_native_libs_tip_part_b" translatable="false">android:extractNativeLibs="false"</string>
+</resources>
