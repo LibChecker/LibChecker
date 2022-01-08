@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.pm.PackageManager
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
@@ -47,7 +46,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
           val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
           loadIconJob =
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
           Timber.e(e)
         }
       }
