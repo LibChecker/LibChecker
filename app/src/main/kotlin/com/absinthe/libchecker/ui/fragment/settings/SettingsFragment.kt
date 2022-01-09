@@ -358,4 +358,5 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   }
 
   override fun isAllowRefreshing(): Boolean = true
+  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
 }

@@ -108,7 +108,9 @@ class AppListFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              (activity as? INavViewContainer)?.hideNavigationView()
+              if (isListCanScroll(appAdapter.data.size)) {
+                (activity as? INavViewContainer)?.hideNavigationView()
+              }
 
               val position = when (layoutManager) {
                 is LinearLayoutManager -> {
@@ -413,7 +415,7 @@ class AppListFragment :
     }
   }
 
-  private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
     layoutManager = when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->

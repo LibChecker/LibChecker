@@ -101,7 +101,9 @@ class LibReferenceFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              (activity as? INavViewContainer)?.hideNavigationView()
+              if (isListCanScroll(refAdapter.data.size)) {
+                (activity as? INavViewContainer)?.hideNavigationView()
+              }
 
               val position = when (layoutManager) {
                 is LinearLayoutManager -> {
@@ -379,6 +381,8 @@ class LibReferenceFragment :
       }
     }
   }
+
+  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = binding.list.layoutManager
 
   private fun flip(child: Int) {
     val context = (context as? BaseActivity<*>) ?: return

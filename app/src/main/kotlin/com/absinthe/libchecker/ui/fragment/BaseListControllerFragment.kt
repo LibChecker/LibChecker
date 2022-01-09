@@ -2,6 +2,8 @@ package com.absinthe.libchecker.ui.fragment
 
 import android.view.Menu
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseFragment
@@ -48,4 +50,19 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
   }
 
   override fun isAllowRefreshing(): Boolean = allowRefreshing
+
+  protected fun isListCanScroll(listSize: Int): Boolean {
+    getSuitableLayoutManager().apply {
+      if (this is LinearLayoutManager) {
+        return findFirstVisibleItemPosition() == 0 && findLastVisibleItemPosition() == listSize - 1
+      } else if (this is StaggeredGridLayoutManager) {
+        val firstLine = IntArray(4)
+        findFirstVisibleItemPositions(firstLine)
+        val lastLine = IntArray(4)
+        findLastVisibleItemPositions(lastLine)
+        return firstLine[0] == 0 && lastLine.last() == listSize - 1
+      }
+    }
+    return false
+  }
 }

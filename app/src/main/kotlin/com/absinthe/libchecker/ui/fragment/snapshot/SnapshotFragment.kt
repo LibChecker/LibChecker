@@ -257,7 +257,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           list.sortedByDescending { it.updateTime }
             .toMutableList()
         ) {
-          if (shouldAddListBottomPadding()) {
+          if (!isListCanScroll(adapter.data.size)) {
             if (!hasAddedListBottomPadding) {
               binding.list.addPaddingBottom(20.dp)
               hasAddedListBottomPadding = true
@@ -423,7 +423,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     isSnapshotDatabaseItemsReady = false
   }
 
-  private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
     return when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
@@ -432,21 +432,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       )
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }
-  }
-
-  private fun shouldAddListBottomPadding(): Boolean {
-    getSuitableLayoutManager().apply {
-      if (this is LinearLayoutManager) {
-        return findFirstVisibleItemPosition() == 0 && findLastVisibleItemPosition() == adapter.data.size - 1
-      } else if (this is StaggeredGridLayoutManager) {
-        val firstLine = IntArray(4)
-        findFirstVisibleItemPositions(firstLine)
-        val lastLine = IntArray(4)
-        findLastVisibleItemPositions(lastLine)
-        return firstLine[0] == 0 && lastLine.last() == adapter.data.size - 1
-      }
-    }
-    return false
   }
 
   override fun onReturnTop() {
