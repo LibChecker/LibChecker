@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="colorPrimary">#B1B8DF</color>
+  <color name="colorPrimaryMd3">?colorPrimary</color>
+  <color name="colorSurface">?colorSurface</color>
+  <color name="colorSurfaceMd3">?colorSurface</color>
   <color name="aboutHeader">#FF121212</color>
   <color name="textNormal">#FFFFFFFF</color>
   <color name="textSecondary">#80BEBEBE</color>
@@ -9,8 +12,10 @@
   <color name="featureBackground">#25000000</color>
   <color name="featureRipple">#25FFFFFF</color>
 
+
   <color name="renge">#FFBB5E61</color>
   <color name="highlightComponent">@color/material_blue_800</color>
+
   <color name="bottom_sheet_header_handler">#CCBBBBBB</color>
   <color name="bottom_sheet_header_handler_activated">#FFFFFFFF</color>
   <color name="bottom_sheet_header_handler_md3">#CCBBBBBB</color>

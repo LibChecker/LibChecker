@@ -426,6 +426,9 @@ class AboutActivity : AbsAboutActivity() {
 
   private fun initView() {
     findViewById<Toolbar>(R.id.toolbar)?.background = null
+    val color = getColor(R.color.aboutHeader)
+    setHeaderBackground(ColorDrawable(color))
+    setHeaderContentScrim(ColorDrawable(color))
   }
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {

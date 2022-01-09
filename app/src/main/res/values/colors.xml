@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="colorPrimary">#6200EE</color>
+  <color name="colorPrimaryMd3">?colorPrimary</color>
+  <color name="colorSurface">?colorSurface</color>
+  <color name="colorSurfaceMd3">?colorSurface</color>
   <color name="aboutHeader">#6200EE</color>
   <color name="textNormal">#FF000000</color>
   <color name="textSecondary">#80464646</color>
@@ -12,6 +15,7 @@
   <color name="appColorDark">#B1B8DF</color>
   <color name="renge">#FFAB373A</color>
   <color name="highlightComponent">@color/material_blue_100</color>
+
   <color name="bottom_sheet_header_handler">#CCDFDFDF</color>
   <color name="bottom_sheet_header_handler_activated">#CC444444</color>
   <color name="bottom_sheet_header_handler_md3">#CC888888</color>

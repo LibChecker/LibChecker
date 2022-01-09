@@ -35,8 +35,12 @@ class EmptyListView(context: Context) : AViewGroup(context) {
     icon.autoMeasure()
     text.autoMeasure()
     setMeasuredDimension(
-      paddingStart + icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
-      paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+      measuredWidth.coerceAtLeast(
+        paddingStart + icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd
+      ),
+      measuredHeight.coerceAtLeast(
+        paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+      )
     )
   }
 

@@ -21,9 +21,6 @@
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 
-    <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-    <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
-
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
@@ -63,9 +60,6 @@
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 
-    <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-    <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
-
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
@@ -100,13 +94,14 @@
   <style name="Base.AppTheme.Material3" parent="Theme.Material3.DayNight.NoActionBar">
     <item name="android:statusBarColor">?android:colorBackground</item>
 
-    <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimary">@color/colorPrimaryMd3</item>
     <item name="colorPrimaryVariant">?colorPrimary</item>
     <item name="colorSecondary">?colorPrimary</item>
     <item name="colorSecondaryVariant">?colorPrimary</item>
     <item name="colorOnSecondary">@android:color/white</item>
     <item name="colorTertiary">?colorPrimary</item>
     <item name="colorOnTertiary">@android:color/white</item>
+    <item name="colorSurface">@color/colorSurfaceMd3</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
     <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
@@ -116,9 +111,6 @@
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog.Md3</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-    <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
 
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>

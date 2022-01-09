@@ -4,7 +4,9 @@
     <item name="android:statusBarColor">?android:colorBackground</item>
 
     <item name="colorPrimary">@color/colorPrimary</item>
+    <item name="colorPrimaryVariant">?colorPrimary</item>
     <item name="colorSecondary">?colorPrimary</item>
+    <item name="colorSecondaryVariant">?colorPrimary</item>
     <item name="colorOnSecondary">@android:color/white</item>
     <item name="colorTertiary">?colorPrimary</item>
     <item name="colorOnTertiary">@android:color/white</item>
@@ -17,9 +19,6 @@
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-    <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
 
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>
@@ -43,7 +42,9 @@
 
   <style name="Base.AppTheme" parent="Theme.Material">
     <item name="colorPrimary">@color/appColorDark</item>
+    <item name="colorPrimaryVariant">?colorPrimary</item>
     <item name="colorSecondary">@color/appColorDark</item>
+    <item name="colorSecondaryVariant">?colorPrimary</item>
     <item name="colorOnSecondary">@android:color/black</item>
     <item name="colorTertiary">?colorPrimary</item>
     <item name="colorOnTertiary">@android:color/black</item>
@@ -56,9 +57,6 @@
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="aboutPageHeaderBackground">@color/aboutHeader</item>
-    <item name="aboutPageHeaderContentScrim">@color/aboutHeader</item>
 
     <item name="android:windowActionBar">false</item>
     <item name="android:windowNoTitle">true</item>

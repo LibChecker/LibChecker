@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
+import android.view.ViewGroup
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TimeNodeBottomSheetView
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
@@ -21,8 +24,20 @@ class TimeNodeBottomSheetDialogFragment :
   override fun init() {
     customTitle?.let { getHeaderView().title.text = it }
     itemClickAction?.let {
-      root.adapter.setOnItemClickListener { _, _, position ->
-        it(position)
+      root.adapter.apply {
+        setOnItemClickListener { _, _, position ->
+          it(position)
+        }
+        setEmptyView(
+          EmptyListView(context).apply {
+            layoutParams = ViewGroup.MarginLayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
+            ).also {
+              it.bottomMargin = 16.dp
+            }
+          }
+        )
       }
     }
 
