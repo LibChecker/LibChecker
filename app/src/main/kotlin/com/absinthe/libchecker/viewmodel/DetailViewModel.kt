@@ -96,7 +96,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         extractNativeLibs = properties["extractNativeLibs"] as? Boolean
 
         list.addAll(
-          getNativeChipList(info, isApk, abiSet?.first())
+          getNativeChipList(info, isApk, abiSet?.firstOrNull())
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {

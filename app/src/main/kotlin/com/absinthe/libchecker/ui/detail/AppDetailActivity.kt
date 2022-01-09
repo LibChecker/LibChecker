@@ -1,11 +1,14 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.BroadcastReceiver
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -15,6 +18,7 @@ import android.text.style.StrikethroughSpan
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -24,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ALL
@@ -82,8 +87,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
+import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
 
 const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
@@ -175,6 +182,31 @@ class AppDetailActivity :
                   )
                   show(supportFragmentManager, tag)
                 }
+              }
+              setOnLongClickListener {
+                (drawable as? BitmapDrawable)?.bitmap?.let { bitmap ->
+                  val iconFile = File(externalCacheDir, Constants.TEMP_ICON)
+                  if (!iconFile.exists()) {
+                    iconFile.createNewFile()
+                  }
+                  FileOutputStream(iconFile).use {
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                    it.flush()
+                  }
+                  val uri = FileProvider.getUriForFile(
+                    this@AppDetailActivity,
+                    BuildConfig.APPLICATION_ID + ".fileprovider",
+                    iconFile
+                  )
+                  if (ClipboardUtils.put(
+                      this@AppDetailActivity,
+                      ClipData.newUri(contentResolver, Constants.TEMP_ICON, uri)
+                    )
+                  ) {
+                    Toasty.showShort(this@AppDetailActivity, R.string.toast_copied_to_clipboard)
+                  }
+                }
+                true
               }
             }
             appNameView.apply {

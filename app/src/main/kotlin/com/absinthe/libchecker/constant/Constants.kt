@@ -26,6 +26,7 @@ object Constants {
 
   const val TEMP_PACKAGE = "lc_temp_package.apk"
   const val TEMP_PACKAGE_2 = "lc_temp_package_2.apk"
+  const val TEMP_ICON = "lc_temp_icon.png"
 
   const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
   const val PREF_APK_ANALYTICS = "apkAnalytics"
