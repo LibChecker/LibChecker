@@ -47,8 +47,11 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
+import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
@@ -258,7 +261,16 @@ class LibReferenceFragment :
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
     if (item.itemId == R.id.filter) {
-      val styler = CascadePopupMenu.Styler()
+      val color = if (GlobalValues.md3Theme) {
+        context.getColor(R.color.colorSurfaceMd3)
+      } else {
+        context.getColorByAttr(R.attr.colorSurface)
+      }
+      val styler = CascadePopupMenu.Styler(
+        background = {
+          RoundedRectDrawable(color, radius = 6.dp.toFloat())
+        }
+      )
       popup = CascadePopupMenu(
         context,
         context.findViewById(R.id.filter),

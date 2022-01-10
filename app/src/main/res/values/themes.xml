@@ -95,11 +95,11 @@
     <item name="android:statusBarColor">?android:colorBackground</item>
 
     <item name="colorPrimary">@color/colorPrimaryMd3</item>
-    <item name="colorPrimaryVariant">?colorPrimary</item>
-    <item name="colorSecondary">?colorPrimary</item>
-    <item name="colorSecondaryVariant">?colorPrimary</item>
+    <item name="colorPrimaryVariant">@color/colorPrimaryMd3</item>
+    <item name="colorSecondary">@color/colorPrimaryMd3</item>
+    <item name="colorSecondaryVariant">@color/colorPrimaryMd3</item>
     <item name="colorOnSecondary">@android:color/white</item>
-    <item name="colorTertiary">?colorPrimary</item>
+    <item name="colorTertiary">@color/colorPrimaryMd3</item>
     <item name="colorOnTertiary">@android:color/white</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>

@@ -606,29 +606,30 @@ object PackageUtils {
           break
         }
 
-        if (elementName.contains("lib/") && !elementName.contains("assets/")) {
+        if (elementName.startsWith("lib/")) {
+          elementName = elementName.removePrefix("lib/")
           when {
-            elementName.contains(ARMV8_STRING) -> {
+            elementName.startsWith("$ARMV8_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(ARMV8_STRING) || ignoreArch) {
                 abiSet.add(ARMV8)
               }
             }
-            elementName.contains(ARMV7_STRING) -> {
+            elementName.startsWith("$ARMV7_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(ARMV7_STRING) || ignoreArch) {
                 abiSet.add(ARMV7)
               }
             }
-            elementName.contains(ARMV5_STRING) -> {
+            elementName.startsWith("$ARMV5_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(ARMV5_STRING) || ignoreArch) {
                 abiSet.add(ARMV5)
               }
             }
-            elementName.contains(X86_64_STRING) -> {
+            elementName.startsWith("$X86_64_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(X86_64_STRING) || ignoreArch) {
                 abiSet.add(X86_64)
               }
             }
-            elementName.contains(X86_STRING) -> {
+            elementName.startsWith("$X86_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(X86_STRING) || ignoreArch) {
                 abiSet.add(X86)
               }

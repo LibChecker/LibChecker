@@ -14,6 +14,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
@@ -84,8 +85,13 @@ fun TextView.tintHighlightText(highlightText: String, rawText: String) {
     val builder = SpannableStringBuilder()
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
+    val color = if (GlobalValues.md3Theme) {
+        context.getColor(R.color.colorPrimaryMd3)
+      } else {
+        context.getColor(R.color.colorPrimary)
+      }
     spannableString.setSpan(
-      ForegroundColorSpan(R.color.colorPrimary.getColor(context)),
+      ForegroundColorSpan(color),
       start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
     builder.append(spannableString)
