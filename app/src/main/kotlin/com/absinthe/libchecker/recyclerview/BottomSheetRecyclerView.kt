@@ -1,11 +1,11 @@
-package com.absinthe.libchecker.view.statistics
+package com.absinthe.libchecker.recyclerview
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import rikka.widget.borderview.BorderRecyclerView
 
-class ClassifyRecyclerView : BorderRecyclerView {
+class BottomSheetRecyclerView : BorderRecyclerView {
 
   constructor(context: Context) : super(context)
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)

@@ -30,13 +30,11 @@ class AppBundleBottomSheetDialogFragment :
       } else {
         list.map { split ->
           val name = split.substringAfterLast("/")
+          val middleName = name.removePrefix("split_config.").removeSuffix(".apk")
           val type = when {
-            name.startsWith("split_config.arm") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
-            name.startsWith("split_config.x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
-            name.endsWith("dpi.apk") -> AppBundleItemView.IconType.TYPE_MATERIALS
-            localeList.contains(
-              name.removePrefix("split_config.").removeSuffix(".apk")
-            ) -> AppBundleItemView.IconType.TYPE_STRINGS
+            middleName.startsWith("arm") || middleName.startsWith("x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
+            middleName.endsWith("dpi") -> AppBundleItemView.IconType.TYPE_MATERIALS
+            localeList.contains(middleName) -> AppBundleItemView.IconType.TYPE_STRINGS
             else -> AppBundleItemView.IconType.TYPE_OTHERS
           }
           AppBundleItemBean(name = name, size = File(split).length(), type = type)

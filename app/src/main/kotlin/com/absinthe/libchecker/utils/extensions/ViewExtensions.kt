@@ -86,10 +86,10 @@ fun TextView.tintHighlightText(highlightText: String, rawText: String) {
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
     val color = if (GlobalValues.md3Theme) {
-        context.getColor(R.color.colorPrimaryMd3)
-      } else {
-        context.getColor(R.color.colorPrimary)
-      }
+      context.getColor(R.color.colorPrimaryMd3)
+    } else {
+      context.getColor(R.color.colorPrimary)
+    }
     spannableString.setSpan(
       ForegroundColorSpan(color),
       start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE

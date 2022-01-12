@@ -24,7 +24,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
     }
 
   private val size = AppCompatTextView(
@@ -35,7 +35,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
   ).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
+    setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
   }
 
   init {
