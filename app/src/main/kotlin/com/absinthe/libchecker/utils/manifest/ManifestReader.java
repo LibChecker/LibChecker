@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
+import timber.log.Timber;
+
 
 public class ManifestReader {
   private final HashMap<String, Object> properties = new HashMap<>();
@@ -22,7 +24,7 @@ public class ManifestReader {
     try (JarFile zip = new JarFile(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
-      AxmlReader reader = new AxmlReader(bytes);
+      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
       reader.accept(new AxmlVisitor() {
         @Override
         public NodeVisitor child(String ns, String name) {
@@ -34,7 +36,12 @@ public class ManifestReader {
   }
 
   public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
-    return new ManifestReader(apk, demands).properties;
+    try {
+      return new ManifestReader(apk, demands).properties;
+    } catch (RuntimeException e) {
+      Timber.e(e, "getManifestProperties");
+    }
+    return new HashMap<>(0);
   }
 
   public static byte[] getBytesFromInputStream(InputStream inputStream) {

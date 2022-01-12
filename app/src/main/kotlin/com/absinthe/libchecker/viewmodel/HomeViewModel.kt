@@ -173,7 +173,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             progressCount++
             updateInitProgress(progressCount * 100 / appList.size)
           } catch (e: Throwable) {
-            Timber.e(e, "initItems")
+            Timber.e(e, "initItems: ${info.packageName}")
             continue
           }
 

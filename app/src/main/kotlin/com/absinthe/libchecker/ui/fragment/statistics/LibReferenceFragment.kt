@@ -197,7 +197,6 @@ class LibReferenceFragment :
 
         flip(VF_LIST)
         isListReady = true
-        menu?.findItem(R.id.search)?.isVisible = true
       }
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
@@ -351,7 +350,7 @@ class LibReferenceFragment :
   }
 
   private fun computeRef() {
-    menu?.findItem(R.id.search)?.isVisible = false
+    isListReady = false
     flip(VF_LOADING)
     homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
@@ -403,9 +402,11 @@ class LibReferenceFragment :
       return
     }
     if (child == VF_LOADING) {
+      menu?.findItem(R.id.search)?.isVisible = false
       binding.loadingView.loadingView.resumeAnimation()
       context.appBar?.setRaised(false)
     } else {
+      menu?.findItem(R.id.search)?.isVisible = true
       binding.loadingView.loadingView.pauseAnimation()
       binding.list.scrollToPosition(0)
     }

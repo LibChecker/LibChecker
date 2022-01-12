@@ -298,13 +298,16 @@ class AppListFragment :
               Timber.d("AppList status updates to ${it.status}")
               when (it.status) {
                 STATUS_START_INIT -> {
+                  isListReady = false
                   flip(VF_INIT)
+                  (activity as? INavViewContainer)?.hideNavigationView()
                 }
                 STATUS_INIT_END -> {
                   if (isFirstLaunch) {
                     Once.markDone(OnceTag.FIRST_LAUNCH)
                     Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                   }
+                  (activity as? INavViewContainer)?.showNavigationView()
                 }
                 STATUS_START_REQUEST_CHANGE_END -> {
                   dbItems.value?.let { dbItems -> updateItems(dbItems) }
@@ -398,7 +401,6 @@ class AppListFragment :
 
     appAdapter.setDiffNewData(filterList) {
       flip(VF_LIST)
-      menu?.findItem(R.id.search)?.isVisible = true
       isListReady = true
 
       if (highlightRefresh) {
@@ -432,8 +434,10 @@ class AppListFragment :
       binding.vfContainer.displayedChild = page
     }
     if (page == VF_INIT) {
+      menu?.findItem(R.id.search)?.isVisible = false
       binding.initView.loadingView.resumeAnimation()
     } else {
+      menu?.findItem(R.id.search)?.isVisible = true
       binding.initView.loadingView.pauseAnimation()
     }
   }

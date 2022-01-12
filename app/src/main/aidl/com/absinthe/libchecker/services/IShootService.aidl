@@ -6,6 +6,7 @@ import com.absinthe.libchecker.services.OnShootListener;
 
 interface IShootService {
     void computeSnapshot(in boolean dropPrevious);
+    boolean isShooting();
     void registerOnShootOverListener(in OnShootListener listener);
     void unregisterOnShootOverListener(in OnShootListener listener);
 }

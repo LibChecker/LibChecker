@@ -57,6 +57,8 @@ class ShootService : LifecycleService() {
 
   private val binder by lazy { ShootBinder(this, lifecycleScope) }
 
+  private var _isShooting: Boolean = false
+
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
     Timber.d("onBind")
@@ -128,7 +130,7 @@ class ShootService : LifecycleService() {
     }
     isComputing = true
     Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
-    GlobalValues.hasFinishedShoot = false
+    _isShooting = true
     notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
     showNotification()
     notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
@@ -269,7 +271,7 @@ class ShootService : LifecycleService() {
     Timber.d("computeSnapshots: $timer")
 
     GlobalValues.snapshotTimestamp = ts
-    GlobalValues.hasFinishedShoot = true
+    _isShooting = false
     notifyFinished(ts)
     stopForeground(true)
     stopSelf()
@@ -306,7 +308,8 @@ class ShootService : LifecycleService() {
     var isComputing = false
   }
 
-  class ShootBinder(service: ShootService, private val lifecycleScope: CoroutineScope) : IShootService.Stub() {
+  class ShootBinder(service: ShootService, private val lifecycleScope: CoroutineScope) :
+    IShootService.Stub() {
 
     private val serviceRef: WeakReference<ShootService> = WeakReference(service)
 
@@ -315,6 +318,10 @@ class ShootService : LifecycleService() {
       lifecycleScope.launch(Dispatchers.IO) {
         serviceRef.get()?.computeSnapshots(dropPrevious)
       }
+    }
+
+    override fun isShooting(): Boolean {
+      return serviceRef.get()?._isShooting ?: false
     }
 
     override fun registerOnShootOverListener(listener: OnShootListener?) {

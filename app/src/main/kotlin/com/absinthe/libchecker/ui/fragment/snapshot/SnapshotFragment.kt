@@ -317,7 +317,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
-    if (GlobalValues.hasFinishedShoot) {
+    if (shootBinder?.isShooting == false || !viewModel.isComparingActive()) {
       flip(VF_LIST)
     }
   }
@@ -425,7 +425,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
     return when (resources.configuration.orientation) {
-      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(context)
       Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
         2,
         StaggeredGridLayoutManager.VERTICAL

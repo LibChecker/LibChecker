@@ -71,6 +71,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private var compareDiffJob: Job? = null
 
+  fun isComparingActive(): Boolean = compareDiffJob?.isActive == true
+
   fun compareDiff(
     preTimeStamp: Long,
     currTimeStamp: Long = CURRENT_SNAPSHOT,
@@ -128,7 +130,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
       if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(packageInfo, true) != dbItem.packageSize) ||
+        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(
+          packageInfo,
+          true
+        ) != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(

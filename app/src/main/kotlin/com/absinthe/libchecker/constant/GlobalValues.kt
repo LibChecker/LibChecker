@@ -60,8 +60,6 @@ object GlobalValues {
 
   val season = LCAppUtils.getCurrentSeason()
 
-  var hasFinishedShoot: Boolean = false
-
   var locale: Locale = Locale.getDefault()
     get() {
       val tag = getPreferences().getString(Constants.PREF_LOCALE, null)

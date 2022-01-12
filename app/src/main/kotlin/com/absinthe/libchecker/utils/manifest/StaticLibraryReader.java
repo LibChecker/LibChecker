@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
+import timber.log.Timber;
+
 public class StaticLibraryReader {
   private final HashMap<String, Object> staticLibs = new HashMap<>();
 
@@ -19,7 +21,7 @@ public class StaticLibraryReader {
     try (JarFile zip = new JarFile(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
-      AxmlReader reader = new AxmlReader(bytes);
+      AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);
       reader.accept(new AxmlVisitor() {
         @Override
         public NodeVisitor child(String ns, String name) {
@@ -31,7 +33,12 @@ public class StaticLibraryReader {
   }
 
   public static Map<String, Object> getStaticLibrary(File apk) throws IOException {
-    return new StaticLibraryReader(apk).staticLibs;
+    try {
+      return new StaticLibraryReader(apk).staticLibs;
+    } catch (RuntimeException e) {
+      Timber.e(e, "getStaticLibrary");
+    }
+    return new HashMap<>(0);
   }
 
   public static byte[] getBytesFromInputStream(InputStream inputStream) {
