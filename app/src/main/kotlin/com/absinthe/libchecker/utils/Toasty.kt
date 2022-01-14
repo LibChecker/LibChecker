@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 object Toasty {
 
   private val handler = Handler(Looper.getMainLooper())
-  private var toast: WeakReference<Toast?>? = null
+  private var toast: Toast? = null
 
   @AnyThread
   fun showShort(context: Context, message: String) {
@@ -56,26 +56,26 @@ object Toasty {
   @Suppress("deprecation")
   @MainThread
   private fun show(context: Context, message: String, duration: Int) {
-    toast?.get()?.cancel()
-    toast = null
-    val ctxRef = WeakReference(context)
+    toast?.cancel()
 
-    if (LCAppUtils.atLeastR() && context !is ContextThemeWrapper) {
-      Toast(ctxRef.get()).also {
-        it.duration = duration
-        it.setText(message)
-        toast = WeakReference(it)
-      }.show()
-    } else {
-      val view = ToastView(ctxRef.get()!!).also {
-        it.message.text = message
+    WeakReference(context).get()?.let { ctx ->
+      if (LCAppUtils.atLeastR() && context !is ContextThemeWrapper) {
+        Toast(ctx).also {
+          it.duration = duration
+          it.setText(message)
+          toast = it
+        }.show()
+      } else {
+        val view = ToastView(ctx).also {
+          it.message.text = message
+        }
+        Toast(ctx).also {
+          it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
+          it.duration = duration
+          it.view = view
+          toast = it
+        }.show()
       }
-      Toast(ctxRef.get()).also {
-        it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
-        it.duration = duration
-        it.view = view
-        toast = WeakReference(it)
-      }.show()
     }
   }
 }
