@@ -103,7 +103,6 @@
     <item name="colorOnSecondary">@android:color/white</item>
     <item name="colorTertiary">@color/colorPrimaryMd3</item>
     <item name="colorOnTertiary">@android:color/white</item>
-    <item name="colorSecondaryContainer">@color/colorSurfaceMd3</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
     <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
