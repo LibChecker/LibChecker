@@ -123,6 +123,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      clipChildren = false
       setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
       addView(this)

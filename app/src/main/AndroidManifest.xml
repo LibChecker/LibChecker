@@ -131,6 +131,11 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/filepaths" />
     </provider>
+    <provider
+      android:name="androidx.startup.InitializationProvider"
+      android:authorities="${applicationId}.androidx-startup"
+      android:exported="false"
+      tools:node="remove" />
 
   </application>
 
