@@ -13,6 +13,7 @@ import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.AViewGroup
@@ -75,7 +76,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextColor(R.color.textNormal.getColor(context))
+      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       maxLines = 1
       ellipsize = TextUtils.TruncateAt.END
@@ -88,7 +89,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(R.color.textNormal.getColor(context))
+        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         maxLines = 1
         ellipsize = TextUtils.TruncateAt.END
@@ -129,7 +130,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       addView(this)
     }
 
-    var badge: AppCompatImageView? = null
+    private var badge: AppCompatImageView? = null
 
     fun setBadge(res: Int) {
       setBadge(res.getDrawable(context))

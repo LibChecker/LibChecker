@@ -147,13 +147,14 @@ dependencies {
   implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.2")
   implementation("org.smali:dexlib2:2.5.2")
 
-  implementation("dev.rikka.rikkax.appcompat:appcompat:1.4.1")
   implementation("dev.rikka.rikkax.core:core:1.3.3")
-  implementation("dev.rikka.rikkax.material:material:1.6.6")
-  implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
-  implementation("dev.rikka.rikkax.widget:borderview:1.1.0")
-  implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
   implementation("dev.rikka.rikkax.insets:insets:1.1.1")
+  implementation("dev.rikka.rikkax.material:material:1.6.6")
+  implementation("dev.rikka.rikkax.widget:borderview:1.1.0")
+  implementation("dev.rikka.rikkax.appcompat:appcompat:1.4.1")
+  implementation("dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0")
+  implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
+  implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
 
   debugImplementation(Libs.leakCanary)
 }

@@ -24,7 +24,7 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
     val horizontalPadding = 16.dp
     val verticalPadding = 8.dp
     setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
-    setBackgroundColor(R.color.highlightComponent.getColor(context))
+    setBackgroundColor(R.color.highlight_component.getColor(context))
   }
 
   private val icon = AppCompatImageView(context).apply {

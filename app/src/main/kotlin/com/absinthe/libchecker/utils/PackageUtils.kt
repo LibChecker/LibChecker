@@ -376,10 +376,18 @@ object PackageUtils {
    */
   private fun isKotlinUsedInClassDex(file: File): Boolean {
     return try {
-      DexFileFactory.loadDexFile(file, Opcodes.getDefault()).classes
-        .any {
-          it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
+      DexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
+        dexEntryNames.forEach { entry ->
+          val isKotlinUsage = getEntry(entry)?.dexFile?.classes
+            ?.any {
+              it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
+            } ?: false
+          if (isKotlinUsage) {
+            return true
+          }
         }
+      }
+      return false
     } catch (e: Throwable) {
       false
     }
@@ -837,10 +845,18 @@ object PackageUtils {
         return false
       }
       val typeName = "L${className.replace(".", "/")};"
-      return DexFileFactory.loadDexFile(path, Opcodes.getDefault()).classes
-        .any {
-          it.type == typeName
+      DexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+        dexEntryNames.forEach { entry ->
+          val isKotlinUsage = getEntry(entry)?.dexFile?.classes
+            ?.any {
+              it.type == typeName
+            } ?: false
+          if (isKotlinUsage) {
+            return true
+          }
         }
+      }
+      return false
     } catch (e: Exception) {
       return false
     }
@@ -866,30 +882,38 @@ object PackageUtils {
       }
       var splits: List<String>
 
-      val primaryList = DexFileFactory.loadDexFile(path, Opcodes.getDefault()).classes
-        .asSequence()
-        .map { it.substring(1, it.length - 1).replace("/", ".") }
-        .filter { !it.startsWith(packageName) }
-        .map { item ->
-          splits = item.split(".")
-          when {
-            // Remove obfuscated classes
-            splits.any { it.length == 1 } -> LibStringItem("")
-            // Merge AndroidX classes
-            splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
-            // Filter classes which paths deep level greater than 4
-            else -> LibStringItem(
-              splits.subList(0, splits.size.coerceAtMost(4))
-                .joinToString(separator = ".")
-            )
+      val primaryList = mutableListOf<LibStringItem>()
+      DexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+        dexEntryNames.forEach { entry ->
+          getEntry(entry)?.let { dexEntry ->
+            primaryList += dexEntry.dexFile.classes
+              .asSequence()
+              .map { it.substring(1, it.length - 1).replace("/", ".") }
+              .filter { !it.startsWith(packageName) }
+              .map { item ->
+                splits = item.split(".")
+                when {
+                  // Remove obfuscated classes
+                  splits.any { it.length == 1 } -> LibStringItem("")
+                  // Merge AndroidX classes
+                  splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
+                  // Filter classes which paths deep level greater than 4
+                  else -> LibStringItem(
+                    splits.subList(0, splits.size.coerceAtMost(4))
+                      .joinToString(separator = ".")
+                  )
+                }
+              }
+              .toSet()
+              .filter {
+                it.name.length > 11 && it.name.contains(".") &&
+                  (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
+              } // Remove obfuscated classes
+              .toMutableList()
           }
         }
-        .toSet()
-        .filter {
-          it.name.length > 11 && it.name.contains(".") &&
-            (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
-        } // Remove obfuscated classes
-        .toMutableList()
+      }
+
       // Merge path deep level 3 classes
       primaryList.filter { it.name.split(".").size == 3 }.forEach {
         primaryList.removeAll { item -> item.name.startsWith(it.name) }

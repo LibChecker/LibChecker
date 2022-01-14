@@ -10,7 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -50,7 +50,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
         it.marginStart = 8.dp
         it.marginEnd = 8.dp
       }
-      setTextColor(R.color.textNormal.getColor(context))
+      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       addView(this)
     }
@@ -64,7 +64,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
           it.marginStart = 8.dp
           it.marginEnd = 8.dp
         }
-        setTextColor(R.color.textNormal.getColor(context))
+        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         addView(this)
       }

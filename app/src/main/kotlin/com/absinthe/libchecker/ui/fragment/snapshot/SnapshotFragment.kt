@@ -317,7 +317,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
-    if (shootBinder?.isShooting == false || !viewModel.isComparingActive()) {
+    if (!viewModel.isComparingActive()) {
       flip(VF_LIST)
     }
   }

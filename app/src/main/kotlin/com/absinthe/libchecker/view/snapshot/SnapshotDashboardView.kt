@@ -9,6 +9,7 @@ import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
@@ -48,7 +49,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(R.color.textNormal.getColor(context))
+        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       }
 
@@ -78,7 +79,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(R.color.textNormal.getColor(context))
+        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {

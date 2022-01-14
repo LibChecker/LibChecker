@@ -24,7 +24,7 @@ import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
@@ -154,12 +154,12 @@ class ChartFragment :
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter(chartView as PieChart))
         setValueTextSize(10f)
-        setValueTextColor(R.color.textNormal.getColor(requireContext()))
+        setValueTextColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
       }
 
       (chartView as PieChart).apply {
         this.data = data
-        setEntryLabelColor(R.color.textNormal.getColor(requireContext()))
+        setEntryLabelColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
         highlightValues(null)
         invalidate()
       }
@@ -297,7 +297,7 @@ class ChartFragment :
       // dataSet.setSelectionShift(0f);
       val data = BarData(dataSet).apply {
         setValueTextSize(10f)
-        setValueTextColor(R.color.textNormal.getColor(requireContext()))
+        setValueTextColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
       }
 
       (chartView as HorizontalBarChart).apply {
@@ -439,6 +439,7 @@ class ChartFragment :
   }
 
   private fun generatePieChartView(): PieChart {
+    val colorOnSurface = requireContext().getColorByAttr(R.attr.colorOnSurface)
     return PieChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -450,23 +451,24 @@ class ChartFragment :
         verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
         horizontalAlignment = Legend.LegendHorizontalAlignment.LEFT
         orientation = Legend.LegendOrientation.HORIZONTAL
-        textColor = R.color.textNormal.getColor(requireContext())
+        textColor = colorOnSurface
         xEntrySpace = 7f
         yEntrySpace = 0f
         isWordWrapEnabled = true
       }
       setUsePercentValues(true)
       setExtraOffsets(24f, 0f, 24f, 0f)
-      setEntryLabelColor(R.color.textNormal.getColor(requireContext()))
+      setEntryLabelColor(colorOnSurface)
       setEntryLabelTextSize(11f)
       setNoDataText(getString(R.string.loading))
-      setNoDataTextColor(R.color.textNormal.getColor(requireContext()))
+      setNoDataTextColor(colorOnSurface)
       setOnChartValueSelectedListener(this@ChartFragment)
       setHoleColor(Color.TRANSPARENT)
     }
   }
 
   private fun generateBarChartView(): HorizontalBarChart {
+    val colorOnSurface = requireContext().getColorByAttr(R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -485,19 +487,19 @@ class ChartFragment :
         setLabelCount(existApiList.size, false)
         granularity = 1f
         textSize = 10f
-        textColor = R.color.textNormal.getColor(requireContext())
+        textColor = colorOnSurface
       }
       axisLeft.apply {
         valueFormatter = IntegerFormatter()
         setDrawGridLines(false)
         setDrawZeroLine(false)
-        textColor = R.color.textNormal.getColor(requireContext())
+        textColor = colorOnSurface
       }
       axisRight.apply {
         valueFormatter = IntegerFormatter()
         setDrawGridLines(false)
         setDrawZeroLine(false)
-        textColor = R.color.textNormal.getColor(requireContext())
+        textColor = colorOnSurface
       }
       setMaxVisibleValueCount(apiScope)
       setDrawGridBackground(false)
@@ -505,7 +507,7 @@ class ChartFragment :
       setDrawMarkers(false)
       setExtraOffsets(12f, 0f, 24f, 0f)
       setNoDataText(getString(R.string.loading))
-      setNoDataTextColor(R.color.textNormal.getColor(context))
+      setNoDataTextColor(colorOnSurface)
       setOnChartValueSelectedListener(this@ChartFragment)
     }
   }

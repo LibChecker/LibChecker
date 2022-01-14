@@ -10,9 +10,9 @@ import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.chip.Chip
@@ -34,7 +34,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(R.color.textNormal.getColor(context))
+      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }
@@ -71,7 +71,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
 
         if (!GlobalValues.isColorfulIcon.valueUnsafe) {
           if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-            chipIconTint = R.color.textNormal.toColorStateList(context)
+            chipIconTint = context.getColorStateListByAttr(R.attr.colorOnSurface)
           } else {
             val icon = chipIcon
             icon?.let {

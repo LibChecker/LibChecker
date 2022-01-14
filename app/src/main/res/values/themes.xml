@@ -11,6 +11,7 @@
     <item name="colorOnSecondary">@android:color/white</item>
     <item name="colorTertiary">?colorPrimary</item>
     <item name="colorOnTertiary">@android:color/white</item>
+    <item name="colorSecondaryContainer">@color/background_gray</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
     <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
@@ -43,13 +44,14 @@
   <style name="Theme.Light" parent="Base.AppTheme.Light" />
 
   <style name="Base.AppTheme" parent="Theme.Material">
-    <item name="colorPrimary">@color/appColorDark</item>
+    <item name="colorPrimary">@color/app_color_dark</item>
     <item name="colorPrimaryVariant">?colorPrimary</item>
-    <item name="colorSecondary">@color/appColorDark</item>
+    <item name="colorSecondary">@color/app_color_dark</item>
     <item name="colorSecondaryVariant">?colorPrimary</item>
     <item name="colorOnSecondary">@android:color/black</item>
     <item name="colorTertiary">?colorPrimary</item>
     <item name="colorOnTertiary">@android:color/black</item>
+    <item name="colorSecondaryContainer">@color/background_gray</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
     <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
@@ -101,6 +103,7 @@
     <item name="colorOnSecondary">@android:color/white</item>
     <item name="colorTertiary">@color/colorPrimaryMd3</item>
     <item name="colorOnTertiary">@android:color/white</item>
+    <item name="colorSecondaryContainer">@color/colorSurfaceMd3</item>
 
     <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
     <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>

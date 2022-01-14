@@ -23,7 +23,7 @@ object Libs {
   const val preference = "androidx.preference:preference-ktx:1.1.1"
   const val window = "androidx.window:window:1.0.0-beta04"
   const val viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
-  const val material = "com.google.android.material:material:1.6.0-alpha01"
+  const val material = "com.google.android.material:material:1.5.0"
 
   const val leakCanary = "com.squareup.leakcanary:leakcanary-android:2.8.1"
   const val okHttp = "com.squareup.okhttp3:okhttp:4.9.3"

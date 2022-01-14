@@ -4,7 +4,7 @@
   android:viewportWidth="24"
   android:viewportHeight="24">
   <path
-    android:fillColor="@color/libIconBackground"
+    android:fillColor="@color/lib_icon_background"
     android:pathData="M12.0117,22.4297C6.2505,22.4297 1.5938,17.7729 1.5938,12.0117C1.5938,6.2505 6.2505,1.5938 12.0117,1.5938C17.7729,1.5938 22.4297,6.2505 22.4297,12.0117C22.4297,17.7729 17.7729,22.4297 12.0117,22.4297Z" />
   <path
     android:fillColor="@color/colorPrimary"

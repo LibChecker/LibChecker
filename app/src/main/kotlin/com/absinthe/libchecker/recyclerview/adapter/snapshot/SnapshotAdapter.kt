@@ -2,6 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -18,7 +19,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.toColorStateList
@@ -67,7 +68,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
           val bitmap = R.drawable.ic_app_list.getDrawable(context)?.apply {
-            setTint(R.color.textNormal.getColor(context))
+            setTint(context.getColorByAttr(R.attr.colorOnSurface))
           }?.toBitmap(40.dp, 40.dp)
           icon.post { icon.setImageBitmap(bitmap) }
         }
@@ -82,28 +83,27 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       var isNewOrDeleted = false
 
       when {
-        item.deleted -> {
-          holder.itemView.backgroundTintList = R.color.material_red_300.toColorStateList(context)
-          versionInfo.setTextColor(R.color.textNormal.getColor(context))
-          packageSizeInfo.setTextColor(R.color.textNormal.getColor(context))
-          targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
-          abiInfo.setTextColor(R.color.textNormal.getColor(context))
-          isNewOrDeleted = true
-        }
-        item.newInstalled -> {
-          holder.itemView.backgroundTintList = R.color.material_green_300.toColorStateList(context)
-          versionInfo.setTextColor(R.color.textNormal.getColor(context))
-          packageSizeInfo.setTextColor(R.color.textNormal.getColor(context))
-          targetApiInfo.setTextColor(R.color.textNormal.getColor(context))
-          abiInfo.setTextColor(R.color.textNormal.getColor(context))
+        item.deleted || item.newInstalled -> {
+          val background = if (item.deleted) {
+            R.color.material_red_300.toColorStateList(context)
+          } else {
+            R.color.material_green_300.toColorStateList(context)
+          }
+          holder.itemView.backgroundTintList = background
+          val color = context.getColorByAttr(R.attr.colorOnSurface)
+          versionInfo.setTextColor(color)
+          packageSizeInfo.setTextColor(color)
+          targetApiInfo.setTextColor(color)
+          abiInfo.setTextColor(color)
           isNewOrDeleted = true
         }
         else -> {
           holder.itemView.backgroundTintList = null
-          versionInfo.setTextColor(android.R.color.darker_gray.getColor(context))
-          packageSizeInfo.setTextColor(android.R.color.darker_gray.getColor(context))
-          targetApiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
-          abiInfo.setTextColor(android.R.color.darker_gray.getColor(context))
+          val color = Color.GRAY
+          versionInfo.setTextColor(color)
+          packageSizeInfo.setTextColor(color)
+          targetApiInfo.setTextColor(color)
+          abiInfo.setTextColor(color)
         }
       }
 

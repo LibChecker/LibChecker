@@ -71,7 +71,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private var compareDiffJob: Job? = null
 
-  fun isComparingActive(): Boolean = compareDiffJob?.isActive == true
+  fun isComparingActive(): Boolean = compareDiffJob == null || compareDiffJob?.isActive == true
 
   fun compareDiff(
     preTimeStamp: Long,

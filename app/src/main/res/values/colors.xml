@@ -5,14 +5,15 @@
   <color name="aboutHeader">#6200EE</color>
   <color name="textNormal">#FF000000</color>
   <color name="textSecondary">#80464646</color>
-  <color name="backgroundGray">#FFDFDFDF</color>
-  <color name="libIconBackground">#10000000</color>
-  <color name="featureBackground">#15000000</color>
-  <color name="featureRipple">#40000000</color>
 
-  <color name="appColorDark">#B1B8DF</color>
+  <color name="background_gray">#FFDFDFDF</color>
+  <color name="lib_icon_background">#10000000</color>
+  <color name="feature_background">#15000000</color>
+  <color name="feature_ripple">#40000000</color>
+
+  <color name="app_color_dark">#B1B8DF</color>
   <color name="renge">#FFAB373A</color>
-  <color name="highlightComponent">@color/material_blue_100</color>
+  <color name="highlight_component">@color/material_blue_100</color>
 
   <color name="bottom_sheet_header_handler">#CCDFDFDF</color>
   <color name="bottom_sheet_header_handler_activated">#CC444444</color>

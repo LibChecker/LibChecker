@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.AlwaysMarqueeTextView
@@ -35,7 +36,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     ).also {
       it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
     }
-    setTextColor(R.color.textNormal.getColor(context))
+    setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     addView(this)
   }
@@ -46,7 +47,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(R.color.textNormal.getColor(context))
+      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }

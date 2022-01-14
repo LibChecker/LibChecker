@@ -130,7 +130,7 @@ class LibStringAdapter(@LibType val type: Int) :
       val drawable = TransitionDrawable(
         listOf(
           ColorDrawable(Color.TRANSPARENT),
-          ColorDrawable(R.color.highlightComponent.getColor(context))
+          ColorDrawable(R.color.highlight_component.getColor(context))
         ).toTypedArray()
       )
       holder.itemView.background = drawable
