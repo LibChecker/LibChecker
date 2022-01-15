@@ -24,6 +24,7 @@ import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.bean.DetailExtraBean
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.database.AppItemRepository
@@ -132,7 +133,11 @@ object LCAppUtils {
     return null
   }
 
-  suspend fun getRuleWithDexChecking(name: String, packageName: String? = null): RuleEntity? {
+  private suspend fun getRuleWithDexChecking(
+    name: String,
+    packageName: String? = null,
+    nativeLibs: List<LibStringItem>? = null
+  ): RuleEntity? {
     val ruleEntity = Repositories.ruleRepository.getRule(name) ?: return null
     if (ruleEntity.type == NATIVE) {
       if (packageName == null) {
@@ -148,7 +153,12 @@ object LCAppUtils {
           }
         }
         "libapp.so" -> {
-          return if (PackageUtils.hasDexClass(packageName, "io.flutter.FlutterInjector", isApk)) {
+          return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
+              packageName,
+              "io.flutter.FlutterInjector",
+              isApk
+            )
+          ) {
             ruleEntity
           } else {
             null
@@ -164,9 +174,10 @@ object LCAppUtils {
   suspend fun getRuleWithRegex(
     name: String,
     @LibType type: Int,
-    packageName: String? = null
+    packageName: String? = null,
+    nativeLibs: List<LibStringItem>? = null
   ): RuleEntity? {
-    return getRuleWithDexChecking(name, packageName) ?: findRuleRegex(name, type)
+    return getRuleWithDexChecking(name, packageName, nativeLibs) ?: findRuleRegex(name, type)
   }
 
   fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
@@ -190,7 +201,12 @@ object LCAppUtils {
     }
   }
 
-  fun launchDetailPage(context: FragmentActivity, item: LCItem, refName: String? = null, refType: Int = NATIVE) {
+  fun launchDetailPage(
+    context: FragmentActivity,
+    item: LCItem,
+    refName: String? = null,
+    refType: Int = NATIVE
+  ) {
     if (item.abi.toInt() == OVERLAY) {
       OverlayDetailBottomSheetDialogFragment().apply {
         arguments = bundleOf(

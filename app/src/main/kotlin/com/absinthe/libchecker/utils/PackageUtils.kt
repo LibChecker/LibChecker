@@ -39,11 +39,11 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.delay
-import org.jf.dexlib2.DexFileFactory
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
 import java.io.BufferedReader
@@ -376,7 +376,7 @@ object PackageUtils {
    */
   private fun isKotlinUsedInClassDex(file: File): Boolean {
     return try {
-      DexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
+      FastDexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
           val isKotlinUsage = getEntry(entry)?.dexFile?.classes
             ?.any {
@@ -845,13 +845,13 @@ object PackageUtils {
         return false
       }
       val typeName = "L${className.replace(".", "/")};"
-      DexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
-          val isKotlinUsage = getEntry(entry)?.dexFile?.classes
+          val hasDex = getEntry(entry)?.dexFile?.classes
             ?.any {
               it.type == typeName
             } ?: false
-          if (isKotlinUsage) {
+          if (hasDex) {
             return true
           }
         }
@@ -863,7 +863,7 @@ object PackageUtils {
   }
 
   /**
-   * Get part of DEX classes of an app
+   * Get part of DEX classes (at most 5 DEX's) of an app
    * @param packageName Package name
    * @param isApk True if it is an apk file
    * @return List of LibStringItem
@@ -883,18 +883,23 @@ object PackageUtils {
       var className: String
 
       val primaryList = mutableListOf<LibStringItem>()
-      val pkgType = "L${packageName.replace(".", "/")};"
-      DexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
-        dexEntryNames.forEach { entry ->
+      val pkgType = "L${packageName.replace(".", "/")}"
+      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+        dexEntryNames.forEachIndexed { index, entry ->
+          if (index >= 5) {
+            return@forEachIndexed
+          }
           getEntry(entry)?.let { dexEntry ->
             primaryList += dexEntry.dexFile.classes
               .asSequence()
-              .filter { !it.startsWith(pkgType) }
+              .filter { !it.type.startsWith(pkgType) }
               .map { item ->
-                className = item.substring(1, item.length - 1).replace("/", ".")
+                className = item.type.substring(1, item.length - 1).replace("/", ".")
                 when {
                   // Remove obfuscated classes
                   !className.contains(".") -> LibStringItem("")
+                  // Remove kotlin
+                  className.startsWith("kotlin") -> LibStringItem("")
                   // Merge AndroidX classes
                   className.startsWith("androidx") -> LibStringItem(
                     className.substring(
@@ -914,12 +919,13 @@ object PackageUtils {
                 }
               }
               .toSet()
+              .filter { it.name.isNotBlank() }
               .toMutableList()
           }
         }
       }
 
-      // Merge path deep level 3 classes
+      //Merge path deep level 3 classes
       primaryList.filter { it.name.split(".").size == 3 }.forEach {
         primaryList.removeAll { item -> item.name.startsWith(it.name) }
         primaryList.add(it)

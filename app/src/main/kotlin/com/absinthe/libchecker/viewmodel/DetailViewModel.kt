@@ -38,6 +38,7 @@ import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
@@ -118,8 +119,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     permissionsItems.postValue(getPermissionChipList(packageName))
   }
 
-  fun initDexData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
-    dexLibItems.postValue(getDexChipList(packageName))
+  var initDexJob: Job? = null
+
+  fun initDexData(packageName: String) {
+    initDexJob?.cancel()
+    initDexJob = viewModelScope.launch(Dispatchers.IO) {
+      val list = getDexChipList(packageName)
+      dexLibItems.postValue(list)
+    }.also {
+      it.start()
+    }
   }
 
   fun initComponentsData(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -227,7 +236,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       return chipList
     } else {
       list.forEach {
-        chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName)?.let { rule ->
+        chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)?.let { rule ->
           LibChip(
             iconRes = IconResMap.getIconRes(rule.iconIndex),
             name = rule.label,

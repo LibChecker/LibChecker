@@ -58,6 +58,11 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
     viewModel.initDexData(packageName)
   }
 
+  override fun onDetach() {
+    super.onDetach()
+    viewModel.initDexJob?.cancel()
+  }
+
   companion object {
     fun newInstance(packageName: String): DexAnalysisFragment {
       return DexAnalysisFragment().putArguments(
