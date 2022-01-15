@@ -530,9 +530,9 @@ object PackageUtils {
         }
 
         val name = if (isSimpleName) {
-          it.name.removePrefix(packageName)
+          it.name.orEmpty().removePrefix(packageName)
         } else {
-          it.name
+          it.name.orEmpty()
         }
         StatefulComponent(name, isEnabled, it.processName.removePrefix(it.packageName))
       }
@@ -880,35 +880,40 @@ object PackageUtils {
       if (path.isNullOrEmpty()) {
         return emptyList()
       }
-      var splits: List<String>
+      var className: String
 
       val primaryList = mutableListOf<LibStringItem>()
+      val pkgType = "L${packageName.replace(".", "/")};"
       DexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
           getEntry(entry)?.let { dexEntry ->
             primaryList += dexEntry.dexFile.classes
               .asSequence()
-              .map { it.substring(1, it.length - 1).replace("/", ".") }
-              .filter { !it.startsWith(packageName) }
+              .filter { !it.startsWith(pkgType) }
               .map { item ->
-                splits = item.split(".")
+                className = item.substring(1, item.length - 1).replace("/", ".")
                 when {
                   // Remove obfuscated classes
-                  splits.any { it.length == 1 } -> LibStringItem("")
+                  !className.contains(".") -> LibStringItem("")
                   // Merge AndroidX classes
-                  splits[0] == "androidx" -> LibStringItem("${splits[0]}.${splits[1]}")
+                  className.startsWith("androidx") -> LibStringItem(
+                    className.substring(
+                      0,
+                      className.indexOf(
+                        ".",
+                        9
+                      )
+                    )
+                  )
                   // Filter classes which paths deep level greater than 4
                   else -> LibStringItem(
-                    splits.subList(0, splits.size.coerceAtMost(4))
-                      .joinToString(separator = ".")
+                    className.split(".").run {
+                      this.subList(0, this.size.coerceAtMost(4)).joinToString(separator = ".")
+                    }
                   )
                 }
               }
               .toSet()
-              .filter {
-                it.name.length > 11 && it.name.contains(".") &&
-                  (!it.name.contains("0") || !it.name.contains("O") || !it.name.contains("o"))
-              } // Remove obfuscated classes
               .toMutableList()
           }
         }

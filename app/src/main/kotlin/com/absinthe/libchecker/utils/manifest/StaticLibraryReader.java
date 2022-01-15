@@ -1,9 +1,5 @@
 package com.absinthe.libchecker.utils.manifest;
 
-import com.absinthe.libraries.axml.axml.AxmlReader;
-import com.absinthe.libraries.axml.axml.AxmlVisitor;
-import com.absinthe.libraries.axml.axml.NodeVisitor;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
-import timber.log.Timber;
+import pxb.android.axml.AxmlReader;
+import pxb.android.axml.AxmlVisitor;
+import pxb.android.axml.NodeVisitor;
 
 public class StaticLibraryReader {
   private final HashMap<String, Object> staticLibs = new HashMap<>();
@@ -33,12 +31,7 @@ public class StaticLibraryReader {
   }
 
   public static Map<String, Object> getStaticLibrary(File apk) throws IOException {
-    try {
-      return new StaticLibraryReader(apk).staticLibs;
-    } catch (RuntimeException e) {
-      Timber.e(e, "getStaticLibrary");
-    }
-    return new HashMap<>(0);
+    return new StaticLibraryReader(apk).staticLibs;
   }
 
   public static byte[] getBytesFromInputStream(InputStream inputStream) {

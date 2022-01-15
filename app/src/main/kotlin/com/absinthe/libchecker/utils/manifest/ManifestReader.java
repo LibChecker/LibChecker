@@ -1,9 +1,5 @@
 package com.absinthe.libchecker.utils.manifest;
 
-import com.absinthe.libraries.axml.axml.AxmlReader;
-import com.absinthe.libraries.axml.axml.AxmlVisitor;
-import com.absinthe.libraries.axml.axml.NodeVisitor;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
-import timber.log.Timber;
+import pxb.android.axml.AxmlReader;
+import pxb.android.axml.AxmlVisitor;
+import pxb.android.axml.NodeVisitor;
 
 
 public class ManifestReader {
@@ -36,12 +34,7 @@ public class ManifestReader {
   }
 
   public static Map<String, Object> getManifestProperties(File apk, String[] demands) throws IOException {
-    try {
-      return new ManifestReader(apk, demands).properties;
-    } catch (RuntimeException e) {
-      Timber.e(e, "getManifestProperties");
-    }
-    return new HashMap<>(0);
+    return new ManifestReader(apk, demands).properties;
   }
 
   public static byte[] getBytesFromInputStream(InputStream inputStream) {

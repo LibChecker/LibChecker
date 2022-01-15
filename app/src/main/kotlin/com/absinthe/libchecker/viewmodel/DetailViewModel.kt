@@ -363,8 +363,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getDexChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getDexChipList")
-    val list =
+    val list = try {
       PackageUtils.getDexList(packageName, packageName.isTempApk()).toMutableList()
+    } catch (e: Exception) {
+      Timber.e(e)
+      emptyList()
+    }
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 
