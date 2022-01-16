@@ -925,7 +925,7 @@ object PackageUtils {
         }
       }
 
-      //Merge path deep level 3 classes
+      // Merge path deep level 3 classes
       primaryList.filter { it.name.split(".").size == 3 }.forEach {
         primaryList.removeAll { item -> item.name.startsWith(it.name) }
         primaryList.add(it)

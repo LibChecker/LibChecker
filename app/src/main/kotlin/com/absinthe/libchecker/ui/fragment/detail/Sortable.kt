@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-fun interface Sortable {
+interface Sortable {
   suspend fun sort()
+  fun filterList(text: String)
 }

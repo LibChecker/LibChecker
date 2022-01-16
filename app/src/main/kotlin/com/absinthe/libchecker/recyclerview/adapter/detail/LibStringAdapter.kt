@@ -19,19 +19,18 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
 import com.absinthe.libchecker.view.detail.StaticLibItemView
-import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
-class LibStringAdapter(@LibType val type: Int) :
-  BaseQuickAdapter<LibStringItemChip, BaseViewHolder>(0) {
+class LibStringAdapter(@LibType val type: Int) : HighlightAdapter<LibStringItemChip>() {
 
   var highlightPosition: Int = -1
     private set
@@ -67,21 +66,21 @@ class LibStringAdapter(@LibType val type: Int) :
     when (type) {
       NATIVE -> {
         (holder.itemView as NativeLibItemView).apply {
-          libName.text = itemName
+          setOrHighlightText(libName, itemName)
           libSize.text = PackageUtils.sizeToString(context, item.item)
           setChip(item.chip)
         }
       }
       METADATA -> {
         (holder.itemView as NativeLibItemView).apply {
-          libName.text = itemName
+          setOrHighlightText(libName, itemName)
           libSize.text = item.item.source
           setChip(item.chip)
         }
       }
       STATIC -> {
         (holder.itemView as StaticLibItemView).apply {
-          libName.text = itemName
+          setOrHighlightText(libName, itemName)
           libDetail.let {
             if (LCAppUtils.atLeastQ()) {
               it.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
@@ -113,7 +112,7 @@ class LibStringAdapter(@LibType val type: Int) :
       }
       else -> {
         (holder.itemView as ComponentLibItemView).apply {
-          libName.text = itemName
+          setOrHighlightText(libName, itemName)
           setChip(item.chip)
         }
       }

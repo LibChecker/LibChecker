@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.DISABLED
@@ -24,6 +23,8 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
+
+  private var itemsList: List<LibStringItemChip>? = null
 
   override fun init() {
     binding.apply {
@@ -59,14 +60,17 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
             } else {
               adapter.data.sortedByDescending { it.item.name }
             }
+            itemsList = list
 
-            withContext(Dispatchers.Main) {
-              binding.list.addItemDecoration(
-                DividerItemDecoration(
-                  requireContext(), DividerItemDecoration.VERTICAL
-                )
-              )
-              adapter.setDiffNewData(list, navigateToComponentTask)
+            if (viewModel.queriedText?.isNotEmpty() == true) {
+              filterList(viewModel.queriedText!!)
+            } else {
+              withContext(Dispatchers.Main) {
+                context?.let {
+                  binding.list.addItemDecoration(dividerItemDecoration)
+                }
+                adapter.setDiffNewData(list, afterListReadyTask)
+              }
             }
           }
         }
@@ -87,6 +91,10 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return itemsList?.filter { it.item.name.contains(text, true) }
   }
 
   private fun doOnLongClick(componentName: String) {

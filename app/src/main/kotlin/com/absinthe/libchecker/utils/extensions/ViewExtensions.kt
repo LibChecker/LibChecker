@@ -79,7 +79,7 @@ fun ViewGroup.setSystemPadding() {
   setPadding(0, if (isOrientationLandscape) 0 else UiUtils.getStatusBarHeight(), 0, 0)
 }
 
-fun TextView.tintHighlightText(highlightText: String, rawText: String) {
+fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
   text = rawText
   if (text.contains(highlightText, true)) {
     val builder = SpannableStringBuilder()

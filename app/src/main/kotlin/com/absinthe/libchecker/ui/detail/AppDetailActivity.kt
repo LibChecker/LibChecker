@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.ClipData
 import android.content.Context
@@ -15,9 +16,7 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
-import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -48,10 +47,8 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
-import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
-import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.impl.AbilityAnalysisFragment
@@ -76,7 +73,6 @@ import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
-import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -92,31 +88,29 @@ import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 
-const val EXTRA_PACKAGE_NAME = "android.intent.extra.PACKAGE_NAME"
+@SuppressLint("InlinedApi")
+const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
 const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
-class AppDetailActivity :
-  CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
-  IDetailContainer {
+class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
   private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
   private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
   private val refType by unsafeLazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
   private val extraBean by unsafeLazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
-  private val viewModel: DetailViewModel by viewModels()
   private val featureAdapter by unsafeLazy { FeatureAdapter() }
 
   private var isHarmonyMode = false
   private var featureListView: RecyclerView? = null
   private var typeList = mutableListOf<Int>()
 
-  override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
-
   override fun requirePackageName() = pkgName
+  override fun getToolbar() = binding.toolbar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    isPackageReady = true
     initView()
     resolveReferenceExtras()
   }
@@ -131,20 +125,7 @@ class AppDetailActivity :
     unregisterPackageBroadcast()
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
-      finish()
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
   private fun initView() {
-    setSupportActionBar(binding.toolbar)
-    supportActionBar?.apply {
-      setDisplayHomeAsUpEnabled(true)
-      setDisplayShowHomeEnabled(true)
-    }
-
     pkgName?.let { packageName ->
       viewModel.packageName = packageName
       binding.apply {

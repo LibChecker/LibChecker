@@ -65,6 +65,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var isApk = false
   var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
+  var queriedText: String? = null
 
   init {
     componentsMap.put(SERVICE, MutableLiveData())

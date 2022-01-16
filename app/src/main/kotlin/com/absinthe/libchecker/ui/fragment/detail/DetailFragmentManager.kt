@@ -40,6 +40,15 @@ class DetailFragmentManager {
     }
   }
 
+  fun deliverFilter(text: String) {
+    val iterator = map.valueIterator()
+    var entry: BaseDetailFragment<*>
+    while (iterator.hasNext()) {
+      entry = iterator.next()
+      entry.filterList(text)
+    }
+  }
+
   fun changeSortMode(mode: Int) {
     GlobalValues.libSortModeLiveData.value = mode
     GlobalValues.libSortMode = mode

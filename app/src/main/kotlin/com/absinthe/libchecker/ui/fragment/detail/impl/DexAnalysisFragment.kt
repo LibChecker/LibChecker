@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -11,6 +11,8 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
 class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
@@ -29,13 +31,14 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.uncharted_territory)
       } else {
-        binding.list.addItemDecoration(
-          DividerItemDecoration(
-            requireContext(),
-            DividerItemDecoration.VERTICAL
-          )
-        )
-        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          context?.let {
+            binding.list.addItemDecoration(dividerItemDecoration)
+          }
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+        }
       }
 
       if (!isListReady) {
@@ -56,6 +59,10 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
       setEmptyView(emptyView)
     }
     viewModel.initDexData(packageName)
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return viewModel.dexLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   override fun onDetach() {

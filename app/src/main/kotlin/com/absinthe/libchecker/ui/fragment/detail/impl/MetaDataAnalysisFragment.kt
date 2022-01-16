@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.METADATA
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -29,12 +30,14 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        context?.let { ctx ->
-          binding.list.addItemDecoration(
-            DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL)
-          )
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          context?.let {
+            binding.list.addItemDecoration(dividerItemDecoration)
+          }
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
         }
-        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
       }
 
       if (!isListReady) {
@@ -58,6 +61,10 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
       setEmptyView(emptyView)
     }
     viewModel.initMetaDataData(packageName)
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return viewModel.metaDataItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   companion object {

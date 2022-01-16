@@ -5,6 +5,8 @@ import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -18,6 +20,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -28,6 +31,7 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -58,10 +62,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       text.text = getString(R.string.loading)
     }
   }
+  protected val dividerItemDecoration by lazy { DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL) }
   protected var isListReady = false
-  protected var navigateToComponentTask: Runnable? = null
+  protected var afterListReadyTask: Runnable? = null
 
   abstract fun getRecyclerView(): RecyclerView
+  abstract fun getFilterList(text: String): List<LibStringItemChip>?
 
   protected abstract val needShowLibDetailDialog: Boolean
 
@@ -72,9 +78,21 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
     if (DetailFragmentManager.navType == type) {
       DetailFragmentManager.navComponent?.let {
-        navigateToComponentTask = Runnable { navigateToComponentImpl(it) }
+        afterListReadyTask = Runnable {
+          navigateToComponentImpl(it)
+        }
       }
       DetailFragmentManager.resetNavigationParams()
+    } else {
+      afterListReadyTask = Runnable {
+        lifecycleScope.launch(Dispatchers.IO) {
+          viewModel.queriedText?.let {
+            if (it.isNotEmpty()) {
+              filterList(it)
+            }
+          }
+        }
+      }
     }
     adapter.apply {
       if (needShowLibDetailDialog) {
@@ -124,6 +142,24 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
     withContext(Dispatchers.Main) {
       adapter.setDiffNewData(list)
+    }
+  }
+
+  override fun filterList(text: String) {
+    adapter.highlightText = text
+    getFilterList(text)?.let {
+      lifecycleScope.launch(Dispatchers.Main) {
+        if (it.isEmpty()) {
+          if (getRecyclerView().itemDecorationCount > 0) {
+            getRecyclerView().removeItemDecoration(dividerItemDecoration)
+          }
+          emptyView.text.text = getString(R.string.empty_list)
+        }
+        adapter.setDiffNewData(it.toMutableList()) {
+          viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
+          viewModel.itemsCountList[type] = it.size
+        }
+      }
     }
   }
 

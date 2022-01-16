@@ -42,6 +42,10 @@ setupAppModule {
     "**.bin"
   )
 
+  lint {
+    disable += "AppCompatResource"
+  }
+
   dependenciesInfo.includeInApk = false
 
   applicationVariants.all {

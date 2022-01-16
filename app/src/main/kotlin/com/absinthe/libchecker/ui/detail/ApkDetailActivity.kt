@@ -7,8 +7,6 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
-import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -23,10 +21,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
-import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
@@ -45,7 +41,6 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
-import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
@@ -57,12 +52,12 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 
-class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailContainer {
+class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
   private var tempFile: File? = null
-  private val viewModel: DetailViewModel by viewModels()
 
-  override var detailFragmentManager: DetailFragmentManager = DetailFragmentManager()
+  override fun requirePackageName() = tempFile?.path
+  override fun getToolbar() = binding.toolbar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -94,24 +89,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
     super.onDestroy()
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
-      finish()
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
   private fun initView(uri: Uri) {
-    setSupportActionBar(binding.toolbar)
-    supportActionBar?.apply {
-      setDisplayHomeAsUpEnabled(true)
-      setDisplayShowHomeEnabled(true)
-    }
-
-    initData(uri)
-  }
-
-  private fun initData(uri: Uri) {
     val dialog = LCAppUtils.createLoadingDialog(this)
     dialog.show()
 
@@ -121,6 +99,7 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
         tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
           inputStream = contentResolver.openInputStream(uri)
           FileUtils.writeFileFromIS(tf, inputStream)
+          isPackageReady = true
 
           withContext(Dispatchers.Main) {
             initDetails(tf.path)
@@ -286,7 +265,9 @@ class ApkDetailActivity : BaseActivity<ActivityAppDetailBinding>(), IDetailConta
       )
       lifecycleScope.launch(Dispatchers.IO) {
         try {
-          if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(it.packageName)).isNotEmpty()) {
+          if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(it.packageName))
+              .isNotEmpty()
+          ) {
             withContext(Dispatchers.Main) {
               types.add(1, STATIC)
               tabTitles.add(1, getText(R.string.ref_category_static))

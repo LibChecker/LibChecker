@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -28,7 +29,11 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+        }
       }
 
       if (!isListReady) {
@@ -49,6 +54,10 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setEmptyView(emptyView)
     }
     viewModel.initStaticData(packageName)
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return viewModel.staticLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   companion object {

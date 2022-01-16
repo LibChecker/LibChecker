@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import android.content.Context
 import android.widget.ArrayAdapter
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -37,6 +36,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction)
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
+  private var itemsList: List<LibStringItemChip>? = null
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = true
@@ -87,14 +87,17 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
             } else {
               list.sortBy { it.item.name }
             }
+            itemsList = list
 
-            withContext(Dispatchers.Main) {
-              context?.let {
-                binding.list.addItemDecoration(
-                  DividerItemDecoration(it, DividerItemDecoration.VERTICAL)
-                )
+            if (viewModel.queriedText?.isNotEmpty() == true) {
+              filterList(viewModel.queriedText!!)
+            } else {
+              withContext(Dispatchers.Main) {
+                context?.let {
+                  binding.list.addItemDecoration(dividerItemDecoration)
+                }
+                adapter.setDiffNewData(list, afterListReadyTask)
               }
-              adapter.setDiffNewData(list, navigateToComponentTask)
             }
           }
         }
@@ -115,6 +118,10 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return itemsList?.filter { it.item.name.contains(text, true) }
   }
 
   private fun doOnLongClick(context: Context, componentName: String) {

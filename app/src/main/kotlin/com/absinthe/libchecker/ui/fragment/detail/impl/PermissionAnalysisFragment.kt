@@ -1,8 +1,8 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import androidx.recyclerview.widget.DividerItemDecoration
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -29,12 +29,14 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        context?.let { ctx ->
-          binding.list.addItemDecoration(
-            DividerItemDecoration(ctx, DividerItemDecoration.VERTICAL)
-          )
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          context?.let {
+            binding.list.addItemDecoration(dividerItemDecoration)
+          }
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
         }
-        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
       }
 
       if (!isListReady) {
@@ -55,6 +57,10 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setEmptyView(emptyView)
     }
     viewModel.initPermissionData(packageName)
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return viewModel.permissionsItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   companion object {

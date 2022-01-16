@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -30,7 +31,11 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        adapter.setDiffNewData(it.toMutableList(), navigateToComponentTask)
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
+        }
 
         if (viewModel.extractNativeLibs == false) {
           context?.let { ctx ->
@@ -64,6 +69,10 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setEmptyView(emptyView)
     }
     viewModel.initSoAnalysisData(packageName)
+  }
+
+  override fun getFilterList(text: String): List<LibStringItemChip>? {
+    return viewModel.nativeLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 
   companion object {
