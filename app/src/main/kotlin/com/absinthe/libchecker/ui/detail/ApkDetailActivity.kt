@@ -265,9 +265,7 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
       )
       lifecycleScope.launch(Dispatchers.IO) {
         try {
-          if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(it.packageName))
-              .isNotEmpty()
-          ) {
+          if (PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(it.packageName)).isNotEmpty()) {
             withContext(Dispatchers.Main) {
               types.add(1, STATIC)
               tabTitles.add(1, getText(R.string.ref_category_static))

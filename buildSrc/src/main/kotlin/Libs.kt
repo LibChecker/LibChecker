@@ -8,7 +8,7 @@ private const val grpcVersion = "1.43.2"
 private const val protocVersion = "3.19.3"
 private const val appCenterVersion = "4.4.2"
 private const val hiddenApiRefineVersion = "3.0.3"
-private const val myLib = "1.0.3.2"
+private const val myLib = "1.0.4"
 
 object Libs {
   const val coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"

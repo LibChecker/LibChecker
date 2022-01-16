@@ -14,8 +14,8 @@ import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 
-abstract class BaseAppDetailActivity<VB : ViewBinding> : CheckPackageOnResumingActivity<VB>(),
-  IDetailContainer, SearchView.OnQueryTextListener {
+abstract class BaseAppDetailActivity<VB : ViewBinding> :
+  CheckPackageOnResumingActivity<VB>(), IDetailContainer, SearchView.OnQueryTextListener {
 
   protected val viewModel: DetailViewModel by viewModels()
   protected var isListReady = false
