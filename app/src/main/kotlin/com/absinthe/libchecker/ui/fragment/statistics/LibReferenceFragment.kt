@@ -260,11 +260,7 @@ class LibReferenceFragment :
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
     if (item.itemId == R.id.filter) {
-      val color = if (GlobalValues.md3Theme) {
-        context.getColor(R.color.colorSurfaceMd3)
-      } else {
-        context.getColorByAttr(R.attr.colorSurface)
-      }
+      val color = context.getColorByAttr(R.attr.colorSurface)
       val styler = CascadePopupMenu.Styler(
         background = {
           RoundedRectDrawable(color, radius = 6.dp.toFloat())
