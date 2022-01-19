@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
@@ -69,6 +70,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
           WindowCompat.setDecorFitsSystemWindows(it, false)
           it.attributes?.windowAnimations = R.style.DialogAnimation
           UiUtils.setSystemBarStyle(it)
+          val wic = WindowInsetsControllerCompat(it, it.decorView)
+          wic.isAppearanceLightNavigationBars = !UiUtils.isDarkMode()
         }
 
         findViewById<View>(com.google.android.material.R.id.container)?.fitsSystemWindows = false
