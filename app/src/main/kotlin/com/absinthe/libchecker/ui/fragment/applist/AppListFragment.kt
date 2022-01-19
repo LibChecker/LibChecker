@@ -65,6 +65,7 @@ class AppListFragment :
   private var popup: PopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
+  private var keyword: String = ""
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
@@ -200,18 +201,10 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
+    keyword = newText
     homeViewModel.dbItems.value?.let { allDatabaseItems ->
-      val filter = allDatabaseItems.filter {
-        it.label.contains(newText, ignoreCase = true) ||
-          it.packageName.contains(newText, ignoreCase = true)
-      }.toMutableList()
-
-      if (HarmonyOsUtil.isHarmonyOs() && newText.contains("Harmony", true)) {
-        filter.addAll(allDatabaseItems.filter { it.variant == Constants.VARIANT_HAP })
-      }
-
       appAdapter.highlightText = newText
-      updateItems(filter, highlightRefresh = true)
+      updateItems(allDatabaseItems, highlightRefresh = true)
 
       when {
         newText.equals("Easter Egg", true) -> {
@@ -383,13 +376,22 @@ class AppListFragment :
     highlightRefresh: Boolean = false
   ) {
     Timber.d("updateItems")
-    val filterList = mutableListOf<LCItem>()
+    var filterList: MutableList<LCItem>
 
-    GlobalValues.isShowSystemApps.value?.let { isShowSystem ->
-      newItems.forEach {
-        if (isShowSystem || (!isShowSystem && !it.isSystem)) {
-          filterList.add(it)
-        }
+    filterList = if (GlobalValues.isShowSystemApps.value == false) {
+      newItems.filter { !it.isSystem }.toMutableList()
+    } else {
+      newItems.toMutableList()
+    }
+
+    if (keyword.isNotEmpty()) {
+      filterList = filterList.filter {
+        it.label.contains(keyword, ignoreCase = true) ||
+          it.packageName.contains(keyword, ignoreCase = true)
+      }.toMutableList()
+
+      if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
+        filterList.addAll(newItems.filter { it.variant == Constants.VARIANT_HAP })
       }
     }
 
