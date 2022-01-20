@@ -108,7 +108,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private var initJob: Job? = null
 
   fun initItems() {
-    if (initJob == null || initJob!!.isActive.not()) {
+    if (initJob == null || initJob?.isActive == false) {
       initJob = viewModelScope.launch(Dispatchers.IO) {
         Timber.d("initItems: START")
 

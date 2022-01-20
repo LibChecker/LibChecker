@@ -169,8 +169,8 @@ class LibReferenceFragment :
       setEmptyView(
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
           ).also {
             it.gravity = Gravity.CENTER
           }

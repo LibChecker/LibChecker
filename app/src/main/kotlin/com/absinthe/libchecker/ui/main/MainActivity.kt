@@ -14,6 +14,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
+import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -30,6 +31,7 @@ import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
@@ -221,7 +223,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
               binding.viewpager.setCurrentItem(0, true)
             }
             is HomeViewModel.Effect.UpdateAppListStatus -> {
-              if (it.status == STATUS_INIT_END) {
+              if (it.status == STATUS_START_INIT) {
+                doOnMainThreadIdle {
+                  hideNavigationView()
+                }
+              } else if (it.status == STATUS_INIT_END) {
                 lifecycleScope.launch(Dispatchers.IO) {
                   do {
                     workerBinder?.initKotlinUsage()
