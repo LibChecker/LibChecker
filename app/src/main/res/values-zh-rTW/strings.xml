@@ -123,6 +123,7 @@
   <string name="toast_cant_open_app">無法啟動此 App</string>
   <string name="toast_package_name_null">套裝軟體名稱為空</string>
   <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
+  <string name="toast_not_enough_storage_space">存儲空間不足</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存當前快照</string>

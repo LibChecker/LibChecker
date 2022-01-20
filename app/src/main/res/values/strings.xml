@@ -123,6 +123,7 @@
   <string name="toast_cant_open_app">Can\'t open this app</string>
   <string name="toast_package_name_null">Package name is null</string>
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again.</string>
+  <string name="toast_not_enough_storage_space">Not enough storage space</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Save current snapshot</string>

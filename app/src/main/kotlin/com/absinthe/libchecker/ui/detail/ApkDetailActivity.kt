@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -98,12 +99,21 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
       try {
         tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
           inputStream = contentResolver.openInputStream(uri)
-          FileUtils.writeFileFromIS(tf, inputStream)
-          isPackageReady = true
+          val fileSize = inputStream?.available() ?: 0
+          val freeSize = Environment.getExternalStorageDirectory().freeSpace
+          Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
-          withContext(Dispatchers.Main) {
-            initDetails(tf.path)
-            dialog.dismiss()
+          if (freeSize > fileSize * 1.5) {
+            FileUtils.writeFileFromIS(tf, inputStream)
+            isPackageReady = true
+
+            withContext(Dispatchers.Main) {
+              initDetails(tf.path)
+              dialog.dismiss()
+            }
+          } else {
+            showToast(R.string.toast_not_enough_storage_space)
+            finish()
           }
         }
       } catch (e: Exception) {

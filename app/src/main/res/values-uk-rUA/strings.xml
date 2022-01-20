@@ -122,6 +122,7 @@
   <string name="toast_cant_open_app">Не вдається відкрити цей додаток</string>
   <string name="toast_package_name_null">Ім\'я пакету порожнє</string>
   <string name="toast_cloud_rules_update_error">Не вдалося оновити хмарні правила. Будь ласка, спробуйте ще раз.</string>
+  <string name="toast_not_enough_storage_space">Not enough storage space</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Зберегти поточний знімок</string>
