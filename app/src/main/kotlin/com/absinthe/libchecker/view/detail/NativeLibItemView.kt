@@ -94,7 +94,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     if (chipWidth != 0) {
       chipWidth.plus(libName.marginEnd)
     }
-    val libNameWidth = measuredWidth - paddingStart - paddingEnd - chipWidth
+    val libNameWidth = measuredWidth - paddingStart - paddingEnd - libName.marginEnd - chipWidth
     libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
     libSize.measure(libNameWidth.toExactlyMeasureSpec(), libSize.defaultHeightMeasureSpec(this))
     setMeasuredDimension(

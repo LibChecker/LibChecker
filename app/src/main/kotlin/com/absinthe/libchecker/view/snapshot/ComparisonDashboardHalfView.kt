@@ -13,7 +13,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 
-class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) :
+class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? = null) :
   AViewGroup(context, attributeSet) {
 
   private val tvSnapshotTimestampTitle =
@@ -34,7 +34,6 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) 
       )
       setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-      setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       text = context.getString(R.string.album_click_to_choose)
     }
 
@@ -66,6 +65,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet) 
     addView(tvSnapshotTimestampText)
     addView(tvSnapshotAppsCountTitle)
     addView(tvSnapshotAppsCountText)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
   }
 
   var horizontalGravity: Int = Gravity.START

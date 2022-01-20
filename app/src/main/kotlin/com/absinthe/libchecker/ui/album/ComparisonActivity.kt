@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.album
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
@@ -15,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
-import com.absinthe.libchecker.databinding.LayoutComparisonDashboardBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
@@ -26,6 +27,7 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.view.snapshot.ComparisonDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -66,60 +68,67 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-    val dashboardBinding = LayoutComparisonDashboardBinding.inflate(layoutInflater)
+    val dashboardView = ComparisonDashboardView(
+      ContextThemeWrapper(this, R.style.AlbumMaterialCard)
+    )
 
-    dashboardBinding.apply {
-      infoLeft.horizontalGravity = Gravity.START
-      infoLeft.setOnClickListener {
-        if (AntiShakeUtils.isInvalidClick(it)) {
-          return@setOnClickListener
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-          val timeStampList = viewModel.repository.getTimeStamps()
-          val dialog = TimeNodeBottomSheetDialogFragment
-            .newInstance(ArrayList(timeStampList))
-            .apply {
-              setOnItemClickListener { position ->
-                val item = timeStampList[position]
-                leftTimeStamp = item.timestamp
-                infoLeft.tvSnapshotTimestampText.text =
-                  viewModel.getFormatDateString(leftTimeStamp)
+    dashboardView.apply {
+      layoutParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      if (!GlobalValues.md3Theme) {
+        background = null
+      }
+      container.leftPart.apply {
+        setOnClickListener {
+          if (AntiShakeUtils.isInvalidClick(it)) {
+            return@setOnClickListener
+          }
+          lifecycleScope.launch(Dispatchers.IO) {
+            val timeStampList = viewModel.repository.getTimeStamps()
+            val dialog = TimeNodeBottomSheetDialogFragment
+              .newInstance(ArrayList(timeStampList))
+              .apply {
+                setOnItemClickListener { position ->
+                  val item = timeStampList[position]
+                  leftTimeStamp = item.timestamp
+                  tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
 
-                this@ComparisonActivity.lifecycleScope.launch {
-                  val count =
-                    viewModel.repository.getSnapshots(leftTimeStamp).size
-                  infoLeft.tvSnapshotAppsCountText.text = count.toString()
+                  this@ComparisonActivity.lifecycleScope.launch {
+                    val count = viewModel.repository.getSnapshots(leftTimeStamp).size
+                    tvSnapshotAppsCountText.text = count.toString()
+                  }
+                  dismiss()
                 }
-                dismiss()
               }
-            }
-          dialog.show(supportFragmentManager, dialog.tag)
+            dialog.show(supportFragmentManager, dialog.tag)
+          }
         }
       }
-      infoRight.horizontalGravity = Gravity.END
-      infoRight.setOnClickListener {
-        if (AntiShakeUtils.isInvalidClick(it)) {
-          return@setOnClickListener
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
-          val timeStampList = viewModel.repository.getTimeStamps()
-          val dialog = TimeNodeBottomSheetDialogFragment
-            .newInstance(ArrayList(timeStampList))
-            .apply {
-              setOnItemClickListener { position ->
-                val item = timeStampList[position]
-                rightTimeStamp = item.timestamp
-                infoRight.tvSnapshotTimestampText.text =
-                  viewModel.getFormatDateString(rightTimeStamp)
-                this@ComparisonActivity.lifecycleScope.launch {
-                  val count =
-                    viewModel.repository.getSnapshots(rightTimeStamp).size
-                  infoRight.tvSnapshotAppsCountText.text = count.toString()
+      container.rightPart.apply {
+        setOnClickListener {
+          if (AntiShakeUtils.isInvalidClick(it)) {
+            return@setOnClickListener
+          }
+          lifecycleScope.launch(Dispatchers.IO) {
+            val timeStampList = viewModel.repository.getTimeStamps()
+            val dialog = TimeNodeBottomSheetDialogFragment
+              .newInstance(ArrayList(timeStampList))
+              .apply {
+                setOnItemClickListener { position ->
+                  val item = timeStampList[position]
+                  rightTimeStamp = item.timestamp
+                  tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
+                  this@ComparisonActivity.lifecycleScope.launch {
+                    val count = viewModel.repository.getSnapshots(rightTimeStamp).size
+                    tvSnapshotAppsCountText.text = count.toString()
+                  }
+                  dismiss()
                 }
-                dismiss()
               }
-            }
-          dialog.show(supportFragmentManager, dialog.tag)
+            dialog.show(supportFragmentManager, dialog.tag)
+          }
         }
       }
     }
@@ -185,7 +194,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         addPaddingTop(96.dp)
       }
       setEmptyView(emptyView)
-      setHeaderView(dashboardBinding.root)
+      setHeaderView(dashboardView)
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
