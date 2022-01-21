@@ -109,7 +109,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val formatted = simpleDateFormat.format(date)
 
           if (StorageUtils.isExternalStorageWritable) {
-            backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
+            runCatching {
+              backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
+            }.onFailure {
+              Timber.e(it)
+              context.showToast("Document API not working")
+            }
           } else {
             context.showToast("External storage is not writable")
           }
@@ -118,7 +123,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       }
       findPreference<Preference>(Constants.PREF_LOCAL_RESTORE)?.apply {
         setOnPreferenceClickListener {
-          restoreResultLauncher.launch("*/*")
+          runCatching {
+            restoreResultLauncher.launch("*/*")
+          }.onFailure {
+            Timber.e(it)
+            context.showToast("Document API not working")
+          }
           true
         }
       }

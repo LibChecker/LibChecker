@@ -75,4 +75,3 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context) {
     }
   }
 }
-
