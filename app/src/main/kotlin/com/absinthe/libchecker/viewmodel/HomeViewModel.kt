@@ -562,7 +562,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               )
             )
           } else {
-            if (rule == null) {
+            if (rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA) {
               refList.add(
                 LibReference(
                   entry.key,
