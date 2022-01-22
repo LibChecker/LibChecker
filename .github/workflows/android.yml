@@ -77,7 +77,9 @@ jobs:
       - name: Upload mappings with App Center CLI
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
-          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/release/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }}
+          command: |
+            appcenter apps set-current --app LibChecker
+            appcenter crashes upload-mappings --mapping app/build/outputs/mapping/release/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }}
           token: ${{secrets.APP_CENTER_TOKEN}}
       - name: Send commit to telegram
         if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
