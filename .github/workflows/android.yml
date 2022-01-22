@@ -75,6 +75,7 @@ jobs:
         with:
           apk-path: ${{ steps.sign.outputs.signedReleaseFile }}
       - name: Upload mappings with App Center CLI
+        if: success() && github.repository == 'zhaobozhen/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
           command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/release/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
