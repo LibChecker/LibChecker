@@ -75,7 +75,7 @@ jobs:
         with:
           apk-path: ${{ steps.sign.outputs.signedReleaseFile }}
       - name: Upload mappings with App Center CLI
-        uses: joabalea/App-Center-action@v1.0.2
+        uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
           command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/release/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }}
           token: ${{secrets.APP_CENTER_TOKEN}}
