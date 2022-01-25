@@ -1025,6 +1025,14 @@ object PackageUtils {
           }
         }
       }
+      zipFile.getEntry("META-INF/androidx.databinding_viewbinding.version")?.let { ze ->
+        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
+          val version = seq.readLine()
+          if (version.isNotBlank()) {
+            return version
+          }
+        }
+      }
     }
 
     return null
