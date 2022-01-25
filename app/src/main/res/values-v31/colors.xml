@@ -2,4 +2,5 @@
 <resources>
   <color name="colorPrimaryMd3">@android:color/system_accent1_600</color>
   <color name="colorSurfaceMd3">@android:color/system_neutral1_50</color>
+  <color name="colorActivatedMd3">@android:color/system_neutral1_100</color>
 </resources>
