@@ -19,5 +19,5 @@ This app is used to view the third-party libraries used by applications in your 
 [Github Discussions](https://github.com/zhaobozhen/LibChecker/discussions)
 
 ### Telegram Group
-![GitHub Light](/source/tg_group_dark.png#gh-dark-mode-only)
-![GitHub Dark](/source/tg_group_light.png#gh-light-mode-only)
+<img src="/source/tg_group_dark.png#gh-dark-mode-only" width="240" height="240" />
+<img src="/source/tg_group_light.png#gh-light-mode-only" width="240" height="240" />
