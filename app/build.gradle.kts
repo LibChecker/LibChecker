@@ -152,7 +152,7 @@ dependencies {
   implementation("org.smali:dexlib2:2.5.2")
 
   implementation("dev.rikka.rikkax.core:core:1.3.3")
-  implementation("dev.rikka.rikkax.insets:insets:1.1.1")
+  implementation("dev.rikka.rikkax.insets:insets:1.2.0")
   implementation("dev.rikka.rikkax.material:material:1.6.6")
   implementation("dev.rikka.rikkax.widget:borderview:1.1.0")
   implementation("dev.rikka.rikkax.appcompat:appcompat:1.4.1")
