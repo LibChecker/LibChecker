@@ -148,7 +148,7 @@ dependencies {
   implementation("me.saket.cascade:cascade:1.3.0")
   implementation("me.zhanghai.android.fastscroll:library:1.1.7")
   implementation("me.zhanghai.android.appiconloader:appiconloader:1.3.1")
-  implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.2")
+  implementation("org.lsposed.hiddenapibypass:hiddenapibypass:4.3")
   implementation("org.smali:dexlib2:2.5.2")
 
   implementation("dev.rikka.rikkax.core:core:1.3.4")
