@@ -1,10 +1,29 @@
 package com.absinthe.libchecker.database
 
 import com.absinthe.libchecker.database.entity.RuleEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class RuleRepository(private val ruleDao: RuleDao) {
 
-  suspend fun getRule(name: String) = ruleDao.getRule(name)
+  init {
+    GlobalScope.launch(Dispatchers.IO) {
+      if (rules == null) {
+        rules = getAllRules().asSequence()
+          .map {
+            it.name to it
+          }
+          .toMap()
+      }
+    }
+  }
+
+  suspend fun getRule(name: String) = if (rules == null) {
+    ruleDao.getRule(name)
+  } else {
+    rules!![name]
+  }
 
   suspend fun insertRules(rules: List<RuleEntity>) {
     ruleDao.insertRules(rules)
@@ -17,4 +36,8 @@ class RuleRepository(private val ruleDao: RuleDao) {
   suspend fun getAllRules() = ruleDao.getAllRules()
 
   suspend fun getRegexRules() = ruleDao.getRegexRules()
+
+  companion object {
+    var rules: Map<String, RuleEntity>? = null
+  }
 }

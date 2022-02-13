@@ -319,6 +319,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
     if (!viewModel.isComparingActive()) {
       flip(VF_LIST)
+    } else {
+      flip(VF_LOADING)
     }
   }
 
@@ -358,6 +360,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val context = (this.context as? BaseActivity<*>) ?: return false
     if (item.itemId == R.id.save) {
+      if (viewModel.isComparingActive() || shootBinder?.isShooting == true) {
+        return false
+      }
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
