@@ -70,6 +70,7 @@ jobs:
           name: mappings
           path: "app/build/outputs/mapping/release"
       - name: Get apk info
+        if: github.repository == 'zhaobozhen/LibChecker'
         id: apk-info
         uses: hkusu/apk-info-action@v1
         with:
