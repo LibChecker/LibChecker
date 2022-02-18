@@ -597,9 +597,9 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
         withContext(Dispatchers.Main) {
           initFeatureListView()
           featureAdapter.addData(
-            FeatureItem(R.drawable.ic_gradle) {
+            FeatureItem(R.drawable.ic_studio) {
               MaterialAlertDialogBuilder(this@AppDetailActivity)
-                .setIcon(R.drawable.ic_gradle)
+                .setIcon(R.drawable.ic_studio)
                 .setTitle(
                   HtmlCompat.fromHtml(
                     "${getString(R.string.agp)} <b>$it</b>",
