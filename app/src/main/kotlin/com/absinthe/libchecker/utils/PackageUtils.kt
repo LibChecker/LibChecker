@@ -1026,11 +1026,17 @@ object PackageUtils {
           }
         }
       }
-      zipFile.getEntry("META-INF/androidx.databinding_viewbinding.version")?.let { ze ->
-        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
-          val version = seq.readLine()
-          if (version.isNotBlank()) {
-            return version
+      arrayOf(
+        "META-INF/androidx.databinding_viewbinding.version",
+        "META-INF/androidx.databinding_databindingKtx.version",
+        "META-INF/androidx.databinding_library.version"
+      ).forEach { entry ->
+        zipFile.getEntry(entry)?.let { ze ->
+          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
+            val version = seq.readLine()
+            if (version.isNotBlank()) {
+              return version
+            }
           }
         }
       }
