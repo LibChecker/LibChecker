@@ -1014,9 +1014,8 @@ object PackageUtils {
       zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
         Properties().apply {
           load(zipFile.getInputStream(ze))
-        }.also {
-          it.getProperty(AGP_KEYWORD)?.run {
-            return this
+          getProperty(AGP_KEYWORD)?.let {
+            return it
           }
         }
       }
