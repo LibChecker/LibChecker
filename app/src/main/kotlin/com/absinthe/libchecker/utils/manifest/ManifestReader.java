@@ -2,6 +2,7 @@ package com.absinthe.libchecker.utils.manifest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.jar.JarFile;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
+import timber.log.Timber;
 
 
 public class ManifestReader {
@@ -30,6 +32,8 @@ public class ManifestReader {
           return new ManifestTagVisitor(child);
         }
       });
+    } catch (FileNotFoundException e) {
+      Timber.e(e);
     }
   }
 
