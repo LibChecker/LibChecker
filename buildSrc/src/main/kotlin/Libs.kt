@@ -1,10 +1,10 @@
 @file:Suppress("SpellCheckingInspection")
 
-private const val lifecycleVersion = "2.4.0"
+private const val lifecycleVersion = "2.4.1"
 private const val retrofitVersion = "2.9.0"
 private const val roomVersion = "2.4.1"
 private const val moshiVersion = "1.13.0"
-private const val grpcVersion = "1.44.0"
+private const val grpcVersion = "1.44.1"
 private const val protocVersion = "3.19.4"
 private const val appCenterVersion = "4.4.2"
 private const val hiddenApiRefineVersion = "3.0.3"
@@ -38,9 +38,9 @@ object Libs {
   const val refineRuntime = "dev.rikka.tools.refine:runtime:$hiddenApiRefineVersion"
 
   const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.18"
-  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.8.0"
+  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.9.0"
   const val hiddenApiRefinePlugin = "dev.rikka.tools.refine:gradle-plugin:$hiddenApiRefineVersion"
-  const val kspPlugin = "com.google.devtools.ksp:symbol-processing-gradle-plugin:1.6.10-1.0.2"
+  const val kspPlugin = "com.google.devtools.ksp:symbol-processing-gradle-plugin:1.6.10-1.0.4"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
