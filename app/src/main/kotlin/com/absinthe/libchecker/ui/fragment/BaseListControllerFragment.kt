@@ -24,8 +24,8 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     if (visible) {
       if (this != homeViewModel.controller) {
         homeViewModel.controller = this
-        requireActivity().invalidateOptionsMenu()
       }
+      activity?.invalidateOptionsMenu()
     }
   }
 

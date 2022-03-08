@@ -56,8 +56,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
+import java.util.LinkedList
+import java.util.Queue
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -103,6 +106,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       shootBinder = null
     }
   }
+  private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
 
   override fun init() {
     setHasOptionsMenu(true)
@@ -293,8 +297,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           when (it) {
             is HomeViewModel.Effect.PackageChanged -> {
               if (allowRefreshing) {
-                flip(VF_LOADING)
-                viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it.packageName)
+                packageQueue.offer(it.packageName to it.action)
+                dequeuePackages()
               }
             }
             else -> {}
@@ -426,6 +430,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
     viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
+  }
+
+  private fun dequeuePackages() = lifecycleScope.launch(Dispatchers.IO) {
+    while (packageQueue.isNotEmpty()) {
+      packageQueue.poll()?.first?.let {
+        withContext(Dispatchers.Main) {
+          flip(VF_LOADING)
+        }
+        viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it)
+      }
+    }
   }
 
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {

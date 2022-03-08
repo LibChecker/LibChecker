@@ -70,6 +70,7 @@ class WorkerService : LifecycleService() {
   }
 
   private fun initAllApplicationInfoItems() {
+    Global.applicationListJob?.cancel()
     Global.applicationListJob = lifecycleScope.launch(Dispatchers.IO) {
       AppItemRepository.allApplicationInfoItems = PackageUtils.getAppsList()
       Global.applicationListJob = null
