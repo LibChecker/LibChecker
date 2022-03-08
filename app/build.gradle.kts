@@ -99,7 +99,7 @@ configurations.all {
 
 dependencies {
   compileOnly(fileTree("ohos"))
-  compileOnly(project(":hidden-api"))
+  compileOnly(projects.hiddenApi)
 
   implementations(
     // UI
