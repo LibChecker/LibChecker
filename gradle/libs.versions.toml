@@ -18,6 +18,27 @@ protoc = "3.19.4"
 grpc = "1.44.1"
 appCenter = "4.4.2"
 zhaobozhen = "1.0.4"
+lottie = "5.0.3"
+drakeet-about = "2.5.0"
+drakeet-multitype = "4.3.0"
+brvah = "3.0.7"
+mpAndroidChart = "3.1.0"
+timber = "5.0.1"
+processPhoenix = "2.1.2"
+once = "1.3.1"
+cascade = "1.3.0"
+fastScroll = "1.1.7"
+appIconLoader = "1.3.1"
+hiddenApiBypass = "4.3"
+dexLib2 = "2.5.2"
+rikkax-core = "1.3.4"
+rikkax-insets = "1.2.0"
+rikkax-material = "1.6.6"
+rikkax-borderview = "1.1.0"
+rikkax-appcompat = "1.4.1"
+rikkax-layoutinflater = "1.2.0"
+rikkax-recyclerview = "1.3.1"
+rikkax-simplemenu-preference = "1.0.3"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -79,6 +100,28 @@ zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 
+lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
+drakeet-about = { module = "com.drakeet.about:about", version.ref = "drakeet-about" }
+drakeet-multitype = { module = "com.drakeet.multitype:multitype", version.ref = "drakeet-multitype" }
+brvah = { module = "com.github.CymChad:BaseRecyclerViewAdapterHelper", version.ref = "brvah" }
+mpAndroidChart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpAndroidChart" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+processPhoenix = { module = "com.jakewharton:process-phoenix", version.ref = "processPhoenix" }
+once = { module = "com.jonathanfinerty.once:once", version.ref = "once" }
+cascade = { module = "me.saket.cascade:cascade", version.ref = "cascade" }
+fastScroll = { module = "me.zhanghai.android.fastscroll:library", version.ref = "fastScroll" }
+appIconLoader = { module = "me.zhanghai.android.appiconloader:appiconloader", version.ref = "appIconLoader" }
+hiddenApiBypass = { module = "org.lsposed.hiddenapibypass:hiddenapibypass", version.ref = "hiddenApiBypass" }
+dexLib2 = { module = "org.smali:dexlib2", version.ref = "dexLib2" }
+rikkax-core = { module = "dev.rikka.rikkax.core:core", version.ref = "rikkax-core" }
+rikkax-insets = { module = "dev.rikka.rikkax.insets:insets", version.ref = "rikkax-insets" }
+rikkax-material = { module = "dev.rikka.rikkax.material:material", version.ref = "rikkax-material" }
+rikkax-borderview = { module = "dev.rikka.rikkax.widget:borderview", version.ref = "rikkax-borderview" }
+rikkax-appcompat = { module = "dev.rikka.rikkax.appcompat:appcompat", version.ref = "rikkax-appcompat" }
+rikkax-layoutinflater = { module = "dev.rikka.rikkax.layoutinflater:layoutinflater", version.ref = "rikkax-layoutinflater" }
+rikkax-recyclerview = { module = "dev.rikka.rikkax.recyclerview:recyclerview-ktx", version.ref = "rikkax-recyclerview" }
+rikkax-simplemenu-preference = { module = "dev.rikka.rikkax.preference:simplemenu-preference", version.ref = "rikkax-simplemenu-preference" }
+
 [bundles]
 androidX-lifecycle = [
   "androidX-lifecycle-viewModel",
@@ -103,4 +146,14 @@ zhaobozhen = [
   "zhaobozhen-me",
   "zhaobozhen-utils",
   "zhaobozhen-axml"
+]
+rikkax = [
+  "rikkax-core",
+  "rikkax-insets",
+  "rikkax-material",
+  "rikkax-borderview",
+  "rikkax-appcompat",
+  "rikkax-layoutinflater",
+  "rikkax-recyclerview",
+  "rikkax-simplemenu-preference"
 ]
