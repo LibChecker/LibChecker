@@ -137,7 +137,7 @@ dependencies {
   ksp(Libs.roomCompiler)
   ksp(Libs.moshiCompiler)
 
-  implementation("com.airbnb.android:lottie:5.0.2")
+  implementation("com.airbnb.android:lottie:5.0.3")
   implementation("com.drakeet.about:about:2.5.0")
   implementation("com.drakeet.multitype:multitype:4.3.0")
   implementation("com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7")
