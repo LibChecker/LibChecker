@@ -121,7 +121,7 @@ dependencies {
   implementation(libs.square.retrofit)
   implementation(libs.square.retrofit.moshi)
   implementation(libs.square.moshi)
-  implementation(libs.google.protobufJavaLite)
+  implementation(libs.google.protobuf.javaLite)
   implementation(libs.bundles.grpc)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
@@ -159,9 +159,9 @@ dependencies {
 protobuf {
   protoc {
     artifact = if (osdetector.os == "osx")
-      "${libs.google.protoc.get()}:osx-aarch_64"
+      "${libs.google.protobuf.protoc.get()}:osx-aarch_64"
     else
-      libs.google.protoc.get().toString()
+      libs.google.protobuf.protoc.get().toString()
   }
   plugins {
     // Optional: an artifact spec for a protoc plugin, with "grpc" as
