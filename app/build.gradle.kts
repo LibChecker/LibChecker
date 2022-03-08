@@ -98,44 +98,37 @@ configurations.all {
 }
 
 dependencies {
+  compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   compileOnly(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
 
-  implementations(
-    // UI
-    Libs.activity,
-    Libs.fragment,
-    *Libs.lifecycle,
-    *Libs.room,
-    Libs.constraintLayout,
-    Libs.browser,
-    Libs.viewPager2,
-    Libs.recyclerView,
-    Libs.preference,
-    Libs.window,
-    Libs.material,
+  implementation(libs.kotlinX.coroutines)
+  implementation(libs.androidX.appCompat)
+  implementation(libs.androidX.core)
+  implementation(libs.androidX.activity)
+  implementation(libs.androidX.fragment)
+  implementation(libs.androidX.constraintLayout)
+  implementation(libs.androidX.browser)
+  implementation(libs.androidX.viewPager2)
+  implementation(libs.androidX.recyclerView)
+  implementation(libs.androidX.preference)
+  implementation(libs.androidX.window)
+  implementation(libs.bundles.androidX.lifecycle)
+  implementation(libs.bundles.androidX.room)
+  implementation(libs.google.material)
+  implementation(libs.coil)
+  implementation(libs.square.okHttp)
+  implementation(libs.square.retrofit)
+  implementation(libs.square.retrofit.moshi)
+  implementation(libs.square.moshi)
+  implementation(libs.google.protobufJavaLite)
+  implementation(libs.bundles.grpc)
+  implementation(libs.rikka.refine.runtime)
+  implementation(libs.bundles.zhaobozhen)
+  implementation(libs.bundles.appCenter)
 
-    // Net
-    Libs.coil,
-    Libs.okHttp,
-    Libs.retrofit,
-
-    // Serialization
-    *Libs.moshi,
-    Libs.protobufJavaLite,
-
-    // gRPC
-    *Libs.grpc,
-
-    // Debug
-    *Libs.appCenter,
-
-    Libs.refineRuntime,
-    *Libs.myLibs
-  )
-
-  ksp(Libs.roomCompiler)
-  ksp(Libs.moshiCompiler)
+  ksp(libs.androidX.room.compiler)
+  ksp(libs.square.moshi.compiler)
 
   implementation("com.airbnb.android:lottie:5.0.3")
   implementation("com.drakeet.about:about:2.5.0")
@@ -160,19 +153,25 @@ dependencies {
   implementation("dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1")
   implementation("dev.rikka.rikkax.preference:simplemenu-preference:1.0.3")
 
-  debugImplementation(Libs.leakCanary)
+  debugImplementation(libs.square.leakCanary)
 }
 
 protobuf {
   protoc {
-    artifact = if (osdetector.os == "osx") Libs.protocMac else Libs.protoc
+    artifact = if (osdetector.os == "osx")
+      "${libs.google.protoc.get()}:osx-aarch_64"
+    else
+      libs.google.protoc.get().toString()
   }
   plugins {
     // Optional: an artifact spec for a protoc plugin, with "grpc" as
     // the identifier, which can be referred to in the "plugins"
     // container of the "generateProtoTasks" closure.
     id("grpc") {
-      artifact = if (osdetector.os == "osx") Libs.genGrpcMac else Libs.genGrpc
+      artifact = if (osdetector.os == "osx")
+        "${libs.grpc.gen.get()}:osx-aarch_64"
+      else
+        libs.grpc.gen.get().toString()
     }
     generateProtoTasks {
       all().forEach {

@@ -6,8 +6,8 @@ plugins {
 setupLibraryModule()
 
 dependencies {
-  annotationProcessor(Libs.refineAnnotationCompiler)
-  compileOnly(Libs.refineAnnotation)
+  annotationProcessor(libs.rikka.refine.compiler)
+  compileOnly(libs.rikka.refine.annotation)
 
-  implementation(Libs.annotation)
+  implementation(libs.androidX.annotation)
 }
