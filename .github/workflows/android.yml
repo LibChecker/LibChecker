@@ -76,13 +76,13 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: snapshot
           path: ${{ steps.sign.outputs.signedReleaseFile }}
       - name: Upload mappings
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: mappings
           path: "app/build/outputs/mapping/release"
