@@ -1,0 +1,117 @@
+[versions]
+agp = "7.1.2"
+androidX-activity = "1.4.0"
+androidX-appCompat = "1.4.1"
+androidX-collection = "1.2.0"
+androidX-core = "1.7.0"
+androidX-fragment = "1.4.1"
+androidX-hilt = "2.41"
+androidX-lifecycle = "2.4.1"
+androidX-room = "2.4.2"
+chucker = "3.5.2"
+coil = "1.4.0"
+coroutines = "1.6.0"
+glide = "4.13.1"
+kotlin = "1.6.10"
+ktlint = "0.44.0"
+square-okHttp = "4.9.3"
+square-retrofit = "2.9.0"
+srl = "2.0.3"
+support = "28.0.0"
+hiddenApiRefine = "3.0.3"
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+protobuf = { id = "com.google.protobuf", version = "0.8.18" }
+kotlinter = { id = "org.jmailen.kotlinter", version = "3.9.0" }
+hiddenApiRefine = { id = "dev.rikka.tools.refine.gradle-plugin", version.ref = "hiddenApiRefine" }
+ksp = { id = "com.google.devtools.ksp", version = "1.6.10-1.0.4" }
+
+[libraries]
+gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+
+kotlin-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
+kotlinX-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+androidX-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidX-activity" }
+androidX-annotation = "androidx.annotation:annotation:1.3.0"
+androidX-appCompat = { module = "androidx.appcompat:appcompat", version.ref = "androidX-appCompat" }
+androidX-browser = "androidx.browser:browser:1.4.0"
+androidX-cardView = "androidx.cardview:cardview:1.0.0"
+androidX-collection = { module = "androidx.collection:collection-ktx", version.ref = "androidX-collection" }
+androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.3"
+androidX-coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:1.2.0"
+androidX-core = { module = "androidx.core:core-ktx", version.ref = "androidX-core" }
+androidX-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidX-fragment" }
+androidX-hilt = { module = "com.google.dagger:hilt-android", version.ref = "androidX-hilt" }
+androidX-hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "androidX-hilt" }
+androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
+androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
+androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
+androidX-paging = "androidx.paging:paging-runtime:3.1.0"
+androidX-recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
+androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidX-room" }
+androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
+androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
+androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.0.0"
+androidX-webKit = "androidx.webkit:webkit:1.4.0"
+
+square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.8.1"
+square-moshi = "com.squareup.moshi:moshi:1.13.0"
+square-okHttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "square-okHttp" }
+square-okHttp-LogInterceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "square-okHttp" }
+square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
+square-retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "square-retrofit" }
+square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
+square-retrofit-rxJava3 = { module = "com.squareup.retrofit2:adapter-rxjava3", version.ref = "square-retrofit" }
+
+google-gson = "com.google.code.gson:gson:2.9.0"
+google-material = "com.google.android.material:material:1.5.0"
+
+chucker-debug = { module = "com.github.chuckerteam.chucker:library", version.ref = "chucker" }
+chucker-release = { module = "com.github.chuckerteam.chucker:library-no-op", version.ref = "chucker" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
+fastjson = "com.alibaba:fastjson:1.1.72.android"
+flycoTabLayout = "com.flyco.tablayout:FlycoTabLayout_Lib:2.2.0"
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+glide-okhttp3 = { module = "com.github.bumptech.glide:okhttp3-integration", version.ref = "glide" }
+glide-transformations = "jp.wasabeef:glide-transformations:4.3.0"
+photoView = "com.github.chrisbanes:PhotoView:2.3.0"
+rxJava3-android = "io.reactivex.rxjava3:rxandroid:3.0.0"
+rxJava3-java = "io.reactivex.rxjava3:rxjava:3.1.3"
+srl-footer = { module = "com.scwang.smart:refresh-footer-classics", version.ref = "srl" }
+srl-header = { module = "com.scwang.smart:refresh-header-classics", version.ref = "srl" }
+srl-kernel = { module = "com.scwang.smart:refresh-layout-kernel", version.ref = "srl" }
+utils = "com.blankj:utilcodex:1.31.0"
+
+[bundles]
+androidX-lifecycle = [
+  "androidX-lifecycle-viewModel",
+  "androidX-lifecycle-liveData",
+  "androidX-lifecycle-service"
+]
+androidX-room = [
+  "androidX-room-runtime",
+  "androidX-room-ktx"
+]
+srl = [
+  "srl-kernel",
+  "srl-header",
+  "srl-footer"
+]
+coil = [
+  "coil",
+  "coil-gif",
+  "coil-svg"
+]
+glide = [
+  "glide",
+  "glide-okhttp3",
+  "glide-transformations"
+]

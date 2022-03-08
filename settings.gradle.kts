@@ -1,4 +1,11 @@
 pluginManagement {
+  resolutionStrategy {
+    eachPlugin {
+      if (requested.id.id == "dev.rikka.tools.refine.gradle-plugin") {
+        useModule("dev.rikka.tools.refine:gradle-plugin:${requested.version}")
+      }
+    }
+  }
   repositories {
     gradlePluginPortal()
     google()

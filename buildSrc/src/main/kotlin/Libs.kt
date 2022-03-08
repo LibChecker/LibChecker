@@ -37,10 +37,6 @@ object Libs {
   const val refineAnnotation = "dev.rikka.tools.refine:annotation:$hiddenApiRefineVersion"
   const val refineRuntime = "dev.rikka.tools.refine:runtime:$hiddenApiRefineVersion"
 
-  const val protobufPlugin = "com.google.protobuf:protobuf-gradle-plugin:0.8.18"
-  const val kotlinterPlugin = "org.jmailen.gradle:kotlinter-gradle:3.9.0"
-  const val hiddenApiRefinePlugin = "dev.rikka.tools.refine:gradle-plugin:$hiddenApiRefineVersion"
-  const val kspPlugin = "com.google.devtools.ksp:symbol-processing-gradle-plugin:1.6.10-1.0.4"
 
   const val roomCompiler = "androidx.room:room-compiler:$roomVersion"
   const val moshiCompiler = "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
