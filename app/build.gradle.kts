@@ -8,12 +8,12 @@ import com.google.protobuf.gradle.protoc
 import java.nio.file.Paths
 
 plugins {
-  id("com.android.application")
-  kotlin("android")
-  kotlin("plugin.parcelize")
-  id("com.google.protobuf")
-  id("dev.rikka.tools.refine.gradle-plugin")
-  id("com.google.devtools.ksp")
+  id(libs.plugins.android.application.get().pluginId)
+  id(libs.plugins.kotlin.android.get().pluginId)
+  id(libs.plugins.kotlin.parcelize.get().pluginId)
+  alias(libs.plugins.protobuf)
+  alias(libs.plugins.hiddenApiRefine)
+  alias(libs.plugins.ksp)
 }
 
 setupAppModule {

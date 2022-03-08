@@ -1,6 +1,6 @@
 plugins {
-  id("com.android.library")
-  kotlin("android")
+  id(libs.plugins.android.library.get().pluginId)
+  id(libs.plugins.kotlin.android.get().pluginId)
 }
 
 setupLibraryModule()

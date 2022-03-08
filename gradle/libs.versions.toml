@@ -25,6 +25,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 protobuf = { id = "com.google.protobuf", version = "0.8.18" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.9.0" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine.gradle-plugin", version.ref = "hiddenApiRefine" }
