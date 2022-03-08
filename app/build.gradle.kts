@@ -16,6 +16,12 @@ plugins {
   alias(libs.plugins.ksp)
 }
 
+ksp {
+  arg("moshi.generated", "javax.annotation.Generated")
+  arg("room.incremental", "true")
+  arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 setupAppModule {
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
@@ -23,12 +29,6 @@ setupAppModule {
 
   buildFeatures {
     viewBinding = true
-  }
-
-  ksp {
-    arg("moshi.generated", "javax.annotation.Generated")
-    arg("room.incremental", "true")
-    arg("room.schemaLocation", "$projectDir/schemas")
   }
 
   sourceSets["main"].java.srcDirs("src/main/kotlin")
