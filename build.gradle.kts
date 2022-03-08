@@ -1,25 +1,15 @@
-buildscript {
-  apply("gradle/extra.gradle.kts")
-
-  repositories {
-    google()
-    gradlePluginPortal()
-  }
-
-  dependencies {
-    classpath(rootProject.extra["androidPlugin"].toString())
-    classpath(rootProject.extra["kotlinPlugin"].toString())
-    classpath(Libs.protobufPlugin)
-    classpath(Libs.kotlinterPlugin)
-    classpath(Libs.hiddenApiRefinePlugin)
-    classpath(Libs.kspPlugin)
-  }
+plugins {
+  id(libs.plugins.android.application.get().pluginId) apply false
+  id(libs.plugins.android.library.get().pluginId) apply false
+  id(libs.plugins.kotlin.android.get().pluginId) apply false
+  alias(libs.plugins.protobuf) apply false
+  alias(libs.plugins.kotlinter) apply false
+  alias(libs.plugins.hiddenApiRefine) apply false
+  alias(libs.plugins.ksp) apply false
 }
 
 allprojects {
-  apply("$rootDir/gradle/extra.gradle.kts")
-
-  apply(plugin = "org.jmailen.kotlinter")
+  apply(plugin = rootProject.libs.plugins.kotlinter.get().pluginId)
 }
 
 task<Delete>("clean") {

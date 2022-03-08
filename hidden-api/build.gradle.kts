@@ -1,13 +1,13 @@
 plugins {
-  id("com.android.library")
-  kotlin("android")
+  id(libs.plugins.android.library.get().pluginId)
+  id(libs.plugins.kotlin.android.get().pluginId)
 }
 
 setupLibraryModule()
 
 dependencies {
-  annotationProcessor(Libs.refineAnnotationCompiler)
-  compileOnly(Libs.refineAnnotation)
+  annotationProcessor(libs.rikka.refine.compiler)
+  compileOnly(libs.rikka.refine.annotation)
 
-  implementation(Libs.annotation)
+  implementation(libs.androidX.annotation)
 }

@@ -58,17 +58,6 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
       targetCompatibility(JavaVersion.VERSION_11)
       sourceCompatibility(JavaVersion.VERSION_11)
     }
-    dependencies {
-      implementations(
-        fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))),
-        Libs.coroutines,
-        Libs.appCompat,
-        Libs.core
-      )
-
-      testImplementations(*Libs.tests)
-      androidTestImplementations(*Libs.androidTests)
-    }
     (this as T).block()
   }
 }
@@ -79,15 +68,3 @@ private fun BaseExtension.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
 
 fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
   .toString(Charset.defaultCharset()).trim()
-
-fun DependencyHandler.implementations(vararg names: Any): Array<Dependency?> =
-  config("implementation", *names)
-
-fun DependencyHandler.androidTestImplementations(vararg names: Any): Array<Dependency?> =
-  config("androidTestImplementation", *names)
-
-fun DependencyHandler.testImplementations(vararg names: Any): Array<Dependency?> =
-  config("testImplementation", *names)
-
-private fun DependencyHandler.config(operation: String, vararg names: Any): Array<Dependency?> =
-  names.map { add(operation, it) }.toTypedArray()
