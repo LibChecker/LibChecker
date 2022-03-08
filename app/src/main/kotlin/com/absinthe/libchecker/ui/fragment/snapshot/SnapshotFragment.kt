@@ -432,6 +432,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     isSnapshotDatabaseItemsReady = false
   }
 
+  @Synchronized
   private fun dequeuePackages() = lifecycleScope.launch(Dispatchers.IO) {
     while (packageQueue.isNotEmpty()) {
       packageQueue.poll()?.first?.let {
