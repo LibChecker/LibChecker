@@ -4,6 +4,7 @@ import com.absinthe.libchecker.api.request.VERSION
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.JsonUtil
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -31,7 +32,8 @@ object ApiManager {
 
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 
-  private val retrofit by lazy {
+  @PublishedApi
+  internal val retrofit by unsafeLazy {
     val okHttpClient = OkHttpClient.Builder()
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
@@ -44,7 +46,5 @@ object ApiManager {
       .build()
   }
 
-  fun <T> create(service: Class<T>): T = retrofit.create(service)
-
-  inline fun <reified T> create(): T = create(T::class.java)
+  inline fun <reified T : Any> create(): T = retrofit.create(T::class.java)
 }
