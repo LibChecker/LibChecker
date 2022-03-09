@@ -10,6 +10,12 @@ plugins {
 
 allprojects {
   apply(plugin = rootProject.libs.plugins.kotlinter.get().pluginId)
+
+  tasks.matching {
+    it.name.contains("transformClassesWithHiddenApiRefine")
+  }.configureEach {
+    notCompatibleWithConfigurationCache("transformClassesWithHiddenApiRefine task can't support CC")
+  }
 }
 
 task<Delete>("clean") {
