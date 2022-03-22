@@ -10,13 +10,13 @@ import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.database.RuleDatabase
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
+import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

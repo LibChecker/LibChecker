@@ -13,6 +13,8 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
+import com.absinthe.rulesbundle.LCRemoteRepo
+import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.color.DynamicColors
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.microsoft.appcenter.AppCenter
@@ -51,6 +53,14 @@ class LibCheckerApp : Application() {
       Timber.plant(ReleaseTree())
     }
 
+    LCRules.init(this)
+    LCRules.setRemoteRepo(
+      if (GlobalValues.repo == Constants.REPO_GITHUB) {
+        LCRemoteRepo.Github
+      } else {
+        LCRemoteRepo.Gitee
+      }
+    )
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)

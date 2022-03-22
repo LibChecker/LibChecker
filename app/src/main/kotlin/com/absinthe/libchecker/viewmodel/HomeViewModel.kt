@@ -37,17 +37,17 @@ import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.constant.librarymap.IconResMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
+import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Rule
 import com.microsoft.appcenter.analytics.Analytics
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +58,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import ohos.bundle.IBundleManager
 import timber.log.Timber
-import java.util.regex.Pattern
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -540,14 +539,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       }
 
       var chip: LibChip?
-      var rule: RuleEntity?
+      var rule: Rule?
       for (entry in map) {
         if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
-          rule = LCAppUtils.getRuleWithRegex(entry.key, entry.value.second)
+          rule = LCRules.getRule(entry.key, entry.value.second, true)
           chip = null
           rule?.let {
             chip = LibChip(
-              iconRes = IconResMap.getIconRes(it.iconIndex),
+              iconRes = it.iconRes,
               name = it.label,
               regexName = it.regexName
             )
@@ -744,13 +743,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private suspend fun update(item: LCItem) = Repositories.lcRepository.update(item)
 
   private suspend fun delete(item: LCItem) = Repositories.lcRepository.delete(item)
-
-  fun initRegexRules() = viewModelScope.launch(Dispatchers.IO) {
-    val list = Repositories.ruleRepository.getRegexRules()
-    list.forEach {
-      AppItemRepository.rulesRegexList[Pattern.compile(it.name)] = it
-    }
-  }
 
   sealed class Effect {
     data class ReloadApps(val obj: Any? = null) : Effect()

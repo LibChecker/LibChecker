@@ -14,7 +14,9 @@ import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -27,8 +29,6 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -37,6 +37,7 @@ import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ManifestReader
+import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -239,7 +240,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       list.forEach {
         chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)?.let { rule ->
           LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -266,9 +267,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, STATIC, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -307,9 +308,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, METADATA, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -353,9 +354,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, PERMISSION, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -387,9 +388,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        LCAppUtils.getRuleWithRegex(it.name, DEX)?.let { rule ->
+        LCRules.getRule(it.name, DEX, true)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )

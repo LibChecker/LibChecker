@@ -9,6 +9,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.rulesbundle.LCRules
 import java.util.Locale
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -23,7 +24,7 @@ object GlobalValues {
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 
-  var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, RULES_VERSION)
+  var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, LCRules.getVersion())
 
   var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 

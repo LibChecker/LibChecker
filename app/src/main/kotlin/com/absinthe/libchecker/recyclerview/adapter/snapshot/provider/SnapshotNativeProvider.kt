@@ -10,10 +10,10 @@ import com.absinthe.libchecker.bean.CHANGED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.snapshot.SnapshotDetailNativeView
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -63,7 +63,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
 
       lifecycleScope.launch {
-        val rule = LCAppUtils.getRuleWithRegex(snapshotItem.name, snapshotItem.itemType)
+        val rule = LCRules.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
         setChip(rule, colorRes)
         if (rule != null) {
@@ -72,8 +72,7 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
               return@setChipOnClickListener
             }
             val name = item.item.name
-            val regexName = LCAppUtils.findRuleRegex(name, item.item.itemType)?.regexName
-            LibDetailDialogFragment.newInstance(name, item.item.itemType, regexName)
+            LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
               .apply {
                 show(
                   (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager,

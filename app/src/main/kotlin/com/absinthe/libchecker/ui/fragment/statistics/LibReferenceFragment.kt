@@ -45,7 +45,6 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.showToast
@@ -53,6 +52,7 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -159,9 +159,15 @@ class LibReferenceFragment :
           val ref = refAdapter.getItem(position)
           if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
             val name = ref.libName
-            val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
-            LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-              .show(childFragmentManager, tag)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+              val regexName = LCRules.getRule(name, ref.type, true)?.regexName
+
+              withContext(Dispatchers.Main) {
+                LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+                  .show(childFragmentManager, tag)
+              }
+            }
           }
         }
       }

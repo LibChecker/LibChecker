@@ -83,7 +83,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     handleIntentFromShortcuts(intent)
     initObserver()
     clearApkCache()
-    appViewModel.initRegexRules()
   }
 
   override fun onNewIntent(intent: Intent) {

@@ -126,6 +126,7 @@ dependencies {
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.bundles.appCenter)
+  implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
   ksp(libs.square.moshi.compiler)

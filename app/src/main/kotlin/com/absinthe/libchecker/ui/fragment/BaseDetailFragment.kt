@@ -23,13 +23,13 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -189,9 +189,14 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   private fun openLibDetailDialog(position: Int) {
     val name = adapter.getItem(position).item.name
-    val regexName = LCAppUtils.findRuleRegex(name, adapter.type)?.regexName
 
-    LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-      .show(childFragmentManager, tag)
+    lifecycleScope.launch(Dispatchers.IO) {
+      val regexName = LCRules.getRule(name, adapter.type, true)?.regexName
+
+      withContext(Dispatchers.Main) {
+        LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+          .show(childFragmentManager, tag)
+      }
+    }
   }
 }

@@ -3,7 +3,7 @@ package com.absinthe.libchecker.database
 import android.app.Application
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.RULES_VERSION
+import com.absinthe.rulesbundle.LCRules
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
 
@@ -11,16 +11,15 @@ object Repositories {
   private lateinit var context: Application
 
   val lcRepository by lazy { LCRepository(LCDatabase.getDatabase(context).lcDao()) }
-  val ruleRepository by lazy { RuleRepository(RuleDatabase.getDatabase(context).ruleDao()) }
 
   fun init(application: Application) {
     context = application
   }
 
   fun checkRulesDatabase() {
-    if (GlobalValues.localRulesVersion < RULES_VERSION) {
+    if (GlobalValues.localRulesVersion < LCRules.getVersion()) {
       deleteRulesDatabase()
-      GlobalValues.localRulesVersion = RULES_VERSION
+      GlobalValues.localRulesVersion = LCRules.getVersion()
       ProcessPhoenix.triggerRebirth(context)
     }
   }

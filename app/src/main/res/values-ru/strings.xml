@@ -10,7 +10,6 @@
   <string name="channel_shoot">Сохранить</string>
   <string name="noti_shoot_title">Сохранение текущего снимка</string>
   <string name="noti_shoot_title_saved">Снимок сохранен</string>
-  <string name="permission_label_get_marked_libraries">Разрешить приложению получать информацию о отмеченных библиотеках, предоставляемую LibChecker</string>
 
   <!--  App list  -->
   <string name="menu_search">Поиск</string>
