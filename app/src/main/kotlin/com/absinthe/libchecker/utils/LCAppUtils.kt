@@ -122,7 +122,7 @@ object LCAppUtils {
     packageName: String? = null,
     nativeLibs: List<LibStringItem>? = null
   ): Rule? {
-    val ruleEntity = LCRules.getRule(name, type, false) ?: return null
+    val ruleEntity = LCRules.getRule(name, type, true) ?: return null
     if (type == NATIVE) {
       if (packageName == null) {
         return ruleEntity
