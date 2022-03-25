@@ -1010,32 +1010,34 @@ object PackageUtils {
   private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
   fun getAGPVersion(packageInfo: PackageInfo): String? {
-    ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
-      zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
-        Properties().apply {
-          load(zipFile.getInputStream(ze))
-          getProperty(AGP_KEYWORD)?.let {
-            return it
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
+          Properties().apply {
+            load(zipFile.getInputStream(ze))
+            getProperty(AGP_KEYWORD)?.let {
+              return it
+            }
           }
         }
-      }
-      zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
-          seq.find { it.contains(AGP_KEYWORD2) }?.let {
-            return it.removePrefix(AGP_KEYWORD2)
+        zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
+          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
+            seq.find { it.contains(AGP_KEYWORD2) }?.let {
+              return it.removePrefix(AGP_KEYWORD2)
+            }
           }
         }
-      }
-      arrayOf(
-        "META-INF/androidx.databinding_viewbinding.version",
-        "META-INF/androidx.databinding_databindingKtx.version",
-        "META-INF/androidx.databinding_library.version"
-      ).forEach { entry ->
-        zipFile.getEntry(entry)?.let { ze ->
-          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
-            val version = seq.readLine()
-            if (version.isNotBlank()) {
-              return version
+        arrayOf(
+          "META-INF/androidx.databinding_viewbinding.version",
+          "META-INF/androidx.databinding_databindingKtx.version",
+          "META-INF/androidx.databinding_library.version"
+        ).forEach { entry ->
+          zipFile.getEntry(entry)?.let { ze ->
+            BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
+              val version = seq.readLine()
+              if (version.isNotBlank()) {
+                return version
+              }
             }
           }
         }
