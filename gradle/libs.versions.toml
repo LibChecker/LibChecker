@@ -7,6 +7,7 @@ grpc = "1.45.0"
 hiddenApiRefine = "3.1.0"
 kotlin = "1.6.10"
 protoc = "3.20.0"
+protoc-javalite = "3.19.4"
 square-moshi = "1.13.0"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.0.4"
@@ -54,7 +55,7 @@ square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", ver
 
 google-material = "com.google.android.material:material:1.5.0"
 google-protobuf-javaLite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
-google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
+google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc-javalite" }
 
 grpc-gen = { module = "io.grpc:protoc-gen-grpc-java", version.ref = "grpc" }
 grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpc" }
