@@ -4,13 +4,13 @@ import android.content.pm.ApplicationInfo
 import com.absinthe.libchecker.app.Global
 
 object AppItemRepository {
-  var allApplicationInfoItems: List<ApplicationInfo> = emptyList()
+  var allApplicationInfoMap: Map<String, ApplicationInfo> = HashMap(100)
   var trackItemsChanged = false
   var shouldRefreshAppList = false
   var shouldClearDiffItemsInDatabase = false
 
-  suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
+  suspend fun getApplicationInfoMap(): Map<String, ApplicationInfo> {
     Global.applicationListJob?.join()
-    return allApplicationInfoItems
+    return allApplicationInfoMap
   }
 }

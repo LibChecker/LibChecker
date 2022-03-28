@@ -2,7 +2,6 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.AndroidViewModel
@@ -111,12 +110,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     val context: Context = getApplication<LibCheckerApp>()
     val packageManager = context.packageManager
-    val appList: MutableList<ApplicationInfo> =
-      AppItemRepository.getApplicationInfoItems().toMutableList()
-    val appMap = mutableMapOf<String, ApplicationInfo>()
-    val size = appList.size
-    var count = 0
+    val appMap = AppItemRepository.getApplicationInfoMap().toMutableMap()
+    val size = appMap.size
 
+    var count = 0
     var packageInfo: PackageInfo
     var versionCode: Long
     var compareDiffNode: CompareDiffNode
@@ -125,17 +122,14 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     var snapshotDiffContent: String
 
     val allTrackItems = repository.getTrackItems()
-    appList.forEach { appMap[it.packageName] = it }
-    appList.clear()
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
-      if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (
-          dbItem.packageSize != 0L && PackageUtils.getPackageSize(
-              packageInfo,
-              true
-            ) != dbItem.packageSize
-          ) ||
+      if (versionCode != dbItem.versionCode ||
+        packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
+        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(
+          packageInfo,
+          true
+        ) != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
@@ -231,125 +225,121 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       }
     }
 
-    preList.let { dbItems ->
-      for (dbItem in dbItems) {
-        appMap[dbItem.packageName]?.let {
-          try {
-            packageInfo = PackageUtils.getPackageInfo(it, PackageManager.GET_META_DATA)
-            versionCode = PackageUtils.getVersionCode(packageInfo)
-            snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
-
-            if (snapshotDiffStoringItem == null ||
-              snapshotDiffStoringItem!!.lastUpdatedTime != packageInfo.lastUpdateTime
-            ) {
-              compare(dbItem, packageInfo, versionCode)
-            } else {
-              try {
-                snapshotDiffStoringItem!!.diffContent.fromJson<SnapshotDiffItem>()?.let { item ->
-                  diffList.add(item)
-                }
-              } catch (e: IOException) {
-                Timber.e(e, "diffContent parsing failed")
-                compare(dbItem, packageInfo, versionCode)
-              }
-            }
-          } catch (e: Exception) {
-            Timber.e(e)
-          } finally {
-            appMap.remove(it.packageName)
-            count++
-            comparingProgressLiveData.postValue(count * 100 / size)
-          }
-        } ?: run {
-          diffList.add(
-            SnapshotDiffItem(
-              dbItem.packageName,
-              dbItem.lastUpdatedTime,
-              SnapshotDiffItem.DiffNode(dbItem.label),
-              SnapshotDiffItem.DiffNode(dbItem.versionName),
-              SnapshotDiffItem.DiffNode(dbItem.versionCode),
-              SnapshotDiffItem.DiffNode(dbItem.abi),
-              SnapshotDiffItem.DiffNode(dbItem.targetApi),
-              SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
-              SnapshotDiffItem.DiffNode(dbItem.services),
-              SnapshotDiffItem.DiffNode(dbItem.activities),
-              SnapshotDiffItem.DiffNode(dbItem.receivers),
-              SnapshotDiffItem.DiffNode(dbItem.providers),
-              SnapshotDiffItem.DiffNode(dbItem.permissions),
-              SnapshotDiffItem.DiffNode(dbItem.metadata),
-              SnapshotDiffItem.DiffNode(dbItem.packageSize),
-              deleted = true,
-              isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
-            )
-          )
-        }
-      }
-
-      appMap.forEach { entry ->
-        val info = entry.value
+    for (dbItem in preList) {
+      appMap[dbItem.packageName]?.let {
         try {
-          packageInfo = PackageUtils.getPackageInfo(info, PackageManager.GET_META_DATA)
+          packageInfo = PackageUtils.getPackageInfo(it, PackageManager.GET_META_DATA)
           versionCode = PackageUtils.getVersionCode(packageInfo)
+          snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
 
-          diffList.add(
-            SnapshotDiffItem(
-              packageInfo.packageName,
-              packageInfo.lastUpdateTime,
-              SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
-              SnapshotDiffItem.DiffNode(packageInfo.versionName),
-              SnapshotDiffItem.DiffNode(versionCode),
-              SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info).toShort()),
-              SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getComponentStringList(
-                  packageInfo.packageName,
-                  SERVICE,
-                  false
-                ).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getComponentStringList(
-                  packageInfo.packageName,
-                  ACTIVITY,
-                  false
-                ).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getComponentStringList(
-                  packageInfo.packageName,
-                  RECEIVER,
-                  false
-                ).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getComponentStringList(
-                  packageInfo.packageName,
-                  PROVIDER,
-                  false
-                ).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
-              ),
-              SnapshotDiffItem.DiffNode(
-                PackageUtils.getPackageSize(packageInfo, true)
-              ),
-              newInstalled = true,
-              isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
-            )
-          )
+          if (snapshotDiffStoringItem?.lastUpdatedTime != packageInfo.lastUpdateTime) {
+            compare(dbItem, packageInfo, versionCode)
+          } else {
+            try {
+              snapshotDiffStoringItem?.diffContent?.fromJson<SnapshotDiffItem>()?.let { item ->
+                diffList.add(item)
+              }
+            } catch (e: IOException) {
+              Timber.e(e, "diffContent parsing failed")
+              compare(dbItem, packageInfo, versionCode)
+            }
+          }
         } catch (e: Exception) {
           Timber.e(e)
         } finally {
+          appMap.remove(it.packageName)
           count++
           comparingProgressLiveData.postValue(count * 100 / size)
         }
+      } ?: run {
+        diffList.add(
+          SnapshotDiffItem(
+            dbItem.packageName,
+            dbItem.lastUpdatedTime,
+            SnapshotDiffItem.DiffNode(dbItem.label),
+            SnapshotDiffItem.DiffNode(dbItem.versionName),
+            SnapshotDiffItem.DiffNode(dbItem.versionCode),
+            SnapshotDiffItem.DiffNode(dbItem.abi),
+            SnapshotDiffItem.DiffNode(dbItem.targetApi),
+            SnapshotDiffItem.DiffNode(dbItem.nativeLibs),
+            SnapshotDiffItem.DiffNode(dbItem.services),
+            SnapshotDiffItem.DiffNode(dbItem.activities),
+            SnapshotDiffItem.DiffNode(dbItem.receivers),
+            SnapshotDiffItem.DiffNode(dbItem.providers),
+            SnapshotDiffItem.DiffNode(dbItem.permissions),
+            SnapshotDiffItem.DiffNode(dbItem.metadata),
+            SnapshotDiffItem.DiffNode(dbItem.packageSize),
+            deleted = true,
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
+          )
+        )
+      }
+    }
+
+    appMap.forEach { entry ->
+      val info = entry.value
+      try {
+        packageInfo = PackageUtils.getPackageInfo(info, PackageManager.GET_META_DATA)
+        versionCode = PackageUtils.getVersionCode(packageInfo)
+
+        diffList.add(
+          SnapshotDiffItem(
+            packageInfo.packageName,
+            packageInfo.lastUpdateTime,
+            SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
+            SnapshotDiffItem.DiffNode(packageInfo.versionName),
+            SnapshotDiffItem.DiffNode(versionCode),
+            SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info).toShort()),
+            SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                SERVICE,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                ACTIVITY,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                RECEIVER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getComponentStringList(
+                packageInfo.packageName,
+                PROVIDER,
+                false
+              ).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+            ),
+            SnapshotDiffItem.DiffNode(
+              PackageUtils.getPackageSize(packageInfo, true)
+            ),
+            newInstalled = true,
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
+          )
+        )
+      } catch (e: Exception) {
+        Timber.e(e)
+      } finally {
+        count++
+        comparingProgressLiveData.postValue(count * 100 / size)
       }
     }
 
@@ -377,8 +367,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     var snapshotDiffItem: SnapshotDiffItem
 
     val allTrackItems = repository.getTrackItems()
-
-    currList.forEach { currMap[it.packageName] = it }
 
     for (preItem in preList) {
       currMap[preItem.packageName]?.let {
@@ -491,13 +479,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     timeStamp: Long = GlobalValues.snapshotTimestamp,
     packageName: String
   ) {
-    val info = try {
-      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-    } catch (e: Exception) {
-      null
-    }
-    var diffItem: SnapshotDiffItem? = null
+    val info = runCatching {
+      PackageUtils.getPackageInfo(
+        packageName,
+        PackageManager.GET_META_DATA
+      )
+    }.getOrNull()
     val allTrackItems = repository.getTrackItems()
+    var diffItem: SnapshotDiffItem? = null
+
     repository.getSnapshot(timeStamp, packageName)?.let {
       info?.let { packageInfo ->
         diffItem = SnapshotDiffItem(

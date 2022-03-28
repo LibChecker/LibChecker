@@ -1088,8 +1088,10 @@ object PackageUtils {
         delay(200)
         retry = true
         emptyList()
-      }.also {
-        AppItemRepository.allApplicationInfoItems = it
+      }.also { items ->
+        AppItemRepository.allApplicationInfoMap = items.asSequence()
+          .map { it.packageName to it }
+          .toMap()
       }
     } while (retry)
 

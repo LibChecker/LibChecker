@@ -212,14 +212,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   ) {
     Timber.d("Request change: START")
     val timeRecorder = TimeRecorder()
-    var appList: MutableList<ApplicationInfo>? =
-      AppItemRepository.getApplicationInfoItems().toMutableList()
+    var appMap = AppItemRepository.getApplicationInfoMap().toMutableMap()
 
     timeRecorder.start()
     updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
-    if (appList.isNullOrEmpty() || needRefresh) {
-      appList = PackageUtils.getAppsList().toMutableList()
+    if (needRefresh) {
+      appMap = PackageUtils.getAppsList().asSequence()
+        .map { it.packageName to it }
+        .toMap()
+        .toMutableMap()
+      AppItemRepository.allApplicationInfoMap = appMap
     }
 
     dbItems.value?.let { value ->
@@ -233,7 +236,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       for (dbItem in value) {
         try {
-          appList.find { it.packageName == dbItem.packageName }?.let {
+          appMap[dbItem.packageName]?.let {
             packageInfo = PackageUtils.getPackageInfo(it)
             versionCode = PackageUtils.getVersionCode(packageInfo)
 
@@ -269,7 +272,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               update(lcItem)
             }
 
-            appList.remove(it)
+            appMap.remove(dbItem.packageName)
           } ?: run {
             delete(dbItem)
           }
@@ -279,7 +282,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
       }
 
-      for (info in appList) {
+      for (info in appMap.values) {
         try {
           packageInfo = PackageUtils.getPackageInfo(info)
           versionCode = PackageUtils.getVersionCode(packageInfo)
@@ -328,71 +331,71 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
       delay(10000)
-      collectPopularLibraries(appList.toList())
+      collectPopularLibraries()
       Once.markDone(OnceTag.HAS_COLLECT_LIB)
     }
   }
 
-  private fun collectPopularLibraries(appList: List<ApplicationInfo>) =
-    viewModelScope.launch(Dispatchers.IO) {
-      if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
-        return@launch
-      }
-      val map = HashMap<String, Int>()
-      var libList: List<LibStringItem>
-      var count: Int
-
-      try {
-        for (item in appList) {
-          libList =
-            PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
-
-          for (lib in libList) {
-            count = map[lib.name] ?: 0
-            map[lib.name] = count + 1
-          }
-        }
-        val properties: MutableMap<String, String> = HashMap()
-        properties["Version"] = Build.VERSION.SDK_INT.toString()
-        Analytics.trackEvent("OS Version", properties)
-
-        for (entry in map) {
-          if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
-            properties.clear()
-            properties["Library name"] = entry.key
-            properties["Library count"] = entry.value.toString()
-
-            Analytics.trackEvent("Native Library", properties)
-          }
-        }
-
-        collectComponentPopularLibraries(
-          appList,
-          SERVICE,
-          "Service"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          ACTIVITY,
-          "Activity"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          RECEIVER,
-          "Receiver"
-        )
-        collectComponentPopularLibraries(
-          appList,
-          PROVIDER,
-          "Provider"
-        )
-      } catch (ignore: Exception) {
-        Timber.e(ignore, "collectPopularLibraries failed")
-      }
+  private fun collectPopularLibraries() = viewModelScope.launch(Dispatchers.IO) {
+    if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
+      return@launch
     }
+    val appList = AppItemRepository.getApplicationInfoMap().values
+    val map = HashMap<String, Int>()
+    var libList: List<LibStringItem>
+    var count: Int
+
+    try {
+      for (item in appList) {
+        libList =
+          PackageUtils.getNativeDirLibs(PackageUtils.getPackageInfo(item.packageName))
+
+        for (lib in libList) {
+          count = map[lib.name] ?: 0
+          map[lib.name] = count + 1
+        }
+      }
+      val properties: MutableMap<String, String> = HashMap()
+      properties["Version"] = Build.VERSION.SDK_INT.toString()
+      Analytics.trackEvent("OS Version", properties)
+
+      for (entry in map) {
+        if (entry.value > 3 && LCAppUtils.getRuleWithRegex(entry.key, NATIVE) == null) {
+          properties.clear()
+          properties["Library name"] = entry.key
+          properties["Library count"] = entry.value.toString()
+
+          Analytics.trackEvent("Native Library", properties)
+        }
+      }
+
+      collectComponentPopularLibraries(
+        appList,
+        SERVICE,
+        "Service"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        ACTIVITY,
+        "Activity"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        RECEIVER,
+        "Receiver"
+      )
+      collectComponentPopularLibraries(
+        appList,
+        PROVIDER,
+        "Provider"
+      )
+    } catch (ignore: Exception) {
+      Timber.e(ignore, "collectPopularLibraries failed")
+    }
+  }
 
   private suspend fun collectComponentPopularLibraries(
-    appList: List<ApplicationInfo>,
+    appList: Collection<ApplicationInfo>,
     @LibType type: Int,
     label: String
   ) {
@@ -432,8 +435,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   fun computeLibReference(@LibType type: Int) {
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
       libReference.postValue(null)
-      val appList: List<ApplicationInfo> =
-        AppItemRepository.getApplicationInfoItems().ifEmpty { PackageUtils.getAppsList() }
+      val appMap = AppItemRepository.getApplicationInfoMap()
       val map = HashMap<String, Pair<MutableList<String>, Int>>()
       val refList = mutableListOf<LibReference>()
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
@@ -445,7 +447,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           if (type == NOT_MARKED) {
             onlyShowNotMarked = true
           }
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -457,7 +459,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         NATIVE -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -467,7 +469,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         SERVICE -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -477,7 +479,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         ACTIVITY -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -487,7 +489,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         RECEIVER -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -497,7 +499,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         PROVIDER -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -507,7 +509,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         DEX -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -517,7 +519,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         PERMISSION -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
@@ -527,7 +529,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
         METADATA -> {
-          for (item in appList) {
+          for (item in appMap.values) {
 
             if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue

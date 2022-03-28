@@ -33,7 +33,6 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -213,9 +212,7 @@ class LibReferenceFragment :
     }
 
     lifecycleScope.launch {
-      if (refAdapter.data.isEmpty() &&
-        AppItemRepository.getApplicationInfoItems().isNotEmpty()
-      ) {
+      if (refAdapter.data.isEmpty()) {
         if (homeViewModel.libRefType == null) {
           computeRef()
           homeViewModel.libRefType = category

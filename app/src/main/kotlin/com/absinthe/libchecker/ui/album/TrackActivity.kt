@@ -90,7 +90,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
 
     lifecycleScope.launch(Dispatchers.IO) {
       val trackedList = repository.getTrackItems()
-      list += AppItemRepository.getApplicationInfoItems()
+      list += AppItemRepository.getApplicationInfoMap().values
         .asSequence()
         .map {
           TrackListItem(
