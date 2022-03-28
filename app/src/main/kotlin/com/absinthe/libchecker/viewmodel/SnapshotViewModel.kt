@@ -368,6 +368,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     val allTrackItems = repository.getTrackItems()
 
+    currList.forEach { currMap[it.packageName] = it }
+    
     for (preItem in preList) {
       currMap[preItem.packageName]?.let {
         if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
