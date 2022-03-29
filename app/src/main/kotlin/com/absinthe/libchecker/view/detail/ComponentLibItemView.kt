@@ -12,7 +12,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
@@ -63,15 +62,11 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
         setChipIconResource(libChip.iconRes)
 
         if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-          if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-            chipIconTint = context.getColorStateListByAttr(R.attr.colorOnSurface)
-          } else {
-            val icon = chipIcon
-            icon?.let {
-              it.colorFilter =
-                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-              chipIcon = it
-            }
+          val icon = chipIcon
+          icon?.let {
+            it.colorFilter =
+              ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+            chipIcon = it
           }
         }
       }

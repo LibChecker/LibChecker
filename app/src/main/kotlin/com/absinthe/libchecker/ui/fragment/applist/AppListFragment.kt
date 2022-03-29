@@ -276,8 +276,7 @@ class AppListFragment :
                 Once.clearDone(OnceTag.FIRST_LAUNCH)
                 isFirstLaunch = true
                 doOnMainThreadIdle {
-                  flip(VF_INIT)
-                  initItems()
+                  initApps()
                 }
               }
             }
@@ -301,6 +300,7 @@ class AppListFragment :
                     Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                   }
                   (activity as? INavViewContainer)?.showNavigationView()
+                  setHasOptionsMenu(true)
                 }
                 STATUS_START_REQUEST_CHANGE_END -> {
                   dbItems.value?.let { dbItems -> updateItems(dbItems) }
@@ -311,8 +311,7 @@ class AppListFragment :
                   val second = !isFirstLaunch &&
                     !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
                   if (first || second) {
-                    flip(VF_INIT)
-                    initItems()
+                    initApps()
                     Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                     Once.markDone(OnceTag.HARMONY_FIRST_INIT)
                   }
@@ -325,8 +324,7 @@ class AppListFragment :
 
       dbItems.observe(viewLifecycleOwner) {
         if (it.isNullOrEmpty()) {
-          flip(VF_INIT)
-          initItems()
+          initApps()
         } else if (
           appListStatus != STATUS_START_INIT &&
           appListStatus != STATUS_START_REQUEST_CHANGE
@@ -442,6 +440,12 @@ class AppListFragment :
       menu?.findItem(R.id.search)?.isVisible = true
       binding.initView.loadingView.pauseAnimation()
     }
+  }
+
+  private fun initApps() {
+    flip(VF_INIT)
+    setHasOptionsMenu(false)
+    homeViewModel.initItems()
   }
 
   override fun onReturnTop() {
