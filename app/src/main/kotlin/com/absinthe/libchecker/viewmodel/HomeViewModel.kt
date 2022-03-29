@@ -222,7 +222,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         .map { it.packageName to it }
         .toMap()
         .toMutableMap()
-      AppItemRepository.allApplicationInfoMap = appMap
     }
 
     dbItems.value?.let { value ->
