@@ -19,7 +19,7 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.9.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.6.10-1.0.4" }
+ksp = { id = "com.google.devtools.ksp", version = "1.6.20-1.0.4" }
 protobuf = { id = "com.google.protobuf", version = "0.8.18" }
 
 [libraries]
