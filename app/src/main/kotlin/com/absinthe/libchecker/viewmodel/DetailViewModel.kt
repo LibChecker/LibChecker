@@ -258,7 +258,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getStaticChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getStaticChipList")
-    val list = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+    val list =
+      runCatching { PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)) }.getOrNull()
+        ?: return emptyList()
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 
