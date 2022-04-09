@@ -56,7 +56,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 import java.util.LinkedList
@@ -436,9 +435,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private fun dequeuePackages() = lifecycleScope.launch(Dispatchers.IO) {
     while (packageQueue.isNotEmpty()) {
       packageQueue.poll()?.first?.let {
-        withContext(Dispatchers.Main) {
-          flip(VF_LOADING)
-        }
         viewModel.compareItemDiff(GlobalValues.snapshotTimestamp, it)
       }
     }

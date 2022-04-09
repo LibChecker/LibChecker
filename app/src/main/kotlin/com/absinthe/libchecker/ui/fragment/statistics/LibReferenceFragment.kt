@@ -185,7 +185,7 @@ class LibReferenceFragment :
         effect.collect {
           when (it) {
             is HomeViewModel.Effect.PackageChanged -> {
-              computeRef()
+              computeRef(false)
             }
             else -> {}
           }
@@ -203,7 +203,7 @@ class LibReferenceFragment :
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
       if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
-        computeRef()
+        computeRef(true)
         homeViewModel.libRefSystemApps = it
       }
     }
@@ -214,7 +214,7 @@ class LibReferenceFragment :
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
         if (homeViewModel.libRefType == null) {
-          computeRef()
+          computeRef(true)
           homeViewModel.libRefType = category
         }
       }
@@ -334,7 +334,7 @@ class LibReferenceFragment :
   private fun doSaveLibRefType(@LibType type: Int): Boolean {
     category = type
     GlobalValues.currentLibRefType = type
-    computeRef()
+    computeRef(true)
     Analytics.trackEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       EventProperties().set(
@@ -345,9 +345,11 @@ class LibReferenceFragment :
     return true
   }
 
-  private fun computeRef() {
+  private fun computeRef(needShowLoading: Boolean) {
     isListReady = false
-    flip(VF_LOADING)
+    if (needShowLoading) {
+      flip(VF_LOADING)
+    }
     homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
   }
