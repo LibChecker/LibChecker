@@ -40,7 +40,7 @@ class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
       gravity = Gravity.START or Gravity.CENTER
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       setTypeface(null, Typeface.BOLD)
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     }
   }
 }

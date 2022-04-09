@@ -40,7 +40,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       viewFlipper.displayedChild = VF_LOADING
       title.text = libName
       lifecycleScope.launch {
-        val iconRes = LCRules.getRule(libName, type, true)?.iconRes ?: R.drawable.ic_sdk_placeholder
+        val iconRes = LCRules.getRule(libName, type, true)?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
         icon.load(iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)

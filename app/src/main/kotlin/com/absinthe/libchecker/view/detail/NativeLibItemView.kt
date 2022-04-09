@@ -36,7 +36,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       ).also {
         it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
       }
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }

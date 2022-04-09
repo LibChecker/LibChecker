@@ -49,7 +49,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+        setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
       }
 
@@ -79,7 +79,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
           ViewGroup.LayoutParams.WRAP_CONTENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+        setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {

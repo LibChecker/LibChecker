@@ -154,12 +154,12 @@ class ChartFragment :
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter(chartView as PieChart))
         setValueTextSize(10f)
-        setValueTextColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
+        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
       (chartView as PieChart).apply {
         this.data = data
-        setEntryLabelColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
+        setEntryLabelColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         highlightValues(null)
         invalidate()
       }
@@ -297,7 +297,7 @@ class ChartFragment :
       // dataSet.setSelectionShift(0f);
       val data = BarData(dataSet).apply {
         setValueTextSize(10f)
-        setValueTextColor(requireContext().getColorByAttr(R.attr.colorOnSurface))
+        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
 
       (chartView as HorizontalBarChart).apply {
@@ -439,7 +439,7 @@ class ChartFragment :
   }
 
   private fun generatePieChartView(): PieChart {
-    val colorOnSurface = requireContext().getColorByAttr(R.attr.colorOnSurface)
+    val colorOnSurface = requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return PieChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -468,7 +468,7 @@ class ChartFragment :
   }
 
   private fun generateBarChartView(): HorizontalBarChart {
-    val colorOnSurface = requireContext().getColorByAttr(R.attr.colorOnSurface)
+    val colorOnSurface = requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,

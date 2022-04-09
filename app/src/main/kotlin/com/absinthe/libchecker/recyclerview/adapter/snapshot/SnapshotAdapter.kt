@@ -68,7 +68,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
           val bitmap = R.drawable.ic_app_list.getDrawable(context)?.apply {
-            setTint(context.getColorByAttr(R.attr.colorOnSurface))
+            setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
           }?.toBitmap(40.dp, 40.dp)
           icon.post { icon.setImageBitmap(bitmap) }
         }
@@ -90,7 +90,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
             R.color.material_green_300.toColorStateList(context)
           }
           holder.itemView.backgroundTintList = background
-          val color = context.getColorByAttr(R.attr.colorOnSurface)
+          val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
           versionInfo.setTextColor(color)
           packageSizeInfo.setTextColor(color)
           targetApiInfo.setTextColor(color)

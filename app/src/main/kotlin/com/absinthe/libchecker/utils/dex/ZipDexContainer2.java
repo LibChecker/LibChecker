@@ -5,7 +5,6 @@ import com.google.common.io.ByteStreams;
 
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.dexbacked.DexBackedDexFile;
-import org.jf.dexlib2.iface.DexFile;
 import org.jf.dexlib2.iface.MultiDexContainer;
 
 import java.io.File;
@@ -87,7 +86,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     }
   }
 
-  protected ZipFile getZipFile() throws IOException {
+  protected ZipFile getZipFile() {
     try {
       return new ZipFile(zipFilePath);
     } catch (IOException ex) {
@@ -96,11 +95,11 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   }
 
   @Nonnull
-  protected DexEntry loadEntry(@Nonnull ZipFile zipFile, @Nonnull ZipEntry zipEntry) throws IOException {
+  protected DexEntry<DexBackedDexFile> loadEntry(@Nonnull ZipFile zipFile, @Nonnull ZipEntry zipEntry) throws IOException {
     try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
       byte[] buf = ByteStreams.toByteArray(inputStream);
 
-      return new DexEntry() {
+      return new DexEntry<>() {
         @Nonnull
         @Override
         public String getEntryName() {
@@ -109,13 +108,13 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
 
         @Nonnull
         @Override
-        public DexFile getDexFile() {
+        public DexBackedDexFile getDexFile() {
           return new DexBackedDexFile(opcodes, buf);
         }
 
         @Nonnull
         @Override
-        public MultiDexContainer getContainer() {
+        public MultiDexContainer<DexBackedDexFile> getContainer() {
           return ZipDexContainer2.this;
         }
       };
