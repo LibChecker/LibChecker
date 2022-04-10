@@ -702,7 +702,7 @@ object PackageUtils {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
     val file = File(applicationInfo.sourceDir)
     val use32bitAbi = applicationInfo.isUse32BitAbi()
-    val overlay = Refine.unsafeCast<PackageInfoHidden>(packageInfo).isOverlayPackage
+    val overlay = packageInfo.isOverlay()
     val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
     if (overlay) {
@@ -1130,6 +1130,16 @@ object PackageUtils {
   fun PackageInfo.isPWA(): Boolean {
     return applicationInfo.metaData?.keySet()
       ?.any { it.startsWith("org.chromium.webapk.shell_apk") } == true
+  }
+
+  fun PackageInfo.isOverlay(): Boolean {
+    return try {
+      Refine.unsafeCast<PackageInfoHidden>(this).isOverlayPackage
+    } catch (t: Throwable) {
+      val demands =
+        ManifestReader.getManifestProperties(File(applicationInfo.sourceDir), arrayOf("overlay"))
+      return demands["overlay"] as? Boolean ?: false
+    }
   }
 
   fun ApplicationInfo.isUse32BitAbi(): Boolean {

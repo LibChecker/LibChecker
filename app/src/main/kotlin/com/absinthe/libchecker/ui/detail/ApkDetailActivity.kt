@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.Intent
-import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -40,6 +39,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -50,7 +50,6 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -169,7 +168,7 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
           val extraInfo = SpannableStringBuilder()
           val file = File(it.applicationInfo.sourceDir)
-          val overlay = Refine.unsafeCast<PackageInfoHidden>(it).isOverlayPackage
+          val overlay = it.isOverlay()
           val abiSet = PackageUtils.getAbiSet(
             file,
             it.applicationInfo,

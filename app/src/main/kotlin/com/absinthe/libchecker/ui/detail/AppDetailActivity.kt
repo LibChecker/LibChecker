@@ -6,9 +6,7 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -64,6 +62,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
@@ -80,7 +79,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -90,7 +88,6 @@ import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Arrays
 import kotlin.math.abs
 
 @SuppressLint("InlinedApi")
@@ -133,15 +130,6 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     isPackageReady = true
     initView()
     resolveReferenceExtras()
-
-    PackageUtils.getPackageInfo(pkgName!!).apply {
-      val installed = applicationInfo.flags.and(ApplicationInfo.FLAG_INSTALLED) != 0
-      val multiArch = applicationInfo.flags.and(ApplicationInfo.FLAG_MULTIARCH) != 0
-      val enable = applicationInfo.enabled
-      val shared = Arrays.toString(applicationInfo.sharedLibraryFiles)
-
-      Timber.d("installed: $installed, multiArch: $multiArch, enable: $enable, shared: $shared")
-    }
   }
 
   override fun onStart() {
@@ -240,7 +228,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
           val extraInfo = SpannableStringBuilder()
           val file = File(packageInfo.applicationInfo.sourceDir)
-          val overlay = Refine.unsafeCast<PackageInfoHidden>(packageInfo).isOverlayPackage
+          val overlay = packageInfo.isOverlay()
           var abiSet = PackageUtils.getAbiSet(
             file,
             packageInfo.applicationInfo,
