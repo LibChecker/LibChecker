@@ -36,7 +36,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,7 +43,6 @@ import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import timber.log.Timber
-import java.io.File
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -94,9 +92,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       }
 
       info?.let {
-        val demands = arrayOf("extractNativeLibs")
-        val properties = ManifestReader.getManifestProperties(File(it.sourceDir), demands)
-        extractNativeLibs = properties["extractNativeLibs"] as? Boolean
+        extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
 
         list.addAll(
           getNativeChipList(info, isApk, abiSet?.firstOrNull())

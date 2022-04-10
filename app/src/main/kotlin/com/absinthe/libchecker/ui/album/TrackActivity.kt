@@ -94,7 +94,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
         .asSequence()
         .map {
           TrackListItem(
-            label = it.loadLabel(packageManager).toString(),
+            label = it.applicationInfo.loadLabel(packageManager).toString(),
             packageName = it.packageName,
             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )

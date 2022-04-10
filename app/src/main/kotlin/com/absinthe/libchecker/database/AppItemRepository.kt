@@ -1,22 +1,21 @@
 package com.absinthe.libchecker.database
 
-import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.utils.PackageUtils
 
 object AppItemRepository {
-  var allApplicationInfoMap: Map<String, ApplicationInfo> = HashMap(100)
+  var allPackageInfoMap: Map<String, PackageInfo> = HashMap(100)
   var trackItemsChanged = false
-  var shouldRefreshAppList = false
   var shouldClearDiffItemsInDatabase = false
 
-  suspend fun getApplicationInfoMap(): Map<String, ApplicationInfo> {
+  suspend fun getApplicationInfoMap(): Map<String, PackageInfo> {
     Global.applicationListJob?.join()
-    if (allApplicationInfoMap.isEmpty()) {
-      allApplicationInfoMap = PackageUtils.getAppsList().asSequence()
+    if (allPackageInfoMap.isEmpty()) {
+      allPackageInfoMap = PackageUtils.getAppsList().asSequence()
         .map { it.packageName to it }
         .toMap()
     }
-    return allApplicationInfoMap
+    return allPackageInfoMap
   }
 }

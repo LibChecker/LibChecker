@@ -24,7 +24,6 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
@@ -149,17 +148,6 @@ class AppListFragment :
     initObserver()
   }
 
-  override fun onResume() {
-    super.onResume()
-
-    if (!isFirstLaunch && isListReady && AppItemRepository.shouldRefreshAppList) {
-      homeViewModel.dbItems.value?.let {
-        updateItems(it)
-        AppItemRepository.shouldRefreshAppList = false
-      }
-    }
-  }
-
   override fun onPause() {
     super.onPause()
     popup?.dismiss()
@@ -201,28 +189,30 @@ class AppListFragment :
   }
 
   override fun onQueryTextChange(newText: String): Boolean {
-    keyword = newText
-    homeViewModel.dbItems.value?.let { allDatabaseItems ->
-      appAdapter.highlightText = newText
-      updateItems(allDatabaseItems, highlightRefresh = true)
+    if (keyword != newText) {
+      keyword = newText
+      homeViewModel.dbItems.value?.let { allDatabaseItems ->
+        appAdapter.highlightText = newText
+        updateItems(allDatabaseItems, highlightRefresh = true)
 
-      when {
-        newText.equals("Easter Egg", true) -> {
-          context?.showToast("🥚")
-          Analytics.trackEvent(
-            Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "AppList Search")
-          )
-        }
-        newText == Constants.COMMAND_DEBUG_MODE -> {
-          GlobalValues.debugMode = true
-          context?.showToast("DEBUG MODE")
-        }
-        newText == Constants.COMMAND_USER_MODE -> {
-          GlobalValues.debugMode = false
-          context?.showToast("USER MODE")
-        }
-        else -> {
+        when {
+          newText.equals("Easter Egg", true) -> {
+            context?.showToast("🥚")
+            Analytics.trackEvent(
+              Constants.Event.EASTER_EGG,
+              EventProperties().set("EASTER_EGG", "AppList Search")
+            )
+          }
+          newText == Constants.COMMAND_DEBUG_MODE -> {
+            GlobalValues.debugMode = true
+            context?.showToast("DEBUG MODE")
+          }
+          newText == Constants.COMMAND_USER_MODE -> {
+            GlobalValues.debugMode = false
+            context?.showToast("USER MODE")
+          }
+          else -> {
+          }
         }
       }
     }
@@ -316,6 +306,11 @@ class AppListFragment :
                     Once.markDone(OnceTag.HARMONY_FIRST_INIT)
                   }
                 }
+              }
+            }
+            is HomeViewModel.Effect.RefreshList -> {
+              homeViewModel.dbItems.value?.let { dbItems ->
+                updateItems(dbItems)
               }
             }
           }

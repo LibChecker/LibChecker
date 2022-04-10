@@ -5,7 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
+import android.content.pm.PackageInfo
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -146,45 +146,45 @@ class ShootService : LifecycleService() {
     val size = appList.size
     var count = 0
     val dbList = mutableListOf<SnapshotItem>()
-    val exceptionInfoList = mutableListOf<ApplicationInfo>()
+    val exceptionInfoList = mutableListOf<PackageInfo>()
 
     builder.setProgress(size, count, false)
     notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
 
     var currentProgress: Int
     var lastProgress = 0
+    var ai: ApplicationInfo
 
     for (info in appList) {
       try {
-        PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_META_DATA).let {
-          dbList.add(
-            SnapshotItem(
-              id = null,
-              packageName = it.packageName,
-              timeStamp = ts,
-              label = info.loadLabel(packageManager).toString(),
-              versionName = it.versionName ?: "null",
-              versionCode = PackageUtils.getVersionCode(it),
-              installedTime = it.firstInstallTime,
-              lastUpdatedTime = it.lastUpdateTime,
-              isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-              abi = PackageUtils.getAbi(info).toShort(),
-              targetApi = info.targetSdkVersion.toShort(),
-              nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
-              services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
-                .toJson().orEmpty(),
-              activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
-                .toJson().orEmpty(),
-              receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
-                .toJson().orEmpty(),
-              providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
-                .toJson().orEmpty(),
-              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-              packageSize = PackageUtils.getPackageSize(it, true)
-            )
+        ai = info.applicationInfo
+        dbList.add(
+          SnapshotItem(
+            id = null,
+            packageName = info.packageName,
+            timeStamp = ts,
+            label = ai.loadLabel(packageManager).toString(),
+            versionName = info.versionName ?: "null",
+            versionCode = PackageUtils.getVersionCode(info),
+            installedTime = info.firstInstallTime,
+            lastUpdatedTime = info.lastUpdateTime,
+            isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+            abi = PackageUtils.getAbi(info).toShort(),
+            targetApi = ai.targetSdkVersion.toShort(),
+            nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
+            services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
+              .toJson().orEmpty(),
+            activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
+              .toJson().orEmpty(),
+            receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
+              .toJson().orEmpty(),
+            providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
+              .toJson().orEmpty(),
+            permissions = PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty(),
+            metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
+            packageSize = PackageUtils.getPackageSize(info, true)
           )
-        }
+        )
         count++
         currentProgress = count * 100 / size
         if (currentProgress > lastProgress) {
@@ -209,8 +209,8 @@ class ShootService : LifecycleService() {
     var abiValue: Int
     while (exceptionInfoList.isNotEmpty()) {
       try {
-        info = exceptionInfoList[0]
-        abiValue = PackageUtils.getAbi(info)
+        info = exceptionInfoList[0].applicationInfo
+        abiValue = PackageUtils.getAbi(exceptionInfoList[0])
         PackageUtils.getPackageInfo(info.packageName).let {
           dbList.add(
             SnapshotItem(

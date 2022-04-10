@@ -75,6 +75,7 @@ class LibReferenceFragment :
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
+  private var keyword: String = ""
 
   override fun init() {
     setHasOptionsMenu(true)
@@ -360,24 +361,27 @@ class LibReferenceFragment :
 
   @SuppressLint("NotifyDataSetChanged")
   override fun onQueryTextChange(newText: String): Boolean {
-    homeViewModel.libReference.value?.let { list ->
-      val filter = list.filter {
-        it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
-          newText,
-          ignoreCase = true
-        ) ?: false
-      }
-      refAdapter.highlightText = newText
-      refAdapter.setDiffNewData(filter.toMutableList()) {
-        refAdapter.notifyDataSetChanged()
-      }
+    if (keyword != newText) {
+      keyword = newText
+      homeViewModel.libReference.value?.let { list ->
+        val filter = list.filter {
+          it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+            newText,
+            ignoreCase = true
+          ) ?: false
+        }
+        refAdapter.highlightText = newText
+        refAdapter.setDiffNewData(filter.toMutableList()) {
+          refAdapter.notifyDataSetChanged()
+        }
 
-      if (newText.equals("Easter Egg", true)) {
-        context?.showToast("🥚")
-        Analytics.trackEvent(
-          Constants.Event.EASTER_EGG,
-          EventProperties().set("EASTER_EGG", "Lib Reference Search")
-        )
+        if (newText.equals("Easter Egg", true)) {
+          context?.showToast("🥚")
+          Analytics.trackEvent(
+            Constants.Event.EASTER_EGG,
+            EventProperties().set("EASTER_EGG", "Lib Reference Search")
+          )
+        }
       }
     }
     return false

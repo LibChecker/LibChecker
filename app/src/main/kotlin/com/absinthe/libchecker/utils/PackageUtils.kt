@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
@@ -79,7 +80,7 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = SystemServices.packageManager.getPackageInfo(
       packageName,
-      FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
+      VersionCompat.MATCH_UNINSTALLED_PACKAGES or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return SystemServices.packageManager.getPackageArchiveInfo(
@@ -98,8 +99,8 @@ object PackageUtils {
    * @throws Exception
    */
   @Throws(Exception::class)
-  fun getInstallApplications(): List<ApplicationInfo> {
-    return SystemServices.packageManager.getInstalledApplications(VersionCompat.MATCH_UNINSTALLED_PACKAGES)
+  fun getInstallApplications(): List<PackageInfo> {
+    return SystemServices.packageManager.getInstalledPackages(VersionCompat.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_META_DATA)
   }
 
   /**
@@ -193,7 +194,7 @@ object PackageUtils {
       if (specifiedAbi != null) {
         abi = specifiedAbi
       } else {
-        abi = getAbi(packageInfo.applicationInfo)
+        abi = getAbi(packageInfo)
         if (abi == NO_LIBS) {
           abi = if (Process.is64Bit()) {
             ARMV8
@@ -565,10 +566,6 @@ object PackageUtils {
       .toList()
   }
 
-  const val use32bitAbiString = "use32bitAbi"
-  const val multiArchString = "multiArch"
-  const val overlayString = "overlay"
-
   /**
    * Get ABIs set of an app
    * @param file Application file
@@ -694,23 +691,19 @@ object PackageUtils {
 
   /**
    * Get ABI type of an app
-   * @param applicationInfo ApplicationInfo
+   * @param packageInfo PackageInfo
    * @return ABI type
    */
   fun getAbi(
-    applicationInfo: ApplicationInfo,
+    packageInfo: PackageInfo,
     isApk: Boolean = false,
-    abiSet: Set<Int>? = null,
-    demands: Map<String, Any>? = null
+    abiSet: Set<Int>? = null
   ): Int {
+    val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
     val file = File(applicationInfo.sourceDir)
-    val realDemands = demands ?: ManifestReader.getManifestProperties(
-      file,
-      arrayOf(use32bitAbiString, multiArchString, overlayString)
-    )
-    val overlay = realDemands[overlayString] as? Boolean ?: false
-    val multiArch = realDemands[multiArchString] as? Boolean ?: false
-    val use32bitAbi = realDemands[use32bitAbiString] as? Boolean ?: false
+    val use32bitAbi = applicationInfo.isUse32BitAbi()
+    val overlay = Refine.unsafeCast<PackageInfoHidden>(packageInfo).isOverlayPackage
+    val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
     if (overlay) {
       return OVERLAY
@@ -1075,8 +1068,8 @@ object PackageUtils {
     }
   }
 
-  suspend fun getAppsList(): List<ApplicationInfo> {
-    var appList: List<ApplicationInfo>
+  suspend fun getAppsList(): List<PackageInfo> {
+    var appList: List<PackageInfo>
     var retry: Boolean
 
     do {
@@ -1089,7 +1082,7 @@ object PackageUtils {
         retry = true
         emptyList()
       }.also { items ->
-        AppItemRepository.allApplicationInfoMap = items.asSequence()
+        AppItemRepository.allPackageInfoMap = items.asSequence()
           .map { it.packageName to it }
           .toMap()
       }
@@ -1099,7 +1092,7 @@ object PackageUtils {
     try {
       if (pmList.size > appList.size) {
         appList = pmList.asSequence()
-          .map { getPackageInfo(it).applicationInfo }
+          .map { getPackageInfo(it) }
           .toList()
       }
     } catch (t: Throwable) {
@@ -1137,5 +1130,12 @@ object PackageUtils {
   fun PackageInfo.isPWA(): Boolean {
     return applicationInfo.metaData?.keySet()
       ?.any { it.startsWith("org.chromium.webapk.shell_apk") } == true
+  }
+
+  fun ApplicationInfo.isUse32BitAbi(): Boolean {
+    runCatching {
+      val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
+      return demands["use32bitAbi"] as? Boolean ?: false
+    }.getOrNull() ?: return false
   }
 }

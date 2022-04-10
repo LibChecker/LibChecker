@@ -2,6 +2,7 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.AndroidViewModel
@@ -114,7 +115,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val size = appMap.size
 
     var count = 0
-    var packageInfo: PackageInfo
+    var ai: ApplicationInfo
     var versionCode: Long
     var compareDiffNode: CompareDiffNode
     var snapshotDiffItem: SnapshotDiffItem
@@ -126,7 +127,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
       if (versionCode != dbItem.versionCode ||
         packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(packageInfo, true) != dbItem.packageSize) ||
+        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(
+          packageInfo,
+          true
+        ) != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
@@ -146,7 +150,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           abiDiff = SnapshotDiffItem.DiffNode(
             dbItem.abi,
-            PackageUtils.getAbi(packageInfo.applicationInfo)
+            PackageUtils.getAbi(packageInfo)
               .toShort()
           ),
           targetApiDiff = SnapshotDiffItem.DiffNode(
@@ -225,12 +229,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     for (dbItem in preList) {
       appMap[dbItem.packageName]?.let {
         try {
-          packageInfo = PackageUtils.getPackageInfo(it, PackageManager.GET_META_DATA)
-          versionCode = PackageUtils.getVersionCode(packageInfo)
+          versionCode = PackageUtils.getVersionCode(it)
           snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
 
-          if (snapshotDiffStoringItem?.lastUpdatedTime != packageInfo.lastUpdateTime) {
-            compare(dbItem, packageInfo, versionCode)
+          if (snapshotDiffStoringItem?.lastUpdatedTime != it.lastUpdateTime) {
+            compare(dbItem, it, versionCode)
           } else {
             try {
               snapshotDiffStoringItem?.diffContent?.fromJson<SnapshotDiffItem>()?.let { item ->
@@ -238,7 +241,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               }
             } catch (e: IOException) {
               Timber.e(e, "diffContent parsing failed")
-              compare(dbItem, packageInfo, versionCode)
+              compare(dbItem, it, versionCode)
             }
           }
         } catch (e: Exception) {
@@ -276,60 +279,60 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     appMap.forEach { entry ->
       val info = entry.value
       try {
-        packageInfo = PackageUtils.getPackageInfo(info, PackageManager.GET_META_DATA)
-        versionCode = PackageUtils.getVersionCode(packageInfo)
+        ai = info.applicationInfo
+        versionCode = PackageUtils.getVersionCode(info)
 
         diffList.add(
           SnapshotDiffItem(
-            packageInfo.packageName,
-            packageInfo.lastUpdateTime,
-            SnapshotDiffItem.DiffNode(info.loadLabel(packageManager).toString()),
-            SnapshotDiffItem.DiffNode(packageInfo.versionName),
+            info.packageName,
+            info.lastUpdateTime,
+            SnapshotDiffItem.DiffNode(ai.loadLabel(packageManager).toString()),
+            SnapshotDiffItem.DiffNode(info.versionName),
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(info).toShort()),
-            SnapshotDiffItem.DiffNode(info.targetSdkVersion.toShort()),
+            SnapshotDiffItem.DiffNode(ai.targetSdkVersion.toShort()),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
+              PackageUtils.getNativeDirLibs(info).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                packageInfo.packageName,
+                info.packageName,
                 SERVICE,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                packageInfo.packageName,
+                info.packageName,
                 ACTIVITY,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                packageInfo.packageName,
+                info.packageName,
                 RECEIVER,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
-                packageInfo.packageName,
+                info.packageName,
                 PROVIDER,
                 false
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+              PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
+              PackageUtils.getMetaDataItems(info).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPackageSize(packageInfo, true)
+              PackageUtils.getPackageSize(info, true)
             ),
             newInstalled = true,
-            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == packageInfo.packageName }
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
           )
         )
       } catch (e: Exception) {
@@ -500,7 +503,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(it.versionCode, PackageUtils.getVersionCode(packageInfo)),
           SnapshotDiffItem.DiffNode(
             it.abi,
-            PackageUtils.getAbi(packageInfo.applicationInfo).toShort()
+            PackageUtils.getAbi(packageInfo).toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.targetApi,
@@ -593,7 +596,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           SnapshotDiffItem.DiffNode(packageInfo.versionName),
           SnapshotDiffItem.DiffNode(PackageUtils.getVersionCode(packageInfo)),
-          SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo.applicationInfo).toShort()),
+          SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()

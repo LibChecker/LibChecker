@@ -6,7 +6,9 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -71,7 +73,6 @@ import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -79,6 +80,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,6 +90,7 @@ import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Arrays
 import kotlin.math.abs
 
 @SuppressLint("InlinedApi")
@@ -130,6 +133,15 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     isPackageReady = true
     initView()
     resolveReferenceExtras()
+
+    PackageUtils.getPackageInfo(pkgName!!).apply {
+      val installed = applicationInfo.flags.and(ApplicationInfo.FLAG_INSTALLED) != 0
+      val multiArch = applicationInfo.flags.and(ApplicationInfo.FLAG_MULTIARCH) != 0
+      val enable = applicationInfo.enabled
+      val shared = Arrays.toString(applicationInfo.sharedLibraryFiles)
+
+      Timber.d("installed: $installed, multiArch: $multiArch, enable: $enable, shared: $shared")
+    }
   }
 
   override fun onStart() {
@@ -144,10 +156,15 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
   private fun initView() {
     pkgName?.let { packageName ->
+      val packageInfo = runCatching {
+        PackageUtils.getPackageInfo(
+          packageName,
+          PackageManager.GET_META_DATA
+        )
+      }.getOrNull() ?: return
       viewModel.packageName = packageName
       binding.apply {
         try {
-          val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
           supportActionBar?.title = null
           collapsingToolbar.also {
             it.setOnApplyWindowInsetsListener(null)
@@ -223,15 +240,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
           val extraInfo = SpannableStringBuilder()
           val file = File(packageInfo.applicationInfo.sourceDir)
-          val demands = ManifestReader.getManifestProperties(
-            file,
-            arrayOf(
-              PackageUtils.use32bitAbiString,
-              PackageUtils.multiArchString,
-              PackageUtils.overlayString
-            )
-          )
-          val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
+          val overlay = Refine.unsafeCast<PackageInfoHidden>(packageInfo).isOverlayPackage
           var abiSet = PackageUtils.getAbiSet(
             file,
             packageInfo.applicationInfo,
@@ -239,12 +248,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             overlay = overlay,
             ignoreArch = true
           ).toSet()
-          val abi = PackageUtils.getAbi(
-            packageInfo.applicationInfo,
-            isApk = false,
-            abiSet = abiSet,
-            demands = demands
-          )
+          val abi = PackageUtils.getAbi(packageInfo, isApk = false, abiSet = abiSet)
           abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
           extraInfo.apply {
@@ -417,7 +421,8 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
         toolbarAdapter.setList(toolbarItems)
         rvToolbar.apply {
           adapter = toolbarAdapter
-          layoutManager = LinearLayoutManager(this@AppDetailActivity, RecyclerView.HORIZONTAL, false)
+          layoutManager =
+            LinearLayoutManager(this@AppDetailActivity, RecyclerView.HORIZONTAL, false)
         }
 
         headerLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
@@ -473,22 +478,25 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
         )
       }
 
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-          if (libs.isNotEmpty()) {
-            withContext(Dispatchers.Main) {
-              typeList.add(1, STATIC)
-              tabTitles.add(1, getText(R.string.ref_category_static))
-              binding.tabLayout.addTab(
-                binding.tabLayout.newTab().also { it.text = getText(R.string.ref_category_static) },
-                1
-              )
-              resolveReferenceExtras()
+      if (packageInfo.applicationInfo.sharedLibraryFiles?.isNotEmpty() == true) {
+        lifecycleScope.launch(Dispatchers.IO) {
+          try {
+            val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+            if (libs.isNotEmpty()) {
+              withContext(Dispatchers.Main) {
+                typeList.add(1, STATIC)
+                tabTitles.add(1, getText(R.string.ref_category_static))
+                binding.tabLayout.addTab(
+                  binding.tabLayout.newTab()
+                    .also { it.text = getText(R.string.ref_category_static) },
+                  1
+                )
+                resolveReferenceExtras()
+              }
             }
+          } catch (e: PackageManager.NameNotFoundException) {
+            Timber.e(e)
           }
-        } catch (e: PackageManager.NameNotFoundException) {
-          Timber.e(e)
         }
       }
 

@@ -78,6 +78,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
+  fun refreshList() {
+    setEffect {
+      Effect.RefreshList()
+    }
+  }
+
   fun packageChanged(packageName: String, action: String) {
     setEffect {
       Effect.PackageChanged(packageName, action)
@@ -124,7 +130,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val isHarmony = HarmonyOsUtil.isHarmonyOs()
         val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
 
-        var packageInfo: PackageInfo
+        var ai: ApplicationInfo
         var versionCode: Long
         var abiType: Int
         var variant: Short
@@ -136,11 +142,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         for (info in appList) {
           try {
-            packageInfo = PackageUtils.getPackageInfo(info)
-            versionCode = PackageUtils.getVersionCode(packageInfo)
+            ai = info.applicationInfo
+            versionCode = PackageUtils.getVersionCode(info)
             abiType = PackageUtils.getAbi(info)
-            isSystemType =
-              (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
+            isSystemType = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
 
             variant = if (isHarmony && bundleManager?.getBundleInfo(
                 info.packageName,
@@ -154,16 +159,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             lcItem = LCItem(
               info.packageName,
-              info.loadLabel(context.packageManager).toString(),
-              packageInfo.versionName.orEmpty(),
+              ai.loadLabel(context.packageManager).toString(),
+              info.versionName.orEmpty(),
               versionCode,
-              packageInfo.firstInstallTime,
-              packageInfo.lastUpdateTime,
+              info.firstInstallTime,
+              info.lastUpdateTime,
               isSystemType,
               abiType.toShort(),
-              PackageUtils.isSplitsApk(packageInfo),
+              PackageUtils.isSplitsApk(info),
               null/* delay init */,
-              packageInfo.applicationInfo.targetSdkVersion.toShort(),
+              ai.targetSdkVersion.toShort(),
               variant
             )
 
@@ -227,7 +232,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     dbItems.value?.let { value ->
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
       val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
-      var packageInfo: PackageInfo
+      var ai: ApplicationInfo
       var versionCode: Long
       var lcItem: LCItem
       var abi: Int
@@ -236,10 +241,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       for (dbItem in value) {
         try {
           appMap[dbItem.packageName]?.let {
-            packageInfo = PackageUtils.getPackageInfo(it)
-            versionCode = PackageUtils.getVersionCode(packageInfo)
+            ai = it.applicationInfo
+            versionCode = PackageUtils.getVersionCode(it)
 
-            if (packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
+            if (it.lastUpdateTime != dbItem.lastUpdatedTime ||
               (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)
             ) {
               abi = PackageUtils.getAbi(it)
@@ -256,16 +261,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
               lcItem = LCItem(
                 it.packageName,
-                it.loadLabel(packageManager).toString(),
-                packageInfo.versionName ?: "null",
+                ai.loadLabel(packageManager).toString(),
+                it.versionName ?: "null",
                 versionCode,
-                packageInfo.firstInstallTime,
-                packageInfo.lastUpdateTime,
-                (it.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                it.firstInstallTime,
+                it.lastUpdateTime,
+                (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                 abi.toShort(),
-                PackageUtils.isSplitsApk(packageInfo),
-                PackageUtils.isKotlinUsed(packageInfo),
-                packageInfo.applicationInfo.targetSdkVersion.toShort(),
+                PackageUtils.isSplitsApk(it),
+                PackageUtils.isKotlinUsed(it),
+                ai.targetSdkVersion.toShort(),
                 variant
               )
               update(lcItem)
@@ -283,8 +288,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       for (info in appMap.values) {
         try {
-          packageInfo = PackageUtils.getPackageInfo(info)
-          versionCode = PackageUtils.getVersionCode(packageInfo)
+          ai = info.applicationInfo
+          versionCode = PackageUtils.getVersionCode(info)
 
           variant = if (isHarmony && bundleManager?.getBundleInfo(
               info.packageName,
@@ -298,16 +303,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
           lcItem = LCItem(
             info.packageName,
-            info.loadLabel(packageManager).toString(),
-            packageInfo.versionName ?: "null",
+            ai.loadLabel(packageManager).toString(),
+            info.versionName ?: "null",
             versionCode,
-            packageInfo.firstInstallTime,
-            packageInfo.lastUpdateTime,
-            (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+            info.firstInstallTime,
+            info.lastUpdateTime,
+            (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
             PackageUtils.getAbi(info).toShort(),
-            PackageUtils.isSplitsApk(packageInfo),
-            PackageUtils.isKotlinUsed(packageInfo),
-            packageInfo.applicationInfo.targetSdkVersion.toShort(),
+            PackageUtils.isSplitsApk(info),
+            PackageUtils.isKotlinUsed(info),
+            ai.targetSdkVersion.toShort(),
             variant
           )
 
@@ -318,7 +323,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
       }
       GlobalValues.shouldRequestChange.postValue(false)
-      AppItemRepository.shouldRefreshAppList = true
+      refreshList()
     } ?: run {
       GlobalValues.shouldRequestChange.postValue(true)
     }
@@ -394,7 +399,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private suspend fun collectComponentPopularLibraries(
-    appList: Collection<ApplicationInfo>,
+    appList: Collection<PackageInfo>,
     @LibType type: Int,
     label: String
   ) {
@@ -448,7 +453,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -460,7 +465,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         NATIVE -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -470,7 +475,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         SERVICE -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -480,7 +485,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         ACTIVITY -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -490,7 +495,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         RECEIVER -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -500,7 +505,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         PROVIDER -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -510,7 +515,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         DEX -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -520,7 +525,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         PERMISSION -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -530,7 +535,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         METADATA -> {
           for (item in appMap.values) {
 
-            if (!showSystem && ((item.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
 
@@ -750,5 +755,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     data class UpdateInitProgress(val progress: Int) : Effect()
     data class UpdateAppListStatus(val status: Int) : Effect()
     data class PackageChanged(val packageName: String, val action: String) : Effect()
+    data class RefreshList(val obj: Any? = null) : Effect()
   }
 }

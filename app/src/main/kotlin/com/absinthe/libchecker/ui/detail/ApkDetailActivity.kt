@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.Intent
+import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -43,13 +44,13 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -168,15 +169,7 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
           val extraInfo = SpannableStringBuilder()
           val file = File(it.applicationInfo.sourceDir)
-          val demands = ManifestReader.getManifestProperties(
-            file,
-            arrayOf(
-              PackageUtils.use32bitAbiString,
-              PackageUtils.multiArchString,
-              PackageUtils.overlayString
-            )
-          )
-          val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
+          val overlay = Refine.unsafeCast<PackageInfoHidden>(it).isOverlayPackage
           val abiSet = PackageUtils.getAbiSet(
             file,
             it.applicationInfo,
@@ -184,7 +177,7 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             overlay = overlay,
             ignoreArch = true
           )
-          val abi = PackageUtils.getAbi(it.applicationInfo, true)
+          val abi = PackageUtils.getAbi(it, true)
           viewModel.abiSet = abiSet
 
           extraInfo.apply {
