@@ -425,21 +425,23 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             LinearLayoutManager(this@AppDetailActivity, RecyclerView.HORIZONTAL, false)
         }
 
-        headerLayout.addOnOffsetChangedListener(AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-          isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
-            //  Collapsed
-            if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-              toolbarAdapter.addData(toolbarQuicklyLaunchItem)
+        headerLayout.addOnOffsetChangedListener(
+          AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
+              // Collapsed
+              if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+                toolbarAdapter.addData(toolbarQuicklyLaunchItem)
+              }
+              true
+            } else {
+              // Expanded
+              if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+                toolbarAdapter.remove(toolbarQuicklyLaunchItem)
+              }
+              false
             }
-            true
-          } else {
-            //Expanded
-            if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-              toolbarAdapter.remove(toolbarQuicklyLaunchItem)
-            }
-            false
           }
-        })
+        )
       }
 
       typeList = if (!isHarmonyMode) {
