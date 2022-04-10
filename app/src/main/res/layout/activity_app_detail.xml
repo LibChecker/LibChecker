@@ -29,12 +29,12 @@
         android:id="@+id/header_content_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/normal_padding"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/normal_padding"
-        android:layout_marginVertical="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
-        android:clipToPadding="false"
-        android:clipChildren="false"
         app:layout_collapseMode="parallax">
 
         <com.absinthe.libchecker.view.detail.DetailsTitleView
@@ -79,7 +79,8 @@
       <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@null">
+        android:background="@null"
+        android:animateLayoutChanges="true">
 
         <TextView
           android:id="@+id/tv_items"
@@ -98,47 +99,13 @@
           android:padding="8dp"
           app:layout_constraintStart_toEndOf="@id/tv_items" />
 
-        <androidx.appcompat.widget.AppCompatImageButton
-          android:id="@+id/ib_harmony_badge"
-          android:layout_width="@dimen/detail_toolbar_size"
-          android:layout_height="@dimen/detail_toolbar_size"
-          android:background="?attr/selectableItemBackgroundBorderless"
-          android:scaleType="center"
-          android:src="@drawable/ic_harmonyos_logo"
-          android:tooltipText="@string/ability"
-          android:visibility="gone"
-          app:layout_constraintEnd_toStartOf="@id/ib_processes"
-          app:layout_constraintTop_toTopOf="parent"
-          app:layout_constraintBottom_toBottomOf="parent"
-          tools:targetApi="o" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-          android:id="@+id/ib_processes"
-          android:layout_width="@dimen/detail_toolbar_size"
-          android:layout_height="@dimen/detail_toolbar_size"
-          android:background="?attr/selectableItemBackgroundBorderless"
-          android:scaleType="center"
-          android:src="@drawable/ic_processes"
-          android:tooltipText="@string/menu_sort"
-          android:visibility="gone"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintEnd_toStartOf="@id/ib_sort"
-          app:layout_constraintTop_toTopOf="parent"
-          tools:targetApi="o" />
-
-        <androidx.appcompat.widget.AppCompatImageButton
-          android:id="@+id/ib_sort"
-          android:layout_width="@dimen/detail_toolbar_size"
-          android:layout_height="@dimen/detail_toolbar_size"
-          android:background="?attr/selectableItemBackgroundBorderless"
-          android:contentDescription="@string/menu_sort"
-          android:scaleType="center"
-          android:src="@drawable/ic_lib_sort"
-          android:tooltipText="@string/menu_sort"
-          app:layout_constraintBottom_toBottomOf="parent"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          tools:targetApi="o" />
+        <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/rv_toolbar"
+          android:layout_width="wrap_content"
+          android:layout_height="match_parent"
+          android:overScrollMode="never"
+          app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+          app:layout_constraintStart_toEndOf="@id/ts_component_count" />
 
       </androidx.constraintlayout.widget.ConstraintLayout>
 

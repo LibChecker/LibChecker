@@ -10,6 +10,8 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.R
@@ -22,8 +24,10 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
@@ -38,6 +42,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
@@ -56,6 +61,7 @@ import java.io.InputStream
 class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
   private var tempFile: File? = null
+  private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
 
   override fun requirePackageName() = tempFile?.path
   override fun getToolbar() = binding.toolbar
@@ -247,16 +253,26 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           finish()
         }
 
-        ibSort.setOnClickListener {
-          lifecycleScope.launch {
-            detailFragmentManager.sortAll()
-            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
-              MODE_SORT_BY_SIZE
-            } else {
-              MODE_SORT_BY_LIB
+        val toolbarItems = mutableListOf(
+          AppDetailToolbarItem(
+            R.drawable.ic_lib_sort,
+            R.string.menu_sort
+          ) {
+            lifecycleScope.launch {
+              detailFragmentManager.sortAll()
+              viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+                MODE_SORT_BY_SIZE
+              } else {
+                MODE_SORT_BY_LIB
+              }
+              detailFragmentManager.changeSortMode(viewModel.sortMode)
             }
-            detailFragmentManager.changeSortMode(viewModel.sortMode)
           }
+        )
+        toolbarAdapter.setList(toolbarItems)
+        rvToolbar.apply {
+          adapter = toolbarAdapter
+          layoutManager = LinearLayoutManager(this@ApkDetailActivity, RecyclerView.HORIZONTAL, false)
         }
       }
 
