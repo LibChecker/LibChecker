@@ -33,6 +33,8 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.absinthe.rulesbundle.LCRemoteRepo
+import com.absinthe.rulesbundle.LCRules
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
@@ -117,6 +119,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.repo = newValue as String
+        LCRules.setRemoteRepo(
+          if (GlobalValues.repo == Constants.REPO_GITHUB) {
+            LCRemoteRepo.Github
+          } else {
+            LCRemoteRepo.Gitee
+          }
+        )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_RULES_REPO", newValue)

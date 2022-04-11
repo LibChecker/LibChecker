@@ -59,7 +59,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
       workerBinder = IWorkerService.Stub.asInterface(service)
-      workerBinder?.registerOnWorkerListener(workerListener)
+      runCatching {
+        workerBinder?.registerOnWorkerListener(workerListener)
+      }.onFailure {
+        Timber.e(it)
+      }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {

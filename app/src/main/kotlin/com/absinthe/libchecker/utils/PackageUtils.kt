@@ -80,7 +80,7 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = SystemServices.packageManager.getPackageInfo(
       packageName,
-      VersionCompat.MATCH_UNINSTALLED_PACKAGES or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
+      VersionCompat.MATCH_UNINSTALLED_PACKAGES or VersionCompat.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return SystemServices.packageManager.getPackageArchiveInfo(
@@ -224,7 +224,7 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
-    try {
+    return runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         return zipFile.entries()
           .asSequence()
@@ -234,10 +234,9 @@ object PackageUtils {
           .toList()
           .ifEmpty { getSplitLibs(packageInfo) }
       }
-    } catch (e: Exception) {
-      Timber.e(e)
-      return emptyList()
-    }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -257,14 +256,9 @@ object PackageUtils {
       fileName.startsWith("split_config.arm") || fileName.startsWith("split_config.x86")
     }?.let {
       ZipFile(File(it)).use { zipFile ->
-        val entries = zipFile.entries()
-        var next: ZipEntry
-
-        while (entries.hasMoreElements()) {
-          next = entries.nextElement()
-
-          if (next.name.contains("lib/") && !next.isDirectory) {
-            libList.add(LibStringItem(next.name.split("/").last(), next.size))
+        zipFile.entries().asSequence().forEach { entry ->
+          if (entry.name.contains("lib/") && entry.isDirectory.not()) {
+            libList.add(LibStringItem(entry.name.split("/").last(), entry.size))
           }
         }
       }
@@ -288,23 +282,16 @@ object PackageUtils {
    * @return true if it uses Kotlin language
    */
   fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
-    return try {
-      val path = packageInfo.applicationInfo.sourceDir
-      val file = File(path)
+    return runCatching {
+      val file = File(packageInfo.applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+        it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-          it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
-        ) {
-          true
-        } else {
+          it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
           isKotlinUsedInClassDex(file)
-        }
       }
-    } catch (e: Exception) {
-      false
-    }
+    }.getOrDefault(false)
   }
 
   const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
@@ -379,10 +366,9 @@ object PackageUtils {
     return try {
       FastDexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
-          val isKotlinUsage = getEntry(entry)?.dexFile?.classes
-            ?.any {
-              it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
-            } ?: false
+          val isKotlinUsage = getEntry(entry)?.dexFile?.classes?.any {
+            it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
+          } ?: false
           if (isKotlinUsage) {
             return true
           }
@@ -414,11 +400,9 @@ object PackageUtils {
       else -> 0
     }
 
-    return try {
+    return runCatching {
       getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
-    } catch (e: Exception) {
-      emptyList()
-    }
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -441,11 +425,9 @@ object PackageUtils {
       else -> 0
     }
 
-    return try {
+    return runCatching {
       getComponentStringList(getPackageInfo(packageName, flag), type, isSimpleName)
-    } catch (e: Exception) {
-      emptyList()
-    }
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -513,16 +495,14 @@ object PackageUtils {
     var isEnabled: Boolean
     return list.asSequence()
       .map {
-        state = try {
+        state = runCatching {
           SystemServices.packageManager.getComponentEnabledSetting(
             ComponentName(
               packageName,
               it.name
             )
           )
-        } catch (e: IllegalArgumentException) {
-          PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
-        }
+        }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
         isEnabled = when (state) {
           PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
           PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
@@ -954,16 +934,9 @@ object PackageUtils {
    * @return Permissions list
    */
   fun getPermissionsList(packageName: String): List<String> {
-    return try {
-      getPackageInfo(
-        packageName,
-        PackageManager.GET_PERMISSIONS
-      ).requestedPermissions.toList()
-    } catch (e: PackageManager.NameNotFoundException) {
-      emptyList()
-    } catch (e: NullPointerException) {
-      emptyList()
-    }
+    return runCatching {
+      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -971,12 +944,9 @@ object PackageUtils {
    * @return true if it is installed
    */
   fun isAppInstalled(pkgName: String): Boolean {
-    val pm = SystemServices.packageManager
-    return try {
-      pm.getApplicationInfo(pkgName, 0).enabled
-    } catch (e: PackageManager.NameNotFoundException) {
-      false
-    }
+    return runCatching {
+      SystemServices.packageManager.getApplicationInfo(pkgName, 0).enabled
+    }.getOrDefault(false)
   }
 
   private const val minSdkVersion = "minSdkVersion"
