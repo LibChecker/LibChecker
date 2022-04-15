@@ -147,19 +147,35 @@ class ChartFragment :
 
       // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
-      for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+      var isDarkColor = false
+
+      if (LCAppUtils.atLeastS() && GlobalValues.md3Theme) {
+        isDarkColor = if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_700))
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_800))
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_900))
+          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_neutral1_700))
+        } else {
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_200))
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_300))
+          colors.add(requireContext().getColor(android.R.color.system_neutral1_400))
+          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_neutral1_200))
+        }
+      } else {
+        for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+      }
 
       dataSet.colors = colors
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter(chartView as PieChart))
         setValueTextSize(10f)
-        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+        setValueTextColor(if (isDarkColor) Color.BLACK else Color.WHITE)
       }
 
       (chartView as PieChart).apply {
         this.data = data
-        setEntryLabelColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+        setEntryLabelColor(if (isDarkColor) Color.BLACK else Color.WHITE)
         highlightValues(null)
         invalidate()
       }
