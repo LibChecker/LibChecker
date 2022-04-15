@@ -440,7 +440,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
       libReference.postValue(null)
       val appMap = AppItemRepository.getApplicationInfoMap()
-      val map = HashMap<String, Pair<MutableList<String>, Int>>()
+      val map = HashMap<String, Pair<MutableSet<String>, Int>>()
       val refList = mutableListOf<LibReference>()
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
@@ -592,7 +592,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private fun computeComponentReference(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     @LibType type: Int
   ) {
@@ -670,66 +670,66 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private fun computeNativeReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     list: List<LibStringItem>
   ) {
     list.forEach {
       if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableListOf<String>() to NATIVE
+        referenceMap[it.name] = mutableSetOf<String>() to NATIVE
       }
       referenceMap[it.name]!!.first.add(packageName)
     }
   }
 
   private fun computeComponentReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     @LibType type: Int,
     components: Array<out ComponentInfo>
   ) {
     components.forEach {
       if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableListOf<String>() to type
+        referenceMap[it.name] = mutableSetOf<String>() to type
       }
       referenceMap[it.name]!!.first.add(packageName)
     }
   }
 
   private fun computeDexReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     list: List<LibStringItem>
   ) {
     list.forEach {
       if (referenceMap[it.name] == null) {
-        referenceMap[it.name] = mutableListOf<String>() to DEX
+        referenceMap[it.name] = mutableSetOf<String>() to DEX
       }
       referenceMap[it.name]!!.first.add(packageName)
     }
   }
 
   private fun computePermissionReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     list: Array<out String>
   ) {
     list.forEach {
       if (referenceMap[it] == null) {
-        referenceMap[it] = mutableListOf<String>() to PERMISSION
+        referenceMap[it] = mutableSetOf<String>() to PERMISSION
       }
       referenceMap[it]!!.first.add(packageName)
     }
   }
 
   private fun computeMetadataReferenceInternal(
-    referenceMap: HashMap<String, Pair<MutableList<String>, Int>>,
+    referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     bundle: Bundle
   ) {
     bundle.keySet().forEach {
       if (referenceMap[it] == null) {
-        referenceMap[it] = mutableListOf<String>() to METADATA
+        referenceMap[it] = mutableSetOf<String>() to METADATA
       }
       referenceMap[it]!!.first.add(packageName)
     }
