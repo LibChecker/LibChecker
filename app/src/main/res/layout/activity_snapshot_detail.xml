@@ -25,92 +25,14 @@
       app:expandedTitleTextAppearance="@style/AboutPage.Header.ToolbarTitleExpanded"
       app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-      <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/header_content_layout"
+      <com.absinthe.libchecker.view.snapshot.SnapshotTitleView
+        android:id="@+id/snapshot_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingHorizontal="@dimen/normal_padding"
         android:paddingTop="?attr/actionBarSize"
         android:paddingBottom="@dimen/normal_padding"
-        app:layout_collapseMode="parallax">
-
-        <ImageView
-          android:id="@+id/iv_app_icon"
-          android:layout_width="@dimen/lib_detail_icon_size"
-          android:layout_height="@dimen/lib_detail_icon_size"
-          android:contentDescription="App icon"
-          android:transitionName="app_icon"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          tools:background="@drawable/pic_launcher"
-          tools:ignore="HardcodedText" />
-
-        <TextView
-          android:id="@+id/tv_app_name"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_marginHorizontal="@dimen/normal_padding"
-          android:fontFamily="sans-serif-medium"
-          android:textColor="?attr/colorOnSurface"
-          android:textSize="16sp"
-          android:transitionName="app_name"
-          app:layout_constraintEnd_toStartOf="@id/tv_target_api"
-          app:layout_constraintStart_toEndOf="@id/iv_app_icon"
-          app:layout_constraintTop_toTopOf="@id/iv_app_icon"
-          tools:text="LibChecker" />
-
-        <TextView
-          android:id="@+id/tv_package_name"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif"
-          android:textColor="?attr/colorOnSurface"
-          android:textSize="14sp"
-          android:transitionName="package_name"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="@id/tv_app_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_app_name"
-          tools:text="com.absinthe.libchecker" />
-
-        <TextView
-          android:id="@+id/tv_version"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif-condensed"
-          android:textColor="@android:color/darker_gray"
-          android:textSize="12sp"
-          android:transitionName="version_name"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="@id/tv_package_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_package_name"
-          tools:text="1.2.0(120)" />
-
-        <TextView
-          android:id="@+id/tv_package_size"
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif-condensed"
-          android:textColor="@android:color/darker_gray"
-          android:textSize="12sp"
-          android:transitionName="package_size"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintStart_toStartOf="@id/tv_package_name"
-          app:layout_constraintTop_toBottomOf="@id/tv_version"
-          tools:text="11.09 MB (11091889 Bytes)" />
-
-        <TextView
-          android:id="@+id/tv_target_api"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:fontFamily="sans-serif-condensed-medium"
-          android:textColor="@android:color/darker_gray"
-          android:textSize="13sp"
-          android:transitionName="target_api"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toTopOf="@id/tv_app_name"
-          tools:text="API 29" />
-
-      </androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_collapseMode="parallax" />
 
       <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"

@@ -13,6 +13,8 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
+import coil.load
+import coil.transform.RoundedCornersTransformation
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
@@ -70,7 +72,9 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           val bitmap = R.drawable.ic_app_list.getDrawable(context)?.apply {
             setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
           }?.toBitmap(40.dp, 40.dp)
-          icon.post { icon.setImageBitmap(bitmap) }
+          icon.load(R.drawable.ic_icon_blueprint) {
+            transformations(RoundedCornersTransformation(24f, 24f, 24f, 24f))
+          }
         }
       }
 

@@ -13,6 +13,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Space
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
@@ -39,7 +40,6 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.addPaddingBottom
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -71,7 +71,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
-  private var hasAddedListBottomPadding = false
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -195,6 +194,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           clipToPadding = false
           clipChildren = false
         }
+        setFooterView(
+          Space(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              96.dp
+            )
+          }
+        )
       }
       setEmptyView(emptyView)
       setDiffCallback(SnapshotDiffUtil())
@@ -203,9 +210,16 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           return@setOnItemClickListener
         }
 
-        val intent = Intent(context, SnapshotDetailActivity::class.java)
-          .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
-        startActivity(intent)
+        val item = getItem(position)
+        if (item.deleted || item.newInstalled) {
+          SnapshotNewOrDeletedBSDFragment.newInstance(item).also {
+            it.show(context.supportFragmentManager, it.tag)
+          }
+        } else {
+          val intent = Intent(context, SnapshotDetailActivity::class.java)
+            .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
+          startActivity(intent)
+        }
       }
     }
 
@@ -259,19 +273,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
             .toMutableList()
-        ) {
-          if (!isListCanScroll(adapter.data.size)) {
-            if (!hasAddedListBottomPadding) {
-              binding.list.addPaddingBottom(20.dp)
-              hasAddedListBottomPadding = true
-            }
-          } else {
-            if (hasAddedListBottomPadding) {
-              binding.list.addPaddingBottom((-20).dp)
-              hasAddedListBottomPadding = false
-            }
-          }
-        }
+        )
         flip(VF_LIST)
 
         lifecycleScope.launch(Dispatchers.IO) {

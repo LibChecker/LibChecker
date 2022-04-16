@@ -95,6 +95,7 @@
   <string name="array_dark_mode_battery">Зависит от режима энергосбережения</string>
 
   <!--  Detail  -->
+  <string name="detail">подробности</string>
   <string name="detail_label">Просмотр сведений о приложении</string>
   <string name="not_found">Не найдено</string>
   <string name="create_an_issue">Помогите нам дополнить информацию</string>

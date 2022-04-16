@@ -95,6 +95,7 @@
   <string name="array_dark_mode_battery">Set by Battery Saver</string>
 
   <!--  Detail  -->
+  <string name="detail">подробности</string>
   <string name="detail_label">Перегляд подробиць про додаток</string>
   <string name="not_found">Не знайдено</string>
   <string name="create_an_issue">Допоможіть нам доповнити інформацію</string>

@@ -96,6 +96,7 @@
   <string name="array_dark_mode_battery">Set by Battery Saver</string>
 
   <!--  Detail  -->
+  <string name="detail">Details</string>
   <string name="detail_label">View App Details</string>
   <string name="not_found">Not found</string>
   <string name="create_an_issue">Assist us to supplement the information</string>

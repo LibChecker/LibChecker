@@ -96,6 +96,7 @@
   <string name="array_dark_mode_battery">由省電模式設置</string>
 
   <!--  Detail  -->
+  <string name="detail">詳情</string>
   <string name="detail_label">查看 App 詳情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">協助我們來補充訊息</string>

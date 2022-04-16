@@ -151,15 +151,15 @@ class ChartFragment :
 
       if (LCAppUtils.atLeastS() && GlobalValues.md3Theme) {
         isDarkColor = if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_700))
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_800))
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_900))
-          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_neutral1_700))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_700))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_800))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_900))
+          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_accent1_700))
         } else {
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_200))
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_300))
-          colors.add(requireContext().getColor(android.R.color.system_neutral1_400))
-          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_neutral1_200))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_200))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_300))
+          colors.add(requireContext().getColor(android.R.color.system_accent1_400))
+          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_accent1_200))
         }
       } else {
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
