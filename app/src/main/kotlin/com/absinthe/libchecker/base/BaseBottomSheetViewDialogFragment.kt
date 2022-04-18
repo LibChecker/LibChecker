@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.base
 
 import android.app.Dialog
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +10,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
@@ -69,25 +69,21 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
         super.onAttachedToWindow()
 
         window?.let {
-          WindowCompat.setDecorFitsSystemWindows(it, false)
           it.attributes?.windowAnimations = R.style.DialogAnimation
+          WindowCompat.setDecorFitsSystemWindows(it, false)
           UiUtils.setSystemBarStyle(it)
-          val wic = WindowInsetsControllerCompat(it, it.decorView)
-          wic.isAppearanceLightNavigationBars = !UiUtils.isDarkMode()
+          WindowInsetsControllerCompat(it, it.decorView)
+            .isAppearanceLightNavigationBars = !UiUtils.isDarkMode()
+
+          if (LCAppUtils.atLeastS()) {
+            it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+            it.attributes.blurBehindRadius = 64
+            it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+          }
         }
 
         findViewById<View>(com.google.android.material.R.id.container)?.fitsSystemWindows = false
         findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
-
-        setOnShowListener {
-          if (Build.VERSION.SDK_INT >= 31) {
-            window?.also {
-              it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-              it.attributes.setBlurBehindRadius(53)
-              it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            }
-          }
-        }
       }
     }
 

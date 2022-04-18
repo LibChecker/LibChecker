@@ -23,6 +23,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
@@ -39,7 +40,6 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import java.text.SimpleDateFormat
@@ -208,7 +208,7 @@ object LCAppUtils {
   }
 
   fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
-    return MaterialAlertDialogBuilder(context)
+    return BaseAlertDialogBuilder(context)
       .setView(
         LinearProgressIndicator(context).apply {
           layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {

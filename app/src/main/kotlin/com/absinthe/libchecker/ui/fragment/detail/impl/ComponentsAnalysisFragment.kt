@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItem
@@ -23,7 +24,6 @@ import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -148,7 +148,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
       }
 
-      MaterialAlertDialogBuilder(context)
+      BaseAlertDialogBuilder(context)
         .setAdapter(arrayAdapter) { _, which ->
           when (which) {
             0 -> {
