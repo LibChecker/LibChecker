@@ -69,4 +69,3 @@ class SnapshotNewOrDeletedBSView(context: Context) : LinearLayout(context), IHea
     object Deleted : Mode()
   }
 }
-

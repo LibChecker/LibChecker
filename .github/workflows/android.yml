@@ -63,7 +63,7 @@ jobs:
         with:
           arguments: -PappVerName=${{ env.VERSION }} assembleRelease
       - name: Sign Android release
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.repository == 'zhaobozhen/LibChecker'
         id: sign
         uses: r0adkll/sign-android-release@v1.0.4
         env:
@@ -75,7 +75,7 @@ jobs:
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built apk
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: snapshot

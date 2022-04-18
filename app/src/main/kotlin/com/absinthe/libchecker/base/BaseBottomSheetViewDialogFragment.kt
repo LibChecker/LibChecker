@@ -76,6 +76,16 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
 
         findViewById<View>(com.google.android.material.R.id.container)?.fitsSystemWindows = false
         findViewById<View>(com.google.android.material.R.id.coordinator)?.fitsSystemWindows = false
+
+        setOnShowListener {
+          if (Build.VERSION.SDK_INT >= 31) {
+            window?.also {
+              it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+              it.attributes.setBlurBehindRadius(53)
+              it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            }
+          }
+        }
       }
     }
 
