@@ -38,6 +38,7 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
@@ -76,7 +77,6 @@ import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
@@ -607,7 +607,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     initFeatureListView()
     featureAdapter.addData(
       FeatureItem(R.drawable.ic_kotlin_logo) {
-        MaterialAlertDialogBuilder(this)
+        BaseAlertDialogBuilder(this)
           .setIcon(R.drawable.ic_kotlin_logo)
           .setTitle(R.string.kotlin_string)
           .setMessage(R.string.kotlin_details)
@@ -642,7 +642,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_gradle) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_gradle)
                 .setTitle(
                   HtmlCompat.fromHtml(
@@ -663,7 +663,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_xposed) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_xposed)
                 .setTitle(R.string.xposed_module)
                 .setMessage(R.string.xposed_module_details)
@@ -679,7 +679,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_lib_play_store) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_lib_play_store)
                 .setTitle(R.string.play_app_signing)
                 .setMessage(R.string.play_app_signing_details)
@@ -695,7 +695,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_pwa) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_pwa)
                 .setTitle(R.string.pwa)
                 .setMessage(R.string.pwa_details)
