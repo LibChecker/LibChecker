@@ -956,17 +956,26 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return minSdkVersion
    */
-  fun getMinSdkVersion(packageInfo: PackageInfo): String {
+  fun getMinSdkVersion(packageInfo: PackageInfo): Int {
     val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
-      packageInfo.applicationInfo.minSdkVersion.toString()
+      packageInfo.applicationInfo.minSdkVersion
     } else {
       val demands = ManifestReader.getManifestProperties(
         File(packageInfo.applicationInfo.sourceDir),
         arrayOf(minSdkVersion)
       )
-      demands[minSdkVersion]?.toString() ?: "?"
+      demands[minSdkVersion]?.toString()?.toInt() ?: 0
     }
-    return "$minSdkVersion $minSdkVersionValue"
+    return minSdkVersionValue
+  }
+
+  /**
+   * Get minSdkVersion of an app
+   * @param packageInfo PackageInfo
+   * @return minSdkVersion
+   */
+  fun getMinSdkVersionString(packageInfo: PackageInfo): String {
+    return "$minSdkVersion ${getMinSdkVersion(packageInfo)}"
   }
 
   private const val AGP_KEYWORD = "androidGradlePluginVersion"

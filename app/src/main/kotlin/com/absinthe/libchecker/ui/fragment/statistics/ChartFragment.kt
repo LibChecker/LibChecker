@@ -54,6 +54,7 @@ import timber.log.Timber
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
 private const val TYPE_TARGET_API = 2
+private const val TYPE_MIN_SDK = 3
 
 class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
@@ -95,6 +96,7 @@ class ChartFragment :
       TYPE_ABI -> setAbiData()
       TYPE_KOTLIN -> setKotlinData()
       TYPE_TARGET_API -> setTargetApiData()
+      TYPE_MIN_SDK -> setMinSdkData()
     }
   }
 
@@ -335,6 +337,83 @@ class ChartFragment :
     }
   }
 
+  private fun setMinSdkData() {
+    val parties = osNameMap.map { it.value }.toMutableList()
+
+    val entries: ArrayList<BarEntry> = ArrayList()
+    var packageInfo: PackageInfo
+
+    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+      viewModel.dbItems.value
+    } else {
+      viewModel.dbItems.value?.filter { !it.isSystem }
+    }
+
+    filteredList?.let {
+      val list = IntArray(apiScope) { 0 }
+
+      var minSdk: Int
+      for (item in it) {
+        try {
+          packageInfo = PackageUtils.getPackageInfo(item.packageName)
+          minSdk = PackageUtils.getMinSdkVersion(packageInfo)
+          if (minSdk in 1..apiScope) {
+            list[minSdk - 1]++
+          }
+        } catch (e: Exception) {
+          Timber.e(e)
+        }
+      }
+      existApiList.clear()
+      val iterator = list.iterator().withIndex()
+      while (iterator.hasNext()) {
+        val entry = iterator.next()
+        if (entry.value != 0) {
+          existApiList.add(entry.index + 1)
+        }
+      }
+
+      if (chartView.parent != null) {
+        binding.root.removeView(chartView)
+      }
+      chartView = generateBarChartView()
+      binding.root.addView(chartView, -1)
+
+      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+      // the chart.
+      legendList.clear()
+      for (i in parties.indices) {
+        if (list[i] > 0) {
+          entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
+          legendList.add((i + 1).toString())
+        }
+      }
+      val dataSet = BarDataSet(entries, "").apply {
+        setDrawIcons(false)
+        valueFormatter = IntegerFormatter()
+      }
+
+      // add a lot of colors
+      val colors: ArrayList<Int> = ArrayList()
+      (0..apiScope).forEach { _ ->
+        colors.add(UiUtils.getRandomColor())
+      }
+
+      dataSet.colors = colors
+      // dataSet.setSelectionShift(0f);
+      val data = BarData(dataSet).apply {
+        setValueTextSize(10f)
+        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+      }
+
+      (chartView as HorizontalBarChart).apply {
+        this.data = data
+        highlightValues(null)
+        invalidate()
+      }
+    }
+  }
+
   override fun onNothingSelected() {
     Timber.d("Nothing selected")
   }
@@ -424,6 +503,15 @@ class ChartFragment :
             packageInfo?.applicationInfo?.targetSdkVersion == targetApi
           }?.let { filter -> item = ArrayList(filter) }
         }
+        TYPE_MIN_SDK -> {
+          val minSdk = legendList[h.x.toInt()].toInt()
+
+          dialogTitle = "Min SDK $minSdk"
+          filteredList?.filter {
+            runCatching { PackageUtils.getPackageInfo(it.packageName) }.getOrNull()
+              ?.let { PackageUtils.getMinSdkVersion(it) == minSdk } ?: false
+          }?.let { filter -> item = ArrayList(filter) }
+        }
       }
 
       viewModel.dialogTitle.postValue(dialogTitle)
@@ -460,6 +548,9 @@ class ChartFragment :
       }
       R.id.btn_target_api -> if (isChecked) {
         chartType = TYPE_TARGET_API
+      }
+      R.id.btn_min_sdk -> if (isChecked) {
+        chartType = TYPE_MIN_SDK
       }
     }
     setData()
@@ -573,10 +664,10 @@ class ChartFragment :
       26 to "Oreo",
       27 to "Oreo",
       28 to "Pie",
-      29 to "Android10",
-      30 to "Android11",
-      31 to "Android12",
-      32 to "Sv2"
+      29 to "Android 10",
+      30 to "Android 11",
+      31 to "Android 12",
+      32 to "Android 12.1"
     )
   }
 }

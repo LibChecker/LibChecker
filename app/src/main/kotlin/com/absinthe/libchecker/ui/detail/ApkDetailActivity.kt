@@ -185,7 +185,7 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
               append(", ")
             }
             append(PackageUtils.getTargetApiString(it))
-            append(", ").append(PackageUtils.getMinSdkVersion(it))
+            append(", ").append(PackageUtils.getMinSdkVersionString(it))
             it.sharedUserId?.let { sharedUid ->
               appendLine().append("sharedUserId = $sharedUid")
             }

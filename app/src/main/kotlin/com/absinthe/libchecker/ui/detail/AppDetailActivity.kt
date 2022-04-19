@@ -246,7 +246,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             }
             if (!isHarmonyMode) {
               append(PackageUtils.getTargetApiString(packageName))
-              append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
+              append(", ").append(PackageUtils.getMinSdkVersionString(packageInfo))
               packageInfo.sharedUserId?.let {
                 appendLine().append("sharedUserId = $it")
               }
