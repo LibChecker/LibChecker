@@ -29,6 +29,7 @@ import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.ChartViewModel
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -116,6 +117,8 @@ class ChartFragment :
     } else {
       viewModel.dbItems.value?.filter { !it.isSystem }
     }
+    val colorOnSurface =
+      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
     filteredList?.let {
       val list = mutableListOf(0, 0, 0)
@@ -143,23 +146,23 @@ class ChartFragment :
         sliceSpace = 3f
         iconsOffset = MPPointF(0f, 40f)
         selectionShift = 5f
+        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        valueLineColor = colorOnSurface
       }
 
       // add a lot of colors
       val colors: ArrayList<Int> = ArrayList()
-      var isDarkColor = false
 
       if (LCAppUtils.atLeastS() && GlobalValues.md3Theme) {
-        isDarkColor = if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+        if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
           colors.add(requireContext().getColor(android.R.color.system_accent1_700))
           colors.add(requireContext().getColor(android.R.color.system_accent1_800))
           colors.add(requireContext().getColor(android.R.color.system_accent1_900))
-          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_accent1_700))
         } else {
           colors.add(requireContext().getColor(android.R.color.system_accent1_200))
           colors.add(requireContext().getColor(android.R.color.system_accent1_300))
           colors.add(requireContext().getColor(android.R.color.system_accent1_400))
-          UiUtils.isDarkColor(requireContext().getColor(android.R.color.system_accent1_200))
         }
       } else {
         for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
@@ -170,12 +173,12 @@ class ChartFragment :
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter(chartView as PieChart))
         setValueTextSize(10f)
-        setValueTextColor(if (isDarkColor) Color.BLACK else Color.WHITE)
+        setValueTextColor(colorOnSurface)
       }
 
       (chartView as PieChart).apply {
         this.data = data
-        setEntryLabelColor(if (isDarkColor) Color.BLACK else Color.WHITE)
+        setEntryLabelColor(colorOnSurface)
         highlightValues(null)
         invalidate()
       }
@@ -200,6 +203,8 @@ class ChartFragment :
     } else {
       viewModel.dbItems.value?.filter { !it.isSystem }
     }
+    val colorOnSurface =
+      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
     filteredList?.let {
       val list = mutableListOf(0, 0)
@@ -224,23 +229,29 @@ class ChartFragment :
         sliceSpace = 3f
         iconsOffset = MPPointF(0f, 40f)
         selectionShift = 5f
+        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+        valueLineColor =
+          requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
       }
 
       // add a lot of colors
-      val colors: ArrayList<Int> = ArrayList()
-      for (c in ColorTemplate.LIBERTY_COLORS) colors.add(c)
+      val colors = arrayListOf(
+        Color.parseColor("#7E52FF"),
+        Color.parseColor("#D9318E")
+      )
 
       dataSet.colors = colors
       // dataSet.setSelectionShift(0f);
       val data = PieData(dataSet).apply {
         setValueFormatter(PercentFormatter(chartView as PieChart))
         setValueTextSize(10f)
-        setValueTextColor(Color.BLACK)
+        setValueTextColor(colorOnSurface)
       }
 
       (chartView as PieChart).apply {
         this.data = data
-        setEntryLabelColor(Color.BLACK)
+        setEntryLabelColor(colorOnSurface)
         highlightValues(null)
         invalidate()
       }
@@ -270,7 +281,7 @@ class ChartFragment :
           if (targetApi in 1..apiScope) {
             list[targetApi - 1]++
           }
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
           Timber.e(e)
         }
       }
@@ -455,7 +466,8 @@ class ChartFragment :
   }
 
   private fun generatePieChartView(): PieChart {
-    val colorOnSurface = requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+    val colorOnSurface =
+      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return PieChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -472,6 +484,7 @@ class ChartFragment :
         yEntrySpace = 0f
         isWordWrapEnabled = true
       }
+      animateY(800, Easing.EaseInOutQuad)
       setUsePercentValues(true)
       setExtraOffsets(24f, 0f, 24f, 0f)
       setEntryLabelColor(colorOnSurface)
@@ -484,7 +497,8 @@ class ChartFragment :
   }
 
   private fun generateBarChartView(): HorizontalBarChart {
-    val colorOnSurface = requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+    val colorOnSurface =
+      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -517,6 +531,7 @@ class ChartFragment :
         setDrawZeroLine(false)
         textColor = colorOnSurface
       }
+      animateY(650, Easing.EaseInOutQuad)
       setMaxVisibleValueCount(apiScope)
       setDrawGridBackground(false)
       setDrawBorders(false)
