@@ -46,7 +46,7 @@ androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
 androidX-window = "androidx.window:window:1.0.0"
 
-square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.8.1"
+square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
 square-moshi = { module = "com.squareup.moshi:moshi", version.ref = "square-moshi" }
 square-moshi-compiler = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "square-moshi" }
 square-okHttp = "com.squareup.okhttp3:okhttp:4.9.3"
