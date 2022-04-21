@@ -686,9 +686,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     @LibType type: Int,
-    components: Array<out ComponentInfo>
+    components: Array<out ComponentInfo>?
   ) {
-    components.forEach {
+    components?.forEach {
       if (referenceMap[it.name] == null) {
         referenceMap[it.name] = mutableSetOf<String>() to type
       }
@@ -712,9 +712,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computePermissionReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    list: Array<out String>
+    list: Array<out String>?
   ) {
-    list.forEach {
+    list?.forEach {
       if (referenceMap[it] == null) {
         referenceMap[it] = mutableSetOf<String>() to PERMISSION
       }
@@ -725,9 +725,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computeMetadataReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    bundle: Bundle
+    bundle: Bundle?
   ) {
-    bundle.keySet().forEach {
+    bundle?.keySet()?.forEach {
       if (referenceMap[it] == null) {
         referenceMap[it] = mutableSetOf<String>() to METADATA
       }

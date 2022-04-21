@@ -286,17 +286,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   private suspend fun getMetaDataChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
     val isApk = packageName.isTempApk()
-    val info = if (isApk) {
-      SystemServices.packageManager.getPackageArchiveInfo(
-        packageName,
-        PackageManager.GET_META_DATA
-      )
-    } else {
-      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-    }
-    if (info == null) {
-      return emptyList()
-    }
+    val info = runCatching {
+      if (isApk) {
+        SystemServices.packageManager.getPackageArchiveInfo(
+          packageName,
+          PackageManager.GET_META_DATA
+        )
+      } else {
+        PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      }
+    }.getOrNull() ?: return emptyList()
+
     val list = PackageUtils.getMetaDataItems(info)
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
