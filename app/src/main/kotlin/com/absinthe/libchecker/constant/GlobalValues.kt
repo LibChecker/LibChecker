@@ -73,4 +73,6 @@ object GlobalValues {
       field = value
       getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
     }
+
+  var uuid: String by SPDelegates(Constants.PREF_UUID, "")
 }

@@ -10,6 +10,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -25,6 +26,7 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import timber.log.Timber
+import java.util.UUID
 
 class LibCheckerApp : Application() {
 
@@ -88,5 +90,14 @@ class LibCheckerApp : Application() {
   companion object {
     @SuppressLint("StaticFieldLeak")
     lateinit var app: Application
+
+    fun generateAuthKey(): Int {
+      if (GlobalValues.uuid.isEmpty()) {
+        GlobalValues.uuid = UUID.randomUUID().toString()
+      }
+      return (GlobalValues.uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(
+        90000
+      ) + 10000
+    }
   }
 }

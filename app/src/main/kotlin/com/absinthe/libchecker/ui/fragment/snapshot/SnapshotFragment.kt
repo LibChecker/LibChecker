@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.IBinder
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -24,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
@@ -405,7 +407,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
-        val scheme = "lc://bridge?action=shoot&dropPrevious=false"
+        val scheme = Uri.Builder().scheme("lc")
+          .authority("bridge")
+          .appendQueryParameter("action", "shoot")
+          .appendQueryParameter("authority", LibCheckerApp.generateAuthKey().toString())
+          .appendQueryParameter("drop_previous", "false")
+          .build()
+          .toString()
         val tipView = TextView(context).also {
           it.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -415,7 +423,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             context.getDimensionByAttr(com.google.android.material.R.attr.dialogPreferredPadding)
               .toInt()
           it.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
-          it.text = HtmlCompat.fromHtml(String.format(getString(R.string.snapshot_scheme_tip), scheme), 0)
+          it.text =
+            HtmlCompat.fromHtml(String.format(getString(R.string.snapshot_scheme_tip), scheme), 0)
           it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
           it.setLongClickCopiedToClipboard(scheme)
         }
