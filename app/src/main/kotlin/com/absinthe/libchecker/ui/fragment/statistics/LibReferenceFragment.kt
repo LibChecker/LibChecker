@@ -62,6 +62,7 @@ import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
+import java.lang.ref.WeakReference
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -224,10 +225,7 @@ class LibReferenceFragment :
 
   override fun onPause() {
     super.onPause()
-    popup?.let {
-      it.dismiss()
-      popup = null
-    }
+    popup?.dismiss()
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -260,6 +258,7 @@ class LibReferenceFragment :
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
+    val contextRef = WeakReference(context)
     if (item.itemId == R.id.filter) {
       val color = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
       val styler = CascadePopupMenu.Styler(
@@ -268,7 +267,7 @@ class LibReferenceFragment :
         }
       )
       popup = CascadePopupMenu(
-        context,
+        contextRef.get()!!,
         context.findViewById(R.id.filter),
         defStyleAttr = R.style.Widget_LC_PopupMenu,
         styler = styler
@@ -298,10 +297,6 @@ class LibReferenceFragment :
             notMarkedMenu.onlyVisibleInDebugMode()
             notMarkedMenu.initMenu(NOT_MARKED)
           }
-        }
-
-        popup.setOnDismissListener {
-          this@LibReferenceFragment.popup = null
         }
       }
       popup?.show()

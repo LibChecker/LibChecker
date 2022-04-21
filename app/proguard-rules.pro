@@ -148,3 +148,8 @@
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
   void setStateInternal(int);
 }
+
+# MPAndroidChart
+-keep public class com.github.mikephil.charting.animation.* {
+    public protected *;
+}

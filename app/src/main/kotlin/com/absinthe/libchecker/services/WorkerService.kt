@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.os.IBinder
 import android.os.RemoteCallbackList
 import android.os.RemoteException
+import android.os.SystemClock
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.app.Global
@@ -21,10 +22,13 @@ import java.lang.ref.WeakReference
 
 class WorkerService : LifecycleService() {
 
+  private var lastPackageChangedTime: Long = 0L
+
   private val packageReceiver by lazy {
     object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent?) {
         Timber.d("package receiver received: ${intent?.action}")
+        lastPackageChangedTime = SystemClock.elapsedRealtime()
         initAllApplicationInfoItems()
         notifyPackagesChanged(
           intent?.data?.encodedSchemeSpecificPart.orEmpty(),
@@ -141,6 +145,10 @@ class WorkerService : LifecycleService() {
     override fun initKotlinUsage() {
       Timber.d("initKotlinUsage")
       serviceRef.get()?.initKotlinUsage()
+    }
+
+    override fun getLastPackageChangedTime(): Long {
+      return serviceRef.get()?.lastPackageChangedTime ?: 0
     }
 
     override fun registerOnWorkerListener(listener: OnWorkerListener?) {

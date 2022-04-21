@@ -33,7 +33,8 @@ object Global {
     if (stack.contains("Service.startForeground()") ||
       stack.contains("com.swift.sandhook") ||
       stack.contains("updateForceDarkMode") ||
-      stack.contains("MultiSelectPopupWindow.showMultiSelectPopupWindow")
+      stack.contains("MultiSelectPopupWindow.showMultiSelectPopupWindow") ||
+      stack.contains("get life cycle exception")
     ) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {

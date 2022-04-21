@@ -144,6 +144,7 @@ dependencies {
   implementation(libs.appIconLoader)
   implementation(libs.hiddenApiBypass)
   implementation(libs.dexLib2)
+  implementation(libs.slf4j)
 
   implementation(libs.bundles.rikkax)
 

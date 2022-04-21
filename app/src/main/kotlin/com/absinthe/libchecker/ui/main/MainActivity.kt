@@ -70,7 +70,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       workerBinder = null
     }
   }
-  private var workerBinder: IWorkerService? = null
+  var workerBinder: IWorkerService? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

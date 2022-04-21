@@ -95,6 +95,7 @@ zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref
 zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
 lc-rules = "com.github.zhaobozhen:LibChecker-Rules-Bundle:23.2"
+slf4j = "org.slf4j:slf4j-simple:1.7.36"
 
 [bundles]
 androidX-lifecycle = [
