@@ -137,6 +137,7 @@
   <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
   <string name="snapshot_time_node_uninitialized">(Неинициализировано)</string>
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
+  <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>

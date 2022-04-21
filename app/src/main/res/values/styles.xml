@@ -118,4 +118,10 @@
     <item name="android:clipToPadding">false</item>
   </style>
 
+  <style name="Transparent" parent="@style/AppTheme">
+    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="windowNoTitle">true</item>
+    <item name="android:windowIsTranslucent">true</item>
+  </style>
+
 </resources>

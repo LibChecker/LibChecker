@@ -138,6 +138,7 @@
   <string name="snapshot_detail_deleted_title">This App has been removed</string>
   <string name="snapshot_time_node_uninitialized">(Uninitialized)</string>
   <string name="snapshot_generate_text_report">Generate Text Report</string>
+  <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>

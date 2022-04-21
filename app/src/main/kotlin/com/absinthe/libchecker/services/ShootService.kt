@@ -20,6 +20,7 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -42,6 +43,9 @@ import java.util.Locale
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
 private const val SHOOT_SUCCESS_NOTIFICATION_ID = 2
+
+const val ACTION_SHOOT_AND_STOP_AUTO = "action_shoot_and_stop_auto"
+const val EXTRA_DROP_PREVIOUS = "extra_drop_previous"
 
 class ShootService : LifecycleService() {
 
@@ -71,6 +75,15 @@ class ShootService : LifecycleService() {
       stopForeground(true)
       stopSelf()
     }
+    if (intent?.action == ACTION_SHOOT_AND_STOP_AUTO) {
+      val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
+      lifecycleScope.launch(Dispatchers.IO) {
+        computeSnapshots(dropPrevious, true)
+      }
+    } else {
+      stopForeground(true)
+      stopSelf()
+    }
     return super.onStartCommand(intent, flags, startId)
   }
 
@@ -88,8 +101,8 @@ class ShootService : LifecycleService() {
         val name = createConfigurationContext(configuration).resources
           .getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
-        createNotificationChannel(mChannel)
+        val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
+        createNotificationChannel(channel)
       }
       startForeground(SHOOT_NOTIFICATION_ID, builder.build())
     }
@@ -123,7 +136,10 @@ class ShootService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
-  private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+  private suspend fun computeSnapshots(
+    dropPrevious: Boolean = false,
+    stopWhenFinish: Boolean = false
+  ) {
     if (isComputing) {
       Timber.w("computeSnapshots isComputing, ignored")
       return
@@ -277,6 +293,10 @@ class ShootService : LifecycleService() {
     stopSelf()
     Timber.i("computeSnapshots end")
     isComputing = false
+
+    if (stopWhenFinish) {
+      stopSelf()
+    }
   }
 
   private fun getFormatDateString(timestamp: Long): String {
@@ -289,7 +309,10 @@ class ShootService : LifecycleService() {
     val pi = PendingIntent.getActivity(
       this,
       0,
-      Intent(this, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+      Intent(this, MainActivity::class.java).also {
+        it.action = Constants.ACTION_SNAPSHOT
+        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      },
       PendingIntent.FLAG_IMMUTABLE
     )
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))

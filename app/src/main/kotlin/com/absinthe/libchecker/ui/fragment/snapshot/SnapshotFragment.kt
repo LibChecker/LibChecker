@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.res.Configuration
 import android.os.IBinder
+import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.Menu
@@ -14,8 +15,10 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Space
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,6 +47,8 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
+import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
@@ -400,9 +405,24 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
+        val scheme = "lc://bridge?action=shoot&dropPrevious=false"
+        val tipView = TextView(context).also {
+          it.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+          val paddingHorizontal =
+            context.getDimensionByAttr(com.google.android.material.R.attr.dialogPreferredPadding)
+              .toInt()
+          it.setPadding(paddingHorizontal, 0, paddingHorizontal, 0)
+          it.text = HtmlCompat.fromHtml(String.format(getString(R.string.snapshot_scheme_tip), scheme), 0)
+          it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
+          it.setLongClickCopiedToClipboard(scheme)
+        }
         BaseAlertDialogBuilder(context)
           .setTitle(R.string.dialog_title_keep_previous_snapshot)
           .setMessage(R.string.dialog_message_keep_previous_snapshot)
+          .setView(tipView)
           .setPositiveButton(R.string.btn_keep) { _, _ ->
             computeNewSnapshot(false)
           }

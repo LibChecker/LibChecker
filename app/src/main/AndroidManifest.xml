@@ -30,13 +30,6 @@
 
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data
-          android:host="action"
-          android:scheme="lcsc" />
-      </intent-filter>
 
       <meta-data
         android:name="android.app.shortcuts"
@@ -104,6 +97,19 @@
     <activity
       android:name=".ui.about.AboutActivity"
       android:label="@string/settings_about" />
+    <activity
+      android:name=".bridge.BridgeActivity"
+      android:exported="true"
+      android:theme="@style/Transparent">
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data
+          android:host="bridge"
+          android:scheme="lc" />
+      </intent-filter>
+    </activity>
 
     <service android:name=".services.ShootService" />
     <service android:name=".services.WorkerService" />
