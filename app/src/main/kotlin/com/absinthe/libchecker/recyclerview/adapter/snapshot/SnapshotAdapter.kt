@@ -12,8 +12,6 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
-import coil.load
-import coil.transform.RoundedCornersTransformation
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
@@ -67,11 +65,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           loadIconJob =
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
-          icon.post {
-            icon.load(R.drawable.ic_icon_blueprint) {
-              transformations(RoundedCornersTransformation(24f, 24f, 24f, 24f))
-            }
-          }
+          icon.setImageResource(R.drawable.ic_icon_blueprint)
         }
       }
 

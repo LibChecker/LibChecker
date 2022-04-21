@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.fragment.snapshot
 import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
 import coil.load
-import coil.transform.RoundedCornersTransformation
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -51,9 +50,7 @@ class SnapshotNewOrDeletedBSDFragment :
               }
             }
           } ?: run {
-            load(R.drawable.ic_icon_blueprint) {
-              transformations(RoundedCornersTransformation(24f, 24f, 24f, 24f))
-            }
+            setImageResource(R.drawable.ic_icon_blueprint)
           }
         }
         appNameView.text = item.labelDiff.old
