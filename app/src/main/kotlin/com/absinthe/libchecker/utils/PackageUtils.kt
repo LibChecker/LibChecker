@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Process
@@ -79,7 +80,7 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = SystemServices.packageManager.getPackageInfo(
       packageName,
-      FreezeUtils.PM_FLAGS_GET_APP_INFO or flag or VersionCompat.MATCH_DISABLED_COMPONENTS
+      VersionCompat.MATCH_UNINSTALLED_PACKAGES or VersionCompat.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return SystemServices.packageManager.getPackageArchiveInfo(
@@ -98,8 +99,8 @@ object PackageUtils {
    * @throws Exception
    */
   @Throws(Exception::class)
-  fun getInstallApplications(): List<ApplicationInfo> {
-    return SystemServices.packageManager.getInstalledApplications(VersionCompat.MATCH_UNINSTALLED_PACKAGES)
+  fun getInstallApplications(): List<PackageInfo> {
+    return SystemServices.packageManager.getInstalledPackages(VersionCompat.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_META_DATA)
   }
 
   /**
@@ -193,7 +194,7 @@ object PackageUtils {
       if (specifiedAbi != null) {
         abi = specifiedAbi
       } else {
-        abi = getAbi(packageInfo.applicationInfo)
+        abi = getAbi(packageInfo)
         if (abi == NO_LIBS) {
           abi = if (Process.is64Bit()) {
             ARMV8
@@ -223,7 +224,7 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
-    try {
+    return runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         return zipFile.entries()
           .asSequence()
@@ -233,10 +234,9 @@ object PackageUtils {
           .toList()
           .ifEmpty { getSplitLibs(packageInfo) }
       }
-    } catch (e: Exception) {
-      Timber.e(e)
-      return emptyList()
-    }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -256,14 +256,9 @@ object PackageUtils {
       fileName.startsWith("split_config.arm") || fileName.startsWith("split_config.x86")
     }?.let {
       ZipFile(File(it)).use { zipFile ->
-        val entries = zipFile.entries()
-        var next: ZipEntry
-
-        while (entries.hasMoreElements()) {
-          next = entries.nextElement()
-
-          if (next.name.contains("lib/") && !next.isDirectory) {
-            libList.add(LibStringItem(next.name.split("/").last(), next.size))
+        zipFile.entries().asSequence().forEach { entry ->
+          if (entry.name.contains("lib/") && entry.isDirectory.not()) {
+            libList.add(LibStringItem(entry.name.split("/").last(), entry.size))
           }
         }
       }
@@ -287,23 +282,16 @@ object PackageUtils {
    * @return true if it uses Kotlin language
    */
   fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
-    return try {
-      val path = packageInfo.applicationInfo.sourceDir
-      val file = File(path)
+    return runCatching {
+      val file = File(packageInfo.applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        if (it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+        it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
-          it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null
-        ) {
-          true
-        } else {
+          it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
           isKotlinUsedInClassDex(file)
-        }
       }
-    } catch (e: Exception) {
-      false
-    }
+    }.getOrDefault(false)
   }
 
   const val STATIC_LIBRARY_SOURCE_PREFIX = "[Path] "
@@ -378,10 +366,9 @@ object PackageUtils {
     return try {
       FastDexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
-          val isKotlinUsage = getEntry(entry)?.dexFile?.classes
-            ?.any {
-              it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
-            } ?: false
+          val isKotlinUsage = getEntry(entry)?.dexFile?.classes?.any {
+            it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
+          } ?: false
           if (isKotlinUsage) {
             return true
           }
@@ -413,11 +400,9 @@ object PackageUtils {
       else -> 0
     }
 
-    return try {
+    return runCatching {
       getComponentList(getPackageInfo(packageName, flag), type, isSimpleName)
-    } catch (e: Exception) {
-      emptyList()
-    }
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -440,11 +425,9 @@ object PackageUtils {
       else -> 0
     }
 
-    return try {
+    return runCatching {
       getComponentStringList(getPackageInfo(packageName, flag), type, isSimpleName)
-    } catch (e: Exception) {
-      emptyList()
-    }
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -512,16 +495,14 @@ object PackageUtils {
     var isEnabled: Boolean
     return list.asSequence()
       .map {
-        state = try {
+        state = runCatching {
           SystemServices.packageManager.getComponentEnabledSetting(
             ComponentName(
               packageName,
               it.name
             )
           )
-        } catch (e: IllegalArgumentException) {
-          PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
-        }
+        }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
         isEnabled = when (state) {
           PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
           PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
@@ -564,10 +545,6 @@ object PackageUtils {
       }
       .toList()
   }
-
-  const val use32bitAbiString = "use32bitAbi"
-  const val multiArchString = "multiArch"
-  const val overlayString = "overlay"
 
   /**
    * Get ABIs set of an app
@@ -694,23 +671,19 @@ object PackageUtils {
 
   /**
    * Get ABI type of an app
-   * @param applicationInfo ApplicationInfo
+   * @param packageInfo PackageInfo
    * @return ABI type
    */
   fun getAbi(
-    applicationInfo: ApplicationInfo,
+    packageInfo: PackageInfo,
     isApk: Boolean = false,
-    abiSet: Set<Int>? = null,
-    demands: Map<String, Any>? = null
+    abiSet: Set<Int>? = null
   ): Int {
+    val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
     val file = File(applicationInfo.sourceDir)
-    val realDemands = demands ?: ManifestReader.getManifestProperties(
-      file,
-      arrayOf(use32bitAbiString, multiArchString, overlayString)
-    )
-    val overlay = realDemands[overlayString] as? Boolean ?: false
-    val multiArch = realDemands[multiArchString] as? Boolean ?: false
-    val use32bitAbi = realDemands[use32bitAbiString] as? Boolean ?: false
+    val use32bitAbi = applicationInfo.isUse32BitAbi()
+    val overlay = packageInfo.isOverlay()
+    val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
 
     if (overlay) {
       return OVERLAY
@@ -961,16 +934,9 @@ object PackageUtils {
    * @return Permissions list
    */
   fun getPermissionsList(packageName: String): List<String> {
-    return try {
-      getPackageInfo(
-        packageName,
-        PackageManager.GET_PERMISSIONS
-      ).requestedPermissions.toList()
-    } catch (e: PackageManager.NameNotFoundException) {
-      emptyList()
-    } catch (e: NullPointerException) {
-      emptyList()
-    }
+    return runCatching {
+      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+    }.getOrElse { emptyList() }
   }
 
   /**
@@ -978,12 +944,9 @@ object PackageUtils {
    * @return true if it is installed
    */
   fun isAppInstalled(pkgName: String): Boolean {
-    val pm = SystemServices.packageManager
-    return try {
-      pm.getApplicationInfo(pkgName, 0).enabled
-    } catch (e: PackageManager.NameNotFoundException) {
-      false
-    }
+    return runCatching {
+      SystemServices.packageManager.getApplicationInfo(pkgName, 0).enabled
+    }.getOrDefault(false)
   }
 
   private const val minSdkVersion = "minSdkVersion"
@@ -993,49 +956,60 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return minSdkVersion
    */
-  fun getMinSdkVersion(packageInfo: PackageInfo): String {
+  fun getMinSdkVersion(packageInfo: PackageInfo): Int {
     val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
-      packageInfo.applicationInfo.minSdkVersion.toString()
+      packageInfo.applicationInfo.minSdkVersion
     } else {
       val demands = ManifestReader.getManifestProperties(
         File(packageInfo.applicationInfo.sourceDir),
         arrayOf(minSdkVersion)
       )
-      demands[minSdkVersion]?.toString() ?: "?"
+      demands[minSdkVersion]?.toString()?.toInt() ?: 0
     }
-    return "$minSdkVersion $minSdkVersionValue"
+    return minSdkVersionValue
+  }
+
+  /**
+   * Get minSdkVersion of an app
+   * @param packageInfo PackageInfo
+   * @return minSdkVersion
+   */
+  fun getMinSdkVersionString(packageInfo: PackageInfo): String {
+    return "$minSdkVersion ${getMinSdkVersion(packageInfo)}"
   }
 
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
   fun getAGPVersion(packageInfo: PackageInfo): String? {
-    ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
-      zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
-        Properties().apply {
-          load(zipFile.getInputStream(ze))
-          getProperty(AGP_KEYWORD)?.let {
-            return it
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
+          Properties().apply {
+            load(zipFile.getInputStream(ze))
+            getProperty(AGP_KEYWORD)?.let {
+              return it
+            }
           }
         }
-      }
-      zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-        BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
-          seq.find { it.contains(AGP_KEYWORD2) }?.let {
-            return it.removePrefix(AGP_KEYWORD2)
+        zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
+          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
+            seq.find { it.contains(AGP_KEYWORD2) }?.let {
+              return it.removePrefix(AGP_KEYWORD2)
+            }
           }
         }
-      }
-      arrayOf(
-        "META-INF/androidx.databinding_viewbinding.version",
-        "META-INF/androidx.databinding_databindingKtx.version",
-        "META-INF/androidx.databinding_library.version"
-      ).forEach { entry ->
-        zipFile.getEntry(entry)?.let { ze ->
-          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
-            val version = seq.readLine()
-            if (version.isNotBlank()) {
-              return version
+        arrayOf(
+          "META-INF/androidx.databinding_viewbinding.version",
+          "META-INF/androidx.databinding_databindingKtx.version",
+          "META-INF/androidx.databinding_library.version"
+        ).forEach { entry ->
+          zipFile.getEntry(entry)?.let { ze ->
+            BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
+              val version = seq.readLine()
+              if (version.isNotBlank()) {
+                return version
+              }
             }
           }
         }
@@ -1073,8 +1047,8 @@ object PackageUtils {
     }
   }
 
-  suspend fun getAppsList(): List<ApplicationInfo> {
-    var appList: List<ApplicationInfo>
+  suspend fun getAppsList(): List<PackageInfo> {
+    var appList: List<PackageInfo>
     var retry: Boolean
 
     do {
@@ -1086,8 +1060,10 @@ object PackageUtils {
         delay(200)
         retry = true
         emptyList()
-      }.also {
-        AppItemRepository.allApplicationInfoItems = it
+      }.also { items ->
+        AppItemRepository.allPackageInfoMap = items.asSequence()
+          .map { it.packageName to it }
+          .toMap()
       }
     } while (retry)
 
@@ -1095,7 +1071,7 @@ object PackageUtils {
     try {
       if (pmList.size > appList.size) {
         appList = pmList.asSequence()
-          .map { getPackageInfo(it).applicationInfo }
+          .map { getPackageInfo(it) }
           .toList()
       }
     } catch (t: Throwable) {
@@ -1133,5 +1109,22 @@ object PackageUtils {
   fun PackageInfo.isPWA(): Boolean {
     return applicationInfo.metaData?.keySet()
       ?.any { it.startsWith("org.chromium.webapk.shell_apk") } == true
+  }
+
+  fun PackageInfo.isOverlay(): Boolean {
+    return try {
+      Refine.unsafeCast<PackageInfoHidden>(this).isOverlayPackage
+    } catch (t: Throwable) {
+      val demands =
+        ManifestReader.getManifestProperties(File(applicationInfo.sourceDir), arrayOf("overlay"))
+      return demands["overlay"] as? Boolean ?: false
+    }
+  }
+
+  fun ApplicationInfo.isUse32BitAbi(): Boolean {
+    runCatching {
+      val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
+      return demands["use32bitAbi"] as? Boolean ?: false
+    }.getOrNull() ?: return false
   }
 }

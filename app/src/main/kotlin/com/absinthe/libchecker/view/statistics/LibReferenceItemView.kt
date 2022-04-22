@@ -50,7 +50,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
         it.marginStart = 8.dp
         it.marginEnd = 8.dp
       }
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
       addView(this)
     }
@@ -64,7 +64,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
           it.marginStart = 8.dp
           it.marginEnd = 8.dp
         }
-        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+        setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
         addView(this)
       }

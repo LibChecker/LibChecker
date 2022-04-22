@@ -124,7 +124,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
       val isNewOrDeleted = entity.deleted || entity.newInstalled
 
-      ivAppIcon.apply {
+      snapshotTitle.iconView.apply {
         val appIconLoader = AppIconLoader(
           resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
           false,
@@ -148,25 +148,25 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
           }
         }
       }
-      tvAppName.text = getDiffString(entity.labelDiff, isNewOrDeleted)
-      tvPackageName.text = entity.packageName
-      tvVersion.text = getDiffString(
+      snapshotTitle.appNameView.text = getDiffString(entity.labelDiff, isNewOrDeleted)
+      snapshotTitle.packageNameView.text = entity.packageName
+      snapshotTitle.versionInfoView.text = getDiffString(
         entity.versionNameDiff,
         entity.versionCodeDiff,
         isNewOrDeleted,
         "%s (%s)"
       )
-      tvTargetApi.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
+      snapshotTitle.targetApiView.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
 
       if (entity.packageSizeDiff.old > 0L) {
-        tvPackageSize.isVisible = true
+        snapshotTitle.packageSizeView.isVisible = true
         val sizeDiff = SnapshotDiffItem.DiffNode(
           entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
           entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
         )
-        tvPackageSize.text = getDiffString(sizeDiff, isNewOrDeleted)
+        snapshotTitle.packageSizeView.text = getDiffString(sizeDiff, isNewOrDeleted)
       } else {
-        tvPackageSize.isVisible = false
+        snapshotTitle.packageSizeView.isVisible = false
       }
     }
 
@@ -323,13 +323,13 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private fun generateReport() {
     val sb = StringBuilder()
-    sb.append(binding.tvAppName.text).appendLine()
-      .append(binding.tvPackageName.text).appendLine()
-      .append(binding.tvVersion.text).appendLine()
-      .append(binding.tvTargetApi.text).appendLine()
+    sb.append(binding.snapshotTitle.appNameView.text).appendLine()
+      .append(binding.snapshotTitle.packageNameView.text).appendLine()
+      .append(binding.snapshotTitle.versionInfoView.text).appendLine()
+      .append(binding.snapshotTitle.targetApiView.text).appendLine()
 
-    if (binding.tvPackageSize.isVisible) {
-      sb.append(binding.tvPackageSize.text).appendLine()
+    if (binding.snapshotTitle.packageSizeView.isVisible) {
+      sb.append(binding.snapshotTitle.packageSizeView.text).appendLine()
     }
 
     sb.appendLine()

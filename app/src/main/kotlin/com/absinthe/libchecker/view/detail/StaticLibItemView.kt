@@ -11,7 +11,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
@@ -34,7 +33,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }
@@ -70,15 +69,11 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
         setChipIconResource(libChip.iconRes)
 
         if (!GlobalValues.isColorfulIcon.valueUnsafe) {
-          if (libChip.iconRes == R.drawable.ic_sdk_placeholder) {
-            chipIconTint = context.getColorStateListByAttr(R.attr.colorOnSurface)
-          } else {
-            val icon = chipIcon
-            icon?.let {
-              it.colorFilter =
-                ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
-              chipIcon = it
-            }
+          val icon = chipIcon
+          icon?.let {
+            it.colorFilter =
+              ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
+            chipIcon = it
           }
         }
       }

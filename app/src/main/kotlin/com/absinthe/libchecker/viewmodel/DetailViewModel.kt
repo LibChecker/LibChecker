@@ -14,7 +14,9 @@ import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -27,8 +29,6 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -36,14 +36,13 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.manifest.ManifestReader
+import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import timber.log.Timber
-import java.io.File
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -93,9 +92,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       }
 
       info?.let {
-        val demands = arrayOf("extractNativeLibs")
-        val properties = ManifestReader.getManifestProperties(File(it.sourceDir), demands)
-        extractNativeLibs = properties["extractNativeLibs"] as? Boolean
+        extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
 
         list.addAll(
           getNativeChipList(info, isApk, abiSet?.firstOrNull())
@@ -239,7 +236,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       list.forEach {
         chip = LCAppUtils.getRuleWithRegex(it.name, NATIVE, info.packageName, list)?.let { rule ->
           LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -257,7 +254,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getStaticChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getStaticChipList")
-    val list = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+    val list =
+      runCatching { PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName)) }.getOrNull()
+        ?: return emptyList()
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
 
@@ -266,9 +265,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, STATIC, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -287,17 +286,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   private suspend fun getMetaDataChipList(packageName: String): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
     val isApk = packageName.isTempApk()
-    val info = if (isApk) {
-      SystemServices.packageManager.getPackageArchiveInfo(
-        packageName,
-        PackageManager.GET_META_DATA
-      )
-    } else {
-      PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-    }
-    if (info == null) {
-      return emptyList()
-    }
+    val info = runCatching {
+      if (isApk) {
+        SystemServices.packageManager.getPackageArchiveInfo(
+          packageName,
+          PackageManager.GET_META_DATA
+        )
+      } else {
+        PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
+      }
+    }.getOrNull() ?: return emptyList()
+
     val list = PackageUtils.getMetaDataItems(info)
     val chipList = mutableListOf<LibStringItemChip>()
     var chip: LibChip?
@@ -307,9 +306,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, METADATA, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -353,9 +352,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        Repositories.ruleRepository.getRule(it.name)?.let { rule ->
+        LCRules.getRule(it.name, PERMISSION, false)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )
@@ -387,9 +386,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } else {
       list.forEach {
         chip = null
-        LCAppUtils.getRuleWithRegex(it.name, DEX)?.let { rule ->
+        LCRules.getRule(it.name, DEX, true)?.let { rule ->
           chip = LibChip(
-            iconRes = IconResMap.getIconRes(rule.iconIndex),
+            iconRes = rule.iconRes,
             name = rule.label,
             regexName = rule.regexName
           )

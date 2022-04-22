@@ -1,20 +1,21 @@
 package com.absinthe.libchecker.database
 
-import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.database.entity.RuleEntity
-import java.util.concurrent.ConcurrentHashMap
-import java.util.regex.Pattern
+import com.absinthe.libchecker.utils.PackageUtils
 
 object AppItemRepository {
-  var allApplicationInfoItems: List<ApplicationInfo> = emptyList()
+  var allPackageInfoMap: Map<String, PackageInfo> = HashMap(100)
   var trackItemsChanged = false
-  var shouldRefreshAppList = false
-  var rulesRegexList = ConcurrentHashMap<Pattern, RuleEntity>()
   var shouldClearDiffItemsInDatabase = false
 
-  suspend fun getApplicationInfoItems(): List<ApplicationInfo> {
+  suspend fun getApplicationInfoMap(): Map<String, PackageInfo> {
     Global.applicationListJob?.join()
-    return allApplicationInfoItems
+    if (allPackageInfoMap.isEmpty()) {
+      allPackageInfoMap = PackageUtils.getAppsList().asSequence()
+        .map { it.packageName to it }
+        .toMap()
+    }
+    return allPackageInfoMap
   }
 }

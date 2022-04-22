@@ -9,6 +9,7 @@ import android.text.style.StyleSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -54,7 +55,11 @@ class LibReferenceAdapter : HighlightAdapter<LibReference>() {
 
         setOrHighlightText(labelName, it.name)
       } ?: let {
-        icon.setImageResource(R.drawable.ic_question)
+        if (item.type == PERMISSION && item.libName.startsWith("android.permission")) {
+          icon.setImageResource(R.drawable.ic_lib_android)
+        } else {
+          icon.setImageResource(R.drawable.ic_question)
+        }
         val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
         val colorSpanit = StyleSpan(Typeface.ITALIC)
         spannableString.setSpan(

@@ -9,7 +9,6 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -18,7 +17,6 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -67,10 +65,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           loadIconJob =
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
-          val bitmap = R.drawable.ic_app_list.getDrawable(context)?.apply {
-            setTint(context.getColorByAttr(R.attr.colorOnSurface))
-          }?.toBitmap(40.dp, 40.dp)
-          icon.post { icon.setImageBitmap(bitmap) }
+          icon.setImageResource(R.drawable.ic_icon_blueprint)
         }
       }
 
@@ -90,7 +85,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
             R.color.material_green_300.toColorStateList(context)
           }
           holder.itemView.backgroundTintList = background
-          val color = context.getColorByAttr(R.attr.colorOnSurface)
+          val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
           versionInfo.setTextColor(color)
           packageSizeInfo.setTextColor(color)
           targetApiInfo.setTextColor(color)

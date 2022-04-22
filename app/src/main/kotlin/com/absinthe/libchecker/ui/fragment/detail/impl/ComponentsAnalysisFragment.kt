@@ -6,12 +6,11 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
@@ -21,10 +20,10 @@ import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.showToast
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Rule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,18 +55,18 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
           lifecycleScope.launch(Dispatchers.IO) {
             val list = mutableListOf<LibStringItemChip>()
             var chip: LibChip?
-            var rule: RuleEntity?
+            var rule: Rule?
             var source: String?
 
             for (item in componentList) {
               rule = if (!item.componentName.startsWith(".")) {
-                LCAppUtils.getRuleWithRegex(item.componentName, adapter.type)
+                LCRules.getRule(item.componentName, adapter.type, true)
               } else {
                 null
               }
               chip = if (rule != null) {
                 LibChip(
-                  iconRes = IconResMap.getIconRes(rule.iconIndex),
+                  iconRes = rule.iconRes,
                   name = rule.label,
                   regexName = rule.regexName
                 )
@@ -149,7 +148,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
       }
 
-      MaterialAlertDialogBuilder(context)
+      BaseAlertDialogBuilder(context)
         .setAdapter(arrayAdapter) { _, which ->
           when (which) {
             0 -> {

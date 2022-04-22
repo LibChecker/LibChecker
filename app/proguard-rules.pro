@@ -139,6 +139,7 @@
 -dontwarn org.openjsse.javax.net.ssl.SSLParameters
 -dontwarn org.openjsse.javax.net.ssl.SSLSocket
 -dontwarn org.openjsse.net.ssl.OpenJSSE
+-dontwarn org.slf4j.impl.StaticLoggerBinder
 
 # ViewBinding
 -keep public class * extends androidx.viewbinding.ViewBinding {*;}
@@ -146,4 +147,9 @@
 # BottomSheetBehavior
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
   void setStateInternal(int);
+}
+
+# MPAndroidChart
+-keep public class com.github.mikephil.charting.animation.* {
+    public protected *;
 }

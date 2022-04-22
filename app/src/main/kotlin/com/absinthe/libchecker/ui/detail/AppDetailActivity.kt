@@ -20,7 +20,6 @@ import android.view.ViewGroup
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,6 +38,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.constant.AbilityType
@@ -46,6 +47,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
@@ -61,6 +63,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
@@ -70,12 +73,10 @@ import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.Dispatchers
@@ -87,6 +88,7 @@ import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.abs
 
 @SuppressLint("InlinedApi")
 const val EXTRA_PACKAGE_NAME = Intent.EXTRA_PACKAGE_NAME
@@ -100,8 +102,23 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
   private val extraBean by unsafeLazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
   private val featureAdapter by unsafeLazy { FeatureAdapter() }
+  private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
+  private val toolbarQuicklyLaunchItem by unsafeLazy {
+    AppDetailToolbarItem(
+      R.drawable.ic_launch,
+      R.string.further_operation
+    ) {
+      AppInfoBottomSheetDialogFragment().apply {
+        arguments = bundleOf(
+          EXTRA_PACKAGE_NAME to pkgName
+        )
+        show(supportFragmentManager, tag)
+      }
+    }
+  }
 
   private var isHarmonyMode = false
+  private var isToolbarCollapsed = false
   private var featureListView: RecyclerView? = null
   private var typeList = mutableListOf<Int>()
 
@@ -127,10 +144,15 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
   private fun initView() {
     pkgName?.let { packageName ->
+      val packageInfo = runCatching {
+        PackageUtils.getPackageInfo(
+          packageName,
+          PackageManager.GET_META_DATA
+        )
+      }.getOrNull() ?: return
       viewModel.packageName = packageName
       binding.apply {
         try {
-          val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_META_DATA)
           supportActionBar?.title = null
           collapsingToolbar.also {
             it.setOnApplyWindowInsetsListener(null)
@@ -206,15 +228,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
 
           val extraInfo = SpannableStringBuilder()
           val file = File(packageInfo.applicationInfo.sourceDir)
-          val demands = ManifestReader.getManifestProperties(
-            file,
-            arrayOf(
-              PackageUtils.use32bitAbiString,
-              PackageUtils.multiArchString,
-              PackageUtils.overlayString
-            )
-          )
-          val overlay = demands[PackageUtils.overlayString] as? Boolean ?: false
+          val overlay = packageInfo.isOverlay()
           var abiSet = PackageUtils.getAbiSet(
             file,
             packageInfo.applicationInfo,
@@ -222,12 +236,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             overlay = overlay,
             ignoreArch = true
           ).toSet()
-          val abi = PackageUtils.getAbi(
-            packageInfo.applicationInfo,
-            isApk = false,
-            abiSet = abiSet,
-            demands = demands
-          )
+          val abi = PackageUtils.getAbi(packageInfo, isApk = false, abiSet = abiSet)
           abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
           extraInfo.apply {
@@ -237,7 +246,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
             }
             if (!isHarmonyMode) {
               append(PackageUtils.getTargetApiString(packageName))
-              append(", ").append(PackageUtils.getMinSdkVersion(packageInfo))
+              append(", ").append(PackageUtils.getMinSdkVersionString(packageInfo))
               packageInfo.sharedUserId?.let {
                 appendLine().append("sharedUserId = $it")
               }
@@ -352,11 +361,6 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
               }
 
               initMoreFeatures(packageInfo)
-
-              if (it.variant == Constants.VARIANT_HAP) {
-                ibHarmonyBadge.isVisible = true
-                ibHarmonyBadge.setImageResource(R.drawable.ic_harmonyos_logo)
-              }
             }
           }
         } catch (e: Exception) {
@@ -365,30 +369,67 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           finish()
         }
 
-        ibSort.setOnClickListener {
-          lifecycleScope.launch {
-            detailFragmentManager.sortAll()
-            viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
-              MODE_SORT_BY_SIZE
-            } else {
-              MODE_SORT_BY_LIB
+        val toolbarItems = mutableListOf(
+          AppDetailToolbarItem(
+            R.drawable.ic_lib_sort,
+            R.string.menu_sort
+          ) {
+            lifecycleScope.launch {
+              detailFragmentManager.sortAll()
+              viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
+                MODE_SORT_BY_SIZE
+              } else {
+                MODE_SORT_BY_LIB
+              }
+              detailFragmentManager.changeSortMode(viewModel.sortMode)
             }
-            detailFragmentManager.changeSortMode(viewModel.sortMode)
           }
-        }
+        )
         if (GlobalValues.debugMode) {
-          ibProcesses.isVisible = true
-          ibProcesses.setOnClickListener {
-            Toasty.showLong(this@AppDetailActivity, viewModel.processesSet.toString())
-          }
+          toolbarItems.add(
+            AppDetailToolbarItem(
+              R.drawable.ic_processes,
+              R.string.menu_sort
+            ) {
+              Toasty.showLong(this@AppDetailActivity, viewModel.processesSet.toString())
+            }
+          )
+        }
+        if (extraBean?.variant == Constants.VARIANT_HAP) {
+          toolbarItems.add(
+            AppDetailToolbarItem(
+              R.drawable.ic_harmonyos_logo,
+              R.string.ability
+            ) {
+              isHarmonyMode = !isHarmonyMode
+              initView()
+            }
+          )
+        }
+        toolbarAdapter.setList(toolbarItems)
+        rvToolbar.apply {
+          adapter = toolbarAdapter
+          layoutManager =
+            LinearLayoutManager(this@AppDetailActivity, RecyclerView.HORIZONTAL, false)
         }
 
-        if (ibHarmonyBadge.isVisible) {
-          ibHarmonyBadge.setOnClickListener {
-            isHarmonyMode = !isHarmonyMode
-            initView()
+        headerLayout.addOnOffsetChangedListener(
+          AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
+            isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
+              // Collapsed
+              if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+                toolbarAdapter.addData(toolbarQuicklyLaunchItem)
+              }
+              true
+            } else {
+              // Expanded
+              if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+                toolbarAdapter.remove(toolbarQuicklyLaunchItem)
+              }
+              false
+            }
           }
-        }
+        )
       }
 
       typeList = if (!isHarmonyMode) {
@@ -427,22 +468,25 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
         )
       }
 
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
-          if (libs.isNotEmpty()) {
-            withContext(Dispatchers.Main) {
-              typeList.add(1, STATIC)
-              tabTitles.add(1, getText(R.string.ref_category_static))
-              binding.tabLayout.addTab(
-                binding.tabLayout.newTab().also { it.text = getText(R.string.ref_category_static) },
-                1
-              )
-              resolveReferenceExtras()
+      if (packageInfo.applicationInfo.sharedLibraryFiles?.isNotEmpty() == true) {
+        lifecycleScope.launch(Dispatchers.IO) {
+          try {
+            val libs = PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageName))
+            if (libs.isNotEmpty()) {
+              withContext(Dispatchers.Main) {
+                typeList.add(1, STATIC)
+                tabTitles.add(1, getText(R.string.ref_category_static))
+                binding.tabLayout.addTab(
+                  binding.tabLayout.newTab()
+                    .also { it.text = getText(R.string.ref_category_static) },
+                  1
+                )
+                resolveReferenceExtras()
+              }
             }
+          } catch (e: PackageManager.NameNotFoundException) {
+            Timber.e(e)
           }
-        } catch (e: PackageManager.NameNotFoundException) {
-          Timber.e(e)
         }
       }
 
@@ -563,7 +607,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     initFeatureListView()
     featureAdapter.addData(
       FeatureItem(R.drawable.ic_kotlin_logo) {
-        MaterialAlertDialogBuilder(this)
+        BaseAlertDialogBuilder(this)
           .setIcon(R.drawable.ic_kotlin_logo)
           .setTitle(R.string.kotlin_string)
           .setMessage(R.string.kotlin_details)
@@ -598,7 +642,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_gradle) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_gradle)
                 .setTitle(
                   HtmlCompat.fromHtml(
@@ -619,7 +663,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_xposed) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_xposed)
                 .setTitle(R.string.xposed_module)
                 .setMessage(R.string.xposed_module_details)
@@ -635,7 +679,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_lib_play_store) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_lib_play_store)
                 .setTitle(R.string.play_app_signing)
                 .setMessage(R.string.play_app_signing_details)
@@ -651,7 +695,7 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           initFeatureListView()
           featureAdapter.addData(
             FeatureItem(R.drawable.ic_pwa) {
-              MaterialAlertDialogBuilder(this@AppDetailActivity)
+              BaseAlertDialogBuilder(this@AppDetailActivity)
                 .setIcon(R.drawable.ic_pwa)
                 .setTitle(R.string.pwa)
                 .setMessage(R.string.pwa_details)

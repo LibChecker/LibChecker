@@ -9,6 +9,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.AppIconCache
+import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -89,6 +90,8 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
 
       if (item.variant == Constants.VARIANT_HAP) {
         setBadge(R.drawable.ic_harmony_badge)
+      } else if (FreezeUtils.isAppFrozen(item.packageName)) {
+        setBadge(R.drawable.ic_uninstalled_package)
       } else {
         setBadge(null)
       }

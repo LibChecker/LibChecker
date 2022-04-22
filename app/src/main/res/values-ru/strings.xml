@@ -10,7 +10,6 @@
   <string name="channel_shoot">Сохранить</string>
   <string name="noti_shoot_title">Сохранение текущего снимка</string>
   <string name="noti_shoot_title_saved">Снимок сохранен</string>
-  <string name="permission_label_get_marked_libraries">Разрешить приложению получать информацию о отмеченных библиотеках, предоставляемую LibChecker</string>
 
   <!--  App list  -->
   <string name="menu_search">Поиск</string>
@@ -96,11 +95,11 @@
   <string name="array_dark_mode_battery">Зависит от режима энергосбережения</string>
 
   <!--  Detail  -->
+  <string name="detail">подробности</string>
   <string name="detail_label">Просмотр сведений о приложении</string>
   <string name="not_found">Не найдено</string>
   <string name="create_an_issue">Помогите нам дополнить информацию</string>
   <string name="app_bundle_details">"Android App Bundle - это новый официальный формат публикации приложений в ОС Android, который предлагает более эффективный способ создания и выпуска вашего приложения. Android App Bundle позволяет выпускать приложения меньшего размера, что может повысить успешность установки и сократить количество удалений. Переключиться на App Bundle легко. Вам не нужно проводить рефакторинг кода, чтобы получить пользу от небольшого размера приложения. И после перехода вы получите выгоду от разработки модульных приложений и настраиваемой доставки функций."</string>
-  <string name="kotlin_used" translatable="false">Используется Kotlin</string>
   <string name="kotlin_details">"Kotlin - это кроссплатформенный язык программирования общего назначения со статической типизацией и выводом типов. Kotlin разработан для полного взаимодействия с Java, а версия JVM стандартной библиотеки Kotlin зависит от библиотеки классов Java, но вывод типа позволяет его синтаксису быть более лаконичным."</string>
   <string name="items_count">Кол-во пунктов: </string>
   <string name="further_operation">Дополнительные опции</string>
@@ -138,6 +137,7 @@
   <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
   <string name="snapshot_time_node_uninitialized">(Неинициализировано)</string>
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
+  <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>

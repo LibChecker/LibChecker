@@ -23,14 +23,12 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -40,7 +38,8 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.isTempApk
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.absinthe.rulesbundle.LCRules
+import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import java.text.SimpleDateFormat
@@ -112,39 +111,24 @@ object LCAppUtils {
     return Build.VERSION.SDK_INT >= 26
   }
 
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N_MR1)
-  fun atLeastNMR1(): Boolean {
-    return Build.VERSION.SDK_INT >= 25
-  }
-
   @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
   fun atLeastN(): Boolean {
     return Build.VERSION.SDK_INT >= 24
   }
 
-  fun findRuleRegex(string: String, @LibType type: Int): RuleEntity? {
-    val iterator = AppItemRepository.rulesRegexList.entries.iterator()
-    while (iterator.hasNext()) {
-      val entry = iterator.next()
-      if (entry.key.matcher(string).matches() && entry.value.type == type) {
-        return entry.value
-      }
-    }
-    return null
-  }
-
-  private suspend fun getRuleWithDexChecking(
+  suspend fun getRuleWithRegex(
     name: String,
+    @LibType type: Int,
     packageName: String? = null,
     nativeLibs: List<LibStringItem>? = null
-  ): RuleEntity? {
-    val ruleEntity = Repositories.ruleRepository.getRule(name) ?: return null
-    if (ruleEntity.type == NATIVE) {
+  ): Rule? {
+    val ruleEntity = LCRules.getRule(name, type, true) ?: return null
+    if (type == NATIVE) {
       if (packageName == null) {
         return ruleEntity
       }
       val isApk = packageName.isTempApk()
-      when (ruleEntity.name) {
+      when (name) {
         "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
           return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", isApk)) {
             ruleEntity
@@ -169,15 +153,6 @@ object LCAppUtils {
     } else {
       return ruleEntity
     }
-  }
-
-  suspend fun getRuleWithRegex(
-    name: String,
-    @LibType type: Int,
-    packageName: String? = null,
-    nativeLibs: List<LibStringItem>? = null
-  ): RuleEntity? {
-    return getRuleWithDexChecking(name, packageName, nativeLibs) ?: findRuleRegex(name, type)
   }
 
   fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
@@ -233,7 +208,7 @@ object LCAppUtils {
   }
 
   fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
-    return MaterialAlertDialogBuilder(context)
+    return BaseAlertDialogBuilder(context)
       .setView(
         LinearProgressIndicator(context).apply {
           layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {

@@ -33,7 +33,6 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
@@ -45,7 +44,6 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.showToast
@@ -53,6 +51,7 @@ import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +62,7 @@ import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
+import java.lang.ref.WeakReference
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -76,6 +76,7 @@ class LibReferenceFragment :
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
+  private var keyword: String = ""
 
   override fun init() {
     setHasOptionsMenu(true)
@@ -159,9 +160,15 @@ class LibReferenceFragment :
           val ref = refAdapter.getItem(position)
           if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
             val name = ref.libName
-            val regexName = LCAppUtils.findRuleRegex(name, ref.type)?.regexName
-            LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-              .show(childFragmentManager, tag)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+              val regexName = LCRules.getRule(name, ref.type, true)?.regexName
+
+              withContext(Dispatchers.Main) {
+                LibDetailDialogFragment.newInstance(name, ref.type, regexName)
+                  .show(childFragmentManager, tag)
+              }
+            }
           }
         }
       }
@@ -180,7 +187,7 @@ class LibReferenceFragment :
         effect.collect {
           when (it) {
             is HomeViewModel.Effect.PackageChanged -> {
-              computeRef()
+              computeRef(false)
             }
             else -> {}
           }
@@ -198,7 +205,7 @@ class LibReferenceFragment :
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
       if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
-        computeRef()
+        computeRef(true)
         homeViewModel.libRefSystemApps = it
       }
     }
@@ -207,11 +214,9 @@ class LibReferenceFragment :
     }
 
     lifecycleScope.launch {
-      if (refAdapter.data.isEmpty() &&
-        AppItemRepository.getApplicationInfoItems().isNotEmpty()
-      ) {
+      if (refAdapter.data.isEmpty()) {
         if (homeViewModel.libRefType == null) {
-          computeRef()
+          computeRef(true)
           homeViewModel.libRefType = category
         }
       }
@@ -220,10 +225,7 @@ class LibReferenceFragment :
 
   override fun onPause() {
     super.onPause()
-    popup?.let {
-      it.dismiss()
-      popup = null
-    }
+    popup?.dismiss()
   }
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -256,15 +258,16 @@ class LibReferenceFragment :
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
+    val contextRef = WeakReference(context)
     if (item.itemId == R.id.filter) {
-      val color = context.getColorByAttr(R.attr.colorSurface)
+      val color = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
       val styler = CascadePopupMenu.Styler(
         background = {
           RoundedRectDrawable(color, radius = 6.dp.toFloat())
         }
       )
       popup = CascadePopupMenu(
-        context,
+        contextRef.get()!!,
         context.findViewById(R.id.filter),
         defStyleAttr = R.style.Widget_LC_PopupMenu,
         styler = styler
@@ -294,10 +297,6 @@ class LibReferenceFragment :
             notMarkedMenu.onlyVisibleInDebugMode()
             notMarkedMenu.initMenu(NOT_MARKED)
           }
-        }
-
-        popup.setOnDismissListener {
-          this@LibReferenceFragment.popup = null
         }
       }
       popup?.show()
@@ -331,7 +330,7 @@ class LibReferenceFragment :
   private fun doSaveLibRefType(@LibType type: Int): Boolean {
     category = type
     GlobalValues.currentLibRefType = type
-    computeRef()
+    computeRef(true)
     Analytics.trackEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       EventProperties().set(
@@ -342,9 +341,11 @@ class LibReferenceFragment :
     return true
   }
 
-  private fun computeRef() {
+  private fun computeRef(needShowLoading: Boolean) {
     isListReady = false
-    flip(VF_LOADING)
+    if (needShowLoading) {
+      flip(VF_LOADING)
+    }
     homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
   }
@@ -355,24 +356,27 @@ class LibReferenceFragment :
 
   @SuppressLint("NotifyDataSetChanged")
   override fun onQueryTextChange(newText: String): Boolean {
-    homeViewModel.libReference.value?.let { list ->
-      val filter = list.filter {
-        it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
-          newText,
-          ignoreCase = true
-        ) ?: false
-      }
-      refAdapter.highlightText = newText
-      refAdapter.setDiffNewData(filter.toMutableList()) {
-        refAdapter.notifyDataSetChanged()
-      }
+    if (keyword != newText) {
+      keyword = newText
+      homeViewModel.libReference.value?.let { list ->
+        val filter = list.filter {
+          it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+            newText,
+            ignoreCase = true
+          ) ?: false
+        }
+        refAdapter.highlightText = newText
+        refAdapter.setDiffNewData(filter.toMutableList()) {
+          refAdapter.notifyDataSetChanged()
+        }
 
-      if (newText.equals("Easter Egg", true)) {
-        context?.showToast("🥚")
-        Analytics.trackEvent(
-          Constants.Event.EASTER_EGG,
-          EventProperties().set("EASTER_EGG", "Lib Reference Search")
-        )
+        if (newText.equals("Easter Egg", true)) {
+          context?.showToast("🥚")
+          Analytics.trackEvent(
+            Constants.Event.EASTER_EGG,
+            EventProperties().set("EASTER_EGG", "Lib Reference Search")
+          )
+        }
       }
     }
     return false

@@ -53,7 +53,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
       ).also {
         it.marginStart = 8.dp
       }
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
       addView(this)
     }
@@ -63,7 +63,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+        setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         addView(this)
       }

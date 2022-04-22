@@ -14,12 +14,11 @@ import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.database.entity.RuleEntity
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.rulesbundle.Rule
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 
@@ -85,8 +84,8 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       chip?.setOnClickListener(listener)
     }
 
-    fun setChip(entity: RuleEntity?, colorRes: Int) {
-      if (entity == null) {
+    fun setChip(rule: Rule?, colorRes: Int) {
+      if (rule == null) {
         if (chip != null) {
           removeView(chip)
           chip = null
@@ -109,24 +108,21 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
           }
         }
         chip!!.apply {
-          setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
-          text = entity.label
+          setChipIconResource(rule.iconRes)
+          text = rule.label
           chipBackgroundColor = colorRes.toColorStateList(context)
 
-          if (!GlobalValues.isColorfulIcon.valueUnsafe && !IconResMap.isSingleColorIcon(
-              entity.iconIndex
-            )
-          ) {
+          if (!GlobalValues.isColorfulIcon.valueUnsafe && !rule.isSimpleColorIcon) {
             val icon = chipIcon
             icon?.let {
               it.mutate().colorFilter =
                 ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
               chipIcon = it
             }
-          } else if (IconResMap.isSingleColorIcon(entity.iconIndex)) {
+          } else if (rule.isSimpleColorIcon) {
             chipIcon?.mutate()?.setTint(Color.BLACK)
           } else {
-            setChipIconResource(IconResMap.getIconRes(entity.iconIndex))
+            setChipIconResource(rule.iconRes)
           }
         }
       }

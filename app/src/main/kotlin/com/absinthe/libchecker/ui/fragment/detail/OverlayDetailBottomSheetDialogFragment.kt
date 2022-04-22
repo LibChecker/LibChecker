@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
@@ -12,22 +12,18 @@ import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.OverlayDetailBottomSheetView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import dev.rikka.tools.refine.Refine
+import kotlinx.coroutines.runBlocking
 import me.zhanghai.android.appiconloader.AppIconLoader
 import timber.log.Timber
-import java.io.File
 
 const val EXTRA_LC_ITEM = "EXTRA_LC_ITEM"
 
@@ -79,65 +75,53 @@ class OverlayDetailBottomSheetDialogFragment :
 
       targetPackageView.apply {
         container.let {
-          lifecycleScope.launch(Dispatchers.IO) {
-            val file = File(packageInfo.applicationInfo.sourceDir)
-            val targetPackageLabel = "targetPackage"
-            val demands = ManifestReader.getManifestProperties(
-              file,
-              arrayOf(targetPackageLabel)
-            )
-            val targetPackage = (demands[targetPackageLabel] as? String).orEmpty()
-            val targetLCItem = Repositories.lcRepository.getItem(targetPackage)
+          val targetPackage = Refine.unsafeCast<PackageInfoHidden>(packageInfo).overlayTarget
+          val targetLCItem = runBlocking { Repositories.lcRepository.getItem(targetPackage) }
 
-            if (targetLCItem == null) {
-              withContext(Dispatchers.Main) {
-                addFloatView(targetPackage)
-              }
-              return@launch
+          if (targetLCItem == null) {
+            addFloatView(targetPackage)
+            return
+          }
+
+          try {
+            val ai = PackageUtils.getPackageInfo(targetPackage).applicationInfo
+            it.icon.load(ai.loadIcon(SystemServices.packageManager))
+          } catch (e: PackageManager.NameNotFoundException) {
+            Timber.e(e)
+          }
+
+          it.appName.text = targetLCItem.label
+          it.packageName.text = targetPackage
+          it.versionInfo.text =
+            PackageUtils.getVersionString(targetLCItem.versionName, targetLCItem.versionCode)
+
+          val str = StringBuilder()
+            .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
+            .append(", ")
+            .append(PackageUtils.getTargetApiString(targetLCItem.targetApi))
+          val spanString: SpannableString
+          val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
+
+          if (targetLCItem.abi.toInt() != Constants.OVERLAY && targetLCItem.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
+            spanString = SpannableString("  $str")
+            abiBadgeRes.getDrawable(context)?.let { drawable ->
+              drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
+              val span = CenterAlignImageSpan(drawable)
+              spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
             }
+            it.abiInfo.text = spanString
+          } else {
+            it.abiInfo.text = str
+          }
 
-            try {
-              val ai = PackageUtils.getPackageInfo(targetPackage).applicationInfo
-              AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, it.icon)
-            } catch (e: PackageManager.NameNotFoundException) {
-              Timber.e(e)
-            }
+          if (lcItem.variant == Constants.VARIANT_HAP) {
+            it.setBadge(R.drawable.ic_harmony_badge)
+          } else {
+            it.setBadge(null)
+          }
 
-            withContext(Dispatchers.Main) {
-              it.appName.text = targetLCItem.label
-              it.packageName.text = targetPackage
-              it.versionInfo.text =
-                PackageUtils.getVersionString(targetLCItem.versionName, targetLCItem.versionCode)
-
-              val str = StringBuilder()
-                .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
-                .append(", ")
-                .append(PackageUtils.getTargetApiString(targetLCItem.targetApi))
-              val spanString: SpannableString
-              val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
-
-              if (targetLCItem.abi.toInt() != Constants.OVERLAY && targetLCItem.abi.toInt() != Constants.ERROR && abiBadgeRes != 0) {
-                spanString = SpannableString("  $str")
-                abiBadgeRes.getDrawable(context)?.let { drawable ->
-                  drawable.setBounds(0, 0, drawable.intrinsicWidth, drawable.intrinsicHeight)
-                  val span = CenterAlignImageSpan(drawable)
-                  spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-                }
-                it.abiInfo.text = spanString
-              } else {
-                it.abiInfo.text = str
-              }
-
-              if (lcItem.variant == Constants.VARIANT_HAP) {
-                it.setBadge(R.drawable.ic_harmony_badge)
-              } else {
-                it.setBadge(null)
-              }
-
-              targetPackageView.setOnClickListener {
-                LCAppUtils.launchDetailPage(requireActivity(), targetLCItem)
-              }
-            }
+          targetPackageView.setOnClickListener {
+            LCAppUtils.launchDetailPage(requireActivity(), targetLCItem)
           }
         }
       }

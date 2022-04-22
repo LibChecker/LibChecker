@@ -10,7 +10,6 @@
   <string name="channel_shoot">保存快照</string>
   <string name="noti_shoot_title">正在保存当前快照</string>
   <string name="noti_shoot_title_saved">快照已保存</string>
-  <string name="permission_label_get_marked_libraries">允许应用程序获取由 LibChecker 提供的标记库信息</string>
 
   <!--  App list  -->
   <string name="menu_search">搜索</string>
@@ -97,11 +96,11 @@
   <string name="array_dark_mode_battery">由省电模式设置</string>
 
   <!--  Detail  -->
+  <string name="detail">详情</string>
   <string name="detail_label">查看 App 详情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
-  <string name="kotlin_used">使用了 Kotlin</string>
   <string name="kotlin_details">Kotlin 是一种在 Java 虚拟机上运行的静态类型编程语言。虽然与 Java 语法并不兼容，但在 JVM 环境中 Kotlin 被设计成可以和 Java 代码相互运作，并可以重复使用如 Java 集合框架等的现有 Java 引用的函数库。</string>
   <string name="items_count">项数：</string>
   <string name="further_operation">进一步操作</string>
@@ -139,6 +138,7 @@
   <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
   <string name="snapshot_time_node_uninitialized">（未初始化）</string>
   <string name="snapshot_generate_text_report">生成文字报告</string>
+  <string name="snapshot_scheme_tip"><![CDATA[提示: 现在您可以通过<br><b>%s</b><br>在后台生成快照。]]></string>
 
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>

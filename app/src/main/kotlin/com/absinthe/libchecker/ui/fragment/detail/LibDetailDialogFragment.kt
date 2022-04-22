@@ -11,8 +11,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.constant.librarymap.IconResMap
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
@@ -20,6 +18,7 @@ import com.absinthe.libchecker.view.detail.VF_CONTENT
 import com.absinthe.libchecker.view.detail.VF_LOADING
 import com.absinthe.libchecker.view.detail.VF_NOT_FOUND
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.launch
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
@@ -41,8 +40,8 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       viewFlipper.displayedChild = VF_LOADING
       title.text = libName
       lifecycleScope.launch {
-        val iconIndex = LCAppUtils.getRuleWithRegex(libName, type)?.iconIndex ?: -1
-        icon.load(IconResMap.getIconRes(iconIndex)) {
+        val iconRes = LCRules.getRule(libName, type, true)?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        icon.load(iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)
         }

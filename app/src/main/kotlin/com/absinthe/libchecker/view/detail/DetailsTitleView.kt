@@ -36,7 +36,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     ).also {
       it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
     }
-    setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     addView(this)
   }
@@ -47,7 +47,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      setTextColor(context.getColorByAttr(R.attr.colorOnSurface))
+      setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
       addView(this)
     }

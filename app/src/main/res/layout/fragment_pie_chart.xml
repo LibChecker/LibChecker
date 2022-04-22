@@ -13,6 +13,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/normal_padding"
+    android:gravity="center_horizontal"
     android:paddingHorizontal="@dimen/normal_padding"
     app:selectionRequired="true"
     app:singleSelection="true"
@@ -37,7 +38,14 @@
       style="?attr/materialButtonOutlinedStyle"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="Target API" />
+      android:text="Target" />
+
+    <com.google.android.material.button.MaterialButton
+      android:id="@+id/btn_min_sdk"
+      style="?attr/materialButtonOutlinedStyle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Min" />
 
   </com.google.android.material.button.MaterialButtonToggleGroup>
 

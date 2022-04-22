@@ -83,6 +83,8 @@ object Constants {
 
   const val RENGE_THEME = "rengeTheme"
 
+  const val PREF_UUID = "uuid"
+
   object Event {
     const val LAUNCH_ACTION = "Launch Action"
     const val SNAPSHOT_CLICK = "Snapshot Click"

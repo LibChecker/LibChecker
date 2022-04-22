@@ -24,8 +24,8 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     if (visible) {
       if (this != homeViewModel.controller) {
         homeViewModel.controller = this
+        activity?.invalidateOptionsMenu()
       }
-      activity?.invalidateOptionsMenu()
     }
   }
 
@@ -52,6 +52,9 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
   override fun isAllowRefreshing(): Boolean = allowRefreshing
 
   protected fun isListCanScroll(listSize: Int): Boolean {
+    if (context == null) {
+      return false
+    }
     getSuitableLayoutManager().apply {
       if (this is LinearLayoutManager) {
         return findFirstVisibleItemPosition() > 0 || findLastVisibleItemPosition() < listSize - 1

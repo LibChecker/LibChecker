@@ -90,11 +90,11 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
 
     lifecycleScope.launch(Dispatchers.IO) {
       val trackedList = repository.getTrackItems()
-      list += AppItemRepository.getApplicationInfoItems()
+      list += AppItemRepository.getApplicationInfoMap().values
         .asSequence()
         .map {
           TrackListItem(
-            label = it.loadLabel(packageManager).toString(),
+            label = it.applicationInfo.loadLabel(packageManager).toString(),
             packageName = it.packageName,
             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )

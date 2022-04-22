@@ -126,6 +126,7 @@ dependencies {
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
   implementation(libs.bundles.appCenter)
+  implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
   ksp(libs.square.moshi.compiler)
@@ -143,6 +144,7 @@ dependencies {
   implementation(libs.appIconLoader)
   implementation(libs.hiddenApiBypass)
   implementation(libs.dexLib2)
+  implementation(libs.slf4j)
 
   implementation(libs.bundles.rikkax)
 

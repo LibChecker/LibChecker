@@ -19,6 +19,8 @@ import androidx.preference.SwitchPreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
@@ -32,7 +34,8 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.absinthe.rulesbundle.LCRemoteRepo
+import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import rikka.material.app.AppBar
@@ -44,7 +47,6 @@ import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 import timber.log.Timber
-import java.util.ArrayList
 import java.util.Locale
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
@@ -80,8 +82,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         }
 
-        requireActivity().packageManager.setComponentEnabledSetting(
-          ComponentName(requireActivity(), ApkDetailActivity::class.java),
+        SystemServices.packageManager.setComponentEnabledSetting(
+          ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
           flag, PackageManager.DONT_KILL_APP
         )
         Analytics.trackEvent(
@@ -116,6 +118,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.repo = newValue as String
+        LCRules.setRemoteRepo(
+          if (GlobalValues.repo == Constants.REPO_GITHUB) {
+            LCRemoteRepo.Github
+          } else {
+            LCRemoteRepo.Gitee
+          }
+        )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_RULES_REPO", newValue)
@@ -172,7 +181,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          MaterialAlertDialogBuilder(requireContext())
+          BaseAlertDialogBuilder(requireContext())
             .setTitle(R.string.dialog_title_reload_apps)
             .setMessage(R.string.dialog_subtitle_reload_apps)
             .setPositiveButton(android.R.string.ok) { _, _ ->

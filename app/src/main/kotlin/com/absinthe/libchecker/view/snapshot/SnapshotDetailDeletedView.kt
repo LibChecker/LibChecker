@@ -33,13 +33,17 @@ class SnapshotDetailDeletedView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    setPadding(0, measuredWidth / 8, 0, measuredWidth / 8)
     image.autoMeasure()
     text.autoMeasure()
-    setMeasuredDimension(measuredWidth, measuredHeight)
+    setMeasuredDimension(
+      measuredWidth,
+      paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+    )
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    image.layout(image.toHorizontalCenter(this), measuredWidth / 2)
+    image.layout(image.toHorizontalCenter(this), paddingTop)
     text.layout(text.toHorizontalCenter(this), image.bottom + text.marginTop)
   }
 }

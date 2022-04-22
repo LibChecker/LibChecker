@@ -5,7 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
+import android.content.pm.PackageInfo
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -20,6 +20,7 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
@@ -42,6 +43,9 @@ import java.util.Locale
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 private const val SHOOT_NOTIFICATION_ID = 1
 private const val SHOOT_SUCCESS_NOTIFICATION_ID = 2
+
+const val ACTION_SHOOT_AND_STOP_AUTO = "action_shoot_and_stop_auto"
+const val EXTRA_DROP_PREVIOUS = "extra_drop_previous"
 
 class ShootService : LifecycleService() {
 
@@ -71,6 +75,15 @@ class ShootService : LifecycleService() {
       stopForeground(true)
       stopSelf()
     }
+    if (intent?.action == ACTION_SHOOT_AND_STOP_AUTO) {
+      val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
+      lifecycleScope.launch(Dispatchers.IO) {
+        computeSnapshots(dropPrevious, true)
+      }
+    } else {
+      stopForeground(true)
+      stopSelf()
+    }
     return super.onStartCommand(intent, flags, startId)
   }
 
@@ -88,8 +101,8 @@ class ShootService : LifecycleService() {
         val name = createConfigurationContext(configuration).resources
           .getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
-        createNotificationChannel(mChannel)
+        val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
+        createNotificationChannel(channel)
       }
       startForeground(SHOOT_NOTIFICATION_ID, builder.build())
     }
@@ -123,7 +136,10 @@ class ShootService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
-  private suspend fun computeSnapshots(dropPrevious: Boolean = false) {
+  private suspend fun computeSnapshots(
+    dropPrevious: Boolean = false,
+    stopWhenFinish: Boolean = false
+  ) {
     if (isComputing) {
       Timber.w("computeSnapshots isComputing, ignored")
       return
@@ -146,45 +162,45 @@ class ShootService : LifecycleService() {
     val size = appList.size
     var count = 0
     val dbList = mutableListOf<SnapshotItem>()
-    val exceptionInfoList = mutableListOf<ApplicationInfo>()
+    val exceptionInfoList = mutableListOf<PackageInfo>()
 
     builder.setProgress(size, count, false)
     notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
 
     var currentProgress: Int
     var lastProgress = 0
+    var ai: ApplicationInfo
 
     for (info in appList) {
       try {
-        PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_META_DATA).let {
-          dbList.add(
-            SnapshotItem(
-              id = null,
-              packageName = it.packageName,
-              timeStamp = ts,
-              label = info.loadLabel(packageManager).toString(),
-              versionName = it.versionName ?: "null",
-              versionCode = PackageUtils.getVersionCode(it),
-              installedTime = it.firstInstallTime,
-              lastUpdatedTime = it.lastUpdateTime,
-              isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-              abi = PackageUtils.getAbi(info).toShort(),
-              targetApi = info.targetSdkVersion.toShort(),
-              nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
-              services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
-                .toJson().orEmpty(),
-              activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
-                .toJson().orEmpty(),
-              receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
-                .toJson().orEmpty(),
-              providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
-                .toJson().orEmpty(),
-              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-              packageSize = PackageUtils.getPackageSize(it, true)
-            )
+        ai = info.applicationInfo
+        dbList.add(
+          SnapshotItem(
+            id = null,
+            packageName = info.packageName,
+            timeStamp = ts,
+            label = ai.loadLabel(packageManager).toString(),
+            versionName = info.versionName ?: "null",
+            versionCode = PackageUtils.getVersionCode(info),
+            installedTime = info.firstInstallTime,
+            lastUpdatedTime = info.lastUpdateTime,
+            isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+            abi = PackageUtils.getAbi(info).toShort(),
+            targetApi = ai.targetSdkVersion.toShort(),
+            nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
+            services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
+              .toJson().orEmpty(),
+            activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
+              .toJson().orEmpty(),
+            receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
+              .toJson().orEmpty(),
+            providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
+              .toJson().orEmpty(),
+            permissions = PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty(),
+            metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
+            packageSize = PackageUtils.getPackageSize(info, true)
           )
-        }
+        )
         count++
         currentProgress = count * 100 / size
         if (currentProgress > lastProgress) {
@@ -209,8 +225,8 @@ class ShootService : LifecycleService() {
     var abiValue: Int
     while (exceptionInfoList.isNotEmpty()) {
       try {
-        info = exceptionInfoList[0]
-        abiValue = PackageUtils.getAbi(info)
+        info = exceptionInfoList[0].applicationInfo
+        abiValue = PackageUtils.getAbi(exceptionInfoList[0])
         PackageUtils.getPackageInfo(info.packageName).let {
           dbList.add(
             SnapshotItem(
@@ -277,6 +293,10 @@ class ShootService : LifecycleService() {
     stopSelf()
     Timber.i("computeSnapshots end")
     isComputing = false
+
+    if (stopWhenFinish) {
+      stopSelf()
+    }
   }
 
   private fun getFormatDateString(timestamp: Long): String {
@@ -289,7 +309,10 @@ class ShootService : LifecycleService() {
     val pi = PendingIntent.getActivity(
       this,
       0,
-      Intent(this, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+      Intent(this, MainActivity::class.java).also {
+        it.action = Constants.ACTION_SNAPSHOT
+        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      },
       PendingIntent.FLAG_IMMUTABLE
     )
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))

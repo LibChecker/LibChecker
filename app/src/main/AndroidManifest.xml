@@ -10,12 +10,6 @@
 
   <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
 
-  <permission
-    android:name="${applicationId}.permission.GET_MARKED_LIBRARIES"
-    android:description="@string/permission_label_get_marked_libraries"
-    android:label="@string/permission_label_get_marked_libraries"
-    android:protectionLevel="normal" />
-
   <application
     android:name=".LibCheckerApp"
     android:allowBackup="true"
@@ -30,19 +24,11 @@
       android:name=".ui.main.MainActivity"
       android:configChanges="orientation"
       android:exported="true"
-      android:label="@string/app_name"
       android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
 
         <category android:name="android.intent.category.LAUNCHER" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data
-          android:host="action"
-          android:scheme="lcsc" />
       </intent-filter>
 
       <meta-data
@@ -111,16 +97,23 @@
     <activity
       android:name=".ui.about.AboutActivity"
       android:label="@string/settings_about" />
+    <activity
+      android:name=".bridge.BridgeActivity"
+      android:exported="true"
+      android:theme="@style/Transparent">
+
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data
+          android:host="bridge"
+          android:scheme="lc" />
+      </intent-filter>
+    </activity>
 
     <service android:name=".services.ShootService" />
     <service android:name=".services.WorkerService" />
 
-    <provider
-      android:name=".provider.CoreProvider"
-      android:authorities="${applicationId}.provider"
-      android:enabled="true"
-      android:exported="true"
-      android:readPermission="${applicationId}.permission.GET_MARKED_LIBRARIES" />
     <provider
       android:name="androidx.core.content.FileProvider"
       android:authorities="${applicationId}.fileprovider"
@@ -135,7 +128,8 @@
       android:name="androidx.startup.InitializationProvider"
       android:authorities="${applicationId}.androidx-startup"
       android:exported="false"
-      tools:node="remove" />
+      tools:node="remove"
+      tools:ignore="MissingClass" />
 
   </application>
 
