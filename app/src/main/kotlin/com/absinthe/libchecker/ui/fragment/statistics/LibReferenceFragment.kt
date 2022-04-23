@@ -11,7 +11,9 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Space
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,18 +28,19 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.NOT_MARKED
+import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
-import com.absinthe.libchecker.recyclerview.adapter.LibReferenceAdapter
-import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
+import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
-import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
@@ -46,12 +49,12 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
@@ -71,7 +74,7 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val refAdapter = LibReferenceAdapter()
+  private val refAdapter by unsafeLazy { LibReferenceAdapter(lifecycleScope) }
   private var popup: CascadePopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
@@ -142,41 +145,31 @@ class LibReferenceFragment :
     }
 
     refAdapter.apply {
-      setDiffCallback(RefListDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
 
-        val item = refAdapter.data[position]
+        val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         val intent = Intent(context, LibReferenceActivity::class.java)
           .putExtra(EXTRA_REF_NAME, item.libName)
           .putExtra(EXTRA_REF_TYPE, item.type)
           .putExtra(EXTRA_REF_LIST, item.referredList.toTypedArray())
         startActivity(intent)
       }
-      setOnItemChildClickListener { _, view, position ->
-        if (view.id == android.R.id.icon) {
-          val ref = refAdapter.getItem(position)
-          if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
-            val name = ref.libName
-
-            lifecycleScope.launch(Dispatchers.IO) {
-              val regexName = LCRules.getRule(name, ref.type, true)?.regexName
-
-              withContext(Dispatchers.Main) {
-                LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-                  .show(childFragmentManager, tag)
-              }
-            }
-          }
-        }
-      }
       setEmptyView(
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
+          )
+        }
+      )
+      setFooterView(
+        Space(context).apply {
+          layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            96.dp
           )
         }
       )
@@ -287,8 +280,8 @@ class LibReferenceFragment :
             manifestMenu.add(R.string.ref_category_perm).initMenu(PERMISSION)
             manifestMenu.add(R.string.ref_category_metadata).initMenu(METADATA)
           }
-          it.add("Package").onlyVisibleInDebugMode()
-          it.add("Shared UID").onlyVisibleInDebugMode()
+          it.add("Package").initMenu(PACKAGE)
+          it.add("Shared UID").initMenu(SHARED_UID)
           it.add(R.string.ref_category_dex).also { dexMenu ->
             dexMenu.onlyVisibleInDebugMode()
             dexMenu.initMenu(DEX)
@@ -365,7 +358,7 @@ class LibReferenceFragment :
             ignoreCase = true
           ) ?: false
         }
-        refAdapter.highlightText = newText
+        LibReferenceAdapter.highlightText = newText
         refAdapter.setDiffNewData(filter.toMutableList()) {
           refAdapter.notifyDataSetChanged()
         }

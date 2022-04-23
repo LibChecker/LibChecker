@@ -21,10 +21,12 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.NOT_MARKED
+import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
@@ -540,6 +542,36 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             computeComponentReference(map, item.packageName, METADATA)
+          }
+        }
+        PACKAGE -> {
+          for (item in appMap.values) {
+
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              continue
+            }
+
+            val split = item.packageName.split(".")
+            val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
+            if (map[packagePrefix] == null) {
+              map[packagePrefix] = mutableSetOf<String>() to PACKAGE
+            }
+            map[packagePrefix]!!.first.add(item.packageName)
+          }
+        }
+        SHARED_UID -> {
+          for (item in appMap.values) {
+
+            if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              continue
+            }
+
+            if (item.sharedUserId?.isNotBlank() == true) {
+              if (map[item.sharedUserId] == null) {
+                map[item.sharedUserId] = mutableSetOf<String>() to SHARED_UID
+              }
+              map[item.sharedUserId]!!.first.add(item.packageName)
+            }
           }
         }
       }

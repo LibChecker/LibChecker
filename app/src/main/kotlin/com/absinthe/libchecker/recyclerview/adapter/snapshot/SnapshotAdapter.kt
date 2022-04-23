@@ -28,6 +28,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val ARROW = "→"
 
@@ -65,7 +66,9 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           loadIconJob =
             AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
         } catch (e: PackageManager.NameNotFoundException) {
-          icon.setImageResource(R.drawable.ic_icon_blueprint)
+          withContext(Dispatchers.Main) {
+            icon.setImageResource(R.drawable.ic_icon_blueprint)
+          }
         }
       }
 
