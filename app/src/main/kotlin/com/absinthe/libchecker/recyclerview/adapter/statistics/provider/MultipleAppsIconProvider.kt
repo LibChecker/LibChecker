@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -53,7 +54,12 @@ class MultipleAppsIconProvider(val lifecycleScope: LifecycleCoroutineScope) : Ba
         Spanned.SPAN_INCLUSIVE_EXCLUSIVE
       )
       labelName.text = spannableString
-      setOrHighlightText(libName, libReferenceItem.libName + ".*")
+
+      if (item.type == PACKAGE) {
+        setOrHighlightText(libName, libReferenceItem.libName + ".*")
+      } else {
+        setOrHighlightText(libName, libReferenceItem.libName)
+      }
     }
   }
 
