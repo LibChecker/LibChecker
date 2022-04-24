@@ -48,6 +48,8 @@
   <string name="ref_category_perm">Разрешения</string>
   <string name="ref_category_static">Static Libraries</string>
   <string name="ref_category_metadata">Meta Data</string>
+  <string name="ref_category_package">Package</string>
+  <string name="ref_category_shared_uid">Shared UID</string>
 
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>

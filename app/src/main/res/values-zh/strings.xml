@@ -48,6 +48,8 @@
   <string name="ref_category_perm">权限</string>
   <string name="ref_category_static">静态库</string>
   <string name="ref_category_metadata">元数据</string>
+  <string name="ref_category_package">包</string>
+  <string name="ref_category_shared_uid">共享的 UID</string>
 
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>

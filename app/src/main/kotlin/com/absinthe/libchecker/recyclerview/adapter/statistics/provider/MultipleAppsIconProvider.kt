@@ -53,7 +53,7 @@ class MultipleAppsIconProvider(val lifecycleScope: LifecycleCoroutineScope) : Ba
         Spanned.SPAN_INCLUSIVE_EXCLUSIVE
       )
       labelName.text = spannableString
-      setOrHighlightText(libName, libReferenceItem.libName)
+      setOrHighlightText(libName, libReferenceItem.libName + ".*")
     }
   }
 

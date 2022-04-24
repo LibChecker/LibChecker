@@ -280,8 +280,8 @@ class LibReferenceFragment :
             manifestMenu.add(R.string.ref_category_perm).initMenu(PERMISSION)
             manifestMenu.add(R.string.ref_category_metadata).initMenu(METADATA)
           }
-          it.add("Package").initMenu(PACKAGE)
-          it.add("Shared UID").initMenu(SHARED_UID)
+          it.add(R.string.ref_category_package).initMenu(PACKAGE)
+          it.add(R.string.ref_category_shared_uid).initMenu(SHARED_UID)
           it.add(R.string.ref_category_dex).also { dexMenu ->
             dexMenu.onlyVisibleInDebugMode()
             dexMenu.initMenu(DEX)
