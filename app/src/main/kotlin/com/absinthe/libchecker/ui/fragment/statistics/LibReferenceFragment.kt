@@ -40,6 +40,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
+import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
@@ -145,6 +146,8 @@ class LibReferenceFragment :
     }
 
     refAdapter.apply {
+      animationEnable = true
+      setDiffCallback(RefListDiffUtil())
       setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
