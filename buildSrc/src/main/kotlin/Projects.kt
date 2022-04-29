@@ -7,9 +7,11 @@ import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
 
-const val baseVersionName = "2.2.4"
-val verName: String by lazy { "${baseVersionName}.${"git rev-parse --short HEAD".exec()}" }
+const val baseVersionName = "2.2.5"
+val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
+val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
+val versionNameSuffix = if (isDevVersion) ".dev" else ""
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
@@ -33,6 +35,9 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
           getDefaultProguardFile("proguard-android-optimize.txt"),
           "proguard-rules.pro"
         )
+      }
+      all {
+        buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
       }
     }
     block()

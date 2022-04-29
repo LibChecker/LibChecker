@@ -9,12 +9,17 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.text.toSpannable
 import androidx.fragment.app.FragmentActivity
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -37,7 +42,9 @@ import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialog
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -59,8 +66,8 @@ object LCAppUtils {
     }
   }
 
-  fun setTitle(context: Context): String {
-    val sb = StringBuilder(context.getString(R.string.app_name))
+  fun setTitle(context: Context): Spannable {
+    val sb = SpannableStringBuilder(context.getString(R.string.app_name))
     val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
     when {
@@ -74,7 +81,16 @@ object LCAppUtils {
         sb.append("\uD83D\uDC2F")
       }
     }
-    return sb.toString()
+
+    if (BuildConfig.IS_DEV_VERSION) {
+      val spanString = SpannableString("   ")
+      val span = CenterAlignImageSpan(R.drawable.ic_ci_label.getDrawable(context)!!.also {
+        it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+      })
+      spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+      sb.append(spanString)
+    }
+    return sb.toSpannable()
   }
 
   fun getAppIcon(packageName: String): Drawable {
