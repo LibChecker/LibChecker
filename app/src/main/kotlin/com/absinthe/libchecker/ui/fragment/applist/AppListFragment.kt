@@ -368,7 +368,6 @@ class AppListFragment :
     }
   }
 
-  @SuppressLint("NotifyDataSetChanged")
   private fun updateItems(
     newItems: List<LCItem>,
     highlightRefresh: Boolean = false
@@ -404,6 +403,7 @@ class AppListFragment :
       isListReady = true
 
       if (highlightRefresh) {
+        //noinspection NotifyDataSetChanged
         appAdapter.notifyDataSetChanged()
       }
     }

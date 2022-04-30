@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
@@ -48,6 +47,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -350,7 +350,6 @@ class LibReferenceFragment :
     return false
   }
 
-  @SuppressLint("NotifyDataSetChanged")
   override fun onQueryTextChange(newText: String): Boolean {
     if (keyword != newText) {
       keyword = newText
@@ -363,7 +362,10 @@ class LibReferenceFragment :
         }
         LibReferenceAdapter.highlightText = newText
         refAdapter.setDiffNewData(filter.toMutableList()) {
-          refAdapter.notifyDataSetChanged()
+          doOnMainThreadIdle {
+            //noinspection NotifyDataSetChanged
+            refAdapter.notifyDataSetChanged()
+          }
         }
 
         if (newText.equals("Easter Egg", true)) {
