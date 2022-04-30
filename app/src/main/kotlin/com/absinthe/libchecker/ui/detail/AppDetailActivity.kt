@@ -583,8 +583,11 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     override fun onReceive(context: Context, intent: Intent) {
       val pkg = intent.data?.schemeSpecificPart.orEmpty()
       if (pkg == pkgName) {
-        GlobalValues.shouldRequestChange.postValue(true)
-        recreate()
+        if (intent.action == Intent.ACTION_PACKAGE_REMOVED) {
+          finish()
+        } else {
+          recreate()
+        }
       }
     }
   }

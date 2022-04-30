@@ -18,6 +18,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
   protected var isListReady = false
   protected var allowRefreshing = true
   protected var menu: Menu? = null
+  protected var lastPackageChangedTime: Long = 0
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
@@ -64,6 +65,17 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
         val lastLine = IntArray(4)
         findLastVisibleItemPositions(lastLine)
         return firstLine[0] > 0 || lastLine.last() < listSize - 1
+      }
+    }
+    return false
+  }
+
+  protected fun hasPackageChanged(): Boolean {
+    homeViewModel.workerBinder?.let {
+      val serverLastPackageChangedTime = it.lastPackageChangedTime
+      if (lastPackageChangedTime < serverLastPackageChangedTime) {
+        lastPackageChangedTime = serverLastPackageChangedTime
+        return true
       }
     }
     return false

@@ -42,6 +42,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -73,6 +74,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   var libRefSystemApps: Boolean? = null
   var libRefType: Int? = null
   var appListStatus: Int = STATUS_NOT_START
+  var workerBinder: IWorkerService? = null
 
   fun reloadApps() {
     setEffect {
@@ -133,21 +135,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
 
         var ai: ApplicationInfo
-        var versionCode: Long
         var abiType: Int
         var variant: Short
-        var isSystemType: Boolean
 
         var lcItem: LCItem
-        var count = 0
         var progressCount = 0
 
         for (info in appList) {
           try {
             ai = info.applicationInfo
-            versionCode = PackageUtils.getVersionCode(info)
             abiType = PackageUtils.getAbi(info)
-            isSystemType = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM
 
             variant = if (isHarmony && bundleManager?.getBundleInfo(
                 info.packageName,
@@ -160,22 +157,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             lcItem = LCItem(
-              info.packageName,
-              ai.loadLabel(context.packageManager).toString(),
-              info.versionName.orEmpty(),
-              versionCode,
-              info.firstInstallTime,
-              info.lastUpdateTime,
-              isSystemType,
-              abiType.toShort(),
-              PackageUtils.isSplitsApk(info),
-              null/* delay init */,
-              ai.targetSdkVersion.toShort(),
-              variant
+              packageName = info.packageName,
+              label = ai.loadLabel(context.packageManager).toString(),
+              versionName = info.versionName.orEmpty(),
+              versionCode = PackageUtils.getVersionCode(info),
+              installedTime = info.firstInstallTime,
+              lastUpdatedTime = info.lastUpdateTime,
+              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+              abi = abiType.toShort(),
+              isSplitApk = PackageUtils.isSplitsApk(info),
+              isKotlinUsed = null/* delay init */,
+              targetApi = ai.targetSdkVersion.toShort(),
+              variant = variant
             )
 
             lcItems.add(lcItem)
-            count++
             progressCount++
             updateInitProgress(progressCount * 100 / appList.size)
           } catch (e: Throwable) {
@@ -183,15 +179,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             continue
           }
 
-          if (count == 50) {
+          if (lcItems.size == 50) {
             insert(lcItems)
             lcItems.clear()
-            count = 0
           }
         }
 
-        insert(lcItems)
-        lcItems.clear()
+        if (lcItems.isNotEmpty()) {
+          insert(lcItems)
+        }
         updateAppListStatus(STATUS_INIT_END)
 
         timeRecorder.end()
@@ -204,14 +200,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  fun requestChange(needRefresh: Boolean = false) = viewModelScope.launch(Dispatchers.IO) {
-    if (appListStatus == STATUS_START_REQUEST_CHANGE || appListStatus == STATUS_START_INIT) {
-      Timber.d("Request change appListStatusLiveData not equals STATUS_START")
-      return@launch
-    }
+  fun requestChange(needRefresh: Boolean = false) =
+    viewModelScope.launch(Dispatchers.IO) {
+      if (appListStatus == STATUS_START_REQUEST_CHANGE || appListStatus == STATUS_START_INIT) {
+        Timber.d("Request change appListStatusLiveData not equals STATUS_START")
+        return@launch
+      }
 
-    requestChangeImpl(SystemServices.packageManager, needRefresh)
-  }
+      requestChangeImpl(SystemServices.packageManager, needRefresh)
+    }
 
   private suspend fun requestChangeImpl(
     packageManager: PackageManager,
@@ -237,7 +234,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       var ai: ApplicationInfo
       var versionCode: Long
       var lcItem: LCItem
-      var abi: Int
       var variant: Short
 
       for (dbItem in value) {
@@ -249,8 +245,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             if (it.lastUpdateTime != dbItem.lastUpdatedTime ||
               (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)
             ) {
-              abi = PackageUtils.getAbi(it)
-
               variant = if (isHarmony && bundleManager?.getBundleInfo(
                   it.packageName,
                   IBundleManager.GET_BUNDLE_DEFAULT
@@ -269,7 +263,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 it.firstInstallTime,
                 it.lastUpdateTime,
                 (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                abi.toShort(),
+                PackageUtils.getAbi(it).toShort(),
                 PackageUtils.isSplitsApk(it),
                 PackageUtils.isKotlinUsed(it),
                 ai.targetSdkVersion.toShort(),
@@ -284,7 +278,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
         } catch (e: Exception) {
           Timber.e(e)
-          continue
         }
       }
 
@@ -321,13 +314,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           insert(lcItem)
         } catch (e: Exception) {
           Timber.e(e)
-          continue
         }
       }
-      GlobalValues.shouldRequestChange.postValue(false)
       refreshList()
-    } ?: run {
-      GlobalValues.shouldRequestChange.postValue(true)
     }
 
     updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)

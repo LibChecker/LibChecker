@@ -148,6 +148,13 @@ class AppListFragment :
     initObserver()
   }
 
+  override fun onResume() {
+    super.onResume()
+    if (hasPackageChanged()) {
+      homeViewModel.requestChange()
+    }
+  }
+
   override fun onPause() {
     super.onPause()
     popup?.dismiss()
@@ -325,7 +332,10 @@ class AppListFragment :
           appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
           updateItems(it)
-          homeViewModel.requestChange()
+          if (hasPackageChanged()) {
+            Timber.d("AppList status updates to ${appListStatus}")
+            homeViewModel.requestChange()
+          }
         }
       }
     }
@@ -353,11 +363,6 @@ class AppListFragment :
             }
             updateItems(list)
           }
-        }
-      }
-      shouldRequestChange.observe(viewLifecycleOwner) { should ->
-        if (isListReady && !should) {
-          homeViewModel.dbItems.value?.let { updateItems(it) }
         }
       }
     }
