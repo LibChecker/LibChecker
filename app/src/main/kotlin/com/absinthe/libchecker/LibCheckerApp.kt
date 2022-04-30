@@ -1,6 +1,5 @@
 package com.absinthe.libchecker
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.window.core.ExperimentalWindowApi
@@ -88,7 +87,7 @@ class LibCheckerApp : Application() {
   }
 
   companion object {
-    @SuppressLint("StaticFieldLeak")
+    //noinspection StaticFieldLeak
     lateinit var app: Application
 
     fun generateAuthKey(): Int {

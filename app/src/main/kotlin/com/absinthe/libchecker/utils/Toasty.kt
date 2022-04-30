@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
@@ -19,7 +18,6 @@ import java.lang.ref.WeakReference
  * time : 2020/08/12
  * </pre>
  */
-@SuppressLint("WrongThread")
 object Toasty {
 
   private val handler = Handler(Looper.getMainLooper())
@@ -28,6 +26,7 @@ object Toasty {
   @AnyThread
   fun showShort(context: Context, message: String) {
     if (Looper.getMainLooper().thread === Thread.currentThread()) {
+      //noinspection WrongThread
       show(context, message, Toast.LENGTH_SHORT)
     } else {
       handler.post { show(context, message, Toast.LENGTH_SHORT) }
@@ -42,6 +41,7 @@ object Toasty {
   @AnyThread
   fun showLong(context: Context, message: String) {
     if (Looper.getMainLooper().thread === Thread.currentThread()) {
+      //noinspection WrongThread
       show(context, message, Toast.LENGTH_LONG)
     } else {
       handler.post { show(context, message, Toast.LENGTH_LONG) }

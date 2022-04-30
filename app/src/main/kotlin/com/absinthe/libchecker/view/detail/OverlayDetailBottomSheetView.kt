@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.view.detail
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -31,7 +30,6 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
     }
   }
 
-  @SuppressLint("SetTextI18n")
   private val targetTitleView = AppCompatTextView(
     ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
   ).apply {
@@ -41,6 +39,7 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
     ).also {
       it.topMargin = 8.dp
     }
+    //noinspection SetTextI18n
     text = "Target Package"
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
