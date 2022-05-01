@@ -77,8 +77,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
         lastPackageChangedTime = serverLastPackageChangedTime
         return true
       }
-      return false
     }
-    return true
+    return false
   }
 }

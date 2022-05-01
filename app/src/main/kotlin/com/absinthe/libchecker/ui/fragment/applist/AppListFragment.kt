@@ -61,6 +61,7 @@ class AppListFragment :
 
   private val appAdapter by lazy { AppAdapter(lifecycleScope) }
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
+  private var isFirstRequestChange = true
   private var popup: PopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
@@ -332,8 +333,8 @@ class AppListFragment :
           appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
           updateItems(it)
-          if (hasPackageChanged()) {
-            Timber.d("AppList status updates to ${appListStatus}")
+          if (hasPackageChanged() || isFirstRequestChange) {
+            isFirstRequestChange = false
             homeViewModel.requestChange()
           }
         }
