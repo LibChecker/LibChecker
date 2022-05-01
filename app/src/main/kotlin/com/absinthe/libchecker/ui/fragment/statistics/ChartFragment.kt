@@ -7,6 +7,7 @@ import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.collection.arrayMapOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -64,7 +65,7 @@ class ChartFragment :
   private val viewModel: ChartViewModel by activityViewModels()
   private val legendList = mutableListOf<String>()
   private val existApiList = mutableListOf<Int>()
-  private val apiScope = Build.VERSION_CODES.S + 1
+  private val apiScope = Build.VERSION_CODES.S_V2
 
   private var chartType = TYPE_ABI
   private var mDialog: ClassifyBottomSheetDialogFragment? = null
@@ -264,7 +265,6 @@ class ChartFragment :
     val parties = osNameMap.map { it.value }.toMutableList()
 
     val entries: ArrayList<BarEntry> = ArrayList()
-    var packageInfo: PackageInfo
 
     val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
       viewModel.dbItems.value
@@ -278,8 +278,8 @@ class ChartFragment :
       var targetApi: Int
       for (item in it) {
         try {
-          packageInfo = PackageUtils.getPackageInfo(item.packageName)
-          targetApi = packageInfo.applicationInfo.targetSdkVersion
+          targetApi = PackageUtils.getPackageInfo(item.packageName)
+            .applicationInfo.targetSdkVersion
           if (targetApi in 1..apiScope) {
             list[targetApi - 1]++
           }
@@ -635,7 +635,7 @@ class ChartFragment :
   }
 
   private val osNameMap by lazy {
-    hashMapOf(
+    arrayMapOf(
       1 to "1.0",
       2 to "1.1",
       3 to "Cupcake",
@@ -667,7 +667,8 @@ class ChartFragment :
       29 to "Android 10",
       30 to "Android 11",
       31 to "Android 12",
-      32 to "Android 12.1"
+      32 to "Android 12.1",
+      33 to "Tiramisu",
     )
   }
 }

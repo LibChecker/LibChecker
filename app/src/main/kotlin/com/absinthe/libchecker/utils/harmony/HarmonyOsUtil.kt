@@ -5,7 +5,13 @@ package com.absinthe.libchecker.utils.harmony
  */
 object HarmonyOsUtil {
 
-  private var sHarmonyOs: Boolean? = null
+  private val _isHarmonyOs by lazy {
+    runCatching {
+      val clz = Class.forName("com.huawei.system.BuildEx")
+      val method = clz.getMethod("getOsBrand")
+      "harmony".equals(method.invoke(clz) as String?, ignoreCase = true)
+    }.getOrDefault(false)
+  }
 
   fun <T> wrapperStub(f: () -> T): T? {
     return try {
@@ -15,13 +21,5 @@ object HarmonyOsUtil {
     }
   }
 
-  fun isHarmonyOs(): Boolean {
-    return try {
-      val clz = Class.forName("com.huawei.system.BuildEx")
-      val method = clz.getMethod("getOsBrand")
-      return "harmony".equals(method.invoke(clz) as String?, ignoreCase = true)
-    } catch (e: Exception) {
-      false
-    }
-  }
+  fun isHarmonyOs(): Boolean = _isHarmonyOs
 }

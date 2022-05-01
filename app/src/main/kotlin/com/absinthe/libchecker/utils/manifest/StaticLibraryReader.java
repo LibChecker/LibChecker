@@ -1,10 +1,11 @@
 package com.absinthe.libchecker.utils.manifest;
 
+import androidx.collection.ArrayMap;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
@@ -13,7 +14,7 @@ import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
 
 public class StaticLibraryReader {
-  private final HashMap<String, Object> staticLibs = new HashMap<>();
+  private final ArrayMap<String, Object> staticLibs = new ArrayMap<>();
 
   private StaticLibraryReader(File apk) throws IOException {
     try (JarFile zip = new JarFile(apk)) {

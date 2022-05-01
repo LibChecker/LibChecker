@@ -1,10 +1,11 @@
 package com.absinthe.libchecker.utils.manifest;
 
+import androidx.collection.ArrayMap;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
 
@@ -15,7 +16,7 @@ import timber.log.Timber;
 
 
 public class ManifestReader {
-  private final HashMap<String, Object> properties = new HashMap<>();
+  private final ArrayMap<String, Object> properties = new ArrayMap<>();
   private final String[] demands;
 
   private ManifestReader(File apk, String[] demands) throws IOException {

@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
+import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
@@ -734,7 +735,7 @@ object PackageUtils {
     return abi
   }
 
-  private val ABI_STRING_RES_MAP = hashMapOf(
+  private val ABI_STRING_RES_MAP = arrayMapOf(
     ARMV8 to listOf(R.string.arm64_v8a),
     ARMV7 to listOf(R.string.armeabi_v7a),
     ARMV5 to listOf(R.string.armeabi),
@@ -749,7 +750,7 @@ object PackageUtils {
     X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
   )
 
-  private val ABI_BADGE_MAP = mapOf(
+  private val ABI_BADGE_MAP = arrayMapOf(
     NO_LIBS to if (Process.is64Bit()) {
       R.drawable.ic_abi_label_64bit
     } else {

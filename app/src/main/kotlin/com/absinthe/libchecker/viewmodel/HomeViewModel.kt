@@ -242,9 +242,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             ai = it.applicationInfo
             versionCode = PackageUtils.getVersionCode(it)
 
-            if (it.lastUpdateTime != dbItem.lastUpdatedTime ||
-              (dbItem.lastUpdatedTime == 0L && versionCode != dbItem.versionCode)
-            ) {
+            if (versionCode != dbItem.versionCode || it.lastUpdateTime != dbItem.lastUpdatedTime || dbItem.lastUpdatedTime == 0L) {
               variant = if (isHarmony && bundleManager?.getBundleInfo(
                   it.packageName,
                   IBundleManager.GET_BUNDLE_DEFAULT
