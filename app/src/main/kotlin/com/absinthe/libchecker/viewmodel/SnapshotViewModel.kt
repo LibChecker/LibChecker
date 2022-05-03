@@ -45,6 +45,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
@@ -1218,10 +1220,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     builder.addAllSnapshots(snapshotList)
-    val str = builder.build().toByteArray()
-
-    os.write(str)
-    os.close()
+    os.sink().buffer().use {
+      it.write(builder.build().toByteArray())
+    }
 
     withContext(Dispatchers.Main) {
       resultAction()
@@ -1230,9 +1231,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   fun restore(inputStream: InputStream, resultAction: (success: Boolean) -> Unit) {
     viewModelScope.launch(Dispatchers.IO) {
-      inputStream.use {
+      inputStream.use { stream ->
         val list: SnapshotList = try {
-          SnapshotList.parseFrom(inputStream)
+          SnapshotList.parseFrom(stream)
         } catch (e: InvalidProtocolBufferException) {
           withContext(Dispatchers.Main) {
             resultAction(false)

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -20,7 +19,7 @@ import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
@@ -82,10 +81,10 @@ class LibStringAdapter(@LibType val type: Int) : HighlightAdapter<LibStringItemC
         (holder.itemView as StaticLibItemView).apply {
           setOrHighlightText(libName, itemName)
           libDetail.let {
-            if (LCAppUtils.atLeastQ()) {
+            if (OsUtils.atLeastQ()) {
               it.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
-            } else if (LCAppUtils.atLeastO()) {
-              @SuppressLint("WrongConstant")
+            } else if (OsUtils.atLeastO()) {
+              // noinspection WrongConstant
               it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
             }
             val spannableString = SpannableString(item.item.source)

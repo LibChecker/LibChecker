@@ -59,7 +59,7 @@ object Toasty {
     toast?.cancel()
 
     WeakReference(context).get()?.let { ctx ->
-      if (LCAppUtils.atLeastR() && context !is ContextThemeWrapper) {
+      if (OsUtils.atLeastR() && context !is ContextThemeWrapper) {
         Toast(ctx).also {
           it.duration = duration
           it.setText(message)

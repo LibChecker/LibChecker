@@ -46,12 +46,11 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.delay
+import okio.buffer
+import okio.source
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -184,7 +183,7 @@ object PackageUtils {
         list.addAll(
           files.asSequence()
             .distinctBy { it.name }
-            .map { LibStringItem(it.name, it.length()) }
+            .map { LibStringItem(it.name, FileUtils.getFileSize(it)) }
             .toMutableList()
         )
       }
@@ -958,7 +957,7 @@ object PackageUtils {
    * @return minSdkVersion
    */
   fun getMinSdkVersion(packageInfo: PackageInfo): Int {
-    val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
+    val minSdkVersionValue = if (OsUtils.atLeastN()) {
       packageInfo.applicationInfo.minSdkVersion
     } else {
       val demands = ManifestReader.getManifestProperties(
@@ -994,9 +993,13 @@ object PackageUtils {
           }
         }
         zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
-            seq.find { it.contains(AGP_KEYWORD2) }?.let {
-              return it.removePrefix(AGP_KEYWORD2)
+          zipFile.getInputStream(ze).source().buffer().use {
+            while (true) {
+              it.readUtf8Line()?.let { line ->
+                if (line.startsWith(AGP_KEYWORD2)) {
+                  return line.removePrefix(AGP_KEYWORD2)
+                }
+              } ?: break
             }
           }
         }
@@ -1006,11 +1009,8 @@ object PackageUtils {
           "META-INF/androidx.databinding_library.version"
         ).forEach { entry ->
           zipFile.getEntry(entry)?.let { ze ->
-            BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
-              val version = seq.readLine()
-              if (version.isNotBlank()) {
-                return version
-              }
+            zipFile.getInputStream(ze).source().buffer().use { bs ->
+              return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
             }
           }
         }
@@ -1026,19 +1026,14 @@ object PackageUtils {
     try {
       val pmList = mutableListOf<String>()
       val process = runtime.exec("pm list packages")
-      InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
-        BufferedReader(isr).use { br ->
-          br.forEachLine { line ->
-            line.trim().let { trimLine ->
-              if (trimLine.startsWith("package:")) {
-                trimLine.removePrefix("package:").let {
-                  if (it.isNotBlank()) {
-                    pmList.add(it)
-                  }
-                }
-              }
+      process.inputStream.source().buffer().use { bs ->
+        while (true) {
+          bs.readUtf8Line()?.trim()?.let { line ->
+            if (line.startsWith("package:")) {
+              line.removePrefix("package:").takeIf { removedPrefix -> removedPrefix.isNotBlank() }
+                ?.let { pmList.add(it) }
             }
-          }
+          } ?: break
         }
       }
       return pmList
@@ -1083,7 +1078,7 @@ object PackageUtils {
   }
 
   fun getPackageSize(packageInfo: PackageInfo, includeSplits: Boolean): Long {
-    var size: Long = File(packageInfo.applicationInfo.sourceDir).length()
+    var size: Long = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
 
     if (!includeSplits) {
       return size
@@ -1091,7 +1086,7 @@ object PackageUtils {
 
     packageInfo.applicationInfo.splitSourceDirs?.forEach {
       runCatching {
-        size += File(it).length()
+        size += FileUtils.getFileSize(it)
       }
     }
     return size

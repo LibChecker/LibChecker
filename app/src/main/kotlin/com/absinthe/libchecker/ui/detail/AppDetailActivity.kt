@@ -87,7 +87,6 @@ import ohos.bundle.IBundleManager
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import kotlin.math.abs
 
 @SuppressLint("InlinedApi")
@@ -192,9 +191,8 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
                   if (!iconFile.exists()) {
                     iconFile.createNewFile()
                   }
-                  FileOutputStream(iconFile).use {
+                  iconFile.outputStream().use {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-                    it.flush()
                   }
                   val uri = FileProvider.getUriForFile(
                     this@AppDetailActivity,

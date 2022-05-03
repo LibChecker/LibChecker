@@ -36,7 +36,6 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
@@ -54,9 +53,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
+import okio.buffer
+import okio.sink
+import okio.source
 import timber.log.Timber
 import java.io.File
-import java.io.InputStream
 
 class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDetailContainer {
 
@@ -101,32 +102,34 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     dialog.show()
 
     lifecycleScope.launch(Dispatchers.IO) {
-      var inputStream: InputStream? = null
-      try {
+      runCatching {
         tempFile = File(externalCacheDir, Constants.TEMP_PACKAGE).also { tf ->
-          inputStream = contentResolver.openInputStream(uri)
-          val fileSize = inputStream?.available() ?: 0
-          val freeSize = Environment.getExternalStorageDirectory().freeSpace
-          Timber.d("fileSize=$fileSize, freeSize=$freeSize")
+          contentResolver.openInputStream(uri)?.use { inputStream ->
+            val fileSize = inputStream.available()
+            val freeSize = Environment.getExternalStorageDirectory().freeSpace
+            Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
-          if (freeSize > fileSize * 1.5) {
-            FileUtils.writeFileFromIS(tf, inputStream)
-            isPackageReady = true
+            if (freeSize > fileSize * 1.5) {
+              tf.sink().buffer().use { sink ->
+                inputStream.source().buffer().use {
+                  sink.writeAll(it)
+                }
+              }
+              isPackageReady = true
 
-            withContext(Dispatchers.Main) {
-              initDetails(tf.path)
-              dialog.dismiss()
+              withContext(Dispatchers.Main) {
+                initDetails(tf.path)
+                dialog.dismiss()
+              }
+            } else {
+              showToast(R.string.toast_not_enough_storage_space)
+              finish()
             }
-          } else {
-            showToast(R.string.toast_not_enough_storage_space)
-            finish()
           }
         }
-      } catch (e: Exception) {
+      }.onFailure {
         showToast(R.string.toast_use_another_file_manager)
         finish()
-      } finally {
-        inputStream?.close()
       }
     }
   }
@@ -264,7 +267,8 @@ class ApkDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
         toolbarAdapter.setList(toolbarItems)
         rvToolbar.apply {
           adapter = toolbarAdapter
-          layoutManager = LinearLayoutManager(this@ApkDetailActivity, RecyclerView.HORIZONTAL, false)
+          layoutManager =
+            LinearLayoutManager(this@ApkDetailActivity, RecyclerView.HORIZONTAL, false)
         }
       }
 

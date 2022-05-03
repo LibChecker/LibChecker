@@ -26,7 +26,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
@@ -97,7 +97,7 @@ class ShootService : LifecycleService() {
     initBuilder()
 
     notificationManager.apply {
-      if (LCAppUtils.atLeastO()) {
+      if (OsUtils.atLeastO()) {
         val name = createConfigurationContext(configuration).resources
           .getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT

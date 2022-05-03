@@ -104,8 +104,7 @@ class AboutActivity : AbsAboutActivity() {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
 
-          val inputStream = assets.open("renge.webp")
-          icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
+          icon.setImageBitmap(BitmapFactory.decodeStream(assets.open("renge.webp")))
           slogan.text = "ええ、私もよ。"
           val headerContentLayout =
             findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)

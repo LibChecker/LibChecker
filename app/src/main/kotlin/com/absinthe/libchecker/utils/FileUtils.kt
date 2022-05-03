@@ -1,14 +1,8 @@
 package com.absinthe.libchecker.utils
 
-import timber.log.Timber
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
-
-private const val BufferSize = 524288
+import java.nio.file.Files
+import java.nio.file.Paths
 
 object FileUtils {
 
@@ -42,65 +36,18 @@ object FileUtils {
     return file != null && (!file.exists() || file.isFile && file.delete())
   }
 
-  /**
-   * Write file from input stream.
-   *
-   * @param file     The file.
-   * @param is       The input stream.
-   * @return `true`: success<br></br>`false`: fail
-   */
-  fun writeFileFromIS(
-    file: File,
-    `is`: InputStream?
-  ): Boolean {
-    if (`is` == null || !createOrExistsFile(file)) {
-      Timber.e("create file <$file> failed.")
-      return false
-    }
-    var os: OutputStream? = null
-    return try {
-      os = BufferedOutputStream(FileOutputStream(file, false), BufferSize)
-      val data = ByteArray(BufferSize)
-      var len: Int
-      while (`is`.read(data).also { len = it } != -1) {
-        os.write(data, 0, len)
-      }
-      true
-    } catch (e: IOException) {
-      e.printStackTrace()
-      false
-    } finally {
-      try {
-        `is`.close()
-      } catch (e: IOException) {
-        e.printStackTrace()
-      }
-      try {
-        os?.close()
-      } catch (e: IOException) {
-        e.printStackTrace()
-      }
-    }
+  fun getFileSize(file: File): Long {
+    return getFileSize(file.path)
   }
 
-  /**
-   * Create a file if it doesn't exist, otherwise do nothing.
-   *
-   * @param file The file.
-   * @return `true`: exists or creates successfully<br></br>`false`: otherwise
-   */
-  private fun createOrExistsFile(file: File?): Boolean {
-    if (file == null) return false
-    if (file.exists()) return file.isFile
-    return if (!createOrExistsDir(file.parentFile)) false else try {
-      file.createNewFile()
-    } catch (e: IOException) {
-      e.printStackTrace()
-      false
+  fun getFileSize(path: String): Long {
+    return if (OsUtils.atLeastO()) {
+      runCatching {
+        Files.size(Paths.get(path))
+      }.getOrDefault(0L)
+    } else {
+      val file = File(path)
+      if (file.exists()) file.length() else 0
     }
-  }
-
-  private fun createOrExistsDir(file: File?): Boolean {
-    return file != null && if (file.exists()) file.isDirectory else file.mkdirs()
   }
 }

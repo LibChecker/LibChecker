@@ -3,7 +3,7 @@ package com.absinthe.libchecker.base
 import android.content.Context
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class BaseAlertDialogBuilder : MaterialAlertDialogBuilder {
@@ -12,7 +12,7 @@ class BaseAlertDialogBuilder : MaterialAlertDialogBuilder {
 
   override fun create(): AlertDialog {
     return super.create().also { dialog ->
-      if (LCAppUtils.atLeastS()) {
+      if (OsUtils.atLeastS()) {
         dialog.window?.let {
           it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
           it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)

@@ -118,6 +118,7 @@ dependencies {
   implementation(libs.google.material)
   implementation(libs.coil)
   implementation(libs.square.okHttp)
+  implementation(libs.square.okio)
   implementation(libs.square.retrofit)
   implementation(libs.square.retrofit.moshi)
   implementation(libs.square.moshi)

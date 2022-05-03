@@ -10,7 +10,7 @@ protoc = "3.20.1"
 protoc-javalite = "3.20.1"
 square-moshi = "1.13.0"
 square-retrofit = "2.9.0"
-zhaobozhen = "1.0.4"
+zhaobozhen = "1.0.5"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -50,6 +50,7 @@ square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
 square-moshi = { module = "com.squareup.moshi:moshi", version.ref = "square-moshi" }
 square-moshi-compiler = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "square-moshi" }
 square-okHttp = "com.squareup.okhttp3:okhttp:4.9.3"
+square-okio = "com.squareup.okio:okio:3.1.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 

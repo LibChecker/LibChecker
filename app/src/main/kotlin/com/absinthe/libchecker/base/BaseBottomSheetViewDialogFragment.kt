@@ -10,7 +10,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
@@ -75,7 +75,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
           WindowInsetsControllerCompat(it, it.decorView)
             .isAppearanceLightNavigationBars = !UiUtils.isDarkMode()
 
-          if (LCAppUtils.atLeastS()) {
+          if (OsUtils.atLeastS()) {
             it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
             it.attributes.blurBehindRadius = 64
             it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
