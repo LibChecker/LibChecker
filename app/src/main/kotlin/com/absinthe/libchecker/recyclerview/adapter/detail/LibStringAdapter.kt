@@ -11,6 +11,7 @@ import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -21,22 +22,33 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
+import com.absinthe.libchecker.view.detail.MetadataLibItemView
 import com.absinthe.libchecker.view.detail.NativeLibItemView
 import com.absinthe.libchecker.view.detail.StaticLibItemView
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import timber.log.Timber
 
 private const val HIGHLIGHT_TRANSITION_DURATION = 250
 
-class LibStringAdapter(@LibType val type: Int) : HighlightAdapter<LibStringItemChip>() {
+class LibStringAdapter(val packageName: String, @LibType val type: Int) :
+  HighlightAdapter<LibStringItemChip>() {
 
   var highlightPosition: Int = -1
     private set
 
+  private val appResources by lazy {
+    runCatching {
+      context.packageManager.getResourcesForApplication(packageName)
+    }.getOrNull()
+  }
+
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return when (type) {
-      NATIVE, METADATA -> createBaseViewHolder(NativeLibItemView(context))
+      NATIVE -> createBaseViewHolder(NativeLibItemView(context))
+      METADATA -> createBaseViewHolder(MetadataLibItemView(context))
       STATIC -> createBaseViewHolder(StaticLibItemView(context))
       else -> createBaseViewHolder(ComponentLibItemView(context))
     }
@@ -71,10 +83,66 @@ class LibStringAdapter(@LibType val type: Int) : HighlightAdapter<LibStringItemC
         }
       }
       METADATA -> {
-        (holder.itemView as NativeLibItemView).apply {
+        (holder.itemView as MetadataLibItemView).apply {
           setOrHighlightText(libName, itemName)
           libSize.text = item.item.source
-          setChip(item.chip)
+          linkToIcon.isVisible = item.item.size > 0
+
+          if (linkToIcon.isVisible) {
+            linkToIcon.setOnClickListener {
+              val transformed = linkToIcon.getTag(R.id.meta_data_transform_id) as? Boolean ?: false
+              if (transformed) {
+                libSize.text = item.item.source
+                linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
+                linkToIcon.setTag(R.id.meta_data_transform_id, false)
+              } else {
+                item.item.source?.let {
+                  val type = runCatching {
+                    it.substring(it.indexOf(":") + 1, it.indexOf("/"))
+                  }.getOrNull()
+                  Timber.d("type: $type")
+
+                  runCatching {
+                    when (type) {
+                      "string" -> {
+                        appResources?.let { res ->
+                          libSize.text = res.getString(item.item.size.toInt())
+                        }
+                      }
+                      "array" -> {
+                        appResources?.let { res ->
+                          libSize.text =
+                            res.getStringArray(item.item.size.toInt()).contentToString()
+                        }
+                      }
+                      "xml" -> {
+                        Toasty.showShort(context, "TODO")
+                      }
+                      "drawable" -> {
+                        appResources?.let { res ->
+                          linkToIcon.setImageDrawable(res.getDrawable(item.item.size.toInt(), null))
+                        }
+                      }
+                      "color" -> {
+                        appResources?.let { res ->
+                          linkToIcon.setImageDrawable(
+                            ColorDrawable(
+                              res.getColor(
+                                item.item.size.toInt(),
+                                null
+                              )
+                            )
+                          )
+                        }
+                      }
+                      else -> {}
+                    }
+                  }
+                }
+                linkToIcon.setTag(R.id.meta_data_transform_id, true)
+              }
+            }
+          }
         }
       }
       STATIC -> {
