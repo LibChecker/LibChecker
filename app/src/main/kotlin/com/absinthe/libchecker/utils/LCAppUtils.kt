@@ -84,8 +84,10 @@ object LCAppUtils {
     if (BuildConfig.IS_DEV_VERSION) {
       val spanString = SpannableString("   ")
       val span = CenterAlignImageSpan(
-        R.drawable.ic_ci_label.getDrawable(context)!!
-          .also { it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight) })
+        R.drawable.ic_ci_label.getDrawable(context)!!.also {
+          it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+        }
+      )
       spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       sb.append(spanString)
     }

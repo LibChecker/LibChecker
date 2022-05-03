@@ -246,7 +246,7 @@ object PackageUtils {
    */
   private fun getSplitLibs(packageInfo: PackageInfo): List<LibStringItem> {
     val libList = mutableListOf<LibStringItem>()
-    val splitList = packageInfo.applicationInfo.splitSourceDirs
+    val splitList = getSplitsSourceDir(packageInfo)
     if (splitList.isNullOrEmpty()) {
       return listOf()
     }
@@ -265,6 +265,24 @@ object PackageUtils {
     }
 
     return libList
+  }
+
+  private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
+
+  fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
+    if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
+      val files = File(packageInfo.applicationInfo.sourceDir).parentFile
+      if (files?.exists() == true) {
+        return files.listFiles()?.asSequence()
+          ?.filter {
+            it.name.matches(regex_splits)
+          }
+          ?.map { it.absolutePath }
+          ?.toList()
+          ?.toTypedArray()
+      }
+    }
+    return packageInfo.applicationInfo.splitSourceDirs
   }
 
   /**
@@ -1084,7 +1102,7 @@ object PackageUtils {
       return size
     }
 
-    packageInfo.applicationInfo.splitSourceDirs?.forEach {
+    getSplitsSourceDir(packageInfo)?.forEach {
       runCatching {
         size += FileUtils.getFileSize(it)
       }

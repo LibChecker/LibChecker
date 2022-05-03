@@ -23,7 +23,7 @@ class AppBundleBottomSheetDialogFragment :
   override fun init() {
     packageName?.let {
       val packageInfo = PackageUtils.getPackageInfo(it)
-      val list = packageInfo.applicationInfo.splitSourceDirs
+      val list = PackageUtils.getSplitsSourceDir(packageInfo)
       val localeList by lazy { Locale.getISOLanguages() }
       val bundleList = if (list.isNullOrEmpty()) {
         emptyList()
