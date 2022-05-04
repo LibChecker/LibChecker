@@ -8,7 +8,6 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ViewFlipper
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.HtmlCompat
@@ -23,12 +22,9 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
-
-const val VF_LOADING = 0
-const val VF_CONTENT = 1
-const val VF_NOT_FOUND = 2
 
 class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
@@ -62,7 +58,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  val viewFlipper = ViewFlipper(context).apply {
+  private val viewFlipper = HeightAnimatableViewFlipper(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     setInAnimation(context, R.anim.anim_fade_in)
@@ -343,5 +339,13 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       description.layout(0, contributor.bottom + marginVertical)
       relativeLink.layout(0, description.bottom + marginVertical)
     }
+  }
+
+  fun showContent() {
+    viewFlipper.show(libDetailContentView)
+  }
+
+  fun showNotFound() {
+    viewFlipper.show(notFoundView)
   }
 }

@@ -135,6 +135,11 @@ class LibStringAdapter(val packageName: String, @LibType val type: Int) :
                           )
                         }
                       }
+                      "dimen" -> {
+                        appResources?.let { res ->
+                          libSize.text = res.getDimension(item.item.size.toInt()).toString()
+                        }
+                      }
                       else -> {}
                     }
                   }

@@ -20,6 +20,7 @@ import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
@@ -51,7 +52,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
             if (GlobalValues.localRulesVersion < it.version) {
               root.cloudRulesContentView.setUpdateButtonStatus(true)
             }
-            root.viewFlipper.displayedChild = 1
+            withContext(Dispatchers.Main) {
+              root.showContent()
+            }
           } catch (e: Exception) {
             Timber.e(e)
             context?.showToast(R.string.toast_cloud_rules_update_error)

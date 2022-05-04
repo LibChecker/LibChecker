@@ -1,30 +1,43 @@
 package com.absinthe.libchecker.base
 
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.Dialog
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.core.animation.doOnEnd
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentManager
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.absinthe.libraries.utils.view.HeightClipDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import timber.log.Timber
 
-abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment() {
+abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment(),
+  View.OnLayoutChangeListener {
+
+  var animationDuration = 350L
 
   private var _root: T? = null
   private var isHandlerActivated = false
+  private var clipBounds2: Rect? = null // Because View#clipBounds creates a new Rect on every call.
+  private var animator: ValueAnimator = ObjectAnimator()
+  private var prevBlurRadius = 64
   private val behavior by unsafeLazy { BottomSheetBehavior.from(root.parent as View) }
   private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
     override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -54,6 +67,18 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     }
 
     override fun onSlide(bottomSheet: View, slideOffset: Float) {
+      if (OsUtils.atLeastS()) {
+        val blurRadius = (64 * (1 + slideOffset)).toInt()
+
+        if (blurRadius != prevBlurRadius) {
+          prevBlurRadius = blurRadius
+          dialog?.window?.let {
+            it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
+            it.attributes?.blurBehindRadius = prevBlurRadius
+            it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+          }
+        }
+      }
     }
   }
 
@@ -100,8 +125,9 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
   override fun onStart() {
     super.onStart()
     behavior.addBottomSheetCallback(bottomSheetCallback)
+    root.addOnLayoutChangeListener(this)
 
-    if (requireActivity().isOrientationLandscape) {
+    if (activity?.isOrientationLandscape == true) {
       root.post {
         Class.forName(behavior::class.java.name).apply {
           getDeclaredMethod("setStateInternal", Int::class.java).apply {
@@ -118,7 +144,13 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     behavior.removeBottomSheetCallback(bottomSheetCallback)
   }
 
+  override fun onDetach() {
+    animator.cancel()
+    super.onDetach()
+  }
+
   override fun onDestroyView() {
+    root.removeOnLayoutChangeListener(this)
     _root = null
     super.onDestroyView()
   }
@@ -126,6 +158,22 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
   override fun show(manager: FragmentManager, tag: String?) {
     runCatching {
       super.show(manager, tag)
+    }
+  }
+
+  override fun onLayoutChange(
+    view: View,
+    left: Int,
+    top: Int,
+    right: Int,
+    bottom: Int,
+    oldLeft: Int,
+    oldTop: Int,
+    oldRight: Int,
+    oldBottom: Int
+  ) {
+    if ((bottom - top) != (oldBottom - oldTop)) {
+      animateHeight(from = oldBottom - oldTop, to = bottom - top, onEnd = { })
     }
   }
 
@@ -146,5 +194,30 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
       strokeWidth = currentMaterialShapeDrawable.strokeWidth
       strokeColor = currentMaterialShapeDrawable.strokeColor
     }
+  }
+
+  private fun animateHeight(from: Int, to: Int, onEnd: () -> Unit) {
+    animator.cancel()
+    animator = ObjectAnimator.ofFloat(0f, 1f).apply {
+      duration = animationDuration
+      interpolator = FastOutSlowInInterpolator()
+      Timber.d("animateHeight: $from -> $to")
+
+      addUpdateListener {
+        val scale = it.animatedValue as Float
+        val newHeight = ((to - from) * scale + from).toInt()
+        setClippedHeight(newHeight)
+      }
+      doOnEnd { onEnd() }
+      start()
+    }
+  }
+
+  private fun setClippedHeight(newHeight: Int) {
+    clipBounds2 = (clipBounds2 ?: Rect()).also {
+      it.set(0, 0, root.right - root.left, root.top + newHeight)
+    }
+    (root.background as HeightClipDrawable?)?.clippedHeight = newHeight
+    root.invalidate()
   }
 }
