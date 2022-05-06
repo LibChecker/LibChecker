@@ -187,6 +187,7 @@ class LibStringAdapter(
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
           itemView.linkToIcon.setTag(R.id.meta_data_transform_id, false)
         } else {
+          var clickedTag = false
           item.item.source?.let {
             val type = runCatching {
               it.substring(it.indexOf(":") + 1, it.indexOf("/"))
@@ -199,12 +200,14 @@ class LibStringAdapter(
                   appResources?.let { res ->
                     itemView.libSize.text = res.getString(item.item.size.toInt())
                   }
+                  clickedTag = true
                 }
                 "array" -> {
                   appResources?.let { res ->
                     itemView.libSize.text =
                       res.getStringArray(item.item.size.toInt()).contentToString()
                   }
+                  clickedTag = true
                 }
                 "xml" -> {
                   fragmentManager?.let { fm ->
@@ -220,6 +223,7 @@ class LibStringAdapter(
                       }
                     }
                   }
+                  clickedTag = false
                 }
                 "drawable" -> {
                   appResources?.let { res ->
@@ -230,6 +234,7 @@ class LibStringAdapter(
                       )
                     )
                   }
+                  clickedTag = true
                 }
                 "color" -> {
                   appResources?.let { res ->
@@ -242,17 +247,21 @@ class LibStringAdapter(
                       )
                     )
                   }
+                  clickedTag = true
                 }
                 "dimen" -> {
                   appResources?.let { res ->
                     itemView.libSize.text = res.getDimension(item.item.size.toInt()).toString()
                   }
+                  clickedTag = true
                 }
-                else -> {}
+                else -> {
+                  clickedTag = false
+                }
               }
             }
           }
-          itemView.linkToIcon.setTag(R.id.meta_data_transform_id, true)
+          itemView.linkToIcon.setTag(R.id.meta_data_transform_id, clickedTag)
         }
       }
     }

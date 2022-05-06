@@ -15,13 +15,11 @@ class BottomSheetRecyclerView : BorderRecyclerView {
     defStyle
   )
 
-  private var lastX = 0f
   private var lastY = 0f
 
   override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
     when (ev.action) {
       MotionEvent.ACTION_DOWN -> {
-        lastX = ev.x
         lastY = ev.y
       }
       MotionEvent.ACTION_MOVE -> {

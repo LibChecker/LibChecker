@@ -116,6 +116,7 @@
   <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
   <string name="pwa_details">"Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. "</string>
   <string name="extract_native_libs_tip_part_a">The app declares </string>
+  <string name="xml_detail">XML Detail</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

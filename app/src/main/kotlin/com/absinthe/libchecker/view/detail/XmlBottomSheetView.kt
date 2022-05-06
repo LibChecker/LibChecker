@@ -1,53 +1,71 @@
 package com.absinthe.libchecker.view.detail
 
 import android.content.Context
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
+import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
-import com.absinthe.libchecker.view.AViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.absinthe.libchecker.R
+import com.absinthe.libchecker.recyclerview.BottomSheetRecyclerView
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.chad.library.adapter.base.BaseQuickAdapter
+import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class XmlBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
+class XmlBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
+
+  private val adapter = Adapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    title.text = "XML"
+    title.text = context.getString(R.string.xml_detail)
   }
 
-  private val container = ScrollView(context).apply {
+  private val container = BottomSheetRecyclerView(context).apply {
     layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-  }
-
-  val text = AppCompatTextView(context).apply {
-    layoutParams =
-      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    textSize = 10f
-    setTextIsSelectable(true)
+      LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+    adapter = this@XmlBottomSheetView.adapter
+    layoutManager = LinearLayoutManager(context)
+    overScrollMode = View.OVER_SCROLL_NEVER
+    isVerticalScrollBarEnabled = false
+    clipToPadding = false
+    clipChildren = false
+    isNestedScrollingEnabled = false
   }
 
   init {
+    orientation = VERTICAL
     addView(header)
     addView(container)
-    container.addView(text)
   }
 
-  override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-    super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-    val maxWidth = measuredWidth - paddingStart - paddingEnd
-    header.measure(maxWidth.toExactlyMeasureSpec(), defaultHeightMeasureSpec(this))
-    container.measure(maxWidth.toExactlyMeasureSpec(), defaultHeightMeasureSpec(this))
-    setMeasuredDimension(measuredWidth, header.measuredHeight + container.measuredHeight + paddingTop + paddingBottom)
-  }
-
-  override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    header.layout(paddingStart, paddingTop)
-    container.layout(paddingStart, header.bottom)
+  fun setText(text: CharSequence?) {
+    adapter.setList(listOf(text, ""))
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
+  }
+
+  class Adapter : BaseQuickAdapter<CharSequence?, BaseViewHolder>(0) {
+
+    override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
+      return createBaseViewHolder(
+        AppCompatTextView(context).apply {
+          layoutParams = MarginLayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+          textSize = 10f
+          setTextIsSelectable(true)
+        }
+      )
+    }
+
+    override fun convert(holder: BaseViewHolder, item: CharSequence?) {
+      (holder.itemView as AppCompatTextView).text = item
+    }
   }
 }

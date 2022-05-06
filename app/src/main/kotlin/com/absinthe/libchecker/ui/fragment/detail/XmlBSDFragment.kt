@@ -5,15 +5,10 @@ import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.XmlBottomSheetView
-import timber.log.Timber
 
 const val EXTRA_TEXT = "text"
 
 class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
-
-  init {
-    Timber.d("init")
-  }
 
   private val text by lazy { arguments?.getCharSequence(EXTRA_TEXT) }
 
@@ -29,6 +24,6 @@ class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
     }
-    root.text.text = text
+    root.setText(text)
   }
 }
