@@ -21,7 +21,7 @@ class BridgeActivity : Activity() {
           val authority = uri.getQueryParameter("authority")?.toInt() ?: 0
 
           if (authority == LibCheckerApp.generateAuthKey()) {
-            val dropPrevious = uri.getQueryParameter("dropPrevious")?.toBoolean() ?: false
+            val dropPrevious = uri.getQueryParameter("drop_previous")?.toBoolean() ?: false
 
             startService(
               Intent(this, ShootService::class.java).also {

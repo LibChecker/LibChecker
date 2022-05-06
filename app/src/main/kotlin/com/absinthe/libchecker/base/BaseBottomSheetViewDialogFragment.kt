@@ -28,8 +28,8 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 import timber.log.Timber
 
-abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFragment(),
-  View.OnLayoutChangeListener {
+abstract class BaseBottomSheetViewDialogFragment<T : View> :
+  BottomSheetDialogFragment(), View.OnLayoutChangeListener {
 
   var animationDuration = 350L
 
@@ -67,18 +67,6 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
     }
 
     override fun onSlide(bottomSheet: View, slideOffset: Float) {
-      if (OsUtils.atLeastS()) {
-        val blurRadius = (64 * (1 + slideOffset)).toInt()
-
-        if (blurRadius != prevBlurRadius) {
-          prevBlurRadius = blurRadius
-          dialog?.window?.let {
-            it.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
-            it.attributes?.blurBehindRadius = prevBlurRadius
-            it.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-          }
-        }
-      }
     }
   }
 
@@ -158,6 +146,8 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> : BottomSheetDialogFr
   override fun show(manager: FragmentManager, tag: String?) {
     runCatching {
       super.show(manager, tag)
+    }.onFailure {
+      Timber.e(it)
     }
   }
 
