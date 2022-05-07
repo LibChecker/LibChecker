@@ -94,7 +94,8 @@ import java.io.File
 import kotlin.math.abs
 
 abstract class BaseAppDetailActivity :
-  CheckPackageOnResumingActivity<ActivityAppDetailBinding>(), IDetailContainer,
+  CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
+  IDetailContainer,
   SearchView.OnQueryTextListener {
 
   protected val viewModel: DetailViewModel by viewModels()
