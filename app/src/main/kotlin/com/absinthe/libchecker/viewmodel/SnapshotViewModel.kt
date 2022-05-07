@@ -128,13 +128,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val allTrackItems = repository.getTrackItems()
 
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
-      if (versionCode != dbItem.versionCode ||
-        packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(
-          packageInfo,
-          true
-        ) != dbItem.packageSize) ||
-        allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
+      if (versionCode != dbItem.versionCode || packageInfo.lastUpdateTime != dbItem.lastUpdatedTime
+        || (dbItem.packageSize != 0L && PackageUtils.getPackageSize(packageInfo, true) != dbItem.packageSize)
+        || allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
           packageName = packageInfo.packageName,

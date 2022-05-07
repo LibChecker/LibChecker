@@ -733,7 +733,6 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           )
         }
       }
-
     }
   }
 }

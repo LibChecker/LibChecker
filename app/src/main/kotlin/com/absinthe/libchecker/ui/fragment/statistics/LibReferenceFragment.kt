@@ -81,6 +81,7 @@ class LibReferenceFragment :
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
   private var keyword: String = ""
+  private var searchUpdateJob: Job? = null
 
   override fun init() {
     setHasOptionsMenu(true)
@@ -353,28 +354,41 @@ class LibReferenceFragment :
   override fun onQueryTextChange(newText: String): Boolean {
     if (keyword != newText) {
       keyword = newText
-      homeViewModel.libReference.value?.let { list ->
-        val filter = list.filter {
-          it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
-            newText,
-            ignoreCase = true
-          ) ?: false
-        }
-        LibReferenceAdapter.highlightText = newText
-        refAdapter.setDiffNewData(filter.toMutableList()) {
-          doOnMainThreadIdle {
-            //noinspection NotifyDataSetChanged
-            refAdapter.notifyDataSetChanged()
+
+      searchUpdateJob?.cancel()
+      searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
+        homeViewModel.libReference.value?.let { list ->
+          val filter = list.filter {
+            it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
+              newText,
+              ignoreCase = true
+            ) ?: false
+          }
+          LibReferenceAdapter.highlightText = newText
+
+          withContext(Dispatchers.Main) {
+            (activity as? INavViewContainer)?.showProgressBar()
+            refAdapter.setDiffNewData(filter.toMutableList()) {
+              doOnMainThreadIdle {
+                //noinspection NotifyDataSetChanged
+                refAdapter.notifyDataSetChanged()
+              }
+              doOnMainThreadIdle {
+                (activity as? INavViewContainer)?.hideProgressBar()
+              }
+            }
+          }
+
+          if (newText.equals("Easter Egg", true)) {
+            context?.showToast("🥚")
+            Analytics.trackEvent(
+              Constants.Event.EASTER_EGG,
+              EventProperties().set("EASTER_EGG", "Lib Reference Search")
+            )
           }
         }
-
-        if (newText.equals("Easter Egg", true)) {
-          context?.showToast("🥚")
-          Analytics.trackEvent(
-            Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "Lib Reference Search")
-          )
-        }
+      }.also {
+        it.start()
       }
     }
     return false

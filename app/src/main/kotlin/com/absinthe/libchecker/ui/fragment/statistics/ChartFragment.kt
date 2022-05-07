@@ -49,7 +49,9 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.button.MaterialButtonToggleGroup
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val TYPE_ABI = 0
@@ -67,9 +69,10 @@ class ChartFragment :
   private val existApiList = mutableListOf<Int>()
   private val apiScope = Build.VERSION_CODES.S_V2
 
+  private lateinit var chartView: ViewGroup
   private var chartType = TYPE_ABI
   private var mDialog: ClassifyBottomSheetDialogFragment? = null
-  private lateinit var chartView: ViewGroup
+  private var queryJob: Job? = null
 
   override fun init() {
     chartView = generatePieChartView()
@@ -102,314 +105,346 @@ class ChartFragment :
   }
 
   private fun setAbiData() {
+    binding.progressHorizontal.show()
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
+    queryJob?.cancel()
+    queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val parties = listOf(
+        resources.getString(R.string.string_64_bit),
+        resources.getString(R.string.string_32_bit),
+        resources.getString(R.string.no_libs)
+      )
+      val entries: ArrayList<PieEntry> = ArrayList()
 
-    val parties = listOf(
-      resources.getString(R.string.string_64_bit),
-      resources.getString(R.string.string_32_bit),
-      resources.getString(R.string.no_libs)
-    )
-    val entries: ArrayList<PieEntry> = ArrayList()
-
-    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-      viewModel.dbItems.value
-    } else {
-      viewModel.dbItems.value?.filter { !it.isSystem }
-    }
-    val colorOnSurface =
-      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-
-    filteredList?.let {
-      val list = mutableListOf(0, 0, 0)
-
-      for (item in it) {
-        if (GlobalValues.isShowSystemApps.value == false) {
-          if (item.isSystem) continue
-        }
-        when (item.abi) {
-          ARMV8.toShort() -> list[0]++
-          ARMV5.toShort(), ARMV7.toShort() -> list[1]++
-          else -> list[2]++
-        }
-      }
-
-      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-      // the chart.
-      legendList.clear()
-      for (i in parties.indices) {
-        entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
-        legendList.add(parties[i % parties.size])
-      }
-      val dataSet = PieDataSet(entries, "").apply {
-        setDrawIcons(false)
-        sliceSpace = 3f
-        iconsOffset = MPPointF(0f, 40f)
-        selectionShift = 5f
-        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        valueLineColor = colorOnSurface
-      }
-
-      // add a lot of colors
-      val colors: ArrayList<Int> = ArrayList()
-
-      if (OsUtils.atLeastS() && GlobalValues.md3Theme) {
-        if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
-          colors.add(requireContext().getColor(android.R.color.system_accent1_700))
-          colors.add(requireContext().getColor(android.R.color.system_accent1_800))
-          colors.add(requireContext().getColor(android.R.color.system_accent1_900))
-        } else {
-          colors.add(requireContext().getColor(android.R.color.system_accent1_200))
-          colors.add(requireContext().getColor(android.R.color.system_accent1_300))
-          colors.add(requireContext().getColor(android.R.color.system_accent1_400))
-        }
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
       } else {
-        for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+        viewModel.dbItems.value?.filter { !it.isSystem }
       }
+      val colorOnSurface =
+        requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
-      dataSet.colors = colors
-      // dataSet.setSelectionShift(0f);
-      val data = PieData(dataSet).apply {
-        setValueFormatter(PercentFormatter(chartView as PieChart))
-        setValueTextSize(10f)
-        setValueTextColor(colorOnSurface)
-      }
+      filteredList?.let {
+        val list = mutableListOf(0, 0, 0)
 
-      (chartView as PieChart).apply {
-        this.data = data
-        setEntryLabelColor(colorOnSurface)
-        highlightValues(null)
-        invalidate()
+        for (item in it) {
+          if (GlobalValues.isShowSystemApps.value == false) {
+            if (item.isSystem) continue
+          }
+          when (item.abi) {
+            ARMV8.toShort() -> list[0]++
+            ARMV5.toShort(), ARMV7.toShort() -> list[1]++
+            else -> list[2]++
+          }
+        }
+
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        legendList.clear()
+        for (i in parties.indices) {
+          entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
+          legendList.add(parties[i % parties.size])
+        }
+        val dataSet = PieDataSet(entries, "").apply {
+          setDrawIcons(false)
+          sliceSpace = 3f
+          iconsOffset = MPPointF(0f, 40f)
+          selectionShift = 5f
+          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          valueLineColor = colorOnSurface
+        }
+
+        // add a lot of colors
+        val colors: ArrayList<Int> = ArrayList()
+
+        if (OsUtils.atLeastS() && GlobalValues.md3Theme) {
+          if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
+            colors.add(requireContext().getColor(android.R.color.system_accent1_700))
+            colors.add(requireContext().getColor(android.R.color.system_accent1_800))
+            colors.add(requireContext().getColor(android.R.color.system_accent1_900))
+          } else {
+            colors.add(requireContext().getColor(android.R.color.system_accent1_200))
+            colors.add(requireContext().getColor(android.R.color.system_accent1_300))
+            colors.add(requireContext().getColor(android.R.color.system_accent1_400))
+          }
+        } else {
+          for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
+        }
+
+        dataSet.colors = colors
+        // dataSet.setSelectionShift(0f);
+        val data = PieData(dataSet).apply {
+          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueTextSize(10f)
+          setValueTextColor(colorOnSurface)
+        }
+
+        withContext(Dispatchers.Main) {
+          (chartView as PieChart).apply {
+            this.data = data
+            setEntryLabelColor(colorOnSurface)
+            highlightValues(null)
+            invalidate()
+          }
+          binding.progressHorizontal.hide()
+        }
       }
     }
   }
 
   private fun setKotlinData() {
+    binding.progressHorizontal.show()
     if (chartView.parent != null) {
       binding.root.removeView(chartView)
     }
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
-
-    val parties = listOf(
-      resources.getString(R.string.string_kotlin_used),
-      resources.getString(R.string.string_kotlin_unused)
-    )
-    val entries: ArrayList<PieEntry> = ArrayList()
-
-    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-      viewModel.dbItems.value
-    } else {
-      viewModel.dbItems.value?.filter { !it.isSystem }
-    }
-    val colorOnSurface =
-      requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-
-    filteredList?.let {
-      val list = mutableListOf(0, 0)
-
-      for (item in it) {
-        if (item.isKotlinUsed == true) {
-          list[0]++
-        } else {
-          list[1]++
-        }
-      }
-
-      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-      // the chart.
-      legendList.clear()
-      for (i in parties.indices) {
-        entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
-        legendList.add(parties[i % parties.size])
-      }
-      val dataSet = PieDataSet(entries, "").apply {
-        setDrawIcons(false)
-        sliceSpace = 3f
-        iconsOffset = MPPointF(0f, 40f)
-        selectionShift = 5f
-        xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-        valueLineColor =
-          requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-      }
-
-      // add a lot of colors
-      val colors = arrayListOf(
-        Color.parseColor("#7E52FF"),
-        Color.parseColor("#D9318E")
+    queryJob?.cancel()
+    queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val parties = listOf(
+        resources.getString(R.string.string_kotlin_used),
+        resources.getString(R.string.string_kotlin_unused)
       )
+      val entries: ArrayList<PieEntry> = ArrayList()
 
-      dataSet.colors = colors
-      // dataSet.setSelectionShift(0f);
-      val data = PieData(dataSet).apply {
-        setValueFormatter(PercentFormatter(chartView as PieChart))
-        setValueTextSize(10f)
-        setValueTextColor(colorOnSurface)
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
+      } else {
+        viewModel.dbItems.value?.filter { !it.isSystem }
       }
+      val colorOnSurface =
+        requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
-      (chartView as PieChart).apply {
-        this.data = data
-        setEntryLabelColor(colorOnSurface)
-        highlightValues(null)
-        invalidate()
+      filteredList?.let {
+        val list = mutableListOf(0, 0)
+
+        for (item in it) {
+          if (item.isKotlinUsed == true) {
+            list[0]++
+          } else {
+            list[1]++
+          }
+        }
+
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        legendList.clear()
+        for (i in parties.indices) {
+          entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
+          legendList.add(parties[i % parties.size])
+        }
+        val dataSet = PieDataSet(entries, "").apply {
+          setDrawIcons(false)
+          sliceSpace = 3f
+          iconsOffset = MPPointF(0f, 40f)
+          selectionShift = 5f
+          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          valueLineColor =
+            requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+        }
+
+        // add a lot of colors
+        val colors = arrayListOf(
+          Color.parseColor("#7E52FF"),
+          Color.parseColor("#D9318E")
+        )
+
+        dataSet.colors = colors
+        // dataSet.setSelectionShift(0f);
+        val data = PieData(dataSet).apply {
+          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueTextSize(10f)
+          setValueTextColor(colorOnSurface)
+        }
+
+        withContext(Dispatchers.Main) {
+          (chartView as PieChart).apply {
+            this.data = data
+            setEntryLabelColor(colorOnSurface)
+            highlightValues(null)
+            invalidate()
+          }
+          binding.progressHorizontal.hide()
+        }
       }
     }
   }
 
   private fun setTargetApiData() {
-    val parties = osNameMap.map { it.value }.toMutableList()
+    binding.progressHorizontal.show()
+    queryJob?.cancel()
+    queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val parties = osNameMap.map { it.value }.toMutableList()
 
-    val entries: ArrayList<BarEntry> = ArrayList()
+      val entries: ArrayList<BarEntry> = ArrayList()
 
-    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-      viewModel.dbItems.value
-    } else {
-      viewModel.dbItems.value?.filter { !it.isSystem }
-    }
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
+      } else {
+        viewModel.dbItems.value?.filter { !it.isSystem }
+      }
 
-    filteredList?.let {
-      val list = IntArray(apiScope) { 0 }
+      filteredList?.let {
+        val list = IntArray(apiScope) { 0 }
 
-      var targetApi: Int
-      for (item in it) {
-        try {
-          targetApi = PackageUtils.getPackageInfo(item.packageName)
-            .applicationInfo.targetSdkVersion
-          if (targetApi in 1..apiScope) {
-            list[targetApi - 1]++
+        var targetApi: Int
+        for (item in it) {
+          try {
+            targetApi = PackageUtils.getPackageInfo(item.packageName)
+              .applicationInfo.targetSdkVersion
+            if (targetApi in 1..apiScope) {
+              list[targetApi - 1]++
+            }
+          } catch (e: Exception) {
+            Timber.e(e)
           }
-        } catch (e: Exception) {
-          Timber.e(e)
+        }
+        existApiList.clear()
+        val iterator = list.iterator().withIndex()
+        while (iterator.hasNext()) {
+          val entry = iterator.next()
+          if (entry.value != 0) {
+            existApiList.add(entry.index + 1)
+          }
+        }
+
+        withContext(Dispatchers.Main) {
+          if (chartView.parent != null) {
+            binding.root.removeView(chartView)
+          }
+          chartView = generateBarChartView()
+          binding.root.addView(chartView, -1)
+        }
+
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        legendList.clear()
+        for (i in parties.indices) {
+          if (list[i] > 0) {
+            entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
+            legendList.add((i + 1).toString())
+          }
+        }
+        val dataSet = BarDataSet(entries, "").apply {
+          setDrawIcons(false)
+          valueFormatter = IntegerFormatter()
+        }
+
+        // add a lot of colors
+        val colors: ArrayList<Int> = ArrayList()
+        (0..apiScope).forEach { _ ->
+          colors.add(UiUtils.getRandomColor())
+        }
+
+        dataSet.colors = colors
+        // dataSet.setSelectionShift(0f);
+        val data = BarData(dataSet).apply {
+          setValueTextSize(10f)
+          setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+        }
+
+        withContext(Dispatchers.Main) {
+          (chartView as HorizontalBarChart).apply {
+            this.data = data
+            highlightValues(null)
+            invalidate()
+          }
+          binding.progressHorizontal.hide()
         }
       }
-      existApiList.clear()
-      val iterator = list.iterator().withIndex()
-      while (iterator.hasNext()) {
-        val entry = iterator.next()
-        if (entry.value != 0) {
-          existApiList.add(entry.index + 1)
-        }
-      }
-
-      if (chartView.parent != null) {
-        binding.root.removeView(chartView)
-      }
-      chartView = generateBarChartView()
-      binding.root.addView(chartView, -1)
-
-      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-      // the chart.
-      legendList.clear()
-      for (i in parties.indices) {
-        if (list[i] > 0) {
-          entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
-          legendList.add((i + 1).toString())
-        }
-      }
-      val dataSet = BarDataSet(entries, "").apply {
-        setDrawIcons(false)
-        valueFormatter = IntegerFormatter()
-      }
-
-      // add a lot of colors
-      val colors: ArrayList<Int> = ArrayList()
-      (0..apiScope).forEach { _ ->
-        colors.add(UiUtils.getRandomColor())
-      }
-
-      dataSet.colors = colors
-      // dataSet.setSelectionShift(0f);
-      val data = BarData(dataSet).apply {
-        setValueTextSize(10f)
-        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      }
-
-      (chartView as HorizontalBarChart).apply {
-        this.data = data
-        highlightValues(null)
-        invalidate()
-      }
+    }.also {
+      it.start()
     }
   }
 
   private fun setMinSdkData() {
-    val parties = osNameMap.map { it.value }.toMutableList()
+    binding.progressHorizontal.show()
+    queryJob?.cancel()
+    queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val parties = osNameMap.map { it.value }.toMutableList()
 
-    val entries: ArrayList<BarEntry> = ArrayList()
-    var packageInfo: PackageInfo
+      val entries: ArrayList<BarEntry> = ArrayList()
+      var packageInfo: PackageInfo
 
-    val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-      viewModel.dbItems.value
-    } else {
-      viewModel.dbItems.value?.filter { !it.isSystem }
-    }
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
+      } else {
+        viewModel.dbItems.value?.filter { !it.isSystem }
+      }
 
-    filteredList?.let {
-      val list = IntArray(apiScope) { 0 }
+      filteredList?.let {
+        val list = IntArray(apiScope) { 0 }
 
-      var minSdk: Int
-      for (item in it) {
-        try {
-          packageInfo = PackageUtils.getPackageInfo(item.packageName)
-          minSdk = PackageUtils.getMinSdkVersion(packageInfo)
-          if (minSdk in 1..apiScope) {
-            list[minSdk - 1]++
+        var minSdk: Int
+        for (item in it) {
+          try {
+            packageInfo = PackageUtils.getPackageInfo(item.packageName)
+            minSdk = PackageUtils.getMinSdkVersion(packageInfo)
+            if (minSdk in 1..apiScope) {
+              list[minSdk - 1]++
+            }
+          } catch (e: Exception) {
+            Timber.e(e)
           }
-        } catch (e: Exception) {
-          Timber.e(e)
         }
-      }
-      existApiList.clear()
-      val iterator = list.iterator().withIndex()
-      while (iterator.hasNext()) {
-        val entry = iterator.next()
-        if (entry.value != 0) {
-          existApiList.add(entry.index + 1)
+        existApiList.clear()
+        val iterator = list.iterator().withIndex()
+        while (iterator.hasNext()) {
+          val entry = iterator.next()
+          if (entry.value != 0) {
+            existApiList.add(entry.index + 1)
+          }
         }
-      }
 
-      if (chartView.parent != null) {
-        binding.root.removeView(chartView)
-      }
-      chartView = generateBarChartView()
-      binding.root.addView(chartView, -1)
-
-      // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-      // the chart.
-      legendList.clear()
-      for (i in parties.indices) {
-        if (list[i] > 0) {
-          entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
-          legendList.add((i + 1).toString())
+        withContext(Dispatchers.Main) {
+          if (chartView.parent != null) {
+            binding.root.removeView(chartView)
+          }
+          chartView = generateBarChartView()
+          binding.root.addView(chartView, -1)
         }
-      }
-      val dataSet = BarDataSet(entries, "").apply {
-        setDrawIcons(false)
-        valueFormatter = IntegerFormatter()
-      }
 
-      // add a lot of colors
-      val colors: ArrayList<Int> = ArrayList()
-      (0..apiScope).forEach { _ ->
-        colors.add(UiUtils.getRandomColor())
-      }
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        legendList.clear()
+        for (i in parties.indices) {
+          if (list[i] > 0) {
+            entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
+            legendList.add((i + 1).toString())
+          }
+        }
+        val dataSet = BarDataSet(entries, "").apply {
+          setDrawIcons(false)
+          valueFormatter = IntegerFormatter()
+        }
 
-      dataSet.colors = colors
-      // dataSet.setSelectionShift(0f);
-      val data = BarData(dataSet).apply {
-        setValueTextSize(10f)
-        setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
-      }
+        // add a lot of colors
+        val colors: ArrayList<Int> = ArrayList()
+        (0..apiScope).forEach { _ ->
+          colors.add(UiUtils.getRandomColor())
+        }
 
-      (chartView as HorizontalBarChart).apply {
-        this.data = data
-        highlightValues(null)
-        invalidate()
+        dataSet.colors = colors
+        // dataSet.setSelectionShift(0f);
+        val data = BarData(dataSet).apply {
+          setValueTextSize(10f)
+          setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+        }
+
+        withContext(Dispatchers.Main) {
+          (chartView as HorizontalBarChart).apply {
+            this.data = data
+            highlightValues(null)
+            invalidate()
+          }
+          binding.progressHorizontal.hide()
+        }
       }
     }
   }

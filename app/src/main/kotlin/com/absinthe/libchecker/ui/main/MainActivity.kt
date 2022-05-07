@@ -108,6 +108,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     navViewBehavior.slideDown(binding.navView)
   }
 
+  override fun showProgressBar() {
+    Timber.d("showProgressBar")
+    binding.progressHorizontal.show()
+  }
+
+  override fun hideProgressBar() {
+    Timber.d("hideProgressBar")
+    binding.progressHorizontal.hide()
+  }
+
   private fun initView() {
     setAppBar(binding.appbar, binding.toolbar)
     binding.root.bringChildToFront(binding.appbar)
