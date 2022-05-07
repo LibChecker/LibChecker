@@ -137,7 +137,8 @@ object LCAppUtils {
           return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
               source,
               "io.flutter.FlutterInjector"
-            )) {
+            )
+          ) {
             ruleEntity
           } else {
             null
