@@ -276,7 +276,7 @@ object PackageUtils {
   private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
 
   fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
-    if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
+    if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       val files = File(packageInfo.applicationInfo.sourceDir).parentFile
       if (files?.exists() == true) {
         return files.listFiles()?.asSequence()
@@ -741,7 +741,7 @@ object PackageUtils {
       X86_64_STRING -> X86_64
       X86_STRING -> X86
       null -> {
-        if (FreezeUtils.isAppFrozen(applicationInfo.packageName)) {
+        if (FreezeUtils.isAppFrozen(applicationInfo)) {
           val supportedAbiSet = realAbiSet.toMutableSet()
           realAbiSet.forEach {
             if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {

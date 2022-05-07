@@ -132,7 +132,7 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       // MonkeyKing Purify
       if (integrationMonkeyKingBlockList == null) {
         integrationMonkeyKingBlockList =
-          MonkeyKingManager().queryBlockedComponent(context, viewModel.packageName)
+          MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
       }
       val monkeyKingShouldBlock =
         integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
@@ -160,20 +160,20 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 MonkeyKingManager().apply {
                   addBlockedComponent(
                     context,
-                    viewModel.packageName,
+                    viewModel.packageInfo.packageName,
                     componentName,
                     type,
                     monkeyKingShouldBlock
                   )
                   integrationMonkeyKingBlockList =
-                    queryBlockedComponent(context, viewModel.packageName)
+                    queryBlockedComponent(context, viewModel.packageInfo.packageName)
                 }
               }
             }
             2 -> {
               AnywhereManager().launchActivityEditor(
                 context,
-                viewModel.packageName,
+                viewModel.packageInfo.packageName,
                 componentName
               )
             }

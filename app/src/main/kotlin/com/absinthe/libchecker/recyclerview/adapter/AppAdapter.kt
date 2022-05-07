@@ -88,12 +88,16 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
         abiInfo.text = str
       }
 
-      if (item.variant == Constants.VARIANT_HAP) {
-        setBadge(R.drawable.ic_harmony_badge)
-      } else if (FreezeUtils.isAppFrozen(item.packageName)) {
-        setBadge(R.drawable.ic_uninstalled_package)
-      } else {
-        setBadge(null)
+      when {
+        item.variant == Constants.VARIANT_HAP -> {
+          setBadge(R.drawable.ic_harmony_badge)
+        }
+        FreezeUtils.isAppFrozen(item.packageName) -> {
+          setBadge(R.drawable.ic_uninstalled_package)
+        }
+        else -> {
+          setBadge(null)
+        }
       }
     }
   }

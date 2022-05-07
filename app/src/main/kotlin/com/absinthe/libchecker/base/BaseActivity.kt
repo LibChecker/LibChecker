@@ -18,7 +18,9 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = inflateBinding(layoutInflater)
+    if (!this::binding.isInitialized) {
+      binding = inflateBinding(layoutInflater)
+    }
     setContentView(binding.root)
   }
 
