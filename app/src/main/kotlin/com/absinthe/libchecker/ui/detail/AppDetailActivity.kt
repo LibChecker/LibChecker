@@ -63,6 +63,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
@@ -343,19 +344,23 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
                   }
                 )
               }
-              if (it.isKotlinUsed == null) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                  val isKotlinUsed = PackageUtils.isKotlinUsed(packageInfo)
+              lifecycleScope.launch(Dispatchers.IO) {
+                if (it.isKotlinUsed == null) {
+                  val isKotlinUsed = packageInfo.isKotlinUsed()
                   Repositories.lcRepository.updateKotlinUsage(packageName, isKotlinUsed)
 
                   if (isKotlinUsed) {
+                    val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
                     withContext(Dispatchers.Main) {
-                      showKotlinUsedLabel()
+                      showKotlinUsedLabel(kotlinPluginVersion)
                     }
                   }
+                } else if (it.isKotlinUsed) {
+                  val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
+                  withContext(Dispatchers.Main) {
+                    showKotlinUsedLabel(kotlinPluginVersion)
+                  }
                 }
-              } else if (it.isKotlinUsed) {
-                showKotlinUsedLabel()
               }
 
               initMoreFeatures(packageInfo)
@@ -604,13 +609,18 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
     unregisterReceiver(requestPackageReceiver)
   }
 
-  private fun showKotlinUsedLabel() {
+  private fun showKotlinUsedLabel(kotlinPluginVersion: String?) {
     initFeatureListView()
+    val title = StringBuilder(getString(R.string.kotlin_string))
+    kotlinPluginVersion?.let {
+      title.append(" ").append(it)
+    }
+
     featureAdapter.addData(
       FeatureItem(R.drawable.ic_kotlin_logo) {
         BaseAlertDialogBuilder(this)
           .setIcon(R.drawable.ic_kotlin_logo)
-          .setTitle(R.string.kotlin_string)
+          .setTitle(title)
           .setMessage(R.string.kotlin_details)
           .setPositiveButton(android.R.string.ok, null)
           .show()

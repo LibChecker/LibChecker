@@ -46,6 +46,8 @@ import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
+import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -165,7 +167,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               lastUpdatedTime = info.lastUpdateTime,
               isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
               abi = abiType.toShort(),
-              isSplitApk = PackageUtils.isSplitsApk(info),
+              isSplitApk = info.isSplitsApk(),
               isKotlinUsed = null/* delay init */,
               targetApi = ai.targetSdkVersion.toShort(),
               variant = variant
@@ -262,8 +264,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 it.lastUpdateTime,
                 (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                 PackageUtils.getAbi(it).toShort(),
-                PackageUtils.isSplitsApk(it),
-                PackageUtils.isKotlinUsed(it),
+                it.isSplitsApk(),
+                it.isKotlinUsed(),
                 ai.targetSdkVersion.toShort(),
                 variant
               )
@@ -303,8 +305,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             info.lastUpdateTime,
             (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
             PackageUtils.getAbi(info).toShort(),
-            PackageUtils.isSplitsApk(info),
-            PackageUtils.isKotlinUsed(info),
+            info.isSplitsApk(),
+            info.isKotlinUsed(),
             ai.targetSdkVersion.toShort(),
             variant
           )

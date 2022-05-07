@@ -36,6 +36,7 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
@@ -129,7 +130,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     suspend fun compare(dbItem: SnapshotItem, packageInfo: PackageInfo, versionCode: Long) {
       if (versionCode != dbItem.versionCode ||
         packageInfo.lastUpdateTime != dbItem.lastUpdatedTime ||
-        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(packageInfo, true) != dbItem.packageSize) ||
+        (dbItem.packageSize != 0L && PackageUtils.getPackageSize(
+          packageInfo,
+          true
+        ) != dbItem.packageSize) ||
         allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
       ) {
         snapshotDiffItem = SnapshotDiffItem(
@@ -194,7 +198,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           permissionsDiff = SnapshotDiffItem.DiffNode(
             dbItem.permissions,
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           metadataDiff = SnapshotDiffItem.DiffNode(
             dbItem.metadata,
@@ -322,7 +326,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty()
+              info.getPermissionsList().toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getMetaDataItems(info).toJson().orEmpty()
@@ -483,7 +487,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val info = runCatching {
       PackageUtils.getPackageInfo(
         packageName,
-        PackageManager.GET_META_DATA
+        PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
       )
     }.getOrNull()
     val allTrackItems = repository.getTrackItems()
@@ -546,7 +550,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           SnapshotDiffItem.DiffNode(
             it.permissions,
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.metadata,
@@ -629,7 +633,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()

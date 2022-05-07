@@ -23,6 +23,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
@@ -101,7 +102,11 @@ object PackageUtils {
    */
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
-    return SystemServices.packageManager.getInstalledPackages(VersionCompat.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_META_DATA)
+    return SystemServices.packageManager.getInstalledPackages(
+      VersionCompat.MATCH_UNINSTALLED_PACKAGES
+        or PackageManager.GET_META_DATA
+        or PackageManager.GET_PERMISSIONS
+    )
   }
 
   /**
@@ -288,24 +293,23 @@ object PackageUtils {
 
   /**
    * Judge that whether an app uses split apks
-   * @param packageInfo PackageInfo
    * @return true if it uses split apks
    */
-  fun isSplitsApk(packageInfo: PackageInfo): Boolean {
-    return !packageInfo.applicationInfo.splitSourceDirs.isNullOrEmpty()
+  fun PackageInfo.isSplitsApk(): Boolean {
+    return !applicationInfo.splitSourceDirs.isNullOrEmpty()
   }
 
   /**
    * Judge that whether an app uses Kotlin language
-   * @param packageInfo PackageInfo
    * @return true if it uses Kotlin language
    */
-  fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
+  fun PackageInfo.isKotlinUsed(): Boolean {
     return runCatching {
-      val file = File(packageInfo.applicationInfo.sourceDir)
+      val file = File(applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+        it.getEntry("kotlin-tooling-metadata.json") != null ||
+          it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
           isKotlinUsedInClassDex(file)
@@ -387,11 +391,9 @@ object PackageUtils {
    * @return permissions list
    */
   fun getPermissionsItems(packageInfo: PackageInfo): List<LibStringItem> {
-    packageInfo.requestedPermissions?.let {
-      return it.asSequence()
-        .map { perm -> LibStringItem(perm, 0) }
-        .toList()
-    } ?: return emptyList()
+    return packageInfo.getPermissionsList().asSequence()
+      .map { perm -> LibStringItem(perm, 0) }
+      .toList()
   }
 
   /**
@@ -972,8 +974,12 @@ object PackageUtils {
    */
   fun getPermissionsList(packageName: String): List<String> {
     return runCatching {
-      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getPermissionsList()
     }.getOrElse { emptyList() }
+  }
+
+  fun PackageInfo.getPermissionsList(): List<String> {
+    return requestedPermissions?.toList() ?: emptyList()
   }
 
   /**
@@ -1159,5 +1165,17 @@ object PackageUtils {
       val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
       return demands["use32bitAbi"] as? Boolean ?: false
     }.getOrNull() ?: return false
+  }
+
+  fun getKotlinPluginVersion(packageInfo: PackageInfo): String? {
+    return runCatching {
+      ZipFile(packageInfo.applicationInfo.sourceDir).use { zip ->
+        val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
+        zip.getInputStream(entry).source().buffer().use {
+          val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
+          return json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" }
+        }
+      }
+    }.getOrNull()
   }
 }
