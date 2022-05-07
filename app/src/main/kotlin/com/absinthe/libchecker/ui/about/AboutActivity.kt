@@ -402,7 +402,10 @@ class AboutActivity : AbsAboutActivity() {
   }
 
   private fun initView() {
-    findViewById<Toolbar>(R.id.toolbar)?.background = null
+    findViewById<Toolbar>(R.id.toolbar)?.let {
+      it.background = null
+      it.title = getString(R.string.settings_about)
+    }
     val color = getColor(R.color.aboutHeader)
     setHeaderBackground(ColorDrawable(color))
     setHeaderContentScrim(ColorDrawable(color))

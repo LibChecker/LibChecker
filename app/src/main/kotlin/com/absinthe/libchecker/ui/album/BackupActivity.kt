@@ -36,6 +36,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.album_item_backup_restore_title)
+
     if (savedInstanceState == null) {
       supportFragmentManager.beginTransaction()
         .replace(R.id.fragment_container, BackupFragment())

@@ -181,11 +181,11 @@ class LibStringAdapter(
     if (itemView.linkToIcon.isVisible) {
       itemView.linkToIcon.setOnClickListener {
         val transformed =
-          itemView.linkToIcon.getTag(R.id.meta_data_transform_id) as? Boolean ?: false
+          itemView.linkToIcon.getTag(item.item.size.toInt()) as? Boolean ?: false
         if (transformed) {
           itemView.libSize.text = item.item.source
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
-          itemView.linkToIcon.setTag(R.id.meta_data_transform_id, false)
+          itemView.linkToIcon.setTag(item.item.size.toInt(), false)
         } else {
           var clickedTag = false
           item.item.source?.let {
@@ -261,7 +261,7 @@ class LibStringAdapter(
               }
             }
           }
-          itemView.linkToIcon.setTag(R.id.meta_data_transform_id, clickedTag)
+          itemView.linkToIcon.setTag(item.item.size.toInt(), clickedTag)
         }
       }
     }

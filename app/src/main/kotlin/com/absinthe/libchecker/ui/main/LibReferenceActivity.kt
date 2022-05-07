@@ -22,7 +22,9 @@ import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -51,9 +53,15 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         }
       }
 
-      lifecycleScope.launch {
+      lifecycleScope.launch(Dispatchers.IO) {
         LCAppUtils.getRuleWithRegex(name, refType)?.let {
-          binding.toolbar.title = it.label
+          withContext(Dispatchers.Main) {
+            binding.toolbar.title = it.label
+          }
+        } ?: run {
+          withContext(Dispatchers.Main) {
+            binding.toolbar.title = getString(R.string.tab_lib_reference_statistics)
+          }
         }
       }
     } ?: finish()
