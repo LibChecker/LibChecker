@@ -292,7 +292,7 @@ object PackageUtils {
   }
 
   /**
-   * Judge that whether an app uses split apks
+   * Check if an app uses split apks
    * @return true if it uses split apks
    */
   fun PackageInfo.isSplitsApk(): Boolean {
@@ -300,7 +300,7 @@ object PackageUtils {
   }
 
   /**
-   * Judge that whether an app uses Kotlin language
+   * Check if an app uses Kotlin language
    * @return true if it uses Kotlin language
    */
   fun PackageInfo.isKotlinUsed(): Boolean {
@@ -397,7 +397,7 @@ object PackageUtils {
   }
 
   /**
-   * Judge that whether an app uses Kotlin language from classes.dex
+   * Check if an app uses Kotlin language from classes.dex
    * @param file APK file of the app
    * @return true if it uses Kotlin language
    */
@@ -847,23 +847,23 @@ object PackageUtils {
     return "(${Formatter.formatFileSize(context, item.size)}$source)"
   }
 
-  fun hasDexClass(packageName: String, className: String, isApk: Boolean = false): Boolean {
-    try {
-      val path = if (isApk) {
-        packageName
-      } else {
-        getPackageInfo(packageName).applicationInfo.sourceDir
-      }
-
-      if (path.isNullOrEmpty()) {
-        return false
-      }
-      val typeName = "L${className.replace(".", "/")};"
-      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+  /**
+   * Check if a package contains a class
+   * @param sourceFile Source file
+   * @param className Class name
+   */
+  fun hasDexClass(sourceFile: File, className: String): Boolean {
+    return runCatching {
+      val typeName = "L${className.replace(".", "/")};".replace("*;", "")
+      FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
           val hasDex = getEntry(entry)?.dexFile?.classes
             ?.any {
-              it.type == typeName
+              if (className.last() == '*') {
+                it.type.startsWith(typeName)
+              } else {
+                it.type == typeName
+              }
             } ?: false
           if (hasDex) {
             return true
@@ -871,9 +871,7 @@ object PackageUtils {
         }
       }
       return false
-    } catch (e: Exception) {
-      return false
-    }
+    }.getOrDefault(false)
   }
 
   /**
@@ -983,7 +981,7 @@ object PackageUtils {
   }
 
   /**
-   * Judge that whether an app is installed
+   * Check if an app is installed
    * @return true if it is installed
    */
   fun isAppInstalled(pkgName: String): Boolean {
@@ -1177,5 +1175,11 @@ object PackageUtils {
         }
       }
     }.getOrNull()
+  }
+
+  fun PackageInfo.isUseJetpackCompose(): Boolean {
+    return runCatching {
+      hasDexClass(File(applicationInfo.sourceDir), "androidx.compose.*")
+    }.getOrDefault(false)
   }
 }

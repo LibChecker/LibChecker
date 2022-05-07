@@ -48,6 +48,7 @@ import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -115,9 +116,19 @@ object LCAppUtils {
         return ruleEntity
       }
       val isApk = packageName.isTempApk()
+      val source = if (isApk) {
+        File(packageName)
+      } else {
+        runCatching {
+          File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+        }.getOrNull()
+      }
+      if (source == null) {
+        return ruleEntity
+      }
       when (name) {
         "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", isApk)) {
+          return if (PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")) {
             ruleEntity
           } else {
             null
@@ -125,11 +136,9 @@ object LCAppUtils {
         }
         "libapp.so" -> {
           return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
-              packageName,
-              "io.flutter.FlutterInjector",
-              isApk
-            )
-          ) {
+              source,
+              "io.flutter.FlutterInjector"
+            )) {
             ruleEntity
           } else {
             null
@@ -145,10 +154,16 @@ object LCAppUtils {
   fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
     return when (nativeLib) {
       "libjiagu.so" -> {
-        PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", false)
+        runCatching {
+          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+          PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")
+        }.getOrDefault(false)
       }
       "libapp.so" -> {
-        PackageUtils.hasDexClass(packageName, "io.flutter.FlutterInjector", false)
+        runCatching {
+          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+          PackageUtils.hasDexClass(source, "io.flutter.FlutterInjector")
+        }.getOrDefault(false)
       }
       else -> true
     }
@@ -229,7 +244,7 @@ fun doOnMainThreadIdle(action: () -> Unit) {
   if (Looper.getMainLooper() == Looper.myLooper()) {
     setupIdleHandler(Looper.myQueue())
   } else {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (OsUtils.atLeastM()) {
       setupIdleHandler(Looper.getMainLooper().queue)
     } else {
       handler.post { setupIdleHandler(Looper.myQueue()) }

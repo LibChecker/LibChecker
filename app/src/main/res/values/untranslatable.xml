@@ -4,6 +4,7 @@
   <string name="kotlin_string" translatable="false">Kotlin</string>
   <string name="agp" translatable="false">Android Gradle Plugin</string>
   <string name="pwa" translatable="false">Progressive Web Apps</string>
+  <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
 
   <string name="snapshot_none" translatable="false">None</string>
 

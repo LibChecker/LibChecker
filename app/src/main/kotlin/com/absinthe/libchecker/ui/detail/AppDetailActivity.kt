@@ -67,6 +67,7 @@ import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
+import com.absinthe.libchecker.utils.PackageUtils.isUseJetpackCompose
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -716,6 +717,23 @@ class AppDetailActivity : BaseAppDetailActivity<ActivityAppDetailBinding>(), IDe
           )
         }
       }
+
+      if (packageInfo.isUseJetpackCompose()) {
+        withContext(Dispatchers.Main) {
+          initFeatureListView()
+          featureAdapter.addData(
+            FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
+              BaseAlertDialogBuilder(this@AppDetailActivity)
+                .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose)
+                .setTitle(R.string.jetpack_compose)
+                .setMessage(R.string.jetpack_compose_details)
+                .setPositiveButton(android.R.string.ok, null)
+                .show()
+            }
+          )
+        }
+      }
+
     }
   }
 }
