@@ -222,11 +222,11 @@ abstract class BaseAppDetailActivity :
         var abiSet = PackageUtils.getAbiSet(
           file,
           packageInfo.applicationInfo,
-          isApk = false,
+          isApk = apkAnalyticsMode,
           overlay = overlay,
           ignoreArch = true
         ).toSet()
-        val abi = PackageUtils.getAbi(packageInfo, isApk = false, abiSet = abiSet)
+        val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
         abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
         extraInfo.apply {

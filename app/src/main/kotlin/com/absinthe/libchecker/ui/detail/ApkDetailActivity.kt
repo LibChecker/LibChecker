@@ -96,6 +96,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                     or PackageManager.GET_PERMISSIONS
                     or PackageManager.GET_META_DATA
                     or VersionCompat.MATCH_DISABLED_COMPONENTS
+                    or VersionCompat.MATCH_UNINSTALLED_PACKAGES
                   )
                 packageManager.getPackageArchiveInfo(tf.path, flag)?.also {
                   it.applicationInfo.sourceDir = tf.path

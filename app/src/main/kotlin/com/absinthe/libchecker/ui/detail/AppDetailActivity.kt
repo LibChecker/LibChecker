@@ -46,6 +46,7 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
             or PackageManager.GET_PERMISSIONS
             or PackageManager.GET_META_DATA
             or VersionCompat.MATCH_DISABLED_COMPONENTS
+            or VersionCompat.MATCH_UNINSTALLED_PACKAGES
           )
         PackageUtils.getPackageInfo(packageName, flag)
       }.getOrNull()?.let { packageInfo ->

@@ -741,7 +741,7 @@ object PackageUtils {
       X86_64_STRING -> X86_64
       X86_STRING -> X86
       null -> {
-        if (FreezeUtils.isAppFrozen(applicationInfo)) {
+        if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
           val supportedAbiSet = realAbiSet.toMutableSet()
           realAbiSet.forEach {
             if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
