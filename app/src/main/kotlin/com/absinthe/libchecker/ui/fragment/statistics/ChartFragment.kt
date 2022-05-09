@@ -71,7 +71,7 @@ class ChartFragment :
 
   private lateinit var chartView: ViewGroup
   private var chartType = TYPE_ABI
-  private var mDialog: ClassifyBottomSheetDialogFragment? = null
+  private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var queryJob: Job? = null
 
   override fun init() {
@@ -113,6 +113,7 @@ class ChartFragment :
     binding.root.addView(chartView, -1)
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val context = context ?: return@launch
       val parties = listOf(
         resources.getString(R.string.string_64_bit),
         resources.getString(R.string.string_32_bit),
@@ -125,8 +126,7 @@ class ChartFragment :
       } else {
         viewModel.dbItems.value?.filter { !it.isSystem }
       }
-      val colorOnSurface =
-        requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
       filteredList?.let {
         val list = mutableListOf(0, 0, 0)
@@ -164,13 +164,13 @@ class ChartFragment :
 
         if (OsUtils.atLeastS() && GlobalValues.md3Theme) {
           if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
-            colors.add(requireContext().getColor(android.R.color.system_accent1_700))
-            colors.add(requireContext().getColor(android.R.color.system_accent1_800))
-            colors.add(requireContext().getColor(android.R.color.system_accent1_900))
+            colors.add(context.getColor(android.R.color.system_accent1_700))
+            colors.add(context.getColor(android.R.color.system_accent1_800))
+            colors.add(context.getColor(android.R.color.system_accent1_900))
           } else {
-            colors.add(requireContext().getColor(android.R.color.system_accent1_200))
-            colors.add(requireContext().getColor(android.R.color.system_accent1_300))
-            colors.add(requireContext().getColor(android.R.color.system_accent1_400))
+            colors.add(context.getColor(android.R.color.system_accent1_200))
+            colors.add(context.getColor(android.R.color.system_accent1_300))
+            colors.add(context.getColor(android.R.color.system_accent1_400))
           }
         } else {
           for (c in ColorTemplate.MATERIAL_COLORS) colors.add(c)
@@ -206,6 +206,7 @@ class ChartFragment :
     binding.root.addView(chartView, -1)
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val context = context ?: return@launch
       val parties = listOf(
         resources.getString(R.string.string_kotlin_used),
         resources.getString(R.string.string_kotlin_unused)
@@ -217,8 +218,7 @@ class ChartFragment :
       } else {
         viewModel.dbItems.value?.filter { !it.isSystem }
       }
-      val colorOnSurface =
-        requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
 
       filteredList?.let {
         val list = mutableListOf(0, 0)
@@ -245,8 +245,7 @@ class ChartFragment :
           selectionShift = 5f
           xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
           yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          valueLineColor =
-            requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+          valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
         }
 
         // add a lot of colors
@@ -280,6 +279,7 @@ class ChartFragment :
     binding.progressHorizontal.show()
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val context = context ?: return@launch
       val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
@@ -346,7 +346,7 @@ class ChartFragment :
         // dataSet.setSelectionShift(0f);
         val data = BarData(dataSet).apply {
           setValueTextSize(10f)
-          setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+          setValueTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         }
 
         withContext(Dispatchers.Main) {
@@ -367,6 +367,7 @@ class ChartFragment :
     binding.progressHorizontal.show()
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val context = context ?: return@launch
       val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
@@ -434,7 +435,7 @@ class ChartFragment :
         // dataSet.setSelectionShift(0f);
         val data = BarData(dataSet).apply {
           setValueTextSize(10f)
-          setValueTextColor(requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+          setValueTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         }
 
         withContext(Dispatchers.Main) {
@@ -456,7 +457,7 @@ class ChartFragment :
   override fun onValueSelected(e: Entry?, h: Highlight?) {
     if (e == null) return
     if (h == null) return
-    if (mDialog != null && mDialog!!.isShowing()) return
+    if (dialog?.isShowing() == true) return
 
     if (OsUtils.atLeastR()) {
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
@@ -476,7 +477,7 @@ class ChartFragment :
 
       when (chartType) {
         TYPE_ABI -> {
-          when (legendList[h.x.toInt()]) {
+          when (legendList.getOrNull(h.x.toInt())) {
             getString(R.string.string_64_bit) -> {
               dialogTitle = String.format(
                 getString(R.string.title_statistics_dialog),
@@ -507,7 +508,7 @@ class ChartFragment :
           }
         }
         TYPE_KOTLIN -> {
-          when (legendList[h.x.toInt()]) {
+          when (legendList.getOrNull(h.x.toInt())) {
             getString(R.string.string_kotlin_used) -> {
               dialogTitle = getString(R.string.string_kotlin_used)
               filteredList?.filter { it.isKotlinUsed == true }
@@ -525,7 +526,7 @@ class ChartFragment :
           }
         }
         TYPE_TARGET_API -> {
-          val targetApi = legendList[h.x.toInt()].toInt()
+          val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
           var packageInfo: PackageInfo?
 
           dialogTitle = "Target API $targetApi"
@@ -539,7 +540,7 @@ class ChartFragment :
           }?.let { filter -> item = ArrayList(filter) }
         }
         TYPE_MIN_SDK -> {
-          val minSdk = legendList[h.x.toInt()].toInt()
+          val minSdk = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
 
           dialogTitle = "Min SDK $minSdk"
           filteredList?.filter {
@@ -553,10 +554,10 @@ class ChartFragment :
       viewModel.filteredList.postValue(item)
     }
 
-    mDialog = ClassifyBottomSheetDialogFragment().apply {
+    dialog = ClassifyBottomSheetDialogFragment().apply {
       setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
         override fun onDismiss() {
-          mDialog = null
+          this@ChartFragment.dialog = null
           if (chartView is PieChart) {
             (chartView as PieChart).highlightValue(null)
           } else if (chartView is HorizontalBarChart) {
