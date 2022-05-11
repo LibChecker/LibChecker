@@ -53,6 +53,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.util.TreeMap
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
@@ -66,7 +67,6 @@ class ChartFragment :
 
   private val viewModel: ChartViewModel by activityViewModels()
   private val legendList = mutableListOf<String>()
-  private val existApiList = mutableListOf<Int>()
   private val apiScope = Build.VERSION_CODES.S_V2
 
   private lateinit var chartView: ViewGroup
@@ -291,45 +291,34 @@ class ChartFragment :
       }
 
       filteredList?.let {
-        val list = IntArray(apiScope) { 0 }
+        val apiMap = mutableMapOf<Int, Int>()
 
         var targetApi: Int
         for (item in it) {
           try {
             targetApi = PackageUtils.getPackageInfo(item.packageName)
               .applicationInfo.targetSdkVersion
-            if (targetApi in 1..apiScope) {
-              list[targetApi - 1]++
-            }
+            apiMap[targetApi] = apiMap[targetApi]?.plus(1) ?: 1
           } catch (e: Exception) {
             Timber.e(e)
           }
         }
-        existApiList.clear()
-        val iterator = list.iterator().withIndex()
-        while (iterator.hasNext()) {
-          val entry = iterator.next()
-          if (entry.value != 0) {
-            existApiList.add(entry.index + 1)
-          }
-        }
 
+        val sortedApiMap = TreeMap(apiMap)
         withContext(Dispatchers.Main) {
           if (chartView.parent != null) {
             binding.root.removeView(chartView)
           }
-          chartView = generateBarChartView()
+          chartView = generateBarChartView(sortedApiMap)
           binding.root.addView(chartView, -1)
         }
 
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
         legendList.clear()
-        for (i in parties.indices) {
-          if (list[i] > 0) {
-            entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
-            legendList.add((i + 1).toString())
-          }
+        var index = 0
+        sortedApiMap.forEach { entry ->
+          entries.add(BarEntry(index.toFloat(), entry.value.toFloat()))
+          legendList.add(entry.key.toString())
+          index++
         }
         val dataSet = BarDataSet(entries, "").apply {
           setDrawIcons(false)
@@ -380,45 +369,33 @@ class ChartFragment :
       }
 
       filteredList?.let {
-        val list = IntArray(apiScope) { 0 }
+        val apiMap = mutableMapOf<Int, Int>()
 
         var minSdk: Int
         for (item in it) {
           try {
             packageInfo = PackageUtils.getPackageInfo(item.packageName)
             minSdk = PackageUtils.getMinSdkVersion(packageInfo)
-            if (minSdk in 1..apiScope) {
-              list[minSdk - 1]++
-            }
+            apiMap[minSdk] = apiMap[minSdk]?.plus(1) ?: 1
           } catch (e: Exception) {
             Timber.e(e)
           }
         }
-        existApiList.clear()
-        val iterator = list.iterator().withIndex()
-        while (iterator.hasNext()) {
-          val entry = iterator.next()
-          if (entry.value != 0) {
-            existApiList.add(entry.index + 1)
-          }
-        }
-
+        val sortedApiMap = TreeMap(apiMap)
         withContext(Dispatchers.Main) {
           if (chartView.parent != null) {
             binding.root.removeView(chartView)
           }
-          chartView = generateBarChartView()
+          chartView = generateBarChartView(sortedApiMap)
           binding.root.addView(chartView, -1)
         }
 
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
         legendList.clear()
-        for (i in parties.indices) {
-          if (list[i] > 0) {
-            entries.add(BarEntry(existApiList.indexOf(i + 1).toFloat(), list[i].toFloat()))
-            legendList.add((i + 1).toString())
-          }
+        var index = 0
+        sortedApiMap.forEach { entry ->
+          entries.add(BarEntry(index.toFloat(), entry.value.toFloat()))
+          legendList.add(entry.key.toString())
+          index++
         }
         val dataSet = BarDataSet(entries, "").apply {
           setDrawIcons(false)
@@ -623,7 +600,7 @@ class ChartFragment :
     }
   }
 
-  private fun generateBarChartView(): HorizontalBarChart {
+  private fun generateBarChartView(map: TreeMap<Int, Int>): HorizontalBarChart {
     val colorOnSurface =
       requireContext().getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
     return HorizontalBarChart(requireContext()).apply {
@@ -637,11 +614,11 @@ class ChartFragment :
       setDrawGridBackground(false)
       setFitBars(true)
       xAxis.apply {
-        valueFormatter = OsVersionAxisFormatter(existApiList)
+        valueFormatter = OsVersionAxisFormatter(map.map { it.key })
         position = XAxis.XAxisPosition.BOTTOM
         setDrawGridLines(false)
         setDrawLabels(true)
-        setLabelCount(existApiList.size, false)
+        setLabelCount(map.size, false)
         granularity = 1f
         textSize = 10f
         textColor = colorOnSurface
