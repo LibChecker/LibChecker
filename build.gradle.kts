@@ -14,7 +14,7 @@ allprojects {
   tasks.matching {
     it.name.contains("transformClassesWithHiddenApiRefine")
   }.configureEach {
-    notCompatibleWithConfigurationCache("transformClassesWithHiddenApiRefine task can't support CC")
+    notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
   }
 }
 
