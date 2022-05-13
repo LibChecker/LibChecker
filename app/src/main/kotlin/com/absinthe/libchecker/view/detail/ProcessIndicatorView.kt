@@ -17,7 +17,7 @@ class ProcessIndicatorView(context: Context, attributeSet: AttributeSet? = null)
     private set
   var animationDuration = 350L
 
-  private val libStringAdapter = LibStringAdapter(ACTIVITY)
+  private val libStringAdapter = LibStringAdapter("", ACTIVITY)
   private var measuredViewHeight: Int = 0
 
   private val indicators = RecyclerView(context).apply {

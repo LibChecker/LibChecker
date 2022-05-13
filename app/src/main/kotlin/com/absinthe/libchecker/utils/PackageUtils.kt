@@ -12,7 +12,9 @@ import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
+import androidx.collection.arrayMapOf
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
@@ -21,6 +23,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.Constants
@@ -45,12 +48,11 @@ import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.delay
+import okio.buffer
+import okio.source
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -100,7 +102,11 @@ object PackageUtils {
    */
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
-    return SystemServices.packageManager.getInstalledPackages(VersionCompat.MATCH_UNINSTALLED_PACKAGES or PackageManager.GET_META_DATA)
+    return SystemServices.packageManager.getInstalledPackages(
+      VersionCompat.MATCH_UNINSTALLED_PACKAGES
+        or PackageManager.GET_META_DATA
+        or PackageManager.GET_PERMISSIONS
+    )
   }
 
   /**
@@ -183,7 +189,7 @@ object PackageUtils {
         list.addAll(
           files.asSequence()
             .distinctBy { it.name }
-            .map { LibStringItem(it.name, it.length()) }
+            .map { LibStringItem(it.name, FileUtils.getFileSize(it)) }
             .toMutableList()
         )
       }
@@ -246,7 +252,7 @@ object PackageUtils {
    */
   private fun getSplitLibs(packageInfo: PackageInfo): List<LibStringItem> {
     val libList = mutableListOf<LibStringItem>()
-    val splitList = packageInfo.applicationInfo.splitSourceDirs
+    val splitList = getSplitsSourceDir(packageInfo)
     if (splitList.isNullOrEmpty()) {
       return listOf()
     }
@@ -267,26 +273,43 @@ object PackageUtils {
     return libList
   }
 
-  /**
-   * Judge that whether an app uses split apks
-   * @param packageInfo PackageInfo
-   * @return true if it uses split apks
-   */
-  fun isSplitsApk(packageInfo: PackageInfo): Boolean {
-    return !packageInfo.applicationInfo.splitSourceDirs.isNullOrEmpty()
+  private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
+
+  fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
+    if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
+      val files = File(packageInfo.applicationInfo.sourceDir).parentFile
+      if (files?.exists() == true) {
+        return files.listFiles()?.asSequence()
+          ?.filter {
+            it.name.matches(regex_splits)
+          }
+          ?.map { it.absolutePath }
+          ?.toList()
+          ?.toTypedArray()
+      }
+    }
+    return packageInfo.applicationInfo.splitSourceDirs
   }
 
   /**
-   * Judge that whether an app uses Kotlin language
-   * @param packageInfo PackageInfo
+   * Check if an app uses split apks
+   * @return true if it uses split apks
+   */
+  fun PackageInfo.isSplitsApk(): Boolean {
+    return !applicationInfo.splitSourceDirs.isNullOrEmpty()
+  }
+
+  /**
+   * Check if an app uses Kotlin language
    * @return true if it uses Kotlin language
    */
-  fun isKotlinUsed(packageInfo: PackageInfo): Boolean {
+  fun PackageInfo.isKotlinUsed(): Boolean {
     return runCatching {
-      val file = File(packageInfo.applicationInfo.sourceDir)
+      val file = File(applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
+        it.getEntry("kotlin-tooling-metadata.json") != null ||
+          it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
           it.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
           isKotlinUsedInClassDex(file)
@@ -337,9 +360,27 @@ object PackageUtils {
    * @return meta data list
    */
   fun getMetaDataItems(packageInfo: PackageInfo): List<LibStringItem> {
+    val appResources by lazy { SystemServices.packageManager.getResourcesForApplication(packageInfo.applicationInfo) }
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
-        .map { key -> LibStringItem(key, 0, it.get(key).toString()) }
+        .map { key ->
+          var value = it.get(key).toString()
+          var id = 0L
+
+          if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {
+            id = value.toLong()
+            if ((id and 0xFF000000) == 0x7F000000.toLong() && (id and 0x00FF0000) >= 0x00010000 && (id and 0x0000FFFF) >= 0x00000000) {
+              // This may be an android resource id
+              Timber.d("Found android resource id: $key")
+              runCatching {
+                value = appResources.getResourceName(id.toInt())
+              }
+            } else {
+              id = 0L
+            }
+          }
+          LibStringItem(key, id, value)
+        }
         .toList()
     } ?: return emptyList()
   }
@@ -350,15 +391,13 @@ object PackageUtils {
    * @return permissions list
    */
   fun getPermissionsItems(packageInfo: PackageInfo): List<LibStringItem> {
-    packageInfo.requestedPermissions?.let {
-      return it.asSequence()
-        .map { perm -> LibStringItem(perm, 0) }
-        .toList()
-    } ?: return emptyList()
+    return packageInfo.getPermissionsList().asSequence()
+      .map { perm -> LibStringItem(perm, 0) }
+      .toList()
   }
 
   /**
-   * Judge that whether an app uses Kotlin language from classes.dex
+   * Check if an app uses Kotlin language from classes.dex
    * @param file APK file of the app
    * @return true if it uses Kotlin language
    */
@@ -702,7 +741,7 @@ object PackageUtils {
       X86_64_STRING -> X86_64
       X86_STRING -> X86
       null -> {
-        if (FreezeUtils.isAppFrozen(applicationInfo.packageName)) {
+        if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
           val supportedAbiSet = realAbiSet.toMutableSet()
           realAbiSet.forEach {
             if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
@@ -734,7 +773,7 @@ object PackageUtils {
     return abi
   }
 
-  private val ABI_STRING_RES_MAP = hashMapOf(
+  private val ABI_STRING_RES_MAP = arrayMapOf(
     ARMV8 to listOf(R.string.arm64_v8a),
     ARMV7 to listOf(R.string.armeabi_v7a),
     ARMV5 to listOf(R.string.armeabi),
@@ -749,7 +788,7 @@ object PackageUtils {
     X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
   )
 
-  private val ABI_BADGE_MAP = mapOf(
+  private val ABI_BADGE_MAP = arrayMapOf(
     NO_LIBS to if (Process.is64Bit()) {
       R.drawable.ic_abi_label_64bit
     } else {
@@ -808,23 +847,23 @@ object PackageUtils {
     return "(${Formatter.formatFileSize(context, item.size)}$source)"
   }
 
-  fun hasDexClass(packageName: String, className: String, isApk: Boolean = false): Boolean {
-    try {
-      val path = if (isApk) {
-        packageName
-      } else {
-        getPackageInfo(packageName).applicationInfo.sourceDir
-      }
-
-      if (path.isNullOrEmpty()) {
-        return false
-      }
-      val typeName = "L${className.replace(".", "/")};"
-      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+  /**
+   * Check if a package contains a class
+   * @param sourceFile Source file
+   * @param className Class name
+   */
+  fun hasDexClass(sourceFile: File, className: String): Boolean {
+    return runCatching {
+      val typeName = "L${className.replace(".", "/")};".replace("*;", "")
+      FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
           val hasDex = getEntry(entry)?.dexFile?.classes
             ?.any {
-              it.type == typeName
+              if (className.last() == '*') {
+                it.type.startsWith(typeName)
+              } else {
+                it.type == typeName
+              }
             } ?: false
           if (hasDex) {
             return true
@@ -832,9 +871,7 @@ object PackageUtils {
         }
       }
       return false
-    } catch (e: Exception) {
-      return false
-    }
+    }.getOrDefault(false)
   }
 
   /**
@@ -935,12 +972,16 @@ object PackageUtils {
    */
   fun getPermissionsList(packageName: String): List<String> {
     return runCatching {
-      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions.toList()
+      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getPermissionsList()
     }.getOrElse { emptyList() }
   }
 
+  fun PackageInfo.getPermissionsList(): List<String> {
+    return requestedPermissions?.toList() ?: emptyList()
+  }
+
   /**
-   * Judge that whether an app is installed
+   * Check if an app is installed
    * @return true if it is installed
    */
   fun isAppInstalled(pkgName: String): Boolean {
@@ -957,7 +998,7 @@ object PackageUtils {
    * @return minSdkVersion
    */
   fun getMinSdkVersion(packageInfo: PackageInfo): Int {
-    val minSdkVersionValue = if (LCAppUtils.atLeastN()) {
+    val minSdkVersionValue = if (OsUtils.atLeastN()) {
       packageInfo.applicationInfo.minSdkVersion
     } else {
       val demands = ManifestReader.getManifestProperties(
@@ -993,9 +1034,13 @@ object PackageUtils {
           }
         }
         zipFile.getEntry("META-INF/MANIFEST.MF")?.let { ze ->
-          BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).useLines { seq ->
-            seq.find { it.contains(AGP_KEYWORD2) }?.let {
-              return it.removePrefix(AGP_KEYWORD2)
+          zipFile.getInputStream(ze).source().buffer().use {
+            while (true) {
+              it.readUtf8Line()?.let { line ->
+                if (line.startsWith(AGP_KEYWORD2)) {
+                  return line.removePrefix(AGP_KEYWORD2)
+                }
+              } ?: break
             }
           }
         }
@@ -1005,11 +1050,8 @@ object PackageUtils {
           "META-INF/androidx.databinding_library.version"
         ).forEach { entry ->
           zipFile.getEntry(entry)?.let { ze ->
-            BufferedReader(InputStreamReader(zipFile.getInputStream(ze))).use { seq ->
-              val version = seq.readLine()
-              if (version.isNotBlank()) {
-                return version
-              }
+            zipFile.getInputStream(ze).source().buffer().use { bs ->
+              return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
             }
           }
         }
@@ -1025,19 +1067,14 @@ object PackageUtils {
     try {
       val pmList = mutableListOf<String>()
       val process = runtime.exec("pm list packages")
-      InputStreamReader(process.inputStream, StandardCharsets.UTF_8).use { isr ->
-        BufferedReader(isr).use { br ->
-          br.forEachLine { line ->
-            line.trim().let { trimLine ->
-              if (trimLine.startsWith("package:")) {
-                trimLine.removePrefix("package:").let {
-                  if (it.isNotBlank()) {
-                    pmList.add(it)
-                  }
-                }
-              }
+      process.inputStream.source().buffer().use { bs ->
+        while (true) {
+          bs.readUtf8Line()?.trim()?.let { line ->
+            if (line.startsWith("package:")) {
+              line.removePrefix("package:").takeIf { removedPrefix -> removedPrefix.isNotBlank() }
+                ?.let { pmList.add(it) }
             }
-          }
+          } ?: break
         }
       }
       return pmList
@@ -1082,15 +1119,15 @@ object PackageUtils {
   }
 
   fun getPackageSize(packageInfo: PackageInfo, includeSplits: Boolean): Long {
-    var size: Long = File(packageInfo.applicationInfo.sourceDir).length()
+    var size: Long = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
 
     if (!includeSplits) {
       return size
     }
 
-    packageInfo.applicationInfo.splitSourceDirs?.forEach {
+    getSplitsSourceDir(packageInfo)?.forEach {
       runCatching {
-        size += File(it).length()
+        size += FileUtils.getFileSize(it)
       }
     }
     return size
@@ -1126,5 +1163,23 @@ object PackageUtils {
       val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf("use32bitAbi"))
       return demands["use32bitAbi"] as? Boolean ?: false
     }.getOrNull() ?: return false
+  }
+
+  fun getKotlinPluginVersion(packageInfo: PackageInfo): String? {
+    return runCatching {
+      ZipFile(packageInfo.applicationInfo.sourceDir).use { zip ->
+        val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
+        zip.getInputStream(entry).source().buffer().use {
+          val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
+          return json?.buildPluginVersion.takeIf { json?.buildPlugin == "org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper" }
+        }
+      }
+    }.getOrNull()
+  }
+
+  fun PackageInfo.isUseJetpackCompose(): Boolean {
+    return runCatching {
+      hasDexClass(File(applicationInfo.sourceDir), "androidx.compose.*")
+    }.getOrDefault(false)
   }
 }

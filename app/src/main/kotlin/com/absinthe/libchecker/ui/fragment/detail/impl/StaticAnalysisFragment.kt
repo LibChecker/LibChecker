@@ -53,7 +53,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initStaticData(packageName)
+    viewModel.initStaticData()
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

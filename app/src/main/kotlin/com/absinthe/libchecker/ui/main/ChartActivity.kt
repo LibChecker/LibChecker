@@ -15,6 +15,7 @@ class ChartActivity : BaseActivity<ActivityChartBinding>() {
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.tab_chart)
     if (savedInstanceState == null) {
       supportFragmentManager.beginTransaction()
         .replace(R.id.fragment_container, ChartFragment())

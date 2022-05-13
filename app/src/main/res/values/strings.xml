@@ -48,6 +48,8 @@
   <string name="ref_category_perm">Permissions</string>
   <string name="ref_category_static">Static Libraries</string>
   <string name="ref_category_metadata">Meta Data</string>
+  <string name="ref_category_package">Package</string>
+  <string name="ref_category_shared_uid">Shared UID</string>
 
   <string name="string_kotlin_used">Kotlin Used</string>
   <string name="string_kotlin_unused">Kotlin Unused</string>
@@ -113,7 +115,9 @@
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
   <string name="pwa_details">"Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. "</string>
+  <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="extract_native_libs_tip_part_a">The app declares </string>
+  <string name="xml_detail">XML Detail</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
@@ -143,7 +147,7 @@
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Are you sure to reload all apps?</string>
   <string name="dialog_subtitle_reload_apps">This may take a few seconds</string>
-  <string name="dialog_title_change_timestamp">Change time node</string>
+  <string name="dialog_title_change_timestamp">Change Time Node</string>
   <string name="dialog_title_keep_previous_snapshot">Attention</string>
   <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
   <string name="dialog_title_select_to_delete">Choose a Date to Delete Snapshot</string>

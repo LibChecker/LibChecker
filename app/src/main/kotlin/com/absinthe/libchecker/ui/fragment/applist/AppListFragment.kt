@@ -61,6 +61,7 @@ class AppListFragment :
 
   private val appAdapter by lazy { AppAdapter(lifecycleScope) }
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
+  private var isFirstRequestChange = true
   private var popup: PopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
@@ -146,6 +147,13 @@ class AppListFragment :
     }
 
     initObserver()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (hasPackageChanged()) {
+      homeViewModel.requestChange()
+    }
   }
 
   override fun onPause() {
@@ -325,7 +333,10 @@ class AppListFragment :
           appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
           updateItems(it)
-          homeViewModel.requestChange()
+          if (hasPackageChanged() || isFirstRequestChange) {
+            isFirstRequestChange = false
+            homeViewModel.requestChange()
+          }
         }
       }
     }
@@ -355,15 +366,9 @@ class AppListFragment :
           }
         }
       }
-      shouldRequestChange.observe(viewLifecycleOwner) { should ->
-        if (isListReady && !should) {
-          homeViewModel.dbItems.value?.let { updateItems(it) }
-        }
-      }
     }
   }
 
-  @SuppressLint("NotifyDataSetChanged")
   private fun updateItems(
     newItems: List<LCItem>,
     highlightRefresh: Boolean = false
@@ -399,6 +404,7 @@ class AppListFragment :
       isListReady = true
 
       if (highlightRefresh) {
+        //noinspection NotifyDataSetChanged
         appAdapter.notifyDataSetChanged()
       }
     }

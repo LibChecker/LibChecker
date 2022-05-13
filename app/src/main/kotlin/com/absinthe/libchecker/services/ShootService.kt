@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -26,8 +27,9 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -97,7 +99,7 @@ class ShootService : LifecycleService() {
     initBuilder()
 
     notificationManager.apply {
-      if (LCAppUtils.atLeastO()) {
+      if (OsUtils.atLeastO()) {
         val name = createConfigurationContext(configuration).resources
           .getString(R.string.channel_shoot)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -196,7 +198,7 @@ class ShootService : LifecycleService() {
               .toJson().orEmpty(),
             providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
               .toJson().orEmpty(),
-            permissions = PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty(),
+            permissions = info.getPermissionsList().toJson().orEmpty(),
             metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
             packageSize = PackageUtils.getPackageSize(info, true)
           )
@@ -227,7 +229,7 @@ class ShootService : LifecycleService() {
       try {
         info = exceptionInfoList[0].applicationInfo
         abiValue = PackageUtils.getAbi(exceptionInfoList[0])
-        PackageUtils.getPackageInfo(info.packageName).let {
+        PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_PERMISSIONS).let {
           dbList.add(
             SnapshotItem(
               id = null,
@@ -250,7 +252,7 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
                 .toJson().orEmpty(),
-              permissions = PackageUtils.getPermissionsList(it.packageName).toJson().orEmpty(),
+              permissions = it.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
               packageSize = PackageUtils.getPackageSize(it, true)
             )

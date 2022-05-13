@@ -15,7 +15,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
@@ -76,7 +76,7 @@ class AppInfoBottomSheetDialogFragment :
       setHasFixedSize(true)
     }
 
-    if (LCAppUtils.atLeastN()) {
+    if (OsUtils.atLeastN()) {
       aiAdapter.also { adapter ->
         adapter.setList(getResolveInfoList())
         adapter.setOnItemClickListener { _, _, position ->

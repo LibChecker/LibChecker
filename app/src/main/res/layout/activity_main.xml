@@ -26,6 +26,16 @@
 
   </rikka.material.widget.AppBarLayout>
 
+  <com.google.android.material.progressindicator.LinearProgressIndicator
+    android:id="@+id/progress_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="?actionBarSize"
+    android:indeterminate="true"
+    android:visibility="gone"
+    app:hideAnimationBehavior="outward"
+    app:layout_fitsSystemWindowsInsets="top" />
+
   <com.google.android.material.bottomnavigation.BottomNavigationView
     android:id="@+id/nav_view"
     android:layout_width="match_parent"

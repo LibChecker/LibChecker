@@ -43,7 +43,6 @@ import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -79,7 +78,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
-  private var lastPackageChangedTime: Long = 0
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -340,10 +338,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       flip(VF_LOADING)
     }
 
-    val serverLastPackageChangedTime =
-      (activity as? MainActivity)?.workerBinder?.lastPackageChangedTime ?: 0L
-    if (lastPackageChangedTime < serverLastPackageChangedTime) {
-      lastPackageChangedTime = serverLastPackageChangedTime
+    if (hasPackageChanged()) {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
   }

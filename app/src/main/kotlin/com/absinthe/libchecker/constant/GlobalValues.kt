@@ -42,8 +42,6 @@ object GlobalValues {
 
   var md3Theme: Boolean by SPDelegates(Constants.PREF_MD3, false)
 
-  val shouldRequestChange: MutableLiveData<Boolean> = MutableLiveData(false)
-
   val isShowSystemApps: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
 

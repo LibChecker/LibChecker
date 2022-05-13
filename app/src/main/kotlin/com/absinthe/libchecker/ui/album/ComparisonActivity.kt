@@ -67,6 +67,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.album_item_comparison_title)
 
     val dashboardView = ComparisonDashboardView(
       ContextThemeWrapper(this, R.style.AlbumMaterialCard)

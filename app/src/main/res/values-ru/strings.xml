@@ -48,6 +48,8 @@
   <string name="ref_category_perm">Разрешения</string>
   <string name="ref_category_static">Static Libraries</string>
   <string name="ref_category_metadata">Meta Data</string>
+  <string name="ref_category_package">Package</string>
+  <string name="ref_category_shared_uid">Shared UID</string>
 
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
@@ -112,7 +114,9 @@
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
   <string name="pwa_details">"Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы."</string>
+  <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="extract_native_libs_tip_part_a">Приложение декларирует </string>
+  <string name="xml_detail">XML Деталь</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>

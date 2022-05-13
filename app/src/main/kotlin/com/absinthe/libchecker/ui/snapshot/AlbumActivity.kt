@@ -40,6 +40,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.title_album)
 
     val isDarkMode = when (DayNightDelegate.getDefaultNightMode()) {
       DayNightDelegate.MODE_NIGHT_YES -> true

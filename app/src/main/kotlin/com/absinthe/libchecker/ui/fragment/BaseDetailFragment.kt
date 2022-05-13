@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -23,6 +22,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -49,7 +49,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   protected val viewModel: DetailViewModel by activityViewModels()
   protected val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME).orEmpty() }
   protected val type by lazy { arguments?.getInt(EXTRA_TYPE) ?: NATIVE }
-  protected val adapter by lazy { LibStringAdapter(type) }
+  protected val adapter by lazy { LibStringAdapter(packageName, type, childFragmentManager) }
   protected val emptyView by unsafeLazy {
     EmptyListView(requireContext()).apply {
       layoutParams = FrameLayout.LayoutParams(
@@ -158,6 +158,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
         adapter.setDiffNewData(it.toMutableList()) {
           viewModel.itemsCountLiveData.value = LocatedCount(locate = type, count = it.size)
           viewModel.itemsCountList[type] = it.size
+          doOnMainThreadIdle {
+            //noinspection NotifyDataSetChanged
+            adapter.notifyDataSetChanged()
+          }
         }
       }
     }
@@ -165,7 +169,6 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   fun getItemsCount() = adapter.itemCount
 
-  @SuppressLint("NotifyDataSetChanged")
   private fun navigateToComponentImpl(component: String) {
     val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
     if (componentPosition == -1) {
@@ -184,6 +187,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
 
     adapter.setHighlightBackgroundItem(componentPosition)
+    //noinspection NotifyDataSetChanged
     adapter.notifyDataSetChanged()
   }
 

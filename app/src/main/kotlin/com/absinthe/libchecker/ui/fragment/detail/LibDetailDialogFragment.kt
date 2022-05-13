@@ -14,9 +14,6 @@ import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
-import com.absinthe.libchecker.view.detail.VF_CONTENT
-import com.absinthe.libchecker.view.detail.VF_LOADING
-import com.absinthe.libchecker.view.detail.VF_NOT_FOUND
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.launch
@@ -37,7 +34,6 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
   override fun init() {
     root.apply {
-      viewFlipper.displayedChild = VF_LOADING
       title.text = libName
       lifecycleScope.launch {
         val iconRes = LCRules.getRule(libName, type, true)?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
@@ -75,11 +71,11 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
             }
           }
 
-          viewFlipper.displayedChild = VF_CONTENT
+          root.showContent()
         }
       } else {
         if (isStickyEventReceived) {
-          root.viewFlipper.displayedChild = VF_NOT_FOUND
+          root.showNotFound()
         } else {
           isStickyEventReceived = true
         }

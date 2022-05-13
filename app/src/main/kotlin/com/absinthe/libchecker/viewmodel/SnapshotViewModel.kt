@@ -36,6 +36,7 @@ import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
@@ -45,6 +46,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.sink
 import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
@@ -192,7 +195,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           permissionsDiff = SnapshotDiffItem.DiffNode(
             dbItem.permissions,
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           metadataDiff = SnapshotDiffItem.DiffNode(
             dbItem.metadata,
@@ -320,7 +323,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPermissionsList(info.packageName).toJson().orEmpty()
+              info.getPermissionsList().toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getMetaDataItems(info).toJson().orEmpty()
@@ -481,7 +484,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val info = runCatching {
       PackageUtils.getPackageInfo(
         packageName,
-        PackageManager.GET_META_DATA
+        PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
       )
     }.getOrNull()
     val allTrackItems = repository.getTrackItems()
@@ -544,7 +547,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           SnapshotDiffItem.DiffNode(
             it.permissions,
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.metadata,
@@ -627,7 +630,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getPermissionsList(packageInfo.packageName).toJson().orEmpty()
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
@@ -1218,10 +1221,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     builder.addAllSnapshots(snapshotList)
-    val str = builder.build().toByteArray()
-
-    os.write(str)
-    os.close()
+    os.sink().buffer().use {
+      it.write(builder.build().toByteArray())
+    }
 
     withContext(Dispatchers.Main) {
       resultAction()
@@ -1230,9 +1232,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   fun restore(inputStream: InputStream, resultAction: (success: Boolean) -> Unit) {
     viewModelScope.launch(Dispatchers.IO) {
-      inputStream.use {
+      inputStream.use { stream ->
         val list: SnapshotList = try {
-          SnapshotList.parseFrom(inputStream)
+          SnapshotList.parseFrom(stream)
         } catch (e: InvalidProtocolBufferException) {
           withContext(Dispatchers.Main) {
             resultAction(false)

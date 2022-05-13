@@ -5,16 +5,19 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
+import androidx.core.text.toSpannable
 import androidx.fragment.app.FragmentActivity
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -37,11 +40,14 @@ import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialog
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
+import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -59,8 +65,8 @@ object LCAppUtils {
     }
   }
 
-  fun setTitle(context: Context): String {
-    val sb = StringBuilder(context.getString(R.string.app_name))
+  fun setTitle(context: Context): Spannable {
+    val sb = SpannableStringBuilder(context.getString(R.string.app_name))
     val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
     when {
@@ -74,7 +80,18 @@ object LCAppUtils {
         sb.append("\uD83D\uDC2F")
       }
     }
-    return sb.toString()
+
+    if (BuildConfig.IS_DEV_VERSION) {
+      val spanString = SpannableString("   ")
+      val span = CenterAlignImageSpan(
+        R.drawable.ic_ci_label.getDrawable(context)!!.also {
+          it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+        }
+      )
+      spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+      sb.append(spanString)
+    }
+    return sb.toSpannable()
   }
 
   fun getAppIcon(packageName: String): Drawable {
@@ -84,36 +101,6 @@ object LCAppUtils {
     } catch (e: Exception) {
       ColorDrawable(Color.TRANSPARENT)
     }
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.S)
-  fun atLeastS(): Boolean {
-    return Build.VERSION.SDK_INT >= 31
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.R)
-  fun atLeastR(): Boolean {
-    return Build.VERSION.SDK_INT >= 30
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
-  fun atLeastQ(): Boolean {
-    return Build.VERSION.SDK_INT >= 29
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.P)
-  fun atLeastP(): Boolean {
-    return Build.VERSION.SDK_INT >= 28
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
-  fun atLeastO(): Boolean {
-    return Build.VERSION.SDK_INT >= 26
-  }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
-  fun atLeastN(): Boolean {
-    return Build.VERSION.SDK_INT >= 24
   }
 
   suspend fun getRuleWithRegex(
@@ -128,9 +115,19 @@ object LCAppUtils {
         return ruleEntity
       }
       val isApk = packageName.isTempApk()
+      val source = if (isApk) {
+        File(packageName)
+      } else {
+        runCatching {
+          File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+        }.getOrNull()
+      }
+      if (source == null) {
+        return ruleEntity
+      }
       when (name) {
         "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", isApk)) {
+          return if (PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")) {
             ruleEntity
           } else {
             null
@@ -138,9 +135,8 @@ object LCAppUtils {
         }
         "libapp.so" -> {
           return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
-              packageName,
-              "io.flutter.FlutterInjector",
-              isApk
+              source,
+              "io.flutter.FlutterInjector"
             )
           ) {
             ruleEntity
@@ -158,10 +154,16 @@ object LCAppUtils {
   fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
     return when (nativeLib) {
       "libjiagu.so" -> {
-        PackageUtils.hasDexClass(packageName, "com.qihoo.util.QHClassLoader", false)
+        runCatching {
+          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+          PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")
+        }.getOrDefault(false)
       }
       "libapp.so" -> {
-        PackageUtils.hasDexClass(packageName, "io.flutter.FlutterInjector", false)
+        runCatching {
+          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+          PackageUtils.hasDexClass(source, "io.flutter.FlutterInjector")
+        }.getOrDefault(false)
       }
       else -> true
     }
@@ -242,7 +244,7 @@ fun doOnMainThreadIdle(action: () -> Unit) {
   if (Looper.getMainLooper() == Looper.myLooper()) {
     setupIdleHandler(Looper.myQueue())
   } else {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (OsUtils.atLeastM()) {
       setupIdleHandler(Looper.getMainLooper().queue)
     } else {
       handler.post { setupIdleHandler(Looper.myQueue()) }

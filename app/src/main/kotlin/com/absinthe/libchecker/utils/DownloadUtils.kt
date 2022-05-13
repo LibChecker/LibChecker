@@ -5,8 +5,10 @@ import okhttp3.Callback
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okio.buffer
+import okio.sink
+import okio.source
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 
 object DownloadUtils {
@@ -34,20 +36,9 @@ object DownloadUtils {
         file.createNewFile()
         runCatching {
           response.body?.let { body ->
-            body.byteStream().use { ins ->
-              val total = body.contentLength()
-              FileOutputStream(file).use { fos ->
-                var sum: Long = 0
-                val buf = ByteArray(2048)
-                var len: Int
-                while (ins.read(buf).also { len = it } != -1) {
-                  fos.write(buf, 0, len)
-                  sum += len.toLong()
-                  val progress = (sum * 1.0f / total * 100).toInt()
-                  listener.onDownloading(progress)
-                }
-                fos.flush()
-                listener.onDownloadSuccess()
+            body.byteStream().source().buffer().use { input ->
+              file.sink().buffer().use { output ->
+                output.writeAll(input)
               }
             }
           } ?: run {

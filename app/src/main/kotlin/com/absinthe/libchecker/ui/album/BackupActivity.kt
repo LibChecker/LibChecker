@@ -24,7 +24,6 @@ import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -37,6 +36,8 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.album_item_backup_restore_title)
+
     if (savedInstanceState == null) {
       supportFragmentManager.beginTransaction()
         .replace(R.id.fragment_container, BackupFragment())
@@ -63,36 +64,40 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
       backupResultLauncher =
         registerForActivityResult(ActivityResultContracts.CreateDocument()) {
           it?.let {
-            try {
-              val dialog = LCAppUtils.createLoadingDialog(requireActivity())
-              dialog.show()
-              requireActivity().contentResolver.openOutputStream(it)?.let { os ->
-                viewModel.backup(os) {
-                  dialog.dismiss()
+            activity?.let { activity ->
+              runCatching {
+                val dialog = LCAppUtils.createLoadingDialog(activity)
+                dialog.show()
+                activity.contentResolver.openOutputStream(it)?.let { os ->
+                  viewModel.backup(os) {
+                    dialog.dismiss()
+                  }
                 }
+              }.onFailure { t ->
+                Timber.e(t)
               }
-            } catch (e: IOException) {
-              Timber.e(e)
             }
           }
         }
       restoreResultLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
           it?.let {
-            try {
-              requireActivity().contentResolver.openInputStream(it)
-                ?.let { inputStream ->
-                  val dialog = LCAppUtils.createLoadingDialog(requireActivity())
-                  dialog.show()
-                  viewModel.restore(inputStream) { success ->
-                    if (!success) {
-                      context.showToast("Backup file error")
+            activity?.let { activity ->
+              runCatching {
+                activity.contentResolver.openInputStream(it)
+                  ?.let { inputStream ->
+                    val dialog = LCAppUtils.createLoadingDialog(activity)
+                    dialog.show()
+                    viewModel.restore(inputStream) { success ->
+                      if (!success) {
+                        context.showToast("Backup file error")
+                      }
+                      dialog.dismiss()
                     }
-                    dialog.dismiss()
                   }
-                }
-            } catch (e: IOException) {
-              Timber.e(e)
+              }.onFailure { t ->
+                Timber.e(t)
+              }
             }
           }
         }

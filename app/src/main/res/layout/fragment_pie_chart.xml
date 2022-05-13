@@ -8,6 +8,14 @@
   android:paddingTop="?actionBarSize"
   app:fitsSystemWindowsInsets="bottom|top">
 
+  <com.google.android.material.progressindicator.LinearProgressIndicator
+    android:id="@+id/progress_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:indeterminate="true"
+    android:visibility="gone"
+    app:hideAnimationBehavior="outward" />
+
   <com.google.android.material.button.MaterialButtonToggleGroup
     android:id="@+id/buttons_group"
     android:layout_width="match_parent"

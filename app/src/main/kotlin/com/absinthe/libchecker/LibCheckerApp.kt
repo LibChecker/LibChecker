@@ -1,6 +1,5 @@
 package com.absinthe.libchecker
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import androidx.window.core.ExperimentalWindowApi
@@ -10,6 +9,7 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
@@ -37,7 +37,7 @@ class LibCheckerApp : Application() {
       return
     }
 
-    if (LCAppUtils.atLeastP()) {
+    if (OsUtils.atLeastP()) {
       HiddenApiBypass.addHiddenApiExemptions("")
     }
 
@@ -88,7 +88,7 @@ class LibCheckerApp : Application() {
   }
 
   companion object {
-    @SuppressLint("StaticFieldLeak")
+    //noinspection StaticFieldLeak
     lateinit var app: Application
 
     fun generateAuthKey(): Int {

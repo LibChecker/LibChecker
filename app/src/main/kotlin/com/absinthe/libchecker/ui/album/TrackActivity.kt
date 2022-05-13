@@ -48,6 +48,8 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
     setAppBar(binding.appbar, binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    binding.toolbar.title = getString(R.string.album_item_track_title)
+
     binding.list.apply {
       adapter = this@TrackActivity.adapter
       layoutManager = LinearLayoutManager(this@TrackActivity)

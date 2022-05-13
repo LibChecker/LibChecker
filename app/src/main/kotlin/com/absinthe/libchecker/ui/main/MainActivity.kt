@@ -17,7 +17,6 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
@@ -58,19 +57,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   }
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      workerBinder = IWorkerService.Stub.asInterface(service)
+      appViewModel.workerBinder = IWorkerService.Stub.asInterface(service)
       runCatching {
-        workerBinder?.registerOnWorkerListener(workerListener)
+        appViewModel.workerBinder?.registerOnWorkerListener(workerListener)
       }.onFailure {
         Timber.e(it)
       }
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
-      workerBinder = null
+      appViewModel.workerBinder = null
     }
   }
-  var workerBinder: IWorkerService? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -94,16 +92,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     handleIntentFromShortcuts(intent)
   }
 
-  override fun onResume() {
-    super.onResume()
-    if (GlobalValues.shouldRequestChange.value == true) {
-      appViewModel.requestChange(true)
-    }
-  }
-
   override fun onDestroy() {
     super.onDestroy()
-    workerBinder?.unregisterOnWorkerListener(workerListener)
+    appViewModel.workerBinder?.unregisterOnWorkerListener(workerListener)
     unbindService(workerServiceConnection)
   }
 
@@ -115,6 +106,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
   override fun hideNavigationView() {
     Timber.d("hideNavigationView")
     navViewBehavior.slideDown(binding.navView)
+  }
+
+  override fun showProgressBar() {
+    Timber.d("showProgressBar")
+    binding.progressHorizontal.show()
+  }
+
+  override fun hideProgressBar() {
+    Timber.d("hideProgressBar")
+    binding.progressHorizontal.hide()
   }
 
   private fun initView() {

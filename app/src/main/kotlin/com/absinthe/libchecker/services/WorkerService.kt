@@ -14,6 +14,7 @@ import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -112,9 +113,7 @@ class WorkerService : LifecycleService() {
       Repositories.lcRepository.allDatabaseItems.value!!.forEach { lcItem ->
         if (lcItem.isKotlinUsed == null) {
           runCatching {
-            map[lcItem.packageName] = PackageUtils.isKotlinUsed(
-              PackageUtils.getPackageInfo(lcItem.packageName)
-            )
+            map[lcItem.packageName] = PackageUtils.getPackageInfo(lcItem.packageName).isKotlinUsed()
           }.onFailure {
             Timber.w(it)
           }

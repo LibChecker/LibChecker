@@ -104,8 +104,7 @@ class AboutActivity : AbsAboutActivity() {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
 
-          val inputStream = assets.open("renge.webp")
-          icon.setImageBitmap(BitmapFactory.decodeStream(inputStream))
+          icon.setImageBitmap(BitmapFactory.decodeStream(assets.open("renge.webp")))
           slogan.text = "ええ、私もよ。"
           val headerContentLayout =
             findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
@@ -403,7 +402,10 @@ class AboutActivity : AbsAboutActivity() {
   }
 
   private fun initView() {
-    findViewById<Toolbar>(R.id.toolbar)?.background = null
+    findViewById<Toolbar>(R.id.toolbar)?.let {
+      it.background = null
+      it.title = getString(R.string.settings_about)
+    }
     val color = getColor(R.color.aboutHeader)
     setHeaderBackground(ColorDrawable(color))
     setHeaderContentScrim(ColorDrawable(color))

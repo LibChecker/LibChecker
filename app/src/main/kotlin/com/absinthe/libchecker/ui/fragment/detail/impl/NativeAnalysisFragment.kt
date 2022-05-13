@@ -68,7 +68,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initSoAnalysisData(packageName)
+    viewModel.initSoAnalysisData()
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

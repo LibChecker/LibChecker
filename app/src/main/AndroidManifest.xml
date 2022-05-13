@@ -50,6 +50,7 @@
       android:name=".ui.detail.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
+      android:launchMode="singleTask"
       android:label="@string/detail_label">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
