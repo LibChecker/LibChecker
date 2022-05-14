@@ -1108,7 +1108,7 @@ object PackageUtils {
     try {
       if (pmList.size > appList.size) {
         appList = pmList.asSequence()
-          .map { getPackageInfo(it) }
+          .map { getPackageInfo(it, PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS) }
           .toList()
       }
     } catch (t: Throwable) {
