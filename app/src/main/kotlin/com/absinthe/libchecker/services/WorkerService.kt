@@ -50,6 +50,7 @@ class WorkerService : LifecycleService() {
   override fun onCreate() {
     super.onCreate()
     Timber.d("onCreate")
+    initializingKotlinUsage = false
     initAllApplicationInfoItems()
 
     val intentFilter = IntentFilter().apply {

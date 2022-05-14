@@ -216,10 +216,10 @@ public class ResourceParser {
    * 自定义节点类
    */
   private static class Node {
-    String name;  // 名称
-    int depth; // 深度
-    boolean isEmptyTag; // 是单标签
-    int attrCount; // 属性个数
+    final String name;  // 名称
+    final int depth; // 深度
+    final boolean isEmptyTag; // 是单标签
+    final int attrCount; // 属性个数
     boolean isTagOpen = true;
     boolean hasSubTag;
     boolean hasText;
@@ -252,9 +252,9 @@ public class ResourceParser {
    * 此类保存上色文本信息
    */
   private static class SpanText {
-    int start;
-    int end;
-    int color;
+    final int start;
+    final int end;
+    final int color;
 
     public SpanText(int start, int end, int color) {
       this.start = start;
