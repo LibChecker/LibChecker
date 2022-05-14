@@ -3,7 +3,6 @@ package com.absinthe.libchecker.base
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.app.Dialog
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +19,6 @@ import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libraries.utils.utils.UiUtils
-import com.absinthe.libraries.utils.view.HeightClipDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -32,12 +30,11 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   BottomSheetDialogFragment(), View.OnLayoutChangeListener {
 
   var animationDuration = 350L
+  var maxPeekSize: Int = 0
 
   private var _root: T? = null
   private var isHandlerActivated = false
-  private var clipBounds2: Rect? = null // Because View#clipBounds creates a new Rect on every call.
   private var animator: ValueAnimator = ObjectAnimator()
-  private var prevBlurRadius = 64
   private val behavior by unsafeLazy { BottomSheetBehavior.from(root.parent as View) }
   private val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
     override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -138,6 +135,7 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
   }
 
   override fun onDestroyView() {
+    animator.cancel()
     root.removeOnLayoutChangeListener(this)
     _root = null
     super.onDestroyView()
@@ -163,7 +161,9 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     oldBottom: Int
   ) {
     if ((bottom - top) != (oldBottom - oldTop)) {
-      animateHeight(from = oldBottom - oldTop, to = bottom - top, onEnd = { })
+      enqueueAnimation {
+        animateHeight(from = oldBottom - oldTop, to = bottom - top, onEnd = { })
+      }
     }
   }
 
@@ -203,11 +203,14 @@ abstract class BaseBottomSheetViewDialogFragment<T : View> :
     }
   }
 
+  private fun enqueueAnimation(action: () -> Unit) {
+    if (!animator.isRunning) action()
+    else animator.doOnEnd { action() }
+  }
+
   private fun setClippedHeight(newHeight: Int) {
-    clipBounds2 = (clipBounds2 ?: Rect()).also {
-      it.set(0, 0, root.right - root.left, root.top + newHeight)
+    if (newHeight <= maxPeekSize || maxPeekSize == 0) {
+      behavior.peekHeight = newHeight
     }
-    (root.background as HeightClipDrawable?)?.clippedHeight = newHeight
-    root.invalidate()
   }
 }

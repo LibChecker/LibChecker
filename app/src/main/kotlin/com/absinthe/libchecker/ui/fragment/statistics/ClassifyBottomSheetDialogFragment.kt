@@ -19,6 +19,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    root.post {
+      maxPeekSize = (root.height * 0.67).toInt()
+    }
     viewModel.dialogTitle.observe(viewLifecycleOwner) {
       getHeaderView().title.text = it
     }
