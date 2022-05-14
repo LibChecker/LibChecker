@@ -70,8 +70,6 @@ class AppListFragment :
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
-    setHasOptionsMenu(true)
-
     appAdapter.also {
       it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {

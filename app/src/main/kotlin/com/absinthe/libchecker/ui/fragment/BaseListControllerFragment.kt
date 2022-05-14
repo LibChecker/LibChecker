@@ -22,16 +22,14 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
-    if (visible) {
-      if (this != homeViewModel.controller) {
-        homeViewModel.controller = this
-        activity?.invalidateOptionsMenu()
-      }
+    if (visible && this != homeViewModel.controller) {
+      homeViewModel.controller = this
     }
   }
 
   override fun onResume() {
     super.onResume()
+    setHasOptionsMenu(isVisible)
     scheduleAppbarRaisingStatus()
   }
 

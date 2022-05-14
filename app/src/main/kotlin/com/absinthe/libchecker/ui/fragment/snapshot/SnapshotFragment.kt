@@ -114,8 +114,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
 
   override fun init() {
-    setHasOptionsMenu(true)
-
     val context = (this.context as? BaseActivity<*>) ?: return
     context.applicationContext.also {
       val intent = Intent(it, ShootService::class.java).apply {

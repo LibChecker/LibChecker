@@ -84,7 +84,6 @@ class LibReferenceFragment :
   private var searchUpdateJob: Job? = null
 
   override fun init() {
-    setHasOptionsMenu(true)
     val context = (context as? BaseActivity<*>) ?: return
 
     binding.apply {

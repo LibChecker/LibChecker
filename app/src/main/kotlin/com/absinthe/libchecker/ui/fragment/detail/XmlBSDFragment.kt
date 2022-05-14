@@ -24,7 +24,7 @@ class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
       post {
-        maxPeekSize = (root.height * 0.67).toInt()
+        maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
       }
     }
     root.setText(text)
