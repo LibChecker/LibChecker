@@ -16,7 +16,9 @@ import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.rulesbundle.LCRules
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
@@ -36,7 +38,8 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     root.apply {
       title.text = libName
       lifecycleScope.launch {
-        val iconRes = LCRules.getRule(libName, type, true)?.iconRes ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        val iconRes = LCRules.getRule(libName, type, true)?.iconRes
+          ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
         icon.load(iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)
@@ -72,6 +75,25 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
           }
 
           root.showContent()
+
+          if (it.relativeUrl.startsWith("https://github.com/")) {
+            lifecycleScope.launch(Dispatchers.IO) {
+              val splits = it.relativeUrl.removePrefix("https://github.com/").split("/")
+              if (splits.size >= 2) {
+                val date = viewModel.getRepoUpdatedTime(splits[0], splits[1])
+                withContext(Dispatchers.Main) {
+                  if (date != null) {
+                    root.libDetailContentView.setUpdatedTime(
+                      String.format(
+                        getString(R.string.format_last_updated),
+                        date
+                      )
+                    )
+                  }
+                }
+              }
+            }
+          }
         }
       } else {
         if (isStickyEventReceived) {

@@ -201,6 +201,8 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
   }
 
   fun showContent() {
-    viewFlipper.show(cloudRulesContentView)
+    if (viewFlipper.displayedChildView != cloudRulesContentView) {
+      viewFlipper.show(cloudRulesContentView)
+    }
   }
 }

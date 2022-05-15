@@ -22,6 +22,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -41,6 +42,11 @@ import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -381,5 +387,15 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } catch (e: Exception) {
       Timber.e(e)
     }
+  }
+
+  suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
+    val request: CloudRuleBundleRequest = ApiManager.create()
+    val result = request.requestRepoInfo(owner, repo) ?: return null
+    val instant = Instant.parse(result.pushed_at)
+    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+      .withLocale(Locale.getDefault())
+      .withZone(ZoneId.systemDefault())
+    return formatter.format(instant)
   }
 }

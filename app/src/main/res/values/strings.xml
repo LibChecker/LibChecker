@@ -118,6 +118,7 @@
   <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="extract_native_libs_tip_part_a">The app declares </string>
   <string name="xml_detail">XML Detail</string>
+  <string name="format_last_updated">Updated at: %s</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

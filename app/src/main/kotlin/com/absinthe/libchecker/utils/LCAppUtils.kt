@@ -49,18 +49,19 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.Month
 import java.util.Date
 import java.util.Locale
 
 object LCAppUtils {
 
   fun getCurrentSeason(): Int {
-    return when (Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
-      3, 4, 5 -> SPRING
-      6, 7, 8 -> SUMMER
-      9, 10, 11 -> AUTUMN
-      12, 1, 2 -> WINTER
+    return when (LocalDate.now().month) {
+      Month.MARCH, Month.APRIL, Month.MAY -> SPRING
+      Month.JUNE, Month.JULY, Month.AUGUST -> SUMMER
+      Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER -> AUTUMN
+      Month.DECEMBER, Month.JANUARY, Month.FEBRUARY -> WINTER
       else -> -1
     }
   }

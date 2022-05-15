@@ -635,6 +635,7 @@ abstract class BaseAppDetailActivity :
       it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = featureAdapter
       it.clipChildren = false
+      it.overScrollMode = View.OVER_SCROLL_NEVER
     }
     binding.headerContentLayout.addView(featureListView)
     return true

@@ -23,6 +23,8 @@ object ApiManager {
   const val GITHUB_NEW_ISSUE_URL =
     "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
 
+  const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/%s/%s"
+
   private val root
     get() = when (GlobalValues.repo) {
       Constants.REPO_GITHUB -> GITHUB_ROOT_URL
@@ -38,6 +40,7 @@ object ApiManager {
       .connectTimeout(30, TimeUnit.SECONDS)
       .readTimeout(30, TimeUnit.SECONDS)
       .writeTimeout(30, TimeUnit.SECONDS)
+      .addInterceptor(BaseUrlInterceptor())
       .build()
     Retrofit.Builder()
       .addConverterFactory(MoshiConverterFactory.create(JsonUtil.moshi))

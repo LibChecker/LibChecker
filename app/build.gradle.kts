@@ -32,6 +32,10 @@ setupAppModule {
     viewBinding = true
   }
 
+  compileOptions {
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   sourceSets["main"].java.srcDirs("src/main/kotlin")
 
   packagingOptions.resources.excludes += setOf(
@@ -102,6 +106,8 @@ dependencies {
   compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
   compileOnly(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
+
+  coreLibraryDesugaring(libs.agp.desugering)
 
   implementation(libs.kotlinX.coroutines)
   implementation(libs.androidX.appCompat)
