@@ -25,10 +25,7 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val ARROW = "→"
 
@@ -57,19 +54,15 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
       icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(
-            item.packageName,
-            PackageManager.GET_META_DATA
-          ).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: PackageManager.NameNotFoundException) {
-          withContext(Dispatchers.Main) {
-            icon.setImageResource(R.drawable.ic_icon_blueprint)
-          }
-        }
+      runCatching {
+        val ai = PackageUtils.getPackageInfo(
+          item.packageName,
+          PackageManager.GET_META_DATA
+        ).applicationInfo
+        loadIconJob =
+          AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+      }.onFailure {
+        icon.setImageResource(R.drawable.ic_icon_blueprint)
       }
 
       if (item.deleted) {

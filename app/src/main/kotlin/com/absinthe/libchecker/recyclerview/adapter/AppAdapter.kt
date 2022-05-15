@@ -16,9 +16,7 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter<LCItem>() {
@@ -42,14 +40,12 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
   override fun convert(holder: BaseViewHolder, item: LCItem) {
     (holder.itemView as AppItemView).container.apply {
       icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: Exception) {
-          Timber.e(e)
-        }
+      runCatching {
+        val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
+        loadIconJob =
+          AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+      }.onFailure {
+        Timber.e(it)
       }
 
       setOrHighlightText(appName, item.label)

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.pm.PackageManager
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
@@ -12,9 +11,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
@@ -43,14 +40,12 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   override fun convert(holder: BaseViewHolder, item: TrackListItem) {
     (holder.itemView as TrackItemView).container.apply {
       icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: PackageManager.NameNotFoundException) {
-          Timber.e(e)
-        }
+      runCatching {
+        val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
+        loadIconJob =
+          AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
+      }.onFailure {
+        Timber.e(it)
       }
       appName.text = item.label
       packageName.text = item.packageName

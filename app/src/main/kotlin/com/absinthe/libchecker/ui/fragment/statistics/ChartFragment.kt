@@ -280,7 +280,6 @@ class ChartFragment :
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
       val context = context ?: return@launch
-      val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
 
@@ -357,7 +356,6 @@ class ChartFragment :
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
       val context = context ?: return@launch
-      val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
       var packageInfo: PackageInfo

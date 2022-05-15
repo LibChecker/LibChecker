@@ -214,12 +214,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems()
       } else {
-        lifecycleScope.launch(Dispatchers.IO) {
-          do {
-            workerBinder?.initKotlinUsage()
-            delay(300)
-          } while (workerBinder == null)
-        }
+        initKotlinUsage()
       }
 
       lifecycleScope.launchWhenStarted {
@@ -234,12 +229,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
                   hideNavigationView()
                 }
               } else if (it.status == STATUS_INIT_END) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                  do {
-                    workerBinder?.initKotlinUsage()
-                    delay(300)
-                  } while (workerBinder == null)
-                }
+                initKotlinUsage()
               }
             }
             else -> {}
@@ -259,5 +249,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
         Repositories.lcRepository.deleteAllSnapshotDiffItems()
       }
     }
+  }
+
+  private fun initKotlinUsage() = lifecycleScope.launch(Dispatchers.IO) {
+    do {
+      appViewModel.workerBinder?.initKotlinUsage()
+      delay(300)
+    } while (appViewModel.workerBinder == null)
   }
 }

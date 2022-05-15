@@ -38,7 +38,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
         if (componentList.isEmpty()) {
           emptyView.text.text = getString(R.string.empty_list)
         } else {
-          lifecycleScope.launch(Dispatchers.IO) {
+          lifecycleScope.launch(Dispatchers.Default) {
             val list = mutableListOf<LibStringItemChip>()
 
             for (item in componentList) {

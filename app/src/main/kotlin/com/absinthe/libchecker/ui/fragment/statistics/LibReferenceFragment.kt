@@ -126,7 +126,7 @@ class LibReferenceFragment :
                 }
               }
               if (position < refAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.Default) {
                   delay(400)
                   withContext(Dispatchers.Main) {
                     (activity as? INavViewContainer)?.showNavigationView()
