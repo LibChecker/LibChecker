@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.XmlBottomSheetView
 
 const val EXTRA_TEXT = "text"

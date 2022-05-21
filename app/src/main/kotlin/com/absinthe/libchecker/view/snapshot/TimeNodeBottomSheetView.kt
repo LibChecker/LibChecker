@@ -10,7 +10,7 @@ import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.TimeNodeAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
 
 class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {

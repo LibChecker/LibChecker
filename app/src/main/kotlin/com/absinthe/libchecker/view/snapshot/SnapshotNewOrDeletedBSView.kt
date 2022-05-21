@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
 
 class SnapshotNewOrDeletedBSView(context: Context) : LinearLayout(context), IHeaderView {

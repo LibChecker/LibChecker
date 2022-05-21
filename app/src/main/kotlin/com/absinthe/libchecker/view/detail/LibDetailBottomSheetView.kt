@@ -20,7 +20,7 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView

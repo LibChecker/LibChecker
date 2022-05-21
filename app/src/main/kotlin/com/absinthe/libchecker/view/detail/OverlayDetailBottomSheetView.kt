@@ -9,7 +9,7 @@ import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.applist.AppItemView
 

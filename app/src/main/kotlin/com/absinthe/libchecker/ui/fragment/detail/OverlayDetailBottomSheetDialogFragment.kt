@@ -8,7 +8,7 @@ import android.text.style.ImageSpan
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
@@ -17,7 +17,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.OverlayDetailBottomSheetView
 import dev.rikka.tools.refine.Refine
