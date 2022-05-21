@@ -72,42 +72,51 @@
 
     <androidx.cardview.widget.CardView
       android:layout_width="match_parent"
-      android:layout_height="@dimen/detail_toolbar_size"
+      android:layout_height="wrap_content"
       android:backgroundTint="?android:colorBackground"
       app:layout_constraintTop_toTopOf="parent">
 
-      <androidx.constraintlayout.widget.ConstraintLayout
+      <LinearLayout
+        android:id="@+id/detail_toolbar_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@null"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:animateLayoutChanges="true">
 
-        <TextView
-          android:id="@+id/tv_items"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:layout_marginStart="@dimen/normal_padding"
-          android:gravity="center"
-          android:text="@string/items_count"
-          android:textColor="?attr/colorControlNormal"
-          app:layout_constraintStart_toStartOf="parent" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/detail_toolbar_size"
+          android:background="@null"
+          android:animateLayoutChanges="true">
 
-        <com.absinthe.libchecker.view.detail.TextSwitcherView
-          android:id="@+id/ts_component_count"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:padding="8dp"
-          app:layout_constraintStart_toEndOf="@id/tv_items" />
+          <TextView
+            android:id="@+id/tv_items"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/normal_padding"
+            android:gravity="center"
+            android:text="@string/items_count"
+            android:textColor="?attr/colorControlNormal"
+            app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/rv_toolbar"
-          android:layout_width="wrap_content"
-          android:layout_height="match_parent"
-          android:overScrollMode="never"
-          app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-          app:layout_constraintStart_toEndOf="@id/ts_component_count" />
+          <com.absinthe.libchecker.view.detail.TextSwitcherView
+            android:id="@+id/ts_component_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:padding="8dp"
+            app:layout_constraintStart_toEndOf="@id/tv_items" />
 
-      </androidx.constraintlayout.widget.ConstraintLayout>
+          <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintStart_toEndOf="@id/ts_component_count" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+      </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

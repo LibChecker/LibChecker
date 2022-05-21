@@ -3,10 +3,10 @@ package com.absinthe.libchecker.ui.fragment.statistics
 import android.content.DialogInterface
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 import com.absinthe.libchecker.viewmodel.ChartViewModel
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 

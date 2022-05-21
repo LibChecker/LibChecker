@@ -36,7 +36,7 @@
   <string name="tab_lib_reference_statistics">庫引用統計</string>
   <string name="not_marked_lib">未標示的庫</string>
 
-  <string name="submenu_title_component">組件</string>
+  <string name="submenu_title_component">元件</string>
   <string name="submenu_title_manifest">清單</string>
   <string name="ref_category_all">全部</string>
   <string name="ref_category_native">原生庫</string>
@@ -47,9 +47,9 @@
   <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
-  <string name="ref_category_metadata">元數據</string>
+  <string name="ref_category_metadata">中繼資料</string>
   <string name="ref_category_package">包</string>
-  <string name="ref_category_shared_uid">共享的 UID</string>
+  <string name="ref_category_shared_uid">共用的 UID</string>
 
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
@@ -98,8 +98,8 @@
   <string name="array_dark_mode_battery">由省電模式設置</string>
 
   <!--  Detail  -->
-  <string name="detail">詳情</string>
-  <string name="detail_label">查看 App 詳情</string>
+  <string name="detail">詳細</string>
+  <string name="detail_label">查看 App 詳細</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">協助我們來補充訊息</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一種官方發布格式，可讓您以更高效的方式開發和發布應用。借助 Android App Bundle，您可以更輕鬆地以更小的應用提供優質的使用體驗，從而提升安裝成功率並減少卸載量。轉換過程輕鬆便捷。您無需重構代碼即可開始獲享較小應用的優勢。改用這種格式後，您可以體驗模塊化應用開發和可自定義功能交付，並從中受益。</string>
@@ -108,24 +108,25 @@
   <string name="further_operation">進一步操作</string>
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
-  <string name="lib_detail_dialog_title">庫詳情</string>
+  <string name="lib_detail_dialog_title">庫詳細</string>
   <string name="agp_details">Android Studio 構建系統以 Gradle 為基礎，並且 Android Gradle 插件添加了幾項專用於構建 Android 應用的功能。雖然 Android 插件通常會與 Android Studio 的更新步調保持一致，但插件（以及 Gradle 系統的其餘部分）可獨立於 Android Studio 運行並單獨更新。</string>
-  <string name="xposed_module">Xposed 模塊</string>
+  <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模塊框架，可以在不接觸任何 APK 的情況下更改系統和應用程序的行為。這很棒，因為這意味著模塊可以在不同版本甚至 ROM 上工作而無需任何更改。</string>
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 應用簽名，Google 可以為您管理和保護您應用的簽名密鑰，並使用它對從您的 app bundle 生成的優化分發 APK 進行簽名。Play App Signing 將您的應用簽名密鑰存儲在 Google 的安全基礎架構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程序 (PWA) 使用現代 API 構建和增強，以提供增強的功能、可靠性和可安裝性，同時使用單個代碼庫在任何設備上訪問任何人、任何地方。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具包，用於建構原生 UI。可簡化及加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="extract_native_libs_tip_part_a">該應用聲明了 </string>
-  <string name="xml_detail">XML 詳情</string>
+  <string name="xml_detail">XML 詳細</string>
   <string name="format_last_updated">最近更新: %s</string>
+  <string name="menu_process">處理程序</string>
 
   <!--  Toast  -->
-  <string name="toast_copied_to_clipboard">已複製到剪貼板</string>
+  <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">設備中不存在應用市場</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理器打開此 APK</string>
   <string name="toast_cant_open_app">無法啟動此 App</string>
-  <string name="toast_package_name_null">套裝軟體名稱為空</string>
+  <string name="toast_package_name_null">套件名稱為空</string>
   <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
   <string name="toast_not_enough_storage_space">存儲空間不足</string>
 
@@ -153,7 +154,7 @@
   <string name="dialog_message_keep_previous_snapshot">是否保留上一張快照？</string>
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
   <string name="btn_keep">保留</string>
-  <string name="btn_drop">丟棄</string>
+  <string name="btn_drop">捨棄</string>
 
   <!--  Album  -->
   <string name="album_compare">對比</string>

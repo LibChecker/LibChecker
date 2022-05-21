@@ -119,6 +119,7 @@
   <string name="extract_native_libs_tip_part_a">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
   <string name="format_last_updated">最近更新: %s</string>
+  <string name="menu_process">进程</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>

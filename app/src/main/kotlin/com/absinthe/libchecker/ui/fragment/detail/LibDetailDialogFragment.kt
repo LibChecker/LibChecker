@@ -10,11 +10,11 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

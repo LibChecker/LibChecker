@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
@@ -103,6 +107,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           openLibDetailDialog(position)
         }
       }
+      setProcessMode(viewModel.processMode)
     }
   }
 
@@ -111,6 +116,15 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     activity?.let {
       if (it is IDetailContainer) {
         (it as IDetailContainer).detailFragmentManager.unregister(type)
+      }
+    }
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      if (viewModel.processesMap.isNotEmpty()) {
+        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
       }
     }
   }
@@ -169,6 +183,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   fun getItemsCount() = adapter.itemCount
 
+  fun switchProcessMode() {
+    if (isComponentFragment()) {
+      adapter.switchProcessMode()
+    }
+  }
+
   private fun navigateToComponentImpl(component: String) {
     val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
     if (componentPosition == -1) {
@@ -202,5 +222,9 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           .show(childFragmentManager, tag)
       }
     }
+  }
+
+  private fun isComponentFragment(): Boolean {
+    return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
   }
 }

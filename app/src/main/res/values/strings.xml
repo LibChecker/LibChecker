@@ -119,6 +119,7 @@
   <string name="extract_native_libs_tip_part_a">The app declares </string>
   <string name="xml_detail">XML Detail</string>
   <string name="format_last_updated">Updated at: %s</string>
+  <string name="menu_process">Process</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
@@ -153,7 +154,7 @@
   <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
   <string name="dialog_title_select_to_delete">Choose a Date to Delete Snapshot</string>
   <string name="btn_keep">Keep</string>
-  <string name="btn_drop">Drop</string>
+  <string name="btn_drop">Discard</string>
 
   <!--  Album  -->
   <string name="album_compare">Compare</string>

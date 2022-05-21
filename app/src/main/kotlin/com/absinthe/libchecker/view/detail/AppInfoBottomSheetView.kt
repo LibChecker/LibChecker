@@ -7,8 +7,8 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 

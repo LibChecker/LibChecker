@@ -6,7 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
-import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -14,8 +13,9 @@ import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers

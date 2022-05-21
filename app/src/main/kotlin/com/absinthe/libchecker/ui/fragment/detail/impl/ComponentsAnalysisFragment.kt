@@ -52,6 +52,9 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         if (componentList.isEmpty()) {
           emptyView.text.text = getString(R.string.empty_list)
         } else {
+          if (!componentList.isNullOrEmpty()) {
+            adapter.processMap = viewModel.processesMap
+          }
           lifecycleScope.launch(Dispatchers.IO) {
             val list = mutableListOf<LibStringItemChip>()
             var chip: LibChip?
@@ -76,7 +79,11 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
               source = if (item.enabled) null else DISABLED
 
               list += LibStringItemChip(
-                LibStringItem(name = item.componentName, source = source),
+                LibStringItem(
+                  name = item.componentName,
+                  source = source,
+                  process = item.processName.takeIf { it.isNotEmpty() }
+                ),
                 chip
               )
             }

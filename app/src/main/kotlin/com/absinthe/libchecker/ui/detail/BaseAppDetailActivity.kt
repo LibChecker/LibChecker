@@ -22,6 +22,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,10 +47,10 @@ import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
+import com.absinthe.libchecker.recyclerview.adapter.detail.ProcessBarAdapter
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
@@ -78,6 +80,7 @@ import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
+import com.absinthe.libchecker.view.detail.ProcessBarView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
@@ -111,21 +114,12 @@ abstract class BaseAppDetailActivity :
   private val bundleManager by unsafeLazy { ApplicationDelegate(this).iBundleManager }
   private val featureAdapter by unsafeLazy { FeatureAdapter() }
   private val toolbarAdapter by unsafeLazy { AppDetailToolbarAdapter() }
-  private val toolbarQuicklyLaunchItem by unsafeLazy {
-    AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
-      AppInfoBottomSheetDialogFragment().apply {
-        arguments = bundleOf(
-          EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
-        )
-        show(supportFragmentManager, tag)
-      }
-    }
-  }
 
   private var isHarmonyMode = false
   private var isToolbarCollapsed = false
   private var hasReloadVariant = false
   private var featureListView: RecyclerView? = null
+  private var processBarView: ProcessBarView? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
@@ -361,11 +355,8 @@ abstract class BaseAppDetailActivity :
         finish()
       }
 
-      val toolbarItems = mutableListOf(
-        AppDetailToolbarItem(
-          R.drawable.ic_lib_sort,
-          R.string.menu_sort
-        ) {
+      toolbarAdapter.addData(
+        AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
             detailFragmentManager.sortAll()
             viewModel.sortMode = if (viewModel.sortMode == MODE_SORT_BY_LIB) {
@@ -377,22 +368,9 @@ abstract class BaseAppDetailActivity :
           }
         }
       )
-      if (GlobalValues.debugMode) {
-        toolbarItems.add(
-          AppDetailToolbarItem(
-            R.drawable.ic_processes,
-            R.string.menu_sort
-          ) {
-            Toasty.showLong(this@BaseAppDetailActivity, viewModel.processesSet.toString())
-          }
-        )
-      }
       if (extraBean?.variant == Constants.VARIANT_HAP) {
-        toolbarItems.add(
-          AppDetailToolbarItem(
-            R.drawable.ic_harmonyos_logo,
-            R.string.ability
-          ) {
+        toolbarAdapter.addData(
+          AppDetailToolbarItem(R.drawable.ic_harmonyos_logo, R.string.ability) {
             if (!hasReloadVariant) {
               isHarmonyMode = !isHarmonyMode
               hasReloadVariant = true
@@ -406,7 +384,6 @@ abstract class BaseAppDetailActivity :
         return
       }
 
-      toolbarAdapter.setList(toolbarItems)
       rvToolbar.apply {
         adapter = toolbarAdapter
         layoutManager =
@@ -544,6 +521,19 @@ abstract class BaseAppDetailActivity :
       if (detailFragmentManager.currentItemsCount != it.count && typeList[binding.tabLayout.selectedTabPosition] == it.locate) {
         binding.tsComponentCount.setText(it.count.toString())
         detailFragmentManager.currentItemsCount = it.count
+      }
+    }
+    viewModel.processToolIconVisibilityLiveData.observe(this) { visible ->
+      if (visible) {
+        if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+          toolbarAdapter.addData(toolbarProcessItem)
+        }
+        processBarView?.isVisible = true
+      } else {
+        if (toolbarAdapter.data.contains(toolbarProcessItem)) {
+          toolbarAdapter.remove(toolbarProcessItem)
+        }
+        processBarView?.isGone = true
       }
     }
 
@@ -724,6 +714,44 @@ abstract class BaseAppDetailActivity :
               .show()
           }
         )
+      }
+    }
+  }
+
+  private val toolbarQuicklyLaunchItem by unsafeLazy {
+    AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
+      AppInfoBottomSheetDialogFragment().apply {
+        arguments = bundleOf(
+          EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
+        )
+        show(supportFragmentManager, tag)
+      }
+    }
+  }
+  private val toolbarProcessItem by unsafeLazy {
+    AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
+      detailFragmentManager.deliverSwitchProcessMode()
+      viewModel.processMode = !viewModel.processMode
+
+      if (processBarView == null) {
+        processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
+          it.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+          it.setData(
+            viewModel.processesMap.map { mapItem ->
+              ProcessBarAdapter.ProcessBarItem(
+                mapItem.key,
+                mapItem.value
+              )
+            }
+          )
+        }
+        binding.detailToolbarContainer.addView(processBarView)
+      } else {
+        binding.detailToolbarContainer.removeView(processBarView)
+        processBarView = null
       }
     }
   }

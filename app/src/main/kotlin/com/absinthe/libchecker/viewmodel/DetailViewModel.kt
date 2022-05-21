@@ -33,6 +33,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
@@ -60,14 +61,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
+  val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
   val itemsCountList = MutableList(9) { 0 }
-  val processesSet = mutableSetOf<String>()
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
   var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
+  var processesMap: Map<String, Int> = mapOf()
+  var processMode: Boolean = false
 
   lateinit var packageInfo: PackageInfo
 
@@ -123,6 +126,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
+    val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
         val services = PackageUtils.getComponentList(it.packageName, it.services, true)
@@ -139,7 +143,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         componentsMap[RECEIVER]?.postValue(receivers)
         componentsMap[PROVIDER]?.postValue(providers)
       }
-      processesSet.filter { it.isBlank() }
+      processesMap = processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
     } catch (e: Exception) {
       Timber.e(e)
     }

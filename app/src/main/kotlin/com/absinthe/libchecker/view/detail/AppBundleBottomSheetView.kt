@@ -10,8 +10,8 @@ import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppBundleAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AppBundleBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
 
