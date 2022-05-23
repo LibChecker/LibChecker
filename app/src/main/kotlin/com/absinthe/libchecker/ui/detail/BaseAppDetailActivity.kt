@@ -47,6 +47,7 @@ import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
@@ -379,6 +380,15 @@ abstract class BaseAppDetailActivity :
           }
         )
       }
+      if (GlobalValues.processMode && processBarView == null) {
+        processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
+          it.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+        }
+        binding.detailToolbarContainer.addView(processBarView)
+      }
 
       if (hasReloadVariant) {
         return
@@ -535,6 +545,16 @@ abstract class BaseAppDetailActivity :
         }
         processBarView?.isGone = true
       }
+    }
+    viewModel.processMapLiveData.observe(this) {
+      processBarView?.setData(
+        it.map { mapItem ->
+          ProcessBarAdapter.ProcessBarItem(
+            mapItem.key,
+            mapItem.value
+          )
+        }
+      )
     }
 
     if (!isHarmonyMode) {
@@ -732,6 +752,7 @@ abstract class BaseAppDetailActivity :
     AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
       detailFragmentManager.deliverSwitchProcessMode()
       viewModel.processMode = !viewModel.processMode
+      GlobalValues.processMode = viewModel.processMode
 
       if (processBarView == null) {
         processBarView = ProcessBarView(this@BaseAppDetailActivity).also {

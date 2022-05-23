@@ -44,6 +44,7 @@ object Constants {
 
   const val PREF_APP_SORT_MODE = "appSortMode"
   const val PREF_LIB_SORT_MODE = "libSortMode"
+  const val PREF_PROCESS_MODE = "processMode"
   const val PREF_SNAPSHOT_TIMESTAMP = "snapshotTimestamp"
 
   const val PREF_LOCAL_BACKUP = "localBackup"

@@ -15,6 +15,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    title.text = context.getString(R.string.further_operation)
   }
 
   val launch = AppInfoItemView(context).apply {

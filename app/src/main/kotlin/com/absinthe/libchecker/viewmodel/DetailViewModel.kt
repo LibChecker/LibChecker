@@ -62,6 +62,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
   val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
+  val processMapLiveData = MutableLiveData<Map<String, Int>>()
   val itemsCountList = MutableList(9) { 0 }
 
   var sortMode = GlobalValues.libSortMode
@@ -70,7 +71,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
   var processesMap: Map<String, Int> = mapOf()
-  var processMode: Boolean = false
+  var processMode: Boolean = GlobalValues.processMode
 
   lateinit var packageInfo: PackageInfo
 
@@ -144,6 +145,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         componentsMap[PROVIDER]?.postValue(providers)
       }
       processesMap = processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
+      processMapLiveData.postValue(processesMap)
     } catch (e: Exception) {
       Timber.e(e)
     }

@@ -25,6 +25,8 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
     layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
     adapter = processBarAdapter
     setPadding(8.dp, 0, 8.dp, 12.dp)
+    clipToPadding = false
+    clipChildren = false
   }
 
   fun setData(data: List<ProcessBarAdapter.ProcessBarItem>) {
