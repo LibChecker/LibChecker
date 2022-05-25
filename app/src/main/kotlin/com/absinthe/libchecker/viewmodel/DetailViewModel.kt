@@ -74,12 +74,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var processMode: Boolean = GlobalValues.processMode
 
   lateinit var packageInfo: PackageInfo
+  val packageInfoLiveData = MutableLiveData<PackageInfo>(null)
 
   init {
     componentsMap.put(SERVICE, MutableLiveData())
     componentsMap.put(ACTIVITY, MutableLiveData())
     componentsMap.put(RECEIVER, MutableLiveData())
     componentsMap.put(PROVIDER, MutableLiveData())
+  }
+
+  fun isPackageInfoAvailable(): Boolean {
+    return this::packageInfo.isInitialized
   }
 
   fun initSoAnalysisData() = viewModelScope.launch(Dispatchers.IO) {

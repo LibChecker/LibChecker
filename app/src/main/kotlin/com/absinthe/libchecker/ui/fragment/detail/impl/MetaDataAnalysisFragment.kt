@@ -59,7 +59,12 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initMetaDataData()
+
+    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        viewModel.initMetaDataData()
+      }
+    }
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

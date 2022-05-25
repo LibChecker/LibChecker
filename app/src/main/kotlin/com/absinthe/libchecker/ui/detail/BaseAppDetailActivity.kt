@@ -137,6 +137,7 @@ abstract class BaseAppDetailActivity :
       hasReloadVariant = false
     }
     viewModel.packageInfo = packageInfo
+    viewModel.packageInfoLiveData.postValue(packageInfo)
     binding.apply {
       try {
         supportActionBar?.title = null
@@ -740,11 +741,13 @@ abstract class BaseAppDetailActivity :
 
   private val toolbarQuicklyLaunchItem by unsafeLazy {
     AppDetailToolbarItem(R.drawable.ic_launch, R.string.further_operation) {
-      AppInfoBottomSheetDialogFragment().apply {
-        arguments = bundleOf(
-          EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
-        )
-        show(supportFragmentManager, tag)
+      if (viewModel.isPackageInfoAvailable()) {
+        AppInfoBottomSheetDialogFragment().apply {
+          arguments = bundleOf(
+            EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
+          )
+          show(supportFragmentManager, tag)
+        }
       }
     }
   }

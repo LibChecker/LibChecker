@@ -56,7 +56,12 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initPermissionData()
+
+    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        viewModel.initPermissionData()
+      }
+    }
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

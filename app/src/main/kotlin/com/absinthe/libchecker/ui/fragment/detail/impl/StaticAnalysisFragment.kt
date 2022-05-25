@@ -53,7 +53,12 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initStaticData()
+
+    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        viewModel.initStaticData()
+      }
+    }
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {
