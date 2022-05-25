@@ -55,4 +55,3 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
     text.layout(icon.right + text.marginStart, text.toVerticalCenter(this))
   }
 }
-

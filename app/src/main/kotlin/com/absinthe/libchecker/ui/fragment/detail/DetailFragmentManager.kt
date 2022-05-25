@@ -5,6 +5,7 @@ import androidx.core.util.forEach
 import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.ui.fragment.BaseComponentFragment
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 
 const val MODE_SORT_BY_SIZE = 0
@@ -41,7 +42,7 @@ class DetailFragmentManager {
     }
   }
 
-  fun deliverFilter(text: String) {
+  fun deliverFilterItems(text: String) {
     map.forEach { _, value ->
       value.filterList(text)
     }
@@ -50,6 +51,12 @@ class DetailFragmentManager {
   fun deliverSwitchProcessMode() {
     map.forEach { _, value ->
       value.switchProcessMode()
+    }
+  }
+
+  fun deliverFilterProcesses(process: String?) {
+    map.forEach { _, value ->
+      (value as? BaseComponentFragment)?.filterProcesses(process)
     }
   }
 

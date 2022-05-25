@@ -99,6 +99,22 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
   }
 }
 
+fun TextView.tintTextToPrimary() {
+  val builder = SpannableStringBuilder()
+  val spannableString = SpannableString(text.toString())
+  val color = if (GlobalValues.md3Theme) {
+    context.getColor(R.color.colorPrimaryMd3)
+  } else {
+    context.getColor(R.color.colorPrimary)
+  }
+  spannableString.setSpan(
+    ForegroundColorSpan(color),
+    0, text.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+  )
+  builder.append(spannableString)
+  text = builder
+}
+
 fun ViewPager2.setCurrentItem(
   item: Int,
   duration: Long,

@@ -387,6 +387,15 @@ abstract class BaseAppDetailActivity :
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
           )
+        }.also {
+          it.setOnItemClickListener { isSelected, process ->
+            if (isSelected) {
+              viewModel.queriedProcess = process
+            } else {
+              viewModel.queriedProcess = null
+            }
+            detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+          }
         }
         binding.detailToolbarContainer.addView(processBarView)
       }
@@ -610,7 +619,7 @@ abstract class BaseAppDetailActivity :
 
   override fun onQueryTextChange(newText: String): Boolean {
     viewModel.queriedText = newText
-    detailFragmentManager.deliverFilter(newText)
+    detailFragmentManager.deliverFilterItems(newText)
     return false
   }
 
@@ -771,6 +780,14 @@ abstract class BaseAppDetailActivity :
               )
             }
           )
+          it.setOnItemClickListener { isSelected, process ->
+            if (isSelected) {
+              viewModel.queriedProcess = process
+            } else {
+              viewModel.queriedProcess = null
+            }
+            detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+          }
         }
         binding.detailToolbarContainer.addView(processBarView)
       } else {

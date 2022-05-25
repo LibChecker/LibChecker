@@ -70,6 +70,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
+  var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
   var processMode: Boolean = GlobalValues.processMode
 

@@ -16,7 +16,7 @@ import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
-import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.BaseComponentFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by lazy {
     !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction)
@@ -105,6 +105,10 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
                 adapter.setDiffNewData(list, afterListReadyTask)
               }
             }
+
+            if (viewModel.queriedProcess?.isNotEmpty() == true) {
+              filterProcesses(viewModel.queriedProcess!!)
+            }
           }
         }
         if (!isListReady) {
@@ -128,6 +132,14 @@ class ComponentsAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {
     return itemsList?.filter { it.item.name.contains(text, true) }
+  }
+
+  override fun getFilterProcessesList(process: String?): List<LibStringItemChip>? {
+    return if (process.isNullOrEmpty()) {
+      itemsList
+    } else {
+      itemsList?.filter { it.item.process == process }
+    }
   }
 
   private fun doOnLongClick(context: Context, componentName: String) {

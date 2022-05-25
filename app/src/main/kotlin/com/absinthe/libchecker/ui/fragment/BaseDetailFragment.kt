@@ -66,7 +66,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       text.text = getString(R.string.loading)
     }
   }
-  protected val dividerItemDecoration by lazy { DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL) }
+  protected val dividerItemDecoration by lazy {
+    DividerItemDecoration(
+      requireContext(),
+      DividerItemDecoration.VERTICAL
+    )
+  }
   protected var isListReady = false
   protected var afterListReadyTask: Runnable? = null
 
@@ -93,6 +98,13 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           viewModel.queriedText?.let {
             if (it.isNotEmpty()) {
               filterList(it)
+            }
+          }
+          if (this@BaseDetailFragment is BaseComponentFragment) {
+            viewModel.queriedProcess?.let {
+              if (it.isNotEmpty()) {
+                filterProcesses(it)
+              }
             }
           }
         }
