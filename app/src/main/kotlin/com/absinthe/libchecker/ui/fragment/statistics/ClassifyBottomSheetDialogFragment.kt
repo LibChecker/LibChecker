@@ -28,6 +28,9 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
     viewModel.filteredList.observe(viewLifecycleOwner) {
       root.adapter.setList(it)
     }
+    viewModel.androidVersion.observe(viewLifecycleOwner) {
+      root.addAndroidVersionView(it)
+    }
   }
 
   override fun onDismiss(dialog: DialogInterface) {
