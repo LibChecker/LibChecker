@@ -62,48 +62,67 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: -PappVerName=${{ env.VERSION }} assembleRelease
-      - name: Sign Android release
+      - name: Sign Foss release
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        id: sign
+        id: signFossRelease
         uses: r0adkll/sign-android-release@v1.0.4
         env:
           BUILD_TOOLS_VERSION: "32.0.0"
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/apk/foss/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
-      - name: Upload built apk
+      - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
-          name: snapshot
-          path: ${{ steps.sign.outputs.signedReleaseFile }}
+          name: Foss
+          path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
+      - name: Sign Market release
+        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        id: signMarketRelease
+        uses: r0adkll/sign-android-release@v1.0.4
+        env:
+          BUILD_TOOLS_VERSION: "32.0.0"
+        with:
+          releaseDirectory: app/build/outputs/apk/market/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+      - name: Upload built Market apk
+        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        uses: actions/upload-artifact@v3
+        with:
+          name: Market
+          path: ${{ steps.signMarketRelease.outputs.signedReleaseFile }}
       - name: Upload mappings
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: mappings
-          path: "app/build/outputs/mapping/release"
+          path: "app/build/outputs/mapping/fossRelease"
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         id: apk-info
         uses: hkusu/apk-info-action@v1
         with:
-          apk-path: ${{ steps.sign.outputs.signedReleaseFile }}
+          apk-path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
       - name: Upload mappings with App Center CLI
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
-          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/release/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
+          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/fossRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
           token: ${{secrets.APP_CENTER_TOKEN}}
       - name: Send commit to telegram
         if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         env:
           CHANNEL_ID: ${{ secrets.TELEGRAM_TO }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          FILE: ${{ github.workspace }}/${{ steps.sign.outputs.signedReleaseFile }}
+          FOSS_FILE: ${{ github.workspace }}/${{ steps.signFossRelease.outputs.signedReleaseFile }}
+          MARKET_FILE: ${{ github.workspace }}/${{ steps.signMarketRelease.outputs.signedReleaseFile }}
           COMMIT_MESSAGE: |+
             New push to github\!
             ```
@@ -113,7 +132,7 @@ jobs:
             Snapshot apk is attached
         run: |
           ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22:%22document%22,%20%22media%22:%22attach://release%22,%22parse_mode%22:%22MarkdownV2%22,%22caption%22:${ESCAPED}%7D%5D"  -F release="@$FILE"
+          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FfossRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F fossRelease="@$FOSS_FILE" -F marketRelease="@$MARKET_FILE"
 
   skipped:
     runs-on: ubuntu-latest

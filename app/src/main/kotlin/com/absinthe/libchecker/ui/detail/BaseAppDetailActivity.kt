@@ -74,6 +74,7 @@ import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
 import com.absinthe.libchecker.utils.PackageUtils.isUseJetpackCompose
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -793,6 +794,11 @@ abstract class BaseAppDetailActivity :
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
+
+        doOnMainThreadIdle {
+          viewModel.queriedProcess = null
+          detailFragmentManager.deliverFilterProcesses(null)
+        }
       }
     }
   }

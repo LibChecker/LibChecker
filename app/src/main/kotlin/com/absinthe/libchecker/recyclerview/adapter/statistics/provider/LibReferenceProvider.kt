@@ -80,7 +80,7 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
         setOrHighlightText(labelName, it.name)
       } ?: let {
         if (libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")) {
-          icon.setImageResource(R.drawable.ic_lib_android)
+          icon.setImageResource(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
         } else {
           icon.setImageResource(R.drawable.ic_question)
         }

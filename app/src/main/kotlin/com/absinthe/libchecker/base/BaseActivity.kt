@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.privacy.Privacy
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.inflateBinding
 import rikka.material.app.MaterialActivity
@@ -22,6 +23,11 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
       binding = inflateBinding(layoutInflater)
     }
     setContentView(binding.root)
+  }
+
+  override fun onPostCreate(savedInstanceState: Bundle?) {
+    super.onPostCreate(savedInstanceState)
+    Privacy.showPrivacyDialog(this)
   }
 
   override fun shouldApplyTranslucentSystemBars(): Boolean {

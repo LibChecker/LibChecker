@@ -40,6 +40,22 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
       }
     }
+
+    productFlavors {
+      flavorDimensions += "channel"
+
+      create("foss") {
+        isDefault = true
+        dimension = flavorDimensionList[0]
+      }
+      create("market") {
+        dimension = flavorDimensionList[0]
+      }
+      all {
+        manifestPlaceholders["channel"] = this.name
+      }
+    }
+
     block()
   }
 }

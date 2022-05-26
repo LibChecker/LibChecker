@@ -125,6 +125,10 @@
         android:resource="@xml/filepaths" />
     </provider>
 
+    <meta-data
+      android:name="channel"
+      android:value="${channel}" />
+
   </application>
 
 </manifest>

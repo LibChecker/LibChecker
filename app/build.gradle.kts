@@ -5,6 +5,7 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.nio.file.Paths
 
 plugins {
@@ -36,7 +37,23 @@ setupAppModule {
     isCoreLibraryDesugaringEnabled = true
   }
 
-  sourceSets["main"].java.srcDirs("src/main/kotlin")
+  sourceSets {
+    named("main") {
+      java {
+        srcDirs("src/main/kotlin")
+      }
+    }
+    named("foss") {
+      java {
+        srcDirs("src/foss/kotlin")
+      }
+    }
+    named("market") {
+      java {
+        srcDirs("src/market/kotlin")
+      }
+    }
+  }
 
   packagingOptions.resources.excludes += setOf(
     "META-INF/**",
@@ -61,43 +78,45 @@ setupAppModule {
   }
 }
 
-val optimizeReleaseRes = task("optimizeReleaseRes").doLast {
-  val aapt2 = File(
-    androidComponents.sdkComponents.sdkDirectory.get().asFile,
-    "build-tools/${project.android.buildToolsVersion}/aapt2"
-  )
-  val zip = Paths.get(
-    buildDir.path,
-    "intermediates",
-    "optimized_processed_res",
-    "release",
-    "resources-release-optimize.ap_"
-  )
-  val optimized = File("${zip}.opt")
-  val cmd = exec {
-    commandLine(
-      aapt2, "optimize",
-      "--collapse-resource-names",
-      "--resources-config-path", "aapt2-resources.cfg",
-      "-o", optimized,
-      zip
-    )
-    isIgnoreExitValue = false
-  }
-  if (cmd.exitValue == 0) {
-    delete(zip)
-    optimized.renameTo(zip.toFile())
-  }
-}
-
 tasks.whenTaskAdded {
-  if (name == "optimizeReleaseResources") {
+  if (name == "optimizeFossReleaseResources" || name == "optimizeMarketReleaseResources") {
+    val flavor = name.removePrefix("optimize").removeSuffix("ReleaseResources")
+    val flavorLowerCase = flavor.toLowerCaseAsciiOnly()
+    val optimizeReleaseRes = task("optimize${flavor}ReleaseRes").doLast {
+      val aapt2 = File(
+        androidComponents.sdkComponents.sdkDirectory.get().asFile,
+        "build-tools/${project.android.buildToolsVersion}/aapt2"
+      )
+      val zip = Paths.get(
+        buildDir.path,
+        "intermediates",
+        "optimized_processed_res",
+        "${flavorLowerCase}Release",
+        "resources-${flavorLowerCase}-release-optimize.ap_"
+      )
+      val optimized = File("${zip}.opt")
+      val cmd = exec {
+        commandLine(
+          aapt2, "optimize",
+          "--collapse-resource-names",
+          "--resources-config-path", "aapt2-resources.cfg",
+          "-o", optimized,
+          zip
+        )
+        isIgnoreExitValue = false
+      }
+      if (cmd.exitValue == 0) {
+        delete(zip)
+        optimized.renameTo(zip.toFile())
+      }
+    }
+
     finalizedBy(optimizeReleaseRes)
   }
 }
 
 configurations.all {
-  exclude(group = "androidx.appcompat", module = "appcompat")
+  exclude("androidx.appcompat", "appcompat")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
