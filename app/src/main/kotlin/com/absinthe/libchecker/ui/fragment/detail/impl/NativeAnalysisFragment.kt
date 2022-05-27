@@ -31,12 +31,6 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        if (viewModel.queriedText?.isNotEmpty() == true) {
-          filterList(viewModel.queriedText!!)
-        } else {
-          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
-        }
-
         if (viewModel.extractNativeLibs == false) {
           context?.let { ctx ->
             adapter.setHeaderView(
@@ -48,6 +42,12 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
               }
             )
           }
+        }
+
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
         }
       }
 

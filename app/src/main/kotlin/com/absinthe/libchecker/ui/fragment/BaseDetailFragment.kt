@@ -202,9 +202,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   private fun navigateToComponentImpl(component: String) {
-    val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
+    var componentPosition = adapter.data.indexOfFirst { it.item.name == component }
     if (componentPosition == -1) {
       return
+    }
+    if (adapter.hasHeaderLayout()) {
+      componentPosition++
     }
 
     Timber.d("navigateToComponent: componentPosition = $componentPosition")
