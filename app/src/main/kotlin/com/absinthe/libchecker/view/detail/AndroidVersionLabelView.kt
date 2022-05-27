@@ -31,10 +31,12 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   fun setIcon(resId: Int?) {
     resId?.let {
       icon.setImageResource(it)
+      if (icon.parent == null) {
+        addView(icon)
+      }
     } ?: run {
-      icon.layoutParams.also {
-        it.width = 0
-        it.height = 0
+      if (icon.parent != null) {
+        removeView(icon)
       }
     }
   }

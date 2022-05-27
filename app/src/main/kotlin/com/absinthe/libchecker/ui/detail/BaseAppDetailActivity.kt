@@ -88,6 +88,8 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.microsoft.appcenter.analytics.Analytics
+import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -122,6 +124,9 @@ abstract class BaseAppDetailActivity :
   private var hasReloadVariant = false
   private var featureListView: RecyclerView? = null
   private var processBarView: ProcessBarView? = null
+  private var easterEggTabA = -1
+  private var easterEggTabB = -1
+  private var easterEggCount = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
@@ -134,9 +139,6 @@ abstract class BaseAppDetailActivity :
   }
 
   protected fun onPackageInfoAvailable(packageInfo: PackageInfo, extraBean: DetailExtraBean?) {
-    if (hasReloadVariant) {
-      hasReloadVariant = false
-    }
     viewModel.packageInfo = packageInfo
     viewModel.packageInfoLiveData.postValue(packageInfo)
     binding.apply {
@@ -358,6 +360,11 @@ abstract class BaseAppDetailActivity :
         finish()
       }
 
+      if (hasReloadVariant) {
+        hasReloadVariant = false
+        return
+      }
+
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
@@ -399,10 +406,6 @@ abstract class BaseAppDetailActivity :
           }
         }
         binding.detailToolbarContainer.addView(processBarView)
-      }
-
-      if (hasReloadVariant) {
-        return
       }
 
       rvToolbar.apply {
@@ -524,6 +527,34 @@ abstract class BaseAppDetailActivity :
             detailFragmentManager.currentItemsCount = count
           }
           detailFragmentManager.selectedPosition = tab.position
+
+          if ((easterEggCount % 2) == 0) {
+            if (tab.position == easterEggTabA || easterEggTabA == -1) {
+              easterEggCount++
+              easterEggTabA = tab.position
+            } else {
+              easterEggCount = 0
+              easterEggTabA = -1
+              easterEggTabB = -1
+            }
+          } else {
+            if (tab.position == easterEggTabB || easterEggTabB == -1) {
+              easterEggCount++
+              easterEggTabB = tab.position
+            } else {
+              easterEggCount = 0
+              easterEggTabA = -1
+              easterEggTabB = -1
+            }
+          }
+          if (easterEggCount >= 10) {
+            easterEggCount = 0
+            Toasty.showLong(this@BaseAppDetailActivity, "What are you doing?\uD83E\uDD14")
+            Analytics.trackEvent(
+              Constants.Event.EASTER_EGG,
+              EventProperties().set("EASTER_EGG", "Detail page Repeated sliding")
+            )
+          }
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab?) {}

@@ -543,7 +543,9 @@ class ChartFragment :
         }
       })
     }.also {
-      it.show(requireActivity().supportFragmentManager, tag)
+      activity?.let { activity ->
+        it.show(activity.supportFragmentManager, tag)
+      }
     }
   }
 
