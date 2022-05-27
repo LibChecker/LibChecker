@@ -56,13 +56,7 @@ class LibCheckerApp : Application() {
     }
 
     LCRules.init(this)
-    LCRules.setRemoteRepo(
-      if (GlobalValues.repo == Constants.REPO_GITHUB) {
-        LCRemoteRepo.Github
-      } else {
-        LCRemoteRepo.Gitee
-      }
-    )
+    LCRules.setRemoteRepo(LCRemoteRepo.Github)
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)
