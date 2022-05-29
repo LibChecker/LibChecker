@@ -126,7 +126,7 @@ class AppInfoBottomSheetDialogFragment :
             )
             .putExtra(
               "org.openintents.extra.ABSOLUTE_PATH",
-              File(PackageUtils.getPackageInfo(packageName!!).applicationInfo.publicSourceDir).parent
+              File(PackageUtils.getPackageInfo(packageName!!).applicationInfo.sourceDir).parent
             )
         )
       )
