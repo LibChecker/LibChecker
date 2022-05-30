@@ -403,7 +403,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
     val request: CloudRuleBundleRequest = ApiManager.create()
-    val result = request.requestRepoInfo(owner, repo) ?: return null
+    val result = runCatching {
+      request.requestRepoInfo(owner, repo) ?: return null
+    }.getOrNull() ?: return null
     val instant = Instant.parse(result.pushed_at)
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
       .withLocale(Locale.getDefault())

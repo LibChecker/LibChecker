@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.api
 
 import com.absinthe.libchecker.api.request.VERSION
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import okhttp3.OkHttpClient
@@ -15,15 +17,20 @@ object ApiManager {
 
   private const val GITHUB_ROOT_URL =
     "https://raw.githubusercontent.com/zhaobozhen/LibChecker-Rules/$WORKING_BRANCH/"
-  private const val GITEE_ROOT_URL =
-    "https://gitee.com/zhaobozhen/LibChecker-Rules/raw/$WORKING_BRANCH/"
+  private const val GITLAB_ROOT_URL =
+    "https://gitlab.com/zhaobozhen/LibChecker-Rules/-/raw/$WORKING_BRANCH/"
 
   const val GITHUB_NEW_ISSUE_URL =
     "https://github.com/zhaobozhen/LibChecker-Rules/issues/new?labels=&template=library-name.md&title=%5BNew+Rule%5D"
 
   const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/%s/%s"
 
-  private val root = GITHUB_ROOT_URL
+  private val root
+    get() = when (GlobalValues.repo) {
+      Constants.REPO_GITHUB -> GITHUB_ROOT_URL
+      Constants.REPO_GITLAB -> GITLAB_ROOT_URL
+      else -> GITHUB_ROOT_URL
+    }
 
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 

@@ -122,7 +122,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           if (GlobalValues.repo == Constants.REPO_GITHUB) {
             LCRemoteRepo.Github
           } else {
-            LCRemoteRepo.Gitee
+            LCRemoteRepo.Gitlab
           }
         )
         Analytics.trackEvent(

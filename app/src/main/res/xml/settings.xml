@@ -43,14 +43,14 @@
       app:summary="%s"
       app:title="@string/dark_mode" />
 
-<!--    <rikka.preference.SimpleMenuPreference-->
-<!--      app:defaultValue="gitee"-->
-<!--      app:entries="@array/list_repo"-->
-<!--      app:entryValues="@array/list_repo_value"-->
-<!--      app:icon="@drawable/ic_repository"-->
-<!--      app:key="rulesRepository"-->
-<!--      app:summary="%s"-->
-<!--      app:title="@string/rules_repo_title" />-->
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="gitlab"
+      app:entries="@array/list_repo"
+      app:entryValues="@array/list_repo_value"
+      app:icon="@drawable/ic_repository"
+      app:key="rulesRepository"
+      app:summary="%s"
+      app:title="@string/rules_repo_title" />
 
     <rikka.preference.SimpleMenuPreference
       app:defaultValue="SYSTEM"

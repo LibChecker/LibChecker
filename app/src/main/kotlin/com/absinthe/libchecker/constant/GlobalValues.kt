@@ -20,7 +20,7 @@ object GlobalValues {
     return SPUtils.sp
   }
 
-  var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
+  var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 

@@ -68,7 +68,7 @@ object Constants {
   const val DARK_MODE_FOLLOW_SYSTEM = "system"
 
   const val REPO_GITHUB = "github"
-  const val REPO_GITEE = "gitee"
+  const val REPO_GITLAB = "gitlab"
 
   const val ACTION_APP_LIST = "com.absinthe.libchecker.intent.action.START_APP_LIST"
   const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"
