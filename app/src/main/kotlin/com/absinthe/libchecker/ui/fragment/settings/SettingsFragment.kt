@@ -30,6 +30,7 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -208,18 +209,19 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_HELP)?.apply {
       setOnPreferenceClickListener {
-        try {
+        runCatching {
           CustomTabsIntent.Builder().build().apply {
             launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
           }
-        } catch (e: ActivityNotFoundException) {
-          Timber.e(e)
-          try {
+        }.onFailure {
+          Timber.e(it)
+          runCatching {
             val intent = Intent(Intent.ACTION_VIEW)
               .setData(URLManager.DOCS_PAGE.toUri())
             requireActivity().startActivity(intent)
-          } catch (e: ActivityNotFoundException) {
-            Timber.e(e)
+          }.onFailure { inner ->
+            Timber.e(inner)
+            Toasty.showShort(requireActivity(), "No browser application")
           }
         }
         true
