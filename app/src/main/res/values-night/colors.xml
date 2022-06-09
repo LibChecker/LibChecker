@@ -18,4 +18,7 @@
   <color name="bottom_sheet_header_handler_activated">#FFFFFFFF</color>
   <color name="bottom_sheet_header_handler_md3">#CCBBBBBB</color>
   <color name="bottom_sheet_header_handler_activated_md3">#FFFFFFFF</color>
+
+  <color name="ic_launcher_foreground">#6200EE</color>
+  <color name="ic_launcher_background">#E1F5FE</color>
 </resources>

@@ -19,4 +19,7 @@
   <color name="bottom_sheet_header_handler_activated">#CC444444</color>
   <color name="bottom_sheet_header_handler_md3">#CC888888</color>
   <color name="bottom_sheet_header_handler_activated_md3">#CC444444</color>
+
+  <color name="ic_launcher_foreground">#FFFFFF</color>
+  <color name="ic_launcher_background">#6200EE</color>
 </resources>
