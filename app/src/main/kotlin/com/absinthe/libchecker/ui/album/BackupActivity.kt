@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -43,11 +44,19 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         .replace(R.id.fragment_container, BackupFragment())
         .commit()
     }
+    onBackPressedDispatcher.addCallback(
+      this,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          finish()
+        }
+      }
+    )
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      onBackPressedDispatcher.onBackPressed()
     }
     return super.onOptionsItemSelected(item)
   }

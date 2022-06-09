@@ -27,6 +27,8 @@ import com.absinthe.libchecker.bean.MOVED
 import com.absinthe.libchecker.bean.REMOVED
 import com.absinthe.libchecker.bean.SnapshotDetailItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.compat.IntentCompat
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
@@ -40,7 +42,6 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleN
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -67,7 +68,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
   private val viewModel: SnapshotViewModel by viewModels()
-  private val _entity by unsafeLazy { intent.getSerializableExtra(EXTRA_ENTITY) as? SnapshotDiffItem }
+  private val _entity by unsafeLazy { IntentCompat.getSerializableExtra<SnapshotDiffItem>(intent, EXTRA_ENTITY) }
 
   override fun requirePackageName() = entity.packageName
 
@@ -357,7 +358,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
       }
     }
     ClipboardUtils.put(this, sb.toString())
-    Toasty.showShort(this, R.string.toast_copied_to_clipboard)
+    VersionCompat.showCopiedOnClipboardToast(this)
   }
 
   private fun getComponentName(@LibType type: Int): String {

@@ -26,6 +26,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -80,13 +81,13 @@ object PackageUtils {
    */
   @Throws(PackageManager.NameNotFoundException::class)
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
-    val packageInfo = SystemServices.packageManager.getPackageInfo(
+    val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      VersionCompat.MATCH_UNINSTALLED_PACKAGES or VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES or PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      return SystemServices.packageManager.getPackageArchiveInfo(
-        packageInfo.applicationInfo.sourceDir, VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+      return PackageManagerCompat.getPackageArchiveInfo(
+        packageInfo.applicationInfo.sourceDir, PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
         applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
         applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
@@ -102,8 +103,8 @@ object PackageUtils {
    */
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
-    return SystemServices.packageManager.getInstalledPackages(
-      VersionCompat.MATCH_UNINSTALLED_PACKAGES
+    return PackageManagerCompat.getInstalledPackages(
+      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
         or PackageManager.GET_META_DATA
         or PackageManager.GET_PERMISSIONS
     )
@@ -986,7 +987,7 @@ object PackageUtils {
    */
   fun isAppInstalled(pkgName: String): Boolean {
     return runCatching {
-      SystemServices.packageManager.getApplicationInfo(pkgName, 0).enabled
+      PackageManagerCompat.getApplicationInfo(pkgName, 0).enabled
     }.getOrDefault(false)
   }
 

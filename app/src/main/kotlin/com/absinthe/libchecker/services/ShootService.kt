@@ -14,6 +14,7 @@ import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -64,6 +65,7 @@ class ShootService : LifecycleService() {
   private val binder by lazy { ShootBinder(this, lifecycleScope) }
 
   private var _isShooting: Boolean = false
+  private var areNotificationsEnabled = false
 
   override fun onBind(intent: Intent): IBinder {
     super.onBind(intent)
@@ -74,14 +76,14 @@ class ShootService : LifecycleService() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     Timber.d("onStartCommand")
     if (intent?.`package` != packageName) {
-      stopForeground(true)
+      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
     }
     if (intent?.action == ACTION_SHOOT_AND_STOP_AUTO) {
       val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
       computeSnapshots(dropPrevious, true)
     } else {
-      stopForeground(true)
+      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
     }
     return super.onStartCommand(intent, flags, startId)
@@ -90,7 +92,7 @@ class ShootService : LifecycleService() {
   override fun onDestroy() {
     super.onDestroy()
     Timber.d("onDestroy")
-    stopForeground(true)
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
   }
 
   private fun showNotification() {
@@ -145,9 +147,14 @@ class ShootService : LifecycleService() {
       isComputing = true
       Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
       _isShooting = true
-      notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
-      showNotification()
-      notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+
+      areNotificationsEnabled = notificationManager.areNotificationsEnabled()
+
+      if (areNotificationsEnabled) {
+        notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
+        showNotification()
+        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+      }
 
       val timer = TimeRecorder().also {
         it.start()
@@ -162,8 +169,10 @@ class ShootService : LifecycleService() {
       val dbList = mutableListOf<SnapshotItem>()
       val exceptionInfoList = mutableListOf<PackageInfo>()
 
-      builder.setProgress(size, count, false)
-      notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+      if (areNotificationsEnabled) {
+        builder.setProgress(size, count, false)
+        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+      }
 
       var currentProgress: Int
       var lastProgress = 0
@@ -212,8 +221,10 @@ class ShootService : LifecycleService() {
         }
 
         if (dbList.size >= 50) {
-          builder.setProgress(size, count, false)
-          notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+          if (areNotificationsEnabled) {
+            builder.setProgress(size, count, false)
+            notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+          }
           repository.insertSnapshots(dbList)
           dbList.clear()
         }
@@ -263,8 +274,10 @@ class ShootService : LifecycleService() {
         notifyProgress(count * 100 / size)
       }
 
-      builder.setProgress(size, count, false)
-      notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+      if (areNotificationsEnabled) {
+        builder.setProgress(size, count, false)
+        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+      }
       repository.insertSnapshots(dbList)
       repository.insert(TimeStampItem(ts, null))
 
@@ -273,13 +286,15 @@ class ShootService : LifecycleService() {
         repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
       }
 
-      notificationManager.cancel(SHOOT_NOTIFICATION_ID)
+      if (areNotificationsEnabled) {
+        notificationManager.cancel(SHOOT_NOTIFICATION_ID)
 
-      builder.setProgress(0, 0, false)
-        .setOngoing(false)
-        .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
-        .setContentText(getFormatDateString(ts))
-      notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
+        builder.setProgress(0, 0, false)
+          .setOngoing(false)
+          .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
+          .setContentText(getFormatDateString(ts))
+        notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
+      }
 
       timer.end()
       Timber.d("computeSnapshots: $timer")
@@ -287,7 +302,7 @@ class ShootService : LifecycleService() {
       GlobalValues.snapshotTimestamp = ts
       _isShooting = false
       notifyFinished(ts)
-      stopForeground(true)
+      ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
       Timber.i("computeSnapshots end")
       isComputing = false

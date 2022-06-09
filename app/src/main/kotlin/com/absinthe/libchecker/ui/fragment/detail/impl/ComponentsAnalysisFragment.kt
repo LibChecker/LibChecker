@@ -11,6 +11,7 @@ import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
@@ -21,7 +22,6 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.utils.showToast
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import kotlinx.coroutines.Dispatchers
@@ -172,7 +172,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
           when (which) {
             0 -> {
               ClipboardUtils.put(context, componentName)
-              context.showToast(R.string.toast_copied_to_clipboard)
+              VersionCompat.showCopiedOnClipboardToast(context)
             }
             1 -> {
               if (MonkeyKingManager.isSupportInteraction) {
@@ -203,7 +203,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
         .show()
     } else {
       ClipboardUtils.put(context, componentName)
-      context.showToast(R.string.toast_copied_to_clipboard)
+      VersionCompat.showCopiedOnClipboardToast(context)
     }
   }
 

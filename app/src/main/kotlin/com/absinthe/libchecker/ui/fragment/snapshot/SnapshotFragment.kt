@@ -1,9 +1,12 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
+import android.Manifest
 import android.app.Service
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.IBinder
@@ -17,6 +20,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Space
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -44,6 +49,7 @@ import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -112,6 +118,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
   }
   private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
+  private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
@@ -314,6 +321,17 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
   }
 
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+
+    if (OsUtils.atLeastT()) {
+      requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+          Timber.d("Request post notification: $isGranted")
+        }
+    }
+  }
+
   override fun onResume() {
     super.onResume()
     menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
@@ -391,6 +409,19 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           Toasty.showShort(context, "Snapshot service error")
         }
         shouldCompare = false
+
+        if (OsUtils.atLeastT()) {
+          if (ContextCompat.checkSelfPermission(
+              context,
+              Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+          ) {
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+              requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+          }
+        }
+
         Analytics.trackEvent(
           Constants.Event.SNAPSHOT_CLICK,
           EventProperties().set("Action", "Click to Save")

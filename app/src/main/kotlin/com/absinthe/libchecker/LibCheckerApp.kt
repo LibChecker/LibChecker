@@ -84,10 +84,8 @@ class LibCheckerApp : Application() {
 
   @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
-    runCatching {
+    if (SplitController.getInstance().isSplitSupported()) {
       SplitController.initialize(this, R.xml.main_split_config)
-    }.onFailure {
-      Timber.e(it)
     }
   }
 

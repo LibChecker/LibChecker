@@ -8,6 +8,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
@@ -47,8 +48,15 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
     initView()
+    onBackPressedDispatcher.addCallback(
+      this,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          finish()
+        }
+      }
+    )
   }
 
   override fun onDestroy() {
@@ -58,7 +66,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      onBackPressedDispatcher.onBackPressed()
     }
     return super.onOptionsItemSelected(item)
   }

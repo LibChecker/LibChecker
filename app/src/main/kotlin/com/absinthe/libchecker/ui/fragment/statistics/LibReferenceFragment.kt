@@ -304,15 +304,17 @@ class LibReferenceFragment :
   }
 
   private fun MenuItem.initMenu(@LibType type: Int) {
-    if (GlobalValues.currentLibRefType == type) {
-      val title = SpannableStringBuilder(this.title)
-      title.setSpan(
-        StyleSpan(Typeface.BOLD),
-        0,
-        this.title.length,
-        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      this.title = title
+    this.title?.let {
+      if (GlobalValues.currentLibRefType == type) {
+        val title = SpannableStringBuilder(it)
+        title.setSpan(
+          StyleSpan(Typeface.BOLD),
+          0,
+          it.length,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        this.title = title
+      }
     }
     this.setOnMenuItemClickListener {
       doSaveLibRefType(type)

@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.app
 
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.PackageUtils
 
@@ -15,7 +16,7 @@ abstract class CheckPackageOnResumingActivity<VB : ViewBinding> : BaseActivity<V
       requirePackageName()?.let { pkgName ->
         runCatching {
           if (pkgName.endsWith(Constants.TEMP_PACKAGE)) {
-            packageManager.getPackageArchiveInfo(pkgName, 0)
+            PackageManagerCompat.getPackageArchiveInfo(pkgName, 0)
           } else {
             PackageUtils.getPackageInfo(pkgName)
           }

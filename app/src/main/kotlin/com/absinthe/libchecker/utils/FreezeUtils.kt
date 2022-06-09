@@ -2,7 +2,7 @@ package com.absinthe.libchecker.utils
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import dev.rikka.tools.refine.Refine
 import timber.log.Timber
 
@@ -27,9 +27,9 @@ object FreezeUtils {
 
   fun isAppFrozen(packageName: String): Boolean {
     runCatching {
-      val packageInfo = SystemServices.packageManager.getPackageInfo(
+      val packageInfo = PackageManagerCompat.getPackageInfo(
         packageName,
-        VersionCompat.MATCH_UNINSTALLED_PACKAGES or VersionCompat.MATCH_DISABLED_COMPONENTS
+        PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES or PackageManagerCompat.MATCH_DISABLED_COMPONENTS
       )
       return isAppFrozen(packageInfo.applicationInfo)
     }.onFailure {
