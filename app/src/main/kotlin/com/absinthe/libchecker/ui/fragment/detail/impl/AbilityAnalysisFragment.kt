@@ -6,6 +6,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -13,7 +14,6 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,7 +99,9 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
 
   private fun doOnLongClick(componentName: String) {
     ClipboardUtils.put(requireContext(), componentName)
-    context?.showToast(R.string.toast_copied_to_clipboard)
+    context?.let {
+      VersionCompat.showCopiedOnClipboardToast(it)
+    }
   }
 
   companion object {

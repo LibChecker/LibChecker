@@ -45,6 +45,7 @@ import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -195,7 +196,7 @@ abstract class BaseAppDetailActivity :
                     ClipData.newUri(contentResolver, Constants.TEMP_ICON, uri)
                   )
                 ) {
-                  Toasty.showShort(this@BaseAppDetailActivity, R.string.toast_copied_to_clipboard)
+                  VersionCompat.showCopiedOnClipboardToast(this@BaseAppDetailActivity)
                 }
               }
               true

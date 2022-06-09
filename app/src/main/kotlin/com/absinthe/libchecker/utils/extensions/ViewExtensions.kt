@@ -14,8 +14,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
@@ -26,7 +26,7 @@ import rikka.core.util.ClipboardUtils
 fun View.setLongClickCopiedToClipboard(text: CharSequence) {
   setOnLongClickListener {
     ClipboardUtils.put(context, text)
-    context.showToast(R.string.toast_copied_to_clipboard)
+    VersionCompat.showCopiedOnClipboardToast(context)
     true
   }
 }
@@ -131,16 +131,16 @@ fun ViewPager2.setCurrentItem(
     previousValue = currentValue
   }
   animator.addListener(object : Animator.AnimatorListener {
-    override fun onAnimationStart(animation: Animator?) {
+    override fun onAnimationStart(animation: Animator) {
       beginFakeDrag()
     }
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
       endFakeDrag()
     }
 
-    override fun onAnimationCancel(animation: Animator?) {}
-    override fun onAnimationRepeat(animation: Animator?) {}
+    override fun onAnimationCancel(animation: Animator) {}
+    override fun onAnimationRepeat(animation: Animator) {}
   })
   animator.interpolator = interpolator
   animator.duration = duration

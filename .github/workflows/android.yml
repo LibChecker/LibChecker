@@ -67,7 +67,7 @@ jobs:
         id: signFossRelease
         uses: r0adkll/sign-android-release@v1.0.4
         env:
-          BUILD_TOOLS_VERSION: "32.0.0"
+          BUILD_TOOLS_VERSION: "33.0.0"
         with:
           releaseDirectory: app/build/outputs/apk/foss/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}

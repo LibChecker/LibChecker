@@ -29,6 +29,7 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.database.entity.LCItem
@@ -97,8 +98,10 @@ object LCAppUtils {
 
   fun getAppIcon(packageName: String): Drawable {
     return runCatching {
-      SystemServices.packageManager.getPackageInfo(packageName, 0)
-        .applicationInfo.loadIcon(SystemServices.packageManager)
+      PackageManagerCompat.getPackageInfo(
+        packageName,
+        0
+      ).applicationInfo.loadIcon(SystemServices.packageManager)
     }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
   }
 

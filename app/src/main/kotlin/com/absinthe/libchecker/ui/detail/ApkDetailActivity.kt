@@ -7,9 +7,10 @@ import android.os.Bundle
 import android.os.Environment
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.IntentCompat
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.showToast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
     intent?.let { i ->
       when {
         i.action == Intent.ACTION_SEND -> {
-          intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)?.let { stream ->
+          IntentCompat.getParcelableExtra<Uri>(intent, Intent.EXTRA_STREAM)?.let { stream ->
             initPackage(stream)
           } ?: run {
             finish()
@@ -95,10 +96,10 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                     or PackageManager.GET_PROVIDERS
                     or PackageManager.GET_PERMISSIONS
                     or PackageManager.GET_META_DATA
-                    or VersionCompat.MATCH_DISABLED_COMPONENTS
-                    or VersionCompat.MATCH_UNINSTALLED_PACKAGES
+                    or PackageManagerCompat.MATCH_DISABLED_COMPONENTS
+                    or PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
                   )
-                packageManager.getPackageArchiveInfo(tf.path, flag)?.also {
+                PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
                   it.applicationInfo.sourceDir = tf.path
                   it.applicationInfo.publicSourceDir = tf.path
                 }?.let { pi ->

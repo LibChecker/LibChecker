@@ -11,6 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.OsUtils
@@ -98,7 +99,7 @@ class AppInfoBottomSheetDialogFragment :
 
   @RequiresApi(Build.VERSION_CODES.N)
   private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
-    return requireContext().packageManager.queryIntentActivities(
+    return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
       .map {
@@ -142,8 +143,7 @@ class AppInfoBottomSheetDialogFragment :
     val intent = Intent(Intent.ACTION_MAIN, null)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setPackage(packageName)
-    val pm = requireActivity().packageManager
-    val info = pm.queryIntentActivities(intent, 0)
+    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
     launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
     val launchIntent = Intent(Intent.ACTION_MAIN)
       .addCategory(Intent.CATEGORY_LAUNCHER)

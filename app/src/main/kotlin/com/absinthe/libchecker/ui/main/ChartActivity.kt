@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.databinding.ActivityChartBinding
@@ -16,16 +17,23 @@ class ChartActivity : BaseActivity<ActivityChartBinding>() {
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.tab_chart)
+
     if (savedInstanceState == null) {
       supportFragmentManager.beginTransaction()
         .replace(R.id.fragment_container, ChartFragment())
         .commit()
     }
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        finish()
+      }
+    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      onBackPressedDispatcher.onBackPressed()
     }
     return super.onOptionsItemSelected(item)
   }

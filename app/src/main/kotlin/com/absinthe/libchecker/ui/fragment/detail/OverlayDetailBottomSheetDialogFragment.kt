@@ -8,6 +8,7 @@ import android.text.style.ImageSpan
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
@@ -37,7 +38,9 @@ class OverlayDetailBottomSheetDialogFragment :
 
   @SuppressLint("SetTextI18n")
   override fun init() {
-    val lcItem = (arguments?.getParcelable(EXTRA_LC_ITEM) as? LCItem) ?: return
+    val lcItem = arguments?.let {
+      BundleCompat.getParcelable<LCItem>(it, EXTRA_LC_ITEM)
+    } ?: return
     val packageInfo = try {
       PackageUtils.getPackageInfo(lcItem.packageName)
     } catch (e: PackageManager.NameNotFoundException) {
