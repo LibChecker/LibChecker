@@ -22,4 +22,5 @@
 
   <color name="ic_launcher_foreground">#FFFFFF</color>
   <color name="ic_launcher_background">#6200EE</color>
+  <color name="ic_launcher_back">#6200EE</color>
 </resources>

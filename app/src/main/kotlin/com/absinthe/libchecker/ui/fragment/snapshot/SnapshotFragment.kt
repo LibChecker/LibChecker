@@ -69,6 +69,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 import java.util.LinkedList
@@ -278,7 +279,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }.launchIn(lifecycleScope)
       snapshotAppsCount.observe(viewLifecycleOwner) {
         if (it != null) {
-          dashboard.container.tvSnapshotAppsCountText.text = it.toString()
+          lifecycleScope.launch(Dispatchers.Default) {
+            val appCount = AppItemRepository.getApplicationInfoMap().size
+
+            withContext(Dispatchers.Main) {
+              dashboard.container.tvSnapshotAppsCountText.text = "$it / $appCount"
+            }
+          }
         }
       }
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->

@@ -133,7 +133,7 @@
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存當前快照</string>
   <string name="snapshot_current_timestamp">當前快照時間戳</string>
-  <string name="snapshot_apps_count">快照應用程式數量</string>
+  <string name="snapshot_apps_count">快照應用程式數量 / 應用程式數量</string>
   <string name="snapshot_indicator_added">增加</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">變更</string>

@@ -132,7 +132,7 @@
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Зберегти поточний знімок</string>
   <string name="snapshot_current_timestamp">Відмітка часу поточного знімка</string>
-  <string name="snapshot_apps_count">Кількість додатків в знімку</string>
+  <string name="snapshot_apps_count">Кількість додатків в знімку / Количество заявок</string>
   <string name="snapshot_indicator_added">Додано</string>
   <string name="snapshot_indicator_removed">Видалено</string>
   <string name="snapshot_indicator_changed">Змінено</string>

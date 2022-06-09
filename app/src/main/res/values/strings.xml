@@ -133,7 +133,7 @@
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Save current snapshot</string>
   <string name="snapshot_current_timestamp">Current Snapshot Timestamp</string>
-  <string name="snapshot_apps_count">Count of Applications in Snapshot</string>
+  <string name="snapshot_apps_count">Count of Applications in Snapshot / Count of Applications</string>
   <string name="snapshot_indicator_added">Added</string>
   <string name="snapshot_indicator_removed">Removed</string>
   <string name="snapshot_indicator_changed">Changed</string>
