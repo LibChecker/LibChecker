@@ -84,8 +84,10 @@ class LibCheckerApp : Application() {
 
   @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
-    if (SplitController.getInstance().isSplitSupported()) {
-      SplitController.initialize(this, R.xml.main_split_config)
+    runCatching {
+      if (SplitController.getInstance().isSplitSupported()) {
+        SplitController.initialize(this, R.xml.main_split_config)
+      }
     }
   }
 
