@@ -203,6 +203,14 @@ class AboutActivity : AbsAboutActivity() {
       add(Category("Open Source Licenses"))
       add(
         License(
+          "LibChecker-Rules-Bundle",
+          "zhaobozhen",
+          License.APACHE_2,
+          "https://github.com/zhaobozhen/LibChecker-Rules-Bundle"
+        )
+      )
+      add(
+        License(
           "kotlin",
           "JetBrains",
           License.APACHE_2,
@@ -375,6 +383,14 @@ class AboutActivity : AbsAboutActivity() {
           "LSPosed",
           License.APACHE_2,
           "https://github.com/LSPosed/AndroidHiddenApiBypass"
+        )
+      )
+      add(
+        License(
+          "cascade",
+          "saket",
+          License.APACHE_2,
+          "https://github.com/saket/cascade"
         )
       )
     }
