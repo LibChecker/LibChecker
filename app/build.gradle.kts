@@ -21,6 +21,7 @@ ksp {
   arg("moshi.generated", "javax.annotation.Generated")
   arg("room.incremental", "true")
   arg("room.schemaLocation", "$projectDir/schemas")
+  arg("room.expandProjection", "true")
 }
 
 setupAppModule {
