@@ -14,6 +14,7 @@ This app is used to view the third-party libraries used by applications in your 
 ## Download
 [<img src="/source/coolapk-badge.png" width="323" height="125" />](https://www.coolapk.com/apk/com.absinthe.libchecker)
 [<img src="/source/google-play-badge.png" width="323" height="125" />](https://play.google.com/store/apps/details?id=com.absinthe.libchecker)
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" width="323" height="125" />](https://apt.izzysoft.de/fdroid/index/apk/com.absinthe.libchecker)
 
 ## Discussions
 [Github Discussions](https://github.com/zhaobozhen/LibChecker/discussions)
