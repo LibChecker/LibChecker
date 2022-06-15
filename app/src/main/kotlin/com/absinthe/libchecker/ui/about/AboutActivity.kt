@@ -137,7 +137,7 @@ class AboutActivity : AbsAboutActivity() {
 
   override fun onItemsCreated(items: MutableList<Any>) {
 
-    val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+    val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
 
     items.apply {
       add(Category("What's this"))

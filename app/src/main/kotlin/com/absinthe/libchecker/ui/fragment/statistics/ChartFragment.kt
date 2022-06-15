@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.view.HapticFeedbackConstants
@@ -97,6 +96,8 @@ class ChartFragment :
   }
 
   private fun setData() {
+    context ?: return
+
     when (chartType) {
       TYPE_ABI -> setAbiData()
       TYPE_KOTLIN -> setKotlinData()
@@ -508,11 +509,9 @@ class ChartFragment :
           dialogTitle = "Target SDK $targetApi"
           viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == targetApi })
           filteredList?.filter {
-            packageInfo = try {
+            packageInfo = runCatching {
               PackageUtils.getPackageInfo(it.packageName)
-            } catch (e: PackageManager.NameNotFoundException) {
-              null
-            }
+            }.getOrNull()
             packageInfo?.applicationInfo?.targetSdkVersion == targetApi
           }?.let { filter -> item = ArrayList(filter) }
         }

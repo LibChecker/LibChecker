@@ -2,6 +2,7 @@ package com.absinthe.libchecker.utils.timber
 
 import android.util.Log
 import com.absinthe.libchecker.constant.GlobalValues
+import com.microsoft.appcenter.crashes.Crashes
 import timber.log.Timber
 
 class ReleaseTree : Timber.DebugTree() {
@@ -18,5 +19,11 @@ class ReleaseTree : Timber.DebugTree() {
       return
     }
     super.log(priority, "<LC_REL>$tag", message, t)
+
+    t?.let {
+      if (priority == Log.ERROR) {
+        Crashes.trackError(it)
+      }
+    }
   }
 }

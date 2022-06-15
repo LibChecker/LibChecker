@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.OsUtils
@@ -112,28 +114,32 @@ class AppInfoBottomSheetDialogFragment :
       }
   }
 
-  private fun getMaterialFilesItem() =
-    if (packageName != null && PackageUtils.isAppInstalled("me.zhanghai.android.files")) {
-      listOf(
-        AppInfoAdapter.AppInfoItem(
-          PackageUtils.getPackageInfo("me.zhanghai.android.files").applicationInfo,
-          Intent(Intent.ACTION_VIEW)
-            .setType("vnd.android.document/directory")
-            .setComponent(
-              ComponentName(
-                "me.zhanghai.android.files",
-                "me.zhanghai.android.files.filelist.FileListActivity"
-              )
-            )
-            .putExtra(
-              "org.openintents.extra.ABSOLUTE_PATH",
-              File(PackageUtils.getPackageInfo(packageName!!).applicationInfo.sourceDir).parent
-            )
-        )
-      )
-    } else {
-      emptyList()
+  private fun getMaterialFilesItem(): List<AppInfoAdapter.AppInfoItem> {
+    val pkg = packageName ?: return emptyList()
+
+    if (!PackageUtils.isAppInstalled(Constants.PackageNames.MATERIAL_FILES)) {
+      return emptyList()
     }
+
+    val sourceDir = runCatching {
+      File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
+    }.getOrNull() ?: return emptyList()
+
+    return listOf(
+      AppInfoAdapter.AppInfoItem(
+        PackageUtils.getPackageInfo(Constants.PackageNames.MATERIAL_FILES).applicationInfo,
+        Intent(Intent.ACTION_VIEW)
+          .setType(DocumentsContract.Document.MIME_TYPE_DIR)
+          .setComponent(
+            ComponentName(
+              Constants.PackageNames.MATERIAL_FILES,
+              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity"
+            )
+          )
+          .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
+      )
+    )
+  }
 
   private fun startLaunchAppActivity(packageName: String?) {
     if (packageName == null) {

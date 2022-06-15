@@ -35,14 +35,16 @@ object PackageManagerCompat {
   }
 
   fun getPackageArchiveInfo(archiveFilePath: String, flags: Int): PackageInfo? {
-    return if (OsUtils.atLeastT()) {
-      SystemServices.packageManager.getPackageArchiveInfo(
-        archiveFilePath,
-        PackageManager.PackageInfoFlags.of(flags.toLong())
-      )
-    } else {
-      SystemServices.packageManager.getPackageArchiveInfo(archiveFilePath, flags)
-    }
+    return runCatching {
+      if (OsUtils.atLeastT()) {
+        SystemServices.packageManager.getPackageArchiveInfo(
+          archiveFilePath,
+          PackageManager.PackageInfoFlags.of(flags.toLong())
+        )
+      } else {
+        SystemServices.packageManager.getPackageArchiveInfo(archiveFilePath, flags)
+      }
+    }.getOrNull()
   }
 
   fun getApplicationInfo(packageName: String, flags: Int): ApplicationInfo {

@@ -34,7 +34,8 @@ object Global {
       stack.contains("com.swift.sandhook") ||
       stack.contains("updateForceDarkMode") ||
       stack.contains("MultiSelectPopupWindow.showMultiSelectPopupWindow") ||
-      stack.contains("get life cycle exception")
+      stack.contains("get life cycle exception") ||
+      stack.contains("android.view.inputmethod.InputMethodManager.startInputInner")
     ) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {

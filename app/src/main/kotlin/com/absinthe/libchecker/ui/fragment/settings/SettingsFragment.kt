@@ -229,7 +229,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_RATE)?.apply {
       setOnPreferenceClickListener {
-        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
         val marketUrl = if (hasInstallCoolApk) {
           URLManager.COOLAPK_APP_PAGE
         } else {

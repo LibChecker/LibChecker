@@ -74,8 +74,6 @@ object Constants {
   const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"
   const val ACTION_SNAPSHOT = "com.absinthe.libchecker.intent.action.START_SNAPSHOT"
 
-  const val PACKAGE_NAME_COOLAPK = "com.coolapk.market"
-
   const val COMMAND_DEBUG_MODE = "/debugMode"
   const val COMMAND_USER_MODE = "/userMode"
 
@@ -94,5 +92,10 @@ object Constants {
     const val LIB_REFERENCE_FILTER_TYPE = "Lib Reference Filter Type"
     const val EASTER_EGG = "Easter Egg"
     const val SNAPSHOT_DETAIL_COMPONENT_COUNT = "Snapshot Detail Component Count"
+  }
+
+  object PackageNames {
+    const val COOLAPK = "com.coolapk.market"
+    const val MATERIAL_FILES = "me.zhanghai.android.files"
   }
 }
