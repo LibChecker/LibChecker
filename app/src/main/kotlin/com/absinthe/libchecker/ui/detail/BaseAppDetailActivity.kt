@@ -767,11 +767,17 @@ abstract class BaseAppDetailActivity :
     if (packageInfo.isUseJetpackCompose()) {
       withContext(Dispatchers.Main) {
         initFeatureListView()
+        val title = PackageUtils.getJetpackComposeVersion(packageInfo)?.let {
+          HtmlCompat.fromHtml(
+            "${getString(R.string.jetpack_compose)} <b>$it</b>",
+            HtmlCompat.FROM_HTML_MODE_COMPACT
+          )
+        } ?: getString(R.string.jetpack_compose)
         featureAdapter.addData(
           FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
               .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose)
-              .setTitle(R.string.jetpack_compose)
+              .setTitle(title)
               .setMessage(R.string.jetpack_compose_details)
               .setPositiveButton(android.R.string.ok, null)
               .show()

@@ -1183,4 +1183,24 @@ object PackageUtils {
       hasDexClass(File(applicationInfo.sourceDir), "androidx.compose.*")
     }.getOrDefault(false)
   }
+
+  fun getJetpackComposeVersion(packageInfo: PackageInfo): String? {
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        arrayOf(
+          "META-INF/androidx.compose.runtime_runtime.version",
+          "META-INF/androidx.compose.ui_ui.version",
+          "META-INF/androidx.compose.ui_ui-tooling-preview.version"
+        ).forEach { entry ->
+          zipFile.getEntry(entry)?.let { ze ->
+            zipFile.getInputStream(ze).source().buffer().use { bs ->
+              return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
+            }
+          }
+        }
+      }
+    }
+
+    return null
+  }
 }
