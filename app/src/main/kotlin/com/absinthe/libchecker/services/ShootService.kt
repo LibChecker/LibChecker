@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
+import android.os.Process
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.core.app.NotificationCompat
@@ -34,7 +35,6 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -44,14 +44,14 @@ import java.util.Date
 import java.util.Locale
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
-private const val SHOOT_NOTIFICATION_ID = 1
-private const val SHOOT_SUCCESS_NOTIFICATION_ID = 2
 
 const val ACTION_SHOOT_AND_STOP_AUTO = "action_shoot_and_stop_auto"
 const val EXTRA_DROP_PREVIOUS = "extra_drop_previous"
 
 class ShootService : LifecycleService() {
 
+  private val notificationIdShoot = Process.myPid()
+  private val notificationIdShootSuccess = notificationIdShoot + 1
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
   private val notificationManager by lazy { NotificationManagerCompat.from(this) }
   private val configuration by lazy {
@@ -62,7 +62,7 @@ class ShootService : LifecycleService() {
   private val repository = Repositories.lcRepository
   private val listenerList = RemoteCallbackList<OnShootListener>()
 
-  private val binder by lazy { ShootBinder(this, lifecycleScope) }
+  private val binder by lazy { ShootBinder(this) }
 
   private var _isShooting: Boolean = false
   private var areNotificationsEnabled = false
@@ -106,7 +106,7 @@ class ShootService : LifecycleService() {
         val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
         createNotificationChannel(channel)
       }
-      startForeground(SHOOT_NOTIFICATION_ID, builder.build())
+      startForeground(notificationIdShoot, builder.build())
     }
   }
 
@@ -150,10 +150,11 @@ class ShootService : LifecycleService() {
 
       areNotificationsEnabled = notificationManager.areNotificationsEnabled()
 
+      notificationManager.cancel(notificationIdShootSuccess)
+      showNotification()
+
       if (areNotificationsEnabled) {
-        notificationManager.cancel(SHOOT_SUCCESS_NOTIFICATION_ID)
-        showNotification()
-        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationIdShoot, builder.build())
       }
 
       val timer = TimeRecorder().also {
@@ -171,7 +172,7 @@ class ShootService : LifecycleService() {
 
       if (areNotificationsEnabled) {
         builder.setProgress(size, count, false)
-        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationIdShoot, builder.build())
       }
 
       var currentProgress: Int
@@ -223,7 +224,7 @@ class ShootService : LifecycleService() {
         if (dbList.size >= 50) {
           if (areNotificationsEnabled) {
             builder.setProgress(size, count, false)
-            notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+            notificationManager.notify(notificationIdShoot, builder.build())
           }
           repository.insertSnapshots(dbList)
           dbList.clear()
@@ -276,7 +277,7 @@ class ShootService : LifecycleService() {
 
       if (areNotificationsEnabled) {
         builder.setProgress(size, count, false)
-        notificationManager.notify(SHOOT_NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationIdShoot, builder.build())
       }
       repository.insertSnapshots(dbList)
       repository.insert(TimeStampItem(ts, null))
@@ -287,13 +288,13 @@ class ShootService : LifecycleService() {
       }
 
       if (areNotificationsEnabled) {
-        notificationManager.cancel(SHOOT_NOTIFICATION_ID)
+        notificationManager.cancel(notificationIdShoot)
 
         builder.setProgress(0, 0, false)
           .setOngoing(false)
           .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
           .setContentText(getFormatDateString(ts))
-        notificationManager.notify(SHOOT_SUCCESS_NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationIdShootSuccess, builder.build())
       }
 
       timer.end()
@@ -344,8 +345,7 @@ class ShootService : LifecycleService() {
     var isComputing = false
   }
 
-  class ShootBinder(service: ShootService, private val lifecycleScope: CoroutineScope) :
-    IShootService.Stub() {
+  class ShootBinder(service: ShootService) : IShootService.Stub() {
 
     private val serviceRef: WeakReference<ShootService> = WeakReference(service)
 

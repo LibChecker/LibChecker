@@ -23,4 +23,12 @@ object BundleCompat {
       bundle.getSerializable(key) as T?
     }
   }
+
+  inline fun <reified T : Parcelable> getParcelableArrayList(bundle: Bundle, key: String?): ArrayList<T>? {
+    return if (OsUtils.atLeastT()) {
+      bundle.getParcelableArrayList(key, T::class.java)
+    } else {
+      bundle.getParcelableArrayList(key)
+    }
+  }
 }

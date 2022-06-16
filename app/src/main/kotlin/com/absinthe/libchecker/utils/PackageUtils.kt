@@ -87,7 +87,8 @@ object PackageUtils {
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return PackageManagerCompat.getPackageArchiveInfo(
-        packageInfo.applicationInfo.sourceDir, PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
+        packageInfo.applicationInfo.sourceDir,
+        PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
         applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
         applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
@@ -555,7 +556,7 @@ object PackageUtils {
         } else {
           it.name.orEmpty()
         }
-        StatefulComponent(name, isEnabled, it.processName.removePrefix(it.packageName))
+        StatefulComponent(name, isEnabled, it.processName.orEmpty().removePrefix(it.packageName))
       }
       .toList()
   }
@@ -720,7 +721,6 @@ object PackageUtils {
     abiSet: Set<Int>? = null
   ): Int {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
-    val file = File(applicationInfo.sourceDir)
     val use32bitAbi = applicationInfo.isUse32BitAbi()
     val overlay = packageInfo.isOverlay()
     val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
@@ -729,6 +729,12 @@ object PackageUtils {
       return OVERLAY
     }
 
+    if (applicationInfo.sourceDir == null) {
+      Timber.d("SourceDir is null: ${packageInfo.packageName}")
+      return ERROR
+    }
+
+    val file = File(applicationInfo.sourceDir)
     val realAbiSet =
       abiSet ?: getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
     if (realAbiSet.contains(NO_LIBS)) {
@@ -1109,7 +1115,12 @@ object PackageUtils {
     try {
       if (pmList.size > appList.size) {
         appList = pmList.asSequence()
-          .map { getPackageInfo(it, PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS) }
+          .map {
+            getPackageInfo(
+              it,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+            )
+          }
           .toList()
       }
     } catch (t: Throwable) {
