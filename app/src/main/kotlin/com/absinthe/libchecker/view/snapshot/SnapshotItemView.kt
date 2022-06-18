@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
@@ -13,14 +14,15 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.google.android.material.card.MaterialCardView
 
-class SnapshotItemView(context: Context) : MaterialCardView(context) {
+class SnapshotItemView(context: Context) : FrameLayout(context) {
 
   val container = SnapshotItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     clipToPadding = false
   }
 

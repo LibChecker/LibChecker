@@ -8,6 +8,8 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.applist.AppItemView
@@ -51,6 +53,9 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
     ).also {
       it.topMargin = 8.dp
     }
+    strokeWidth = 1.dp
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
   }
 
   init {

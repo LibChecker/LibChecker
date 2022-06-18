@@ -31,7 +31,7 @@ class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeader
     ).also {
       val padding = 16.dp
       it.topMargin = padding
-      setPadding(padding, 0, padding, padding)
+      setPadding(padding, 0, padding, 0)
     }
     adapter = this@TimeNodeBottomSheetView.adapter
     isVerticalScrollBarEnabled = false

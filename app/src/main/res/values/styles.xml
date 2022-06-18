@@ -69,15 +69,14 @@
     <item name="cardElevation">1dp</item>
   </style>
 
-  <style name="AlbumMaterialCard" parent="Widget.Material3.CardView.Filled">
-    <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
-    <item name="cardCornerRadius">5dp</item>
+  <style name="AlbumMaterialCard" parent="Widget.Material3.CardView.Outlined">
+    <item name="cardCornerRadius">8dp</item>
   </style>
 
   <style name="App.Material3.CardView" parent="Widget.Material3.CardView.Outlined">
     <item name="android:stateListAnimator">@null</item>
-    <item name="android:clickable">true</item>
-    <item name="android:focusable">true</item>
+    <item name="android:background">@null</item>
+    <item name="android:foreground">@null</item>
     <item name="cardPreventCornerOverlap">false</item>
     <item name="strokeColor">@android:color/transparent</item>
   </style>

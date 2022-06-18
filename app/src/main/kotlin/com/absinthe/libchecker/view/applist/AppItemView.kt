@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.view.applist
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.TypedValue
@@ -16,6 +17,7 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
@@ -24,6 +26,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
   val container = AppItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
   }
 
   private val floatView by lazy {
@@ -43,6 +46,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
   }
 
   init {
+    strokeColor = Color.TRANSPARENT
     addView(container)
   }
 

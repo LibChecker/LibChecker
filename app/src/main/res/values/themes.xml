@@ -27,7 +27,6 @@
     <item name="albumCardBorderColor">?attr/colorOutline</item>
 
     <item name="chipStyle">@style/App.LibChip.Material3</item>
-    <item name="materialCardViewStyle">@style/App.Material3.CardView</item>
   </style>
 
   <style name="Theme.Light" parent="Base.AppTheme.Light" />
@@ -58,7 +57,6 @@
     <item name="albumCardBorderColor">?attr/colorOutline</item>
 
     <item name="chipStyle">@style/App.LibChip.Material3</item>
-    <item name="materialCardViewStyle">@style/App.Material3.CardView</item>
   </style>
 
   <style name="Theme" parent="Base.AppTheme" />

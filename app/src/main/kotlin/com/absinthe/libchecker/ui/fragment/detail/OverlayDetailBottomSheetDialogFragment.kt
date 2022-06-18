@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
@@ -36,7 +35,6 @@ class OverlayDetailBottomSheetDialogFragment :
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  @SuppressLint("SetTextI18n")
   override fun init() {
     val lcItem = arguments?.let {
       BundleCompat.getParcelable<LCItem>(it, EXTRA_LC_ITEM)
@@ -72,7 +70,7 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
-          text = "${Constants.OVERLAY_STRING}, ${PackageUtils.getTargetApiString(packageInfo)}"
+          text = String.format("%s, %s", Constants.OVERLAY_STRING, PackageUtils.getTargetApiString(packageInfo))
         }
       }
 

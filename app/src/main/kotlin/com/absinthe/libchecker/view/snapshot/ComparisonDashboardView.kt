@@ -4,11 +4,13 @@ import android.content.Context
 import android.view.Gravity
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
-class ComparisonDashboardView(context: Context) : MaterialCardView(context) {
+class ComparisonDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
   val container = SnapshotDashboardContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
@@ -25,6 +27,8 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context) {
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
+    radius = 8.dp.toFloat()
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
     addView(container)
   }
 

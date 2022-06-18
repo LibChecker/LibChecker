@@ -7,7 +7,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -36,12 +35,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      SnapshotItemView(
-        ContextThemeWrapper(
-          context,
-          R.style.AppListMaterialCard
-        )
-      ).also {
+      SnapshotItemView(context).also {
         it.layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT

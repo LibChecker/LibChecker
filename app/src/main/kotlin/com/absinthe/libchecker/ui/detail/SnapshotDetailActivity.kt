@@ -59,6 +59,7 @@ import com.microsoft.appcenter.analytics.EventProperties
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
 import rikka.core.util.ClipboardUtils
+import rikka.widget.borderview.BorderView
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
@@ -121,6 +122,10 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
         adapter = this@SnapshotDetailActivity.adapter
         (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+        borderVisibilityChangedListener =
+          BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+            binding.headerLayout.isLifted = !top
+          }
       }
 
       val isNewOrDeleted = entity.deleted || entity.newInstalled

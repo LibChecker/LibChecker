@@ -21,6 +21,7 @@ import android.widget.Space
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -132,12 +133,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       )
     }
 
-    val dashboard = SnapshotDashboardView(context).apply {
-      layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-    }
+    val dashboard =
+      SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+      }
 
     dashboard.setOnClickListener {
       startActivity(Intent(context, AlbumActivity::class.java))
@@ -277,7 +279,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             val appCount = AppItemRepository.getApplicationInfoMap().size
 
             withContext(Dispatchers.Main) {
-              dashboard.container.tvSnapshotAppsCountText.text = "$it / $appCount"
+              dashboard.container.tvSnapshotAppsCountText.text = String.format("%d / %d", it, appCount)
             }
           }
         }
