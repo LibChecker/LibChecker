@@ -8,7 +8,7 @@
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end">
 
-  <rikka.material.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
     style="?appBarStyle"
     android:layout_width="match_parent"
@@ -23,7 +23,7 @@
       android:layout_height="wrap_content"
       android:background="@null" />
 
-  </rikka.material.widget.AppBarLayout>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <androidx.fragment.app.FragmentContainerView
     android:id="@+id/fragment_container"

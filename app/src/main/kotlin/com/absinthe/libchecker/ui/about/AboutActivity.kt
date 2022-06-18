@@ -28,7 +28,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
-import com.drakeet.about.AbsAboutActivity
 import com.drakeet.about.Card
 import com.drakeet.about.Category
 import com.drakeet.about.Contributor
@@ -42,7 +41,7 @@ import timber.log.Timber
 
 private const val RENGE_CHECKER = "RengeChecker"
 
-class AboutActivity : AbsAboutActivity() {
+class AboutActivity : AbsAboutActivityProxy() {
 
   private var shouldShowEasterEggCount = 1
   private val configuration by lazy {
@@ -419,7 +418,6 @@ class AboutActivity : AbsAboutActivity() {
 
   private fun initView() {
     findViewById<Toolbar>(R.id.toolbar)?.let {
-      it.background = null
       it.title = getString(R.string.settings_about)
     }
     val color = getColor(R.color.aboutHeader)

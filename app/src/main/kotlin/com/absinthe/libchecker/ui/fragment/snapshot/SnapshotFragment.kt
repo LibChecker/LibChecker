@@ -11,7 +11,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.IBinder
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
@@ -133,16 +132,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       )
     }
 
-    val dashboard = SnapshotDashboardView(
-      ContextThemeWrapper(context, R.style.AlbumMaterialCard)
-    ).apply {
+    val dashboard = SnapshotDashboardView(context).apply {
       layoutParams = ViewGroup.MarginLayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      if (!GlobalValues.md3Theme) {
-        background = null
-      }
     }
 
     dashboard.setOnClickListener {
@@ -243,7 +237,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            context.appBar?.setRaised(!top)
+            getAppBar()?.isLifted = !top
           }
 
         if (itemDecorationCount == 0) {
@@ -477,14 +471,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
 
   private fun flip(child: Int) {
-    val context = (this.context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      context.appBar?.setRaised(false)
+      getAppBar()?.isLifted = false
       menu?.findItem(R.id.save)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()

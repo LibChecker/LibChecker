@@ -164,7 +164,7 @@ class ChartFragment :
         // add a lot of colors
         val colors: ArrayList<Int> = ArrayList()
 
-        if (OsUtils.atLeastS() && GlobalValues.md3Theme) {
+        if (OsUtils.atLeastS()) {
           if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
             colors.add(context.getColor(android.R.color.system_accent1_700))
             colors.add(context.getColor(android.R.color.system_accent1_800))

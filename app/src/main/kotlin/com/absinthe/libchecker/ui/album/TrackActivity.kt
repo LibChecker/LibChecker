@@ -54,7 +54,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
   }
 
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.album_item_track_title)
@@ -64,7 +64,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
       layoutManager = LinearLayoutManager(this@TrackActivity)
       borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-          appBar?.setRaised(!top)
+          binding.appbar.isLifted = !top
         }
       FastScrollerBuilder(this).useMd2Style().build()
     }

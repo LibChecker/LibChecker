@@ -37,9 +37,9 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
+import com.google.android.material.appbar.AppBarLayout
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import rikka.material.app.AppBar
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
@@ -63,7 +63,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   }
 
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-    setPreferencesFromResource(R.xml.settings, rootKey)
+    setPreferencesFromResource(R.xml.settings, null)
 
     (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
@@ -101,17 +101,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_COLORFUL_ICON", newValue)
-        )
-        true
-      }
-    }
-    (findPreference<SwitchPreference>(Constants.PREF_MD3))?.apply {
-      setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.md3Theme = newValue as Boolean
-        activity?.recreate()
-        Analytics.trackEvent(
-          Constants.Event.SETTINGS,
-          EventProperties().set("PREF_MD3", newValue)
         )
         true
       }
@@ -342,7 +331,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     borderViewDelegate = recyclerView.borderViewDelegate
     borderViewDelegate.borderVisibilityChangedListener =
       BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-        (activity as MainActivity?)?.appBar?.setRaised(!top)
+        getAppBar()?.isLifted = !top
       }
 
     prefRecyclerView = recyclerView
@@ -360,12 +349,12 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     // Do nothing
   }
 
-  override fun getAppBar(): AppBar? = (activity as MainActivity?)?.appBar
+  override fun getAppBar(): AppBarLayout? = (activity as MainActivity?)?._binding?.appbar
 
   override fun getBorderViewDelegate(): BorderViewDelegate = borderViewDelegate
 
   override fun scheduleAppbarRaisingStatus() {
-    getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
+    getAppBar()?.isLifted = !getBorderViewDelegate().isShowingTopBorder
   }
 
   override fun isAllowRefreshing(): Boolean = true

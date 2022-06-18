@@ -33,7 +33,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
       id = android.R.id.icon
       val iconSize = context.getDimensionPixelSize(R.dimen.lib_reference_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-      setBackgroundResource(R.drawable.bg_gray_circle)
+      setBackgroundResource(R.drawable.bg_circle_secondary_container)
       addView(this)
     }
 

@@ -12,6 +12,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import rikka.widget.borderview.BorderRecyclerView
 
 class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeaderView {
 
@@ -23,23 +24,24 @@ class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeader
     title.text = context.getString(R.string.dialog_title_change_timestamp)
   }
 
-  private val list = RecyclerView(context).apply {
+  private val list = BorderRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
+      setPadding(24.dp, 0, 24.dp, 0)
     }
-    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
-    isVerticalScrollBarEnabled = false
     adapter = this@TimeNodeBottomSheetView.adapter
+    isVerticalScrollBarEnabled = false
     layoutManager = LinearLayoutManager(context)
+    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
   }
 
   init {
     orientation = VERTICAL
-    setPadding(24.dp, 16.dp, 24.dp, 0)
+    setPadding(0, 16.dp, 0, 0)
     addView(header)
     addView(list)
   }

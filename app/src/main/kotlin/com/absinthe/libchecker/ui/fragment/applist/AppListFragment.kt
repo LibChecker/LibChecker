@@ -30,7 +30,6 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -90,7 +89,7 @@ class AppListFragment :
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (activity as? MainActivity)?.appBar?.setRaised(!top)
+            getAppBar()?.isLifted = !top
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()

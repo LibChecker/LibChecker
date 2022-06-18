@@ -415,23 +415,21 @@ abstract class BaseAppDetailActivity :
           LinearLayoutManager(this@BaseAppDetailActivity, RecyclerView.HORIZONTAL, false)
       }
 
-      headerLayout.addOnOffsetChangedListener(
-        AppBarLayout.OnOffsetChangedListener { appBarLayout, verticalOffset ->
-          isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
-            // Collapsed
-            if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-              toolbarAdapter.addData(toolbarQuicklyLaunchItem)
-            }
-            true
-          } else {
-            // Expanded
-            if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
-              toolbarAdapter.remove(toolbarQuicklyLaunchItem)
-            }
-            false
+      headerLayout.addOnOffsetChangedListener { appBarLayout, verticalOffset ->
+        isToolbarCollapsed = if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
+          // Collapsed
+          if (!isToolbarCollapsed && !toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+            toolbarAdapter.addData(toolbarQuicklyLaunchItem)
           }
+          true
+        } else {
+          // Expanded
+          if (isToolbarCollapsed && toolbarAdapter.data.contains(toolbarQuicklyLaunchItem)) {
+            toolbarAdapter.remove(toolbarQuicklyLaunchItem)
+          }
+          false
         }
-      )
+      }
     }
 
     typeList = if (!isHarmonyMode) {

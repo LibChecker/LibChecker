@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.viewModels
@@ -120,12 +121,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     binding.progressHorizontal.hide()
   }
 
+  override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
+    super.onApplyUserThemeResource(theme, isDecorView)
+    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
+  }
+
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
-    binding.root.bringChildToFront(binding.appbar)
+    setSupportActionBar(binding.toolbar)
     supportActionBar?.title = LCAppUtils.setTitle(this)
 
     binding.apply {
+      root.bringChildToFront(binding.appbar)
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {

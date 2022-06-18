@@ -3,7 +3,7 @@
   <item
     android:width="32dp"
     android:height="32dp"
-    android:drawable="@drawable/bg_gray_circle"
+    android:drawable="@drawable/bg_circle_secondary_container"
     android:gravity="center" />
   <item android:drawable="@drawable/ic_harmonyos_logo" />
 </layer-list>

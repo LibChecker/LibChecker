@@ -5,10 +5,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseFragment
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.HomeViewModel
-import rikka.material.app.AppBar
+import com.google.android.material.appbar.AppBarLayout
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController {
@@ -40,12 +40,12 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     }
   }
 
-  override fun getAppBar(): AppBar? = (activity as? BaseActivity<*>)?.appBar
+  override fun getAppBar(): AppBarLayout? = (activity as? MainActivity)?._binding?.appbar
 
   override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 
   override fun scheduleAppbarRaisingStatus() {
-    getAppBar()?.setRaised(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
+    getAppBar()?.isLifted = !(getBorderViewDelegate()?.isShowingTopBorder ?: true)
   }
 
   override fun isAllowRefreshing(): Boolean = allowRefreshing

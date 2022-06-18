@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -72,7 +71,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   }
 
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.album_item_comparison_title)
@@ -86,9 +85,6 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
-      if (!GlobalValues.md3Theme) {
-        background = null
-      }
       container.leftPart.apply {
         setOnClickListener {
           if (AntiShakeUtils.isInvalidClick(it)) {
@@ -173,7 +169,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            appBar?.setRaised(!top)
+            appbar.isLifted = !top
           }
 
         if (itemDecorationCount == 0) {

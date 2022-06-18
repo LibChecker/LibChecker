@@ -11,7 +11,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
 
 class SnapshotStateIndicatorView(context: Context) : View(context) {
-  var enableRoundCorner: Boolean = false
+  var enableRoundCorner: Boolean = true
   var added: Boolean = false
   var removed: Boolean = false
   var changed: Boolean = false

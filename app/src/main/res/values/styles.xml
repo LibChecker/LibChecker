@@ -3,29 +3,6 @@
   <!-- Base application theme. -->
   <style name="AppTheme" parent="Theme.Light" />
 
-  <style name="Animation.Material.Dialog" parent="Animation.AppCompat.Dialog">
-    <item name="android:windowEnterAnimation">@anim/rd_dialog_enter</item>
-    <item name="android:windowExitAnimation">@anim/rd_dialog_exit</item>
-  </style>
-
-  <style name="ThemeOverlay.Material.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog">
-    <item name="android:windowAnimationStyle">@style/Animation.Material.Dialog</item>
-    <item name="android:windowElevation">@dimen/rd_material_dialog_default_elevation</item>
-    <item name="android:backgroundDimAmount">@dimen/rd_material_dialog_default_dim_amount</item>
-  </style>
-
-  <style name="Widget.AppBar" parent="">
-    <item name="android:theme">?actionBarTheme</item>
-    <item name="android:background">?android:colorBackground</item>
-    <item name="android:stateListAnimator">@animator/raise_animator</item>
-    <item name="android:elevation">0dp</item>
-  </style>
-
-  <style name="App.LibChip" parent="Widget.MaterialComponents.Chip.Action">
-    <item name="chipMinTouchTargetSize">0dp</item>
-    <item name="chipStartPadding">12dp</item>
-  </style>
-
   <style name="App.LibChip.Material3" parent="Widget.Material3.Chip.Assist.Elevated">
     <item name="chipIconTint">@null</item>
   </style>
@@ -92,20 +69,17 @@
     <item name="cardElevation">1dp</item>
   </style>
 
-  <style name="AlbumMaterialCard" parent="Widget.MaterialComponents.CardView">
+  <style name="AlbumMaterialCard" parent="Widget.Material3.CardView.Filled">
+    <item name="cardBackgroundColor">?attr/colorPrimaryContainer</item>
     <item name="cardCornerRadius">5dp</item>
-    <item name="cardBackgroundColor">?albumCardViewColorSurface</item>
-    <item name="cardElevation">0dp</item>
-    <item name="strokeColor">?albumCardBorderColor</item>
-    <item name="strokeWidth">@dimen/album_card_stroke_width</item>
-    <item name="rippleColor">@null</item>
   </style>
 
-  <style name="App.Material3.CardView" parent="Widget.Material3.CardView.Elevated">
+  <style name="App.Material3.CardView" parent="Widget.Material3.CardView.Outlined">
     <item name="android:stateListAnimator">@null</item>
     <item name="android:clickable">true</item>
     <item name="android:focusable">true</item>
     <item name="cardPreventCornerOverlap">false</item>
+    <item name="strokeColor">@android:color/transparent</item>
   </style>
 
   <style name="Widget.LC.PopupMenu" parent="Widget.AppCompat.ListView.DropDown">

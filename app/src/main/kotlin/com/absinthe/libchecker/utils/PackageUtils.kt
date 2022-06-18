@@ -232,6 +232,9 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
+    if (packageInfo.applicationInfo.sourceDir == null) {
+      return emptyList()
+    }
     return runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         return zipFile.entries()

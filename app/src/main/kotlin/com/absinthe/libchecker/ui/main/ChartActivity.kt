@@ -13,7 +13,7 @@ class ChartActivity : BaseActivity<ActivityChartBinding>() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.tab_chart)

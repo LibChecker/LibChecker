@@ -77,7 +77,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
         }
       } else {
         if (chip == null) {
-          chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
+          chip = Chip(context).apply {
             layoutParams = LayoutParams(
               ViewGroup.LayoutParams.WRAP_CONTENT,
               ViewGroup.LayoutParams.WRAP_CONTENT

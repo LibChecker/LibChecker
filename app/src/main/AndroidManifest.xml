@@ -98,7 +98,8 @@
       android:label="@string/tab_chart" />
     <activity
       android:name=".ui.about.AboutActivity"
-      android:label="@string/settings_about" />
+      android:label="@string/settings_about"
+      android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
       android:name=".bridge.BridgeActivity"
       android:exported="true"

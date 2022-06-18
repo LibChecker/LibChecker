@@ -10,7 +10,6 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -131,7 +130,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     val stateIndicator = SnapshotStateIndicatorView(context).apply {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
-      enableRoundCorner = GlobalValues.md3Theme
       addView(this)
     }
 

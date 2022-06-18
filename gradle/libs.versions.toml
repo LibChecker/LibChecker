@@ -72,9 +72,10 @@ rikkax-borderview = "dev.rikka.rikkax.widget:borderview:1.1.0"
 rikkax-core = "dev.rikka.rikkax.core:core:1.4.0"
 rikkax-insets = "dev.rikka.rikkax.insets:insets:1.2.0"
 rikkax-layoutinflater = "dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0"
-rikkax-material = "dev.rikka.rikkax.material:material:1.6.6"
+rikkax-material = "dev.rikka.rikkax.material:material:2.4.0"
 rikkax-recyclerview = "dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1"
 rikkax-simplemenu-preference = "dev.rikka.rikkax.preference:simplemenu-preference:1.0.3"
+rikkax-material-preference = "dev.rikka.rikkax.material:material-preference:1.0.0"
 
 appCenter-analytics = { module = "com.microsoft.appcenter:appcenter-analytics", version.ref = "appCenter" }
 appCenter-crashes = { module = "com.microsoft.appcenter:appcenter-crashes", version.ref = "appCenter" }
@@ -127,7 +128,8 @@ rikkax = [
   "rikkax-appcompat",
   "rikkax-layoutinflater",
   "rikkax-recyclerview",
-  "rikkax-simplemenu-preference"
+  "rikkax-simplemenu-preference",
+  "rikkax-material-preference"
 ]
 zhaobozhen = [
   "zhaobozhen-me",

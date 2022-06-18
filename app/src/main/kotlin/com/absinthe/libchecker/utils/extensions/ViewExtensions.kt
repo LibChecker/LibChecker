@@ -13,9 +13,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.viewpager2.widget.ViewPager2
-import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.VersionCompat
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
@@ -85,11 +83,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
     val builder = SpannableStringBuilder()
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
-    val color = if (GlobalValues.md3Theme) {
-      context.getColor(R.color.colorPrimaryMd3)
-    } else {
-      context.getColor(R.color.colorPrimary)
-    }
+    val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
     spannableString.setSpan(
       ForegroundColorSpan(color),
       start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
@@ -102,11 +96,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
 fun TextView.tintTextToPrimary() {
   val builder = SpannableStringBuilder()
   val spannableString = SpannableString(text.toString())
-  val color = if (GlobalValues.md3Theme) {
-    context.getColor(R.color.colorPrimaryMd3)
-  } else {
-    context.getColor(R.color.colorPrimary)
-  }
+  val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
   spannableString.setSpan(
     ForegroundColorSpan(color),
     0, text.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE

@@ -93,7 +93,7 @@ class LibReferenceFragment :
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            context.appBar?.setRaised(!top)
+            getAppBar()?.isLifted = !top
           }
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -406,7 +406,6 @@ class LibReferenceFragment :
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = binding.list.layoutManager
 
   private fun flip(child: Int) {
-    val context = (context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
@@ -414,7 +413,7 @@ class LibReferenceFragment :
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
       binding.loadingView.loadingView.resumeAnimation()
-      context.appBar?.setRaised(false)
+      getAppBar()?.isLifted = false
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
       binding.loadingView.loadingView.pauseAnimation()

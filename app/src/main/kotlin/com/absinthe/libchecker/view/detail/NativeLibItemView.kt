@@ -61,7 +61,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
       }
     } else {
       if (chip == null) {
-        chip = Chip(ContextThemeWrapper(context, R.style.App_LibChip)).apply {
+        chip = Chip(context).apply {
           isClickable = false
           layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 48.dp)
           addView(this)

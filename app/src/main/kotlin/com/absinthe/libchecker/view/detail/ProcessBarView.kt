@@ -66,7 +66,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
 
     private val colorIndicator = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(18.dp, 18.dp)
-      setImageResource(R.drawable.bg_gray_circle)
+      setImageResource(R.drawable.bg_circle_secondary_container)
       setPadding(2.dp, 2.dp, 2.dp, 2.dp)
       addView(this)
     }

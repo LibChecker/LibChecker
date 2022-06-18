@@ -10,7 +10,7 @@
   app:fitsSystemWindowsInsets="start|end"
   tools:context=".ui.main.LibReferenceActivity">
 
-  <rikka.material.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
     style="?appBarStyle"
     android:layout_width="match_parent"
@@ -25,7 +25,7 @@
       android:layout_height="wrap_content"
       android:background="@null" />
 
-  </rikka.material.widget.AppBarLayout>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <ViewFlipper
     android:id="@+id/vf_container"

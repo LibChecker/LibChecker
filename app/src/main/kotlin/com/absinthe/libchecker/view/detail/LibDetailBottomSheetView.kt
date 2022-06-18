@@ -40,7 +40,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     layoutParams = LayoutParams(iconSize, iconSize).also {
       it.topMargin = 4.dp
     }
-    setBackgroundResource(R.drawable.bg_gray_circle)
+    setBackgroundResource(R.drawable.bg_circle_outline)
   }
 
   val title = AppCompatTextView(

@@ -43,7 +43,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     val iconSize = context.getDimensionPixelSize(R.dimen.app_info_icon_size)
     layoutParams = LayoutParams(iconSize, iconSize)
     scaleType = ImageView.ScaleType.CENTER_CROP
-    setBackgroundResource(R.drawable.bg_gray_circle)
+    setBackgroundResource(R.drawable.bg_circle_secondary_container)
     addView(this)
   }
 
@@ -83,7 +83,7 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     if (cleanBackground) {
       icon.background = null
     } else {
-      icon.setBackgroundResource(R.drawable.bg_gray_circle)
+      icon.setBackgroundResource(R.drawable.bg_circle_secondary_container)
     }
   }
 

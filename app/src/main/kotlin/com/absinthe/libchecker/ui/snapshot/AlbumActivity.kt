@@ -46,7 +46,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
   }
 
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.title_album)
@@ -163,9 +163,6 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
         context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
       val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertical)
       it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-    }
-    if (!GlobalValues.md3Theme) {
-      background = null
     }
     container.apply {
       setIcon(iconRes)

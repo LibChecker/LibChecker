@@ -71,10 +71,7 @@ class LibCheckerApp : Application() {
     Repositories.init(this)
     Repositories.checkRulesDatabase()
     initSplitController()
-
-    if (GlobalValues.md3Theme) {
-      DynamicColors.applyToActivitiesIfAvailable(this)
-    }
+    DynamicColors.applyToActivitiesIfAvailable(this)
   }
 
   override fun attachBaseContext(base: Context?) {

@@ -88,13 +88,13 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   }
 
   private fun initView() {
+    setSupportActionBar(binding.toolbar)
     binding.apply {
       root.apply {
         fitsSystemWindows = isOrientationLandscape
         paddingTopCompat = 0
       }
 
-      setAppBar(appbar, toolbar)
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
       (root as ViewGroup).bringChildToFront(appbar)
 
@@ -102,7 +102,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         adapter = this@LibReferenceActivity.adapter
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            appBar?.setRaised(!top)
+            binding.appbar.isLifted = !top
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
