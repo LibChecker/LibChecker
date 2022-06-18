@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
@@ -25,7 +24,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+      AppItemView(context).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT

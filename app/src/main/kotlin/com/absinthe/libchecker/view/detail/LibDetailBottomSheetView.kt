@@ -92,8 +92,8 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
   }
 
   init {
-    val padding = 24.dp
-    setPadding(padding, 16.dp, padding, padding)
+    val padding = 16.dp
+    setPadding(padding, padding, padding, padding)
     addView(header)
     addView(icon)
     addView(title)

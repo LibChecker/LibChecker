@@ -43,7 +43,8 @@ class AppBundleBottomSheetView(context: Context) : LinearLayout(context), IHeade
 
   init {
     orientation = VERTICAL
-    setPadding(24.dp, 16.dp, 24.dp, 0)
+    val padding = 16.dp
+    setPadding(padding, padding, padding, padding)
     addView(header)
     addView(list)
   }

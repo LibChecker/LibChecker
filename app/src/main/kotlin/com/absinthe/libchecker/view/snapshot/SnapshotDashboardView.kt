@@ -27,7 +27,7 @@ class SnapshotDashboardView : MaterialCardView {
   )
 
   val container = SnapshotDashboardContainerView(context).apply {
-    val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
+    val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
     clipToPadding = false
   }

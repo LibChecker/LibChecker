@@ -306,7 +306,7 @@ class LibReferenceFragment :
   private fun MenuItem.initMenu(@LibType type: Int) {
     this.title?.let {
       if (GlobalValues.currentLibRefType == type) {
-        val title = SpannableStringBuilder(it)
+        val title = SpannableStringBuilder("$it ✔")
         title.setSpan(
           StyleSpan(Typeface.BOLD),
           0,
