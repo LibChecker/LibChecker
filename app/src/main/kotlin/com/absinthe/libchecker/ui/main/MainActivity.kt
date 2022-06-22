@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.res.Resources
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.viewModels
@@ -25,6 +24,7 @@ import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
 import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
@@ -47,7 +47,7 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
+class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAppBarContainer {
 
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
@@ -121,9 +121,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     binding.progressHorizontal.hide()
   }
 
-  override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
-    super.onApplyUserThemeResource(theme, isDecorView)
-    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
+  override fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
+    Timber.d("scheduleAppbarLiftingStatus: isLifted: $isLifted, from: $from")
+    binding.appbar.isLifted = isLifted
+  }
+
+  override fun bringAppbarToFront() {
+    binding.root.bringChildToFront(binding.appbar)
   }
 
   private fun initView() {

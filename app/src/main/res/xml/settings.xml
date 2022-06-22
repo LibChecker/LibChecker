@@ -6,21 +6,21 @@
     app:key="normalCategory"
     app:title="@string/pref_group_normal">
 
-    <SwitchPreference
+    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="false"
       app:icon="@drawable/ic_android_outline"
       app:key="showSystemApps"
       app:summary="@string/show_system_apps_summary"
       app:title="@string/show_system_apps" />
 
-    <SwitchPreference
+    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
       app:icon="@drawable/ic_apk_analytics"
       app:key="apkAnalytics"
       app:summary="@string/apk_analytics_summary"
       app:title="@string/apk_analytics" />
 
-    <SwitchPreference
+    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
       app:icon="@drawable/ic_color_palette"
       app:key="colorfulIcon"
@@ -110,7 +110,7 @@
 
     </Preference>
 
-    <SwitchPreference
+    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
       app:icon="@drawable/ic_appcenter"
       app:key="analytics"

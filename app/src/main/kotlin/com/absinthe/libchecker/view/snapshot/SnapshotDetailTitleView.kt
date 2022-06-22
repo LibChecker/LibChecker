@@ -1,9 +1,6 @@
 package com.absinthe.libchecker.view.snapshot
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Path
-import android.graphics.RectF
 import android.graphics.Typeface
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
@@ -15,9 +12,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawableByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.RoundCornerView
 
-class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
+class SnapshotDetailTitleView(context: Context) : RoundCornerView(context) {
 
   val arrow = ImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp).also {
@@ -50,6 +47,7 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     )
     isClickable = true
     isFocusable = true
+    radius = 8.dp
   }
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -64,38 +62,5 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     arrow.layout(arrow.marginStart, arrow.toVerticalCenter(this))
     title.layout(arrow.right, title.toVerticalCenter(this))
     list.layout(title.right, list.toVerticalCenter(this))
-  }
-
-  private val backgroundPath = Path()
-  private var rect = RectF()
-
-  override fun onDraw(canvas: Canvas?) {
-    super.onDraw(canvas)
-  }
-
-  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-    super.onSizeChanged(w, h, oldw, oldh)
-    rect = RectF(0f, 0f, w.toFloat(), h.toFloat())
-    resetPath()
-  }
-
-  override fun draw(canvas: Canvas) {
-    val save = canvas.save()
-    canvas.clipPath(backgroundPath)
-    super.draw(canvas)
-    canvas.restoreToCount(save)
-  }
-
-  override fun dispatchDraw(canvas: Canvas) {
-    val save = canvas.save()
-    canvas.clipPath(backgroundPath)
-    super.dispatchDraw(canvas)
-    canvas.restoreToCount(save)
-  }
-
-  private fun resetPath() {
-    backgroundPath.reset()
-    backgroundPath.addRoundRect(rect, 5.dp.toFloat(), 5.dp.toFloat(), Path.Direction.CW)
-    backgroundPath.close()
   }
 }

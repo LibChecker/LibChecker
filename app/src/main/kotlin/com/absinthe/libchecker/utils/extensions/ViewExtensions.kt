@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
@@ -135,4 +136,8 @@ fun ViewPager2.setCurrentItem(
   animator.interpolator = interpolator
   animator.duration = duration
   animator.start()
+}
+
+fun ViewGroup.setAlphaForAll(alpha: Float) = children.forEach {
+  it.alpha = alpha
 }

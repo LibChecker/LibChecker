@@ -6,9 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.base.BaseFragment
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.viewmodel.HomeViewModel
-import com.google.android.material.appbar.AppBarLayout
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController {
@@ -30,7 +28,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
   override fun onResume() {
     super.onResume()
     setHasOptionsMenu(isVisible)
-    scheduleAppbarRaisingStatus()
+    scheduleAppbarLiftingStatus(!(getBorderViewDelegate()?.isShowingTopBorder ?: true), "${this.javaClass.simpleName} onResume")
   }
 
   override fun onDetach() {
@@ -40,15 +38,13 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     }
   }
 
-  override fun getAppBar(): AppBarLayout? = (activity as? MainActivity)?._binding?.appbar
-
   override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 
-  override fun scheduleAppbarRaisingStatus() {
-    getAppBar()?.isLifted = !(getBorderViewDelegate()?.isShowingTopBorder ?: true)
-  }
-
   override fun isAllowRefreshing(): Boolean = allowRefreshing
+
+  protected fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
+    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted, from)
+  }
 
   protected fun isListCanScroll(listSize: Int): Boolean {
     if (context == null) {

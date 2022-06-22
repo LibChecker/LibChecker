@@ -14,7 +14,6 @@ import rikka.material.app.MaterialActivity
 abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
   protected lateinit var binding: VB
-  val _binding by lazy { binding }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

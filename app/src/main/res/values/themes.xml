@@ -6,7 +6,7 @@
   <style name="Platform.Theme.LibChecker" parent="Platform.V23.Theme.LibChecker" />
 
   <style name="Base.AppTheme" parent="Platform.Theme.LibChecker">
-    <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
+    <item name="preferenceTheme">@style/PreferenceThemeOverlay.Rikka.Material3</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
 

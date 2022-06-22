@@ -3,7 +3,6 @@ package com.absinthe.libchecker.view.snapshot
 import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
@@ -15,7 +14,7 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
-import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.RoundCornerView
 
 class SnapshotItemView(context: Context) : FrameLayout(context) {
 
@@ -34,7 +33,11 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
     addView(container)
   }
 
-  class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
+  class SnapshotItemContainerView(context: Context) : RoundCornerView(context) {
+
+    init {
+      radius = 8.dp
+    }
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -135,29 +138,6 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       addView(this)
     }
 
-    private var redMask: View? = null
-
-    fun addRedMask() {
-      if (redMask == null) {
-        redMask = View(context).apply {
-          layoutParams = LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-          )
-          setBackgroundColor(R.color.material_red_300.getColor(context))
-          alpha = 0.5f
-          addView(this)
-        }
-      }
-    }
-
-    fun removeRedMask() {
-      if (redMask != null) {
-        removeView(redMask)
-        redMask = null
-      }
-    }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       icon.autoMeasure()
@@ -210,7 +190,6 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
         stateIndicator.defaultWidthMeasureSpec(this),
         (measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec()
       )
-      redMask?.autoMeasure()
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -229,7 +208,6 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
         stateIndicator.toVerticalCenter(this),
         fromRight = true
       )
-      redMask?.layout(0, 0)
     }
   }
 }

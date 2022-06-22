@@ -7,10 +7,6 @@
     <item name="chipIconTint">@null</item>
   </style>
 
-  <style name="ThemeOverlay.Preference" parent="PreferenceThemeOverlay">
-    <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
-  </style>
-
   <style name="CustomBottomSheetDialog" parent="@style/ThemeOverlay.MaterialComponents.BottomSheetDialog">
     <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
   </style>

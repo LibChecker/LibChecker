@@ -239,7 +239,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            getAppBar()?.isLifted = !top
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "SnapshotFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
 
         if (itemDecorationCount == 0) {
@@ -479,7 +484,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      getAppBar()?.isLifted = false
       menu?.findItem(R.id.save)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()

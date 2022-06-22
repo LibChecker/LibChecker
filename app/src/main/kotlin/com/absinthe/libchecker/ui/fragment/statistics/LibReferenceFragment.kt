@@ -93,7 +93,12 @@ class LibReferenceFragment :
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            getAppBar()?.isLifted = !top
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "LibReferenceFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -413,7 +418,6 @@ class LibReferenceFragment :
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
       binding.loadingView.loadingView.resumeAnimation()
-      getAppBar()?.isLifted = false
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
       binding.loadingView.loadingView.pauseAnimation()

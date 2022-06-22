@@ -89,7 +89,12 @@ class AppListFragment :
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            getAppBar()?.isLifted = !top
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "AppListFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()

@@ -16,10 +16,11 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -60,9 +61,9 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       }
 
       if (item.deleted) {
-        addRedMask()
+        setAlphaForAll(0.7f)
       } else {
-        removeRedMask()
+        setAlphaForAll(1.0f)
       }
 
       var isNewOrDeleted = false
@@ -70,11 +71,11 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       when {
         item.deleted || item.newInstalled -> {
           val background = if (item.deleted) {
-            R.color.material_red_300.toColorStateList(context)
+            R.color.material_red_300.getColor(context)
           } else {
-            R.color.material_green_300.toColorStateList(context)
+            R.color.material_green_300.getColor(context)
           }
-          holder.itemView.backgroundTintList = background
+          setBackgroundColor(background)
           val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
           versionInfo.setTextColor(color)
           packageSizeInfo.setTextColor(color)
