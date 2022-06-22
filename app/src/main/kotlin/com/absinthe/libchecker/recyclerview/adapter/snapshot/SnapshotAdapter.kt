@@ -19,6 +19,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
@@ -84,7 +85,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           isNewOrDeleted = true
         }
         else -> {
-          holder.itemView.backgroundTintList = null
+          setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
           val color = Color.GRAY
           versionInfo.setTextColor(color)
           packageSizeInfo.setTextColor(color)

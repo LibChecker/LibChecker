@@ -668,7 +668,7 @@ object PackageUtils {
       }
 
       if (abiSet.isEmpty()) {
-        if (!isApk) {
+        if (!isApk && applicationInfo.nativeLibraryDir != null) {
           abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
         }
 
