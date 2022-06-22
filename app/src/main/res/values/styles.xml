@@ -1,7 +1,7 @@
 <resources>
 
   <!-- Base application theme. -->
-  <style name="AppTheme" parent="Theme.Light" />
+  <style name="AppTheme" parent="Theme" />
 
   <style name="App.LibChip.Material3" parent="Widget.Material3.Chip.Assist.Elevated">
     <item name="chipIconTint">@null</item>

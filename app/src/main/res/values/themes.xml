@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
-  <style name="Base.AppTheme.Light" parent="Theme.Material3.Light.LibChecker">
+  <style name="Platform.V23.Theme.LibChecker" parent="Theme.Material3.Light.LibChecker" />
+
+  <style name="Platform.Theme.LibChecker" parent="Platform.V23.Theme.LibChecker" />
+
+  <style name="Base.AppTheme" parent="Platform.Theme.LibChecker">
     <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
     <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
@@ -10,44 +14,6 @@
     <item name="android:windowNoTitle">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-    </item>
-    <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-    <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
-
-    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler_md3</item>
-    <item name="bottomSheetHeaderHandlerColorActivated">
-      @color/bottom_sheet_header_handler_activated_md3
-    </item>
-    <item name="albumCardViewColorSurface">@android:color/transparent</item>
-    <item name="albumCardBorderColor">?attr/colorOutline</item>
-
-    <item name="chipStyle">@style/App.LibChip.Material3</item>
-  </style>
-
-  <style name="Theme.Light" parent="Base.AppTheme.Light" />
-
-  <style name="Base.AppTheme" parent="Theme.Material3.Dark.LibChecker">
-    <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
-    <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
-    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="android:windowActionBar">false</item>
-    <item name="android:windowNoTitle">true</item>
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-    </item>
-    <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-    <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
 
     <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler_md3</item>
     <item name="bottomSheetHeaderHandlerColorActivated">

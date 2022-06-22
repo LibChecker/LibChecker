@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="Platform.V29.Theme.LibChecker" parent="Platform.V27.Theme.LibChecker">
+    <item name="android:forceDarkAllowed">false</item>
+    <item name="android:enforceNavigationBarContrast">false</item>
+    <item name="android:enforceStatusBarContrast">false</item>
+  </style>
+
+  <style name="Platform.Theme.LibChecker" parent="Platform.V29.Theme.LibChecker" />
+
+</resources>

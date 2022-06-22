@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="Platform.V27.Theme.LibChecker" parent="Platform.V26.Theme.LibChecker">
+    <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+  </style>
+
+  <style name="Platform.Theme.LibChecker" parent="Platform.V27.Theme.LibChecker" />
+
+</resources>
