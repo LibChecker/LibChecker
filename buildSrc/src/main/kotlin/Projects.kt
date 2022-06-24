@@ -70,6 +70,7 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
     }
     kotlinOptions {
       jvmTarget = JavaVersion.VERSION_11.toString()
+      freeCompilerArgs = listOf("-Xuse-k2")
     }
     compileOptions {
       targetCompatibility(JavaVersion.VERSION_11)
