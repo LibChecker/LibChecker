@@ -57,6 +57,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -321,6 +322,15 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
               if (allowRefreshing) {
                 packageQueue.offer(it.packageName to it.action)
                 dequeuePackages()
+
+                lifecycleScope.launch(Dispatchers.Default) {
+                  val appCount = AppItemRepository.getApplicationInfoMap().size
+
+                  withContext(Dispatchers.Main) {
+                    dashboard.container.tvSnapshotAppsCountText.text =
+                      String.format("%d / %d", viewModel.snapshotAppsCount.valueUnsafe, appCount)
+                  }
+                }
               }
             }
             else -> {}

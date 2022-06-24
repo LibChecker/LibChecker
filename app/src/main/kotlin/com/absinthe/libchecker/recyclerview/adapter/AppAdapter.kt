@@ -39,6 +39,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem) {
+    var shouldReturn = false
     (holder.itemView as AppItemView).container.apply {
       icon.setTag(R.id.app_item_icon_id, item.packageName)
       runCatching {
@@ -47,6 +48,11 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
           AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
       }.onFailure {
         Timber.e(it)
+        shouldReturn = true
+      }
+
+      if (shouldReturn) {
+        return
       }
 
       setOrHighlightText(appName, item.label)

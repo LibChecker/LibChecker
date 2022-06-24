@@ -53,7 +53,11 @@ class AppInfoBottomSheetDialogFragment :
     }
     root.launch.setOnClickListener {
       try {
-        startLaunchAppActivity(packageName)
+        if (packageName == BuildConfig.APPLICATION_ID) {
+          Toasty.showShort(requireContext(), "But why…")
+        } else {
+          startLaunchAppActivity(packageName)
+        }
       } catch (e: NullPointerException) {
         context?.showToast(R.string.toast_package_name_null)
       } catch (e: Exception) {

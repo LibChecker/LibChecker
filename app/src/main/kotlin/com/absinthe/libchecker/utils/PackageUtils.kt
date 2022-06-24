@@ -1107,9 +1107,12 @@ object PackageUtils {
         retry = true
         emptyList()
       }.also { items ->
-        AppItemRepository.allPackageInfoMap = items.asSequence()
-          .map { it.packageName to it }
-          .toMap()
+        AppItemRepository.allPackageInfoMap.clear()
+        AppItemRepository.allPackageInfoMap.putAll(
+          items.asSequence()
+            .map { it.packageName to it }
+            .toMap()
+        )
       }
     } while (retry)
 

@@ -244,7 +244,6 @@ abstract class LCDatabase : RoomDatabase() {
         database.execSQL(
           "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'"
         )
-        AppItemRepository.shouldClearDiffItemsInDatabase = true
       }
     }
 

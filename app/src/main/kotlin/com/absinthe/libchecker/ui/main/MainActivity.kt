@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.viewModels
@@ -19,7 +20,6 @@ import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
@@ -31,6 +31,7 @@ import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -53,6 +54,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
   private val workerListener = object : OnWorkerListener.Stub() {
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
+      if (packageName != null && action != null) {
+        if (action == Intent.ACTION_PACKAGE_REMOVED) {
+          AppItemRepository.allPackageInfoMap.remove(packageName)
+        } else {
+          runCatching {
+            PackageUtils.getPackageInfo(
+              packageName,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+            )
+          }.onSuccess {
+            AppItemRepository.allPackageInfoMap[packageName] = it
+          }
+        }
+      }
       appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
     }
   }
@@ -77,7 +92,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     super.onCreate(savedInstanceState)
 
     initView()
-    preWork()
     bindService(
       Intent(this, WorkerService::class.java).apply {
         setPackage(packageName)
@@ -250,14 +264,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
 
   private fun clearApkCache() {
     FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
-  }
-
-  private fun preWork() {
-    lifecycleScope.launch(Dispatchers.IO) {
-      if (AppItemRepository.shouldClearDiffItemsInDatabase) {
-        Repositories.lcRepository.deleteAllSnapshotDiffItems()
-      }
-    }
   }
 
   private fun initKotlinUsage() = lifecycleScope.launch(Dispatchers.IO) {
