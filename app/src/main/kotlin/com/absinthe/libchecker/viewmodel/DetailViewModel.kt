@@ -150,7 +150,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         componentsMap[RECEIVER]?.postValue(receivers)
         componentsMap[PROVIDER]?.postValue(providers)
       }
-      processesMap = processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
+      processesMap =
+        processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
       processMapLiveData.postValue(processesMap)
     } catch (e: Exception) {
       Timber.e(e)
@@ -348,7 +349,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
-        packageName, IBundleManager.GET_BUNDLE_WITH_ABILITIES
+        packageName,
+        IBundleManager.GET_BUNDLE_WITH_ABILITIES
       )?.abilityInfos?.let { abilities ->
         val pages = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.PAGE }

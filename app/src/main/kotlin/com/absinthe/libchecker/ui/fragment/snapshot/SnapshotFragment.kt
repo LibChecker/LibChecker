@@ -129,7 +129,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
       it.bindService(
         intent,
-        shootServiceConnection, Service.BIND_AUTO_CREATE
+        shootServiceConnection,
+        Service.BIND_AUTO_CREATE
       )
     }
 
@@ -146,7 +147,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
 
     dashboard.container.apply {
-
       fun changeTimeNode() {
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.repository.getTimeStamps()
@@ -284,7 +284,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             val appCount = AppItemRepository.getApplicationInfoMap().size
 
             withContext(Dispatchers.Main) {
-              dashboard.container.tvSnapshotAppsCountText.text = String.format("%d / %d", it, appCount)
+              dashboard.container.tvSnapshotAppsCountText.text =
+                String.format("%d / %d", it, appCount)
             }
           }
         }
@@ -378,7 +379,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           runCatching {
             ctx.stopService(
               Intent(
-                ctx, ShootService::class.java
+                ctx,
+                ShootService::class.java
               )
             )
           }
@@ -410,7 +412,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
-          context, Intent(context, ShootService::class.java)
+          context,
+          Intent(context, ShootService::class.java)
         )
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")

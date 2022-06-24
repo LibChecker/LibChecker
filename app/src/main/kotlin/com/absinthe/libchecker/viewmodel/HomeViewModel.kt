@@ -443,7 +443,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             onlyShowNotMarked = true
           }
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -455,7 +454,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         NATIVE -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -465,7 +463,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         SERVICE -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -475,7 +472,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         ACTIVITY -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -485,7 +481,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         RECEIVER -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -495,7 +490,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         PROVIDER -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -505,7 +499,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         DEX -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -515,7 +508,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         PERMISSION -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -525,7 +517,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         METADATA -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -535,7 +526,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         PACKAGE -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }
@@ -550,7 +540,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         SHARED_UID -> {
           for (item in appMap.values) {
-
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               continue
             }

@@ -87,7 +87,9 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
     val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
     spannableString.setSpan(
       ForegroundColorSpan(color),
-      start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      start,
+      start + highlightText.length,
+      Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
     builder.append(spannableString)
     text = builder
@@ -100,7 +102,9 @@ fun TextView.tintTextToPrimary() {
   val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
   spannableString.setSpan(
     ForegroundColorSpan(color),
-    0, text.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+    0,
+    text.length,
+    Spannable.SPAN_INCLUSIVE_EXCLUSIVE
   )
   builder.append(spannableString)
   text = builder

@@ -13,7 +13,7 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
-import com.absinthe.libchecker.integrations.anywhere_.AnywhereManager
+import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil

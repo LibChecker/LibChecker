@@ -795,7 +795,7 @@ object PackageUtils {
     ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
     ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
     X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
-    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
+    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch)
   )
 
   private val ABI_BADGE_MAP = arrayMapOf(
@@ -891,7 +891,6 @@ object PackageUtils {
    * @return List of LibStringItem
    */
   fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
-
     try {
       val path = if (isApk) {
         packageName

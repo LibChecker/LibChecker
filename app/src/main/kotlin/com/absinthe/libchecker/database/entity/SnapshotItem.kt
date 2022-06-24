@@ -6,23 +6,24 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "snapshot_table")
 data class SnapshotItem(
-  @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Int?,
-  @ColumnInfo(name = "packageName") val packageName: String,
-  @ColumnInfo(name = "timeStamp") var timeStamp: Long,
-  @ColumnInfo(name = "label") val label: String,
-  @ColumnInfo(name = "versionName") val versionName: String,
-  @ColumnInfo(name = "versionCode") val versionCode: Long,
-  @ColumnInfo(name = "installedTime") val installedTime: Long,
-  @ColumnInfo(name = "lastUpdatedTime") val lastUpdatedTime: Long,
-  @ColumnInfo(name = "isSystem") val isSystem: Boolean,
-  @ColumnInfo(name = "abi") val abi: Short,
-  @ColumnInfo(name = "targetApi") val targetApi: Short,
-  @ColumnInfo(name = "nativeLibs") val nativeLibs: String,
-  @ColumnInfo(name = "services") val services: String,
-  @ColumnInfo(name = "activities") val activities: String,
-  @ColumnInfo(name = "receivers") val receivers: String,
-  @ColumnInfo(name = "providers") val providers: String,
-  @ColumnInfo(name = "permissions") val permissions: String,
-  @ColumnInfo(name = "metadata") val metadata: String,
-  @ColumnInfo(name = "packageSize") val packageSize: Long
+  @PrimaryKey(autoGenerate = true)
+  val id: Int?,
+  @ColumnInfo val packageName: String,
+  @ColumnInfo var timeStamp: Long,
+  @ColumnInfo val label: String,
+  @ColumnInfo val versionName: String,
+  @ColumnInfo val versionCode: Long,
+  @ColumnInfo val installedTime: Long,
+  @ColumnInfo val lastUpdatedTime: Long,
+  @ColumnInfo val isSystem: Boolean,
+  @ColumnInfo val abi: Short,
+  @ColumnInfo val targetApi: Short,
+  @ColumnInfo val nativeLibs: String,
+  @ColumnInfo val services: String,
+  @ColumnInfo val activities: String,
+  @ColumnInfo val receivers: String,
+  @ColumnInfo val providers: String,
+  @ColumnInfo val permissions: String,
+  @ColumnInfo val metadata: String,
+  @ColumnInfo val packageSize: Long
 )

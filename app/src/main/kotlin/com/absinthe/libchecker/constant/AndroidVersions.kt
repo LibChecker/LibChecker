@@ -36,6 +36,6 @@ object AndroidVersions {
     Triple(30, "Android 11", R.drawable.ic_android_r),
     Triple(31, "Android 12", R.drawable.ic_android_s),
     Triple(32, "Android 12L, 12.1", R.drawable.ic_android_s),
-    Triple(33, "Tiramisu, 13", R.drawable.ic_android_t),
+    Triple(33, "Tiramisu, 13", R.drawable.ic_android_t)
   )
 }

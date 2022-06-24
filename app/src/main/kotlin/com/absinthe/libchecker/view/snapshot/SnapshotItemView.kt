@@ -64,9 +64,8 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
 
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        layoutParams =
+          LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         addView(this)

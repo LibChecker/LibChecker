@@ -135,7 +135,6 @@ class AboutActivity : AbsAboutActivityProxy() {
   }
 
   override fun onItemsCreated(items: MutableList<Any>) {
-
     val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
 
     items.apply {

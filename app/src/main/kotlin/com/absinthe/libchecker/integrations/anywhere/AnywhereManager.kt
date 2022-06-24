@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.integrations.anywhere_
+package com.absinthe.libchecker.integrations.anywhere
 
 import android.content.ActivityNotFoundException
 import android.content.Context

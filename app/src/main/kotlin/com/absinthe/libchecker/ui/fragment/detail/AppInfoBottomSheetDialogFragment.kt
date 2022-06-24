@@ -102,7 +102,8 @@ class AppInfoBottomSheetDialogFragment :
   @RequiresApi(Build.VERSION_CODES.N)
   private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
     return PackageManagerCompat.queryIntentActivities(
-      Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
+      Intent(Intent.ACTION_SHOW_APP_INFO),
+      PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
       .map {
         AppInfoAdapter.AppInfoItem(

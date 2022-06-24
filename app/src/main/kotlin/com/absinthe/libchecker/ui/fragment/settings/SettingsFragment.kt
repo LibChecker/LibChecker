@@ -78,7 +78,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
         SystemServices.packageManager.setComponentEnabledSetting(
           ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
-          flag, PackageManager.DONT_KILL_APP
+          flag,
+          PackageManager.DONT_KILL_APP
         )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
@@ -298,7 +299,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       viewModel.controller = this
       activity?.invalidateOptionsMenu()
     }
-    scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder, "SettingsFragment onResume")
+    scheduleAppbarRaisingStatus(
+      !getBorderViewDelegate().isShowingTopBorder,
+      "SettingsFragment onResume"
+    )
   }
 
   override fun onCreateRecyclerView(
@@ -324,7 +328,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     borderViewDelegate = recyclerView.borderViewDelegate
     borderViewDelegate.borderVisibilityChangedListener =
       BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-        scheduleAppbarRaisingStatus(!top, "SettingsFragment OnBorderVisibilityChangedListener: top=$top")
+        scheduleAppbarRaisingStatus(
+          !top,
+          "SettingsFragment OnBorderVisibilityChangedListener: top=$top"
+        )
       }
 
     prefRecyclerView = recyclerView

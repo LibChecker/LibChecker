@@ -172,7 +172,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         requestLayout()
         // 当 ViewPager 切换页面时，改变 ViewPager 的显示
         setOnItemSelectedListener {
-
           fun performClickNavigationItem(index: Int) {
             if (binding.viewpager.currentItem != index) {
               if (!binding.viewpager.isFakeDragging) {

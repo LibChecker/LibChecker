@@ -433,9 +433,7 @@ abstract class BaseAppDetailActivity :
     }
 
     typeList = if (!isHarmonyMode) {
-      mutableListOf(
-        NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA, DEX
-      )
+      mutableListOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA, DEX)
     } else {
       mutableListOf(
         NATIVE,

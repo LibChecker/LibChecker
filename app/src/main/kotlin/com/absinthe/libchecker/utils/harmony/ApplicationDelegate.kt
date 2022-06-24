@@ -42,7 +42,8 @@ class ApplicationDelegate(context: Context) {
       sOhosApplication = clazzOhosApplication.newInstance()
       val clazzContextDeal = Class.forName("ohos.app.ContextDeal")
       val contextDealConstructor = clazzContextDeal.getConstructor(
-        Context::class.java, ClassLoader::class.java
+        Context::class.java,
+        ClassLoader::class.java
       )
       val contextDeal = contextDealConstructor.newInstance(applicationContext, classLoader)
       val setApplicationMethod =
