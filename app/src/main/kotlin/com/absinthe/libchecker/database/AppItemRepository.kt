@@ -1,12 +1,13 @@
 package com.absinthe.libchecker.database
 
 import android.content.pm.PackageInfo
-import androidx.collection.ArrayMap
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.utils.PackageUtils
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 object AppItemRepository {
-  var allPackageInfoMap: MutableMap<String, PackageInfo> = ArrayMap(100)
+  var allPackageInfoMap: ConcurrentMap<String, PackageInfo> = ConcurrentHashMap(100)
   var trackItemsChanged = false
 
   suspend fun getApplicationInfoMap(): Map<String, PackageInfo> {
