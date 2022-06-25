@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -16,10 +15,7 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getColor
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
-import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
@@ -67,32 +63,7 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         setAlphaForAll(1.0f)
       }
 
-      var isNewOrDeleted = false
-
-      when {
-        item.deleted || item.newInstalled -> {
-          val background = if (item.deleted) {
-            R.color.material_red_300.getColor(context)
-          } else {
-            R.color.material_green_300.getColor(context)
-          }
-          setBackgroundColor(background)
-          val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-          versionInfo.setTextColor(color)
-          packageSizeInfo.setTextColor(color)
-          targetApiInfo.setTextColor(color)
-          abiInfo.setTextColor(color)
-          isNewOrDeleted = true
-        }
-        else -> {
-          setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
-          val color = Color.GRAY
-          versionInfo.setTextColor(color)
-          packageSizeInfo.setTextColor(color)
-          targetApiInfo.setTextColor(color)
-          abiInfo.setTextColor(color)
-        }
-      }
+      val isNewOrDeleted = item.deleted || item.newInstalled
 
       stateIndicator.apply {
         added = item.added && !isNewOrDeleted
@@ -108,6 +79,24 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         appName.text = spannable
       } else {
         appName.text = getDiffString(item.labelDiff, isNewOrDeleted)
+      }
+
+      if (isNewOrDeleted) {
+        val labelDrawable = if (item.newInstalled) {
+          R.drawable.ic_label_new_package.getDrawable(context)!!
+        } else {
+          R.drawable.ic_label_deleted_package.getDrawable(context)!!
+        }
+        val sb = SpannableStringBuilder(appName.text)
+        val spanString = SpannableString("   ")
+        val span = CenterAlignImageSpan(
+          labelDrawable.also {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+          }
+        )
+        spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append(spanString)
+        appName.text = sb
       }
 
       packageName.text = item.packageName
