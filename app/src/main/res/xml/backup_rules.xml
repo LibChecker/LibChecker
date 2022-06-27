@@ -2,5 +2,5 @@
 <full-backup-content>
   <include
     domain="database"
-    path="lc_database.db" />
+    path="." />
 </full-backup-content>

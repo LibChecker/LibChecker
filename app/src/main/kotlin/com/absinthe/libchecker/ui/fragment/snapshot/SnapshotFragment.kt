@@ -133,6 +133,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         shootServiceConnection,
         Service.BIND_AUTO_CREATE
       )
+      it.startService(intent)
     }
 
     val dashboard =

@@ -160,10 +160,6 @@ class AppInfoBottomSheetDialogFragment :
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setClassName(packageName, launcherActivity)
       .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    try {
-      startActivity(launchIntent)
-    } catch (e: Exception) {
-      Toasty.showShort(requireContext(), R.string.toast_cant_open_app)
-    }
+    startActivity(launchIntent)
   }
 }

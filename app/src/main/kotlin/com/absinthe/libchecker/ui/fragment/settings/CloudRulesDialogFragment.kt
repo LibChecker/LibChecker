@@ -80,14 +80,12 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
             root.cloudRulesContentView.localVersion.version.text =
               root.cloudRulesContentView.remoteVersion.version.text
             root.cloudRulesContentView.setUpdateButtonStatus(false)
-            try {
+            runCatching {
               GlobalValues.localRulesVersion =
-                root.cloudRulesContentView.remoteVersion.version.text.toString()
-                  .toInt()
+                root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
               context?.let {
                 ProcessPhoenix.triggerRebirth(it)
               }
-            } catch (e: NumberFormatException) {
             }
           }
         }

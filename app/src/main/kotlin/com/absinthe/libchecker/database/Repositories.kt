@@ -26,7 +26,7 @@ object Repositories {
   }
 
   fun deleteRulesDatabase() {
-    val databaseDir = File(context.filesDir.parent, "databases")
+    val databaseDir = context.getDatabasePath(Constants.RULES_DATABASE_NAME).parent
     FileUtils.delete(File(databaseDir, Constants.RULES_DATABASE_NAME))
     FileUtils.delete(File(databaseDir, "${Constants.RULES_DATABASE_NAME}-shm"))
     FileUtils.delete(File(databaseDir, "${Constants.RULES_DATABASE_NAME}-wal"))
