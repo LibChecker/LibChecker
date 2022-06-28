@@ -2,8 +2,6 @@ package com.absinthe.libchecker.constant
 
 object Constants {
 
-  const val APP_CENTER_SECRET = "5f11b856-0a27-4438-a038-9e18e4797133"
-
   const val ERROR = -1
   const val ARMV8 = 0
   const val ARMV7 = 1
