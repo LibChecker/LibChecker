@@ -1,0 +1,132 @@
+/*This is a TeamCity global styles mock*/
+
+/*body {*/
+/*    background: #fff;*/
+/*    margin: 0;*/
+/*    line-height: 1.5em;*/
+/*    color: #1f2326;*/
+/*    text-rendering: optimizeLegibility;*/
+/*    text-size-adjust: none;*/
+/*}*/
+
+/* Needed for IE10 support */
+[hidden] {
+	display: none !important;
+}
+
+body {
+	margin: 0;
+}
+
+body,
+input,
+select,
+button {
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
+		Cantarell, Droid Sans, Helvetica Neue, Arial, sans-serif;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
+
+textarea {
+	font: normal 12px Menlo, 'Bitstream Vera Sans Mono', 'Ubuntu Mono', Consolas, 'Courier New',
+		Courier, monospace;
+}
+
+img {
+	border: none;
+}
+
+strong {
+	font-weight: bold;
+}
+
+a {
+	color: #1564c2;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: #1564c2;
+}
+
+h2 {
+	margin: 0;
+	padding: 3px 18px 3px 0;
+	font-weight: normal;
+	font-size: 18px;
+	letter-spacing: 0;
+	color: #1f2326;
+}
+
+h3 {
+	font-size: 100%;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* Normalize styling of form elements */
+form {
+	margin: 0;
+	padding: 0;
+}
+
+input,
+select,
+textarea {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+optgroup {
+	font-style: normal;
+	font-weight: bold;
+}
+
+optgroup:disabled {
+	color: #999;
+}
+
+input[type='text'],
+input[type='password'],
+input[type='search'],
+textarea,
+select[multiple] {
+	min-height: 20px !important;
+	margin: 0;
+	padding: 1px 3px;
+	line-height: 1.5em;
+
+	border: 1px solid;
+	border-color: #888 #ccc #ccc;
+
+	/*box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);*/
+	font-size: 13px;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: 0;
+	vertical-align: middle;
+	position: relative;
+}
+
+input[type='checkbox'] {
+	bottom: 1px;
+}
+
+input[type='radio'] {
+	bottom: 2px;
+}
+
+input[disabled] {
+	background-color: #f9f9f9;
+	color: #999;
+	border-color: #ccc #ddd #ddd;
+}

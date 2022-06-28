@@ -1,0 +1,13 @@
+{
+  "languages": [
+    "Kotlin",
+    "XML",
+    "Plain text",
+    "JSON",
+    "Java",
+    "Groovy",
+    "Properties",
+    ".gitignore (GitIgnore)",
+    "EditorConfig"
+  ]
+}

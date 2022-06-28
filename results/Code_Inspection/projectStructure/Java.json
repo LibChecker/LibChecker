@@ -1,0 +1,28 @@
+{
+  "modules": [
+    {
+      "name": "LibChecker",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.app",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.hidden-api",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.buildSrc",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.buildSrc.test",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.buildSrc.main",
+      "languageLevel": 11
+    }
+  ]
+}
