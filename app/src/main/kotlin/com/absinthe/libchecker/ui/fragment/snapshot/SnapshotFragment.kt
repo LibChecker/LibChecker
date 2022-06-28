@@ -128,12 +128,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       val intent = Intent(it, ShootService::class.java).apply {
         setPackage(it.packageName)
       }
+      it.startService(intent)
       it.bindService(
         intent,
         shootServiceConnection,
         Service.BIND_AUTO_CREATE
       )
-      it.startService(intent)
     }
 
     val dashboard =
@@ -385,9 +385,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     shootBinder?.let {
       context?.applicationContext?.let { ctx ->
         it.unregisterOnShootOverListener(shootListener)
-        ctx.unbindService(shootServiceConnection)
         if (ShootService.isComputing.not()) {
           runCatching {
+            ctx.unbindService(shootServiceConnection)
             ctx.stopService(
               Intent(
                 ctx,

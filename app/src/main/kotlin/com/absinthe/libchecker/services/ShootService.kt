@@ -74,17 +74,16 @@ class ShootService : LifecycleService() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    Timber.d("onStartCommand")
+    Timber.d("onStartCommand: ${intent?.action}")
     if (intent?.`package` != packageName) {
       ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
       stopSelf()
     }
-    if (intent?.action == ACTION_SHOOT_AND_STOP_AUTO) {
-      val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
-      computeSnapshots(dropPrevious, true)
-    } else {
-      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-      stopSelf()
+    when (intent?.action) {
+      ACTION_SHOOT_AND_STOP_AUTO -> {
+        val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
+        computeSnapshots(dropPrevious, true)
+      }
     }
     return super.onStartCommand(intent, flags, startId)
   }
@@ -361,7 +360,7 @@ class ShootService : LifecycleService() {
     override fun registerOnShootOverListener(listener: OnShootListener?) {
       Timber.i("registerOnShootOverListener $listener")
       listener?.let {
-        serviceRef.get()?.listenerList?.register(listener)
+        serviceRef.get()?.listenerList?.register(it)
       }
     }
 
