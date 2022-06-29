@@ -29,7 +29,7 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.3"
 agp-desugering = "com.android.tools:desugar_jdk_libs:1.1.6"
 
-androidX-activity = "androidx.activity:activity-ktx:1.4.0"
+androidX-activity = "androidx.activity:activity-ktx:1.5.0"
 androidX-annotation = "androidx.annotation:annotation:1.4.0"
 androidX-appCompat = "androidx.appcompat:appcompat:1.6.0-alpha05"
 androidX-browser = "androidx.browser:browser:1.4.0"
