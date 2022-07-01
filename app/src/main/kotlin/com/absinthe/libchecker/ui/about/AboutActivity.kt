@@ -72,7 +72,11 @@ class AboutActivity : AbsAboutActivityProxy() {
   override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
     icon.load(R.drawable.pic_logo)
     slogan.setText(R.string.app_name)
-    version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
+    if (GlobalValues.debugMode) {
+      version.text = String.format("Build Time: %s\nAppCenter Secret: %s", BuildConfig.BUILD_TIME, BuildConfig.APP_CENTER_SECRET)
+    } else {
+      version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
+    }
 
     val rebornCoroutine = lifecycleScope.launch(Dispatchers.Default) {
       delay(300)

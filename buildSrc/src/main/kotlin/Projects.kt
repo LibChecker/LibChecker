@@ -6,6 +6,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
+import java.time.Instant
 
 const val baseVersionName = "2.2.11"
 val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
@@ -38,6 +39,8 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
       }
       all {
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
+        buildConfigField("String", "APP_CENTER_SECRET", "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\"")
+        buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
 

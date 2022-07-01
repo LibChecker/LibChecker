@@ -45,7 +45,7 @@ class LibCheckerApp : Application() {
     if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
       AppCenter.start(
         this,
-        System.getenv("APP_CENTER_SECRET"),
+        BuildConfig.APP_CENTER_SECRET,
         Analytics::class.java,
         Crashes::class.java
       )

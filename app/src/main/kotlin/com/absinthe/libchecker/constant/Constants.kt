@@ -71,8 +71,8 @@ object Constants {
   const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"
   const val ACTION_SNAPSHOT = "com.absinthe.libchecker.intent.action.START_SNAPSHOT"
 
-  const val COMMAND_DEBUG_MODE = "/debugMode"
-  const val COMMAND_USER_MODE = "/userMode"
+  const val COMMAND_DEBUG_MODE = "/debugmode"
+  const val COMMAND_USER_MODE = "/usermode"
 
   const val RULES_DB_FILE_NAME = "rules.db"
   const val RULES_DATABASE_NAME = "rule_database"
