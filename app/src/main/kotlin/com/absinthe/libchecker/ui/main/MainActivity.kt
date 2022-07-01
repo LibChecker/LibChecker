@@ -99,14 +99,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       workerServiceConnection,
       Context.BIND_AUTO_CREATE
     )
-    handleIntentFromShortcuts(intent)
+    handleIntent(intent)
     initObserver()
     clearApkCache()
   }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    handleIntentFromShortcuts(intent)
+    handleIntent(intent)
   }
 
   override fun onDestroy() {
@@ -220,11 +220,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     }
   }
 
-  private fun handleIntentFromShortcuts(intent: Intent) {
+  private fun handleIntent(intent: Intent) {
     when (intent.action) {
       Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
       Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
       Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
+      Intent.ACTION_APPLICATION_PREFERENCES -> binding.viewpager.setCurrentItem(3, false)
     }
     Analytics.trackEvent(
       Constants.Event.LAUNCH_ACTION,
