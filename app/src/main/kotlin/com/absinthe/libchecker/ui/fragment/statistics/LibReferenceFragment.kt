@@ -379,9 +379,7 @@ class LibReferenceFragment :
                 //noinspection NotifyDataSetChanged
                 refAdapter.notifyDataSetChanged()
               }
-              doOnMainThreadIdle {
-                (activity as? INavViewContainer)?.hideProgressBar()
-              }
+              (activity as? INavViewContainer)?.hideProgressBar()
             }
           }
 

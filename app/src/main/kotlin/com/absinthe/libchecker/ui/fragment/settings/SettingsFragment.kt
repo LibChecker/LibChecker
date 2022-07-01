@@ -312,6 +312,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   ): RecyclerView {
     val recyclerView =
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+    recyclerView.id = android.R.id.list
     recyclerView.fixEdgeEffect()
     recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
