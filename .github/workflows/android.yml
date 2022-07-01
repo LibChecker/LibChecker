@@ -24,6 +24,9 @@ on:
       - 'LICENSE'
       - 'NOTICE'
 
+env:
+  APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
+
 jobs:
   check:
     name: Check
