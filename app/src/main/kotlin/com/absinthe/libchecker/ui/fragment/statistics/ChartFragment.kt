@@ -137,9 +137,9 @@ class ChartFragment :
           if (GlobalValues.isShowSystemApps.value == false) {
             if (item.isSystem) continue
           }
-          when (item.abi) {
-            ARMV8.toShort() -> list[0]++
-            ARMV5.toShort(), ARMV7.toShort() -> list[1]++
+          when (item.abi % 10) {
+            ARMV8 -> list[0]++
+            ARMV5, ARMV7 -> list[1]++
             else -> list[2]++
           }
         }
