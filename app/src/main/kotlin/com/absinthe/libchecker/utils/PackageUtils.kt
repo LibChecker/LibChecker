@@ -27,6 +27,7 @@ import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.constant.AndroidVersions.apiToAndroidVerMap
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -152,6 +153,11 @@ object PackageUtils {
     return "$versionName ($versionCode)"
   }
 
+  private fun apiLevelToAndroidVer(apiVersion: Int) =
+    if (apiVersion == 0 || apiVersion >= apiToAndroidVerMap.size) ""
+    else "Android${apiToAndroidVerMap[apiVersion]}"
+
+
   /**
    * Get target api string of an app ( API 30 )
    * @param packageName PackageName
@@ -163,13 +169,14 @@ object PackageUtils {
 
   fun getTargetApiString(packageInfo: PackageInfo): String {
     return try {
-      "targetSdkVersion ${packageInfo.applicationInfo.targetSdkVersion}"
+      val targetSdkVersion = packageInfo.applicationInfo.targetSdkVersion
+      "targetSdkVersion ${targetSdkVersion}(${apiLevelToAndroidVer(targetSdkVersion)})"
     } catch (e: PackageManager.NameNotFoundException) {
       "targetSdkVersion ?"
     }
   }
 
-  fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion"
+  fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion(${apiLevelToAndroidVer(targetSdkVersion.toInt())})"
 
   /**
    * Get native libraries of an app
@@ -1025,7 +1032,8 @@ object PackageUtils {
    * @return minSdkVersion
    */
   fun getMinSdkVersionString(packageInfo: PackageInfo): String {
-    return "$minSdkVersion ${getMinSdkVersion(packageInfo)}"
+    val minSdkVersionNum = getMinSdkVersion(packageInfo)
+    return "$minSdkVersion ${minSdkVersionNum}(${apiLevelToAndroidVer(minSdkVersionNum)})"
   }
 
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
