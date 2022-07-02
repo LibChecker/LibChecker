@@ -85,9 +85,4 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
   override fun getHeaderView(): BottomSheetHeaderView {
     return header
   }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    adapter.release()
-  }
 }

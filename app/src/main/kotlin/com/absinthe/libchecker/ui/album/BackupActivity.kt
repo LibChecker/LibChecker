@@ -77,7 +77,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     override fun onAttach(context: Context) {
       super.onAttach(context)
       backupResultLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+        registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
           it?.let {
             activity?.let { activity ->
               runCatching {

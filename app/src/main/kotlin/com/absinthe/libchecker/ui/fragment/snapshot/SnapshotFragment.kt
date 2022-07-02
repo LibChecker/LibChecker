@@ -383,7 +383,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onDestroyView() {
     super.onDestroyView()
-    adapter.release()
     shootBinder?.let {
       context?.applicationContext?.let { ctx ->
         it.unregisterOnShootOverListener(shootListener)

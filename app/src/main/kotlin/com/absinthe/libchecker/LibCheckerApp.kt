@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
+import coil.Coil
+import coil.ImageLoader
+import com.absinthe.libchecker.app.AppIconFetcherFactory
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -74,6 +77,14 @@ class LibCheckerApp : Application() {
     Repositories.checkRulesDatabase()
     initSplitController()
     DynamicColors.applyToActivitiesIfAvailable(this)
+
+    Coil.setImageLoader {
+      ImageLoader(this).newBuilder()
+        .components {
+          add(AppIconFetcherFactory(this@LibCheckerApp))
+        }
+        .build()
+    }
   }
 
   override fun attachBaseContext(base: Context?) {

@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -10,10 +9,11 @@ import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.utils.AppIconCache
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
@@ -22,14 +22,11 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Job
 
 const val ARROW = "→"
 
 class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
-
-  private var loadIconJob: Job? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -45,16 +42,15 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   @SuppressLint("SetTextI18n")
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
-      icon.setTag(R.id.app_item_icon_id, item.packageName)
-      runCatching {
-        val ai = PackageUtils.getPackageInfo(
-          item.packageName,
-          PackageManager.GET_META_DATA
-        ).applicationInfo
-        loadIconJob =
-          AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-      }.onFailure {
-        icon.setImageResource(R.drawable.ic_icon_blueprint)
+      val packageInfo = runCatching {
+        AppItemRepository.allPackageInfoMap[item.packageName]
+          ?: PackageUtils.getPackageInfo(item.packageName)
+      }.getOrNull()
+
+      if (packageInfo == null) {
+        icon.load(R.drawable.ic_icon_blueprint)
+      } else {
+        icon.load(packageInfo)
       }
 
       if (item.deleted) {
@@ -176,12 +172,6 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         builder.append(" $ARROW ").append(newAbiSpanString)
       }
       abiInfo.text = builder
-    }
-  }
-
-  fun release() {
-    if (loadIconJob?.isActive == true) {
-      loadIconJob?.cancel()
     }
   }
 
