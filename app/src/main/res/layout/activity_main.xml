@@ -16,8 +16,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:fitsSystemWindows="true"
-    app:liftOnScroll="true"
-    app:liftOnScrollTargetViewId="@android:id/list">
+    app:liftOnScroll="true">
 
     <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"

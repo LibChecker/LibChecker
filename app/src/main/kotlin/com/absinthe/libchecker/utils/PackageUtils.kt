@@ -1110,6 +1110,7 @@ object PackageUtils {
         AppItemRepository.allPackageInfoMap.clear()
         AppItemRepository.allPackageInfoMap.putAll(
           items.asSequence()
+            .filter { it.applicationInfo.sourceDir != null }
             .map { it.packageName to it }
             .toMap()
         )

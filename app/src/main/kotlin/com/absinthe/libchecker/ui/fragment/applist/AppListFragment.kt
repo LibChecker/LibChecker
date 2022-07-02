@@ -29,6 +29,7 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -156,6 +157,7 @@ class AppListFragment :
     if (hasPackageChanged()) {
       homeViewModel.requestChange()
     }
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onPause() {

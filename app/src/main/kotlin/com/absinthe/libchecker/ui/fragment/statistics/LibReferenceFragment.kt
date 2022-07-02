@@ -41,6 +41,7 @@ import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
@@ -222,6 +223,11 @@ class LibReferenceFragment :
         }
       }
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onPause() {

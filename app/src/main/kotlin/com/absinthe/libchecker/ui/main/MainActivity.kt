@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
@@ -140,8 +141,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     binding.appbar.isLifted = isLifted
   }
 
-  override fun bringAppbarToFront() {
-    binding.root.bringChildToFront(binding.appbar)
+  override fun setLiftOnScrollTargetView(targetView: View) {
+    binding.appbar.setLiftOnScrollTargetView(targetView)
   }
 
   private fun initView() {

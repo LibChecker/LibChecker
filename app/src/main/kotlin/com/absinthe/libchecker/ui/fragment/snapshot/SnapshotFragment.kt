@@ -47,6 +47,7 @@ import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.OsUtils
@@ -377,6 +378,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     if (hasPackageChanged()) {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onDestroyView() {
