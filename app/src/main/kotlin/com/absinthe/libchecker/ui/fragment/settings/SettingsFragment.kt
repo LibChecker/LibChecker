@@ -91,7 +91,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     (findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isColorfulIcon.value = newValue as Boolean
-        activity?.recreate()
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_COLORFUL_ICON", newValue)
@@ -303,6 +302,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       !getBorderViewDelegate().isShowingTopBorder,
       "SettingsFragment onResume"
     )
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(prefRecyclerView)
   }
 
   override fun onCreateRecyclerView(

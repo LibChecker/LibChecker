@@ -214,6 +214,10 @@ class LibReferenceFragment :
     GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
       homeViewModel.refreshRef()
     }
+    GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
+      // noinspection NotifyDataSetChanged
+      refAdapter.notifyDataSetChanged()
+    }
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
