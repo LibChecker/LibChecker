@@ -73,7 +73,7 @@ class AboutActivity : AbsAboutActivityProxy() {
     icon.load(R.drawable.pic_logo)
     slogan.setText(R.string.app_name)
     if (GlobalValues.debugMode) {
-      version.text = String.format("Build Time: %s\nAppCenter Secret: %s", BuildConfig.BUILD_TIME, BuildConfig.APP_CENTER_SECRET)
+      version.text = String.format("Build Time: %s", BuildConfig.BUILD_TIME)
     } else {
       version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
     }
@@ -171,12 +171,36 @@ class AboutActivity : AbsAboutActivityProxy() {
       )
 
       add(Category("Contribution"))
+      val contributors = StringBuilder()
+      contributors.append("Russian & Ukrainian Translation: ")
+        .append("<b>")
+        .append("tommynok")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/tommynok"))
+        .append("]")
+        .append("<br>")
+      contributors.append("Harmony OS detection methods: ")
+        .append("<b>")
+        .append("su1216")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/dear_su1216"))
+        .append("]")
+        .append("<br>")
+      contributors.append("Bug Reporter: ")
+        .append("<b>")
+        .append("LiuXing")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://www.coolapk.com/u/1382006"))
+        .append("]")
       add(
-        Contributor(
-          0/*TODO*/,
-          "Telegram @tommynok",
-          "Russian & Ukrainian Translation",
-          "https://t.me/tommynok"
+        Card(
+          HtmlCompat.fromHtml(
+            contributors.toString(),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+          )
         )
       )
 
@@ -430,11 +454,14 @@ class AboutActivity : AbsAboutActivityProxy() {
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {
     val sb = StringBuilder()
-    val formatItem = "<a href=\"%s\">%s</a><br>"
 
     sb.append(getStringByConfiguration(R.string.resource_declaration)).append("<br>")
-    list.forEach { sb.append(String.format(formatItem, it, it)) }
+    list.forEach { sb.append(getHyperLink(it)) }
     return sb.toString()
+  }
+
+  private fun getHyperLink(url: String): String {
+    return String.format("<a href=\"%s\">%s</a>", url, url)
   }
 
   private fun getStringByConfiguration(@StringRes res: Int): String =
