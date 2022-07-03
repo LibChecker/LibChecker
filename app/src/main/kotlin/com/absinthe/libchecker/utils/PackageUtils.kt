@@ -751,27 +751,23 @@ object PackageUtils {
       X86_64_STRING -> X86_64
       X86_STRING -> X86
       null -> {
-        if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
-          val supportedAbiSet = realAbiSet.toMutableSet()
-          realAbiSet.forEach {
-            if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
-              supportedAbiSet.add(it)
-            }
+        val supportedAbiSet = mutableSetOf<Int>()
+        realAbiSet.forEach {
+          if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
+            supportedAbiSet.add(it)
           }
-          if (use32bitAbi) {
-            supportedAbiSet.remove(ARMV8)
-            supportedAbiSet.remove(X86_64)
-          }
-          when {
-            supportedAbiSet.contains(ARMV8) -> ARMV8
-            supportedAbiSet.contains(ARMV7) -> ARMV7
-            supportedAbiSet.contains(ARMV5) -> ARMV5
-            supportedAbiSet.contains(X86_64) -> X86_64
-            supportedAbiSet.contains(X86) -> X86
-            else -> ERROR
-          }
-        } else {
-          NO_LIBS
+        }
+        if (use32bitAbi) {
+          supportedAbiSet.remove(ARMV8)
+          supportedAbiSet.remove(X86_64)
+        }
+        when {
+          supportedAbiSet.contains(ARMV8) -> ARMV8
+          supportedAbiSet.contains(ARMV7) -> ARMV7
+          supportedAbiSet.contains(ARMV5) -> ARMV5
+          supportedAbiSet.contains(X86_64) -> X86_64
+          supportedAbiSet.contains(X86) -> X86
+          else -> ERROR
         }
       }
       else -> ERROR

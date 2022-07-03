@@ -366,6 +366,7 @@ abstract class BaseAppDetailActivity :
         return
       }
 
+      toolbarAdapter.data.clear()
       toolbarAdapter.addData(
         AppDetailToolbarItem(R.drawable.ic_lib_sort, R.string.menu_sort) {
           lifecycleScope.launch {
