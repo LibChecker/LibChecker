@@ -120,13 +120,13 @@
   <string name="xml_detail">XML Detail</string>
   <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Process</string>
+  <string name="alternative_launch_method">Alternative Launch Method</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
   <string name="toast_not_existing_market">There\'s not existing any app market</string>
   <string name="toast_use_another_file_manager">Please use another File Manager to open the APK</string>
   <string name="toast_cant_open_app">Can\'t open this app</string>
-  <string name="toast_package_name_null">Package name is null</string>
   <string name="toast_cloud_rules_update_error">Failed to update cloud rules. Please try again.</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
 

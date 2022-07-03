@@ -120,13 +120,13 @@
   <string name="xml_detail">XML 详情</string>
   <string name="format_last_updated">最近更新: %s</string>
   <string name="menu_process">进程</string>
+  <string name="alternative_launch_method">备选的启动方式</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
   <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
   <string name="toast_cant_open_app">无法启动此 App</string>
-  <string name="toast_package_name_null">软件包名称为空</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
 

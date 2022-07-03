@@ -119,13 +119,13 @@
   <string name="xml_detail">XML Деталь</string>
   <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Приложение</string>
+  <string name="alternative_launch_method">Alternative Launch Method</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
   <string name="toast_not_existing_market">"Нет магазина приложений"</string>
   <string name="toast_use_another_file_manager">Пожалуйста, используйте другой файловый менеджер, чтобы открыть APK</string>
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
-  <string name="toast_package_name_null">Имя пакета не указано</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
 

@@ -9,6 +9,7 @@ import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -58,10 +59,15 @@ class AppInfoBottomSheetDialogFragment :
         } else {
           startLaunchAppActivity(packageName)
         }
-      } catch (e: NullPointerException) {
-        context?.showToast(R.string.toast_package_name_null)
       } catch (e: Exception) {
-        context?.showToast(R.string.toast_cant_open_app)
+        activity?.let {
+          AlternativeLaunchBSDFragment().apply {
+            arguments = bundleOf(
+              EXTRA_PACKAGE_NAME to packageName
+            )
+            show(it.supportFragmentManager, tag)
+          }
+        }
       } finally {
         dismiss()
       }

@@ -120,13 +120,13 @@
   <string name="xml_detail">XML 詳細</string>
   <string name="format_last_updated">最近更新: %s</string>
   <string name="menu_process">處理程序</string>
+  <string name="alternative_launch_method">替代的啟動方法</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">設備中不存在應用市場</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理器打開此 APK</string>
   <string name="toast_cant_open_app">無法啟動此 App</string>
-  <string name="toast_package_name_null">套件名稱為空</string>
   <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
   <string name="toast_not_enough_storage_space">存儲空間不足</string>
 

@@ -119,13 +119,13 @@
   <string name="xml_detail">XML Деталь</string>
   <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Приложение</string>
+  <string name="alternative_launch_method">Alternative Launch Method</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>
   <string name="toast_not_existing_market">Немає магазину додатків</string>
   <string name="toast_use_another_file_manager">Будь ласка використовуйте інший файловий менеджер, щоб відкрити АРК</string>
   <string name="toast_cant_open_app">Не вдається відкрити цей додаток</string>
-  <string name="toast_package_name_null">Ім\'я пакету порожнє</string>
   <string name="toast_cloud_rules_update_error">Не вдалося оновити хмарні правила. Будь ласка, спробуйте ще раз.</string>
   <string name="toast_not_enough_storage_space">Not enough storage space</string>
 
