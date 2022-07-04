@@ -1,0 +1,129 @@
+{"version":"3","listProblem":[{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Kotlin annotator",
+  "tags": [
+    "kotlin",
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "'val Project.libs: LibrariesForLibs' can't be called in this context by implicit receiver. Use the explicit one if necessary",
+  "detailsInfo": "Allows viewing the problems reported by the Kotlin annotator: compilation problems, references unresolved by the IDE, and so on.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/build.gradle.kts",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 5,
+      "length": 4,
+      "code": {
+        "startLine": 10,
+        "length": 4,
+        "offset": 16,
+        "surroundingCode": "\nplugins {\n  id(libs.plugins.android.application.get().pluginId)\n  id(libs.plugins.kotlin.android.get().pluginId)\n  id(libs.plugins.kotlin.parcelize.get().pluginId)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app",
+    "inspectionName": "KotlinAnnotator"
+  },
+  "hash": "-2750795120705881810"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Kotlin annotator",
+  "tags": [
+    "kotlin",
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "Cannot access class 'org.gradle.accessors.dm.LibrariesForLibs'. Check your module classpath for missing or conflicting dependencies",
+  "detailsInfo": "Allows viewing the problems reported by the Kotlin annotator: compilation problems, references unresolved by the IDE, and so on.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/build.gradle.kts",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 5,
+      "length": 4,
+      "code": {
+        "startLine": 10,
+        "length": 4,
+        "offset": 16,
+        "surroundingCode": "\nplugins {\n  id(libs.plugins.android.application.get().pluginId)\n  id(libs.plugins.kotlin.android.get().pluginId)\n  id(libs.plugins.kotlin.parcelize.get().pluginId)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app",
+    "inspectionName": "KotlinAnnotator"
+  },
+  "hash": "-1655767281299845323"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Kotlin annotator",
+  "tags": [
+    "kotlin",
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "Function invocation 'plugins(...)' expected",
+  "detailsInfo": "Allows viewing the problems reported by the Kotlin annotator: compilation problems, references unresolved by the IDE, and so on.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/build.gradle.kts",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 10,
+      "length": 7,
+      "code": {
+        "startLine": 10,
+        "length": 7,
+        "offset": 21,
+        "surroundingCode": "\nplugins {\n  id(libs.plugins.android.application.get().pluginId)\n  id(libs.plugins.kotlin.android.get().pluginId)\n  id(libs.plugins.kotlin.parcelize.get().pluginId)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app",
+    "inspectionName": "KotlinAnnotator"
+  },
+  "hash": "909000041384479503"
+},{
+  "tool": "Code Inspection",
+  "category": "General",
+  "type": "Kotlin annotator",
+  "tags": [
+    "kotlin",
+    "Sanity"
+  ],
+  "severity": "Critical",
+  "comment": "Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: \npublic fun GenerateProtoTask.plugins(action: NamedDomainObjectContainerScope<GenerateProtoTask.PluginOptions>.() -> Unit): Unit defined in com.google.protobuf.gradle\npublic fun ProtobufConfigurator.plugins(action: NamedDomainObjectContainerScope<ExecutableLocator>.() -> Unit): Unit defined in com.google.protobuf.gradle",
+  "detailsInfo": "Allows viewing the problems reported by the Kotlin annotator: compilation problems, references unresolved by the IDE, and so on.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/build.gradle.kts",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 10,
+      "length": 7,
+      "code": {
+        "startLine": 10,
+        "length": 7,
+        "offset": 21,
+        "surroundingCode": "\nplugins {\n  id(libs.plugins.android.application.get().pluginId)\n  id(libs.plugins.kotlin.android.get().pluginId)\n  id(libs.plugins.kotlin.parcelize.get().pluginId)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app",
+    "inspectionName": "KotlinAnnotator"
+  },
+  "hash": "3655000381942486569"
+}]}
