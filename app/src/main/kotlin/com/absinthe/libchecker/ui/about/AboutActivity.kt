@@ -195,6 +195,14 @@ class AboutActivity : AbsAboutActivityProxy() {
         .append("[")
         .append(getHyperLink("https://www.coolapk.com/u/1382006"))
         .append("]")
+        .append("<br>")
+      contributors.append("Bug Reporter: ")
+        .append("<b>")
+        .append("Flyzc")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/Flyzc"))
+        .append("]")
       add(
         Card(
           HtmlCompat.fromHtml(
