@@ -177,6 +177,8 @@
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」禁用此組件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解禁此組件</string>
+  <string name="integration_blocker_menu_block">使用「Blocker」禁用此組件</string>
+  <string name="integration_blocker_menu_unblock">使用「Blocker」解禁此組件</string>
   <string name="integration_anywhere_menu_editor">在「Anywhere- 編輯器」中打開</string>
 
   <!--  Cloud rules  -->

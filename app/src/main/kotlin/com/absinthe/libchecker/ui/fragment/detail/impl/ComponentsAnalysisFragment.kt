@@ -14,6 +14,7 @@ import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
+import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
@@ -32,9 +33,13 @@ import rikka.core.util.ClipboardUtils
 class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by lazy {
-    !viewModel.isApk && (MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction)
+    !viewModel.isApk &&
+      (BlockerManager.isSupportInteraction ||
+        MonkeyKingManager.isSupportInteraction ||
+        AnywhereManager.isSupportInteraction)
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
+  private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
   private var itemsList: List<LibStringItemChip>? = null
 
   override fun getRecyclerView() = binding.list
@@ -147,7 +152,25 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
       val arrayAdapter =
         ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
       arrayAdapter.add(getString(android.R.string.copy))
-
+      // Blocker
+      if (integrationBlockerList == null) {
+        integrationBlockerList = BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+      }
+      val fullComponentName = if (componentName.startsWith(".")) {
+        viewModel.packageInfo.packageName + componentName
+      } else {
+        componentName
+      }
+      val blockerShouldBlock = integrationBlockerList!!.find { it.name == fullComponentName } == null
+      if (BlockerManager.isSupportInteraction) {
+        arrayAdapter.add(
+          if (blockerShouldBlock) {
+            getString(R.string.integration_blocker_menu_block)
+          } else {
+            getString(R.string.integration_blocker_menu_unblock)
+          }
+        )
+      }
       // MonkeyKing Purify
       if (integrationMonkeyKingBlockList == null) {
         integrationMonkeyKingBlockList =
@@ -175,6 +198,21 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
               VersionCompat.showCopiedOnClipboardToast(context)
             }
             1 -> {
+              if (BlockerManager.isSupportInteraction) {
+                BlockerManager().apply {
+                  addBlockedComponent(
+                    context,
+                    viewModel.packageInfo.packageName,
+                    componentName,
+                    type,
+                    blockerShouldBlock
+                  )
+                  integrationBlockerList =
+                    queryBlockedComponent(context, viewModel.packageInfo.packageName)
+                }
+              }
+            }
+            2 -> {
               if (MonkeyKingManager.isSupportInteraction) {
                 MonkeyKingManager().apply {
                   addBlockedComponent(
@@ -189,7 +227,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
                 }
               }
             }
-            2 -> {
+            3 -> {
               AnywhereManager().launchActivityEditor(
                 context,
                 viewModel.packageInfo.packageName,
