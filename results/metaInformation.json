@@ -4,6 +4,13 @@
     "Code Inspection": 22
   },
   "attributes": {
+    "vcs": {
+      "sarifIdea": {
+        "repositoryUri": "https://github.com/zhaobozhen/LibChecker",
+        "revisionId": "0b16d1c21d455a7751a0813eb9a6353c3efb573d",
+        "branch": "master"
+      }
+    },
     "deviceId": "200820300000000-9a51-bd2c-aa09-1801369fd0c6"
   }
 }
