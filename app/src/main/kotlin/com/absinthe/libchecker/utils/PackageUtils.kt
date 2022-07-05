@@ -733,8 +733,7 @@ object PackageUtils {
     }
 
     if (applicationInfo.sourceDir == null) {
-      Timber.d("SourceDir is null: ${packageInfo.packageName}")
-      return ERROR
+      throw IllegalStateException("SourceDir is null: ${packageInfo.packageName}")
     }
 
     val file = File(applicationInfo.sourceDir)
@@ -1123,6 +1122,7 @@ object PackageUtils {
               PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
             )
           }
+          .filter { it.applicationInfo.sourceDir != null }
           .toList()
       }
     } catch (t: Throwable) {
