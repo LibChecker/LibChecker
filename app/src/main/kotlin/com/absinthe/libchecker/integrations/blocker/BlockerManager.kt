@@ -20,7 +20,7 @@ const val TYPE_SERVICE = "service"
 const val TYPE_RECEIVER = "receiver"
 const val TYPE_PROVIDER = "provider"
 
-private const val URI_AUTHORIZATION = "content://com.merxury.blocker.provider.ComponentProvider/"
+private const val URI_AUTHORIZATION = "content://com.merxury.blocker.provider.ComponentProvider"
 private const val BLOCKER_APPLICATION_ID = "com.merxury.blocker"
 private const val FIRST_SUPPORT_VERSION_CODE = 1264
 

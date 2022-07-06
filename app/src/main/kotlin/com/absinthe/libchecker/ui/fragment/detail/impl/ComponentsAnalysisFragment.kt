@@ -33,10 +33,7 @@ import rikka.core.util.ClipboardUtils
 class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by lazy {
-    !viewModel.isApk &&
-      (BlockerManager.isSupportInteraction ||
-        MonkeyKingManager.isSupportInteraction ||
-        AnywhereManager.isSupportInteraction)
+    BlockerManager.isSupportInteraction || MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
@@ -148,21 +145,29 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
   }
 
   private fun doOnLongClick(context: Context, componentName: String) {
-    if (hasIntegration) {
-      val arrayAdapter =
-        ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
+    if (!viewModel.isApk && hasIntegration) {
+      val actionMap = mutableMapOf<Int, () -> Unit>()
+      val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
+
+      // Copy
       arrayAdapter.add(getString(android.R.string.copy))
+      actionMap[arrayAdapter.count - 1] = {
+        ClipboardUtils.put(context, componentName)
+        VersionCompat.showCopiedOnClipboardToast(context)
+      }
+
       // Blocker
-      if (integrationBlockerList == null) {
-        integrationBlockerList = BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
-      }
-      val fullComponentName = if (componentName.startsWith(".")) {
-        viewModel.packageInfo.packageName + componentName
-      } else {
-        componentName
-      }
-      val blockerShouldBlock = integrationBlockerList!!.find { it.name == fullComponentName } == null
       if (BlockerManager.isSupportInteraction) {
+        if (integrationBlockerList == null) {
+          integrationBlockerList =
+            BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val fullComponentName = if (componentName.startsWith(".")) {
+          viewModel.packageInfo.packageName + componentName
+        } else {
+          componentName
+        }
+        val blockerShouldBlock = integrationBlockerList!!.any { it.name == fullComponentName }.not()
         arrayAdapter.add(
           if (blockerShouldBlock) {
             getString(R.string.integration_blocker_menu_block)
@@ -170,73 +175,68 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
             getString(R.string.integration_blocker_menu_unblock)
           }
         )
+        actionMap[arrayAdapter.count - 1] = {
+          if (BlockerManager.isSupportInteraction) {
+            BlockerManager().apply {
+              addBlockedComponent(
+                context,
+                viewModel.packageInfo.packageName,
+                componentName,
+                type,
+                blockerShouldBlock
+              )
+              integrationBlockerList =
+                queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            }
+          }
+        }
       }
+
       // MonkeyKing Purify
-      if (integrationMonkeyKingBlockList == null) {
-        integrationMonkeyKingBlockList =
-          MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
-      }
-      val monkeyKingShouldBlock =
-        integrationMonkeyKingBlockList!!.find { it.name == componentName } == null
       if (MonkeyKingManager.isSupportInteraction) {
+        if (integrationMonkeyKingBlockList == null) {
+          integrationMonkeyKingBlockList =
+            MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
+        }
+        val monkeyKingShouldBlock =
+          integrationMonkeyKingBlockList!!.any { it.name == componentName }.not()
         if (monkeyKingShouldBlock) {
           arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
         } else {
           arrayAdapter.add(getString(R.string.integration_monkey_king_menu_unblock))
         }
+        actionMap[arrayAdapter.count - 1] = {
+          if (MonkeyKingManager.isSupportInteraction) {
+            MonkeyKingManager().apply {
+              addBlockedComponent(
+                context,
+                viewModel.packageInfo.packageName,
+                componentName,
+                type,
+                monkeyKingShouldBlock
+              )
+              integrationMonkeyKingBlockList =
+                queryBlockedComponent(context, viewModel.packageInfo.packageName)
+            }
+          }
+        }
       }
+
       // Anywhere-
       if (AnywhereManager.isSupportInteraction && type == ACTIVITY) {
         arrayAdapter.add(getString(R.string.integration_anywhere_menu_editor))
+        actionMap[arrayAdapter.count - 1] = {
+          AnywhereManager().launchActivityEditor(
+            context,
+            viewModel.packageInfo.packageName,
+            componentName
+          )
+        }
       }
 
       BaseAlertDialogBuilder(context)
         .setAdapter(arrayAdapter) { _, which ->
-          when (which) {
-            0 -> {
-              ClipboardUtils.put(context, componentName)
-              VersionCompat.showCopiedOnClipboardToast(context)
-            }
-            1 -> {
-              if (BlockerManager.isSupportInteraction) {
-                BlockerManager().apply {
-                  addBlockedComponent(
-                    context,
-                    viewModel.packageInfo.packageName,
-                    componentName,
-                    type,
-                    blockerShouldBlock
-                  )
-                  integrationBlockerList =
-                    queryBlockedComponent(context, viewModel.packageInfo.packageName)
-                }
-              }
-            }
-            2 -> {
-              if (MonkeyKingManager.isSupportInteraction) {
-                MonkeyKingManager().apply {
-                  addBlockedComponent(
-                    context,
-                    viewModel.packageInfo.packageName,
-                    componentName,
-                    type,
-                    monkeyKingShouldBlock
-                  )
-                  integrationMonkeyKingBlockList =
-                    queryBlockedComponent(context, viewModel.packageInfo.packageName)
-                }
-              }
-            }
-            3 -> {
-              AnywhereManager().launchActivityEditor(
-                context,
-                viewModel.packageInfo.packageName,
-                componentName
-              )
-            }
-            else -> { /*Do nothing*/
-            }
-          }
+          actionMap[which]?.invoke()
         }
         .show()
     } else {

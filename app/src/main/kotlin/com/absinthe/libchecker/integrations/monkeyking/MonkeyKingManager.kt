@@ -19,7 +19,7 @@ const val TYPE_SERVICE = "service"
 const val TYPE_RECEIVER = "receiver"
 const val TYPE_PROVIDER = "provider"
 
-private const val URI_AUTHORIZATION = "content://com.ext.star.wars.cfg.InnerProvider/"
+private const val URI_AUTHORIZATION = "content://com.ext.star.wars.cfg.InnerProvider"
 private const val MONKEY_KING_APPLICATION_ID = "com.ext.star.wars"
 private const val FIRST_SUPPORT_VERSION_CODE = 308047
 
