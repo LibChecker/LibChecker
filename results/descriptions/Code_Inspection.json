@@ -367,16 +367,16 @@
           "description": "Reports `if-then` expressions that can be folded into elvis (`?:`) expressions.\n\n**Example:**\n\n\n      fun maybeFoo(): String? = \"foo\"\n\n      var foo = maybeFoo()\n      val bar = if (foo == null) \"hello\" else foo\n\nThe quick fix converts the `if-then` expression into an elvis (`?:`) expression:\n\n\n      fun maybeFoo(): String? = \"foo\"\n\n      var foo = maybeFoo()\n      val bar = foo ?: \"hello\"\n"
         },
         {
-          "shortName": "ReplaceNotNullAssertionWithElvisReturn",
-          "displayName": "Not-null assertion can be replaced with 'return'",
-          "enabled": false,
-          "description": "Reports not-null assertion (`!!`) calls that can be replaced with the elvis operator and return (`?: return`).\n\nA not-null assertion can lead to NPE (NullPointerException) that is not expected. Avoiding the use of `!!` is good practice.\n\nThe quick-fix replaces the not-null assertion with `return` or `return null`.\n\n**Example:**\n\n\n      fun test(number: Int?) {\n          val x = number!!\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun test(number: Int?) {\n          val x = number ?: return\n      }\n"
-        },
-        {
           "shortName": "ReplaceStringFormatWithLiteral",
           "displayName": "'String.format' call can be replaced with string templates",
           "enabled": false,
           "description": "Reports `String.format` calls that can be replaced with string templates.\n\nUsing string templates makes your code simpler.\n\nThe quick-fix replaces the call with a string template.\n\n**Example:**\n\n\n      fun main() {\n          val id = \"abc\"\n          val date = \"123\"\n          val s = String.format(\"%s_%s_%s\", id, date, id)\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun main() {\n          val id = \"abc\"\n          val date = \"123\"\n          val s = \"${id}_${date}_$id\"\n      }\n"
+        },
+        {
+          "shortName": "ReplaceNotNullAssertionWithElvisReturn",
+          "displayName": "Not-null assertion can be replaced with 'return'",
+          "enabled": false,
+          "description": "Reports not-null assertion (`!!`) calls that can be replaced with the elvis operator and return (`?: return`).\n\nA not-null assertion can lead to NPE (NullPointerException) that is not expected. Avoiding the use of `!!` is good practice.\n\nThe quick-fix replaces the not-null assertion with `return` or `return null`.\n\n**Example:**\n\n\n      fun test(number: Int?) {\n          val x = number!!\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun test(number: Int?) {\n          val x = number ?: return\n      }\n"
         },
         {
           "shortName": "ReplaceSubstringWithSubstringBefore",
@@ -403,16 +403,16 @@
           "description": "Reports calls to `Collection<T>.count()`.\n\n\nThis function call can be replaced with `.size`.\n\n\n`.size` form ensures that the operation is O(1) and won't allocate extra objects, whereas\n`count()` could be confused with `Iterable<T>.count()`, which is O(n) and allocating.\n\n\n**Example:**\n\n      fun foo() {\n          var list = listOf(1,2,3)\n          list.count() // replaceable 'count()'\n      }\n\nAfter the quick-fix is applied:\n\n      fun foo() {\n          var list = listOf(1,2,3)\n          list.size\n      }\n"
         },
         {
-          "shortName": "RedundantAsync",
-          "displayName": "Redundant 'async' call",
-          "enabled": false,
-          "description": "Reports `async` calls that are immediately followed by `await`.\nSuch calls can be replaced with blocking calls.\n\n**Example:**\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          scope.async(ctx) { doSomeJob() }.await()\n      }\n\nAfter the quick-fix is applied:\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          withContext(scope.coroutineContext + ctx) { doSomeJob() }\n      }\n"
-        },
-        {
           "shortName": "JavaCollectionsStaticMethod",
           "displayName": "Java Collections static method call can be replaced with Kotlin stdlib",
           "enabled": false,
           "description": "Reports a Java `Collections` static method call that can be replaced with Kotlin stdlib.\n\n**Example:**\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          Collections.fill(mutableList, 3)\n      }\n\nThe quick fix replaces Java `Collections` static method call with the corresponding Kotlin stdlib method call:\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          mutableList.fill(3)\n      }\n"
+        },
+        {
+          "shortName": "RedundantAsync",
+          "displayName": "Redundant 'async' call",
+          "enabled": false,
+          "description": "Reports `async` calls that are immediately followed by `await`.\nSuch calls can be replaced with blocking calls.\n\n**Example:**\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          scope.async(ctx) { doSomeJob() }.await()\n      }\n\nAfter the quick-fix is applied:\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          withContext(scope.coroutineContext + ctx) { doSomeJob() }\n      }\n"
         },
         {
           "shortName": "MoveVariableDeclarationIntoWhen",
@@ -1192,16 +1192,16 @@
           "description": "Reports non-final fields that are accessed in both `synchronized` and non-`synchronized` contexts. `volatile` fields as well as accesses in constructors and initializers are ignored by this inspection.\n\n\nSuch \"partially synchronized\" access is often the result of a coding oversight\nand may lead to unexpectedly inconsistent data structures.\n\n**Example:**\n\n\n      public class Program {\n        Console console; // warning: Field 'console' is accessed in both synchronized and unsynchronized contexts\n\n        public synchronized void execute() {\n          console.print(\"running\");\n        }\n\n        public void check() {\n          console.check();\n        }\n      }\n\n\nUse the option to specify if simple getters and setters are counted as accesses too."
         },
         {
-          "shortName": "WaitCalledOnCondition",
-          "displayName": "'wait()' called on 'java.util.concurrent.locks.Condition' object",
-          "enabled": false,
-          "description": "Reports calls to `wait()` made on a `java.util.concurrent.locks.Condition` object. This is probably a programming error, and some variant of the `await()` method was intended instead.\n\n**Example:**\n\n\n      void acquire(Condition released) throws InterruptedException {\n        while (acquired) {\n          released.wait();\n        }\n      }\n\nGood code would look like this:\n\n\n      void acquire(Condition released) throws InterruptedException {\n        while (acquired) {\n          released.await();\n        }\n      }\n"
-        },
-        {
           "shortName": "NonSynchronizedMethodOverridesSynchronizedMethod",
           "displayName": "Unsynchronized method overrides 'synchronized' method",
           "enabled": true,
           "description": "Reports non-`synchronized` methods overriding `synchronized` methods.\n\n\nThe overridden method will not be automatically synchronized if the superclass method\nis declared as `synchronized`. This may result in unexpected race conditions when using the subclass.\n\n**Example:**\n\n\n      class Super {\n        synchronized void process() {}\n      }\n      class Sub extends Super {\n        // Unsynchronized method 'process()' overrides synchronized method\n        void process() {}\n      }  \n"
+        },
+        {
+          "shortName": "WaitCalledOnCondition",
+          "displayName": "'wait()' called on 'java.util.concurrent.locks.Condition' object",
+          "enabled": false,
+          "description": "Reports calls to `wait()` made on a `java.util.concurrent.locks.Condition` object. This is probably a programming error, and some variant of the `await()` method was intended instead.\n\n**Example:**\n\n\n      void acquire(Condition released) throws InterruptedException {\n        while (acquired) {\n          released.wait();\n        }\n      }\n\nGood code would look like this:\n\n\n      void acquire(Condition released) throws InterruptedException {\n        while (acquired) {\n          released.await();\n        }\n      }\n"
         },
         {
           "shortName": "WaitNotifyNotInSynchronizedContext",
@@ -1264,16 +1264,16 @@
           "description": "Reports [double-checked locking](https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html).\n\n\nDouble-checked locking tries to initialize a field on demand and in a thread-safe manner while avoiding the cost of synchronization.\nUnfortunately it is not thread-safe when used on a field that is not declared `volatile`.\nWhen using Java 1.4 or earlier, double-checked locking doesn't work even with `volatile` fields.\nRead the article linked above for the detailed explanation of the problem.\n\n\nExample of an incorrect double-checked locking:\n\n\n      class Foo {\n        private Helper helper = null;\n        public Helper getHelper() {\n          if (helper == null)\n            synchronized(this) {\n              if (helper == null) helper = new Helper();\n            }\n            return helper;\n          }\n        }\n        // other functions and members...\n      }\n"
         },
         {
-          "shortName": "ThreadLocalNotStaticFinal",
-          "displayName": "'ThreadLocal' field not declared 'static final'",
-          "enabled": false,
-          "description": "Reports fields of type `java.lang.ThreadLocal` that are not declared `static final`.\n\n\nIn the most common case, a `java.lang.ThreadLocal` instance associates state with a thread.\nA non-static non-final `java.lang.ThreadLocal` field associates state with an instance-thread combination.\nThis is usually unnecessary and quite often is a bug that can cause memory leaks and incorrect behavior.\n\n\nA quick-fix is suggested to make the field `static final`.\n\n\n**Example:**\n\n\n      private ThreadLocal tl = ThreadLocal.withInitial(() -> Boolean.TRUE);\n"
-        },
-        {
           "shortName": "ConditionSignal",
           "displayName": "Call to 'signal()' instead of 'signalAll()'",
           "enabled": false,
           "description": "Reports calls to `java.util.concurrent.locks.Condition.signal()`. While occasionally useful, in almost all cases `signalAll()` is a better and safer choice."
+        },
+        {
+          "shortName": "ThreadLocalNotStaticFinal",
+          "displayName": "'ThreadLocal' field not declared 'static final'",
+          "enabled": false,
+          "description": "Reports fields of type `java.lang.ThreadLocal` that are not declared `static final`.\n\n\nIn the most common case, a `java.lang.ThreadLocal` instance associates state with a thread.\nA non-static non-final `java.lang.ThreadLocal` field associates state with an instance-thread combination.\nThis is usually unnecessary and quite often is a bug that can cause memory leaks and incorrect behavior.\n\n\nA quick-fix is suggested to make the field `static final`.\n\n\n**Example:**\n\n\n      private ThreadLocal tl = ThreadLocal.withInitial(() -> Boolean.TRUE);\n"
         },
         {
           "shortName": "CallToNativeMethodWhileLocked",
@@ -2508,16 +2508,16 @@
           "description": "Reports methods that are declared `final`. Such methods can't be overridden and may indicate a lack of object-oriented design. Some coding standards discourage `final` methods."
         },
         {
-          "shortName": "NonFinalUtilityClass",
-          "displayName": "Utility class is not 'final'",
-          "enabled": false,
-          "description": "Reports utility classes that aren't `final`.\n\nUtility classes have all fields and methods declared as `static`.\nMaking them `final` prevents them from being accidentally subclassed."
-        },
-        {
           "shortName": "Singleton",
           "displayName": "Singleton",
           "enabled": false,
           "description": "Reports singleton classes.\n\nSingleton classes are declared in a way that only one instance of the class can ever be instantiated. Singleton classes complicate testing,\nand their presence may indicate a lack of object-oriented design.\n\n**Example:**\n\n\n      class Singleton {\n        private static final Singleton ourInstance = new Singleton();\n\n        private Singleton() {\n        }\n\n        public Singleton getInstance() {\n            return ourInstance;\n        }\n      }\n"
+        },
+        {
+          "shortName": "NonFinalUtilityClass",
+          "displayName": "Utility class is not 'final'",
+          "enabled": false,
+          "description": "Reports utility classes that aren't `final`.\n\nUtility classes have all fields and methods declared as `static`.\nMaking them `final` prevents them from being accidentally subclassed."
         },
         {
           "shortName": "StaticNonFinalField",
@@ -3053,10 +3053,10 @@
           "description": "Reports suspicious indentation of statements after a control statement without braces.\n\n\nSuch indentation can make it look like the statement is inside the control statement,\nwhen in fact it will be executed unconditionally after the control statement.\n\n**Example:**\n\n\n      class Bar {\n          void foo(int i) {\n              if (i == 0)\n                  System.out.println(\"foo\");\n                  System.out.println(\"bar\"); // warning\n              if (i == 1);\n                  System.out.println(\"great\"); // warning\n              if (i == 42)\n                  System.out.println(\"answer\");\n                      System.out.println(\"question\"); // warning\n          }\n      }\n"
         },
         {
-          "shortName": "ClassNewInstance",
-          "displayName": "Unsafe call to 'Class.newInstance()'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
+          "shortName": "MagicConstant",
+          "displayName": "Magic Constant",
+          "enabled": true,
+          "description": "Reports expressions that can be replaced with \"magic\" constants.\n\nExample 1:\n\n\n      // Bare literal \"2\" is used, warning:\n      Font font = new Font(\"Arial\", 2)\n\nExample 2:\n\n\n      // Predefined constant is used, good:\n      Font font = new Font(\"Arial\", Font.ITALIC)\n\n\nWhen possible, the quick-fix inserts an appropriate predefined constant.\n\n\nThe behavior of this inspection is controlled by `org.intellij.lang.annotations.MagicConstant` annotation.\nSome standard Java library methods are pre-annotated, but you can use this annotation in your code as well."
         },
         {
           "shortName": "SuspiciousDateFormat",
@@ -3065,10 +3065,10 @@
           "description": "Reports date format patterns that are likely used by mistake.\n\nThe following patterns are reported:\n\n* Uppercase \"Y\", unless \"w\" appears nearby. It stands for \"Week year\" that is almost always the same as normal \"Year\" (lowercase \"y\" pattern), but may point to the next year at the end of December.\n* Uppercase \"M\" (month) close to \"H\", \"K\", \"h\", or \"k\" (hour). It's likely that a lowercase \"m\" (minute) was intended.\n* Lowercase \"m\" (minute) close to \"y\" (year) or \"d\" (day in month). It's likely that an uppercase \"M\" (month) was intended.\n* Uppercase \"D\" (day in year) close to \"M\", or \"L\" (month). It's likely that a lowercase \"d\" (day in month) was intended.\n* Uppercase \"S\" (milliseconds) close to \"m\" (minutes). It's likely that a lowercase \"s\" (seconds) was intended.\n\n\nExamples:  \n\n`new SimpleDateFormat(\"YYYY-MM-dd\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"yyyy-MM-DD\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"HH:MM\")`: likely `\"HH:mm\"` was intended.\n\nNew in 2020.1"
         },
         {
-          "shortName": "MagicConstant",
-          "displayName": "Magic Constant",
-          "enabled": true,
-          "description": "Reports expressions that can be replaced with \"magic\" constants.\n\nExample 1:\n\n\n      // Bare literal \"2\" is used, warning:\n      Font font = new Font(\"Arial\", 2)\n\nExample 2:\n\n\n      // Predefined constant is used, good:\n      Font font = new Font(\"Arial\", Font.ITALIC)\n\n\nWhen possible, the quick-fix inserts an appropriate predefined constant.\n\n\nThe behavior of this inspection is controlled by `org.intellij.lang.annotations.MagicConstant` annotation.\nSome standard Java library methods are pre-annotated, but you can use this annotation in your code as well."
+          "shortName": "ClassNewInstance",
+          "displayName": "Unsafe call to 'Class.newInstance()'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
         },
         {
           "shortName": "ConstantConditions",
@@ -4232,35 +4232,6 @@
       ]
     },
     {
-      "name": "GPath",
-      "inspections": [
-        {
-          "shortName": "GroovyListSetCanBeKeyedAccess",
-          "displayName": "Call to List.set can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapPutCanBeKeyedAccess",
-          "displayName": "Call to Map.put can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapGetCanBeKeyedAccess",
-          "displayName": "Call to Map.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
-        },
-        {
-          "shortName": "GroovyListGetCanBeKeyedAccess",
-          "displayName": "Call to List.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
-        }
-      ]
-    },
-    {
       "name": "Embedded",
       "inspections": [
         {
@@ -4328,6 +4299,35 @@
           "displayName": "Large array allocation with no OutOfMemoryError check",
           "enabled": false,
           "description": "Reports large array allocations which do not check for `java.lang.OutOfMemoryError`. In memory constrained environments, allocations of large data objects should probably be checked for memory depletion.\n\n\nThis inspection is intended for Java ME and other highly resource constrained environments.\nApplying the results of this inspection without consideration might have negative effects on code clarity and design.\n\n\nUse the option to specify the maximum number of elements to allow in unchecked array allocations."
+        }
+      ]
+    },
+    {
+      "name": "GPath",
+      "inspections": [
+        {
+          "shortName": "GroovyListSetCanBeKeyedAccess",
+          "displayName": "Call to List.set can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapPutCanBeKeyedAccess",
+          "displayName": "Call to Map.put can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapGetCanBeKeyedAccess",
+          "displayName": "Call to Map.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
+        },
+        {
+          "shortName": "GroovyListGetCanBeKeyedAccess",
+          "displayName": "Call to List.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
         }
       ]
     },
@@ -4590,16 +4590,16 @@
           "description": "Reports equality expressions which are negated by a prefix expression.\n\nSuch expressions can be simplified using the `!=` operator.\n\nExample:\n\n\n      !(i == 1)\n\nAfter the quick-fix is applied:\n\n\n      i != 1\n"
         },
         {
-          "shortName": "DoubleNegation",
-          "displayName": "Double negation",
-          "enabled": true,
-          "description": "Reports double negations that can be simplified.\n\nExample:\n\n\n      if (!!functionCall()) {}\n\nAfter the quick-fix is applied:\n\n\n      if (functionCall()) {}\n\nExample:\n\n\n      if (!(a != b)) {}\n\nAfter the quick-fix is applied:\n\n\n      if (a == b) {}\n"
-        },
-        {
           "shortName": "AssertionCanBeIf",
           "displayName": "Assertion can be replaced with 'if' statement",
           "enabled": false,
           "description": "Reports `assert` statements and suggests replacing them with `if` statements that throw `java.lang.AssertionError`.\n\nExample:\n\n\n      assert param != null;\n\nAfter the quick-fix is applied:\n\n\n      if (param == null) throw new AssertionError();\n"
+        },
+        {
+          "shortName": "DoubleNegation",
+          "displayName": "Double negation",
+          "enabled": true,
+          "description": "Reports double negations that can be simplified.\n\nExample:\n\n\n      if (!!functionCall()) {}\n\nAfter the quick-fix is applied:\n\n\n      if (functionCall()) {}\n\nExample:\n\n\n      if (!(a != b)) {}\n\nAfter the quick-fix is applied:\n\n\n      if (a == b) {}\n"
         },
         {
           "shortName": "BreakStatement",
@@ -6867,6 +6867,113 @@
       ]
     },
     {
+      "name": "Java 8",
+      "inspections": [
+        {
+          "shortName": "StaticPseudoFunctionalStyleMethod",
+          "displayName": "Pseudo-functional expression using static class",
+          "enabled": false,
+          "description": "Reports usages of pseudo-functional code if `Java Stream API` is available.\n\nThough `guava Iterable API` provides functionality similar to `Java Streams API`, it's slightly different and\nmay miss some features.\nEspecially, primitive-specialized stream variants like `IntStream` are more performant than generic variants.\n\n**Example:**\n\n\n    List<String> transformedIterable = Iterables.transform(someList, someTransformFunction);//warning: Pseudo functional style code\n\nAfter the quick-fix is applied:\n\n    List<String> transformedIterable = someList.stream().map(someTransformFunction).collect(Collectors.toList());\n\n\n**Note:** Code semantics can be changed; for example, guava's `Iterable.transform` produces a lazy-evaluated iterable,\nbut the replacement is eager-evaluated.\n\n\nUse the **Static method calls translated to the 'Stream' API** option\nto configure static method calls that should be translated to the `stream` API.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "AnonymousHasLambdaAlternative",
+          "displayName": "Anonymous type has shorter lambda alternative",
+          "enabled": false,
+          "description": "Reports anonymous classes which could be transformed to a constructor or a factory method call with a lambda expression argument.\n\nThe following classes are reported by this inspection:\n\n* Anonymous classes extending `ThreadLocal` which have an `initialValue()` method (can be replaced with `ThreadLocal.withInitial`)\n* Anonymous classes extending `Thread` which have a `run()` method (can be replaced with `new Thread(Runnable)`\n\nExample:\n\n\n      new Thread() {\n        @Override\n        public void run() {\n          System.out.println(\"Hello from thread!\");\n        }\n      }.start();\n\nAfter the quick-fix is applied:\n\n\n      new Thread(() -> {\n        System.out.println(\"Hello from thread!\");\n      }).start();\n"
+        },
+        {
+          "shortName": "Java8ListReplaceAll",
+          "displayName": "Loop can be replaced with 'List.replaceAll()'",
+          "enabled": false,
+          "description": "Reports loops which can be collapsed into a single `List.replaceAll()` call.\n\n**Example:**\n\n\n      for (int i = 0; i < strings.size(); i++) {\n        String str = strings.get(i).toLowerCase();\n        strings.set(i, str);\n      }\n\nAfter the quick-fix is applied:\n\n\n      strings.replaceAll(String::toLowerCase);\n\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2022.1"
+        },
+        {
+          "shortName": "FoldExpressionIntoStream",
+          "displayName": "Expression can be folded into Stream chain",
+          "enabled": false,
+          "description": "Reports expressions with a repeating pattern which could be replaced with *Stream API* or `String.join()`.\n\nExample:\n\n\n      boolean allStartWith(String a, String b, String c, String d, String prefix) {\n        return a.startsWith(prefix) && b.startsWith(prefix) && c.startsWith(prefix) && d.startsWith(prefix);\n      }\n\nAfter the quick-fix is applied:\n\n\n      boolean foo(String a, String b, String c, String d, String prefix) {\n        return Stream.of(a, b, c, d).allMatch(s -> s.startsWith(prefix));\n      }\n\nExample:\n\n\n      String joinAll(String a, String b, String c, String d) {\n        return a + \",\" + b + \",\" + c + \",\" + d;\n      }\n\nAfter the quick-fix is applied:\n\n\n      String joinAll(String a, String b, String c, String d) {\n        return String.join(\",\", a, b, c, d);\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2018.2"
+        },
+        {
+          "shortName": "Convert2streamapi",
+          "displayName": "Loop can be collapsed with Stream API",
+          "enabled": false,
+          "description": "Reports loops which can be replaced with stream API calls using lambda expressions.\n\nSuch a replacement changes the style from imperative to more functional and makes the code more compact.\n\nExample:\n\n\n      boolean check(List<String> data) {\n        for (String e : data) {\n          String trimmed = e.trim();\n          if (!trimmed.startsWith(\"xyz\")) {\n            return false;\n          }\n        }\n        return true;\n      }\n\nAfter the quick-fix is applied:\n\n\n      boolean check(List<String> data) {\n        return data.stream().map(String::trim).allMatch(trimmed -> trimmed.startsWith(\"xyz\"));\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "LambdaCanBeMethodCall",
+          "displayName": "Lambda can be replaced with method call",
+          "enabled": false,
+          "description": "Reports lambda expressions which can be replaced with a JDK method call.\n\nFor example, the expression `x -> x` of the `Function<T, T>` type\ncan be replaced with the `Function.identity()` call.\n\nNew in 2017.1"
+        },
+        {
+          "shortName": "Anonymous2MethodRef",
+          "displayName": "Anonymous type can be replaced with method reference",
+          "enabled": false,
+          "description": "Reports anonymous classes which can be replaced with method references.\n\n\nNote that if an anonymous class is converted into an unbound method reference, the same method reference object\ncan be reused by the Java runtime during subsequent invocations. On the other hand, when an anonymous class is used,\nseparate objects are created every time. Thus, applying the quick-fix can cause the semantics change in rare cases,\ne.g. when anonymous class instances are used as `HashMap` keys.\n\n**Example:**\n\n\n        Runnable r = new Runnable() {\n          @Override\n          public void run() {\n            System.out.println();\n          }\n        };\n\nThe quick-fix changes this code to the compact form: `Runnable r = System.out::println;`.\n\nUse the **Report when interface is not annotated with @FunctionalInterface** option to enable this inspection for\ninterfaces which are not annotated with @FunctionalInterface.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "CodeBlock2Expr",
+          "displayName": "Statement lambda can be replaced with expression lambda",
+          "enabled": false,
+          "description": "Reports lambda expressions with code block bodies when expression-style bodies can be used instead. The result of the conversion is shorter and more clear.\n\nExample:\n\n\n      Comparable<String> c = o -> {return 0;};\n\nAfter the quick-fix is applied:\n\n\n      Comparable<String> c = o -> 0;\n"
+        },
+        {
+          "shortName": "SimplifyForEach",
+          "displayName": "Simplifiable forEach() call",
+          "enabled": false,
+          "description": "Reports `forEach()` calls that can be replaced with a more concise method or from which intermediate steps can be extracted.\n\n**Example:**\n\n\n      List<String> findNStrings(List<String> list, int n) {\n        List<String> other = new ArrayList<>();\n        list.forEach(s -> {\n          if(s.length() > n) other.add(s);\n        });\n        return other;\n      }\n\nAfter the quick-fix is applied:\n\n\n      List<String> findNStrings(List<String> list, int n) {\n        List<String> other = list.stream()\n          .filter(s -> s.length() > n)\n          .collect(Collectors.toList());\n        return other;\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2017.3"
+        },
+        {
+          "shortName": "Guava",
+          "displayName": "Guava's functional primitives can be replaced with Java",
+          "enabled": false,
+          "description": "Reports usages of Guava's functional primitives that can be migrated to standard Java API calls.\n\nFor example, the inspection reports usages of classes and interfaces like `FluentIterable`, `Optional`, `Function`,\n`Predicate`, or `Supplier`.\n\nExample:\n\n\n      ImmutableList<String> results = FluentIterable.from(List.of(1, 2, 3)).transform(Object::toString).toList();\n\nAfter the quick-fix is applied:\n\n\n      List<String> results = List.of(1, 2, 3).stream().map(Object::toString).collect(Collectors.toList());\n\n\nThe quick-fix may change the semantics. Some lazy-evaluated Guava's iterables can be transformed to eager-evaluated.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "Java8ListSort",
+          "displayName": "'Collections.sort()' can be replaced with 'List.sort()'",
+          "enabled": false,
+          "description": "Reports calls of `Collections.sort(list, comparator)` which can be replaced with `list.sort(comparator)`.\n\n`Collections.sort` is just a wrapper, so it is better to use an instance method directly.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "ComparatorCombinators",
+          "displayName": "'Comparator' combinator can be used",
+          "enabled": false,
+          "description": "Reports `Comparator` instances defined as lambda expressions that could be expressed using `Comparator.comparing()` calls. Chained comparisons which can be replaced by `Comparator.thenComparing()` expression are also reported.\n\nExample:\n\n\n      myList.sort((person1, person2) -> person1.getName().compareTo(person2.getName()));\n\n      myList2.sort((person1, person2) -> {\n          int res = person1.first().compareTo(person2.first());\n          if(res == 0) res = person1.second().compareTo(person2.second());\n          if(res == 0) res = person1.third() - person2.third();\n          return res;\n      });\n\nAfter the quick-fixes are applied:\n\n\n      myList.sort(Comparator.comparing(Person::getName));\n\n      myList2.sort(Comparator.comparing(Person::first)\n                             .thenComparing(Person::second)\n                             .thenComparingInt(Person::third));\n"
+        },
+        {
+          "shortName": "Java8MapForEach",
+          "displayName": "Map.forEach() can be used",
+          "enabled": false,
+          "description": "Suggests replacing `for(Entry<?,?> entry : map.entrySet()) {...}` or `map.entrySet().forEach(entry -> ...)` with `map.forEach((key, value) -> ...)`.\n\nExample\n\n\n      void print(Map<String, Integer> map) {\n        map.entrySet().forEach(entry -> {\n          String str = entry.getKey();\n          System.out.println(str + \":\" + entry.getValue());\n        });\n      }\n\nAfter the quick-fix is applied:\n\n\n      void print(Map<String, Integer> map) {\n        map.forEach((str, value) -> System.out.println(str + \":\" + value));\n      }\n\n\nWhen the **Do not report loops** option is enabled, only `entrySet().forEach()` cases will be reported.\nHowever, the quick-fix action will be available for `for`-loops as well.\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2017.1"
+        },
+        {
+          "shortName": "Convert2Lambda",
+          "displayName": "Anonymous type can be replaced with lambda",
+          "enabled": false,
+          "description": "Reports anonymous classes which can be replaced with lambda expressions.\n\nExample:\n\n\n      new Thread(new Runnable() {\n        @Override\n        public void run() {\n          // run thread\n        }\n      });\n\nAfter the quick-fix is applied:\n\n\n      new Thread(() -> {\n        // run thread\n      });\n\n\nNote that if an anonymous class is converted into a stateless lambda, the same lambda object\ncan be reused by Java runtime during subsequent invocations. On the other hand, when an anonymous class is used,\nseparate objects are created every time. Thus, applying the quick-fix can cause the semantics change in rare cases,\ne.g. when anonymous class instances are used as `HashMap` keys.\n\nLambda syntax is not supported in Java 1.7 and earlier JVMs.\n\n\nUse the **Report when interface is not annotated with @FunctionalInterface** option to ignore the cases in which an anonymous\nclass implements an interface without `@FunctionalInterface` annotation."
+        },
+        {
+          "shortName": "Java8CollectionRemoveIf",
+          "displayName": "Loop can be replaced with 'Collection.removeIf()'",
+          "enabled": false,
+          "description": "Reports loops which can be collapsed into a single `Collection.removeIf` call.\n\nExample:\n\n\n      for (Iterator<String> it = collection.iterator(); it.hasNext(); ) {\n        String aValue = it.next();\n        if(shouldBeRemoved(aValue)) {\n          it.remove();\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      collection.removeIf(aValue -> shouldBeRemoved(aValue));\n\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "Convert2MethodRef",
+          "displayName": "Lambda can be replaced with method reference",
+          "enabled": false,
+          "description": "Reports lambdas that can be replaced with method references. While often it could be a matter of taste, method references are more clear and readable compared to lambdas.\n\nExample:\n\n\n      Runnable r = () -> System.out.println();\n\nAfter the quick-fix is applied:\n\n\n      Runnable r = System.out::println;\n\n\nThe inspection may suggest method references even if a lambda doesn't call any method, like replacing `obj -> obj != null`\nwith `Objects::nonNull`.\nUse the [Settings \\| Editor \\| Code Style \\| Java \\| Code Generation](settings://preferences.sourceCode.Java?Lambda%20Body)\nsettings to configure special method references.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "Java8MapApi",
+          "displayName": "Simplifiable 'Map' operations",
+          "enabled": false,
+          "description": "Reports common usage patterns of `java.util.Map` and suggests replacing them with: `getOrDefault()`, `computeIfAbsent()`, `putIfAbsent()`, `merge()`, or `replaceAll()`.\n\nExample:\n\n\n      map.containsKey(key) ? map.get(key) : \"default\";\n\nAfter the quick-fix is applied:\n\n\n      map.getOrDefault(key, \"default\");\n\nExample:\n\n\n      List<String> list = map.get(key);\n      if (list == null) {\n        list = new ArrayList<>();\n        map.put(key, list);\n      }\n\nAfter the quick-fix is applied:\n\n\n      map.computeIfAbsent(key, localKey -> new ArrayList<>());\n\nExample:\n\n\n      Integer val = map.get(key);\n      if (val == null) map.put(key, 1);\n      else map.put(key, val + 1);\n\nAfter the quick-fix is applied:\n\n\n      map.merge(key, 1, (localKey, localValue) -> localValue + 1);\n\nExample:\n\n\n      for (Map.Entry<String, String> entry : map.entrySet()) {\n        map.put(entry.getKey(), transform(entry.getValue()));\n      }\n\nAfter the quick-fix is applied:\n\n\n      map.replaceAll((localKey, localValue) -> transform(localValue));\n\nNote that the replacement with `computeIfAbsent()` or `merge()` might work incorrectly for some `Map`\nimplementations if the code extracted to the lambda expression modifies the same `Map`. By default,\nthe warning doesn't appear if this code might have side effects. If necessary, enable the\n**Suggest replacement even if lambda may have side effects** option to always show the warning.\n\nAlso, due to different handling of the `null` value in old methods like `put()` and newer methods like\n`computeIfAbsent()` or `merge()`, semantics might change if storing the `null` value into given\n`Map` is important. The inspection won't suggest the replacement when the value is statically known to be nullable,\nbut for values with unknown nullability the replacement is still suggested. In these cases, we recommended suppressing the warning\nand adding an explanatory comment.\n\nThis inspection works only if the language level of the project or module is 8 or higher."
+        }
+      ]
+    },
+    {
       "name": "JUnit",
       "inspections": [
         {
@@ -7042,113 +7149,6 @@
           "displayName": "Malformed parameterized tests",
           "enabled": false,
           "description": "Reports parameterized tests that have malformed sources:\n\n* `MethodSource` has an unknown target or the method is not static, `no-arg`.\n* `ValueSource` and `EnumSource` types cannot be converted to method parameters.\n* No sources are defined.\n\nExample:\n\n\n      class Test {\n        @MethodSource(\"parameters\")\n        @ParameterizedTest\n        void foo(String param) {}\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Test {\n        private static Stream<Arguments> parameters() {\n            return Stream.empty();\n        }\n\n        @MethodSource(\"parameters\")\n        @ParameterizedTest\n        void foo(String param) {}\n      }\n"
-        }
-      ]
-    },
-    {
-      "name": "Java 8",
-      "inspections": [
-        {
-          "shortName": "StaticPseudoFunctionalStyleMethod",
-          "displayName": "Pseudo-functional expression using static class",
-          "enabled": false,
-          "description": "Reports usages of pseudo-functional code if `Java Stream API` is available.\n\nThough `guava Iterable API` provides functionality similar to `Java Streams API`, it's slightly different and\nmay miss some features.\nEspecially, primitive-specialized stream variants like `IntStream` are more performant than generic variants.\n\n**Example:**\n\n\n    List<String> transformedIterable = Iterables.transform(someList, someTransformFunction);//warning: Pseudo functional style code\n\nAfter the quick-fix is applied:\n\n    List<String> transformedIterable = someList.stream().map(someTransformFunction).collect(Collectors.toList());\n\n\n**Note:** Code semantics can be changed; for example, guava's `Iterable.transform` produces a lazy-evaluated iterable,\nbut the replacement is eager-evaluated.\n\n\nUse the **Static method calls translated to the 'Stream' API** option\nto configure static method calls that should be translated to the `stream` API.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "AnonymousHasLambdaAlternative",
-          "displayName": "Anonymous type has shorter lambda alternative",
-          "enabled": false,
-          "description": "Reports anonymous classes which could be transformed to a constructor or a factory method call with a lambda expression argument.\n\nThe following classes are reported by this inspection:\n\n* Anonymous classes extending `ThreadLocal` which have an `initialValue()` method (can be replaced with `ThreadLocal.withInitial`)\n* Anonymous classes extending `Thread` which have a `run()` method (can be replaced with `new Thread(Runnable)`\n\nExample:\n\n\n      new Thread() {\n        @Override\n        public void run() {\n          System.out.println(\"Hello from thread!\");\n        }\n      }.start();\n\nAfter the quick-fix is applied:\n\n\n      new Thread(() -> {\n        System.out.println(\"Hello from thread!\");\n      }).start();\n"
-        },
-        {
-          "shortName": "Java8ListReplaceAll",
-          "displayName": "Loop can be replaced with 'List.replaceAll()'",
-          "enabled": false,
-          "description": "Reports loops which can be collapsed into a single `List.replaceAll()` call.\n\n**Example:**\n\n\n      for (int i = 0; i < strings.size(); i++) {\n        String str = strings.get(i).toLowerCase();\n        strings.set(i, str);\n      }\n\nAfter the quick-fix is applied:\n\n\n      strings.replaceAll(String::toLowerCase);\n\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2022.1"
-        },
-        {
-          "shortName": "FoldExpressionIntoStream",
-          "displayName": "Expression can be folded into Stream chain",
-          "enabled": false,
-          "description": "Reports expressions with a repeating pattern which could be replaced with *Stream API* or `String.join()`.\n\nExample:\n\n\n      boolean allStartWith(String a, String b, String c, String d, String prefix) {\n        return a.startsWith(prefix) && b.startsWith(prefix) && c.startsWith(prefix) && d.startsWith(prefix);\n      }\n\nAfter the quick-fix is applied:\n\n\n      boolean foo(String a, String b, String c, String d, String prefix) {\n        return Stream.of(a, b, c, d).allMatch(s -> s.startsWith(prefix));\n      }\n\nExample:\n\n\n      String joinAll(String a, String b, String c, String d) {\n        return a + \",\" + b + \",\" + c + \",\" + d;\n      }\n\nAfter the quick-fix is applied:\n\n\n      String joinAll(String a, String b, String c, String d) {\n        return String.join(\",\", a, b, c, d);\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2018.2"
-        },
-        {
-          "shortName": "Convert2streamapi",
-          "displayName": "Loop can be collapsed with Stream API",
-          "enabled": false,
-          "description": "Reports loops which can be replaced with stream API calls using lambda expressions.\n\nSuch a replacement changes the style from imperative to more functional and makes the code more compact.\n\nExample:\n\n\n      boolean check(List<String> data) {\n        for (String e : data) {\n          String trimmed = e.trim();\n          if (!trimmed.startsWith(\"xyz\")) {\n            return false;\n          }\n        }\n        return true;\n      }\n\nAfter the quick-fix is applied:\n\n\n      boolean check(List<String> data) {\n        return data.stream().map(String::trim).allMatch(trimmed -> trimmed.startsWith(\"xyz\"));\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "LambdaCanBeMethodCall",
-          "displayName": "Lambda can be replaced with method call",
-          "enabled": false,
-          "description": "Reports lambda expressions which can be replaced with a JDK method call.\n\nFor example, the expression `x -> x` of the `Function<T, T>` type\ncan be replaced with the `Function.identity()` call.\n\nNew in 2017.1"
-        },
-        {
-          "shortName": "Anonymous2MethodRef",
-          "displayName": "Anonymous type can be replaced with method reference",
-          "enabled": false,
-          "description": "Reports anonymous classes which can be replaced with method references.\n\n\nNote that if an anonymous class is converted into an unbound method reference, the same method reference object\ncan be reused by the Java runtime during subsequent invocations. On the other hand, when an anonymous class is used,\nseparate objects are created every time. Thus, applying the quick-fix can cause the semantics change in rare cases,\ne.g. when anonymous class instances are used as `HashMap` keys.\n\n**Example:**\n\n\n        Runnable r = new Runnable() {\n          @Override\n          public void run() {\n            System.out.println();\n          }\n        };\n\nThe quick-fix changes this code to the compact form: `Runnable r = System.out::println;`.\n\nUse the **Report when interface is not annotated with @FunctionalInterface** option to enable this inspection for\ninterfaces which are not annotated with @FunctionalInterface.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "CodeBlock2Expr",
-          "displayName": "Statement lambda can be replaced with expression lambda",
-          "enabled": false,
-          "description": "Reports lambda expressions with code block bodies when expression-style bodies can be used instead. The result of the conversion is shorter and more clear.\n\nExample:\n\n\n      Comparable<String> c = o -> {return 0;};\n\nAfter the quick-fix is applied:\n\n\n      Comparable<String> c = o -> 0;\n"
-        },
-        {
-          "shortName": "SimplifyForEach",
-          "displayName": "Simplifiable forEach() call",
-          "enabled": false,
-          "description": "Reports `forEach()` calls that can be replaced with a more concise method or from which intermediate steps can be extracted.\n\n**Example:**\n\n\n      List<String> findNStrings(List<String> list, int n) {\n        List<String> other = new ArrayList<>();\n        list.forEach(s -> {\n          if(s.length() > n) other.add(s);\n        });\n        return other;\n      }\n\nAfter the quick-fix is applied:\n\n\n      List<String> findNStrings(List<String> list, int n) {\n        List<String> other = list.stream()\n          .filter(s -> s.length() > n)\n          .collect(Collectors.toList());\n        return other;\n      }\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2017.3"
-        },
-        {
-          "shortName": "Guava",
-          "displayName": "Guava's functional primitives can be replaced with Java",
-          "enabled": false,
-          "description": "Reports usages of Guava's functional primitives that can be migrated to standard Java API calls.\n\nFor example, the inspection reports usages of classes and interfaces like `FluentIterable`, `Optional`, `Function`,\n`Predicate`, or `Supplier`.\n\nExample:\n\n\n      ImmutableList<String> results = FluentIterable.from(List.of(1, 2, 3)).transform(Object::toString).toList();\n\nAfter the quick-fix is applied:\n\n\n      List<String> results = List.of(1, 2, 3).stream().map(Object::toString).collect(Collectors.toList());\n\n\nThe quick-fix may change the semantics. Some lazy-evaluated Guava's iterables can be transformed to eager-evaluated.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "Java8ListSort",
-          "displayName": "'Collections.sort()' can be replaced with 'List.sort()'",
-          "enabled": false,
-          "description": "Reports calls of `Collections.sort(list, comparator)` which can be replaced with `list.sort(comparator)`.\n\n`Collections.sort` is just a wrapper, so it is better to use an instance method directly.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "ComparatorCombinators",
-          "displayName": "'Comparator' combinator can be used",
-          "enabled": false,
-          "description": "Reports `Comparator` instances defined as lambda expressions that could be expressed using `Comparator.comparing()` calls. Chained comparisons which can be replaced by `Comparator.thenComparing()` expression are also reported.\n\nExample:\n\n\n      myList.sort((person1, person2) -> person1.getName().compareTo(person2.getName()));\n\n      myList2.sort((person1, person2) -> {\n          int res = person1.first().compareTo(person2.first());\n          if(res == 0) res = person1.second().compareTo(person2.second());\n          if(res == 0) res = person1.third() - person2.third();\n          return res;\n      });\n\nAfter the quick-fixes are applied:\n\n\n      myList.sort(Comparator.comparing(Person::getName));\n\n      myList2.sort(Comparator.comparing(Person::first)\n                             .thenComparing(Person::second)\n                             .thenComparingInt(Person::third));\n"
-        },
-        {
-          "shortName": "Java8MapForEach",
-          "displayName": "Map.forEach() can be used",
-          "enabled": false,
-          "description": "Suggests replacing `for(Entry<?,?> entry : map.entrySet()) {...}` or `map.entrySet().forEach(entry -> ...)` with `map.forEach((key, value) -> ...)`.\n\nExample\n\n\n      void print(Map<String, Integer> map) {\n        map.entrySet().forEach(entry -> {\n          String str = entry.getKey();\n          System.out.println(str + \":\" + entry.getValue());\n        });\n      }\n\nAfter the quick-fix is applied:\n\n\n      void print(Map<String, Integer> map) {\n        map.forEach((str, value) -> System.out.println(str + \":\" + value));\n      }\n\n\nWhen the **Do not report loops** option is enabled, only `entrySet().forEach()` cases will be reported.\nHowever, the quick-fix action will be available for `for`-loops as well.\n\nThis inspection only reports if the language level of the project or module is 8 or higher.\n\nNew in 2017.1"
-        },
-        {
-          "shortName": "Convert2Lambda",
-          "displayName": "Anonymous type can be replaced with lambda",
-          "enabled": false,
-          "description": "Reports anonymous classes which can be replaced with lambda expressions.\n\nExample:\n\n\n      new Thread(new Runnable() {\n        @Override\n        public void run() {\n          // run thread\n        }\n      });\n\nAfter the quick-fix is applied:\n\n\n      new Thread(() -> {\n        // run thread\n      });\n\n\nNote that if an anonymous class is converted into a stateless lambda, the same lambda object\ncan be reused by Java runtime during subsequent invocations. On the other hand, when an anonymous class is used,\nseparate objects are created every time. Thus, applying the quick-fix can cause the semantics change in rare cases,\ne.g. when anonymous class instances are used as `HashMap` keys.\n\nLambda syntax is not supported in Java 1.7 and earlier JVMs.\n\n\nUse the **Report when interface is not annotated with @FunctionalInterface** option to ignore the cases in which an anonymous\nclass implements an interface without `@FunctionalInterface` annotation."
-        },
-        {
-          "shortName": "Java8CollectionRemoveIf",
-          "displayName": "Loop can be replaced with 'Collection.removeIf()'",
-          "enabled": false,
-          "description": "Reports loops which can be collapsed into a single `Collection.removeIf` call.\n\nExample:\n\n\n      for (Iterator<String> it = collection.iterator(); it.hasNext(); ) {\n        String aValue = it.next();\n        if(shouldBeRemoved(aValue)) {\n          it.remove();\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      collection.removeIf(aValue -> shouldBeRemoved(aValue));\n\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "Convert2MethodRef",
-          "displayName": "Lambda can be replaced with method reference",
-          "enabled": false,
-          "description": "Reports lambdas that can be replaced with method references. While often it could be a matter of taste, method references are more clear and readable compared to lambdas.\n\nExample:\n\n\n      Runnable r = () -> System.out.println();\n\nAfter the quick-fix is applied:\n\n\n      Runnable r = System.out::println;\n\n\nThe inspection may suggest method references even if a lambda doesn't call any method, like replacing `obj -> obj != null`\nwith `Objects::nonNull`.\nUse the [Settings \\| Editor \\| Code Style \\| Java \\| Code Generation](settings://preferences.sourceCode.Java?Lambda%20Body)\nsettings to configure special method references.\n\nThis inspection only reports if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "Java8MapApi",
-          "displayName": "Simplifiable 'Map' operations",
-          "enabled": false,
-          "description": "Reports common usage patterns of `java.util.Map` and suggests replacing them with: `getOrDefault()`, `computeIfAbsent()`, `putIfAbsent()`, `merge()`, or `replaceAll()`.\n\nExample:\n\n\n      map.containsKey(key) ? map.get(key) : \"default\";\n\nAfter the quick-fix is applied:\n\n\n      map.getOrDefault(key, \"default\");\n\nExample:\n\n\n      List<String> list = map.get(key);\n      if (list == null) {\n        list = new ArrayList<>();\n        map.put(key, list);\n      }\n\nAfter the quick-fix is applied:\n\n\n      map.computeIfAbsent(key, localKey -> new ArrayList<>());\n\nExample:\n\n\n      Integer val = map.get(key);\n      if (val == null) map.put(key, 1);\n      else map.put(key, val + 1);\n\nAfter the quick-fix is applied:\n\n\n      map.merge(key, 1, (localKey, localValue) -> localValue + 1);\n\nExample:\n\n\n      for (Map.Entry<String, String> entry : map.entrySet()) {\n        map.put(entry.getKey(), transform(entry.getValue()));\n      }\n\nAfter the quick-fix is applied:\n\n\n      map.replaceAll((localKey, localValue) -> transform(localValue));\n\nNote that the replacement with `computeIfAbsent()` or `merge()` might work incorrectly for some `Map`\nimplementations if the code extracted to the lambda expression modifies the same `Map`. By default,\nthe warning doesn't appear if this code might have side effects. If necessary, enable the\n**Suggest replacement even if lambda may have side effects** option to always show the warning.\n\nAlso, due to different handling of the `null` value in old methods like `put()` and newer methods like\n`computeIfAbsent()` or `merge()`, semantics might change if storing the `null` value into given\n`Map` is important. The inspection won't suggest the replacement when the value is statically known to be nullable,\nbut for values with unknown nullability the replacement is still suggested. In these cases, we recommended suppressing the warning\nand adding an explanatory comment.\n\nThis inspection works only if the language level of the project or module is 8 or higher."
         }
       ]
     },
