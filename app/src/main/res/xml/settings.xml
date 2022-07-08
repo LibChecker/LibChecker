@@ -37,6 +37,14 @@
       app:title="@string/dark_mode" />
 
     <rikka.preference.SimpleMenuPreference
+      app:defaultValue="api"
+      app:entries="@array/target_mode"
+      app:entryValues="@array/target_mode_value"
+      app:key="tDisplay"
+      app:summary="%s"
+      app:title="@string/target_mode" />
+
+    <rikka.preference.SimpleMenuPreference
       app:defaultValue="gitlab"
       app:entries="@array/list_repo"
       app:entryValues="@array/list_repo_value"

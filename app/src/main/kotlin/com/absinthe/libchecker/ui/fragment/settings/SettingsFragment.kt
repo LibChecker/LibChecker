@@ -139,6 +139,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
+    findPreference<SimpleMenuPreference>(Constants.PREF_TARGET_DISPLAY_MODE)?.apply {
+      setOnPreferenceChangeListener{_,newValue->
+        GlobalValues.targetMode=newValue.toString()
+        activity?.recreate()
+        true
+      }
+    }
     findPreference<Preference>(Constants.PREF_CLOUD_RULES)?.apply {
       setOnPreferenceClickListener {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {

@@ -32,6 +32,8 @@ object GlobalValues {
 
   var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
 
+  var targetMode:String by SPDelegates(Constants.PREF_TARGET_DISPLAY_MODE, Constants.TARGET_API)
+
   var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
 
   var appSortMode: Int by SPDelegates(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
