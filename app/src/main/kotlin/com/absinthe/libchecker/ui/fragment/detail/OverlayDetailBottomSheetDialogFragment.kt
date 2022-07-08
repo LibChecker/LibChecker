@@ -70,7 +70,7 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
-          text = String.format("%s, %s", Constants.OVERLAY_STRING, PackageUtils.getTargetApiString(packageInfo))
+          text = String.format("%s, %s", Constants.OVERLAY_STRING, PackageUtils.getTargetString(packageInfo))
         }
       }
 
@@ -99,7 +99,7 @@ class OverlayDetailBottomSheetDialogFragment :
           val str = StringBuilder()
             .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
             .append(", ")
-            .append(PackageUtils.getTargetApiString(targetLCItem.targetApi))
+            .append(PackageUtils.getTargetString(targetLCItem.targetApi))
           val spanString: SpannableString
           val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 

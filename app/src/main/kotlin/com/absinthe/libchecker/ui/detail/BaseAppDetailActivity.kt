@@ -235,8 +235,8 @@ abstract class BaseAppDetailActivity :
             append(", ")
           }
           if (!isHarmonyMode) {
-            append(PackageUtils.getTargetApiString(packageInfo))
-            append(", ").append(PackageUtils.getMinSdkVersionString(packageInfo))
+            append(PackageUtils.getTargetString(packageInfo))
+            append(", ").append(PackageUtils.getMinSdkString(packageInfo))
             packageInfo.sharedUserId?.let {
               appendLine().append("sharedUserId = $it")
             }

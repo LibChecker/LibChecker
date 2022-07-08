@@ -51,7 +51,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
       val str = StringBuilder()
         .append(PackageUtils.getAbiString(context, item.abi.toInt(), false))
         .append(", ")
-        .append(PackageUtils.getTargetApiString(item.targetApi))
+        .append(PackageUtils.getTargetString(item.targetApi))
       val spanString: SpannableString
       val abiBadgeRes = PackageUtils.getAbiBadgeResource(item.abi.toInt())
 
