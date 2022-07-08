@@ -188,16 +188,16 @@
           "description": "Reports call arguments with `Boolean` type without explicit parameter names specified.\n\n\nWhen multiple boolean literals are passed sequentially, it's easy to forget parameter ordering that could lead to mistakes.\nExplicit parameter names allow for easier code reading and understanding.\n\n**Example:**\n\n\n      fun check(checkName: Boolean, checkAddress: Boolean, checkPhone: Boolean) {}\n\n      fun usage() {\n          check(true, false, true) // What does this mean?\n      }\n\nA quick-fix adds missing parameter names:\n\n\n      fun check(checkName: Boolean, checkAddress: Boolean, checkPhone: Boolean) {}\n\n      fun usage() {\n          check(checkName = true, checkAddress = false, checkPhone = true)\n      }\n"
         },
         {
-          "shortName": "ReplaceSizeZeroCheckWithIsEmpty",
-          "displayName": "Size zero check can be replaced with 'isEmpty()'",
-          "enabled": false,
-          "description": "Reports `size == 0` checks on `Collections/Array/String` that should be replaced with `isEmpty()`.\n\nUsing `isEmpty()` makes your code simpler.\n\nThe quick-fix replaces the size check with `isEmpty()`.\n\n**Example:**\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.size == 0\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.isEmpty()\n      }\n"
-        },
-        {
           "shortName": "ReplaceGuardClauseWithFunctionCall",
           "displayName": "Guard clause can be replaced with Kotlin's function call",
           "enabled": false,
           "description": "Reports guard clauses that can be replaced with a function call.\n\n**Example:**\n\n      fun test(foo: Int?) {\n          if (foo == null) throw IllegalArgumentException(\"foo\") // replaceable clause\n      }\n\nAfter the quick-fix is applied:\n\n      fun test(foo: Int?) {\n          checkNotNull(foo)\n      }\n"
+        },
+        {
+          "shortName": "ReplaceSizeZeroCheckWithIsEmpty",
+          "displayName": "Size zero check can be replaced with 'isEmpty()'",
+          "enabled": false,
+          "description": "Reports `size == 0` checks on `Collections/Array/String` that should be replaced with `isEmpty()`.\n\nUsing `isEmpty()` makes your code simpler.\n\nThe quick-fix replaces the size check with `isEmpty()`.\n\n**Example:**\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.size == 0\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.isEmpty()\n      }\n"
         },
         {
           "shortName": "ReplaceToStringWithStringTemplate",
@@ -254,16 +254,16 @@
           "description": "Reports `if-then` expressions that can be folded into elvis (`?:`) expressions.\n\n**Example:**\n\n\n      fun maybeFoo(): String? = \"foo\"\n\n      var foo = maybeFoo()\n      val bar = if (foo == null) \"hello\" else foo\n\nThe quick fix converts the `if-then` expression into an elvis (`?:`) expression:\n\n\n      fun maybeFoo(): String? = \"foo\"\n\n      var foo = maybeFoo()\n      val bar = foo ?: \"hello\"\n"
         },
         {
-          "shortName": "ReplaceNotNullAssertionWithElvisReturn",
-          "displayName": "Not-null assertion can be replaced with 'return'",
-          "enabled": false,
-          "description": "Reports not-null assertion (`!!`) calls that can be replaced with the elvis operator and return (`?: return`).\n\nA not-null assertion can lead to NPE (NullPointerException) that is not expected. Avoiding the use of `!!` is good practice.\n\nThe quick-fix replaces the not-null assertion with `return` or `return null`.\n\n**Example:**\n\n\n      fun test(number: Int?) {\n          val x = number!!\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun test(number: Int?) {\n          val x = number ?: return\n      }\n"
-        },
-        {
           "shortName": "ReplaceStringFormatWithLiteral",
           "displayName": "'String.format' call can be replaced with string templates",
           "enabled": false,
           "description": "Reports `String.format` calls that can be replaced with string templates.\n\nUsing string templates makes your code simpler.\n\nThe quick-fix replaces the call with a string template.\n\n**Example:**\n\n\n      fun main() {\n          val id = \"abc\"\n          val date = \"123\"\n          val s = String.format(\"%s_%s_%s\", id, date, id)\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun main() {\n          val id = \"abc\"\n          val date = \"123\"\n          val s = \"${id}_${date}_$id\"\n      }\n"
+        },
+        {
+          "shortName": "ReplaceNotNullAssertionWithElvisReturn",
+          "displayName": "Not-null assertion can be replaced with 'return'",
+          "enabled": false,
+          "description": "Reports not-null assertion (`!!`) calls that can be replaced with the elvis operator and return (`?: return`).\n\nA not-null assertion can lead to NPE (NullPointerException) that is not expected. Avoiding the use of `!!` is good practice.\n\nThe quick-fix replaces the not-null assertion with `return` or `return null`.\n\n**Example:**\n\n\n      fun test(number: Int?) {\n          val x = number!!\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun test(number: Int?) {\n          val x = number ?: return\n      }\n"
         },
         {
           "shortName": "ReplaceSubstringWithSubstringBefore",
@@ -1264,16 +1264,16 @@
           "description": "Reports [double-checked locking](https://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html).\n\n\nDouble-checked locking tries to initialize a field on demand and in a thread-safe manner while avoiding the cost of synchronization.\nUnfortunately it is not thread-safe when used on a field that is not declared `volatile`.\nWhen using Java 1.4 or earlier, double-checked locking doesn't work even with `volatile` fields.\nRead the article linked above for the detailed explanation of the problem.\n\n\nExample of an incorrect double-checked locking:\n\n\n      class Foo {\n        private Helper helper = null;\n        public Helper getHelper() {\n          if (helper == null)\n            synchronized(this) {\n              if (helper == null) helper = new Helper();\n            }\n            return helper;\n          }\n        }\n        // other functions and members...\n      }\n"
         },
         {
-          "shortName": "ConditionSignal",
-          "displayName": "Call to 'signal()' instead of 'signalAll()'",
-          "enabled": false,
-          "description": "Reports calls to `java.util.concurrent.locks.Condition.signal()`. While occasionally useful, in almost all cases `signalAll()` is a better and safer choice."
-        },
-        {
           "shortName": "ThreadLocalNotStaticFinal",
           "displayName": "'ThreadLocal' field not declared 'static final'",
           "enabled": false,
           "description": "Reports fields of type `java.lang.ThreadLocal` that are not declared `static final`.\n\n\nIn the most common case, a `java.lang.ThreadLocal` instance associates state with a thread.\nA non-static non-final `java.lang.ThreadLocal` field associates state with an instance-thread combination.\nThis is usually unnecessary and quite often is a bug that can cause memory leaks and incorrect behavior.\n\n\nA quick-fix is suggested to make the field `static final`.\n\n\n**Example:**\n\n\n      private ThreadLocal tl = ThreadLocal.withInitial(() -> Boolean.TRUE);\n"
+        },
+        {
+          "shortName": "ConditionSignal",
+          "displayName": "Call to 'signal()' instead of 'signalAll()'",
+          "enabled": false,
+          "description": "Reports calls to `java.util.concurrent.locks.Condition.signal()`. While occasionally useful, in almost all cases `signalAll()` is a better and safer choice."
         },
         {
           "shortName": "CallToNativeMethodWhileLocked",
@@ -1641,16 +1641,16 @@
           "description": "Reports method and constructor calls that implicitly use the platform default charset. These calls can produce different results on systems that use different default charsets. It might result in unexpected behaviour.\n\n**Example:**\n\n    void foo(byte[] bytes) {\n      String s = new String(bytes);\n    }\n\nYou can use a quick-fix that specifies the explicit UTF-8 charset if the corresponding overloaded method is available.\nAfter the quick-fix is applied:\n\n    void foo(byte[] bytes) {\n      String s = new String(bytes, StandardCharsets.UTF_8);\n    }\n"
         },
         {
-          "shortName": "UnnecessaryUnicodeEscape",
-          "displayName": "Unnecessary unicode escape sequence",
-          "enabled": false,
-          "description": "Reports unnecessary unicode escape sequences. For example, when the file encoding can handle the character without escaping it. Unicode control characters are not reported by this inspection (except for a line feed and a tab).\n\n**Example:**\n\n    String s = \"\\u0062\";\n"
-        },
-        {
           "shortName": "StringTokenizer",
           "displayName": "Use of 'StringTokenizer'",
           "enabled": false,
           "description": "Reports usages of the `StringTokenizer` class. Excessive use of `StringTokenizer` is incorrect in an internationalized environment."
+        },
+        {
+          "shortName": "UnnecessaryUnicodeEscape",
+          "displayName": "Unnecessary unicode escape sequence",
+          "enabled": false,
+          "description": "Reports unnecessary unicode escape sequences. For example, when the file encoding can handle the character without escaping it. Unicode control characters are not reported by this inspection (except for a line feed and a tab).\n\n**Example:**\n\n    String s = \"\\u0062\";\n"
         },
         {
           "shortName": "NumericToString",
@@ -2508,16 +2508,16 @@
           "description": "Reports methods that are declared `final`. Such methods can't be overridden and may indicate a lack of object-oriented design. Some coding standards discourage `final` methods."
         },
         {
-          "shortName": "NonFinalUtilityClass",
-          "displayName": "Utility class is not 'final'",
-          "enabled": false,
-          "description": "Reports utility classes that aren't `final`.\n\nUtility classes have all fields and methods declared as `static`.\nMaking them `final` prevents them from being accidentally subclassed."
-        },
-        {
           "shortName": "Singleton",
           "displayName": "Singleton",
           "enabled": false,
           "description": "Reports singleton classes.\n\nSingleton classes are declared in a way that only one instance of the class can ever be instantiated. Singleton classes complicate testing,\nand their presence may indicate a lack of object-oriented design.\n\n**Example:**\n\n\n      class Singleton {\n        private static final Singleton ourInstance = new Singleton();\n\n        private Singleton() {\n        }\n\n        public Singleton getInstance() {\n            return ourInstance;\n        }\n      }\n"
+        },
+        {
+          "shortName": "NonFinalUtilityClass",
+          "displayName": "Utility class is not 'final'",
+          "enabled": false,
+          "description": "Reports utility classes that aren't `final`.\n\nUtility classes have all fields and methods declared as `static`.\nMaking them `final` prevents them from being accidentally subclassed."
         },
         {
           "shortName": "StaticNonFinalField",
@@ -3053,10 +3053,10 @@
           "description": "Reports suspicious indentation of statements after a control statement without braces.\n\n\nSuch indentation can make it look like the statement is inside the control statement,\nwhen in fact it will be executed unconditionally after the control statement.\n\n**Example:**\n\n\n      class Bar {\n          void foo(int i) {\n              if (i == 0)\n                  System.out.println(\"foo\");\n                  System.out.println(\"bar\"); // warning\n              if (i == 1);\n                  System.out.println(\"great\"); // warning\n              if (i == 42)\n                  System.out.println(\"answer\");\n                      System.out.println(\"question\"); // warning\n          }\n      }\n"
         },
         {
-          "shortName": "SuspiciousDateFormat",
-          "displayName": "Suspicious date format pattern",
-          "enabled": true,
-          "description": "Reports date format patterns that are likely used by mistake.\n\nThe following patterns are reported:\n\n* Uppercase \"Y\", unless \"w\" appears nearby. It stands for \"Week year\" that is almost always the same as normal \"Year\" (lowercase \"y\" pattern), but may point to the next year at the end of December.\n* Uppercase \"M\" (month) close to \"H\", \"K\", \"h\", or \"k\" (hour). It's likely that a lowercase \"m\" (minute) was intended.\n* Lowercase \"m\" (minute) close to \"y\" (year) or \"d\" (day in month). It's likely that an uppercase \"M\" (month) was intended.\n* Uppercase \"D\" (day in year) close to \"M\", or \"L\" (month). It's likely that a lowercase \"d\" (day in month) was intended.\n* Uppercase \"S\" (milliseconds) close to \"m\" (minutes). It's likely that a lowercase \"s\" (seconds) was intended.\n\n\nExamples:  \n\n`new SimpleDateFormat(\"YYYY-MM-dd\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"yyyy-MM-DD\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"HH:MM\")`: likely `\"HH:mm\"` was intended.\n\nNew in 2020.1"
+          "shortName": "ClassNewInstance",
+          "displayName": "Unsafe call to 'Class.newInstance()'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
         },
         {
           "shortName": "MagicConstant",
@@ -3065,10 +3065,10 @@
           "description": "Reports expressions that can be replaced with \"magic\" constants.\n\nExample 1:\n\n\n      // Bare literal \"2\" is used, warning:\n      Font font = new Font(\"Arial\", 2)\n\nExample 2:\n\n\n      // Predefined constant is used, good:\n      Font font = new Font(\"Arial\", Font.ITALIC)\n\n\nWhen possible, the quick-fix inserts an appropriate predefined constant.\n\n\nThe behavior of this inspection is controlled by `org.intellij.lang.annotations.MagicConstant` annotation.\nSome standard Java library methods are pre-annotated, but you can use this annotation in your code as well."
         },
         {
-          "shortName": "ClassNewInstance",
-          "displayName": "Unsafe call to 'Class.newInstance()'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
+          "shortName": "SuspiciousDateFormat",
+          "displayName": "Suspicious date format pattern",
+          "enabled": true,
+          "description": "Reports date format patterns that are likely used by mistake.\n\nThe following patterns are reported:\n\n* Uppercase \"Y\", unless \"w\" appears nearby. It stands for \"Week year\" that is almost always the same as normal \"Year\" (lowercase \"y\" pattern), but may point to the next year at the end of December.\n* Uppercase \"M\" (month) close to \"H\", \"K\", \"h\", or \"k\" (hour). It's likely that a lowercase \"m\" (minute) was intended.\n* Lowercase \"m\" (minute) close to \"y\" (year) or \"d\" (day in month). It's likely that an uppercase \"M\" (month) was intended.\n* Uppercase \"D\" (day in year) close to \"M\", or \"L\" (month). It's likely that a lowercase \"d\" (day in month) was intended.\n* Uppercase \"S\" (milliseconds) close to \"m\" (minutes). It's likely that a lowercase \"s\" (seconds) was intended.\n\n\nExamples:  \n\n`new SimpleDateFormat(\"YYYY-MM-dd\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"yyyy-MM-DD\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"HH:MM\")`: likely `\"HH:mm\"` was intended.\n\nNew in 2020.1"
         },
         {
           "shortName": "ConstantConditions",
@@ -3619,167 +3619,6 @@
       ]
     },
     {
-      "name": "Declaration redundancy",
-      "inspections": [
-        {
-          "shortName": "UnusedReturnValue",
-          "displayName": "Method can be made 'void'",
-          "enabled": false,
-          "description": "Reports methods whose return values are never used when called. The return type of such methods can be made `void`.\n\nMethods annotated with Error Prone's or AssertJ's `@CanIgnoreReturnValue` annotation will not be reported.\nThe quick-fix updates the method signature and removes `return` statements from inside the method.\n\n**Example:**\n\n\n      // reported if visibility setting is Protected or Public\n      protected String myToUpperCase(String s) {\n        return s.toUpperCase();\n      }\n\n      // simple setter, reporting depends on setting\n      public String setStr(String str) {\n        myStr = str;\n        return myStr;\n      }\n\n      void test() {\n        setStr(\"value\");          // return value is unused\n        myToUpperCase(\"result\");  // return value is unused\n      }\n\nAfter the quick-fix is applied to both methods:\n\n\n        protected void myToUpperCase(String s) {\n          // 'return' removed completely\n          // as 's.toUpperCase()' has no side effect\n        }\n\n        public void setStr(String str) {\n          myStr = str;\n          // 'return' removed\n        }\n      ...\n\n\n**NOTE:** Some methods might not be reported during in-editor highlighting due to performance reasons.\nTo see all results, run the inspection using **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name**\\>\n\nUse the **Ignore simple setters** option to ignore unused return values from simple setter calls.\n\nUse the **Maximal reported method visibility** option to control the maximum visibility of methods to be reported."
-        },
-        {
-          "shortName": "unused",
-          "displayName": "Unused declaration",
-          "enabled": false,
-          "description": "Reports classes, methods, or fields in the specified inspection scope that are not used or unreachable from entry points.\n\nAn entry point can be the main method, tests, classes mentioned outside the specified scope, classes accessible from\n`module-info.java`, and so on. You can also configure custom entry points by using name patterns or annotations.\n\n**Example:**\n\n\n      public class Department {\n        private Organization myOrganization;\n      }\n\nIn this example, `Department` explicitly references `Organization` but if `Department` class itself is unused, then inspection will report both classes.\n\n\nThe inspection also reports parameters that are not used by their methods and all method implementations and overriders, as well as local\nvariables that are declared but not used.\n\n\n**Note:** Some unused members may not be reported during in-editor code highlighting. For performance reasons, a non-private member is\nchecked only when its name rarely occurs in the project.\nTo see all results, run the inspection by selecting **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name** from the main menu.\n\nUse the visibility settings below to configure members to be reported. For example, configuring report `private` methods only means\nthat `public` methods of `private` inner class will be reported but `protected` methods of top level class\nwill be ignored.\n\n\nUse the **entry points** tab to configure entry points to be considered during the inspection run.\n\nYou can add entry points manually when inspection results are ready.\n\nIf your code uses unsupported frameworks, there are several options:\n\n* If the framework relies on annotations, use the **Annotations...** button to configure the framework's annotations.\n* If the framework doesn't rely on annotations, try to configure class name patterns that are expected by the framework.\n\nThis way the annotated code accessible by the framework internals will be treated as used."
-        },
-        {
-          "shortName": "ProtectedMemberInFinalClass",
-          "displayName": "'protected' member in 'final' class",
-          "enabled": true,
-          "description": "Reports `protected` members in `final`classes.\n\nSince `final` classes cannot be inherited, marking the method as `protected`\nmay be confusing. It is better to declare such members as `private` or package-visible instead.\n\n**Example:**\n\n    record Bar(int a, int b) {\n      protected int sum() { \n         return a + b;\n      }\n    }\n\nAfter the quick-fix is applied:\n\n    record Bar(int a, int b) {\n      int sum() { \n         return a + b;\n      }\n    }\n\nAs shown in the example, a class can be marked as `final` explicitly or implicitly."
-        },
-        {
-          "shortName": "EmptyInitializer",
-          "displayName": "Empty class initializer",
-          "enabled": false,
-          "description": "Reports empty class initializer blocks."
-        },
-        {
-          "shortName": "UnusedLibrary",
-          "displayName": "Unused library",
-          "enabled": false,
-          "description": "Reports libraries attached to the specified inspection scope that are not used directly in code."
-        },
-        {
-          "shortName": "TrivialFunctionalExpressionUsage",
-          "displayName": "Trivial usage of functional expression",
-          "enabled": true,
-          "description": "Reports functional interface methods calls that are directly invoked on the definition of the lambda, method reference, or anonymous class. Such method calls can be replaced with the body of the functional interface implementation.\n\n**Example:**\n\n\n      boolean contains(List<String> names, String name) {\n        return ((Predicate<String>)x -> {\n          return names.contains(x);\n        }).test(name);\n      }\n\nWhen the quick-fix is applied, the method call changes to:\n\n\n      boolean contains(List<String> names, String name) {\n        return names.contains(name);\n      }\n"
-        },
-        {
-          "shortName": "RedundantLambdaParameterType",
-          "displayName": "Redundant lambda parameter types",
-          "enabled": true,
-          "description": "Reports lambda formal parameter types that are redundant because they can be inferred from the context.\n\n**Example:**\n\n\n      Map<String, Integer> map = ...\n      map.forEach((String s, Integer i) -> log.info(s + \"=\" + i));\n\nThe quick-fix removes the parameter types from the lambda.\n\n\n      Map<String, Integer> map = ...\n      map.forEach((s, i) -> log.info(s + \"=\" + i));\n"
-        },
-        {
-          "shortName": "AccessStaticViaInstance",
-          "displayName": "Access static member via instance reference",
-          "enabled": false,
-          "description": "Reports references to `static` methods and fields via a class instance rather than the class itself.\n\nEven though referring to static members via instance variables is allowed by The Java Language Specification,\nthis makes the code confusing as the reader may think that the result of the method depends on the instance.\n\nThe quick-fix replaces the instance variable with the class name.\n\nExample:\n\n\n      String s1 = s.valueOf(0);\n\nAfter the quick-fix is applied:\n\n\n      String s = String.valueOf(0);\n"
-        },
-        {
-          "shortName": "UnnecessaryModuleDependencyInspection",
-          "displayName": "Unnecessary module dependency",
-          "enabled": false,
-          "description": "Reports dependencies on modules that are not used. The quick-fix safely removes such unused dependencies."
-        },
-        {
-          "shortName": "CanBeFinal",
-          "displayName": "Declaration can have 'final' modifier",
-          "enabled": false,
-          "description": "Reports all fields, methods, or classes found in the specified inspection scope that may have the `final` modifier added to their declarations.\n\nFinal classes can't be extended, final methods can't be overridden, and final fields can't be reassigned.\n\nUse the **Report classes** and **Report methods** options to define which declarations are to be reported."
-        },
-        {
-          "shortName": "EmptyMethod",
-          "displayName": "Empty method",
-          "enabled": false,
-          "description": "Reports empty methods that can be removed.\n\nMethods are considered empty if they are empty themselves and if they are overridden or\nimplemented by empty methods only. Note that methods containing only comments and the `super()` call with own parameters are\nalso considered empty.\n\nThe inspection ignores methods with special annotations, for example, the `javax.ejb.Init` and `javax.ejb.Remove` EJB annotations .\n\nThe quick-fix safely removes unnecessary methods.\n\nConfigure the inspection:\n\n* Use the **Comments and javadoc count as content** option to select whether methods with comments should be treated as non-empty.\n* Use the **Additional special annotations** option to configure additional annotations that should be ignored by this inspection."
-        },
-        {
-          "shortName": "RedundantExplicitClose",
-          "displayName": "Redundant 'close()'",
-          "enabled": true,
-          "description": "Reports unnecessary calls to `close()` at the end of a try-with-resources block and suggests removing them.\n\n**Example**:\n\n\n      try(MyAutoCloseable ac = new MyAutoCloseable()) {\n        foo();\n        ac.close();\n      }\n\nAfter the quick-fix is applied:\n\n\n      try(MyAutoCloseable ac = new MyAutoCloseable()) {\n        foo();\n      }\n\nNew in 2018.1"
-        },
-        {
-          "shortName": "RedundantThrows",
-          "displayName": "Redundant 'throws' clause",
-          "enabled": false,
-          "description": "Reports exceptions that are declared in a method's signature but never thrown by the method itself or its implementations and derivatives.\n\nThe inspection ignores methods related to the serialization, for example methods `readObject()` or `writeObject()`.\n\n**Example:**\n\n\n      void method() throws InterruptedException {\n        System.out.println();\n      }\n\nThe quick-fix removes unnecessary exceptions from the declaration and normalizes the redundant `try`-`catch` statements:\n\n\n      void method() {\n        System.out.println();\n      }\n\n\n**Note:** Some exceptions might not be reported during in-editor highlighting.\nFor performance reasons, a non-private method is checked only when its name rarely occurs in the project.\nTo see all results, run the inspection by selecting **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name** from the main menu.\n\nUse the **Ignore exceptions thrown by entry points methods** option to ignore exceptions thrown by entry points methods.\nEntry points methods are configured the following inspection: **Editor \\| Inspections \\| Java \\| Declaration redundancy \\| Unused declaration**."
-        },
-        {
-          "shortName": "DuplicateThrows",
-          "displayName": "Duplicate throws",
-          "enabled": true,
-          "description": "Reports duplicate exceptions in a method `throws` list.\n\nExample:\n\n\n      void f() throws Exception, Exception {}\n\nAfter the quick-fix is applied:\n\n\n      void f() throws Exception {}\n\n\nUse the **Ignore exceptions subclassing others** option to ignore exceptions subclassing other exceptions."
-        },
-        {
-          "shortName": "UnusedLabel",
-          "displayName": "Unused label",
-          "enabled": true,
-          "description": "Reports labels that are not targets of any `break` or `continue` statements.\n\n**Example:**\n\n\n      label: for (int i = 0; i < 10; i++) {\n        if (i == 3) {\n          break;\n        }\n      }\n\nAfter the quick-fix is applied, the label is removed:\n\n\n      for (int i = 0; i < 10; i++) {\n        if (i == 3) {\n          break;\n        }\n      }\n"
-        },
-        {
-          "shortName": "DefaultAnnotationParam",
-          "displayName": "Default annotation parameter value",
-          "enabled": true,
-          "description": "Reports annotation parameters that are assigned to their `default` value.\n\nExample:\n\n\n      @interface Test {\n          Class<?> expected() default Throwable.class;\n      }\n\n      @Test(expected = Throwable.class)\n      void testSmth() {}\n\nAfter the quick-fix is applied:\n\n\n      @Test()\n      void testSmth() {}\n"
-        },
-        {
-          "shortName": "RedundantImplements",
-          "displayName": "Redundant interface declaration",
-          "enabled": false,
-          "description": "Reports classes declaring that they implement or extend an interface, when that interface is already declared as `implemented` by a superclass or extended by another interface of that class. Such declarations are unnecessary and may be safely removed."
-        },
-        {
-          "shortName": "SameParameterValue",
-          "displayName": "Method parameter value is always the same constant",
-          "enabled": false,
-          "description": "Reports method parameters that always have the same constant value.\n\nExample:\n\n\n      static void printPoint(int x, int y) { // x is always 0\n        System.out.println(x + \", \" + y);\n      }\n\n      public static void main(String[] args) {\n        printPoint(0, 1);\n        printPoint(0, 2);\n      }\n\nThe quick-fix inlines the constant value. This may simplify the method implementation.\n\n\nUse the **Ignore when inline parameter initializer would not succeed** option to suppress the inspections when:\n\n* the parameter is modified inside the method.\n* the parameter value that is being passed is a reference to an inaccessible field (only in Java).\n* the parameter is a vararg (only in Java).\n\n\nUse the **Maximal reported method visibility** option to control the maximum visibility of methods to be reported.\n\n\nUse the **Minimal reported method usage count** field to specify the minimal number of method usages with the same parameter value."
-        },
-        {
-          "shortName": "SameReturnValue",
-          "displayName": "Method returns the same value",
-          "enabled": false,
-          "description": "Reports methods and method hierarchies in which the return value always appears to be the same constant."
-        },
-        {
-          "shortName": "RedundantRecordConstructor",
-          "displayName": "Redundant record constructor",
-          "enabled": true,
-          "description": "Reports redundant constructors declared inside Java records.\n\n**Example 1:**\n\n\n      record Point(int x, int y) {\n        public Point {} // could be removed\n      }\n      \n      record Point(int x, int y) {\n        public Point(int x, int y) { // could be removed\n          this.x = x;\n          this.y = y;\n        }\n      }\n\nThe quick-fix removes the redundant constructors.\n\n**Example 2:**\n\n\n       // could be converted to compact constructor\n      record Range(int from, int to) {\n        public Range(int from, int to) {\n          if (from > to) throw new IllegalArgumentException();\n          this.from = from;\n          this.to = to;\n        }\n      }\n\nThe quick-fix converts this code into a compact constructor.\n\nThis inspection only reports if the language level of the project or module is 16 or higher.\n\nNew in 2020.1"
-        },
-        {
-          "shortName": "WeakerAccess",
-          "displayName": "Declaration access can be weaker",
-          "enabled": false,
-          "description": "Reports all fields, methods or classes, found in the specified inspection scope that may have their access modifier narrowed down.\n\nExample:\n\n\n      class Sample {\n        void foo() {\n            bar(\"foo\", \"foo\");\n        }\n        void bar(String x, String y) { } // can be private\n      }\n\nUse the inspection's options to define the rules for the modifier change suggestions."
-        },
-        {
-          "shortName": "FinalMethodInFinalClass",
-          "displayName": "'final' method in 'final' class",
-          "enabled": false,
-          "description": "Reports `final` methods in `final` classes.\n\nSince `final` classes cannot be inherited, marking a method as `final`\nmay be unnecessary and confusing.\n\n**Example:**\n\n    record Bar(int a, int b) {\n      public final int sum() { \n         return a + b;\n      }\n    }\n\nAfter the quick-fix is applied:\n\n    record Bar(int a, int b) {\n      public int sum() { \n         return a + b;\n      }\n    }\n\nAs shown in the example, a class can be marked as `final` explicitly or implicitly."
-        },
-        {
-          "shortName": "Java9RedundantRequiresStatement",
-          "displayName": "Redundant 'requires' directive in module-info",
-          "enabled": false,
-          "description": "Reports redundant `requires` directives in Java Platform Module System `module-info.java` files. A `requires` directive is redundant when a module `A` requires a module `B`, but the code in module `A` doesn't import any packages or classes from `B`. Furthermore, all modules have an implicitly declared dependence on the `java.base` module, therefore a `requires java.base;` directive is always redundant.\n\n\nThe quick-fix deletes the redundant `requires` directive.\nIf the deleted dependency re-exported modules that are actually used, the fix adds a `requires` directives for these modules.\n\nThis inspection only reports if the language level of the project or module is 9 or higher.\n\nNew in 2017.1"
-        },
-        {
-          "shortName": "SillyAssignment",
-          "displayName": "Variable is assigned to itself",
-          "enabled": true,
-          "description": "Reports assignments of a variable to itself.\n\n**Example:**\n\n\n      a = a;\n\nThe quick-fix removes the assigment."
-        },
-        {
-          "shortName": "FunctionalExpressionCanBeFolded",
-          "displayName": "Functional expression can be folded",
-          "enabled": false,
-          "description": "Reports method references or lambda expressions that point to a method of their own functional interface type and hence can be replaced with their qualifiers removing unnecessary object allocation.\n\nExample:\n\n\n      SwingUtilities.invokeLater(r::run);\n      SwingUtilities.invokeAndWait(() -> r.run());\n\nAfter the quick-fix is applied:\n\n\n      SwingUtilities.invokeLater(r);\n      SwingUtilities.invokeAndWait(r);\n\nThis inspection only reports only if the language level of the project or module is 8 or higher."
-        },
-        {
-          "shortName": "GroovyUnusedDeclaration",
-          "displayName": "Unused declaration",
-          "enabled": false,
-          "description": "Reports unused classes, methods and fields.\n\n**Example:**\n\n\n      public class Department {\n          private Organization myOrganization;\n      }\n\nHere `Department` explicitly references `Organization` but if `Department` class itself is unused,\nthen inspection would report both classes.\n\n\nThe inspection also reports parameters, which are not used by their methods and all method implementations/overriders, as well as local\nvariables, which are declared but not used.\n\nFor more information, see the same inspection in Java."
-        }
-      ]
-    },
-    {
       "name": "Error handling",
       "inspections": [
         {
@@ -3985,6 +3824,167 @@
           "displayName": "Empty 'finally' block",
           "enabled": false,
           "description": "Reports empty `finally` blocks. Empty `finally` blocks usually indicate coding errors.\n\n**Example:**\n\n\n    try {\n      throw new Exception()\n    }\n    finally {\n    }\n\n"
+        }
+      ]
+    },
+    {
+      "name": "Declaration redundancy",
+      "inspections": [
+        {
+          "shortName": "UnusedReturnValue",
+          "displayName": "Method can be made 'void'",
+          "enabled": false,
+          "description": "Reports methods whose return values are never used when called. The return type of such methods can be made `void`.\n\nMethods annotated with Error Prone's or AssertJ's `@CanIgnoreReturnValue` annotation will not be reported.\nThe quick-fix updates the method signature and removes `return` statements from inside the method.\n\n**Example:**\n\n\n      // reported if visibility setting is Protected or Public\n      protected String myToUpperCase(String s) {\n        return s.toUpperCase();\n      }\n\n      // simple setter, reporting depends on setting\n      public String setStr(String str) {\n        myStr = str;\n        return myStr;\n      }\n\n      void test() {\n        setStr(\"value\");          // return value is unused\n        myToUpperCase(\"result\");  // return value is unused\n      }\n\nAfter the quick-fix is applied to both methods:\n\n\n        protected void myToUpperCase(String s) {\n          // 'return' removed completely\n          // as 's.toUpperCase()' has no side effect\n        }\n\n        public void setStr(String str) {\n          myStr = str;\n          // 'return' removed\n        }\n      ...\n\n\n**NOTE:** Some methods might not be reported during in-editor highlighting due to performance reasons.\nTo see all results, run the inspection using **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name**\\>\n\nUse the **Ignore simple setters** option to ignore unused return values from simple setter calls.\n\nUse the **Maximal reported method visibility** option to control the maximum visibility of methods to be reported."
+        },
+        {
+          "shortName": "unused",
+          "displayName": "Unused declaration",
+          "enabled": false,
+          "description": "Reports classes, methods, or fields in the specified inspection scope that are not used or unreachable from entry points.\n\nAn entry point can be the main method, tests, classes mentioned outside the specified scope, classes accessible from\n`module-info.java`, and so on. You can also configure custom entry points by using name patterns or annotations.\n\n**Example:**\n\n\n      public class Department {\n        private Organization myOrganization;\n      }\n\nIn this example, `Department` explicitly references `Organization` but if `Department` class itself is unused, then inspection will report both classes.\n\n\nThe inspection also reports parameters that are not used by their methods and all method implementations and overriders, as well as local\nvariables that are declared but not used.\n\n\n**Note:** Some unused members may not be reported during in-editor code highlighting. For performance reasons, a non-private member is\nchecked only when its name rarely occurs in the project.\nTo see all results, run the inspection by selecting **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name** from the main menu.\n\nUse the visibility settings below to configure members to be reported. For example, configuring report `private` methods only means\nthat `public` methods of `private` inner class will be reported but `protected` methods of top level class\nwill be ignored.\n\n\nUse the **entry points** tab to configure entry points to be considered during the inspection run.\n\nYou can add entry points manually when inspection results are ready.\n\nIf your code uses unsupported frameworks, there are several options:\n\n* If the framework relies on annotations, use the **Annotations...** button to configure the framework's annotations.\n* If the framework doesn't rely on annotations, try to configure class name patterns that are expected by the framework.\n\nThis way the annotated code accessible by the framework internals will be treated as used."
+        },
+        {
+          "shortName": "ProtectedMemberInFinalClass",
+          "displayName": "'protected' member in 'final' class",
+          "enabled": true,
+          "description": "Reports `protected` members in `final`classes.\n\nSince `final` classes cannot be inherited, marking the method as `protected`\nmay be confusing. It is better to declare such members as `private` or package-visible instead.\n\n**Example:**\n\n    record Bar(int a, int b) {\n      protected int sum() { \n         return a + b;\n      }\n    }\n\nAfter the quick-fix is applied:\n\n    record Bar(int a, int b) {\n      int sum() { \n         return a + b;\n      }\n    }\n\nAs shown in the example, a class can be marked as `final` explicitly or implicitly."
+        },
+        {
+          "shortName": "EmptyInitializer",
+          "displayName": "Empty class initializer",
+          "enabled": false,
+          "description": "Reports empty class initializer blocks."
+        },
+        {
+          "shortName": "UnusedLibrary",
+          "displayName": "Unused library",
+          "enabled": false,
+          "description": "Reports libraries attached to the specified inspection scope that are not used directly in code."
+        },
+        {
+          "shortName": "TrivialFunctionalExpressionUsage",
+          "displayName": "Trivial usage of functional expression",
+          "enabled": true,
+          "description": "Reports functional interface methods calls that are directly invoked on the definition of the lambda, method reference, or anonymous class. Such method calls can be replaced with the body of the functional interface implementation.\n\n**Example:**\n\n\n      boolean contains(List<String> names, String name) {\n        return ((Predicate<String>)x -> {\n          return names.contains(x);\n        }).test(name);\n      }\n\nWhen the quick-fix is applied, the method call changes to:\n\n\n      boolean contains(List<String> names, String name) {\n        return names.contains(name);\n      }\n"
+        },
+        {
+          "shortName": "RedundantLambdaParameterType",
+          "displayName": "Redundant lambda parameter types",
+          "enabled": true,
+          "description": "Reports lambda formal parameter types that are redundant because they can be inferred from the context.\n\n**Example:**\n\n\n      Map<String, Integer> map = ...\n      map.forEach((String s, Integer i) -> log.info(s + \"=\" + i));\n\nThe quick-fix removes the parameter types from the lambda.\n\n\n      Map<String, Integer> map = ...\n      map.forEach((s, i) -> log.info(s + \"=\" + i));\n"
+        },
+        {
+          "shortName": "AccessStaticViaInstance",
+          "displayName": "Access static member via instance reference",
+          "enabled": false,
+          "description": "Reports references to `static` methods and fields via a class instance rather than the class itself.\n\nEven though referring to static members via instance variables is allowed by The Java Language Specification,\nthis makes the code confusing as the reader may think that the result of the method depends on the instance.\n\nThe quick-fix replaces the instance variable with the class name.\n\nExample:\n\n\n      String s1 = s.valueOf(0);\n\nAfter the quick-fix is applied:\n\n\n      String s = String.valueOf(0);\n"
+        },
+        {
+          "shortName": "UnnecessaryModuleDependencyInspection",
+          "displayName": "Unnecessary module dependency",
+          "enabled": false,
+          "description": "Reports dependencies on modules that are not used. The quick-fix safely removes such unused dependencies."
+        },
+        {
+          "shortName": "CanBeFinal",
+          "displayName": "Declaration can have 'final' modifier",
+          "enabled": false,
+          "description": "Reports all fields, methods, or classes found in the specified inspection scope that may have the `final` modifier added to their declarations.\n\nFinal classes can't be extended, final methods can't be overridden, and final fields can't be reassigned.\n\nUse the **Report classes** and **Report methods** options to define which declarations are to be reported."
+        },
+        {
+          "shortName": "EmptyMethod",
+          "displayName": "Empty method",
+          "enabled": false,
+          "description": "Reports empty methods that can be removed.\n\nMethods are considered empty if they are empty themselves and if they are overridden or\nimplemented by empty methods only. Note that methods containing only comments and the `super()` call with own parameters are\nalso considered empty.\n\nThe inspection ignores methods with special annotations, for example, the `javax.ejb.Init` and `javax.ejb.Remove` EJB annotations .\n\nThe quick-fix safely removes unnecessary methods.\n\nConfigure the inspection:\n\n* Use the **Comments and javadoc count as content** option to select whether methods with comments should be treated as non-empty.\n* Use the **Additional special annotations** option to configure additional annotations that should be ignored by this inspection."
+        },
+        {
+          "shortName": "RedundantExplicitClose",
+          "displayName": "Redundant 'close()'",
+          "enabled": true,
+          "description": "Reports unnecessary calls to `close()` at the end of a try-with-resources block and suggests removing them.\n\n**Example**:\n\n\n      try(MyAutoCloseable ac = new MyAutoCloseable()) {\n        foo();\n        ac.close();\n      }\n\nAfter the quick-fix is applied:\n\n\n      try(MyAutoCloseable ac = new MyAutoCloseable()) {\n        foo();\n      }\n\nNew in 2018.1"
+        },
+        {
+          "shortName": "RedundantThrows",
+          "displayName": "Redundant 'throws' clause",
+          "enabled": false,
+          "description": "Reports exceptions that are declared in a method's signature but never thrown by the method itself or its implementations and derivatives.\n\nThe inspection ignores methods related to the serialization, for example methods `readObject()` or `writeObject()`.\n\n**Example:**\n\n\n      void method() throws InterruptedException {\n        System.out.println();\n      }\n\nThe quick-fix removes unnecessary exceptions from the declaration and normalizes the redundant `try`-`catch` statements:\n\n\n      void method() {\n        System.out.println();\n      }\n\n\n**Note:** Some exceptions might not be reported during in-editor highlighting.\nFor performance reasons, a non-private method is checked only when its name rarely occurs in the project.\nTo see all results, run the inspection by selecting **Code \\| Inspect Code** or **Code \\| Analyze Code \\| Run Inspection by Name** from the main menu.\n\nUse the **Ignore exceptions thrown by entry points methods** option to ignore exceptions thrown by entry points methods.\nEntry points methods are configured the following inspection: **Editor \\| Inspections \\| Java \\| Declaration redundancy \\| Unused declaration**."
+        },
+        {
+          "shortName": "DuplicateThrows",
+          "displayName": "Duplicate throws",
+          "enabled": true,
+          "description": "Reports duplicate exceptions in a method `throws` list.\n\nExample:\n\n\n      void f() throws Exception, Exception {}\n\nAfter the quick-fix is applied:\n\n\n      void f() throws Exception {}\n\n\nUse the **Ignore exceptions subclassing others** option to ignore exceptions subclassing other exceptions."
+        },
+        {
+          "shortName": "UnusedLabel",
+          "displayName": "Unused label",
+          "enabled": true,
+          "description": "Reports labels that are not targets of any `break` or `continue` statements.\n\n**Example:**\n\n\n      label: for (int i = 0; i < 10; i++) {\n        if (i == 3) {\n          break;\n        }\n      }\n\nAfter the quick-fix is applied, the label is removed:\n\n\n      for (int i = 0; i < 10; i++) {\n        if (i == 3) {\n          break;\n        }\n      }\n"
+        },
+        {
+          "shortName": "DefaultAnnotationParam",
+          "displayName": "Default annotation parameter value",
+          "enabled": true,
+          "description": "Reports annotation parameters that are assigned to their `default` value.\n\nExample:\n\n\n      @interface Test {\n          Class<?> expected() default Throwable.class;\n      }\n\n      @Test(expected = Throwable.class)\n      void testSmth() {}\n\nAfter the quick-fix is applied:\n\n\n      @Test()\n      void testSmth() {}\n"
+        },
+        {
+          "shortName": "RedundantImplements",
+          "displayName": "Redundant interface declaration",
+          "enabled": false,
+          "description": "Reports classes declaring that they implement or extend an interface, when that interface is already declared as `implemented` by a superclass or extended by another interface of that class. Such declarations are unnecessary and may be safely removed."
+        },
+        {
+          "shortName": "SameParameterValue",
+          "displayName": "Method parameter value is always the same constant",
+          "enabled": false,
+          "description": "Reports method parameters that always have the same constant value.\n\nExample:\n\n\n      static void printPoint(int x, int y) { // x is always 0\n        System.out.println(x + \", \" + y);\n      }\n\n      public static void main(String[] args) {\n        printPoint(0, 1);\n        printPoint(0, 2);\n      }\n\nThe quick-fix inlines the constant value. This may simplify the method implementation.\n\n\nUse the **Ignore when inline parameter initializer would not succeed** option to suppress the inspections when:\n\n* the parameter is modified inside the method.\n* the parameter value that is being passed is a reference to an inaccessible field (only in Java).\n* the parameter is a vararg (only in Java).\n\n\nUse the **Maximal reported method visibility** option to control the maximum visibility of methods to be reported.\n\n\nUse the **Minimal reported method usage count** field to specify the minimal number of method usages with the same parameter value."
+        },
+        {
+          "shortName": "SameReturnValue",
+          "displayName": "Method returns the same value",
+          "enabled": false,
+          "description": "Reports methods and method hierarchies in which the return value always appears to be the same constant."
+        },
+        {
+          "shortName": "RedundantRecordConstructor",
+          "displayName": "Redundant record constructor",
+          "enabled": true,
+          "description": "Reports redundant constructors declared inside Java records.\n\n**Example 1:**\n\n\n      record Point(int x, int y) {\n        public Point {} // could be removed\n      }\n      \n      record Point(int x, int y) {\n        public Point(int x, int y) { // could be removed\n          this.x = x;\n          this.y = y;\n        }\n      }\n\nThe quick-fix removes the redundant constructors.\n\n**Example 2:**\n\n\n       // could be converted to compact constructor\n      record Range(int from, int to) {\n        public Range(int from, int to) {\n          if (from > to) throw new IllegalArgumentException();\n          this.from = from;\n          this.to = to;\n        }\n      }\n\nThe quick-fix converts this code into a compact constructor.\n\nThis inspection only reports if the language level of the project or module is 16 or higher.\n\nNew in 2020.1"
+        },
+        {
+          "shortName": "WeakerAccess",
+          "displayName": "Declaration access can be weaker",
+          "enabled": false,
+          "description": "Reports all fields, methods or classes, found in the specified inspection scope that may have their access modifier narrowed down.\n\nExample:\n\n\n      class Sample {\n        void foo() {\n            bar(\"foo\", \"foo\");\n        }\n        void bar(String x, String y) { } // can be private\n      }\n\nUse the inspection's options to define the rules for the modifier change suggestions."
+        },
+        {
+          "shortName": "FinalMethodInFinalClass",
+          "displayName": "'final' method in 'final' class",
+          "enabled": false,
+          "description": "Reports `final` methods in `final` classes.\n\nSince `final` classes cannot be inherited, marking a method as `final`\nmay be unnecessary and confusing.\n\n**Example:**\n\n    record Bar(int a, int b) {\n      public final int sum() { \n         return a + b;\n      }\n    }\n\nAfter the quick-fix is applied:\n\n    record Bar(int a, int b) {\n      public int sum() { \n         return a + b;\n      }\n    }\n\nAs shown in the example, a class can be marked as `final` explicitly or implicitly."
+        },
+        {
+          "shortName": "Java9RedundantRequiresStatement",
+          "displayName": "Redundant 'requires' directive in module-info",
+          "enabled": false,
+          "description": "Reports redundant `requires` directives in Java Platform Module System `module-info.java` files. A `requires` directive is redundant when a module `A` requires a module `B`, but the code in module `A` doesn't import any packages or classes from `B`. Furthermore, all modules have an implicitly declared dependence on the `java.base` module, therefore a `requires java.base;` directive is always redundant.\n\n\nThe quick-fix deletes the redundant `requires` directive.\nIf the deleted dependency re-exported modules that are actually used, the fix adds a `requires` directives for these modules.\n\nThis inspection only reports if the language level of the project or module is 9 or higher.\n\nNew in 2017.1"
+        },
+        {
+          "shortName": "SillyAssignment",
+          "displayName": "Variable is assigned to itself",
+          "enabled": true,
+          "description": "Reports assignments of a variable to itself.\n\n**Example:**\n\n\n      a = a;\n\nThe quick-fix removes the assigment."
+        },
+        {
+          "shortName": "FunctionalExpressionCanBeFolded",
+          "displayName": "Functional expression can be folded",
+          "enabled": false,
+          "description": "Reports method references or lambda expressions that point to a method of their own functional interface type and hence can be replaced with their qualifiers removing unnecessary object allocation.\n\nExample:\n\n\n      SwingUtilities.invokeLater(r::run);\n      SwingUtilities.invokeAndWait(() -> r.run());\n\nAfter the quick-fix is applied:\n\n\n      SwingUtilities.invokeLater(r);\n      SwingUtilities.invokeAndWait(r);\n\nThis inspection only reports only if the language level of the project or module is 8 or higher."
+        },
+        {
+          "shortName": "GroovyUnusedDeclaration",
+          "displayName": "Unused declaration",
+          "enabled": false,
+          "description": "Reports unused classes, methods and fields.\n\n**Example:**\n\n\n      public class Department {\n          private Organization myOrganization;\n      }\n\nHere `Department` explicitly references `Organization` but if `Department` class itself is unused,\nthen inspection would report both classes.\n\n\nThe inspection also reports parameters, which are not used by their methods and all method implementations/overriders, as well as local\nvariables, which are declared but not used.\n\nFor more information, see the same inspection in Java."
         }
       ]
     },
@@ -4232,6 +4232,35 @@
       ]
     },
     {
+      "name": "GPath",
+      "inspections": [
+        {
+          "shortName": "GroovyListSetCanBeKeyedAccess",
+          "displayName": "Call to List.set can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapPutCanBeKeyedAccess",
+          "displayName": "Call to Map.put can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapGetCanBeKeyedAccess",
+          "displayName": "Call to Map.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
+        },
+        {
+          "shortName": "GroovyListGetCanBeKeyedAccess",
+          "displayName": "Call to List.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
+        }
+      ]
+    },
+    {
       "name": "Embedded",
       "inspections": [
         {
@@ -4299,35 +4328,6 @@
           "displayName": "Large array allocation with no OutOfMemoryError check",
           "enabled": false,
           "description": "Reports large array allocations which do not check for `java.lang.OutOfMemoryError`. In memory constrained environments, allocations of large data objects should probably be checked for memory depletion.\n\n\nThis inspection is intended for Java ME and other highly resource constrained environments.\nApplying the results of this inspection without consideration might have negative effects on code clarity and design.\n\n\nUse the option to specify the maximum number of elements to allow in unchecked array allocations."
-        }
-      ]
-    },
-    {
-      "name": "GPath",
-      "inspections": [
-        {
-          "shortName": "GroovyListSetCanBeKeyedAccess",
-          "displayName": "Call to List.set can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapPutCanBeKeyedAccess",
-          "displayName": "Call to Map.put can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapGetCanBeKeyedAccess",
-          "displayName": "Call to Map.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
-        },
-        {
-          "shortName": "GroovyListGetCanBeKeyedAccess",
-          "displayName": "Call to List.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
         }
       ]
     },
@@ -4581,167 +4581,6 @@
       ]
     },
     {
-      "name": "Numeric issues",
-      "inspections": [
-        {
-          "shortName": "RemoveLiteralUnderscores",
-          "displayName": "Underscores in numeric literal",
-          "enabled": false,
-          "description": "Reports numeric literals with underscores and suggests removing them with a quick-fix. This may be useful if you need to lower the language level.\n\nThe quick-fix removes underscores from numeric literals. For example `1_000_000` will be converted to `1000000`.\n\nThis inspection only reports if the language level of the project or module is 7 or higher.\n\nNew in 2020.2"
-        },
-        {
-          "shortName": "BadOddness",
-          "displayName": "Suspicious oddness check",
-          "enabled": false,
-          "description": "Reports odd-even checks of the following form: `x % 2 == 1`. Such checks fail when used with negative odd values. Consider using `x % 2 != 0` or `(x & 1) == 1` instead."
-        },
-        {
-          "shortName": "ComparisonOfShortAndChar",
-          "displayName": "Comparison of 'short' and 'char' values",
-          "enabled": true,
-          "description": "Reports equality comparisons between `short` and `char` values.\n\nSuch comparisons may cause subtle bugs because while both values are 2-byte long, `short` values are\nsigned, and `char` values are unsigned.\n\n**Example:**\n\n\n    if (Character.MAX_VALUE == shortValue()) {} //never can be true\n"
-        },
-        {
-          "shortName": "InsertLiteralUnderscores",
-          "displayName": "Unreadable numeric literal",
-          "enabled": true,
-          "description": "Reports long numeric literals without underscores and suggests adding them. Underscores make such literals easier to read.\n\nExample:\n\n\n      1000000\n\nAfter the quick-fix is applied:\n\n\n      1_000_000\n\nThis inspection only reports if the language level of the project of module is 7 or higher.\n\nNew in 2020.2"
-        },
-        {
-          "shortName": "DivideByZero",
-          "displayName": "Division by zero",
-          "enabled": true,
-          "description": "Reports division by zero or remainder by zero. Such expressions will produce an `Infinity`, `-Infinity` or `NaN` result for doubles or floats, and will throw an `ArithmeticException` for integers.\n\nWhen the expression has a `NaN` result, the fix suggests replacing the division expression with the `NaN` constant."
-        },
-        {
-          "shortName": "ComparisonToNaN",
-          "displayName": "Comparison to 'Double.NaN' or 'Float.NaN'",
-          "enabled": true,
-          "description": "Reports any comparisons to `Double.NaN` or `Float.NaN`. Such comparisons are never meaningful, as NaN is not equal to anything, including itself. Use the `Double.isNaN()` or `Float.isNaN()` methods instead.\n\n**Example:**\n\n\n      if (x == Double.NaN) {...}\n\nAfter the quick-fix is applied:\n\n\n      if (Double.isNaN(x)) {...}\n"
-        },
-        {
-          "shortName": "ConfusingFloatingPointLiteral",
-          "displayName": "Confusing floating point literal",
-          "enabled": false,
-          "description": "Reports any floating point numbers that don't have a decimal point, numbers before the decimal point, or numbers after the decimal point.\n\nSuch literals may be confusing, and violate several coding standards.\n\n**Example:**\n\n    double d = .03;\n\nAfter the quick-fix is applied:\n\n    double d = 0.03;\n\n\nUse the **Ignore floating point literals in scientific notation** option to ignore floating point numbers in scientific notation."
-        },
-        {
-          "shortName": "UnaryPlus",
-          "displayName": "Unary plus",
-          "enabled": true,
-          "description": "Reports usages of the `+` unary operator. The unary plus is usually a null operation, and its presence might represent a coding error. For example, in a combination with the increment operator (like in `+++`) or with the equal operator (like in `=+`).\n\n**Example:**\n\n\n      void unaryPlus(int i) {\n        int x = + +i;\n      }\n\nThe following quick fixes are suggested:\n\n* Remove `+` operators before the `i` variable:\n\n\n        void unaryPlus(int i) {\n          int x = i;\n        }\n\n* Replace `+` operators with the prefix increment operator:\n\n\n        void unaryPlus(int i) {\n          int x = ++i;\n        }\n\n\nUse the checkbox below to report unary pluses that are used together with a binary or another unary expression.\nIt means the inspection will not report situations when a unary plus expression is used in array\ninitializer expressions or as a method argument."
-        },
-        {
-          "shortName": "OctalAndDecimalIntegersMixed",
-          "displayName": "Octal and decimal integers in same array",
-          "enabled": false,
-          "description": "Reports mixed octal and decimal integer literals in a single array initializer. This situation might happen when you copy a list of numbers into an array initializer. Some numbers in the array might be zero-padded and the compiler will interpret them as octal.\n\n**Example:**\n\n    int[] elapsed = {1, 13, 052};\n\nAfter the quick-fix that removes a leading zero is applied:\n\n    int[] elapsed = {1, 13, 52};\n\nIf it is an octal number (for example, after a variable inline), then you can use another quick-fix that converts octal to decimal:\n`int[] elapsed = {1, 13, 42};`"
-        },
-        {
-          "shortName": "UnnecessaryUnaryMinus",
-          "displayName": "Unnecessary unary minus",
-          "enabled": true,
-          "description": "Reports unnecessary unary minuses. Such expressions might be hard to understand and might contain errors.\n\n**For example:**\n\n    void unaryMinus(int i) {\n        int x = - -i;\n      }\n\nThe following quick fixes are suggested here:\n\n* Remove `-` operators before the `i` variable:\n\n      void unaryMinus(int i) {\n          int x = i;\n        }\n\n* Replace `-` operators with the prefix decrement operator:\n\n      void unaryMinus(int i) {\n          int x = --i;\n        }\n\n**Another example:**\n\n    void unaryMinus(int i) {\n        i += - 8;\n      }\n\nAfter the quick-fix is applied:\n\n    void unaryMinus(int i) {\n        i -= 8;\n      }\n"
-        },
-        {
-          "shortName": "CachedNumberConstructorCall",
-          "displayName": "Number constructor call with primitive argument",
-          "enabled": true,
-          "description": "Reports instantiations of new `Long`, `Integer`, `Short`, or `Byte` objects that have a primitive `long`, `integer`, `short`, or `byte` argument.\n\nIt is recommended that you use the static method `valueOf()`\nintroduced in Java 5. By default, this method caches objects for values between -128 and\n127 inclusive.\n\n**Example:**\n\n\n      Integer i = new Integer(1);\n      Long l = new Long(1L);\n\nAfter the quick-fix is applied, the code changes to:\n\n\n      Integer i = Integer.valueOf(1);\n      Long l = Long.valueOf(1L);\n\nThis inspection only reports if the language level of the project or module is 5 or higher\n\n\nUse the **Ignore new number expressions with a String argument** option to ignore calls to number constructors with a `String` argument.\n\n\nUse the **Report only when constructor is @Deprecated** option to only report calls to deprecated constructors.\n`Long`, `Integer`, `Short` and `Byte` constructors are deprecated since JDK 9."
-        },
-        {
-          "shortName": "PointlessArithmeticExpression",
-          "displayName": "Pointless arithmetic expression",
-          "enabled": true,
-          "description": "Reports pointless arithmetic expressions. Such expressions include adding or subtracting zero, multiplying by zero or one, and division by one.\n\nSuch expressions may be the result of automated refactorings and they are unlikely to be what the developer intended to do.\n\nThe quick-fix simplifies such expressions.\n\n**Example:**\n\n\n      void f(int a) {\n        int x = a - a;\n        int y = a + 0;\n        int res = x / x;\n      }\n\nAfter the quick-fix is applied:\n\n\n      void f(int a) {\n        int x = 0;\n        int y = a;\n        int res = 1;\n      }\n\n\nNote that in rare cases, the suggested replacement might not be completely equivalent to the original code\nfor all possible inputs. For example, the inspection suggests replacing `x / x` with `1`.\nHowever, if `x` is zero, the original code throws `ArithmeticException` or results in `NaN`.\nAlso, if `x` is `NaN`, then the result is also `NaN`. It's very unlikely that such behavior is intended."
-        },
-        {
-          "shortName": "CharUsedInArithmeticContext",
-          "displayName": "'char' expression used in arithmetic context",
-          "enabled": false,
-          "description": "Reports expressions of the `char` type used in addition or subtraction expressions.\n\nSuch code is not necessarily an issue but may result in bugs (for example,\nif a string is expected).\n\n**Example:** `int a = 'a' + 42;`\n\nAfter the quick-fix is applied: `int a = (int) 'a' + 42;`\n\nFor the `String` context:\n\n    int i1 = 1;\n    int i2 = 2;\n    System.out.println(i2 + '-' + i1 + \" = \" + (i2 - i1));\n\nAfter the quick-fix is applied:\n`System.out.println(i2 + \"-\" + i1 + \" = \" + (i2 - i1));`"
-        },
-        {
-          "shortName": "UnpredictableBigDecimalConstructorCall",
-          "displayName": "Unpredictable 'BigDecimal' constructor call",
-          "enabled": true,
-          "description": "Reports calls to `BigDecimal` constructors that accept a `double` value. These constructors produce `BigDecimal` that is exactly equal to the supplied `double` value. However, because doubles are encoded in the IEEE 754 64-bit double-precision binary floating-point format, the exact value can be unexpected.\n\nFor example, `new BigDecimal(0.1)` yields a `BigDecimal` object. Its value is\n`0.1000000000000000055511151231257827021181583404541015625`\nwhich is the nearest number to 0.1 representable as a double.\nTo get `BigDecimal` that stores the same value as written in the source code,\nuse either `new BigDecimal(\"0.1\")` or `BigDecimal.valueOf(0.1)`.\n\n**Example:**\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(0.1);\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(\"0.1\");\n        }\n      }\n"
-        },
-        {
-          "shortName": "IntegerDivisionInFloatingPointContext",
-          "displayName": "Integer division in floating point context",
-          "enabled": true,
-          "description": "Reports integer divisions where the result is used as a floating-point number. Such division is often an error and may have unexpected results due to the truncation that happens in integer division.\n\n**Example:**\n\n\n      float x = 3.0F + 3/5;\n"
-        },
-        {
-          "shortName": "ImplicitNumericConversion",
-          "displayName": "Implicit numeric conversion",
-          "enabled": false,
-          "description": "Reports implicit conversion between numeric types.\n\nImplicit numeric conversion is not a problem in itself but, if unexpected, may cause difficulties when tracing bugs.\n\n**Example:**\n\n\n      double m(int i) {\n        return i * 10;\n      }\n\nAfter the quick-fix is applied:\n\n\n      double m(int i) {\n        return (double) (i * 10);\n      }\n\nConfigure the inspection:\n\n* Use the **Ignore widening conversions** option to ignore implicit conversion that cannot result in data loss (for example, `int`-\\>`long`).\n* Use the **Ignore conversions from and to 'char'** option to ignore conversion from and to `char`. The inspection will still report conversion from and to floating-point numbers.\n* Use the **Ignore conversion from constants and literals** to make the inspection ignore conversion from literals and compile-time constants."
-        },
-        {
-          "shortName": "BigDecimalEquals",
-          "displayName": "'equals()' called on 'BigDecimal'",
-          "enabled": false,
-          "description": "Reports `.equals()` being called to compare two `java.math.BigDecimal` numbers.\n\nThis is normally a mistake, as two `java.math.BigDecimal` numbers are only equal if\nthey are equal in both value and scale.\n\n**Example:**\n\n    if (new BigDecimal(\"2.0\").equals(new BigDecimal(\"2.00\"))) {}\n\nAfter the quick-fix is applied:\n\n    if (new BigDecimal(\"2.0\").compareTo(new BigDecimal(\"2.00\")) == 0) {}\n"
-        },
-        {
-          "shortName": "OctalLiteral",
-          "displayName": "Octal integer",
-          "enabled": true,
-          "description": "Reports octal integer literals. Some coding standards prohibit the use of octal literals, as they may be easily confused with decimal literals.\n\nExample:\n\n\n      int i = 015;\n      int j = 0_777;\n\nThis inspection has two different quick-fixes.\nAfter the **Convert octal literal to decimal literal** quick-fix is applied, the code changes to:\n\n\n      int i = 13;\n      int j = 511;\n\nAfter the **Remove leading zero to make decimal** quick-fix is applied, the code changes to:\n\n\n      int i = 15;\n      int j = 777;\n"
-        },
-        {
-          "shortName": "ConstantMathCall",
-          "displayName": "Constant call to 'Math'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Math` or `java.lang.StrictMath` methods that can be determined as simple compile-time constants.\n\n**Example:**\n\n    double v = Math.sin(0.0);\n\nAfter the quick-fix is applied:\n\n    double v = 0.0;\n"
-        },
-        {
-          "shortName": "NumericOverflow",
-          "displayName": "Numeric overflow",
-          "enabled": true,
-          "description": "Reports expressions that overflow during computation. Usually, this happens by accident and indicates a bug. For example, a wrong type is used or a shift should be done in an opposite direction .\n\n**Examples:**\n\n\n      float a = 1.0f/0.0f;\n      long b = 30 * 24 * 60 * 60 * 1000;\n      long c = 1000L << 62;\n"
-        },
-        {
-          "shortName": "NonReproducibleMathCall",
-          "displayName": "Non-reproducible call to 'Math'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Math` methods, which results are not guaranteed to be reproduced precisely.\n\nIn environments where reproducibility of results is required, `java.lang.StrictMath`\nshould be used instead."
-        },
-        {
-          "shortName": "FloatingPointEquality",
-          "displayName": "Floating point equality comparison",
-          "enabled": false,
-          "description": "Reports floating-point values that are being compared using the `==` or `!=` operator.\n\nFloating-point values are inherently inaccurate, and comparing them for exact equality is seldom the desired semantics.\n\nThis inspection ignores comparisons with zero and infinity literals.\n\n**Example:**\n\n\n      void m(double d1, double d2) {\n        if (d1 == d2) {}\n      }\n"
-        },
-        {
-          "shortName": "SuspiciousLiteralUnderscore",
-          "displayName": "Suspicious underscore in number literal",
-          "enabled": false,
-          "description": "Reports decimal number literals that use the underscore numeric separator with groups where the number of digits is not three. Such literals may contain a typo.\n\nThis inspection will not warn on literals containing two consecutive underscores.\nIt is also allowed to omit underscores in the fractional part of `double` and `float` literals.\n\n**Example:** `int oneMillion = 1_000_0000;`"
-        },
-        {
-          "shortName": "LongLiteralsEndingWithLowercaseL",
-          "displayName": "'long' literal ending with 'l' instead of 'L'",
-          "enabled": true,
-          "description": "Reports `long` literals ending with lowercase 'l'. These literals may be confusing, as lowercase 'l' looks very similar to '1'.\n\nThe quick-fix for this inspection replaces lowercase 'l' with uppercase 'L'."
-        },
-        {
-          "shortName": "BigDecimalMethodWithoutRoundingCalled",
-          "displayName": "Call to 'BigDecimal' method without a rounding mode argument",
-          "enabled": true,
-          "description": "Reports calls to `divide()` or `setScale()` without a rounding mode argument.\n\nSuch calls can lead to an `ArithmeticException` when the exact value cannot be represented in the result\n(for example, because it has a non-terminating decimal expansion).\n\nSpecifying a rounding mode prevents the `ArithmeticException`.\n\n**Example:**\n\n\n      BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3));\n"
-        },
-        {
-          "shortName": "OverlyComplexArithmeticExpression",
-          "displayName": "Overly complex arithmetic expression",
-          "enabled": false,
-          "description": "Reports arithmetic expressions with the excessive number of terms. Such expressions might be hard to understand and might contain errors.\n\nParameters, field references, and other primary expressions are counted as a term.\n\n**Example:**\n\n    int calc(int a, int b) {\n            return a + a + a + b + b + b + b; // The line contains 7 terms and will be reported.\n        }\n\nUse the field below to specify a number of terms allowed in arithmetic expressions."
-        }
-      ]
-    },
-    {
       "name": "Control flow issues",
       "inspections": [
         {
@@ -4751,16 +4590,16 @@
           "description": "Reports equality expressions which are negated by a prefix expression.\n\nSuch expressions can be simplified using the `!=` operator.\n\nExample:\n\n\n      !(i == 1)\n\nAfter the quick-fix is applied:\n\n\n      i != 1\n"
         },
         {
-          "shortName": "AssertionCanBeIf",
-          "displayName": "Assertion can be replaced with 'if' statement",
-          "enabled": false,
-          "description": "Reports `assert` statements and suggests replacing them with `if` statements that throw `java.lang.AssertionError`.\n\nExample:\n\n\n      assert param != null;\n\nAfter the quick-fix is applied:\n\n\n      if (param == null) throw new AssertionError();\n"
-        },
-        {
           "shortName": "DoubleNegation",
           "displayName": "Double negation",
           "enabled": true,
           "description": "Reports double negations that can be simplified.\n\nExample:\n\n\n      if (!!functionCall()) {}\n\nAfter the quick-fix is applied:\n\n\n      if (functionCall()) {}\n\nExample:\n\n\n      if (!(a != b)) {}\n\nAfter the quick-fix is applied:\n\n\n      if (a == b) {}\n"
+        },
+        {
+          "shortName": "AssertionCanBeIf",
+          "displayName": "Assertion can be replaced with 'if' statement",
+          "enabled": false,
+          "description": "Reports `assert` statements and suggests replacing them with `if` statements that throw `java.lang.AssertionError`.\n\nExample:\n\n\n      assert param != null;\n\nAfter the quick-fix is applied:\n\n\n      if (param == null) throw new AssertionError();\n"
         },
         {
           "shortName": "BreakStatement",
@@ -5139,6 +4978,167 @@
           "displayName": "'return' statement can be implicit",
           "enabled": false,
           "description": "Reports return statements at the end of closures which can be made implicit.\n\n\nGroovy closures implicitly return the value of the last statement in them.\n\n**Example:**\n\n\n      def foo = {\n        return 1\n      }\n\nAfter the quick-fix is applied:\n\n\n      def foo = {\n        1\n      }\n"
+        }
+      ]
+    },
+    {
+      "name": "Numeric issues",
+      "inspections": [
+        {
+          "shortName": "RemoveLiteralUnderscores",
+          "displayName": "Underscores in numeric literal",
+          "enabled": false,
+          "description": "Reports numeric literals with underscores and suggests removing them with a quick-fix. This may be useful if you need to lower the language level.\n\nThe quick-fix removes underscores from numeric literals. For example `1_000_000` will be converted to `1000000`.\n\nThis inspection only reports if the language level of the project or module is 7 or higher.\n\nNew in 2020.2"
+        },
+        {
+          "shortName": "BadOddness",
+          "displayName": "Suspicious oddness check",
+          "enabled": false,
+          "description": "Reports odd-even checks of the following form: `x % 2 == 1`. Such checks fail when used with negative odd values. Consider using `x % 2 != 0` or `(x & 1) == 1` instead."
+        },
+        {
+          "shortName": "ComparisonOfShortAndChar",
+          "displayName": "Comparison of 'short' and 'char' values",
+          "enabled": true,
+          "description": "Reports equality comparisons between `short` and `char` values.\n\nSuch comparisons may cause subtle bugs because while both values are 2-byte long, `short` values are\nsigned, and `char` values are unsigned.\n\n**Example:**\n\n\n    if (Character.MAX_VALUE == shortValue()) {} //never can be true\n"
+        },
+        {
+          "shortName": "InsertLiteralUnderscores",
+          "displayName": "Unreadable numeric literal",
+          "enabled": true,
+          "description": "Reports long numeric literals without underscores and suggests adding them. Underscores make such literals easier to read.\n\nExample:\n\n\n      1000000\n\nAfter the quick-fix is applied:\n\n\n      1_000_000\n\nThis inspection only reports if the language level of the project of module is 7 or higher.\n\nNew in 2020.2"
+        },
+        {
+          "shortName": "DivideByZero",
+          "displayName": "Division by zero",
+          "enabled": true,
+          "description": "Reports division by zero or remainder by zero. Such expressions will produce an `Infinity`, `-Infinity` or `NaN` result for doubles or floats, and will throw an `ArithmeticException` for integers.\n\nWhen the expression has a `NaN` result, the fix suggests replacing the division expression with the `NaN` constant."
+        },
+        {
+          "shortName": "ComparisonToNaN",
+          "displayName": "Comparison to 'Double.NaN' or 'Float.NaN'",
+          "enabled": true,
+          "description": "Reports any comparisons to `Double.NaN` or `Float.NaN`. Such comparisons are never meaningful, as NaN is not equal to anything, including itself. Use the `Double.isNaN()` or `Float.isNaN()` methods instead.\n\n**Example:**\n\n\n      if (x == Double.NaN) {...}\n\nAfter the quick-fix is applied:\n\n\n      if (Double.isNaN(x)) {...}\n"
+        },
+        {
+          "shortName": "ConfusingFloatingPointLiteral",
+          "displayName": "Confusing floating point literal",
+          "enabled": false,
+          "description": "Reports any floating point numbers that don't have a decimal point, numbers before the decimal point, or numbers after the decimal point.\n\nSuch literals may be confusing, and violate several coding standards.\n\n**Example:**\n\n    double d = .03;\n\nAfter the quick-fix is applied:\n\n    double d = 0.03;\n\n\nUse the **Ignore floating point literals in scientific notation** option to ignore floating point numbers in scientific notation."
+        },
+        {
+          "shortName": "UnaryPlus",
+          "displayName": "Unary plus",
+          "enabled": true,
+          "description": "Reports usages of the `+` unary operator. The unary plus is usually a null operation, and its presence might represent a coding error. For example, in a combination with the increment operator (like in `+++`) or with the equal operator (like in `=+`).\n\n**Example:**\n\n\n      void unaryPlus(int i) {\n        int x = + +i;\n      }\n\nThe following quick fixes are suggested:\n\n* Remove `+` operators before the `i` variable:\n\n\n        void unaryPlus(int i) {\n          int x = i;\n        }\n\n* Replace `+` operators with the prefix increment operator:\n\n\n        void unaryPlus(int i) {\n          int x = ++i;\n        }\n\n\nUse the checkbox below to report unary pluses that are used together with a binary or another unary expression.\nIt means the inspection will not report situations when a unary plus expression is used in array\ninitializer expressions or as a method argument."
+        },
+        {
+          "shortName": "OctalAndDecimalIntegersMixed",
+          "displayName": "Octal and decimal integers in same array",
+          "enabled": false,
+          "description": "Reports mixed octal and decimal integer literals in a single array initializer. This situation might happen when you copy a list of numbers into an array initializer. Some numbers in the array might be zero-padded and the compiler will interpret them as octal.\n\n**Example:**\n\n    int[] elapsed = {1, 13, 052};\n\nAfter the quick-fix that removes a leading zero is applied:\n\n    int[] elapsed = {1, 13, 52};\n\nIf it is an octal number (for example, after a variable inline), then you can use another quick-fix that converts octal to decimal:\n`int[] elapsed = {1, 13, 42};`"
+        },
+        {
+          "shortName": "UnnecessaryUnaryMinus",
+          "displayName": "Unnecessary unary minus",
+          "enabled": true,
+          "description": "Reports unnecessary unary minuses. Such expressions might be hard to understand and might contain errors.\n\n**For example:**\n\n    void unaryMinus(int i) {\n        int x = - -i;\n      }\n\nThe following quick fixes are suggested here:\n\n* Remove `-` operators before the `i` variable:\n\n      void unaryMinus(int i) {\n          int x = i;\n        }\n\n* Replace `-` operators with the prefix decrement operator:\n\n      void unaryMinus(int i) {\n          int x = --i;\n        }\n\n**Another example:**\n\n    void unaryMinus(int i) {\n        i += - 8;\n      }\n\nAfter the quick-fix is applied:\n\n    void unaryMinus(int i) {\n        i -= 8;\n      }\n"
+        },
+        {
+          "shortName": "CachedNumberConstructorCall",
+          "displayName": "Number constructor call with primitive argument",
+          "enabled": true,
+          "description": "Reports instantiations of new `Long`, `Integer`, `Short`, or `Byte` objects that have a primitive `long`, `integer`, `short`, or `byte` argument.\n\nIt is recommended that you use the static method `valueOf()`\nintroduced in Java 5. By default, this method caches objects for values between -128 and\n127 inclusive.\n\n**Example:**\n\n\n      Integer i = new Integer(1);\n      Long l = new Long(1L);\n\nAfter the quick-fix is applied, the code changes to:\n\n\n      Integer i = Integer.valueOf(1);\n      Long l = Long.valueOf(1L);\n\nThis inspection only reports if the language level of the project or module is 5 or higher\n\n\nUse the **Ignore new number expressions with a String argument** option to ignore calls to number constructors with a `String` argument.\n\n\nUse the **Report only when constructor is @Deprecated** option to only report calls to deprecated constructors.\n`Long`, `Integer`, `Short` and `Byte` constructors are deprecated since JDK 9."
+        },
+        {
+          "shortName": "PointlessArithmeticExpression",
+          "displayName": "Pointless arithmetic expression",
+          "enabled": true,
+          "description": "Reports pointless arithmetic expressions. Such expressions include adding or subtracting zero, multiplying by zero or one, and division by one.\n\nSuch expressions may be the result of automated refactorings and they are unlikely to be what the developer intended to do.\n\nThe quick-fix simplifies such expressions.\n\n**Example:**\n\n\n      void f(int a) {\n        int x = a - a;\n        int y = a + 0;\n        int res = x / x;\n      }\n\nAfter the quick-fix is applied:\n\n\n      void f(int a) {\n        int x = 0;\n        int y = a;\n        int res = 1;\n      }\n\n\nNote that in rare cases, the suggested replacement might not be completely equivalent to the original code\nfor all possible inputs. For example, the inspection suggests replacing `x / x` with `1`.\nHowever, if `x` is zero, the original code throws `ArithmeticException` or results in `NaN`.\nAlso, if `x` is `NaN`, then the result is also `NaN`. It's very unlikely that such behavior is intended."
+        },
+        {
+          "shortName": "CharUsedInArithmeticContext",
+          "displayName": "'char' expression used in arithmetic context",
+          "enabled": false,
+          "description": "Reports expressions of the `char` type used in addition or subtraction expressions.\n\nSuch code is not necessarily an issue but may result in bugs (for example,\nif a string is expected).\n\n**Example:** `int a = 'a' + 42;`\n\nAfter the quick-fix is applied: `int a = (int) 'a' + 42;`\n\nFor the `String` context:\n\n    int i1 = 1;\n    int i2 = 2;\n    System.out.println(i2 + '-' + i1 + \" = \" + (i2 - i1));\n\nAfter the quick-fix is applied:\n`System.out.println(i2 + \"-\" + i1 + \" = \" + (i2 - i1));`"
+        },
+        {
+          "shortName": "UnpredictableBigDecimalConstructorCall",
+          "displayName": "Unpredictable 'BigDecimal' constructor call",
+          "enabled": true,
+          "description": "Reports calls to `BigDecimal` constructors that accept a `double` value. These constructors produce `BigDecimal` that is exactly equal to the supplied `double` value. However, because doubles are encoded in the IEEE 754 64-bit double-precision binary floating-point format, the exact value can be unexpected.\n\nFor example, `new BigDecimal(0.1)` yields a `BigDecimal` object. Its value is\n`0.1000000000000000055511151231257827021181583404541015625`\nwhich is the nearest number to 0.1 representable as a double.\nTo get `BigDecimal` that stores the same value as written in the source code,\nuse either `new BigDecimal(\"0.1\")` or `BigDecimal.valueOf(0.1)`.\n\n**Example:**\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(0.1);\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(\"0.1\");\n        }\n      }\n"
+        },
+        {
+          "shortName": "IntegerDivisionInFloatingPointContext",
+          "displayName": "Integer division in floating point context",
+          "enabled": true,
+          "description": "Reports integer divisions where the result is used as a floating-point number. Such division is often an error and may have unexpected results due to the truncation that happens in integer division.\n\n**Example:**\n\n\n      float x = 3.0F + 3/5;\n"
+        },
+        {
+          "shortName": "ImplicitNumericConversion",
+          "displayName": "Implicit numeric conversion",
+          "enabled": false,
+          "description": "Reports implicit conversion between numeric types.\n\nImplicit numeric conversion is not a problem in itself but, if unexpected, may cause difficulties when tracing bugs.\n\n**Example:**\n\n\n      double m(int i) {\n        return i * 10;\n      }\n\nAfter the quick-fix is applied:\n\n\n      double m(int i) {\n        return (double) (i * 10);\n      }\n\nConfigure the inspection:\n\n* Use the **Ignore widening conversions** option to ignore implicit conversion that cannot result in data loss (for example, `int`-\\>`long`).\n* Use the **Ignore conversions from and to 'char'** option to ignore conversion from and to `char`. The inspection will still report conversion from and to floating-point numbers.\n* Use the **Ignore conversion from constants and literals** to make the inspection ignore conversion from literals and compile-time constants."
+        },
+        {
+          "shortName": "BigDecimalEquals",
+          "displayName": "'equals()' called on 'BigDecimal'",
+          "enabled": false,
+          "description": "Reports `.equals()` being called to compare two `java.math.BigDecimal` numbers.\n\nThis is normally a mistake, as two `java.math.BigDecimal` numbers are only equal if\nthey are equal in both value and scale.\n\n**Example:**\n\n    if (new BigDecimal(\"2.0\").equals(new BigDecimal(\"2.00\"))) {}\n\nAfter the quick-fix is applied:\n\n    if (new BigDecimal(\"2.0\").compareTo(new BigDecimal(\"2.00\")) == 0) {}\n"
+        },
+        {
+          "shortName": "OctalLiteral",
+          "displayName": "Octal integer",
+          "enabled": true,
+          "description": "Reports octal integer literals. Some coding standards prohibit the use of octal literals, as they may be easily confused with decimal literals.\n\nExample:\n\n\n      int i = 015;\n      int j = 0_777;\n\nThis inspection has two different quick-fixes.\nAfter the **Convert octal literal to decimal literal** quick-fix is applied, the code changes to:\n\n\n      int i = 13;\n      int j = 511;\n\nAfter the **Remove leading zero to make decimal** quick-fix is applied, the code changes to:\n\n\n      int i = 15;\n      int j = 777;\n"
+        },
+        {
+          "shortName": "ConstantMathCall",
+          "displayName": "Constant call to 'Math'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Math` or `java.lang.StrictMath` methods that can be determined as simple compile-time constants.\n\n**Example:**\n\n    double v = Math.sin(0.0);\n\nAfter the quick-fix is applied:\n\n    double v = 0.0;\n"
+        },
+        {
+          "shortName": "NumericOverflow",
+          "displayName": "Numeric overflow",
+          "enabled": true,
+          "description": "Reports expressions that overflow during computation. Usually, this happens by accident and indicates a bug. For example, a wrong type is used or a shift should be done in an opposite direction .\n\n**Examples:**\n\n\n      float a = 1.0f/0.0f;\n      long b = 30 * 24 * 60 * 60 * 1000;\n      long c = 1000L << 62;\n"
+        },
+        {
+          "shortName": "NonReproducibleMathCall",
+          "displayName": "Non-reproducible call to 'Math'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Math` methods, which results are not guaranteed to be reproduced precisely.\n\nIn environments where reproducibility of results is required, `java.lang.StrictMath`\nshould be used instead."
+        },
+        {
+          "shortName": "FloatingPointEquality",
+          "displayName": "Floating point equality comparison",
+          "enabled": false,
+          "description": "Reports floating-point values that are being compared using the `==` or `!=` operator.\n\nFloating-point values are inherently inaccurate, and comparing them for exact equality is seldom the desired semantics.\n\nThis inspection ignores comparisons with zero and infinity literals.\n\n**Example:**\n\n\n      void m(double d1, double d2) {\n        if (d1 == d2) {}\n      }\n"
+        },
+        {
+          "shortName": "SuspiciousLiteralUnderscore",
+          "displayName": "Suspicious underscore in number literal",
+          "enabled": false,
+          "description": "Reports decimal number literals that use the underscore numeric separator with groups where the number of digits is not three. Such literals may contain a typo.\n\nThis inspection will not warn on literals containing two consecutive underscores.\nIt is also allowed to omit underscores in the fractional part of `double` and `float` literals.\n\n**Example:** `int oneMillion = 1_000_0000;`"
+        },
+        {
+          "shortName": "LongLiteralsEndingWithLowercaseL",
+          "displayName": "'long' literal ending with 'l' instead of 'L'",
+          "enabled": true,
+          "description": "Reports `long` literals ending with lowercase 'l'. These literals may be confusing, as lowercase 'l' looks very similar to '1'.\n\nThe quick-fix for this inspection replaces lowercase 'l' with uppercase 'L'."
+        },
+        {
+          "shortName": "BigDecimalMethodWithoutRoundingCalled",
+          "displayName": "Call to 'BigDecimal' method without a rounding mode argument",
+          "enabled": true,
+          "description": "Reports calls to `divide()` or `setScale()` without a rounding mode argument.\n\nSuch calls can lead to an `ArithmeticException` when the exact value cannot be represented in the result\n(for example, because it has a non-terminating decimal expansion).\n\nSpecifying a rounding mode prevents the `ArithmeticException`.\n\n**Example:**\n\n\n      BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3));\n"
+        },
+        {
+          "shortName": "OverlyComplexArithmeticExpression",
+          "displayName": "Overly complex arithmetic expression",
+          "enabled": false,
+          "description": "Reports arithmetic expressions with the excessive number of terms. Such expressions might be hard to understand and might contain errors.\n\nParameters, field references, and other primary expressions are counted as a term.\n\n**Example:**\n\n    int calc(int a, int b) {\n            return a + a + a + b + b + b + b; // The line contains 7 terms and will be reported.\n        }\n\nUse the field below to specify a number of terms allowed in arithmetic expressions."
         }
       ]
     },
@@ -8071,6 +8071,83 @@
       ]
     },
     {
+      "name": "Style",
+      "inspections": [
+        {
+          "shortName": "JavaStylePropertiesInvocation",
+          "displayName": "Java-style property access",
+          "enabled": false,
+          "description": "Reports properties accessed via method calls.\n\n**Example:**\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.getFoo())\n\nAfter the quick-fix is applied:\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.foo)\n"
+        },
+        {
+          "shortName": "GrUnnecessarySemicolon",
+          "displayName": "Unnecessary semicolon",
+          "enabled": false,
+          "description": "Reports unnecessary semicolons.\n\n**Example:**\n\n\n      print 2; print 3 // semicolon is required\n      print 2; // semicolon is unnecessary\n"
+        },
+        {
+          "shortName": "ChangeToMethod",
+          "displayName": "Operator invocation can be replaced with method call",
+          "enabled": false,
+          "description": "Reports operator invocations that can be replaced with method calls.\n\n**Example:**\n\n\n      a + b\n\nAfter the quick-fix is applied:\n\n\n      a.plus(b)\n"
+        },
+        {
+          "shortName": "ChangeToOperator",
+          "displayName": "Method call can be replaced with operator invocation",
+          "enabled": false,
+          "description": "Reports method calls that can be replaced with operator invocations.\n\n**Example:**\n\n\n      a.plus(b)\n\nAfter the quick-fix is applied:\n\n\n      a + b\n"
+        },
+        {
+          "shortName": "GroovyConditional",
+          "displayName": "Ternary expression",
+          "enabled": false,
+          "description": "Reports ternary expressions.\n\nSome coding standards prohibit the use of the condition operator in favor of `if` statements."
+        },
+        {
+          "shortName": "GrUnnecessaryAlias",
+          "displayName": "Unnecessary import alias",
+          "enabled": false,
+          "description": "Reports unnecessary import aliases.\n\n**Example:**\n\n\n      import com.foo.Bar as Bar\n\nAfter the quick-fix is applied:\n\n\n      import com.foo.Bar\n"
+        },
+        {
+          "shortName": "GrUnnecessaryNonSealedModifier",
+          "displayName": "Unnecessary 'non-sealed' modifier",
+          "enabled": false,
+          "description": "Reports unnecessary `non-sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      non-sealed boolean foo() {} // modifier is unnecessary\n      non-sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      non-sealed class A {}\n"
+        },
+        {
+          "shortName": "GrUnnecessaryDefModifier",
+          "displayName": "Unnecessary 'def'",
+          "enabled": false,
+          "description": "Reports unnecessary `def` modifiers when used with explicit type declaration.\n\n**Example:**\n\n\n      def boolean foo() {} // modifier is unnecessary\n      def Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      def (int a, String b) = []\n"
+        },
+        {
+          "shortName": "GrUnnecessaryFinalModifier",
+          "displayName": "Unnecessary 'final'",
+          "enabled": false,
+          "description": "Reports unnecessary `final` modifiers when used with the record definition.\n\n**Example:**\n\n\n      final record R(int a) {} // modifier is unnecessary\n"
+        },
+        {
+          "shortName": "GrUnnecessaryPublicModifier",
+          "displayName": "Unnecessary 'public'",
+          "enabled": false,
+          "description": "Reports unnecessary `public` modifiers as Groovy classes and methods are `public` by default.\n\n**Example:**\n\n\n      public class Foo{\n          public void bar(){\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Foo{\n          void bar(){\n          }\n      }\n"
+        },
+        {
+          "shortName": "GrStringStyleViolation",
+          "displayName": "String style violation",
+          "enabled": false,
+          "description": "Reports strings with quotation that doesn't match code style.\n\n**Example:**\n\n\n      def hw = \"Hello, world!\"\n\nAfter the quick-fix is applied:\n\n\n      def hw = 'Hello, world!'\n\nUse the fields provided below to specify code style for different kinds of strings."
+        },
+        {
+          "shortName": "GrUnnecessarySealedModifier",
+          "displayName": "Unnecessary 'sealed' modifier",
+          "enabled": false,
+          "description": "Reports unnecessary `sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      sealed boolean foo() {} // modifier is unnecessary\n      sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      sealed class A {}\n"
+        }
+      ]
+    },
+    {
       "name": "RegExp",
       "inspections": [
         {
@@ -8156,83 +8233,6 @@
           "displayName": "Consecutive spaces",
           "enabled": true,
           "description": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
-        }
-      ]
-    },
-    {
-      "name": "Style",
-      "inspections": [
-        {
-          "shortName": "JavaStylePropertiesInvocation",
-          "displayName": "Java-style property access",
-          "enabled": false,
-          "description": "Reports properties accessed via method calls.\n\n**Example:**\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.getFoo())\n\nAfter the quick-fix is applied:\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.foo)\n"
-        },
-        {
-          "shortName": "GrUnnecessarySemicolon",
-          "displayName": "Unnecessary semicolon",
-          "enabled": false,
-          "description": "Reports unnecessary semicolons.\n\n**Example:**\n\n\n      print 2; print 3 // semicolon is required\n      print 2; // semicolon is unnecessary\n"
-        },
-        {
-          "shortName": "ChangeToMethod",
-          "displayName": "Operator invocation can be replaced with method call",
-          "enabled": false,
-          "description": "Reports operator invocations that can be replaced with method calls.\n\n**Example:**\n\n\n      a + b\n\nAfter the quick-fix is applied:\n\n\n      a.plus(b)\n"
-        },
-        {
-          "shortName": "ChangeToOperator",
-          "displayName": "Method call can be replaced with operator invocation",
-          "enabled": false,
-          "description": "Reports method calls that can be replaced with operator invocations.\n\n**Example:**\n\n\n      a.plus(b)\n\nAfter the quick-fix is applied:\n\n\n      a + b\n"
-        },
-        {
-          "shortName": "GroovyConditional",
-          "displayName": "Ternary expression",
-          "enabled": false,
-          "description": "Reports ternary expressions.\n\nSome coding standards prohibit the use of the condition operator in favor of `if` statements."
-        },
-        {
-          "shortName": "GrUnnecessaryAlias",
-          "displayName": "Unnecessary import alias",
-          "enabled": false,
-          "description": "Reports unnecessary import aliases.\n\n**Example:**\n\n\n      import com.foo.Bar as Bar\n\nAfter the quick-fix is applied:\n\n\n      import com.foo.Bar\n"
-        },
-        {
-          "shortName": "GrUnnecessaryNonSealedModifier",
-          "displayName": "Unnecessary 'non-sealed' modifier",
-          "enabled": false,
-          "description": "Reports unnecessary `non-sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      non-sealed boolean foo() {} // modifier is unnecessary\n      non-sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      non-sealed class A {}\n"
-        },
-        {
-          "shortName": "GrUnnecessaryDefModifier",
-          "displayName": "Unnecessary 'def'",
-          "enabled": false,
-          "description": "Reports unnecessary `def` modifiers when used with explicit type declaration.\n\n**Example:**\n\n\n      def boolean foo() {} // modifier is unnecessary\n      def Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      def (int a, String b) = []\n"
-        },
-        {
-          "shortName": "GrUnnecessaryFinalModifier",
-          "displayName": "Unnecessary 'final'",
-          "enabled": false,
-          "description": "Reports unnecessary `final` modifiers when used with the record definition.\n\n**Example:**\n\n\n      final record R(int a) {} // modifier is unnecessary\n"
-        },
-        {
-          "shortName": "GrUnnecessaryPublicModifier",
-          "displayName": "Unnecessary 'public'",
-          "enabled": false,
-          "description": "Reports unnecessary `public` modifiers as Groovy classes and methods are `public` by default.\n\n**Example:**\n\n\n      public class Foo{\n          public void bar(){\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Foo{\n          void bar(){\n          }\n      }\n"
-        },
-        {
-          "shortName": "GrStringStyleViolation",
-          "displayName": "String style violation",
-          "enabled": false,
-          "description": "Reports strings with quotation that doesn't match code style.\n\n**Example:**\n\n\n      def hw = \"Hello, world!\"\n\nAfter the quick-fix is applied:\n\n\n      def hw = 'Hello, world!'\n\nUse the fields provided below to specify code style for different kinds of strings."
-        },
-        {
-          "shortName": "GrUnnecessarySealedModifier",
-          "displayName": "Unnecessary 'sealed' modifier",
-          "enabled": false,
-          "description": "Reports unnecessary `sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      sealed boolean foo() {} // modifier is unnecessary\n      sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      sealed class A {}\n"
         }
       ]
     },
