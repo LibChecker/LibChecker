@@ -70,6 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
@@ -326,10 +327,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
                 lifecycleScope.launch(Dispatchers.Default) {
                   val appCount = AppItemRepository.getApplicationInfoMap().size
-                  val snapshotCount =
-                    viewModel.snapshotAppsCount.value ?: viewModel.computeSnapshotAppCount(
-                      GlobalValues.snapshotTimestamp
-                    )
+                  viewModel.snapshotAppsCount.value ?: runBlocking {
+                    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+                  }
+                  val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
 
                   withContext(Dispatchers.Main) {
                     dashboard.container.tvSnapshotAppsCountText.text =

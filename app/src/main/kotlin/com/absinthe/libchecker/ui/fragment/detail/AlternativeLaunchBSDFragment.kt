@@ -32,6 +32,11 @@ class AlternativeLaunchBSDFragment :
     }
     packageName?.let { packageName ->
       val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+      if (packageInfo.activities == null) {
+        activity?.showToast(R.string.toast_cant_open_app)
+        dismiss()
+        return
+      }
       val list = packageInfo.activities.asSequence()
         .filter { it.exported }
         .map {
