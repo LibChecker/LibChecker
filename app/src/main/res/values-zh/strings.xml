@@ -80,7 +80,7 @@
   <string name="anonymous_statistics">匿名统计</string>
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
-  <string name="target_mode">Target显示方式</string>
+  <string name="target_mode">Target显示模式</string>
 
   <string name="show_system_apps_summary">控制是否在应用列表中显示系统应用</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
