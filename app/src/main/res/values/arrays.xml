@@ -39,4 +39,14 @@
     <item>on</item>
     <item>system</item>
   </string-array>
+
+  <string-array name="target_mode" translatable="false">
+    <item>Target API</item>
+    <item>Target Android</item>
+  </string-array>
+
+  <string-array name="target_mode_value" translatable="false">
+    <item>api</item>
+    <item>android</item>
+  </string-array>
 </resources>

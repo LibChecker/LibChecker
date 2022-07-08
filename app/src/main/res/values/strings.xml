@@ -80,6 +80,7 @@
   <string name="anonymous_statistics">Anonymous Statistics</string>
   <string name="cloud_rules">Cloud Rules</string>
   <string name="dark_mode">Dark Mode</string>
+  <string name="target_mode">Target Mode</string>
 
   <string name="show_system_apps_summary">Control whether display system apps in apps list</string>
   <string name="apk_analytics_summary">Open the detail page when click an APK file</string>

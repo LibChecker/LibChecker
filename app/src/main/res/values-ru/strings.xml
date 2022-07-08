@@ -79,6 +79,7 @@
   <string name="anonymous_statistics">Анонимная статистика</string>
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
+  <string name="target_mode">Целевой режим отображения</string>
 
   <string name="show_system_apps_summary">Управление отображением системных приложений в списке приложений</string>
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>

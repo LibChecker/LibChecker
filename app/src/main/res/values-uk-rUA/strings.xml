@@ -79,6 +79,7 @@
   <string name="anonymous_statistics">Анонімна статистика</string>
   <string name="cloud_rules">Правила в хмарі</string>
   <string name="dark_mode">Dark Mode</string>
+  <string name="target_mode">Target Mode</string>
 
   <string name="show_system_apps_summary">Управління відображенням системних додатків в списку додатків</string>
   <string name="apk_analytics_summary">Відкриває сторінку подробиць при натисканні на APK-файл</string>
