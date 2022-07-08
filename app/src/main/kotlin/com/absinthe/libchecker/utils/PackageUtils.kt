@@ -27,6 +27,7 @@ import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -42,6 +43,7 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
@@ -151,6 +153,47 @@ object PackageUtils {
   fun getVersionString(versionName: String, versionCode: Long): String {
     return "$versionName ($versionCode)"
   }
+
+  /**
+   * Get target string of an app
+   * @param packageName PackageName
+   * @return version code or version number as String
+   */
+  fun getTargetString(packageName: String) :String {
+    return getTargetString(getPackageInfo(packageName))
+  }
+
+  fun getTargetString(packageInfo: PackageInfo) :String {
+    return when (GlobalValues.targetMode) {
+      "android" -> getTargetVersionString(packageInfo)
+      else -> getTargetApiString(packageInfo)
+    }
+  }
+
+  fun getTargetString(targetSdkVersion: Short) = when (GlobalValues.targetMode) {
+    "android"-> getTargetVersionString(targetSdkVersion)
+    else -> getTargetApiString(targetSdkVersion)
+  }
+
+  /**
+   * Get target Android version of an app ( Android 10 )
+   * @param packageName PackageName
+   * @return version number as String
+   */
+  fun getTargetVersionString(packageName: String): String {
+    return getTargetVersionString(getPackageInfo(packageName))
+  }
+
+  fun getTargetVersionString(packageInfo: PackageInfo): String {
+    return try {
+      "targetAndroidVersion ${AndroidVersions.apiToVer(packageInfo.applicationInfo.targetSdkVersion)}"
+    } catch (e: PackageManager.NameNotFoundException) {
+      "targetAndroidVersion ?"
+    }
+  }
+
+  fun getTargetVersionString(targetSdkVersion: Short) =
+    "Target Android ${AndroidVersions.apiToVer(targetSdkVersion.toInt())}"
 
   /**
    * Get target api string of an app ( API 30 )
@@ -1015,12 +1058,33 @@ object PackageUtils {
   }
 
   /**
+   * Get minSdkString of an app
+   * @param packageInfo PackageInfo
+   * @return minSdkString
+   */
+  fun getMinSdkString(packageInfo: PackageInfo):String{
+    return when(GlobalValues.targetMode) {
+      "android"-> getMinAndroidVersionString(packageInfo)
+      else -> getMinSdkVersionString(packageInfo)
+    }
+  }
+
+  /**
    * Get minSdkVersion of an app
    * @param packageInfo PackageInfo
    * @return minSdkVersion
    */
   fun getMinSdkVersionString(packageInfo: PackageInfo): String {
     return "$minSdkVersion ${getMinSdkVersion(packageInfo)}"
+  }
+
+  /**
+   * Get minAndroidVersion of an app
+   * @param packageInfo PackageInfo
+   * @return minAndroidVersion
+   */
+  fun getMinAndroidVersionString(packageInfo: PackageInfo):String {
+    return "minAndroidVersion ${AndroidVersions.apiToVer(getMinSdkVersion(packageInfo))}"
   }
 
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
