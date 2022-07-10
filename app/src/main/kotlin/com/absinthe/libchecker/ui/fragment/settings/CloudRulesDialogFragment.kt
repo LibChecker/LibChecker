@@ -21,6 +21,7 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import rikka.core.os.FileUtils
 import timber.log.Timber
 import java.io.File
 
@@ -75,6 +76,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         override fun onDownloadSuccess() {
           RuleDatabase.getDatabase(requireContext()).close()
           Repositories.deleteRulesDatabase()
+
+          val databaseDir = requireContext().getDatabasePath(Constants.RULES_DATABASE_NAME).parent
+          FileUtils.copy(saveFile, File(databaseDir, Constants.RULES_DATABASE_NAME))
 
           lifecycleScope.launch(Dispatchers.Main) {
             root.cloudRulesContentView.localVersion.version.text =
