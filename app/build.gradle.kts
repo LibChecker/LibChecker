@@ -181,9 +181,12 @@ dependencies {
 
 protobuf {
   protoc {
-    artifact = if (osdetector.os == "osx")
-      "${libs.google.protobuf.protoc.get()}:osx-aarch_64"
-    else
+    artifact = if (osdetector.os == "osx") {
+      // support both Apple Silicon and Intel chipsets
+      val arch = System.getProperty("os.arch")
+      val suffix = if (arch == "x86_64") "x86_64" else "aarch_64"
+      "${libs.google.protobuf.protoc.get()}:osx-$suffix"
+    } else
       libs.google.protobuf.protoc.get().toString()
   }
   plugins {
