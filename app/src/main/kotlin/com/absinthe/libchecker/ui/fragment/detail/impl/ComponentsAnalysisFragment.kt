@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import android.content.Context
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -23,6 +24,8 @@ import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.extensions.putArguments
+import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
+import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import kotlinx.coroutines.Dispatchers
@@ -124,7 +127,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
 
     adapter.apply {
       setOnItemLongClickListener { _, _, position ->
-        doOnLongClick(context, getItem(position).item.name)
+        doOnLongClick(context, getItem(position).item.name, position)
         true
       }
       setDiffCallback(LibStringDiffUtil())
@@ -144,10 +147,15 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
     }
   }
 
-  private fun doOnLongClick(context: Context, componentName: String) {
+  private fun doOnLongClick(context: Context, componentName: String, position: Int) {
     if (!viewModel.isApk && hasIntegration) {
       val actionMap = mutableMapOf<Int, () -> Unit>()
       val arrayAdapter = ArrayAdapter<String>(context, android.R.layout.simple_list_item_1)
+      val fullComponentName = if (componentName.startsWith(".")) {
+        viewModel.packageInfo.packageName + componentName
+      } else {
+        componentName
+      }
 
       // Copy
       arrayAdapter.add(getString(android.R.string.copy))
@@ -162,12 +170,8 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
           integrationBlockerList =
             BlockerManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
         }
-        val fullComponentName = if (componentName.startsWith(".")) {
-          viewModel.packageInfo.packageName + componentName
-        } else {
-          componentName
-        }
-        val blockerShouldBlock = integrationBlockerList!!.any { it.name == fullComponentName }.not()
+        val blockerShouldBlock =
+          integrationBlockerList?.any { it.name == fullComponentName } == false
         arrayAdapter.add(
           if (blockerShouldBlock) {
             getString(R.string.integration_blocker_menu_block)
@@ -187,6 +191,19 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
               )
               integrationBlockerList =
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
+              val shouldTurnToDisable =
+                integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
+              if (shouldTurnToDisable) {
+                (adapter.getViewByPosition(
+                  position,
+                  android.R.id.title
+                ) as? TextView)?.startStrikeThroughAnimation()
+              } else {
+                (adapter.getViewByPosition(
+                  position,
+                  android.R.id.title
+                ) as? TextView)?.reverseStrikeThroughAnimation()
+              }
             }
           }
         }
@@ -199,7 +216,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
             MonkeyKingManager().queryBlockedComponent(context, viewModel.packageInfo.packageName)
         }
         val monkeyKingShouldBlock =
-          integrationMonkeyKingBlockList!!.any { it.name == componentName }.not()
+          integrationMonkeyKingBlockList?.any { it.name == componentName } == false
         if (monkeyKingShouldBlock) {
           arrayAdapter.add(getString(R.string.integration_monkey_king_menu_block))
         } else {
@@ -217,6 +234,19 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
               )
               integrationMonkeyKingBlockList =
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
+              val shouldTurnToDisable =
+                integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
+              if (shouldTurnToDisable) {
+                (adapter.getViewByPosition(
+                  position,
+                  android.R.id.title
+                ) as? TextView)?.startStrikeThroughAnimation()
+              } else {
+                (adapter.getViewByPosition(
+                  position,
+                  android.R.id.title
+                ) as? TextView)?.reverseStrikeThroughAnimation()
+              }
             }
           }
         }

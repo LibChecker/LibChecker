@@ -36,6 +36,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
 
   val libName =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
+      id = android.R.id.title
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT

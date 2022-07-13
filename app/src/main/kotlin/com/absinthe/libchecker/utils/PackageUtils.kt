@@ -280,6 +280,11 @@ object PackageUtils {
 
   private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
 
+  /**
+   * Get split apks dirs
+   * @param packageInfo PackageInfo
+   * @return List of split apks dirs
+   */
   fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       val files = File(packageInfo.applicationInfo.sourceDir).parentFile
@@ -521,6 +526,25 @@ object PackageUtils {
   }
 
   /**
+   * Check if a component is enabled
+   * @param info ComponentInfo
+   * @return true if it is enabled
+   */
+  fun isComponentEnabled(info: ComponentInfo): Boolean {
+    val state = runCatching {
+      SystemServices.packageManager.getComponentEnabledSetting(
+        ComponentName(info.packageName, info.name)
+      )
+    }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
+    return when (state) {
+      PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
+      PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+      PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> info.enabled
+      else -> false
+    }
+  }
+
+  /**
    * Get components list of an app
    * @param packageName Package name of the app
    * @param list List of components(can be nullable)
@@ -535,31 +559,18 @@ object PackageUtils {
     if (list.isNullOrEmpty()) {
       return emptyList()
     }
-    var state: Int
-    var isEnabled: Boolean
     return list.asSequence()
       .map {
-        state = runCatching {
-          SystemServices.packageManager.getComponentEnabledSetting(
-            ComponentName(
-              packageName,
-              it.name
-            )
-          )
-        }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-        isEnabled = when (state) {
-          PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
-          PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
-          PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> it.enabled
-          else -> false
-        }
-
         val name = if (isSimpleName) {
           it.name.orEmpty().removePrefix(packageName)
         } else {
           it.name.orEmpty()
         }
-        StatefulComponent(name, isEnabled, it.processName.orEmpty().removePrefix(it.packageName))
+        StatefulComponent(
+          name,
+          isComponentEnabled(it),
+          it.processName.orEmpty().removePrefix(it.packageName)
+        )
       }
       .toList()
   }
@@ -1026,6 +1037,11 @@ object PackageUtils {
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
+  /**
+   * Get Android Gradle Plugin version of an app
+   * @param packageInfo PackageInfo
+   * @return Android Gradle Plugin version
+   */
   fun getAGPVersion(packageInfo: PackageInfo): String? {
     runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
