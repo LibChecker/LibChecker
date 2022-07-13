@@ -27,7 +27,7 @@ gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref 
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
-agp-desugering = "com.android.tools:desugar_jdk_libs:1.1.6"
+agp-desugering = "com.android.tools:desugar_jdk_libs:1.2.0"
 
 androidX-activity = "androidx.activity:activity-ktx:1.5.0"
 androidX-annotation = "androidx.annotation:annotation:1.4.0"
