@@ -26,7 +26,7 @@ protobuf = { id = "com.google.protobuf", version = "0.8.19" }
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.3"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 agp-desugering = "com.android.tools:desugar_jdk_libs:1.1.6"
 
 androidX-activity = "androidx.activity:activity-ktx:1.5.0"
