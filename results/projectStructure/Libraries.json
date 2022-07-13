@@ -24,9 +24,9 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin/1.7.0/5c664a6e75ae89154e3631ef6fb6d95b74463e44/kotlin-gradle-plugin-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin/1.7.10/ea3ee595df31d338be8135ce1ea6f78f8836ebd3/kotlin-gradle-plugin-1.7.10.jar!/"
       ]
     },
     {
@@ -60,21 +60,21 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-model/1.7.0/4bb159ce683c51893c10e6dd86006ce72ed8cdca/kotlin-gradle-plugin-model-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-model/1.7.10/762b2bb7063c74bb564ed7a7523446a4e7252682/kotlin-gradle-plugin-model-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-api/1.7.0/361e20f57ad4f772a9500bd795d2ab0956a91b75/kotlin-gradle-plugin-api-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-api/1.7.10/3b38be7ed8f8c678b13991d5b3ec99c4908d3313/kotlin-gradle-plugin-api-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-core/1.7.0/8fc54e880cf9ea73396f2844a2d3aa76bdcbcfbb/kotlin-tooling-core-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-core/1.7.10/8fc54e880cf9ea73396f2844a2d3aa76bdcbcfbb/kotlin-tooling-core-1.7.10.jar!/"
       ]
     },
     {
@@ -127,21 +127,21 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-native-utils/1.7.0/d3e9a6f19ffad631d686523709939a20632ba295/kotlin-native-utils-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-native-utils/1.7.10/2f0fbe380f54a395d99e75558c21924ef262cc8e/kotlin-native-utils-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-project-model/1.7.0/e048320d1bc516909c5c5034adf33928c4987dee/kotlin-project-model-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-project-model/1.7.10/a393b70222ebad45abb2e0eb273a7cac9deb4df9/kotlin-project-model-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-util-io/1.7.0/d56995b7c3a460e15892b8bb992a23e8f2288b6f/kotlin-util-io-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-util-io/1.7.10/fdcfe10a398c931a5770ca45cffdd245112ca949/kotlin-util-io-1.7.10.jar!/"
       ]
     },
     {
@@ -421,33 +421,33 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-runner/1.7.0/bf501a7a29ca14e8d8ce6fdd7e1b7d2d278cbe53/kotlin-compiler-runner-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-runner/1.7.10/19b6254d2b5059986115cd1f7b32ce3dadf277/kotlin-compiler-runner-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-metadata/1.7.0/91aa35099dfb667b61968b221fea16b372cda9bf/kotlin-tooling-metadata-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-tooling-metadata/1.7.10/91aa35099dfb667b61968b221fea16b372cda9bf/kotlin-tooling-metadata-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-idea/1.7.0/9b37a1ebe7a7e1886e48eba7ebacf49d72121fd3/kotlin-gradle-plugin-idea-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-gradle-plugin-idea/1.7.10/9b37a1ebe7a7e1886e48eba7ebacf49d72121fd3/kotlin-gradle-plugin-idea-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-util-klib/1.7.0/bbc3009e665f3c83a4adbd75ec1407ada0b13e03/kotlin-util-klib-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-util-klib/1.7.10/962b03365699d66b08bbb397a50bbf6a2a6050e1/kotlin-util-klib-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-klib-commonizer-api/1.7.0/fb21d7ada45112531e551413e7b5b551b1f97e17/kotlin-klib-commonizer-api-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-klib-commonizer-api/1.7.10/fb033cc9bbe497f445f25b6f2a667c13828787c2/kotlin-klib-commonizer-api-1.7.10.jar!/"
       ]
     },
     {
@@ -469,33 +469,33 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-annotation-processing-gradle/1.7.0/4af73d85cbf3357a2580f883cc2446c6fb813d3f/kotlin-annotation-processing-gradle-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-annotation-processing-gradle/1.7.10/e1d645a739463b61ce1980f67068d8ab9b16fef5/kotlin-annotation-processing-gradle-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.7.0/915e36cdb6ef3e9a51dff88b31bc4815ed0c3ac9/kotlin-android-extensions-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-android-extensions/1.7.10/6f72eaede229ab1f700f8a3583f7bef832b56f48/kotlin-android-extensions-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/1.7.0/4d09852239f61842072b40b524882fa3caaed371/kotlin-compiler-embeddable-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-compiler-embeddable/1.7.10/909803167c98606fcf22b4c848647c68e351d48d/kotlin-compiler-embeddable-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-compiler-embeddable/1.7.0/69924a0f52055776049f96ee09d875233e253529/kotlin-scripting-compiler-embeddable-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-compiler-embeddable/1.7.10/a72ad70dab380867376418e72dfbe290e6dcd63d/kotlin-scripting-compiler-embeddable-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-compiler-impl-embeddable/1.7.0/69ebbb984c0e9c7a9ca8a4ed0a87b36f1c793ed8/kotlin-scripting-compiler-impl-embeddable-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-compiler-impl-embeddable/1.7.10/e8d55cf4b9d9bbcd403e4d860846549f3b4d6dde/kotlin-scripting-compiler-impl-embeddable-1.7.10.jar!/"
       ]
     },
     {
@@ -781,9 +781,9 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-client/1.7.0/6ac260325ead3cf605580c38884ea9bd6a6a0bea/kotlin-daemon-client-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-client/1.7.10/f10e62104d02f7f2a25a41675453fc1258155945/kotlin-daemon-client-1.7.10.jar!/"
       ]
     },
     {
@@ -793,9 +793,9 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-common/1.7.0/496762e1689fd70a5a46b48f322251b0226e4219/kotlin-build-common-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-build-common/1.7.10/ac8d44a03072ec9563d3cdda87929b24920c097f/kotlin-build-common-1.7.10.jar!/"
       ]
     },
     {
@@ -823,9 +823,9 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/1.7.0/fd56798de80825c673ac93808284c5198ffa2b50/kotlin-daemon-embeddable-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-daemon-embeddable/1.7.10/3a9f7aef7080d3ae63126cbba4f827ed664f32fa/kotlin-daemon-embeddable-1.7.10.jar!/"
       ]
     },
     {
@@ -835,15 +835,15 @@
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/1.7.0/d03ca0d4594387836eecc7c67cec679f34172b36/kotlin-scripting-jvm-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/1.7.10/c1e3bade3e9795023867dce31404736995037e4f/kotlin-scripting-jvm-1.7.10.jar!/"
       ]
     },
     {
-      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.0",
+      "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.10",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/1.7.0/1a19885731b40f0340c90c3edd70c157be90ac8c/kotlin-scripting-common-1.7.0.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/1.7.10/bddf009658701ba5fb98e40e7877dcce7d8695ee/kotlin-scripting-common-1.7.10.jar!/"
       ]
     },
     {

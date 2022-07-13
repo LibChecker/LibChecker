@@ -210,7 +210,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10",
           "type": "Library"
         },
         {
@@ -234,15 +234,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.10",
           "type": "Library"
         },
         {
@@ -278,15 +278,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.10",
           "type": "Library"
         },
         {
@@ -478,23 +478,23 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.10",
           "type": "Library"
         },
         {
@@ -510,23 +510,23 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.10",
           "type": "Library"
         },
         {
@@ -718,7 +718,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.10",
           "type": "Library"
         },
         {
@@ -726,7 +726,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.10",
           "type": "Library"
         },
         {
@@ -746,7 +746,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.10",
           "type": "Library"
         },
         {
@@ -754,11 +754,11 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.10",
           "type": "Library"
         },
         {
@@ -971,7 +971,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10",
           "type": "Library"
         },
         {
@@ -995,15 +995,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-model:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-core:1.7.10",
           "type": "Library"
         },
         {
@@ -1039,15 +1039,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-native-utils:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-project-model:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-io:1.7.10",
           "type": "Library"
         },
         {
@@ -1235,23 +1235,23 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-runner:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-tooling-metadata:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-gradle-plugin-idea:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-util-klib:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-klib-commonizer-api:1.7.10",
           "type": "Library"
         },
         {
@@ -1267,23 +1267,23 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-annotation-processing-gradle:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-compiler-embeddable:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-embeddable:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-compiler-impl-embeddable:1.7.10",
           "type": "Library"
         },
         {
@@ -1475,7 +1475,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-client:1.7.10",
           "type": "Library"
         },
         {
@@ -1483,7 +1483,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-build-common:1.7.10",
           "type": "Library"
         },
         {
@@ -1503,7 +1503,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.10",
           "type": "Library"
         },
         {
@@ -1511,11 +1511,11 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-jvm:1.7.10",
           "type": "Library"
         },
         {
-          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.0",
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-scripting-common:1.7.10",
           "type": "Library"
         },
         {
