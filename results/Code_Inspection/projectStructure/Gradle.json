@@ -2,20 +2,20 @@
   "gradleJvm": "#JAVA_HOME",
   "libraries": [
     {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21",
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31",
       "unresolved": false,
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-stdlib-jdk8",
-      "version": "1.6.21"
+      "version": "1.5.31"
     },
     {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-reflect:1.6.21",
-      "gradleName": "org.jetbrains.kotlin:kotlin-reflect:1.6.21",
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-reflect:1.5.31",
+      "gradleName": "org.jetbrains.kotlin:kotlin-reflect:1.5.31",
       "unresolved": false,
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-reflect",
-      "version": "1.6.21"
+      "version": "1.5.31"
     },
     {
       "ideaName": "Gradle: com.android.tools.build:gradle:7.2.1",
@@ -34,20 +34,20 @@
       "version": "1.7.10"
     },
     {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21",
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31",
       "unresolved": false,
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-stdlib-jdk7",
-      "version": "1.6.21"
+      "version": "1.5.31"
     },
     {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.6.21",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib:1.6.21",
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.5.31",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib:1.5.31",
       "unresolved": false,
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-stdlib",
-      "version": "1.6.21"
+      "version": "1.5.31"
     },
     {
       "ideaName": "Gradle: com.android.tools.build:builder:7.2.1",
@@ -98,20 +98,20 @@
       "version": "1.7.10"
     },
     {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.6.21",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-common:1.6.21",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-stdlib-common",
-      "version": "1.6.21"
-    },
-    {
       "ideaName": "Gradle: org.jetbrains:annotations:13.0",
       "gradleName": "org.jetbrains:annotations:13.0",
       "unresolved": false,
       "groupId": "org.jetbrains",
       "artifactId": "annotations",
       "version": "13.0"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-stdlib-common",
+      "version": "1.5.31"
     },
     {
       "ideaName": "Gradle: com.android.tools.build:manifest-merger:30.2.1",
@@ -1272,46 +1272,6 @@
       "groupId": "io.netty",
       "artifactId": "netty-resolver",
       "version": "4.1.34.Final"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-stdlib-jdk8",
-      "version": "1.5.31"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-reflect:1.5.31",
-      "gradleName": "org.jetbrains.kotlin:kotlin-reflect:1.5.31",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-reflect",
-      "version": "1.5.31"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-stdlib-jdk7",
-      "version": "1.5.31"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.5.31",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib:1.5.31",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-stdlib",
-      "version": "1.5.31"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31",
-      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31",
-      "unresolved": false,
-      "groupId": "org.jetbrains.kotlin",
-      "artifactId": "kotlin-stdlib-common",
-      "version": "1.5.31"
     }
   ]
 }
