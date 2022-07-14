@@ -17,7 +17,7 @@ allprojects {
     notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
   }
   tasks.matching {
-    it.name.contains("optimize*ReleaseRes")
+    it.name.contains("optimize(.*)ReleaseRes")
   }.configureEach {
     notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
   }
