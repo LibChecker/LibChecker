@@ -660,8 +660,8 @@
       "code": {
         "startLine": 20,
         "length": 35,
-        "offset": 71,
-        "surroundingCode": "    it.name.contains(\"optimize(.*)ReleaseRes\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"optimizeReleaseRes tasks haven't support CC.\")\n  }\n}"
+        "offset": 81,
+        "surroundingCode": "    it.name.contains(\"optimize(.*)ReleaseRes\".toRegex())\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"optimizeReleaseRes tasks haven't support CC.\")\n  }\n}"
       }
     }
   ],
@@ -669,5 +669,5 @@
     "module": "LibChecker",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "3a34f657f94eefcd72680e18a22a4ea20379660ddd2926448dec0ea400a538a1"
+  "hash": "834ea671ce425662a261d98827bbbe9dc3eb4ec53977cea54005493d4ea84079"
 }]}
