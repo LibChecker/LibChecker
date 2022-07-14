@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.database
 
 import android.app.Application
+import android.content.Context
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.FileUtils
@@ -15,6 +16,11 @@ object Repositories {
 
   fun init(application: Application) {
     context = application
+  }
+
+  fun getLCDatabaseFile(context: Context): File {
+    val databaseDir = Repositories.context.getDatabasePath(Constants.RULES_DATABASE_NAME).parent
+    return File(databaseDir, Constants.RULES_DATABASE_NAME)
   }
 
   fun checkRulesDatabase() {

@@ -158,6 +158,10 @@ class AppListFragment :
       homeViewModel.requestChange()
     }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
+    if (homeViewModel.appListStatus == STATUS_START_INIT) {
+      flip(VF_INIT)
+      setHasOptionsMenu(false)
+    }
   }
 
   override fun onPause() {

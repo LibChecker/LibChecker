@@ -140,6 +140,7 @@ dependencies {
   implementation(libs.androidX.recyclerView)
   implementation(libs.androidX.preference)
   implementation(libs.androidX.window)
+  implementation(libs.androidX.security)
   implementation(libs.bundles.androidX.lifecycle)
   implementation(libs.bundles.androidX.room)
   implementation(libs.google.material)
@@ -173,6 +174,7 @@ dependencies {
   implementation(libs.hiddenApiBypass)
   implementation(libs.dexLib2)
   implementation(libs.slf4j)
+  implementation(libs.commons.io)
 
   implementation(libs.bundles.rikkax)
 

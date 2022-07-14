@@ -46,6 +46,7 @@ androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-alpha01"
 androidX-window = "androidx.window:window:1.0.0"
+androidX-security = "androidx.security:security-crypto:1.1.0-alpha03"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
 square-moshi = { module = "com.squareup.moshi:moshi", version.ref = "square-moshi" }
@@ -99,6 +100,7 @@ zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
 lc-rules = "com.github.zhaobozhen:LibChecker-Rules-Bundle:25.2"
 slf4j = "org.slf4j:slf4j-simple:1.7.36"
+commons-io = "commons-io:commons-io:2.11.0"
 
 [bundles]
 androidX-lifecycle = [

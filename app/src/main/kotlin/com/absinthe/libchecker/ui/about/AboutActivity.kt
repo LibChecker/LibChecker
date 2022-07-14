@@ -427,6 +427,14 @@ class AboutActivity : AbsAboutActivityProxy() {
           "https://github.com/saket/cascade"
         )
       )
+      add(
+        License(
+          "Android-Room-Database-Backup",
+          "rafi0101",
+          License.MIT,
+          "https://github.com/rafi0101/Android-Room-Database-Backup"
+        )
+      )
     }
   }
 

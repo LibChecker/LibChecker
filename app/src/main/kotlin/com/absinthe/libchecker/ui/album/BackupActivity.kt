@@ -11,21 +11,36 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.LCDatabase
+import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
+import com.jakewharton.processphoenix.ProcessPhoenix
+import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okio.buffer
+import okio.sink
+import okio.source
 import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,7 +72,10 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
   override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
     super.onApplyUserThemeResource(theme, isDecorView)
-    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
+    theme.applyStyle(
+      rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference,
+      true
+    )
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -73,6 +91,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
     private lateinit var backupResultLauncher: ActivityResultLauncher<String>
     private lateinit var restoreResultLauncher: ActivityResultLauncher<String>
+    private lateinit var roomBackup: RoomBackup
 
     override fun onAttach(context: Context) {
       super.onAttach(context)
@@ -103,11 +122,41 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
                   ?.let { inputStream ->
                     val dialog = LCAppUtils.createLoadingDialog(activity)
                     dialog.show()
-                    viewModel.restore(inputStream) { success ->
-                      if (!success) {
-                        context.showToast("Backup file error")
+                    if (it.toString().endsWith(".sqlite3")) {
+                      lifecycleScope.launch(Dispatchers.IO) {
+                        val restoreFile = File(activity.externalCacheDir, "restore.sqlite3")
+                        inputStream.source().buffer().use { source ->
+                          restoreFile.outputStream().sink().buffer().use { sink ->
+                            source.readAll(sink)
+                          }
+                        }
+                        roomBackup
+                          .database(LCDatabase.getDatabase(requireContext()))
+                          .enableLogDebug(true)
+                          .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
+                          .backupLocationCustomFile(restoreFile)
+                          .apply {
+                            onCompleteListener { success, message, exitCode ->
+                              Timber.d("success: $success, message: $message, exitCode: $exitCode")
+                              if (success) {
+                                restoreFile.delete()
+                                Once.clearDone(OnceTag.FIRST_LAUNCH)
+                                ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
+                              }
+                              lifecycleScope.launch(Dispatchers.Main) {
+                                dialog.dismiss()
+                              }
+                            }
+                          }
+                          .restore()
                       }
-                      dialog.dismiss()
+                    } else {
+                      viewModel.restore(inputStream) { success ->
+                        if (!success) {
+                          context.showToast("Backup file error")
+                        }
+                        dialog.dismiss()
+                      }
                     }
                   }
               }.onFailure { t ->
@@ -116,6 +165,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
             }
           }
         }
+      roomBackup = RoomBackup(context)
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -129,11 +179,32 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val formatted = simpleDateFormat.format(date)
 
           if (StorageUtils.isExternalStorageWritable) {
-            runCatching {
-              backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
-            }.onFailure {
-              Timber.e(it)
-              context.showToast("Document API not working")
+
+            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile(context)) > 100 * 1024 * 1024) {
+              val dialog = LCAppUtils.createLoadingDialog(requireActivity())
+              dialog.show()
+              roomBackup
+                .database(LCDatabase.getDatabase(requireContext()))
+                .enableLogDebug(true)
+                .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_DIALOG)
+                .customBackupFileName("LibChecker-Snapshot-Backups-$formatted.sqlite3")
+                .maxFileCount(5)
+                .apply {
+                  onCompleteListener { success, message, exitCode ->
+                    Timber.d("success: $success, message: $message, exitCode: $exitCode")
+                    lifecycleScope.launch(Dispatchers.Main) {
+                      dialog.dismiss()
+                    }
+                  }
+                }
+                .backup()
+            } else {
+              runCatching {
+                backupResultLauncher.launch("LibChecker-Snapshot-Backups-$formatted.lcss")
+              }.onFailure {
+                Timber.e(it)
+                context.showToast("Document API not working")
+              }
             }
           } else {
             context.showToast("External storage is not writable")
