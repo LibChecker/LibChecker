@@ -660,8 +660,8 @@
       "code": {
         "startLine": 20,
         "length": 35,
-        "offset": 67,
-        "surroundingCode": "    it.name.contains(\"optimizeReleaseRes\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"Cannot serialize Gradle script object references as these are not supported with the configuration cache.\")\n  }\n}"
+        "offset": 71,
+        "surroundingCode": "    it.name.contains(\"optimize(.*)ReleaseRes\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"optimizeReleaseRes tasks haven't support CC.\")\n  }\n}"
       }
     }
   ],
@@ -669,5 +669,5 @@
     "module": "LibChecker",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "d6231f8d81226b6ebeb2e6964030cea1144b4dc3dec81d3b55b603809c8dc4d2"
+  "hash": "3a34f657f94eefcd72680e18a22a4ea20379660ddd2926448dec0ea400a538a1"
 }]}
