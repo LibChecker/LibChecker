@@ -17,9 +17,9 @@ allprojects {
     notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
   }
   tasks.matching {
-    it.name.contains("optimizeReleaseRes")
+    it.name.contains("optimize*ReleaseRes")
   }.configureEach {
-    notCompatibleWithConfigurationCache("Cannot serialize Gradle script object references as these are not supported with the configuration cache.")
+    notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
   }
 }
 
