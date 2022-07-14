@@ -158,6 +158,7 @@ fun TextView.startStrikeThroughAnimation(): ValueAnimator {
     invalidate()
   }
   animator.interpolator = AccelerateDecelerateInterpolator()
+  animator.duration = 1000
   animator.start()
   return animator
 }
@@ -172,6 +173,7 @@ fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
     invalidate()
   }
   animator.interpolator = AccelerateDecelerateInterpolator()
+  animator.duration = 1000
   animator.start()
   return animator
 }
