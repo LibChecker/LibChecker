@@ -1,13 +1,13 @@
 {
-  "total": 22,
+  "total": 24,
   "tools inspection": {
-    "Code Inspection": 22
+    "Code Inspection": 24
   },
   "attributes": {
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/zhaobozhen/LibChecker",
-        "revisionId": "c9601fbb377f051fe8c07030a26d66f55ba5fcab",
+        "revisionId": "3adce923d77e7c902e1ba537d66acf3590091564",
         "branch": "master"
       }
     },

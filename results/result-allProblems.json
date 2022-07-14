@@ -614,4 +614,60 @@
     "inspectionName": "UnstableApiUsage"
   },
   "hash": "c2e325bc8a4072f660c2f26e8d4127046643be1772399fbd3493805ca5269576"
+},{
+  "tool": "Code Inspection",
+  "category": "JVM languages",
+  "type": "Unstable API Usage",
+  "severity": "High",
+  "comment": "'notCompatibleWithConfigurationCache(java.lang.String)' is marked unstable with @Incubating",
+  "detailsInfo": "Reports usages of an API marked with one of the annotations as unstable. Such an API may be changed or removed in future versions, breaking the code that uses it.\n\nThe annotations which are used to mark unstable APIs are shown in the list below.\n\nBy default, the inspection ignores usages of unstable APIs\nif their declarations are located in sources of the same project. In such cases it'll be possible to update the usages when you change APIs.\nHowever, it may be inconvenient if the project is big, so one can switch off the **Ignore API declared in this project** option to report\nthe usages of unstable APIs declared in both the project sources and libraries.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "build.gradle.kts",
+      "language": "kotlin",
+      "line": 17,
+      "offset": 5,
+      "length": 35,
+      "code": {
+        "startLine": 15,
+        "length": 35,
+        "offset": 84,
+        "surroundingCode": "    it.name.contains(\"transformClassesWithHiddenApiRefine\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9\")\n  }\n  tasks.matching {"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker",
+    "inspectionName": "UnstableApiUsage"
+  },
+  "hash": "01d94da4354fd39b5b7b3a790be10ed5f23d0fd45aa5e3187d63217598de59c2"
+},{
+  "tool": "Code Inspection",
+  "category": "JVM languages",
+  "type": "Unstable API Usage",
+  "severity": "High",
+  "comment": "'notCompatibleWithConfigurationCache(java.lang.String)' is marked unstable with @Incubating",
+  "detailsInfo": "Reports usages of an API marked with one of the annotations as unstable. Such an API may be changed or removed in future versions, breaking the code that uses it.\n\nThe annotations which are used to mark unstable APIs are shown in the list below.\n\nBy default, the inspection ignores usages of unstable APIs\nif their declarations are located in sources of the same project. In such cases it'll be possible to update the usages when you change APIs.\nHowever, it may be inconvenient if the project is big, so one can switch off the **Ignore API declared in this project** option to report\nthe usages of unstable APIs declared in both the project sources and libraries.",
+  "sources": [
+    {
+      "type": "file",
+      "path": "build.gradle.kts",
+      "language": "kotlin",
+      "line": 22,
+      "offset": 5,
+      "length": 35,
+      "code": {
+        "startLine": 20,
+        "length": 35,
+        "offset": 67,
+        "surroundingCode": "    it.name.contains(\"optimizeReleaseRes\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"Cannot serialize Gradle script object references as these are not supported with the configuration cache.\")\n  }\n}"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker",
+    "inspectionName": "UnstableApiUsage"
+  },
+  "hash": "d6231f8d81226b6ebeb2e6964030cea1144b4dc3dec81d3b55b603809c8dc4d2"
 }]}
