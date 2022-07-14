@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -42,18 +43,14 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
   private var itemsList: List<LibStringItemChip>? = null
 
-  override fun getRecyclerView() = binding.list
+  override fun getRecyclerView(): RecyclerView = binding.list
   override val needShowLibDetailDialog = true
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@ComponentsAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     viewModel.apply {
-      componentsMap[adapter.type]?.observe(viewLifecycleOwner) { componentList ->
+      componentsMap.get(adapter.type).observe(viewLifecycleOwner) { componentList ->
         if (componentList.isEmpty()) {
           emptyView.text.text = getString(R.string.empty_list)
         } else {
@@ -172,13 +169,12 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
         }
         val blockerShouldBlock =
           integrationBlockerList?.any { it.name == fullComponentName } == false
-        arrayAdapter.add(
-          if (blockerShouldBlock) {
-            getString(R.string.integration_blocker_menu_block)
-          } else {
-            getString(R.string.integration_blocker_menu_unblock)
-          }
-        )
+        val blockStr = if (blockerShouldBlock) {
+          R.string.integration_blocker_menu_block
+        } else {
+          R.string.integration_blocker_menu_unblock
+        }
+        arrayAdapter.add(getString(blockStr))
         actionMap[arrayAdapter.count - 1] = {
           if (BlockerManager.isSupportInteraction) {
             BlockerManager().apply {
@@ -193,9 +189,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
               val shouldTurnToDisable =
                 integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
-              (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
-                if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
-              }
+              animateTvTitle(position, shouldTurnToDisable)
             }
           }
         }
@@ -228,9 +222,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
               val shouldTurnToDisable =
                 integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
-              (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
-                if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
-              }
+              animateTvTitle(position, shouldTurnToDisable)
             }
           }
         }
@@ -256,6 +248,12 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
     } else {
       ClipboardUtils.put(context, componentName)
       VersionCompat.showCopiedOnClipboardToast(context)
+    }
+  }
+
+  private fun animateTvTitle(position: Int, shouldTurnToDisable: Boolean) {
+    (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
+      if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
     }
   }
 
