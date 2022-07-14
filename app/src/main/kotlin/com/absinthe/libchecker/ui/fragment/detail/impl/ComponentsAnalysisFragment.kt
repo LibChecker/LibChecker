@@ -193,16 +193,8 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
               val shouldTurnToDisable =
                 integrationBlockerList?.any { it.name == fullComponentName } == true && blockerShouldBlock
-              if (shouldTurnToDisable) {
-                (adapter.getViewByPosition(
-                  position,
-                  android.R.id.title
-                ) as? TextView)?.startStrikeThroughAnimation()
-              } else {
-                (adapter.getViewByPosition(
-                  position,
-                  android.R.id.title
-                ) as? TextView)?.reverseStrikeThroughAnimation()
+              (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
+                if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
               }
             }
           }
@@ -236,16 +228,8 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
               val shouldTurnToDisable =
                 integrationMonkeyKingBlockList?.any { it.name == fullComponentName } == true && monkeyKingShouldBlock
-              if (shouldTurnToDisable) {
-                (adapter.getViewByPosition(
-                  position,
-                  android.R.id.title
-                ) as? TextView)?.startStrikeThroughAnimation()
-              } else {
-                (adapter.getViewByPosition(
-                  position,
-                  android.R.id.title
-                ) as? TextView)?.reverseStrikeThroughAnimation()
+              (adapter.getViewByPosition(position, android.R.id.title) as? TextView)?.run {
+                if (shouldTurnToDisable) startStrikeThroughAnimation() else reverseStrikeThroughAnimation()
               }
             }
           }
