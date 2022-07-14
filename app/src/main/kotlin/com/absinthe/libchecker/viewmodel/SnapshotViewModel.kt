@@ -107,7 +107,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val preList = repository.getSnapshots(preTimeStamp)
     val diffList = mutableListOf<SnapshotDiffItem>()
 
-    if (preList.isNullOrEmpty() || preTimeStamp == 0L) {
+    if (preList.isEmpty() || preTimeStamp == 0L) {
       snapshotDiffItems.postValue(diffList)
       return
     }
@@ -351,12 +351,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private suspend fun compareDiffWithSnapshotList(preTimeStamp: Long, currTimeStamp: Long) {
     val preList = repository.getSnapshots(preTimeStamp)
-    if (preList.isNullOrEmpty()) {
+    if (preList.isEmpty()) {
       return
     }
 
     val currList = repository.getSnapshots(currTimeStamp).toMutableList()
-    if (currList.isNullOrEmpty()) {
+    if (currList.isEmpty()) {
       return
     }
 

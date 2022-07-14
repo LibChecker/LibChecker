@@ -1,11 +1,13 @@
 package com.absinthe.libchecker.ui.album
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
@@ -33,7 +35,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.album_item_backup_restore_title)
@@ -43,11 +45,24 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         .replace(R.id.fragment_container, BackupFragment())
         .commit()
     }
+    onBackPressedDispatcher.addCallback(
+      this,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          finish()
+        }
+      }
+    )
+  }
+
+  override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
+    super.onApplyUserThemeResource(theme, isDecorView)
+    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      onBackPressedDispatcher.onBackPressed()
     }
     return super.onOptionsItemSelected(item)
   }
@@ -62,7 +77,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     override fun onAttach(context: Context) {
       super.onAttach(context)
       backupResultLauncher =
-        registerForActivityResult(ActivityResultContracts.CreateDocument()) {
+        registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) {
           it?.let {
             activity?.let { activity ->
               runCatching {
@@ -104,7 +119,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-      setPreferencesFromResource(R.xml.album_backup, rootKey)
+      setPreferencesFromResource(R.xml.album_backup, null)
 
       findPreference<Preference>(Constants.PREF_LOCAL_BACKUP)?.apply {
         setOnPreferenceClickListener {
@@ -162,7 +177,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
       recyclerView.borderViewDelegate.borderVisibilityChangedListener =
         BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-          (activity as? BaseActivity<*>)?.appBar?.setRaised(!top)
+          (activity as? BackupActivity)?.let {
+            it.binding.appbar.isLifted = !top
+          }
         }
       return recyclerView
     }

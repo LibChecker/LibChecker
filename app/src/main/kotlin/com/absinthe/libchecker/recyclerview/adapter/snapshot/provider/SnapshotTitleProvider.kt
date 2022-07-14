@@ -74,24 +74,22 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
       }
 
       countAdapter.setList(finalList)
-    } ?: let {
-      lifecycleScope.launch(Dispatchers.IO) {
-        @Suppress("UNCHECKED_CAST")
-        (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
-          countList[diffNode.item.diffType]++
-        }
+    } ?: lifecycleScope.launch(Dispatchers.Default) {
+      @Suppress("UNCHECKED_CAST")
+      (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
+        countList[diffNode.item.diffType]++
+      }
 
-        countMap.put(node.type, countList)
+      countMap.put(node.type, countList)
 
-        for (i in countList.indices) {
-          if (countList[i] != 0) {
-            finalList.add(SnapshotDetailCountNode(countList[i], i))
-          }
+      for (i in countList.indices) {
+        if (countList[i] != 0) {
+          finalList.add(SnapshotDetailCountNode(countList[i], i))
         }
+      }
 
-        withContext(Dispatchers.Main) {
-          countAdapter.setList(finalList)
-        }
+      withContext(Dispatchers.Main) {
+        countAdapter.setList(finalList)
       }
     }
 

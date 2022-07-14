@@ -5,10 +5,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.viewmodel.HomeViewModel
-import rikka.material.app.AppBar
 import rikka.widget.borderview.BorderViewDelegate
 
 abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController {
@@ -22,17 +20,15 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
-    if (visible) {
-      if (this != homeViewModel.controller) {
-        homeViewModel.controller = this
-        activity?.invalidateOptionsMenu()
-      }
+    if (visible && this != homeViewModel.controller) {
+      homeViewModel.controller = this
     }
   }
 
   override fun onResume() {
     super.onResume()
-    scheduleAppbarRaisingStatus()
+    setHasOptionsMenu(isVisible)
+    scheduleAppbarLiftingStatus(!(getBorderViewDelegate()?.isShowingTopBorder ?: true), "${this.javaClass.simpleName} onResume")
   }
 
   override fun onDetach() {
@@ -42,15 +38,13 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     }
   }
 
-  override fun getAppBar(): AppBar? = (activity as? BaseActivity<*>)?.appBar
-
   override fun getBorderViewDelegate(): BorderViewDelegate? = borderDelegate
 
-  override fun scheduleAppbarRaisingStatus() {
-    getAppBar()?.setRaised(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
-  }
-
   override fun isAllowRefreshing(): Boolean = allowRefreshing
+
+  protected fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
+    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted, from)
+  }
 
   protected fun isListCanScroll(listSize: Int): Boolean {
     if (context == null) {
@@ -72,7 +66,8 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
 
   protected fun hasPackageChanged(): Boolean {
     homeViewModel.workerBinder?.let {
-      val serverLastPackageChangedTime = it.lastPackageChangedTime
+      val serverLastPackageChangedTime =
+        runCatching { it.lastPackageChangedTime }.getOrElse { return false }
       if (lastPackageChangedTime < serverLastPackageChangedTime) {
         lastPackageChangedTime = serverLastPackageChangedTime
         return true

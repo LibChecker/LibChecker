@@ -118,20 +118,22 @@
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
   <string name="extract_native_libs_tip_part_a">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
+  <string name="format_last_updated">最近更新: %s</string>
+  <string name="menu_process">进程</string>
+  <string name="alternative_launch_method">备选的启动方式</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
   <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
   <string name="toast_cant_open_app">无法启动此 App</string>
-  <string name="toast_package_name_null">软件包名称为空</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
 
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>
-  <string name="snapshot_apps_count">快照应用程序数量</string>
+  <string name="snapshot_apps_count">快照应用程序数量 / 应用程序数量</string>
   <string name="snapshot_indicator_added">增加</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
@@ -175,6 +177,8 @@
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大圣净化」禁用此组件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大圣净化」解禁此组件</string>
+  <string name="integration_blocker_menu_block">使用「Blocker」禁用此组件</string>
+  <string name="integration_blocker_menu_unblock">使用「Blocker」解禁此组件</string>
   <string name="integration_anywhere_menu_editor">在「Anywhere- 编辑器」中打开</string>
 
   <!--  Cloud rules  -->

@@ -29,8 +29,8 @@ import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -70,8 +70,6 @@ class AppListFragment :
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
-    setHasOptionsMenu(true)
-
     appAdapter.also {
       it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
@@ -92,7 +90,12 @@ class AppListFragment :
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            (activity as? MainActivity)?.appBar?.setRaised(!top)
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "AppListFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
         setHasFixedSize(true)
         FastScrollerBuilder(this).useMd2Style().build()
@@ -154,6 +157,7 @@ class AppListFragment :
     if (hasPackageChanged()) {
       homeViewModel.requestChange()
     }
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onPause() {

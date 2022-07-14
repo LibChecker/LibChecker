@@ -3,25 +3,25 @@ package com.absinthe.libchecker.view.snapshot
 import android.content.Context
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
-import com.absinthe.libchecker.view.AViewGroup
-import com.google.android.material.card.MaterialCardView
+import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
+import com.absinthe.libchecker.view.RoundCornerView
 
-class SnapshotItemView(context: Context) : MaterialCardView(context) {
+class SnapshotItemView(context: Context) : FrameLayout(context) {
 
   val container = SnapshotItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
     clipToPadding = false
   }
 
@@ -33,7 +33,11 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
     addView(container)
   }
 
-  class SnapshotItemContainerView(context: Context) : AViewGroup(context) {
+  class SnapshotItemContainerView(context: Context) : RoundCornerView(context) {
+
+    init {
+      radius = 8.dp
+    }
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -60,9 +64,8 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     val packageName =
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
-        layoutParams = LayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        layoutParams =
+          LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
         addView(this)
@@ -131,31 +134,7 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
 
     val stateIndicator = SnapshotStateIndicatorView(context).apply {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
-      enableRoundCorner = GlobalValues.md3Theme
       addView(this)
-    }
-
-    private var redMask: View? = null
-
-    fun addRedMask() {
-      if (redMask == null) {
-        redMask = View(context).apply {
-          layoutParams = LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-          )
-          setBackgroundColor(R.color.material_red_300.getColor(context))
-          alpha = 0.5f
-          addView(this)
-        }
-      }
-    }
-
-    fun removeRedMask() {
-      if (redMask != null) {
-        removeView(redMask)
-        redMask = null
-      }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -210,7 +189,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         stateIndicator.defaultWidthMeasureSpec(this),
         (measuredHeight - paddingTop - paddingBottom).toExactlyMeasureSpec()
       )
-      redMask?.autoMeasure()
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -229,7 +207,6 @@ class SnapshotItemView(context: Context) : MaterialCardView(context) {
         stateIndicator.toVerticalCenter(this),
         fromRight = true
       )
-      redMask?.layout(0, 0)
     }
   }
 }

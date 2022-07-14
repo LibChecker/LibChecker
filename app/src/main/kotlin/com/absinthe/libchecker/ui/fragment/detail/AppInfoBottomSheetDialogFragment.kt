@@ -3,24 +3,29 @@ package com.absinthe.libchecker.ui.fragment.detail
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.Build
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
+import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.showToast
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppInfoBottomSheetView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import java.io.File
 
 /**
  * <pre>
@@ -49,11 +54,20 @@ class AppInfoBottomSheetDialogFragment :
     }
     root.launch.setOnClickListener {
       try {
-        startLaunchAppActivity(packageName)
-      } catch (e: NullPointerException) {
-        context?.showToast(R.string.toast_package_name_null)
+        if (packageName == BuildConfig.APPLICATION_ID) {
+          Toasty.showShort(requireContext(), "But why…")
+        } else {
+          startLaunchAppActivity(packageName)
+        }
       } catch (e: Exception) {
-        context?.showToast(R.string.toast_cant_open_app)
+        activity?.let {
+          AlternativeLaunchBSDFragment().apply {
+            arguments = bundleOf(
+              EXTRA_PACKAGE_NAME to packageName
+            )
+            show(it.supportFragmentManager, tag)
+          }
+        }
       } finally {
         dismiss()
       }
@@ -78,17 +92,12 @@ class AppInfoBottomSheetDialogFragment :
 
     if (OsUtils.atLeastN()) {
       aiAdapter.also { adapter ->
-        adapter.setList(getResolveInfoList())
+        adapter.setList(getResolveInfoList() + getMaterialFilesItem())
         adapter.setOnItemClickListener { _, _, position ->
           adapter.data[position].let {
-            val intent = Intent(Intent.ACTION_SHOW_APP_INFO)
-              .setComponent(
-                ComponentName(it.activityInfo.packageName, it.activityInfo.name)
-              )
-              .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
-            try {
-              startActivity(intent)
-            } catch (e: Exception) {
+            runCatching {
+              startActivity(it.intent)
+            }.onFailure {
               context?.let { ctx ->
                 Toasty.showShort(ctx, R.string.toast_cant_open_app)
               }
@@ -101,10 +110,46 @@ class AppInfoBottomSheetDialogFragment :
   }
 
   @RequiresApi(Build.VERSION_CODES.N)
-  private fun getResolveInfoList(): List<ResolveInfo> {
-    return requireContext().packageManager.queryIntentActivities(
-      Intent(Intent.ACTION_SHOW_APP_INFO), PackageManager.MATCH_DEFAULT_ONLY
+  private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
+    return PackageManagerCompat.queryIntentActivities(
+      Intent(Intent.ACTION_SHOW_APP_INFO),
+      PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
+      .map {
+        AppInfoAdapter.AppInfoItem(
+          it.activityInfo,
+          Intent(Intent.ACTION_SHOW_APP_INFO)
+            .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
+            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+        )
+      }
+  }
+
+  private fun getMaterialFilesItem(): List<AppInfoAdapter.AppInfoItem> {
+    val pkg = packageName ?: return emptyList()
+
+    if (!PackageUtils.isAppInstalled(Constants.PackageNames.MATERIAL_FILES)) {
+      return emptyList()
+    }
+
+    val sourceDir = runCatching {
+      File(PackageUtils.getPackageInfo(pkg).applicationInfo.sourceDir).parent
+    }.getOrNull() ?: return emptyList()
+
+    return listOf(
+      AppInfoAdapter.AppInfoItem(
+        PackageUtils.getPackageInfo(Constants.PackageNames.MATERIAL_FILES).applicationInfo,
+        Intent(Intent.ACTION_VIEW)
+          .setType(DocumentsContract.Document.MIME_TYPE_DIR)
+          .setComponent(
+            ComponentName(
+              Constants.PackageNames.MATERIAL_FILES,
+              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity"
+            )
+          )
+          .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
+      )
+    )
   }
 
   private fun startLaunchAppActivity(packageName: String?) {
@@ -115,17 +160,12 @@ class AppInfoBottomSheetDialogFragment :
     val intent = Intent(Intent.ACTION_MAIN, null)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setPackage(packageName)
-    val pm = requireActivity().packageManager
-    val info = pm.queryIntentActivities(intent, 0)
-    launcherActivity = if (info.size == 0) "" else info[0].activityInfo.name
+    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
+    launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
     val launchIntent = Intent(Intent.ACTION_MAIN)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setClassName(packageName, launcherActivity)
       .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    try {
-      startActivity(launchIntent)
-    } catch (e: Exception) {
-      Toasty.showShort(requireContext(), R.string.toast_cant_open_app)
-    }
+    startActivity(launchIntent)
   }
 }

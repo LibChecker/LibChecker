@@ -1,13 +1,13 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.bean.AppBundleItemBean
+import com.absinthe.libchecker.bean.AppBundleItem
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.AppBundleBottomSheetView
 import com.absinthe.libchecker.view.detail.AppBundleItemView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.util.Locale
 
 class AppBundleBottomSheetDialogFragment :
@@ -37,7 +37,7 @@ class AppBundleBottomSheetDialogFragment :
             localeList.contains(middleName) -> AppBundleItemView.IconType.TYPE_STRINGS
             else -> AppBundleItemView.IconType.TYPE_OTHERS
           }
-          AppBundleItemBean(name = name, size = FileUtils.getFileSize(split), type = type)
+          AppBundleItem(name = name, size = FileUtils.getFileSize(split), type = type)
         }
       }
       root.adapter.setList(bundleList)

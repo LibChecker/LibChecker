@@ -6,7 +6,6 @@ import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.view.ContextThemeWrapper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -48,13 +47,13 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
-      LibReferenceItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+      LibReferenceItemView(context).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-          it.setMargins(margin, margin, margin, margin)
+          it.setMargins(0, margin, 0, margin)
         }
       }
     )
@@ -80,7 +79,7 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
         setOrHighlightText(labelName, it.name)
       } ?: let {
         if (libReferenceItem.type == PERMISSION && libReferenceItem.libName.startsWith("android.permission")) {
-          icon.setImageResource(R.drawable.ic_lib_android)
+          icon.setImageResource(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_android)
         } else {
           icon.setImageResource(R.drawable.ic_question)
         }

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--suppress AndroidDomInspection -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   tools:targetApi="n_mr1">
 
   <shortcut
-    android:icon="@drawable/ic_sc_app_list"
-    android:shortcutId="start_app_list"
-    android:shortcutShortLabel="@string/title_app_list">
+    android:icon="@drawable/ic_sc_chart"
+    android:shortcutId="start_chart"
+    android:shortcutShortLabel="@string/tab_chart">
 
     <intent
-      android:action="com.absinthe.libchecker.intent.action.START_APP_LIST"
-      android:targetClass="com.absinthe.libchecker.ui.main.MainActivity"
+      android:action="android.intent.action.VIEW"
+      android:targetClass="com.absinthe.libchecker.ui.main.ChartActivity"
       android:targetPackage="com.absinthe.libchecker.debug" />
   </shortcut>
 

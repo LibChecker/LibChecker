@@ -1,123 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools">
-  <style name="Base.AppTheme.Light" parent="Theme.Material.Light.LightStatusBar">
-    <item name="android:statusBarColor">?android:colorBackground</item>
+<resources>
 
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryVariant">?colorPrimary</item>
-    <item name="colorSecondary">?colorPrimary</item>
-    <item name="colorSecondaryVariant">?colorPrimary</item>
-    <item name="colorOnSecondary">@android:color/white</item>
-    <item name="colorTertiary">?colorPrimary</item>
-    <item name="colorOnTertiary">@android:color/white</item>
-    <item name="colorSecondaryContainer">@color/background_gray</item>
-
-    <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
-    <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
-    <item name="toolbarStyle">@style/Widget.Material.Toolbar</item>
-
-    <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
-    <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
-    <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
-    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="android:windowActionBar">false</item>
-    <item name="android:windowNoTitle">true</item>
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-    </item>
-    <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-    <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
-
-    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
-    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
-    <item name="albumCardViewColorSurface">@android:color/transparent</item>
-    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
-
+  <style name="Platform.V31.Theme.LibChecker" parent="Platform.V29.Theme.LibChecker">
     <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
     <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_anim_vector</item>
     <item name="android:windowSplashScreenAnimationDuration">500</item>
   </style>
 
-  <style name="Base.AppTheme" parent="Theme.Material">
-    <item name="colorPrimary">@color/app_color_dark</item>
-    <item name="colorPrimaryVariant">?colorPrimary</item>
-    <item name="colorSecondary">@color/app_color_dark</item>
-    <item name="colorSecondaryVariant">?colorPrimary</item>
-    <item name="colorOnSecondary">@android:color/black</item>
-    <item name="colorTertiary">?colorPrimary</item>
-    <item name="colorOnTertiary">@android:color/black</item>
-    <item name="colorSecondaryContainer">@color/background_gray</item>
+  <style name="Platform.Theme.LibChecker" parent="Platform.V31.Theme.LibChecker" />
 
-    <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
-    <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
-    <item name="toolbarStyle">@style/Widget.Material.Toolbar</item>
-
-    <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
-    <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
-    <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
-    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="android:windowActionBar">false</item>
-    <item name="android:windowNoTitle">true</item>
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-    </item>
-    <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-    <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
-
-    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler</item>
-    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated</item>
-    <item name="albumCardViewColorSurface">@android:color/transparent</item>
-    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler</item>
-
-    <item name="android:windowSplashScreenBackground">?android:attr/colorBackground</item>
-    <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_anim_vector</item>
-    <item name="android:windowSplashScreenAnimationDuration">500</item>
-  </style>
-
-  <style name="Base.AppTheme.Material3" parent="Theme.Material3.DayNight.NoActionBar">
-    <item name="android:statusBarColor">?android:colorBackground</item>
-
-    <item name="colorPrimary">@color/colorPrimaryMd3</item>
-    <item name="colorSecondary">?colorPrimary</item>
-    <item name="colorOnSecondary">@android:color/white</item>
-    <item name="colorTertiary">?colorPrimary</item>
-    <item name="colorOnTertiary">@android:color/white</item>
-    <item name="colorSurface">@color/colorSurfaceMd3</item>
-    <item name="colorSecondaryContainer">@color/colorActivatedMd3</item>
-
-    <item name="actionBarStyle">@style/Widget.Material.ActionBar.Surface</item>
-    <item name="actionBarTheme">@style/ThemeOverlay.ActionBar</item>
-    <item name="toolbarStyle">@style/Widget.Material.Toolbar</item>
-
-    <item name="appBarStyle">@style/Widget.AppBar.Surface.Raisable</item>
-    <item name="preferenceTheme">@style/ThemeOverlay.Preference</item>
-    <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog.Md3</item>
-    <item name="dropDownListViewStyle">@style/Widget.LC.PopupMenu</item>
-
-    <item name="android:windowActionBar">false</item>
-    <item name="android:windowNoTitle">true</item>
-    <item name="windowActionBar">false</item>
-    <item name="windowNoTitle">true</item>
-    <item name="android:windowSplashscreenContent" tools:targetApi="o">
-      @drawable/splash_drawable
-    </item>
-    <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges
-    </item>
-    <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-    <item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
-    <item name="android:enforceStatusBarContrast" tools:targetApi="q">false</item>
-
-    <item name="chipStyle">@style/App.LibChip.Material3</item>
-    <item name="materialCardViewStyle">@style/App.Material3.CardView</item>
-    <item name="bottomSheetHeaderHandlerColor">@color/bottom_sheet_header_handler_md3</item>
-    <item name="bottomSheetHeaderHandlerColorActivated">@color/bottom_sheet_header_handler_activated_md3</item>
-    <item name="albumCardViewColorSurface">@color/material_blue_grey_300</item>
-    <item name="albumCardBorderColor">@color/bottom_sheet_header_handler_md3</item>
-  </style>
 </resources>

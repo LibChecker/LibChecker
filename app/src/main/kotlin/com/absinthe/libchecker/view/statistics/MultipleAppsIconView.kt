@@ -6,15 +6,11 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.lifecycle.LifecycleCoroutineScope
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.AppIconCache
+import coil.load
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class MultipleAppsIconView(context: Context) : AViewGroup(context) {
 
@@ -33,7 +29,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     setBackgroundColor(context.getColorByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
   }
 
-  fun setIcons(lifecycleScope: LifecycleCoroutineScope, packages: List<String>) {
+  fun setIcons(packages: List<String>) {
     if (icons.isNotEmpty()) {
       removeAllViews()
       icons.clear()
@@ -41,15 +37,12 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
     while (icons.size < 4 && icons.size < packages.size) {
       val icon = AppCompatImageView(context).also {
         val packageName = packages[icons.size]
-        it.setTag(R.id.app_item_icon_id, packageName)
-        lifecycleScope.launch(Dispatchers.IO) {
-          try {
-            val ai = PackageUtils.getPackageInfo(packageName).applicationInfo
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, it)
-          } catch (e: Exception) {
-            Timber.e(e)
-          }
-        }
+        val packageInfo = runCatching {
+          AppItemRepository.allPackageInfoMap[packageName]
+            ?: PackageUtils.getPackageInfo(packageName)
+        }.getOrNull() ?: return
+
+        it.load(packageInfo)
       }
       icons.add(icon)
       addView(icon)

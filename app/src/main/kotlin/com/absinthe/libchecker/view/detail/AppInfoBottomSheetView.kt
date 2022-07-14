@@ -7,14 +7,15 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    title.text = context.getString(R.string.further_operation)
   }
 
   val launch = AppInfoItemView(context).apply {

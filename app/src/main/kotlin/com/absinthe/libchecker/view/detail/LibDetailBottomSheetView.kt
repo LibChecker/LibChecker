@@ -20,11 +20,12 @@ import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
+import timber.log.Timber
 
 class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
@@ -39,7 +40,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
     layoutParams = LayoutParams(iconSize, iconSize).also {
       it.topMargin = 4.dp
     }
-    setBackgroundResource(R.drawable.bg_gray_circle)
+    setBackgroundResource(R.drawable.bg_circle_outline)
   }
 
   val title = AppCompatTextView(
@@ -91,8 +92,8 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
   }
 
   init {
-    val padding = 24.dp
-    setPadding(padding, 16.dp, padding, padding)
+    val padding = 16.dp
+    setPadding(padding, padding, padding, 0)
     addView(header)
     addView(icon)
     addView(title)
@@ -294,12 +295,29 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
     }
 
+    var updatedTime: LibDetailItemView? = null
+
     init {
       addView(label)
       addView(team)
       addView(contributor)
       addView(description)
       addView(relativeLink)
+    }
+
+    fun setUpdatedTime(time: String) {
+      if (updatedTime == null) {
+        updatedTime = LibDetailItemView(context).apply {
+          layoutParams = LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+          )
+          icon.setImageResource(R.drawable.ic_time)
+          text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
+        }
+        addView(updatedTime)
+      }
+      updatedTime!!.text.text = time
     }
 
     private val marginVertical = 8.dp
@@ -326,9 +344,16 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
         relativeLink.defaultHeightMeasureSpec(this)
       )
+      updatedTime?.measure(
+        (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
+        updatedTime!!.defaultHeightMeasureSpec(this)
+      )
+      val updatedTimeHeight = updatedTime?.let { it.measuredHeight + marginVertical } ?: 0
       setMeasuredDimension(
         measuredWidth,
-        label.measuredHeight + team.measuredHeight + contributor.measuredHeight + description.measuredHeight + relativeLink.measuredHeight + marginVertical * 4
+        label.measuredHeight + team.measuredHeight +
+          contributor.measuredHeight + description.measuredHeight +
+          relativeLink.measuredHeight + updatedTimeHeight + marginVertical * 4
       )
     }
 
@@ -338,14 +363,20 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       contributor.layout(0, team.bottom + marginVertical)
       description.layout(0, contributor.bottom + marginVertical)
       relativeLink.layout(0, description.bottom + marginVertical)
+      updatedTime?.layout(0, relativeLink.bottom + marginVertical)
     }
   }
 
   fun showContent() {
-    viewFlipper.show(libDetailContentView)
+    Timber.d("showContent")
+    if (viewFlipper.displayedChildView != libDetailContentView) {
+      viewFlipper.show(libDetailContentView)
+    }
   }
 
   fun showNotFound() {
-    viewFlipper.show(notFoundView)
+    if (viewFlipper.displayedChildView != notFoundView) {
+      viewFlipper.show(notFoundView)
+    }
   }
 }

@@ -1,13 +1,14 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TimeNodeBottomSheetView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 const val EXTRA_TOP_APPS = "EXTRA_TOP_APPS"
 
@@ -22,6 +23,9 @@ class TimeNodeBottomSheetDialogFragment :
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    root.post {
+      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+    }
     customTitle?.let { getHeaderView().title.text = it }
     itemClickAction?.let {
       root.adapter.apply {
@@ -41,8 +45,10 @@ class TimeNodeBottomSheetDialogFragment :
       }
     }
 
-    arguments?.getParcelableArrayList<TimeStampItem>(EXTRA_TOP_APPS)?.let { topApps ->
-      root.adapter.setList(topApps)
+    arguments?.let {
+      BundleCompat.getParcelableArrayList<TimeStampItem>(it, EXTRA_TOP_APPS)?.let { topApps ->
+        root.adapter.setList(topApps)
+      }
     }
   }
 

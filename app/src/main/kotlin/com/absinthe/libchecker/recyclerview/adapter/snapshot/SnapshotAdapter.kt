@@ -1,50 +1,36 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleCoroutineScope
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.utils.AppIconCache
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
-import com.absinthe.libchecker.utils.extensions.toColorStateList
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 const val ARROW = "→"
 
 class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
-  private var loadIconJob: Job? = null
-
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      SnapshotItemView(
-        ContextThemeWrapper(
-          context,
-          R.style.AppListMaterialCard
-        )
-      ).also {
+      SnapshotItemView(context).also {
         it.layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
@@ -56,54 +42,24 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   @SuppressLint("SetTextI18n")
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
-      icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(
-            item.packageName,
-            PackageManager.GET_META_DATA
-          ).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: PackageManager.NameNotFoundException) {
-          withContext(Dispatchers.Main) {
-            icon.setImageResource(R.drawable.ic_icon_blueprint)
-          }
-        }
+      val packageInfo = runCatching {
+        AppItemRepository.allPackageInfoMap[item.packageName]
+          ?: PackageUtils.getPackageInfo(item.packageName)
+      }.getOrNull()
+
+      if (packageInfo == null) {
+        icon.load(R.drawable.ic_icon_blueprint)
+      } else {
+        icon.load(packageInfo)
       }
 
       if (item.deleted) {
-        addRedMask()
+        setAlphaForAll(0.7f)
       } else {
-        removeRedMask()
+        setAlphaForAll(1.0f)
       }
 
-      var isNewOrDeleted = false
-
-      when {
-        item.deleted || item.newInstalled -> {
-          val background = if (item.deleted) {
-            R.color.material_red_300.toColorStateList(context)
-          } else {
-            R.color.material_green_300.toColorStateList(context)
-          }
-          holder.itemView.backgroundTintList = background
-          val color = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-          versionInfo.setTextColor(color)
-          packageSizeInfo.setTextColor(color)
-          targetApiInfo.setTextColor(color)
-          abiInfo.setTextColor(color)
-          isNewOrDeleted = true
-        }
-        else -> {
-          holder.itemView.backgroundTintList = null
-          val color = Color.GRAY
-          versionInfo.setTextColor(color)
-          packageSizeInfo.setTextColor(color)
-          targetApiInfo.setTextColor(color)
-          abiInfo.setTextColor(color)
-        }
-      }
+      val isNewOrDeleted = item.deleted || item.newInstalled
 
       stateIndicator.apply {
         added = item.added && !isNewOrDeleted
@@ -119,6 +75,24 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         appName.text = spannable
       } else {
         appName.text = getDiffString(item.labelDiff, isNewOrDeleted)
+      }
+
+      if (isNewOrDeleted) {
+        val labelDrawable = if (item.newInstalled) {
+          R.drawable.ic_label_new_package.getDrawable(context)!!
+        } else {
+          R.drawable.ic_label_deleted_package.getDrawable(context)!!
+        }
+        val sb = SpannableStringBuilder(appName.text)
+        val spanString = SpannableString("   ")
+        val span = CenterAlignImageSpan(
+          labelDrawable.also {
+            it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
+          }
+        )
+        spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        sb.append(spanString)
+        appName.text = sb
       }
 
       packageName.text = item.packageName
@@ -198,12 +172,6 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
         builder.append(" $ARROW ").append(newAbiSpanString)
       }
       abiInfo.text = builder
-    }
-  }
-
-  fun release() {
-    if (loadIconJob?.isActive == true) {
-      loadIconJob?.cancel()
     }
   }
 

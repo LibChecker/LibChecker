@@ -3,10 +3,12 @@
 [![Android CI](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml/badge.svg)](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml)
 [![License](https://img.shields.io/github/license/zhaobozhen/LibChecker?label=License)](https://choosealicense.com/licenses/apache-2.0/)
 [![Discussion](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/libcheckerr)
-[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/zhaobozhen/LibChecker-Rules)
 
 ## What's this?
 This app is used to view the third-party libraries used by applications in your device. It can view the ABI architecture of the application's native library (in general, whether the application is 64-bit or 32-bit). It can also view well-known libraries marked by [The Rule Repository](https://github.com/zhaobozhen/LibChecker-Rules), and can even sort and view them according to the number of libraries references.
+
+## Supported Versions
+Android 6.0 ~ 13 Beta 3
 
 ## Document
 [LibChecker-Docs](https://github.com/zhaobozhen/LibChecker-Docs)
@@ -14,6 +16,7 @@ This app is used to view the third-party libraries used by applications in your 
 ## Download
 [<img src="/source/coolapk-badge.png" width="323" height="125" />](https://www.coolapk.com/apk/com.absinthe.libchecker)
 [<img src="/source/google-play-badge.png" width="323" height="125" />](https://play.google.com/store/apps/details?id=com.absinthe.libchecker)
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" width="323" height="125" />](https://apt.izzysoft.de/fdroid/index/apk/com.absinthe.libchecker)
 
 ## Discussions
 [Github Discussions](https://github.com/zhaobozhen/LibChecker/discussions)

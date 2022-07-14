@@ -21,7 +21,6 @@ class VerticalSpacesItemDecoration(
     parent: RecyclerView,
     state: RecyclerView.State
   ) {
-
     if (influenceParent && parent.paddingTop != space) {
       parent.setPadding(parent.paddingStart, space, parent.paddingEnd, space)
       parent.clipToPadding = false

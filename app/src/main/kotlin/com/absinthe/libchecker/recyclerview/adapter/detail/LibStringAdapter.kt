@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -26,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.detail.EXTRA_TEXT
 import com.absinthe.libchecker.ui.fragment.detail.XmlBSDFragment
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
@@ -47,10 +49,26 @@ class LibStringAdapter(
   var highlightPosition: Int = -1
     private set
 
+  var processMap: Map<String, Int> = mapOf()
+
   private val appResources by lazy {
     runCatching {
       context.packageManager.getResourcesForApplication(packageName)
     }.getOrNull()
+  }
+
+  private var processMode: Boolean = false
+
+  @SuppressLint("NotifyDataSetChanged")
+  fun switchProcessMode() {
+    processMode = !processMode
+    notifyDataSetChanged()
+  }
+
+  @SuppressLint("NotifyDataSetChanged")
+  fun setProcessMode(isProcessMode: Boolean) {
+    processMode = isProcessMode
+    notifyDataSetChanged()
   }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -88,6 +106,11 @@ class LibStringAdapter(
       STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
       else -> {
         (holder.itemView as ComponentLibItemView).apply {
+          processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
+            -1
+          } else {
+            processMap[item.item.process] ?: UiUtils.getRandomColor()
+          }
           setOrHighlightText(libName, itemName)
           setChip(item.chip)
         }

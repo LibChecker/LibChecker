@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -34,10 +35,18 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     initView()
+    onBackPressedDispatcher.addCallback(
+      this,
+      object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+          finish()
+        }
+      }
+    )
   }
 
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
+    setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.title_album)
@@ -135,7 +144,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     if (item.itemId == android.R.id.home) {
-      onBackPressed()
+      onBackPressedDispatcher.onBackPressed()
     }
     return super.onOptionsItemSelected(item)
   }
@@ -154,9 +163,6 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
         context.getDimensionPixelSize(R.dimen.album_item_margin_horizontal)
       val marginVertical = context.getDimensionPixelSize(R.dimen.album_item_margin_vertical)
       it.setMargins(marginHorizontal, marginVertical, marginHorizontal, marginVertical)
-    }
-    if (!GlobalValues.md3Theme) {
-      background = null
     }
     container.apply {
       setIcon(iconRes)

@@ -20,7 +20,8 @@ import com.absinthe.rulesbundle.LCRules
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 19, exportSchema = true
+  version = 19,
+  exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
 
@@ -243,7 +244,6 @@ abstract class LCDatabase : RoomDatabase() {
         database.execSQL(
           "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'"
         )
-        AppItemRepository.shouldClearDiffItemsInDatabase = true
       }
     }
 

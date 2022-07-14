@@ -28,7 +28,6 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.showLongToast
 import com.absinthe.libraries.me.Absinthe
-import com.drakeet.about.AbsAboutActivity
 import com.drakeet.about.Card
 import com.drakeet.about.Category
 import com.drakeet.about.Contributor
@@ -42,7 +41,7 @@ import timber.log.Timber
 
 private const val RENGE_CHECKER = "RengeChecker"
 
-class AboutActivity : AbsAboutActivity() {
+class AboutActivity : AbsAboutActivityProxy() {
 
   private var shouldShowEasterEggCount = 1
   private val configuration by lazy {
@@ -73,7 +72,11 @@ class AboutActivity : AbsAboutActivity() {
   override fun onCreateHeader(icon: ImageView, slogan: TextView, version: TextView) {
     icon.load(R.drawable.pic_logo)
     slogan.setText(R.string.app_name)
-    version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
+    if (GlobalValues.debugMode) {
+      version.text = String.format("Build Time: %s", BuildConfig.BUILD_TIME)
+    } else {
+      version.text = String.format("Version: %s", BuildConfig.VERSION_NAME)
+    }
 
     val rebornCoroutine = lifecycleScope.launch(Dispatchers.Default) {
       delay(300)
@@ -136,8 +139,7 @@ class AboutActivity : AbsAboutActivity() {
   }
 
   override fun onItemsCreated(items: MutableList<Any>) {
-
-    val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+    val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
 
     items.apply {
       add(Category("What's this"))
@@ -169,12 +171,44 @@ class AboutActivity : AbsAboutActivity() {
       )
 
       add(Category("Contribution"))
+      val contributors = StringBuilder()
+      contributors.append("Russian & Ukrainian Translation: ")
+        .append("<b>")
+        .append("tommynok")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/tommynok"))
+        .append("]")
+        .append("<br>")
+      contributors.append("Harmony OS detection methods: ")
+        .append("<b>")
+        .append("su1216")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/dear_su1216"))
+        .append("]")
+        .append("<br>")
+      contributors.append("Bug Reporter: ")
+        .append("<b>")
+        .append("LiuXing")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://www.coolapk.com/u/1382006"))
+        .append("]")
+        .append("<br>")
+      contributors.append("Bug Reporter: ")
+        .append("<b>")
+        .append("Flyzc")
+        .append("</b>")
+        .append("[")
+        .append(getHyperLink("https://t.me/Flyzc"))
+        .append("]")
       add(
-        Contributor(
-          0/*TODO*/,
-          "Telegram @tommynok",
-          "Russian & Ukrainian Translation",
-          "https://t.me/tommynok"
+        Card(
+          HtmlCompat.fromHtml(
+            contributors.toString(),
+            HtmlCompat.FROM_HTML_MODE_LEGACY
+          )
         )
       )
 
@@ -201,6 +235,14 @@ class AboutActivity : AbsAboutActivity() {
       add(Card(getStringByConfiguration(R.string.library_declaration)))
 
       add(Category("Open Source Licenses"))
+      add(
+        License(
+          "LibChecker-Rules-Bundle",
+          "zhaobozhen",
+          License.APACHE_2,
+          "https://github.com/zhaobozhen/LibChecker-Rules-Bundle"
+        )
+      )
       add(
         License(
           "kotlin",
@@ -377,6 +419,14 @@ class AboutActivity : AbsAboutActivity() {
           "https://github.com/LSPosed/AndroidHiddenApiBypass"
         )
       )
+      add(
+        License(
+          "cascade",
+          "saket",
+          License.APACHE_2,
+          "https://github.com/saket/cascade"
+        )
+      )
     }
   }
 
@@ -403,7 +453,6 @@ class AboutActivity : AbsAboutActivity() {
 
   private fun initView() {
     findViewById<Toolbar>(R.id.toolbar)?.let {
-      it.background = null
       it.title = getString(R.string.settings_about)
     }
     val color = getColor(R.color.aboutHeader)
@@ -413,11 +462,14 @@ class AboutActivity : AbsAboutActivity() {
 
   private fun getAcknowledgementHtmlString(list: List<String>): String {
     val sb = StringBuilder()
-    val formatItem = "<a href=\"%s\">%s</a><br>"
 
     sb.append(getStringByConfiguration(R.string.resource_declaration)).append("<br>")
-    list.forEach { sb.append(String.format(formatItem, it, it)) }
+    list.forEach { sb.append(getHyperLink(it)) }
     return sb.toString()
+  }
+
+  private fun getHyperLink(url: String): String {
+    return String.format("<a href=\"%s\">%s</a>", url, url)
   }
 
   private fun getStringByConfiguration(@StringRes res: Int): String =

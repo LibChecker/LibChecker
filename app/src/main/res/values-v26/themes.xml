@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <style name="Platform.V26.Theme.LibChecker" parent="Platform.V23.Theme.LibChecker">
+    <item name="android:windowSplashscreenContent">@drawable/splash_drawable</item>
+  </style>
+
+  <style name="Platform.Theme.LibChecker" parent="Platform.V26.Theme.LibChecker" />
+
+</resources>

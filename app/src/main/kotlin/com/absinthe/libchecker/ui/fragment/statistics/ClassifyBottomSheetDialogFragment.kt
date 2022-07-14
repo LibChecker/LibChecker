@@ -3,10 +3,10 @@ package com.absinthe.libchecker.ui.fragment.statistics
 import android.content.DialogInterface
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.statistics.ClassifyDialogView
 import com.absinthe.libchecker.viewmodel.ChartViewModel
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<ClassifyDialogView>() {
 
@@ -19,11 +19,17 @@ class ClassifyBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Clas
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    root.post {
+      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+    }
     viewModel.dialogTitle.observe(viewLifecycleOwner) {
       getHeaderView().title.text = it
     }
     viewModel.filteredList.observe(viewLifecycleOwner) {
       root.adapter.setList(it)
+    }
+    viewModel.androidVersion.observe(viewLifecycleOwner) {
+      root.addAndroidVersionView(it)
     }
   }
 

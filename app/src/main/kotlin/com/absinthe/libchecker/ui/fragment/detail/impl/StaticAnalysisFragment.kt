@@ -3,6 +3,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -10,7 +11,6 @@ import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.utils.showToast
 import rikka.core.util.ClipboardUtils
 
 class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
@@ -47,13 +47,18 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       animationEnable = true
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(requireContext(), getItem(position).item.name)
-        context.showToast(R.string.toast_copied_to_clipboard)
+        VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initStaticData()
+
+    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        viewModel.initStaticData()
+      }
+    }
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

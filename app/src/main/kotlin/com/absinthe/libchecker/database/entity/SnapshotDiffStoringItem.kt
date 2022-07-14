@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "diff_table")
 data class SnapshotDiffStoringItem(
-  @PrimaryKey @ColumnInfo(name = "packageName") val packageName: String,
-  @ColumnInfo(name = "lastUpdatedTime") val lastUpdatedTime: Long,
-  @ColumnInfo(name = "diffContent") val diffContent: String
+  @PrimaryKey val packageName: String,
+  @ColumnInfo val lastUpdatedTime: Long,
+  @ColumnInfo val diffContent: String
 )

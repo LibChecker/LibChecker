@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  package="com.absinthe.libchecker"
   tools:ignore="QueryAllPackagesPermission">
 
   <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
 
   <application
     android:name=".LibCheckerApp"
-    android:allowBackup="true"
+    android:dataExtractionRules="@xml/data_extraction_rules"
+    android:enableOnBackInvokedCallback="true"
     android:fullBackupContent="@xml/backup_rules"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme"
+    tools:targetApi="33">
 
     <activity
       android:name=".ui.main.MainActivity"
@@ -27,8 +28,11 @@
       android:launchMode="singleTop">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
-
         <category android:name="android.intent.category.LAUNCHER" />
+        <category android:name="android.intent.category.DEFAULT" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
       </intent-filter>
 
       <meta-data
@@ -97,7 +101,8 @@
       android:label="@string/tab_chart" />
     <activity
       android:name=".ui.about.AboutActivity"
-      android:label="@string/settings_about" />
+      android:label="@string/settings_about"
+      android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
       android:name=".bridge.BridgeActivity"
       android:exported="true"
@@ -125,12 +130,10 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/filepaths" />
     </provider>
-    <provider
-      android:name="androidx.startup.InitializationProvider"
-      android:authorities="${applicationId}.androidx-startup"
-      android:exported="false"
-      tools:node="remove"
-      tools:ignore="MissingClass" />
+
+    <meta-data
+      android:name="channel"
+      android:value="${channel}" />
 
   </application>
 

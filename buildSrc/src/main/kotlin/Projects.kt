@@ -6,8 +6,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
+import java.time.Instant
 
-const val baseVersionName = "2.2.6"
+const val baseVersionName = "2.2.11"
 val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
 val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
@@ -38,23 +39,40 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
       }
       all {
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
+        buildConfigField("String", "APP_CENTER_SECRET", "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\"")
+        buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
+
+    productFlavors {
+      flavorDimensions += "channel"
+
+      create("foss") {
+        isDefault = true
+        dimension = flavorDimensionList[0]
+      }
+      create("market") {
+        dimension = flavorDimensionList[0]
+      }
+      all {
+        manifestPlaceholders["channel"] = this.name
+      }
+    }
+
     block()
   }
 }
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(32)
+    compileSdkVersion(33)
     defaultConfig {
       minSdk = 23
-      targetSdk = 32
+      targetSdk = 33
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     kotlinOptions {
       jvmTarget = JavaVersion.VERSION_11.toString()
-      freeCompilerArgs = freeCompilerArgs + arrayOf("-opt-in=kotlin.RequiresOptIn")
     }
     compileOptions {
       targetCompatibility(JavaVersion.VERSION_11)

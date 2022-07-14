@@ -29,6 +29,7 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.database.entity.LCItem
@@ -49,18 +50,19 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import rikka.material.app.DayNightDelegate
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.Calendar
+import java.time.LocalDate
+import java.time.Month
 import java.util.Date
 import java.util.Locale
 
 object LCAppUtils {
 
   fun getCurrentSeason(): Int {
-    return when (Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
-      3, 4, 5 -> SPRING
-      6, 7, 8 -> SUMMER
-      9, 10, 11 -> AUTUMN
-      12, 1, 2 -> WINTER
+    return when (LocalDate.now().month) {
+      Month.MARCH, Month.APRIL, Month.MAY -> SPRING
+      Month.JUNE, Month.JULY, Month.AUGUST -> SUMMER
+      Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER -> AUTUMN
+      Month.DECEMBER, Month.JANUARY, Month.FEBRUARY -> WINTER
       else -> -1
     }
   }
@@ -95,12 +97,12 @@ object LCAppUtils {
   }
 
   fun getAppIcon(packageName: String): Drawable {
-    return try {
-      val pi = SystemServices.packageManager.getPackageInfo(packageName, 0)
-      pi?.applicationInfo?.loadIcon(SystemServices.packageManager)!!
-    } catch (e: Exception) {
-      ColorDrawable(Color.TRANSPARENT)
-    }
+    return runCatching {
+      PackageManagerCompat.getPackageInfo(
+        packageName,
+        0
+      ).applicationInfo.loadIcon(SystemServices.packageManager)
+    }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
   }
 
   suspend fun getRuleWithRegex(

@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.fragment
 
 import androidx.recyclerview.widget.RecyclerView
-import rikka.material.app.AppBar
 import rikka.widget.borderview.BorderViewDelegate
 
 /**
@@ -12,9 +11,7 @@ import rikka.widget.borderview.BorderViewDelegate
  */
 interface IListController {
   fun onReturnTop()
-  fun getAppBar(): AppBar?
   fun getBorderViewDelegate(): BorderViewDelegate?
-  fun scheduleAppbarRaisingStatus()
   fun isAllowRefreshing(): Boolean
   fun getSuitableLayoutManager(): RecyclerView.LayoutManager?
 }

@@ -14,13 +14,13 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.google.android.material.card.MaterialCardView
 
-class LibReferenceItemView(context: Context) : MaterialCardView(context) {
+class LibReferenceItemView(context: Context) : FrameLayout(context) {
 
   val container = LibReferenceItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
     setPadding(padding, padding, padding, padding)
+    setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
   }
 
   init {
@@ -33,7 +33,7 @@ class LibReferenceItemView(context: Context) : MaterialCardView(context) {
       id = android.R.id.icon
       val iconSize = context.getDimensionPixelSize(R.dimen.lib_reference_icon_size)
       layoutParams = FrameLayout.LayoutParams(iconSize, iconSize)
-      setBackgroundResource(R.drawable.bg_gray_circle)
+      setBackgroundResource(R.drawable.bg_circle_secondary_container)
       addView(this)
     }
 

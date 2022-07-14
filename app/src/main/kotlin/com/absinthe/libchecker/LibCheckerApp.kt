@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
+import coil.Coil
+import coil.ImageLoader
+import com.absinthe.libchecker.app.AppIconFetcherFactory
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -44,8 +47,10 @@ class LibCheckerApp : Application() {
     app = this
     if (!BuildConfig.DEBUG && GlobalValues.isAnonymousAnalyticsEnabled.value == true) {
       AppCenter.start(
-        this, Constants.APP_CENTER_SECRET,
-        Analytics::class.java, Crashes::class.java
+        this,
+        BuildConfig.APP_CENTER_SECRET,
+        Analytics::class.java,
+        Crashes::class.java
       )
     }
 
@@ -60,7 +65,7 @@ class LibCheckerApp : Application() {
       if (GlobalValues.repo == Constants.REPO_GITHUB) {
         LCRemoteRepo.Github
       } else {
-        LCRemoteRepo.Gitee
+        LCRemoteRepo.Gitlab
       }
     )
     Utility.init(this)
@@ -71,9 +76,14 @@ class LibCheckerApp : Application() {
     Repositories.init(this)
     Repositories.checkRulesDatabase()
     initSplitController()
+    DynamicColors.applyToActivitiesIfAvailable(this)
 
-    if (GlobalValues.md3Theme) {
-      DynamicColors.applyToActivitiesIfAvailable(this)
+    Coil.setImageLoader {
+      ImageLoader(this).newBuilder()
+        .components {
+          add(AppIconFetcherFactory(this@LibCheckerApp))
+        }
+        .build()
     }
   }
 
@@ -84,7 +94,11 @@ class LibCheckerApp : Application() {
 
   @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
-    SplitController.initialize(this, R.xml.main_split_config)
+    runCatching {
+      if (SplitController.getInstance().isSplitSupported()) {
+        SplitController.initialize(this, R.xml.main_split_config)
+      }
+    }
   }
 
   companion object {

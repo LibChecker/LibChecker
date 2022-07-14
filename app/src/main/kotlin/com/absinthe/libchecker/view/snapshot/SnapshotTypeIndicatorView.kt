@@ -15,7 +15,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 
 class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
-  var enableRoundCorner: Boolean = false
+  var enableRoundCorner: Boolean = true
 
   private val text =
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {

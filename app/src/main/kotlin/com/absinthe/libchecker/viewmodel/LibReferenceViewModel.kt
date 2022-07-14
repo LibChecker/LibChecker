@@ -2,6 +2,7 @@ package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -81,9 +82,8 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
         SERVICE, ACTIVITY, RECEIVER, PROVIDER -> {
           for (item in items) {
             try {
-              val componentStringList = PackageUtils.getComponentStringList(
-                item.packageName, type, false
-              )
+              val componentStringList =
+                PackageUtils.getComponentStringList(item.packageName, type, false)
               if (componentStringList.contains(name)) {
                 list.add(item)
               }
@@ -108,7 +108,12 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
           for (item in items) {
             try {
               val metadataList =
-                PackageUtils.getMetaDataItems(PackageUtils.getPackageInfo(item.packageName))
+                PackageUtils.getMetaDataItems(
+                  PackageUtils.getPackageInfo(
+                    item.packageName,
+                    PackageManager.GET_META_DATA
+                  )
+                )
               if (metadataList.any { it.name == name }) {
                 list.add(item)
               }

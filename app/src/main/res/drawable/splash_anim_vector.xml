@@ -55,7 +55,7 @@
         android:interpolator="@android:anim/accelerate_decelerate_interpolator"
         android:propertyName="rotation"
         android:valueFrom="0"
-        android:valueTo="135"
+        android:valueTo="45"
         android:valueType="floatType" />
     </aapt:attr>
   </target>

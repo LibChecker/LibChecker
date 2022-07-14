@@ -14,7 +14,6 @@ import com.microsoft.appcenter.analytics.EventProperties
 class LibThresholdDialogFragment : DialogFragment() {
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-
     val view = LibReferenceThresholdView(requireContext())
     view.count.text = GlobalValues.libReferenceThreshold.toString()
 

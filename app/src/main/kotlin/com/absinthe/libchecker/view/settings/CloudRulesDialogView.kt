@@ -12,8 +12,8 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
@@ -201,6 +201,8 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
   }
 
   fun showContent() {
-    viewFlipper.show(cloudRulesContentView)
+    if (viewFlipper.displayedChildView != cloudRulesContentView) {
+      viewFlipper.show(cloudRulesContentView)
+    }
   }
 }

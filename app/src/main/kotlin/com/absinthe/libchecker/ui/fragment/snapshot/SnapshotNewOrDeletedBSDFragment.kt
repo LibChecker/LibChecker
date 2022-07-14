@@ -1,17 +1,17 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.snapshot.SnapshotNewOrDeletedBSView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
 import me.zhanghai.android.appiconloader.AppIconLoader
 
@@ -25,9 +25,12 @@ class SnapshotNewOrDeletedBSDFragment :
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  @SuppressLint("SetTextI18n")
   override fun init() {
-    (arguments?.getSerializable(EXTRA_DIFF_ITEM) as? SnapshotDiffItem)?.let { item ->
+    val arg = arguments ?: run {
+      dismiss()
+      return
+    }
+    BundleCompat.getSerializable<SnapshotDiffItem>(arg, EXTRA_DIFF_ITEM)?.let { item ->
       val packageInfo = runCatching { PackageUtils.getPackageInfo(item.packageName) }.getOrNull()
       root.title.apply {
         iconView.apply {

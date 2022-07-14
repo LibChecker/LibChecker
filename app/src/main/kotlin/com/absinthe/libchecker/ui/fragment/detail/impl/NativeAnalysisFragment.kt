@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
@@ -11,7 +12,6 @@ import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.NativeLibExtractTipView
 import rikka.core.util.ClipboardUtils
 
@@ -31,12 +31,6 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       if (it.isEmpty()) {
         emptyView.text.text = getString(R.string.empty_list)
       } else {
-        if (viewModel.queriedText?.isNotEmpty() == true) {
-          filterList(viewModel.queriedText!!)
-        } else {
-          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
-        }
-
         if (viewModel.extractNativeLibs == false) {
           context?.let { ctx ->
             adapter.setHeaderView(
@@ -48,6 +42,12 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
               }
             )
           }
+        }
+
+        if (viewModel.queriedText?.isNotEmpty() == true) {
+          filterList(viewModel.queriedText!!)
+        } else {
+          adapter.setDiffNewData(it.toMutableList(), afterListReadyTask)
         }
       }
 
@@ -62,13 +62,18 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       animationEnable = true
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(context, getItem(position).item.name)
-        context.showToast(R.string.toast_copied_to_clipboard)
+        VersionCompat.showCopiedOnClipboardToast(context)
         true
       }
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initSoAnalysisData()
+
+    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
+      if (it != null) {
+        viewModel.initSoAnalysisData()
+      }
+    }
   }
 
   override fun getFilterList(text: String): List<LibStringItemChip>? {

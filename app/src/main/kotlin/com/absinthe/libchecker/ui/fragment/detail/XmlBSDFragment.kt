@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.XmlBottomSheetView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 const val EXTRA_TEXT = "text"
 
@@ -23,6 +23,9 @@ class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
+      post {
+        maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+      }
     }
     root.setText(text)
   }

@@ -26,6 +26,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.bean.KotlinToolingMetadata
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -80,13 +81,14 @@ object PackageUtils {
    */
   @Throws(PackageManager.NameNotFoundException::class)
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
-    val packageInfo = SystemServices.packageManager.getPackageInfo(
+    val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      VersionCompat.MATCH_UNINSTALLED_PACKAGES or VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES or PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
-      return SystemServices.packageManager.getPackageArchiveInfo(
-        packageInfo.applicationInfo.sourceDir, VersionCompat.MATCH_DISABLED_COMPONENTS or flag
+      return PackageManagerCompat.getPackageArchiveInfo(
+        packageInfo.applicationInfo.sourceDir,
+        PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
         applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
         applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
@@ -102,8 +104,8 @@ object PackageUtils {
    */
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
-    return SystemServices.packageManager.getInstalledPackages(
-      VersionCompat.MATCH_UNINSTALLED_PACKAGES
+    return PackageManagerCompat.getInstalledPackages(
+      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
         or PackageManager.GET_META_DATA
         or PackageManager.GET_PERMISSIONS
     )
@@ -230,6 +232,9 @@ object PackageUtils {
     childDir: String,
     source: String? = null
   ): List<LibStringItem> {
+    if (packageInfo.applicationInfo.sourceDir == null) {
+      return emptyList()
+    }
     return runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         return zipFile.entries()
@@ -275,6 +280,11 @@ object PackageUtils {
 
   private val regex_splits by lazy { Regex("split_config\\.(.*)\\.apk") }
 
+  /**
+   * Get split apks dirs
+   * @param packageInfo PackageInfo
+   * @return List of split apks dirs
+   */
   fun getSplitsSourceDir(packageInfo: PackageInfo): Array<String>? {
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       val files = File(packageInfo.applicationInfo.sourceDir).parentFile
@@ -516,6 +526,25 @@ object PackageUtils {
   }
 
   /**
+   * Check if a component is enabled
+   * @param info ComponentInfo
+   * @return true if it is enabled
+   */
+  fun isComponentEnabled(info: ComponentInfo): Boolean {
+    val state = runCatching {
+      SystemServices.packageManager.getComponentEnabledSetting(
+        ComponentName(info.packageName, info.name)
+      )
+    }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
+    return when (state) {
+      PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
+      PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
+      PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> info.enabled
+      else -> false
+    }
+  }
+
+  /**
    * Get components list of an app
    * @param packageName Package name of the app
    * @param list List of components(can be nullable)
@@ -530,31 +559,18 @@ object PackageUtils {
     if (list.isNullOrEmpty()) {
       return emptyList()
     }
-    var state: Int
-    var isEnabled: Boolean
     return list.asSequence()
       .map {
-        state = runCatching {
-          SystemServices.packageManager.getComponentEnabledSetting(
-            ComponentName(
-              packageName,
-              it.name
-            )
-          )
-        }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-        isEnabled = when (state) {
-          PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER, PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED -> false
-          PackageManager.COMPONENT_ENABLED_STATE_ENABLED -> true
-          PackageManager.COMPONENT_ENABLED_STATE_DEFAULT -> it.enabled
-          else -> false
-        }
-
         val name = if (isSimpleName) {
           it.name.orEmpty().removePrefix(packageName)
         } else {
           it.name.orEmpty()
         }
-        StatefulComponent(name, isEnabled, it.processName.removePrefix(it.packageName))
+        StatefulComponent(
+          name,
+          isComponentEnabled(it),
+          it.processName.orEmpty().removePrefix(it.packageName)
+        )
       }
       .toList()
   }
@@ -663,7 +679,7 @@ object PackageUtils {
       }
 
       if (abiSet.isEmpty()) {
-        if (!isApk) {
+        if (!isApk && applicationInfo.nativeLibraryDir != null) {
           abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
         }
 
@@ -719,7 +735,6 @@ object PackageUtils {
     abiSet: Set<Int>? = null
   ): Int {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
-    val file = File(applicationInfo.sourceDir)
     val use32bitAbi = applicationInfo.isUse32BitAbi()
     val overlay = packageInfo.isOverlay()
     val multiArch = applicationInfo.flags and ApplicationInfo.FLAG_MULTIARCH != 0
@@ -728,6 +743,11 @@ object PackageUtils {
       return OVERLAY
     }
 
+    if (applicationInfo.sourceDir == null) {
+      throw IllegalStateException("SourceDir is null: ${packageInfo.packageName}")
+    }
+
+    val file = File(applicationInfo.sourceDir)
     val realAbiSet =
       abiSet ?: getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
     if (realAbiSet.contains(NO_LIBS)) {
@@ -741,27 +761,23 @@ object PackageUtils {
       X86_64_STRING -> X86_64
       X86_STRING -> X86
       null -> {
-        if (FreezeUtils.isAppFrozen(packageInfo.packageName)) {
-          val supportedAbiSet = realAbiSet.toMutableSet()
-          realAbiSet.forEach {
-            if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
-              supportedAbiSet.add(it)
-            }
+        val supportedAbiSet = mutableSetOf<Int>()
+        realAbiSet.forEach {
+          if (Build.SUPPORTED_ABIS.contains(getAbiString(LibCheckerApp.app, it, false))) {
+            supportedAbiSet.add(it)
           }
-          if (use32bitAbi) {
-            supportedAbiSet.remove(ARMV8)
-            supportedAbiSet.remove(X86_64)
-          }
-          when {
-            supportedAbiSet.contains(ARMV8) -> ARMV8
-            supportedAbiSet.contains(ARMV7) -> ARMV7
-            supportedAbiSet.contains(ARMV5) -> ARMV5
-            supportedAbiSet.contains(X86_64) -> X86_64
-            supportedAbiSet.contains(X86) -> X86
-            else -> ERROR
-          }
-        } else {
-          NO_LIBS
+        }
+        if (use32bitAbi) {
+          supportedAbiSet.remove(ARMV8)
+          supportedAbiSet.remove(X86_64)
+        }
+        when {
+          supportedAbiSet.contains(ARMV8) -> ARMV8
+          supportedAbiSet.contains(ARMV7) -> ARMV7
+          supportedAbiSet.contains(ARMV5) -> ARMV5
+          supportedAbiSet.contains(X86_64) -> X86_64
+          supportedAbiSet.contains(X86) -> X86
+          else -> ERROR
         }
       }
       else -> ERROR
@@ -785,7 +801,7 @@ object PackageUtils {
     ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
     ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
     X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
-    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
+    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch)
   )
 
   private val ABI_BADGE_MAP = arrayMapOf(
@@ -881,7 +897,6 @@ object PackageUtils {
    * @return List of LibStringItem
    */
   fun getDexList(packageName: String, isApk: Boolean = false): List<LibStringItem> {
-
     try {
       val path = if (isApk) {
         packageName
@@ -986,7 +1001,7 @@ object PackageUtils {
    */
   fun isAppInstalled(pkgName: String): Boolean {
     return runCatching {
-      SystemServices.packageManager.getApplicationInfo(pkgName, 0).enabled
+      PackageManagerCompat.getApplicationInfo(pkgName, 0).enabled
     }.getOrDefault(false)
   }
 
@@ -1022,6 +1037,11 @@ object PackageUtils {
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
   private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
 
+  /**
+   * Get Android Gradle Plugin version of an app
+   * @param packageInfo PackageInfo
+   * @return Android Gradle Plugin version
+   */
   fun getAGPVersion(packageInfo: PackageInfo): String? {
     runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
@@ -1098,9 +1118,13 @@ object PackageUtils {
         retry = true
         emptyList()
       }.also { items ->
-        AppItemRepository.allPackageInfoMap = items.asSequence()
-          .map { it.packageName to it }
-          .toMap()
+        AppItemRepository.allPackageInfoMap.clear()
+        AppItemRepository.allPackageInfoMap.putAll(
+          items.asSequence()
+            .filter { it.applicationInfo.sourceDir != null }
+            .map { it.packageName to it }
+            .toMap()
+        )
       }
     } while (retry)
 
@@ -1108,7 +1132,13 @@ object PackageUtils {
     try {
       if (pmList.size > appList.size) {
         appList = pmList.asSequence()
-          .map { getPackageInfo(it) }
+          .map {
+            getPackageInfo(
+              it,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+            )
+          }
+          .filter { it.applicationInfo.sourceDir != null }
           .toList()
       }
     } catch (t: Throwable) {
@@ -1181,5 +1211,25 @@ object PackageUtils {
     return runCatching {
       hasDexClass(File(applicationInfo.sourceDir), "androidx.compose.*")
     }.getOrDefault(false)
+  }
+
+  fun getJetpackComposeVersion(packageInfo: PackageInfo): String? {
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        arrayOf(
+          "META-INF/androidx.compose.runtime_runtime.version",
+          "META-INF/androidx.compose.ui_ui.version",
+          "META-INF/androidx.compose.ui_ui-tooling-preview.version"
+        ).forEach { entry ->
+          zipFile.getEntry(entry)?.let { ze ->
+            zipFile.getInputStream(ze).source().buffer().use { bs ->
+              return bs.readUtf8Line().takeIf { it?.isNotBlank() == true }
+            }
+          }
+        }
+      }
+    }
+
+    return null
   }
 }

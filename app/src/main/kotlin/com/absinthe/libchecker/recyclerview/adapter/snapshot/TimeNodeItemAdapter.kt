@@ -1,20 +1,15 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.content.pm.PackageManager
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.AppIconCache
+import coil.load
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Job
-import timber.log.Timber
 
 class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
-
-  private var loadIconJob: Job? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return BaseViewHolder(
@@ -27,13 +22,12 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
 
   override fun convert(holder: BaseViewHolder, item: String) {
     (holder.itemView as AppCompatImageView).also {
-      try {
-        it.setTag(R.id.app_item_icon_id, item)
-        val ai = PackageUtils.getPackageInfo(item).applicationInfo
-        loadIconJob = AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, it)
-      } catch (e: PackageManager.NameNotFoundException) {
-        Timber.e(e)
-      }
+      val packageInfo = runCatching {
+        AppItemRepository.allPackageInfoMap[item]
+          ?: PackageUtils.getPackageInfo(item)
+      }.getOrNull() ?: return
+
+      it.load(packageInfo)
     }
   }
 }

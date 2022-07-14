@@ -1,26 +1,20 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.pm.PackageManager
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.TrackListItem
-import com.absinthe.libchecker.utils.AppIconCache
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
   BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
-
-  private var loadIconJob: Job? = null
 
   init {
     addChildClickViewIds(android.R.id.toggle)
@@ -34,7 +28,7 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-          it.setMargins(margin, margin, margin, margin)
+          it.setMargins(0, margin, 0, margin)
         }
       }
     )
@@ -42,25 +36,15 @@ class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
 
   override fun convert(holder: BaseViewHolder, item: TrackListItem) {
     (holder.itemView as TrackItemView).container.apply {
-      icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: PackageManager.NameNotFoundException) {
-          Timber.e(e)
-        }
-      }
+      val packageInfo = runCatching {
+        AppItemRepository.allPackageInfoMap[item.packageName]
+          ?: PackageUtils.getPackageInfo(item.packageName)
+      }.getOrNull() ?: return
+
+      icon.load(packageInfo)
       appName.text = item.label
       packageName.text = item.packageName
       switch.isChecked = item.switchState
-    }
-  }
-
-  fun release() {
-    if (loadIconJob?.isActive == true) {
-      loadIconJob?.cancel()
     }
   }
 }

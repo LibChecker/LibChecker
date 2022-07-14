@@ -9,13 +9,14 @@
   app:edgeToEdge="true"
   app:fitsSystemWindowsInsets="start|end">
 
-  <rikka.material.widget.AppBarLayout
+  <com.google.android.material.appbar.AppBarLayout
     android:id="@+id/appbar"
     style="?appBarStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    app:liftOnScroll="true">
 
     <androidx.appcompat.widget.Toolbar
       android:id="@+id/toolbar"
@@ -24,7 +25,7 @@
       android:layout_height="wrap_content"
       android:background="@null" />
 
-  </rikka.material.widget.AppBarLayout>
+  </com.google.android.material.appbar.AppBarLayout>
 
   <com.google.android.material.progressindicator.LinearProgressIndicator
     android:id="@+id/progress_horizontal"

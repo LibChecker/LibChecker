@@ -41,6 +41,7 @@ import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
@@ -84,7 +85,6 @@ class LibReferenceFragment :
   private var searchUpdateJob: Job? = null
 
   override fun init() {
-    setHasOptionsMenu(true)
     val context = (context as? BaseActivity<*>) ?: return
 
     binding.apply {
@@ -94,7 +94,12 @@ class LibReferenceFragment :
         borderDelegate = borderViewDelegate
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            context.appBar?.setRaised(!top)
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "LibReferenceFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
         FastScrollerBuilder(this).useMd2Style().build()
         addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -127,7 +132,7 @@ class LibReferenceFragment :
                 }
               }
               if (position < refAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.Default) {
                   delay(400)
                   withContext(Dispatchers.Main) {
                     (activity as? INavViewContainer)?.showNavigationView()
@@ -209,6 +214,10 @@ class LibReferenceFragment :
     GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
       homeViewModel.refreshRef()
     }
+    GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
+      // noinspection NotifyDataSetChanged
+      refAdapter.notifyDataSetChanged()
+    }
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
@@ -218,6 +227,11 @@ class LibReferenceFragment :
         }
       }
     }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onPause() {
@@ -305,15 +319,17 @@ class LibReferenceFragment :
   }
 
   private fun MenuItem.initMenu(@LibType type: Int) {
-    if (GlobalValues.currentLibRefType == type) {
-      val title = SpannableStringBuilder(this.title)
-      title.setSpan(
-        StyleSpan(Typeface.BOLD),
-        0,
-        this.title.length,
-        Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      this.title = title
+    this.title?.let {
+      if (GlobalValues.currentLibRefType == type) {
+        val title = SpannableStringBuilder("$it ✔")
+        title.setSpan(
+          StyleSpan(Typeface.BOLD),
+          0,
+          it.length,
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+        )
+        this.title = title
+      }
     }
     this.setOnMenuItemClickListener {
       doSaveLibRefType(type)
@@ -373,9 +389,7 @@ class LibReferenceFragment :
                 //noinspection NotifyDataSetChanged
                 refAdapter.notifyDataSetChanged()
               }
-              doOnMainThreadIdle {
-                (activity as? INavViewContainer)?.hideProgressBar()
-              }
+              (activity as? INavViewContainer)?.hideProgressBar()
             }
           }
 
@@ -405,7 +419,6 @@ class LibReferenceFragment :
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = binding.list.layoutManager
 
   private fun flip(child: Int) {
-    val context = (context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
@@ -413,7 +426,6 @@ class LibReferenceFragment :
     if (child == VF_LOADING) {
       menu?.findItem(R.id.search)?.isVisible = false
       binding.loadingView.loadingView.resumeAnimation()
-      context.appBar?.setRaised(false)
     } else {
       menu?.findItem(R.id.search)?.isVisible = true
       binding.loadingView.loadingView.pauseAnimation()

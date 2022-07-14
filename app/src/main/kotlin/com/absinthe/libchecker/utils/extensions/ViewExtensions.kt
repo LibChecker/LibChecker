@@ -7,15 +7,16 @@ import android.content.res.Resources
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.style.ForegroundColorSpan
+import android.text.style.StrikethroughSpan
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
+import androidx.core.view.children
 import androidx.viewpager2.widget.ViewPager2
-import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
@@ -26,7 +27,7 @@ import rikka.core.util.ClipboardUtils
 fun View.setLongClickCopiedToClipboard(text: CharSequence) {
   setOnLongClickListener {
     ClipboardUtils.put(context, text)
-    context.showToast(R.string.toast_copied_to_clipboard)
+    VersionCompat.showCopiedOnClipboardToast(context)
     true
   }
 }
@@ -85,18 +86,30 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
     val builder = SpannableStringBuilder()
     val spannableString = SpannableString(text.toString())
     val start = text.indexOf(highlightText, 0, true)
-    val color = if (GlobalValues.md3Theme) {
-      context.getColor(R.color.colorPrimaryMd3)
-    } else {
-      context.getColor(R.color.colorPrimary)
-    }
+    val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
     spannableString.setSpan(
       ForegroundColorSpan(color),
-      start, start + highlightText.length, Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+      start,
+      start + highlightText.length,
+      Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
     builder.append(spannableString)
     text = builder
   }
+}
+
+fun TextView.tintTextToPrimary() {
+  val builder = SpannableStringBuilder()
+  val spannableString = SpannableString(text.toString())
+  val color = context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)
+  spannableString.setSpan(
+    ForegroundColorSpan(color),
+    0,
+    text.length,
+    Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+  )
+  builder.append(spannableString)
+  text = builder
 }
 
 fun ViewPager2.setCurrentItem(
@@ -115,18 +128,50 @@ fun ViewPager2.setCurrentItem(
     previousValue = currentValue
   }
   animator.addListener(object : Animator.AnimatorListener {
-    override fun onAnimationStart(animation: Animator?) {
+    override fun onAnimationStart(animation: Animator) {
       beginFakeDrag()
     }
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
       endFakeDrag()
     }
 
-    override fun onAnimationCancel(animation: Animator?) {}
-    override fun onAnimationRepeat(animation: Animator?) {}
+    override fun onAnimationCancel(animation: Animator) {}
+    override fun onAnimationRepeat(animation: Animator) {}
   })
   animator.interpolator = interpolator
   animator.duration = duration
   animator.start()
+}
+
+fun ViewGroup.setAlphaForAll(alpha: Float) = children.forEach {
+  it.alpha = alpha
+}
+
+fun TextView.startStrikeThroughAnimation(): ValueAnimator {
+  val span = SpannableString(text)
+  val strikeSpan = StrikethroughSpan()
+  val animator = ValueAnimator.ofInt(text.length)
+  animator.addUpdateListener {
+    span.setSpan(strikeSpan, 0, it.animatedValue as Int, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    text = span
+    invalidate()
+  }
+  animator.interpolator = AccelerateDecelerateInterpolator()
+  animator.start()
+  return animator
+}
+
+fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
+  val span = SpannableString(text.toString())
+  val strikeSpan = StrikethroughSpan()
+  val animator = ValueAnimator.ofInt(text.length, 0)
+  animator.addUpdateListener {
+    span.setSpan(strikeSpan, 0, it.animatedValue as Int, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    text = span
+    invalidate()
+  }
+  animator.interpolator = AccelerateDecelerateInterpolator()
+  animator.start()
+  return animator
 }

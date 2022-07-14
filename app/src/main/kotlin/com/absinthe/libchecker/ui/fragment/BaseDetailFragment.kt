@@ -11,7 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PROVIDER
+import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
@@ -62,7 +66,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       text.text = getString(R.string.loading)
     }
   }
-  protected val dividerItemDecoration by lazy { DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL) }
+  protected val dividerItemDecoration by lazy {
+    DividerItemDecoration(
+      requireContext(),
+      DividerItemDecoration.VERTICAL
+    )
+  }
   protected var isListReady = false
   protected var afterListReadyTask: Runnable? = null
 
@@ -91,6 +100,13 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
               filterList(it)
             }
           }
+          if (this@BaseDetailFragment is BaseComponentFragment) {
+            viewModel.queriedProcess?.let {
+              if (it.isNotEmpty()) {
+                filterProcesses(it)
+              }
+            }
+          }
         }
       }
     }
@@ -103,6 +119,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           openLibDetailDialog(position)
         }
       }
+      setProcessMode(viewModel.processMode)
     }
   }
 
@@ -115,15 +132,25 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
   }
 
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      if (viewModel.processesMap.isNotEmpty()) {
+        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
+      }
+    }
+  }
+
   override suspend fun sort() {
     val list = mutableListOf<LibStringItemChip>().also {
       it += adapter.data
     }
-    val itemChip = if (adapter.highlightPosition != -1) {
-      adapter.data[adapter.highlightPosition]
-    } else {
-      null
-    }
+    val itemChip =
+      if (adapter.highlightPosition != -1 && adapter.highlightPosition < adapter.data.size) {
+        adapter.data[adapter.highlightPosition]
+      } else {
+        null
+      }
 
     if (viewModel.sortMode == MODE_SORT_BY_LIB) {
       if (type == NATIVE) {
@@ -169,10 +196,19 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   fun getItemsCount() = adapter.itemCount
 
+  fun switchProcessMode() {
+    if (isComponentFragment()) {
+      adapter.switchProcessMode()
+    }
+  }
+
   private fun navigateToComponentImpl(component: String) {
-    val componentPosition = adapter.data.indexOfFirst { it.item.name == component }
+    var componentPosition = adapter.data.indexOfFirst { it.item.name == component }
     if (componentPosition == -1) {
       return
+    }
+    if (adapter.hasHeaderLayout()) {
+      componentPosition++
     }
 
     Timber.d("navigateToComponent: componentPosition = $componentPosition")
@@ -202,5 +238,9 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
           .show(childFragmentManager, tag)
       }
     }
+  }
+
+  private fun isComponentFragment(): Boolean {
+    return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
   }
 }

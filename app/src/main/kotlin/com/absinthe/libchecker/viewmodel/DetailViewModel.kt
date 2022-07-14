@@ -22,6 +22,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -32,6 +33,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
@@ -41,6 +43,11 @@ import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -54,22 +61,31 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
+  val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
+  val processMapLiveData = MutableLiveData<Map<String, Int>>()
   val itemsCountList = MutableList(9) { 0 }
-  val processesSet = mutableSetOf<String>()
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
   var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
+  var queriedProcess: String? = null
+  var processesMap: Map<String, Int> = mapOf()
+  var processMode: Boolean = GlobalValues.processMode
 
   lateinit var packageInfo: PackageInfo
+  val packageInfoLiveData = MutableLiveData<PackageInfo>(null)
 
   init {
     componentsMap.put(SERVICE, MutableLiveData())
     componentsMap.put(ACTIVITY, MutableLiveData())
     componentsMap.put(RECEIVER, MutableLiveData())
     componentsMap.put(PROVIDER, MutableLiveData())
+  }
+
+  fun isPackageInfoAvailable(): Boolean {
+    return this::packageInfo.isInitialized
   }
 
   fun initSoAnalysisData() = viewModelScope.launch(Dispatchers.IO) {
@@ -117,6 +133,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
+    val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
         val services = PackageUtils.getComponentList(it.packageName, it.services, true)
@@ -133,7 +150,9 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         componentsMap[RECEIVER]?.postValue(receivers)
         componentsMap[PROVIDER]?.postValue(providers)
       }
-      processesSet.filter { it.isBlank() }
+      processesMap =
+        processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
+      processMapLiveData.postValue(processesMap)
     } catch (e: Exception) {
       Timber.e(e)
     }
@@ -330,7 +349,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
-        packageName, IBundleManager.GET_BUNDLE_WITH_ABILITIES
+        packageName,
+        IBundleManager.GET_BUNDLE_WITH_ABILITIES
       )?.abilityInfos?.let { abilities ->
         val pages = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.PAGE }
@@ -381,5 +401,17 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     } catch (e: Exception) {
       Timber.e(e)
     }
+  }
+
+  suspend fun getRepoUpdatedTime(owner: String, repo: String): String? {
+    val request: CloudRuleBundleRequest = ApiManager.create()
+    val result = runCatching {
+      request.requestRepoInfo(owner, repo) ?: return null
+    }.getOrNull() ?: return null
+    val instant = Instant.parse(result.pushed_at)
+    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
+      .withLocale(Locale.getDefault())
+      .withZone(ZoneId.systemDefault())
+    return formatter.format(instant)
   }
 }

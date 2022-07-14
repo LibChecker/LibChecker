@@ -10,6 +10,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.toColorStateList
@@ -31,6 +32,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
   }
 
   init {
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
     addView(container)
   }
 
@@ -39,7 +41,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     private val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.album_card_icon_size)
       layoutParams = LayoutParams(iconSize, iconSize)
-      setBackgroundResource(R.drawable.bg_gray_circle)
+      setBackgroundResource(R.drawable.bg_circle_secondary_container)
       scaleType = ImageView.ScaleType.CENTER_INSIDE
     }
 

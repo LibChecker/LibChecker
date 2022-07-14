@@ -7,16 +7,18 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
-class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
+class SnapshotDashboardView(context: Context) :
+  MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
   val container = SnapshotDashboardContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
@@ -29,6 +31,8 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     )
+    radius = 8.dp.toFloat()
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
     addView(container)
   }
 
@@ -83,7 +87,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
       }
 
     private val addedIndicator = SnapshotTypeIndicatorView(context).apply {
-      enableRoundCorner = GlobalValues.md3Theme
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_added),
         R.drawable.ic_add.getDrawable(context),
@@ -92,7 +95,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
     }
 
     private val removedIndicator = SnapshotTypeIndicatorView(context).apply {
-      enableRoundCorner = GlobalValues.md3Theme
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_removed),
         R.drawable.ic_remove.getDrawable(context),
@@ -101,7 +103,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
     }
 
     private val changedIndicator = SnapshotTypeIndicatorView(context).apply {
-      enableRoundCorner = GlobalValues.md3Theme
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_changed),
         R.drawable.ic_changed.getDrawable(context),
@@ -110,7 +111,6 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context) {
     }
 
     private val movedIndicator = SnapshotTypeIndicatorView(context).apply {
-      enableRoundCorner = GlobalValues.md3Theme
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_moved),
         R.drawable.ic_move.getDrawable(context),

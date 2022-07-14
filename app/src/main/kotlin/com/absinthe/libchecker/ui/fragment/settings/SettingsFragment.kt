@@ -15,7 +15,7 @@ import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.SwitchPreference
+import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -26,10 +26,11 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.ui.about.AboutActivity
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -38,7 +39,6 @@ import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import rikka.material.app.AppBar
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
@@ -55,16 +55,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   private lateinit var prefRecyclerView: RecyclerView
   private val viewModel: HomeViewModel by activityViewModels()
 
-  companion object {
-    init {
-      SimpleMenuPreference.setLightFixEnabled(true)
-    }
-  }
-
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-    setPreferencesFromResource(R.xml.settings, rootKey)
+    setPreferencesFromResource(R.xml.settings, null)
 
-    (findPreference<SwitchPreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
+    (findPreference<TwoStatePreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isShowSystemApps.value = newValue as Boolean
         Analytics.trackEvent(
@@ -74,7 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<SwitchPreference>(Constants.PREF_APK_ANALYTICS))?.apply {
+    (findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         val flag = if (newValue as Boolean) {
           PackageManager.COMPONENT_ENABLED_STATE_ENABLED
@@ -84,7 +78,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
         SystemServices.packageManager.setComponentEnabledSetting(
           ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
-          flag, PackageManager.DONT_KILL_APP
+          flag,
+          PackageManager.DONT_KILL_APP
         )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
@@ -93,24 +88,12 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<SwitchPreference>(Constants.PREF_COLORFUL_ICON))?.apply {
+    (findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isColorfulIcon.value = newValue as Boolean
-        activity?.recreate()
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_COLORFUL_ICON", newValue)
-        )
-        true
-      }
-    }
-    (findPreference<SwitchPreference>(Constants.PREF_MD3))?.apply {
-      setOnPreferenceChangeListener { _, newValue ->
-        GlobalValues.md3Theme = newValue as Boolean
-        activity?.recreate()
-        Analytics.trackEvent(
-          Constants.Event.SETTINGS,
-          EventProperties().set("PREF_MD3", newValue)
         )
         true
       }
@@ -122,7 +105,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           if (GlobalValues.repo == Constants.REPO_GITHUB) {
             LCRemoteRepo.Github
           } else {
-            LCRemoteRepo.Gitee
+            LCRemoteRepo.Gitlab
           }
         )
         Analytics.trackEvent(
@@ -208,18 +191,19 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_HELP)?.apply {
       setOnPreferenceClickListener {
-        try {
+        runCatching {
           CustomTabsIntent.Builder().build().apply {
             launchUrl(requireActivity(), URLManager.DOCS_PAGE.toUri())
           }
-        } catch (e: ActivityNotFoundException) {
-          Timber.e(e)
-          try {
+        }.onFailure {
+          Timber.e(it)
+          runCatching {
             val intent = Intent(Intent.ACTION_VIEW)
               .setData(URLManager.DOCS_PAGE.toUri())
             requireActivity().startActivity(intent)
-          } catch (e: ActivityNotFoundException) {
-            Timber.e(e)
+          }.onFailure { inner ->
+            Timber.e(inner)
+            Toasty.showShort(requireActivity(), "No browser application")
           }
         }
         true
@@ -227,7 +211,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_RATE)?.apply {
       setOnPreferenceClickListener {
-        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PACKAGE_NAME_COOLAPK)
+        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
         val marketUrl = if (hasInstallCoolApk) {
           URLManager.COOLAPK_APP_PAGE
         } else {
@@ -259,7 +243,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<SwitchPreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
+    (findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
         true
@@ -312,9 +296,13 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     super.onResume()
     if (this != viewModel.controller) {
       viewModel.controller = this
-      requireActivity().invalidateOptionsMenu()
+      activity?.invalidateOptionsMenu()
     }
-    scheduleAppbarRaisingStatus()
+    scheduleAppbarRaisingStatus(
+      !getBorderViewDelegate().isShowingTopBorder,
+      "SettingsFragment onResume"
+    )
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(prefRecyclerView)
   }
 
   override fun onCreateRecyclerView(
@@ -324,6 +312,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   ): RecyclerView {
     val recyclerView =
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
+    recyclerView.id = android.R.id.list
     recyclerView.fixEdgeEffect()
     recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
@@ -340,11 +329,18 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     borderViewDelegate = recyclerView.borderViewDelegate
     borderViewDelegate.borderVisibilityChangedListener =
       BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-        (activity as MainActivity?)?.appBar?.setRaised(!top)
+        scheduleAppbarRaisingStatus(
+          !top,
+          "SettingsFragment OnBorderVisibilityChangedListener: top=$top"
+        )
       }
 
     prefRecyclerView = recyclerView
     return recyclerView
+  }
+
+  private fun scheduleAppbarRaisingStatus(isLifted: Boolean, from: String) {
+    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted, from)
   }
 
   override fun onDetach() {
@@ -358,14 +354,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     // Do nothing
   }
 
-  override fun getAppBar(): AppBar? = (activity as MainActivity?)?.appBar
-
   override fun getBorderViewDelegate(): BorderViewDelegate = borderViewDelegate
-
-  override fun scheduleAppbarRaisingStatus() {
-    getAppBar()?.setRaised(!getBorderViewDelegate().isShowingTopBorder)
-  }
-
   override fun isAllowRefreshing(): Boolean = true
   override fun getSuitableLayoutManager(): RecyclerView.LayoutManager? = null
 }

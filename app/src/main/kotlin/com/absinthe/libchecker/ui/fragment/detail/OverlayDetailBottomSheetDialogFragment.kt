@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
@@ -8,7 +7,7 @@ import android.text.style.ImageSpan
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
@@ -17,9 +16,10 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.OverlayDetailBottomSheetView
+import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import dev.rikka.tools.refine.Refine
 import kotlinx.coroutines.runBlocking
 import me.zhanghai.android.appiconloader.AppIconLoader
@@ -35,9 +35,10 @@ class OverlayDetailBottomSheetDialogFragment :
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
-  @SuppressLint("SetTextI18n")
   override fun init() {
-    val lcItem = (arguments?.getParcelable(EXTRA_LC_ITEM) as? LCItem) ?: return
+    val lcItem = arguments?.let {
+      BundleCompat.getParcelable<LCItem>(it, EXTRA_LC_ITEM)
+    } ?: return
     val packageInfo = try {
       PackageUtils.getPackageInfo(lcItem.packageName)
     } catch (e: PackageManager.NameNotFoundException) {
@@ -69,7 +70,7 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
-          text = "${Constants.OVERLAY_STRING}, ${PackageUtils.getTargetApiString(packageInfo)}"
+          text = String.format("%s, %s", Constants.OVERLAY_STRING, PackageUtils.getTargetApiString(packageInfo))
         }
       }
 

@@ -4,8 +4,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
+import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
@@ -19,17 +21,18 @@ import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.AppItemRepository
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
 import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -46,22 +49,38 @@ import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
+class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAppBarContainer {
 
   private val appViewModel: HomeViewModel by viewModels()
   private val navViewBehavior by lazy { HideBottomViewOnScrollBehavior<BottomNavigationView>() }
   private val workerListener = object : OnWorkerListener.Stub() {
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
+      if (packageName != null && action != null) {
+        if (action == Intent.ACTION_PACKAGE_REMOVED) {
+          AppItemRepository.allPackageInfoMap.remove(packageName)
+        } else {
+          runCatching {
+            PackageUtils.getPackageInfo(
+              packageName,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+            )
+          }.onSuccess {
+            AppItemRepository.allPackageInfoMap[packageName] = it
+          }
+        }
+      }
       appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
     }
   }
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      appViewModel.workerBinder = IWorkerService.Stub.asInterface(service)
-      runCatching {
-        appViewModel.workerBinder?.registerOnWorkerListener(workerListener)
-      }.onFailure {
-        Timber.e(it)
+      if (service?.pingBinder() == true) {
+        appViewModel.workerBinder = IWorkerService.Stub.asInterface(service)
+        runCatching {
+          appViewModel.workerBinder?.registerOnWorkerListener(workerListener)
+        }.onFailure {
+          Timber.e(it)
+        }
       }
     }
 
@@ -74,7 +93,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     super.onCreate(savedInstanceState)
 
     initView()
-    preWork()
     bindService(
       Intent(this, WorkerService::class.java).apply {
         setPackage(packageName)
@@ -82,14 +100,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       workerServiceConnection,
       Context.BIND_AUTO_CREATE
     )
-    handleIntentFromShortcuts(intent)
+    handleIntent(intent)
     initObserver()
     clearApkCache()
   }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
-    handleIntentFromShortcuts(intent)
+    handleIntent(intent)
   }
 
   override fun onDestroy() {
@@ -118,12 +136,21 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     binding.progressHorizontal.hide()
   }
 
+  override fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
+    Timber.d("scheduleAppbarLiftingStatus: isLifted: $isLifted, from: $from")
+    binding.appbar.isLifted = isLifted
+  }
+
+  override fun setLiftOnScrollTargetView(targetView: View) {
+    binding.appbar.setLiftOnScrollTargetView(targetView)
+  }
+
   private fun initView() {
-    setAppBar(binding.appbar, binding.toolbar)
-    binding.root.bringChildToFront(binding.appbar)
+    setSupportActionBar(binding.toolbar)
     supportActionBar?.title = LCAppUtils.setTitle(this)
 
     binding.apply {
+      root.bringChildToFront(binding.appbar)
       viewpager.apply {
         adapter = object : FragmentStateAdapter(this@MainActivity) {
           override fun getItemCount(): Int {
@@ -160,7 +187,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
         requestLayout()
         // 当 ViewPager 切换页面时，改变 ViewPager 的显示
         setOnItemSelectedListener {
-
           fun performClickNavigationItem(index: Int) {
             if (binding.viewpager.currentItem != index) {
               if (!binding.viewpager.isFakeDragging) {
@@ -195,11 +221,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     }
   }
 
-  private fun handleIntentFromShortcuts(intent: Intent) {
+  private fun handleIntent(intent: Intent) {
     when (intent.action) {
       Constants.ACTION_APP_LIST -> binding.viewpager.setCurrentItem(0, false)
       Constants.ACTION_STATISTICS -> binding.viewpager.setCurrentItem(1, false)
       Constants.ACTION_SNAPSHOT -> binding.viewpager.setCurrentItem(2, false)
+      Intent.ACTION_APPLICATION_PREFERENCES -> binding.viewpager.setCurrentItem(3, false)
     }
     Analytics.trackEvent(
       Constants.Event.LAUNCH_ACTION,
@@ -212,12 +239,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems()
       } else {
-        lifecycleScope.launch(Dispatchers.IO) {
-          do {
-            workerBinder?.initKotlinUsage()
-            delay(300)
-          } while (workerBinder == null)
-        }
+        initKotlinUsage()
       }
 
       lifecycleScope.launchWhenStarted {
@@ -232,12 +254,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
                   hideNavigationView()
                 }
               } else if (it.status == STATUS_INIT_END) {
-                lifecycleScope.launch(Dispatchers.IO) {
-                  do {
-                    workerBinder?.initKotlinUsage()
-                    delay(300)
-                  } while (workerBinder == null)
-                }
+                initKotlinUsage()
               }
             }
             else -> {}
@@ -251,11 +268,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer {
     FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
-  private fun preWork() {
-    lifecycleScope.launch(Dispatchers.IO) {
-      if (AppItemRepository.shouldClearDiffItemsInDatabase) {
-        Repositories.lcRepository.deleteAllSnapshotDiffItems()
-      }
-    }
+  private fun initKotlinUsage() = lifecycleScope.launch(Dispatchers.IO) {
+    do {
+      appViewModel.workerBinder?.initKotlinUsage()
+      delay(300)
+    } while (appViewModel.workerBinder == null)
   }
 }

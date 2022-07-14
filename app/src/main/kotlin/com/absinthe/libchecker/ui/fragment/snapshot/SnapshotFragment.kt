@@ -1,14 +1,16 @@
 package com.absinthe.libchecker.ui.fragment.snapshot
 
+import android.Manifest
 import android.app.Service
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.IBinder
 import android.util.TypedValue
-import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuInflater
@@ -17,6 +19,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Space
 import android.widget.TextView
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -42,8 +47,10 @@ import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
+import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -63,6 +70,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 import java.util.LinkedList
@@ -112,39 +121,35 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
   }
   private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
+  private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
   override fun init() {
-    setHasOptionsMenu(true)
-
     val context = (this.context as? BaseActivity<*>) ?: return
     context.applicationContext.also {
       val intent = Intent(it, ShootService::class.java).apply {
         setPackage(it.packageName)
       }
+      it.startService(intent)
       it.bindService(
         intent,
-        shootServiceConnection, Service.BIND_AUTO_CREATE
+        shootServiceConnection,
+        Service.BIND_AUTO_CREATE
       )
     }
 
-    val dashboard = SnapshotDashboardView(
-      ContextThemeWrapper(context, R.style.AlbumMaterialCard)
-    ).apply {
-      layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      )
-      if (!GlobalValues.md3Theme) {
-        background = null
+    val dashboard =
+      SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
+        layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        )
       }
-    }
 
     dashboard.setOnClickListener {
       startActivity(Intent(context, AlbumActivity::class.java))
     }
 
     dashboard.container.apply {
-
       fun changeTimeNode() {
         lifecycleScope.launch(Dispatchers.IO) {
           val timeStampList = viewModel.repository.getTimeStamps()
@@ -237,7 +242,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            context.appBar?.setRaised(!top)
+            if (isResumed) {
+              scheduleAppbarLiftingStatus(
+                !top,
+                "SnapshotFragment OnBorderVisibilityChangedListener: top=$top"
+              )
+            }
           }
 
         if (itemDecorationCount == 0) {
@@ -273,7 +283,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }.launchIn(lifecycleScope)
       snapshotAppsCount.observe(viewLifecycleOwner) {
         if (it != null) {
-          dashboard.container.tvSnapshotAppsCountText.text = it.toString()
+          lifecycleScope.launch(Dispatchers.Default) {
+            val appCount = AppItemRepository.getApplicationInfoMap().size
+
+            withContext(Dispatchers.Main) {
+              dashboard.container.tvSnapshotAppsCountText.text =
+                String.format("%d / %d", it, appCount)
+            }
+          }
         }
       }
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
@@ -307,12 +324,36 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
               if (allowRefreshing) {
                 packageQueue.offer(it.packageName to it.action)
                 dequeuePackages()
+
+                lifecycleScope.launch(Dispatchers.Default) {
+                  val appCount = AppItemRepository.getApplicationInfoMap().size
+                  viewModel.snapshotAppsCount.value ?: runBlocking {
+                    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+                  }
+                  val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
+
+                  withContext(Dispatchers.Main) {
+                    dashboard.container.tvSnapshotAppsCountText.text =
+                      String.format("%d / %d", snapshotCount, appCount)
+                  }
+                }
               }
             }
             else -> {}
           }
         }
       }
+    }
+  }
+
+  override fun onAttach(context: Context) {
+    super.onAttach(context)
+
+    if (OsUtils.atLeastT()) {
+      requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+          Timber.d("Request post notification: $isGranted")
+        }
     }
   }
 
@@ -341,20 +382,21 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     if (hasPackageChanged()) {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
+    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
   }
 
   override fun onDestroyView() {
     super.onDestroyView()
-    adapter.release()
     shootBinder?.let {
       context?.applicationContext?.let { ctx ->
         it.unregisterOnShootOverListener(shootListener)
-        ctx.unbindService(shootServiceConnection)
         if (ShootService.isComputing.not()) {
           runCatching {
+            ctx.unbindService(shootServiceConnection)
             ctx.stopService(
               Intent(
-                ctx, ShootService::class.java
+                ctx,
+                ShootService::class.java
               )
             )
           }
@@ -386,13 +428,27 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         flip(VF_LOADING)
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
-          context, Intent(context, ShootService::class.java)
+          context,
+          Intent(context, ShootService::class.java)
         )
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")
           Toasty.showShort(context, "Snapshot service error")
         }
         shouldCompare = false
+
+        if (OsUtils.atLeastT()) {
+          if (ContextCompat.checkSelfPermission(
+              context,
+              Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+          ) {
+            if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+              requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+          }
+        }
+
         Analytics.trackEvent(
           Constants.Event.SNAPSHOT_CLICK,
           EventProperties().set("Action", "Click to Save")
@@ -441,14 +497,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
 
   private fun flip(child: Int) {
-    val context = (this.context as? BaseActivity<*>) ?: return
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
       return
     }
     if (child == VF_LOADING) {
       binding.loading.resumeAnimation()
-      context.appBar?.setRaised(false)
       menu?.findItem(R.id.save)?.isVisible = false
     } else {
       binding.loading.pauseAnimation()

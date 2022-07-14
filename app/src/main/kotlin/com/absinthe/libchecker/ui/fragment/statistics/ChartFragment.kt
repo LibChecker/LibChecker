@@ -1,18 +1,17 @@
 package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.collection.arrayMapOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseFragment
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV7
 import com.absinthe.libchecker.constant.Constants.ARMV8
@@ -31,6 +30,7 @@ import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.ChartViewModel
 import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.Chart
 import com.github.mikephil.charting.charts.HorizontalBarChart
 import com.github.mikephil.charting.charts.PieChart
 import com.github.mikephil.charting.components.Legend
@@ -96,6 +96,8 @@ class ChartFragment :
   }
 
   private fun setData() {
+    context ?: return
+
     when (chartType) {
       TYPE_ABI -> setAbiData()
       TYPE_KOTLIN -> setKotlinData()
@@ -135,9 +137,9 @@ class ChartFragment :
           if (GlobalValues.isShowSystemApps.value == false) {
             if (item.isSystem) continue
           }
-          when (item.abi) {
-            ARMV8.toShort() -> list[0]++
-            ARMV5.toShort(), ARMV7.toShort() -> list[1]++
+          when (item.abi % 10) {
+            ARMV8 -> list[0]++
+            ARMV5, ARMV7 -> list[1]++
             else -> list[2]++
           }
         }
@@ -162,7 +164,7 @@ class ChartFragment :
         // add a lot of colors
         val colors: ArrayList<Int> = ArrayList()
 
-        if (OsUtils.atLeastS() && GlobalValues.md3Theme) {
+        if (OsUtils.atLeastS()) {
           if (com.absinthe.libraries.utils.utils.UiUtils.isDarkMode()) {
             colors.add(context.getColor(android.R.color.system_accent1_700))
             colors.add(context.getColor(android.R.color.system_accent1_800))
@@ -280,7 +282,6 @@ class ChartFragment :
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
       val context = context ?: return@launch
-      val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
 
@@ -357,7 +358,6 @@ class ChartFragment :
     queryJob?.cancel()
     queryJob = lifecycleScope.launch(Dispatchers.IO) {
       val context = context ?: return@launch
-      val parties = osNameMap.map { it.value }.toMutableList()
 
       val entries: ArrayList<BarEntry> = ArrayList()
       var packageInfo: PackageInfo
@@ -506,13 +506,12 @@ class ChartFragment :
           val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
           var packageInfo: PackageInfo?
 
-          dialogTitle = "Target API $targetApi"
+          dialogTitle = "Target SDK $targetApi"
+          viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == targetApi })
           filteredList?.filter {
-            packageInfo = try {
+            packageInfo = runCatching {
               PackageUtils.getPackageInfo(it.packageName)
-            } catch (e: PackageManager.NameNotFoundException) {
-              null
-            }
+            }.getOrNull()
             packageInfo?.applicationInfo?.targetSdkVersion == targetApi
           }?.let { filter -> item = ArrayList(filter) }
         }
@@ -520,6 +519,7 @@ class ChartFragment :
           val minSdk = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
 
           dialogTitle = "Min SDK $minSdk"
+          viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == minSdk })
           filteredList?.filter {
             runCatching { PackageUtils.getPackageInfo(it.packageName) }.getOrNull()
               ?.let { PackageUtils.getMinSdkVersion(it) == minSdk } ?: false
@@ -535,15 +535,16 @@ class ChartFragment :
       setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
         override fun onDismiss() {
           this@ChartFragment.dialog = null
-          if (chartView is PieChart) {
-            (chartView as PieChart).highlightValue(null)
-          } else if (chartView is HorizontalBarChart) {
-            (chartView as HorizontalBarChart).highlightValue(null)
-          }
+          (chartView as? Chart<*>)?.highlightValue(null)
+          viewModel.dialogTitle.postValue("")
+          viewModel.filteredList.postValue(emptyList())
+          viewModel.androidVersion.postValue(null)
         }
       })
     }.also {
-      it.show(requireActivity().supportFragmentManager, tag)
+      activity?.let { activity ->
+        it.show(activity.supportFragmentManager, tag)
+      }
     }
   }
 
@@ -645,43 +646,5 @@ class ChartFragment :
       setNoDataTextColor(colorOnSurface)
       setOnChartValueSelectedListener(this@ChartFragment)
     }
-  }
-
-  private val osNameMap by lazy {
-    arrayMapOf(
-      1 to "1.0",
-      2 to "1.1",
-      3 to "Cupcake",
-      4 to "Donut",
-      5 to "Eclair",
-      6 to "Eclair",
-      7 to "Eclair",
-      8 to "Froyo",
-      9 to "Gingerbread",
-      10 to "Gingerbread",
-      11 to "Honeycomb",
-      12 to "Honeycomb",
-      13 to "Honeycomb",
-      14 to "Ice Cream Sandwich",
-      15 to "Ice Cream Sandwich",
-      16 to "Jelly Bean",
-      17 to "Jelly Bean",
-      18 to "Jelly Bean",
-      19 to "KitKat",
-      20 to "KitKat",
-      21 to "Lollipop",
-      22 to "Lollipop",
-      23 to "Marshmallow",
-      24 to "Nougat",
-      25 to "Nougat",
-      26 to "Oreo",
-      27 to "Oreo",
-      28 to "Pie",
-      29 to "Android 10",
-      30 to "Android 11",
-      31 to "Android 12",
-      32 to "Android 12.1",
-      // 33 to "Tiramisu",
-    )
   }
 }

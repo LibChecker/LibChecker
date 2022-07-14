@@ -70,7 +70,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val extraInfoView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensed
+      R.style.TextView_SansSerifCondensedMedium
     )
   ).apply {
     layoutParams = LayoutParams(

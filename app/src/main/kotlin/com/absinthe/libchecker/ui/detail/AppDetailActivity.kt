@@ -10,10 +10,11 @@ import android.os.Bundle
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.bean.DetailExtraBean
+import com.absinthe.libchecker.compat.IntentCompat
+import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.VersionCompat
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import timber.log.Timber
 
@@ -26,7 +27,7 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
   private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
   private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
   private val refType by unsafeLazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
-  private val extraBean by unsafeLazy { intent.getParcelableExtra(EXTRA_DETAIL_BEAN) as? DetailExtraBean }
+  private val extraBean by unsafeLazy { IntentCompat.getParcelableExtra<DetailExtraBean>(intent, EXTRA_DETAIL_BEAN) }
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
@@ -45,8 +46,8 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
             or PackageManager.GET_PROVIDERS
             or PackageManager.GET_PERMISSIONS
             or PackageManager.GET_META_DATA
-            or VersionCompat.MATCH_DISABLED_COMPONENTS
-            or VersionCompat.MATCH_UNINSTALLED_PACKAGES
+            or PackageManagerCompat.MATCH_DISABLED_COMPONENTS
+            or PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
           )
         PackageUtils.getPackageInfo(packageName, flag)
       }.getOrNull()?.let { packageInfo ->

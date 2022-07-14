@@ -21,7 +21,6 @@ class HorizontalSpacesItemDecoration(
     parent: RecyclerView,
     state: RecyclerView.State
   ) {
-
     if (influenceParent && parent.paddingLeft != space) {
       parent.setPadding(space, parent.paddingTop, space, parent.paddingBottom)
       parent.clipToPadding = false

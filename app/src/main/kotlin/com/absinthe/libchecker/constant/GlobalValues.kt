@@ -20,7 +20,7 @@ object GlobalValues {
     return SPUtils.sp
   }
 
-  var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITEE)
+  var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 
@@ -38,9 +38,9 @@ object GlobalValues {
 
   var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
 
-  var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
+  var processMode: Boolean by SPDelegates(Constants.PREF_PROCESS_MODE, false)
 
-  var md3Theme: Boolean by SPDelegates(Constants.PREF_MD3, false)
+  var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
   val isShowSystemApps: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
@@ -73,4 +73,6 @@ object GlobalValues {
     }
 
   var uuid: String by SPDelegates(Constants.PREF_UUID, "")
+
+  var agreedPrivacy: Boolean by SPDelegates(Constants.PREF_AGREED_PRIVACY, false)
 }

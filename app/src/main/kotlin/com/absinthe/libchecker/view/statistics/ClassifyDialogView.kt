@@ -14,8 +14,9 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.view.app.BottomSheetHeaderView
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libchecker.view.detail.AndroidVersionLabelView
+import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 @SuppressLint("ViewConstructor")
@@ -35,7 +36,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       ViewGroup.LayoutParams.MATCH_PARENT,
       1.0f
     ).also {
-      it.topMargin = 24.dp
+      it.topMargin = 4.dp
     }
     layoutManager = LinearLayoutManager(context)
     adapter = this@ClassifyDialogView.adapter
@@ -65,12 +66,23 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     addView(list)
   }
 
-  override fun getHeaderView(): BottomSheetHeaderView {
-    return header
+  private val androidVersionView = AndroidVersionLabelView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    )
+    setPadding(0, 4.dp, 0, 4.dp)
   }
 
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    adapter.release()
+  fun addAndroidVersionView(triple: Triple<Int, String, Int?>?) {
+    if (androidVersionView.parent == null && triple != null) {
+      androidVersionView.setIcon(triple.third)
+      androidVersionView.text.text = triple.second
+      addView(androidVersionView, 1)
+    }
+  }
+
+  override fun getHeaderView(): BottomSheetHeaderView {
+    return header
   }
 }

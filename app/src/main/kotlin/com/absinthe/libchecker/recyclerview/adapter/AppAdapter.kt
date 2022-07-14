@@ -1,14 +1,15 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleCoroutineScope
+import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.AppIconCache
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -16,42 +17,32 @@ import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter<LCItem>() {
 
-  private var loadIconJob: Job? = null
-
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
-      AppItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
+      AppItemView(context).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-          it.setMargins(margin, margin, margin, margin)
+          it.setMargins(0, margin, 0, margin)
         }
+        setCardBackgroundColor(Color.TRANSPARENT)
       }
     )
   }
 
   override fun convert(holder: BaseViewHolder, item: LCItem) {
     (holder.itemView as AppItemView).container.apply {
-      icon.setTag(R.id.app_item_icon_id, item.packageName)
-      lifecycleScope.launch(Dispatchers.IO) {
-        try {
-          val ai = PackageUtils.getPackageInfo(item.packageName).applicationInfo
-          loadIconJob =
-            AppIconCache.loadIconBitmapAsync(context, ai, ai.uid / 100000, icon)
-        } catch (e: Exception) {
-          Timber.e(e)
-        }
-      }
+      val packageInfo = runCatching {
+        AppItemRepository.allPackageInfoMap[item.packageName]
+          ?: PackageUtils.getPackageInfo(item.packageName)
+      }.getOrNull() ?: return
 
+      icon.load(packageInfo)
       setOrHighlightText(appName, item.label)
       setOrHighlightText(packageName, item.packageName)
 
@@ -104,11 +95,5 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
 
   override fun getItemId(position: Int): Long {
     return data[position].hashCode().toLong()
-  }
-
-  fun release() {
-    if (loadIconJob?.isActive == true) {
-      loadIconJob?.cancel()
-    }
   }
 }

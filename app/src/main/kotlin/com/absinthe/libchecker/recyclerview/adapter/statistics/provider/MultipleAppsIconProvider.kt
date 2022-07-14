@@ -34,7 +34,7 @@ class MultipleAppsIconProvider(val lifecycleScope: LifecycleCoroutineScope) : Ba
           ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
-          it.setMargins(margin, margin, margin, margin)
+          it.setMargins(0, margin, 0, margin)
         }
       }
     )
@@ -43,7 +43,7 @@ class MultipleAppsIconProvider(val lifecycleScope: LifecycleCoroutineScope) : Ba
   override fun convert(helper: BaseViewHolder, item: BaseNode) {
     (helper.itemView as MultipleAppsIconItemView).container.apply {
       val libReferenceItem = item as LibReference
-      icon.setIcons(lifecycleScope, libReferenceItem.referredList.toList())
+      icon.setIcons(libReferenceItem.referredList.toList())
       count.text = libReferenceItem.referredList.size.toString()
       val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
       val colorSpanit = StyleSpan(Typeface.ITALIC)

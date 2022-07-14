@@ -11,5 +11,6 @@ const val DISABLED = "DISABLED"
 data class LibStringItem(
   val name: String,
   val size: Long = 0,
-  val source: String? = null
+  val source: String? = null,
+  val process: String? = null
 ) : Parcelable
