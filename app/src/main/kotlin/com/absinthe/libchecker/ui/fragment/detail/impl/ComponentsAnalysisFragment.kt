@@ -27,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.reverseStrikeThroughAnimation
 import com.absinthe.libchecker.utils.extensions.startStrikeThroughAnimation
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import kotlinx.coroutines.Dispatchers
@@ -36,15 +37,17 @@ import rikka.core.util.ClipboardUtils
 
 class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBinding>() {
 
-  private val hasIntegration by lazy {
-    BlockerManager.isSupportInteraction || MonkeyKingManager.isSupportInteraction || AnywhereManager.isSupportInteraction
+  private val hasIntegration by unsafeLazy {
+    BlockerManager.isSupportInteraction ||
+      MonkeyKingManager.isSupportInteraction ||
+      AnywhereManager.isSupportInteraction
   }
   private var integrationMonkeyKingBlockList: List<ShareCmpInfo.Component>? = null
   private var integrationBlockerList: List<ShareCmpInfo.Component>? = null
   private var itemsList: List<LibStringItemChip>? = null
 
   override fun getRecyclerView(): RecyclerView = binding.list
-  override val needShowLibDetailDialog = true
+  override val needShowLibDetailDialog: Boolean = true
 
   override fun init() {
     binding.list.adapter = adapter
@@ -259,9 +262,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
 
   companion object {
     fun newInstance(@LibType type: Int): ComponentsAnalysisFragment {
-      return ComponentsAnalysisFragment().putArguments(
-        EXTRA_TYPE to type
-      )
+      return ComponentsAnalysisFragment().putArguments(EXTRA_TYPE to type)
     }
   }
 }
