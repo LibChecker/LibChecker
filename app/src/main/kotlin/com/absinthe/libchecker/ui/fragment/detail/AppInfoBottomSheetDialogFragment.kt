@@ -4,11 +4,9 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.Settings
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.BuildConfig
@@ -17,7 +15,6 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppInfoAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
@@ -90,26 +87,23 @@ class AppInfoBottomSheetDialogFragment :
       setHasFixedSize(true)
     }
 
-    if (OsUtils.atLeastN()) {
-      aiAdapter.also { adapter ->
-        adapter.setList(getResolveInfoList() + getMaterialFilesItem())
-        adapter.setOnItemClickListener { _, _, position ->
-          adapter.data[position].let {
-            runCatching {
-              startActivity(it.intent)
-            }.onFailure {
-              context?.let { ctx ->
-                Toasty.showShort(ctx, R.string.toast_cant_open_app)
-              }
+    aiAdapter.also { adapter ->
+      adapter.setList(getResolveInfoList() + getMaterialFilesItem())
+      adapter.setOnItemClickListener { _, _, position ->
+        adapter.data[position].let {
+          runCatching {
+            startActivity(it.intent)
+          }.onFailure {
+            context?.let { ctx ->
+              Toasty.showShort(ctx, R.string.toast_cant_open_app)
             }
           }
-          dismiss()
         }
+        dismiss()
       }
     }
   }
 
-  @RequiresApi(Build.VERSION_CODES.N)
   private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_SHOW_APP_INFO),

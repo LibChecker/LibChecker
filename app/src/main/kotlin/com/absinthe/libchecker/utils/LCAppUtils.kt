@@ -246,10 +246,6 @@ fun doOnMainThreadIdle(action: () -> Unit) {
   if (Looper.getMainLooper() == Looper.myLooper()) {
     setupIdleHandler(Looper.myQueue())
   } else {
-    if (OsUtils.atLeastM()) {
-      setupIdleHandler(Looper.getMainLooper().queue)
-    } else {
-      handler.post { setupIdleHandler(Looper.myQueue()) }
-    }
+    setupIdleHandler(Looper.getMainLooper().queue)
   }
 }

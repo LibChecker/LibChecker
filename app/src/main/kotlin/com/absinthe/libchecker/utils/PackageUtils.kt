@@ -83,12 +83,12 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES or PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
+      PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return PackageManagerCompat.getPackageArchiveInfo(
         packageInfo.applicationInfo.sourceDir,
-        PackageManagerCompat.MATCH_DISABLED_COMPONENTS or flag
+        PackageManager.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
         applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
         applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
@@ -105,7 +105,7 @@ object PackageUtils {
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
     return PackageManagerCompat.getInstalledPackages(
-      PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
+      PackageManager.MATCH_UNINSTALLED_PACKAGES
         or PackageManager.GET_META_DATA
         or PackageManager.GET_PERMISSIONS
     )

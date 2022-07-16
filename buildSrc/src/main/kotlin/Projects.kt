@@ -8,7 +8,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.nio.charset.Charset
 import java.time.Instant
 
-const val baseVersionName = "2.2.11"
+const val baseVersionName = "2.3.0"
 val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
 val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
@@ -67,7 +67,7 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
   extensions.configure<BaseExtension>("android") {
     compileSdkVersion(33)
     defaultConfig {
-      minSdk = 23
+      minSdk = 24
       targetSdk = 33
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
