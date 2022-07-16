@@ -16,7 +16,7 @@ import javax.crypto.spec.GCMParameterSpec
 /**
  * Encryption / Decryption service using the AES algorithm
  * example for nullbeans.com
- * https://nullbeans.com/how-to-encrypt-decrypt-files-byte-arrays-in-java-using-aes-gcm/#Generating_an_AES_key
+ * https:// nullbeans.com/how-to-encrypt-decrypt-files-byte-arrays-in-java-using-aes-gcm/#Generating_an_AES_key
  */
 class AESEncryptionManager {
 
@@ -42,15 +42,14 @@ class AESEncryptionManager {
     encryptPassword: String?,
     data: ByteArray
   ): ByteArray {
-
-    //Prepare the nonce
+    // Prepare the nonce
     val secureRandom = SecureRandom()
 
-    //Noonce should be 12 bytes
+    // Noonce should be 12 bytes
     val iv = ByteArray(12)
     secureRandom.nextBytes(iv)
 
-    //Prepare your key/password
+    // Prepare your key/password
     val secretKey = if (encryptPassword != null) {
       aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
     } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
@@ -58,13 +57,13 @@ class AESEncryptionManager {
     val cipher = Cipher.getInstance("AES/GCM/NoPadding")
     val parameterSpec = GCMParameterSpec(128, iv)
 
-    //Encryption mode on!
+    // Encryption mode on!
     cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec)
 
-    //Encrypt the data
+    // Encrypt the data
     val encryptedData = cipher.doFinal(data)
 
-    //Concatenate everything and return the final data
+    // Concatenate everything and return the final data
     val byteBuffer = ByteBuffer.allocate(4 + iv.size + encryptedData.size)
     byteBuffer.putInt(iv.size)
     byteBuffer.put(iv)
@@ -92,31 +91,30 @@ class AESEncryptionManager {
     encryptPassword: String?,
     encryptedData: ByteArray
   ): ByteArray {
-
-    //Wrap the data into a byte buffer to ease the reading process
+    // Wrap the data into a byte buffer to ease the reading process
     val byteBuffer = ByteBuffer.wrap(encryptedData)
     val noonceSize = byteBuffer.int
 
-    //Make sure that the file was encrypted properly
+    // Make sure that the file was encrypted properly
     require(!(noonceSize < 12 || noonceSize >= 16)) { "Nonce size is incorrect. Make sure that the incoming data is an AES encrypted file." }
     val iv = ByteArray(noonceSize)
     byteBuffer[iv]
 
-    //Prepare your key/password
+    // Prepare your key/password
     val secretKey = if (encryptPassword != null) {
       aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
     } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
 
-    //get the rest of encrypted data
+    // get the rest of encrypted data
     val cipherBytes = ByteArray(byteBuffer.remaining())
     byteBuffer[cipherBytes]
     val cipher = Cipher.getInstance("AES/GCM/NoPadding")
     val parameterSpec = GCMParameterSpec(128, iv)
 
-    //Encryption mode on!
+    // Encryption mode on!
     cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec)
 
-    //Encrypt the data
+    // Encrypt the data
     return cipher.doFinal(cipherBytes)
   }
 }
