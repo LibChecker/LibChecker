@@ -1,1 +1,29 @@
-{"version":"3","listProblem":[]}
+{"version":"3","listProblem":[{
+  "tool": "Code Inspection",
+  "category": "Redundant constructs",
+  "type": "Remove unnecessary parentheses from function call with lambda",
+  "severity": "Info",
+  "comment": "Remove unnecessary parentheses from function call with lambda",
+  "detailsInfo": "Reports redundant empty parentheses of function calls where the only parameter is a lambda that's outside the parentheses.\n\nUse the 'Remove unnecessary parentheses from function call with lambda' quick-fix to clean up the code.\n\n**Examples:**\n\n\n      fun foo() {\n          listOf(1).forEach() {  }\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun foo() {\n          listOf(1).forEach {  }\n      }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "hidden-api/build.gradle.kts",
+      "language": "kotlin",
+      "line": 6,
+      "offset": 19,
+      "length": 2,
+      "code": {
+        "startLine": 4,
+        "length": 2,
+        "offset": 21,
+        "surroundingCode": "}\n\nsetupLibraryModule() {\n  defaultConfig {\n    namespace = \"com.absinthe.libchecker.hidden_api\""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.hidden-api",
+    "inspectionName": "RemoveEmptyParenthesesFromLambdaCall"
+  },
+  "hash": "76ea04b8e017cc2d1a313b4d4dde2cfb0895c873ee60e5f14104cc929b64b3c5"
+}]}
