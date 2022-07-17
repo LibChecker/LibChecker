@@ -320,8 +320,8 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     try {
       INTERNAL_BACKUP_PATH.mkdirs()
       TEMP_BACKUP_PATH.mkdirs()
-    } catch (e: FileAlreadyExistsException) {
-    } catch (e: IOException) {
+    } catch (_: FileAlreadyExistsException) {
+    } catch (_: IOException) {
     }
 
     if (enableLogDebug) {

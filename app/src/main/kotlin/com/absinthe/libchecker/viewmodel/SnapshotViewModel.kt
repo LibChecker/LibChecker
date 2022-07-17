@@ -858,8 +858,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         deletedNewList.add(item)
       }
     }
-    tempOldList.removeAll(deletedOldList)
-    tempNewList.removeAll(deletedNewList)
+    tempOldList.removeAll(deletedOldList.toSet())
+    tempNewList.removeAll(deletedNewList.toSet())
 
     for (item in tempOldList) {
       list.add(
@@ -896,8 +896,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     for (item in sameList) {
-      tempOldList.removeAll(sameList)
-      tempNewList.removeAll(sameList)
+      tempOldList.removeAll(sameList.toSet())
+      tempNewList.removeAll(sameList.toSet())
     }
 
     for (item in tempOldList) {
@@ -1109,8 +1109,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         deletedNewList.add(item)
       }
     }
-    tempOldList.removeAll(deletedOldList)
-    tempNewList.removeAll(deletedNewList)
+    tempOldList.removeAll(deletedOldList.toSet())
+    tempNewList.removeAll(deletedNewList.toSet())
 
     if (tempOldList.isNotEmpty()) {
       node.removed = true

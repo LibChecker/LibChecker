@@ -969,7 +969,7 @@ object PackageUtils {
         filter = primaryList.filter { item -> item.name.startsWith(pathLevel3Item) }
 
         if (filter.isNotEmpty()) {
-          primaryList.removeAll(filter)
+          primaryList.removeAll(filter.toSet())
           primaryList.add(LibStringItem(pathLevel3Item))
         }
       }
