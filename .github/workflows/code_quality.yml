@@ -9,6 +9,7 @@ on:
 jobs:
   qodana:
     runs-on: ubuntu-latest
+    if: github.repository == 'zhaobozhen/LibChecker'
     steps:
       - uses: actions/checkout@v3
         with:
