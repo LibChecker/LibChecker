@@ -5,6 +5,7 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
+import java.io.File
 import java.nio.charset.Charset
 import java.time.Instant
 
@@ -25,6 +26,16 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
       versionName = verName
       resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
     }
+    if (project.hasProperty("releaseStoreFile")) {
+      signingConfigs {
+        create("config") {
+          storeFile = File(project.properties["releaseStoreFile"] as String)
+          storePassword = project.properties["releaseStorePassword"] as String
+          keyAlias = project.properties["releaseKeyAlias"] as String
+          keyPassword = project.properties["releaseKeyPassword"] as String
+        }
+      }
+    }
     buildTypes {
       debug {
         applicationIdSuffix = ".debug"
@@ -38,6 +49,11 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         )
       }
       all {
+        if (project.hasProperty("releaseStoreFile")) {
+          signingConfig = signingConfigs.getByName("config")
+        } else {
+          signingConfig = signingConfigs.getByName("debug")
+        }
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
         buildConfigField("String", "APP_CENTER_SECRET", "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\"")
         buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")

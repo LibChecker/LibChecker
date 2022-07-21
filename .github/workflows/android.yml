@@ -61,58 +61,51 @@ jobs:
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
+      - name: Write sign info
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'zhaobozhen/LibChecker'
+        run: |
+          if [ ! -z "${{ secrets.SIGNING_KEY }}" ]; then
+            echo releaseStorePassword='${{ secrets.KEY_STORE_PASSWORD }}' >> gradle.properties
+            echo releaseKeyAlias='${{ secrets.ALIAS }}' >> gradle.properties
+            echo releaseKeyPassword='${{ secrets.KEY_PASSWORD }}' >> gradle.properties
+            echo releaseStoreFile='${{ github.workspace }}/key.jks' >> gradle.properties
+            echo ${{ secrets.SIGNING_KEY }} | base64 --decode > ${{ github.workspace }}/key.jks
+          fi
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
           arguments: -PappVerName=${{ env.VERSION }} assembleRelease
-      - name: Sign Foss release
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        id: signFossRelease
-        uses: r0adkll/sign-android-release@v1.0.4
-        env:
-          BUILD_TOOLS_VERSION: "32.0.0"
-        with:
-          releaseDirectory: app/build/outputs/apk/foss/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Foss
-          path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
-      - name: Sign Market release
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        id: signMarketRelease
-        uses: r0adkll/sign-android-release@v1.0.4
-        env:
-          BUILD_TOOLS_VERSION: "32.0.0"
-        with:
-          releaseDirectory: app/build/outputs/apk/market/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          path: ${{ github.workspace }}/app/build/outputs/apk/foss/release
       - name: Upload built Market apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Market
-          path: ${{ steps.signMarketRelease.outputs.signedReleaseFile }}
+          path: ${{ github.workspace }}/app/build/outputs/apk/market/release
       - name: Upload mappings
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: mappings
           path: "app/build/outputs/mapping/fossRelease"
+      - name: Set apk path
+        id: apk-path
+        run: |
+          foss_path=$(find **/build/outputs/apk/foss -name '*.apk' -type f | head -1)
+          echo "::set-output name=foss_path::$foss_path"
+          market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
+          echo "::set-output name=market_path::$market_path"
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         id: apk-info
         uses: hkusu/apk-info-action@v1
         with:
-          apk-path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
+          apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
@@ -124,8 +117,8 @@ jobs:
         env:
           CHANNEL_ID: ${{ secrets.TELEGRAM_TO }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          FOSS_FILE: ${{ github.workspace }}/${{ steps.signFossRelease.outputs.signedReleaseFile }}
-          MARKET_FILE: ${{ github.workspace }}/${{ steps.signMarketRelease.outputs.signedReleaseFile }}
+          FOSS_FILE: ${{ steps.apk-path.outputs.foss_path }}
+          MARKET_FILE: ${{ steps.apk-path.outputs.market_path }}
           COMMIT_MESSAGE: |+
             New push to github\!
             ```
