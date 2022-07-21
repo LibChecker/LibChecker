@@ -184,12 +184,19 @@ class ShootService : LifecycleService() {
         try {
           ai = info.applicationInfo
           dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
+
           if (dbSnapshotItem?.lastUpdatedTime == info.lastUpdateTime && dbSnapshotItem.packageSize == PackageUtils.getPackageSize(
               info,
               true
             )
           ) {
-            dbList.add(dbSnapshotItem)
+            Timber.d("computeSnapshots: ${info.packageName} is up to date")
+            dbList.add(
+              dbSnapshotItem.copy().also {
+                it.id = null
+                it.timeStamp = ts
+              }
+            )
           } else {
             dbList.add(
               SnapshotItem(

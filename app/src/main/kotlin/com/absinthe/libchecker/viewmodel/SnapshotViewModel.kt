@@ -1215,6 +1215,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         providers = it.providers
         permissions = it.permissions
         metadata = it.metadata
+        packageSize = it.packageSize
       }
 
       snapshotList.add(snapshotBuilder.build())
