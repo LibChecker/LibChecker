@@ -188,16 +188,16 @@
           "description": "Reports call arguments with `Boolean` type without explicit parameter names specified.\n\n\nWhen multiple boolean literals are passed sequentially, it's easy to forget parameter ordering that could lead to mistakes.\nExplicit parameter names allow for easier code reading and understanding.\n\n**Example:**\n\n\n      fun check(checkName: Boolean, checkAddress: Boolean, checkPhone: Boolean) {}\n\n      fun usage() {\n          check(true, false, true) // What does this mean?\n      }\n\nA quick-fix adds missing parameter names:\n\n\n      fun check(checkName: Boolean, checkAddress: Boolean, checkPhone: Boolean) {}\n\n      fun usage() {\n          check(checkName = true, checkAddress = false, checkPhone = true)\n      }\n"
         },
         {
-          "shortName": "ReplaceGuardClauseWithFunctionCall",
-          "displayName": "Guard clause can be replaced with Kotlin's function call",
-          "enabled": false,
-          "description": "Reports guard clauses that can be replaced with a function call.\n\n**Example:**\n\n      fun test(foo: Int?) {\n          if (foo == null) throw IllegalArgumentException(\"foo\") // replaceable clause\n      }\n\nAfter the quick-fix is applied:\n\n      fun test(foo: Int?) {\n          checkNotNull(foo)\n      }\n"
-        },
-        {
           "shortName": "ReplaceSizeZeroCheckWithIsEmpty",
           "displayName": "Size zero check can be replaced with 'isEmpty()'",
           "enabled": false,
           "description": "Reports `size == 0` checks on `Collections/Array/String` that should be replaced with `isEmpty()`.\n\nUsing `isEmpty()` makes your code simpler.\n\nThe quick-fix replaces the size check with `isEmpty()`.\n\n**Example:**\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.size == 0\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun foo() {\n          val arrayOf = arrayOf(1, 2, 3)\n          arrayOf.isEmpty()\n      }\n"
+        },
+        {
+          "shortName": "ReplaceGuardClauseWithFunctionCall",
+          "displayName": "Guard clause can be replaced with Kotlin's function call",
+          "enabled": false,
+          "description": "Reports guard clauses that can be replaced with a function call.\n\n**Example:**\n\n      fun test(foo: Int?) {\n          if (foo == null) throw IllegalArgumentException(\"foo\") // replaceable clause\n      }\n\nAfter the quick-fix is applied:\n\n      fun test(foo: Int?) {\n          checkNotNull(foo)\n      }\n"
         },
         {
           "shortName": "ReplaceToStringWithStringTemplate",
@@ -290,16 +290,16 @@
           "description": "Reports calls to `Collection<T>.count()`.\n\n\nThis function call can be replaced with `.size`.\n\n\n`.size` form ensures that the operation is O(1) and won't allocate extra objects, whereas\n`count()` could be confused with `Iterable<T>.count()`, which is O(n) and allocating.\n\n\n**Example:**\n\n      fun foo() {\n          var list = listOf(1,2,3)\n          list.count() // replaceable 'count()'\n      }\n\nAfter the quick-fix is applied:\n\n      fun foo() {\n          var list = listOf(1,2,3)\n          list.size\n      }\n"
         },
         {
-          "shortName": "JavaCollectionsStaticMethod",
-          "displayName": "Java Collections static method call can be replaced with Kotlin stdlib",
-          "enabled": false,
-          "description": "Reports a Java `Collections` static method call that can be replaced with Kotlin stdlib.\n\n**Example:**\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          Collections.fill(mutableList, 3)\n      }\n\nThe quick fix replaces Java `Collections` static method call with the corresponding Kotlin stdlib method call:\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          mutableList.fill(3)\n      }\n"
-        },
-        {
           "shortName": "RedundantAsync",
           "displayName": "Redundant 'async' call",
           "enabled": false,
           "description": "Reports `async` calls that are immediately followed by `await`.\nSuch calls can be replaced with blocking calls.\n\n**Example:**\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          scope.async(ctx) { doSomeJob() }.await()\n      }\n\nAfter the quick-fix is applied:\n\n\n      suspend fun test(ctx: CoroutineContext, scope: CoroutineScope) {\n          withContext(scope.coroutineContext + ctx) { doSomeJob() }\n      }\n"
+        },
+        {
+          "shortName": "JavaCollectionsStaticMethod",
+          "displayName": "Java Collections static method call can be replaced with Kotlin stdlib",
+          "enabled": false,
+          "description": "Reports a Java `Collections` static method call that can be replaced with Kotlin stdlib.\n\n**Example:**\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          Collections.fill(mutableList, 3)\n      }\n\nThe quick fix replaces Java `Collections` static method call with the corresponding Kotlin stdlib method call:\n\n\n      import java.util.Collections\n\n      fun test() {\n          val mutableList = mutableListOf(1, 2)\n          mutableList.fill(3)\n      }\n"
         },
         {
           "shortName": "MoveVariableDeclarationIntoWhen",
@@ -428,16 +428,16 @@
           "description": "Reports `isEmpty`, `isBlank`, `isNotEmpty`, or `isNotBlank` calls in an `if` statement to assign a default value.\n\nThe quick-fix replaces the `if` condition with `ifEmpty` or `ifBlank` calls.\n\n**Example:**\n\n\n      fun test(list: List<Int>): List<Int> {\n          return if (list.isEmpty()) {\n              println()\n              foo()\n          } else {\n              list\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun test(list: List<Int>): List<Int> {\n          return list.ifEmpty {\n              println()\n              foo()\n          }\n      }\n\nThis inspection only reports if the Kotlin language version of the project or module is 1.3 or higher."
         },
         {
-          "shortName": "ReplaceWithImportAlias",
-          "displayName": "Fully qualified name can be replaced with existing import alias",
-          "enabled": false,
-          "description": "Reports fully qualified names that can be replaced with an existing import alias.\n\n**Example:**\n\n\n    import foo.Foo as Bar\n    fun main() {\n        foo.Foo()\n    }\n\nAfter the quick-fix is applied:\n\n\n    import foo.Foo as Bar\n    fun main() {\n        Bar()\n    }\n"
-        },
-        {
           "shortName": "ReplaceNegatedIsEmptyWithIsNotEmpty",
           "displayName": "Negated call can be simplified",
           "enabled": false,
           "description": "Reports negation `isEmpty()` and `isNotEmpty()` for collections and `String`, or `isBlank()` and `isNotBlank()` for `String`.\n\nUsing corresponding functions makes your code simpler.\n\nThe quick-fix replaces the negation call with the corresponding call from the Standard Library.\n\n**Example:**\n\n\n      fun main() {\n          val list = listOf(1,2,3)\n          if (!list.isEmpty()) {\n              // do smth\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      fun main() {\n          val list = listOf(1,2,3)\n          if (list.isNotEmpty()) {\n              // do smth\n          }\n      }\n"
+        },
+        {
+          "shortName": "ReplaceWithImportAlias",
+          "displayName": "Fully qualified name can be replaced with existing import alias",
+          "enabled": false,
+          "description": "Reports fully qualified names that can be replaced with an existing import alias.\n\n**Example:**\n\n\n    import foo.Foo as Bar\n    fun main() {\n        foo.Foo()\n    }\n\nAfter the quick-fix is applied:\n\n\n    import foo.Foo as Bar\n    fun main() {\n        Bar()\n    }\n"
         },
         {
           "shortName": "SimplifyBooleanWithConstants",
@@ -2508,16 +2508,16 @@
           "description": "Reports methods that are declared `final`. Such methods can't be overridden and may indicate a lack of object-oriented design. Some coding standards discourage `final` methods."
         },
         {
-          "shortName": "Singleton",
-          "displayName": "Singleton",
-          "enabled": false,
-          "description": "Reports singleton classes.\n\nSingleton classes are declared in a way that only one instance of the class can ever be instantiated. Singleton classes complicate testing,\nand their presence may indicate a lack of object-oriented design.\n\n**Example:**\n\n\n      class Singleton {\n        private static final Singleton ourInstance = new Singleton();\n\n        private Singleton() {\n        }\n\n        public Singleton getInstance() {\n            return ourInstance;\n        }\n      }\n"
-        },
-        {
           "shortName": "NonFinalUtilityClass",
           "displayName": "Utility class is not 'final'",
           "enabled": false,
           "description": "Reports utility classes that aren't `final`.\n\nUtility classes have all fields and methods declared as `static`.\nMaking them `final` prevents them from being accidentally subclassed."
+        },
+        {
+          "shortName": "Singleton",
+          "displayName": "Singleton",
+          "enabled": false,
+          "description": "Reports singleton classes.\n\nSingleton classes are declared in a way that only one instance of the class can ever be instantiated. Singleton classes complicate testing,\nand their presence may indicate a lack of object-oriented design.\n\n**Example:**\n\n\n      class Singleton {\n        private static final Singleton ourInstance = new Singleton();\n\n        private Singleton() {\n        }\n\n        public Singleton getInstance() {\n            return ourInstance;\n        }\n      }\n"
         },
         {
           "shortName": "StaticNonFinalField",
@@ -3053,10 +3053,10 @@
           "description": "Reports suspicious indentation of statements after a control statement without braces.\n\n\nSuch indentation can make it look like the statement is inside the control statement,\nwhen in fact it will be executed unconditionally after the control statement.\n\n**Example:**\n\n\n      class Bar {\n          void foo(int i) {\n              if (i == 0)\n                  System.out.println(\"foo\");\n                  System.out.println(\"bar\"); // warning\n              if (i == 1);\n                  System.out.println(\"great\"); // warning\n              if (i == 42)\n                  System.out.println(\"answer\");\n                      System.out.println(\"question\"); // warning\n          }\n      }\n"
         },
         {
-          "shortName": "SuspiciousDateFormat",
-          "displayName": "Suspicious date format pattern",
-          "enabled": true,
-          "description": "Reports date format patterns that are likely used by mistake.\n\nThe following patterns are reported:\n\n* Uppercase \"Y\", unless \"w\" appears nearby. It stands for \"Week year\" that is almost always the same as normal \"Year\" (lowercase \"y\" pattern), but may point to the next year at the end of December.\n* Uppercase \"M\" (month) close to \"H\", \"K\", \"h\", or \"k\" (hour). It's likely that a lowercase \"m\" (minute) was intended.\n* Lowercase \"m\" (minute) close to \"y\" (year) or \"d\" (day in month). It's likely that an uppercase \"M\" (month) was intended.\n* Uppercase \"D\" (day in year) close to \"M\", or \"L\" (month). It's likely that a lowercase \"d\" (day in month) was intended.\n* Uppercase \"S\" (milliseconds) close to \"m\" (minutes). It's likely that a lowercase \"s\" (seconds) was intended.\n\n\nExamples:  \n\n`new SimpleDateFormat(\"YYYY-MM-dd\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"yyyy-MM-DD\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"HH:MM\")`: likely `\"HH:mm\"` was intended.\n\nNew in 2020.1"
+          "shortName": "ClassNewInstance",
+          "displayName": "Unsafe call to 'Class.newInstance()'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
         },
         {
           "shortName": "MagicConstant",
@@ -3065,10 +3065,10 @@
           "description": "Reports expressions that can be replaced with \"magic\" constants.\n\nExample 1:\n\n\n      // Bare literal \"2\" is used, warning:\n      Font font = new Font(\"Arial\", 2)\n\nExample 2:\n\n\n      // Predefined constant is used, good:\n      Font font = new Font(\"Arial\", Font.ITALIC)\n\n\nWhen possible, the quick-fix inserts an appropriate predefined constant.\n\n\nThe behavior of this inspection is controlled by `org.intellij.lang.annotations.MagicConstant` annotation.\nSome standard Java library methods are pre-annotated, but you can use this annotation in your code as well."
         },
         {
-          "shortName": "ClassNewInstance",
-          "displayName": "Unsafe call to 'Class.newInstance()'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Class.newInstance()`.\n\n\nThis method propagates exceptions thrown by\nthe no-arguments constructor, including checked exceptions. Usages of this method\neffectively bypass the compile-time exception checking that would\notherwise be performed by the compiler.\n\n\nA quick-fix is suggested to replace the call with a call to the\n`java.lang.reflect.Constructor.newInstance()` method, which\navoids this problem by wrapping any exception thrown by the constructor in a\n(checked) `java.lang.reflect.InvocationTargetException`.\n\n**Example:**\n\n\n      clazz.newInstance()\n\nAfter the quick-fix is applied:\n\n\n      clazz.getConstructor().newInstance();\n"
+          "shortName": "SuspiciousDateFormat",
+          "displayName": "Suspicious date format pattern",
+          "enabled": true,
+          "description": "Reports date format patterns that are likely used by mistake.\n\nThe following patterns are reported:\n\n* Uppercase \"Y\", unless \"w\" appears nearby. It stands for \"Week year\" that is almost always the same as normal \"Year\" (lowercase \"y\" pattern), but may point to the next year at the end of December.\n* Uppercase \"M\" (month) close to \"H\", \"K\", \"h\", or \"k\" (hour). It's likely that a lowercase \"m\" (minute) was intended.\n* Lowercase \"m\" (minute) close to \"y\" (year) or \"d\" (day in month). It's likely that an uppercase \"M\" (month) was intended.\n* Uppercase \"D\" (day in year) close to \"M\", or \"L\" (month). It's likely that a lowercase \"d\" (day in month) was intended.\n* Uppercase \"S\" (milliseconds) close to \"m\" (minutes). It's likely that a lowercase \"s\" (seconds) was intended.\n\n\nExamples:  \n\n`new SimpleDateFormat(\"YYYY-MM-dd\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"yyyy-MM-DD\")`: likely `\"yyyy-MM-dd\"` was intended.  \n\n`new SimpleDateFormat(\"HH:MM\")`: likely `\"HH:mm\"` was intended.\n\nNew in 2020.1"
         },
         {
           "shortName": "ConstantConditions",
@@ -4232,35 +4232,6 @@
       ]
     },
     {
-      "name": "GPath",
-      "inspections": [
-        {
-          "shortName": "GroovyListSetCanBeKeyedAccess",
-          "displayName": "Call to List.set can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapPutCanBeKeyedAccess",
-          "displayName": "Call to Map.put can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
-        },
-        {
-          "shortName": "GroovyMapGetCanBeKeyedAccess",
-          "displayName": "Call to Map.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
-        },
-        {
-          "shortName": "GroovyListGetCanBeKeyedAccess",
-          "displayName": "Call to List.get can be keyed access",
-          "enabled": false,
-          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
-        }
-      ]
-    },
-    {
       "name": "Embedded",
       "inspections": [
         {
@@ -4328,6 +4299,35 @@
           "displayName": "Large array allocation with no OutOfMemoryError check",
           "enabled": false,
           "description": "Reports large array allocations which do not check for `java.lang.OutOfMemoryError`. In memory constrained environments, allocations of large data objects should probably be checked for memory depletion.\n\n\nThis inspection is intended for Java ME and other highly resource constrained environments.\nApplying the results of this inspection without consideration might have negative effects on code clarity and design.\n\n\nUse the option to specify the maximum number of elements to allow in unchecked array allocations."
+        }
+      ]
+    },
+    {
+      "name": "GPath",
+      "inspections": [
+        {
+          "shortName": "GroovyListSetCanBeKeyedAccess",
+          "displayName": "Call to List.set can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.set()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    list.set(0, \"bar\") // list.set(0, \"bar\") could be replaced with list[0] = \"bar\"\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    list[0] = \"bar\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapPutCanBeKeyedAccess",
+          "displayName": "Call to Map.put can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.put()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    map.put(\"foo\", \"baz\") // map.put(\"foo\", \"baz\") could be replaced with map[\"foo\"] = \"baz\"\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    map[\"foo\"] = \"baz\"\n\n"
+        },
+        {
+          "shortName": "GroovyMapGetCanBeKeyedAccess",
+          "displayName": "Call to Map.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.Map.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map.get(\"foo\") // map.get(\"foo\") could be replaced with map[\"foo\"]\n\nAfter the quick-fix is applied:\n\n\n    def map = [\"foo\": \"bar\"]\n    def str = map[\"foo\"]\n\n"
+        },
+        {
+          "shortName": "GroovyListGetCanBeKeyedAccess",
+          "displayName": "Call to List.get can be keyed access",
+          "enabled": false,
+          "description": "Reports calls to `java.util.List.get()` methods. Such calls could be replaced by the shorter and clearer keyed access form.\n\n**Example:**\n\n\n    def list = [\"foo\"]\n    def str = list.get(0) // list.get(0) could be replaced with list[0]\n\nAfter the quick-fix is applied:\n\n\n    def list = [\"foo\"]\n    def str = list[0]\n\n"
         }
       ]
     },
@@ -8071,83 +8071,6 @@
       ]
     },
     {
-      "name": "Style",
-      "inspections": [
-        {
-          "shortName": "JavaStylePropertiesInvocation",
-          "displayName": "Java-style property access",
-          "enabled": false,
-          "description": "Reports properties accessed via method calls.\n\n**Example:**\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.getFoo())\n\nAfter the quick-fix is applied:\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.foo)\n"
-        },
-        {
-          "shortName": "GrUnnecessarySemicolon",
-          "displayName": "Unnecessary semicolon",
-          "enabled": false,
-          "description": "Reports unnecessary semicolons.\n\n**Example:**\n\n\n      print 2; print 3 // semicolon is required\n      print 2; // semicolon is unnecessary\n"
-        },
-        {
-          "shortName": "ChangeToMethod",
-          "displayName": "Operator invocation can be replaced with method call",
-          "enabled": false,
-          "description": "Reports operator invocations that can be replaced with method calls.\n\n**Example:**\n\n\n      a + b\n\nAfter the quick-fix is applied:\n\n\n      a.plus(b)\n"
-        },
-        {
-          "shortName": "ChangeToOperator",
-          "displayName": "Method call can be replaced with operator invocation",
-          "enabled": false,
-          "description": "Reports method calls that can be replaced with operator invocations.\n\n**Example:**\n\n\n      a.plus(b)\n\nAfter the quick-fix is applied:\n\n\n      a + b\n"
-        },
-        {
-          "shortName": "GroovyConditional",
-          "displayName": "Ternary expression",
-          "enabled": false,
-          "description": "Reports ternary expressions.\n\nSome coding standards prohibit the use of the condition operator in favor of `if` statements."
-        },
-        {
-          "shortName": "GrUnnecessaryAlias",
-          "displayName": "Unnecessary import alias",
-          "enabled": false,
-          "description": "Reports unnecessary import aliases.\n\n**Example:**\n\n\n      import com.foo.Bar as Bar\n\nAfter the quick-fix is applied:\n\n\n      import com.foo.Bar\n"
-        },
-        {
-          "shortName": "GrUnnecessaryNonSealedModifier",
-          "displayName": "Unnecessary 'non-sealed' modifier",
-          "enabled": false,
-          "description": "Reports unnecessary `non-sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      non-sealed boolean foo() {} // modifier is unnecessary\n      non-sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      non-sealed class A {}\n"
-        },
-        {
-          "shortName": "GrUnnecessaryDefModifier",
-          "displayName": "Unnecessary 'def'",
-          "enabled": false,
-          "description": "Reports unnecessary `def` modifiers when used with explicit type declaration.\n\n**Example:**\n\n\n      def boolean foo() {} // modifier is unnecessary\n      def Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      def (int a, String b) = []\n"
-        },
-        {
-          "shortName": "GrUnnecessaryFinalModifier",
-          "displayName": "Unnecessary 'final'",
-          "enabled": false,
-          "description": "Reports unnecessary `final` modifiers when used with the record definition.\n\n**Example:**\n\n\n      final record R(int a) {} // modifier is unnecessary\n"
-        },
-        {
-          "shortName": "GrUnnecessaryPublicModifier",
-          "displayName": "Unnecessary 'public'",
-          "enabled": false,
-          "description": "Reports unnecessary `public` modifiers as Groovy classes and methods are `public` by default.\n\n**Example:**\n\n\n      public class Foo{\n          public void bar(){\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Foo{\n          void bar(){\n          }\n      }\n"
-        },
-        {
-          "shortName": "GrStringStyleViolation",
-          "displayName": "String style violation",
-          "enabled": false,
-          "description": "Reports strings with quotation that doesn't match code style.\n\n**Example:**\n\n\n      def hw = \"Hello, world!\"\n\nAfter the quick-fix is applied:\n\n\n      def hw = 'Hello, world!'\n\nUse the fields provided below to specify code style for different kinds of strings."
-        },
-        {
-          "shortName": "GrUnnecessarySealedModifier",
-          "displayName": "Unnecessary 'sealed' modifier",
-          "enabled": false,
-          "description": "Reports unnecessary `sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      sealed boolean foo() {} // modifier is unnecessary\n      sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      sealed class A {}\n"
-        }
-      ]
-    },
-    {
       "name": "RegExp",
       "inspections": [
         {
@@ -8223,16 +8146,93 @@
           "description": "Reports anonymous capturing groups and numeric back references in a RegExp. These are only reported when the RegExp dialect supports named group and named group references. Named groups and named back references improve code readability and are recommended to use instead. When a capture is not needed, matching can be more performant and use less memory by using a non-capturing group, i.e. `(?:xxx)` instead of `(xxx)`.\n\n**Example:**\n\n\n      (\\d\\d\\d\\d)\\1\n\nA better regex pattern could look like this:\n\n\n      (?<quad>\\d\\d\\d\\d)\\k<quad>\n\nNew in 2017.2"
         },
         {
-          "shortName": "RegExpDuplicateAlternationBranch",
-          "displayName": "Duplicate branch in alternation",
-          "enabled": true,
-          "description": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
-        },
-        {
           "shortName": "RegExpRepeatedSpace",
           "displayName": "Consecutive spaces",
           "enabled": true,
           "description": "Reports multiple consecutive spaces in a RegExp. Because spaces are not visible by default, it can be hard to see how many spaces are required. The RegExp can be made more clear by replacing the consecutive spaces with a single space and a counted quantifier.\n\n**Example:**\n\n\n      (     )\n\nAfter the quick-fix is applied:\n\n\n      ( {5})\n\n\nNew in 2017.1"
+        },
+        {
+          "shortName": "RegExpDuplicateAlternationBranch",
+          "displayName": "Duplicate branch in alternation",
+          "enabled": true,
+          "description": "Reports duplicate branches in a RegExp alternation. Duplicate branches slow down matching and obscure the intent of the expression.\n\n**Example:**\n\n\n      (alpha|bravo|charlie|alpha)\n\nAfter the quick-fix is applied:\n\n\n      (alpha|bravo|charlie)\n\nNew in 2017.1"
+        }
+      ]
+    },
+    {
+      "name": "Style",
+      "inspections": [
+        {
+          "shortName": "JavaStylePropertiesInvocation",
+          "displayName": "Java-style property access",
+          "enabled": false,
+          "description": "Reports properties accessed via method calls.\n\n**Example:**\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.getFoo())\n\nAfter the quick-fix is applied:\n\n\n      class Foo {\n          int foo\n      }\n\n      def bar = new Foo()\n      print(bar.foo)\n"
+        },
+        {
+          "shortName": "GrUnnecessarySemicolon",
+          "displayName": "Unnecessary semicolon",
+          "enabled": false,
+          "description": "Reports unnecessary semicolons.\n\n**Example:**\n\n\n      print 2; print 3 // semicolon is required\n      print 2; // semicolon is unnecessary\n"
+        },
+        {
+          "shortName": "ChangeToMethod",
+          "displayName": "Operator invocation can be replaced with method call",
+          "enabled": false,
+          "description": "Reports operator invocations that can be replaced with method calls.\n\n**Example:**\n\n\n      a + b\n\nAfter the quick-fix is applied:\n\n\n      a.plus(b)\n"
+        },
+        {
+          "shortName": "ChangeToOperator",
+          "displayName": "Method call can be replaced with operator invocation",
+          "enabled": false,
+          "description": "Reports method calls that can be replaced with operator invocations.\n\n**Example:**\n\n\n      a.plus(b)\n\nAfter the quick-fix is applied:\n\n\n      a + b\n"
+        },
+        {
+          "shortName": "GroovyConditional",
+          "displayName": "Ternary expression",
+          "enabled": false,
+          "description": "Reports ternary expressions.\n\nSome coding standards prohibit the use of the condition operator in favor of `if` statements."
+        },
+        {
+          "shortName": "GrUnnecessaryAlias",
+          "displayName": "Unnecessary import alias",
+          "enabled": false,
+          "description": "Reports unnecessary import aliases.\n\n**Example:**\n\n\n      import com.foo.Bar as Bar\n\nAfter the quick-fix is applied:\n\n\n      import com.foo.Bar\n"
+        },
+        {
+          "shortName": "GrUnnecessaryNonSealedModifier",
+          "displayName": "Unnecessary 'non-sealed' modifier",
+          "enabled": false,
+          "description": "Reports unnecessary `non-sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      non-sealed boolean foo() {} // modifier is unnecessary\n      non-sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      non-sealed class A {}\n"
+        },
+        {
+          "shortName": "GrUnnecessaryDefModifier",
+          "displayName": "Unnecessary 'def'",
+          "enabled": false,
+          "description": "Reports unnecessary `def` modifiers when used with explicit type declaration.\n\n**Example:**\n\n\n      def boolean foo() {} // modifier is unnecessary\n      def Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      def (int a, String b) = []\n"
+        },
+        {
+          "shortName": "GrUnnecessaryFinalModifier",
+          "displayName": "Unnecessary 'final'",
+          "enabled": false,
+          "description": "Reports unnecessary `final` modifiers when used with the record definition.\n\n**Example:**\n\n\n      final record R(int a) {} // modifier is unnecessary\n"
+        },
+        {
+          "shortName": "GrUnnecessaryPublicModifier",
+          "displayName": "Unnecessary 'public'",
+          "enabled": false,
+          "description": "Reports unnecessary `public` modifiers as Groovy classes and methods are `public` by default.\n\n**Example:**\n\n\n      public class Foo{\n          public void bar(){\n          }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Foo{\n          void bar(){\n          }\n      }\n"
+        },
+        {
+          "shortName": "GrStringStyleViolation",
+          "displayName": "String style violation",
+          "enabled": false,
+          "description": "Reports strings with quotation that doesn't match code style.\n\n**Example:**\n\n\n      def hw = \"Hello, world!\"\n\nAfter the quick-fix is applied:\n\n\n      def hw = 'Hello, world!'\n\nUse the fields provided below to specify code style for different kinds of strings."
+        },
+        {
+          "shortName": "GrUnnecessarySealedModifier",
+          "displayName": "Unnecessary 'sealed' modifier",
+          "enabled": false,
+          "description": "Reports unnecessary `sealed` modifiers which used on methods, fields, or variables.\n\nThis modifier has effect only on classes, interfaces and traits.\n\n**Example:**\n\n\n      sealed boolean foo() {} // modifier is unnecessary\n      sealed Object bar // modifier is unnecessary\n\n      // modifier is required and therefore not highlighted\n      sealed class A {}\n"
         }
       ]
     },
@@ -8781,16 +8781,16 @@
           "description": "Reports methods whose number of statements exceeds the specified maximum.\n\nMethods with too many statements may be confusing and are a good sign that refactoring is necessary.\n\nThe following statements are not counted:\n\n* empty statements (semicolons)\n* block statements\n* `for` loop initialization statements, that is, `int i = ...` within a `for(int i = ...;...)` statement\n* `for` loop update statements, that is, `i += 2` within a `for(int i = ...;...; i += 2)` statement\n\nUse the **Maximum statements per method** field to specify the maximum allowed number of statements in a method."
         },
         {
-          "shortName": "ParametersPerMethod",
-          "displayName": "Method with too many parameters",
-          "enabled": false,
-          "description": "Reports methods whose number of parameters exceeds the specified maximum. Methods with too many parameters can be a good sign that a refactoring is necessary.\n\nMethods that have super methods are not reported.\n\nUse the **Parameter limit** field to specify the maximum allowed number of parameters for a method."
-        },
-        {
           "shortName": "OverlyLongLambda",
           "displayName": "Overly long lambda expression",
           "enabled": false,
           "description": "Reports lambda expressions whose number of statements exceeds the specified maximum.\n\nLambda expressions that are too long may be confusing, and it is often better to extract the statements into a separate method.\n\n\nThe following statements are not counted:\n\n* empty statements (semicolons)\n* block statements\n* `for` loop initialization statements, that is, `int i = ...` within a `for(int i = ...;...)` statement\n* `for` loop update statements, that is, `i += 2` within a `for(int i = ...;...; i += 2)` statement\n\nUse the **Non-comment source statements limit** field to specify the maximum allowed number of statements in a lambda expression."
+        },
+        {
+          "shortName": "ParametersPerMethod",
+          "displayName": "Method with too many parameters",
+          "enabled": false,
+          "description": "Reports methods whose number of parameters exceeds the specified maximum. Methods with too many parameters can be a good sign that a refactoring is necessary.\n\nMethods that have super methods are not reported.\n\nUse the **Parameter limit** field to specify the maximum allowed number of parameters for a method."
         },
         {
           "shortName": "MethodCoupling",
