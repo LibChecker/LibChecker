@@ -16,6 +16,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
@@ -29,6 +30,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.MetadataLibItemView
@@ -155,6 +157,11 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item)
     itemView.setChip(item.chip)
+
+    if (item.item.elfType != ET_DYN) {
+      itemView.libName.tintTextToPrimary()
+      itemView.libSize.tintTextToPrimary()
+    }
   }
 
   private fun setStaticContent(

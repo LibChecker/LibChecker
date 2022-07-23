@@ -914,7 +914,7 @@ object PackageUtils {
    * @return String of size number (100KB)
    */
   fun sizeToString(context: Context, item: LibStringItem): String {
-    val source = item.source?.let { "[$item.source]" }.orEmpty()
+    val source = item.source?.let { "[${item.source}]" }.orEmpty()
     val elfType = "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN }.orEmpty()
     return "(${Formatter.formatFileSize(context, item.size)}) $source $elfType"
   }
