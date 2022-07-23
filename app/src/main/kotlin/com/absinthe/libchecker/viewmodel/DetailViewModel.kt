@@ -67,7 +67,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
-  var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
   var queriedProcess: String? = null
@@ -98,7 +97,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
 
         list.addAll(
-          getNativeChipList(info, abiSet?.firstOrNull())
+          getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk))
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {
