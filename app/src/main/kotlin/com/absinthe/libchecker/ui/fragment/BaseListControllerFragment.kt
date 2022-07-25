@@ -46,18 +46,24 @@ abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), 
     (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted, from)
   }
 
-  protected fun isListCanScroll(listSize: Int): Boolean {
+  protected fun canListScroll(listSize: Int): Boolean {
     if (context == null) {
       return false
     }
     getSuitableLayoutManager().apply {
       if (this is LinearLayoutManager) {
+        if (findFirstVisibleItemPosition() == 0 && findLastVisibleItemPosition() == listSize - 1) {
+          return false
+        }
         return findFirstVisibleItemPosition() > 0 || findLastVisibleItemPosition() < listSize - 1
       } else if (this is StaggeredGridLayoutManager) {
         val firstLine = IntArray(4)
         findFirstVisibleItemPositions(firstLine)
         val lastLine = IntArray(4)
         findLastVisibleItemPositions(lastLine)
+        if (firstLine[0] == 0 && lastLine.last() == listSize - 1) {
+          return false
+        }
         return firstLine[0] > 0 || lastLine.last() < listSize - 1
       }
     }

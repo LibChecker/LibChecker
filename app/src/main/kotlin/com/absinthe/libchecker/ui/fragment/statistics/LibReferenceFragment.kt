@@ -114,7 +114,7 @@ class LibReferenceFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (isListCanScroll(refAdapter.data.size)) {
+              if (canListScroll(refAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 

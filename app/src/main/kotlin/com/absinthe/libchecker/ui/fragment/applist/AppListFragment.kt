@@ -87,7 +87,7 @@ class AppListFragment :
       list.apply {
         adapter = appAdapter
         borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManager()
+        layoutManager = getSuitableLayoutManagerImpl()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
@@ -112,7 +112,7 @@ class AppListFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (isListCanScroll(appAdapter.data.size)) {
+              if (canListScroll(appAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -197,7 +197,7 @@ class AppListFragment :
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManager()
+    binding.list.layoutManager = getSuitableLayoutManagerImpl()
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -426,7 +426,9 @@ class AppListFragment :
     }
   }
 
-  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+  override fun getSuitableLayoutManager() = binding.list.layoutManager
+
+  private fun getSuitableLayoutManagerImpl(): RecyclerView.LayoutManager {
     layoutManager = when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->
