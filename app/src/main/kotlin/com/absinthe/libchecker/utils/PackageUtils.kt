@@ -95,7 +95,7 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS or flag
+      PackageManager.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return PackageManagerCompat.getPackageArchiveInfo(
@@ -117,8 +117,7 @@ object PackageUtils {
   @Throws(Exception::class)
   fun getInstallApplications(): List<PackageInfo> {
     return PackageManagerCompat.getInstalledPackages(
-      PackageManager.MATCH_UNINSTALLED_PACKAGES
-        or PackageManager.GET_META_DATA
+      PackageManager.GET_META_DATA
         or PackageManager.GET_PERMISSIONS
     )
   }
@@ -913,9 +912,9 @@ object PackageUtils {
    * @param item LibStringItem
    * @return String of size number (100KB)
    */
-  fun sizeToString(context: Context, item: LibStringItem): String {
+  fun sizeToString(context: Context, item: LibStringItem, showElfInfo: Boolean = true): String {
     val source = item.source?.let { "[${item.source}]" }.orEmpty()
-    val elfType = "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN }.orEmpty()
+    val elfType = "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN && showElfInfo }.orEmpty()
     return "(${Formatter.formatFileSize(context, item.size)}) $source $elfType"
   }
 
