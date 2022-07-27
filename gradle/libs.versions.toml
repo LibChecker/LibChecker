@@ -1,6 +1,6 @@
 [versions]
 agp = "7.2.1"
-androidX-lifecycle = "2.5.0"
+androidX-lifecycle = "2.5.1"
 androidX-room = "2.5.0-alpha02"
 appCenter = "4.4.5"
 grpc = "1.48.0"
