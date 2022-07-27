@@ -124,7 +124,7 @@ configurations.all {
 
 dependencies {
   compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-  compileOnly(fileTree("ohos"))
+  "marketCompileOnly"(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
 
   coreLibraryDesugaring(libs.agp.desugering)
