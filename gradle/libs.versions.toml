@@ -35,7 +35,7 @@ androidX-appCompat = "androidx.appcompat:appcompat:1.6.0-alpha05"
 androidX-browser = "androidx.browser:browser:1.4.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.9.0-alpha05"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.5.0"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.5.1"
 androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
