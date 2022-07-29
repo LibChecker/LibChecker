@@ -10,7 +10,5 @@ class IBundleManagerDelegate(applicationDelegate: ApplicationDelegate) {
 
   private val mIBundleManager: IBundleManager? = applicationDelegate.iBundleManager
 
-  fun getBundleInfo(bundleName: String, flags: Int): BundleInfo? {
-    return null
-  }
+  fun getBundleInfo(bundleName: String, flags: Int): BundleInfo? = null
 }

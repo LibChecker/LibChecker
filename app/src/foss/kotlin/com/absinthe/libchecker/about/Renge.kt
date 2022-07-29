@@ -9,10 +9,8 @@ class Renge(private val contextRef: WeakReference<Context>) {
   val renge: Bitmap? = null
 
   fun inori() {
-
   }
 
   fun sayonara() {
-
   }
 }

@@ -1,3 +1,3 @@
 package ohos.app
 
-object Context {}
+object Context

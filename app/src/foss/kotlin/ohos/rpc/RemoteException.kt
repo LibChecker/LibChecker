@@ -1,3 +1,3 @@
 package ohos.rpc
 
-object RemoteException {}
+object RemoteException

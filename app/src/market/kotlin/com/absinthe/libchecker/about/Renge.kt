@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.about
 
 import android.content.Context
-import android.media.MediaPlayer
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import java.lang.ref.WeakReference
 
 class Renge(private val contextRef: WeakReference<Context>) {
