@@ -33,6 +33,7 @@ import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.viewmodel.HomeViewModel
+import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
 import com.absinthe.rulesbundle.LCRemoteRepo
@@ -244,6 +245,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     (findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
+      isVisible = getBoolean(R.bool.is_foss).not()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
         true

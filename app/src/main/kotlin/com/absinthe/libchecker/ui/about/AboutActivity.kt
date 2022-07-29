@@ -3,10 +3,8 @@ package com.absinthe.libchecker.ui.about
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +19,7 @@ import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.about.Renge
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
@@ -38,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.ref.WeakReference
 
 private const val RENGE_CHECKER = "RengeChecker"
 
@@ -51,7 +51,7 @@ class AboutActivity : AbsAboutActivityProxy() {
       )
     }
   }
-  private val mediaPlayer by lazy { MediaPlayer() }
+  private val renge by lazy { Renge(WeakReference(this)) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -65,7 +65,7 @@ class AboutActivity : AbsAboutActivityProxy() {
   override fun onDestroy() {
     super.onDestroy()
     if (shouldShowEasterEggCount == 20) {
-      mediaPlayer.release()
+      renge.sayonara()
     }
   }
 
@@ -107,7 +107,9 @@ class AboutActivity : AbsAboutActivityProxy() {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
 
-          icon.setImageBitmap(BitmapFactory.decodeStream(assets.open("renge.webp")))
+          renge.renge?.let {
+            icon.setImageBitmap(it)
+          }
           slogan.text = "ええ、私もよ。"
           val headerContentLayout =
             findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
@@ -122,12 +124,7 @@ class AboutActivity : AbsAboutActivityProxy() {
           window.statusBarColor = R.color.renge.getColor(this)
           drawable.startTransition(250)
 
-          val fd = assets.openFd("renge_no_koe.aac")
-          mediaPlayer.also {
-            it.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
-            it.prepare()
-            it.start()
-          }
+          renge.inori()
           GlobalValues.rengeTheme = !GlobalValues.rengeTheme
           Analytics.trackEvent(
             Constants.Event.EASTER_EGG,

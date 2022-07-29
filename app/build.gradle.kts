@@ -123,8 +123,6 @@ configurations.all {
 }
 
 dependencies {
-  compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-  compileOnly(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
 
   coreLibraryDesugaring(libs.agp.desugering)
@@ -154,7 +152,6 @@ dependencies {
   implementation(libs.bundles.grpc)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
-  implementation(libs.bundles.appCenter)
   implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
@@ -179,6 +176,8 @@ dependencies {
   implementation(libs.bundles.rikkax)
 
   debugImplementation(libs.square.leakCanary)
+  "marketCompileOnly"(fileTree("ohos"))
+  "marketImplementation"(libs.bundles.appCenter)
 }
 
 protobuf {
