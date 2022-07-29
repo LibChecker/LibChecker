@@ -43,7 +43,7 @@ jobs:
       - name: Check style
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: lintKotlin
+          arguments: lintKotlin --scan
 
   build:
     name: Build
