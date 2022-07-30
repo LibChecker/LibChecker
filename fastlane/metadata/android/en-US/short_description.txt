@@ -1,0 +1,1 @@
+View the third-party libraries used by applications
