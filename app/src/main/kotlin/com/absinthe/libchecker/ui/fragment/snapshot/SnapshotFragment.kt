@@ -87,6 +87,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
+  private var shootServiceStarted = false
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -109,7 +110,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
   private val shootServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      if (shootBinder == null) {
+      shootServiceStarted = true
+      if (shootBinder == null && service?.pingBinder() == true) {
         shootBinder = IShootService.Stub.asInterface(service).also {
           it.registerOnShootOverListener(shootListener)
         }
@@ -117,6 +119,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+      shootServiceStarted = false
       shootBinder = null
     }
   }
@@ -125,17 +128,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
-    context.applicationContext.also {
-      val intent = Intent(it, ShootService::class.java).apply {
-        setPackage(it.packageName)
-      }
-      it.startService(intent)
-      it.bindService(
-        intent,
-        shootServiceConnection,
-        Service.BIND_AUTO_CREATE
-      )
-    }
 
     val dashboard =
       SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
@@ -360,6 +352,21 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   override fun onResume() {
     super.onResume()
     menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
+
+    if (!shootServiceStarted && isFragmentVisible()) {
+      context?.applicationContext?.also {
+        val intent = Intent(it, ShootService::class.java).apply {
+          setPackage(it.packageName)
+        }
+        it.startService(intent)
+        it.bindService(
+          intent,
+          shootServiceConnection,
+          Service.BIND_AUTO_CREATE
+        )
+        shootServiceStarted = true
+      }
+    }
 
     if (AppItemRepository.trackItemsChanged) {
       AppItemRepository.trackItemsChanged = false

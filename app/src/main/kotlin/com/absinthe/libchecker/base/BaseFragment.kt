@@ -28,6 +28,11 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment() {
 
   open fun onVisibilityChanged(visible: Boolean) {
     Timber.d("${javaClass.simpleName} ==> onVisibilityChanged = $visible")
+    this.visible = visible
+  }
+
+  fun isFragmentVisible(): Boolean {
+    return visible
   }
 
   @CallSuper
