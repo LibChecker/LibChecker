@@ -22,6 +22,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
+import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -229,14 +231,21 @@ abstract class BaseAppDetailActivity :
         val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
         abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
-        extraInfo.apply {
-          if (abi >= Constants.MULTI_ARCH) {
-            append(getString(R.string.multiArch))
-            append(", ")
-          }
+        val versionInfo = buildSpannedString {
           if (!isHarmonyMode) {
+            scale(0.8f) {
+              append("Target: ")
+            }
             append(PackageUtils.getTargetApiString(packageInfo))
-            append(", ").append(PackageUtils.getMinSdkVersionString(packageInfo))
+            scale(0.8f) {
+              append(" Min: ")
+            }
+            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+            scale(0.8f) {
+              append(" Compile: ")
+            }
+            append(PackageUtils.getCompileSdkVersion(packageInfo))
+
             packageInfo.sharedUserId?.let {
               appendLine().append("sharedUserId = $it")
             }
@@ -247,8 +256,15 @@ abstract class BaseAppDetailActivity :
                   packageInfo.packageName,
                   IBundleManager.GET_BUNDLE_DEFAULT
                 )
-                append("targetVersion ${hapBundle.targetVersion}")
-                append(", ").append("minSdkVersion ${hapBundle.minSdkVersion}")
+                scale(0.8f) {
+                  append("Target: ")
+                }
+                append(hapBundle.targetVersion.toString())
+                scale(0.8f) {
+                  append("Min: ")
+                }
+                append(hapBundle.minSdkVersion.toString())
+
                 if (!hapBundle.jointUserId.isNullOrEmpty()) {
                   appendLine().append("jointUserId = ${hapBundle.jointUserId}")
                 }
@@ -257,16 +273,30 @@ abstract class BaseAppDetailActivity :
           }
           appendLine()
         }
+        extraInfo.append(versionInfo)
+
         if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
           val spanStringBuilder = SpannableStringBuilder()
           var spanString: SpannableString
-          var firstLoop = true
           var itemCount = 0
+
+          if (abi >= Constants.MULTI_ARCH) {
+            spanString = SpannableString("  ")
+            R.drawable.ic_multi_arch_full.getDrawable(this@BaseAppDetailActivity)?.let { drawable ->
+              drawable.setBounds(
+                0,
+                0,
+                drawable.intrinsicWidth,
+                (drawable.intrinsicHeight * 0.92f).toInt()
+              )
+              val span = CenterAlignImageSpan(drawable)
+              spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+            }
+            spanStringBuilder.append(spanString)
+          }
+
           abiSet.forEach {
             itemCount++
-            if (firstLoop) {
-              firstLoop = false
-            }
             PackageUtils.getAbiString(
               this@BaseAppDetailActivity,
               it,

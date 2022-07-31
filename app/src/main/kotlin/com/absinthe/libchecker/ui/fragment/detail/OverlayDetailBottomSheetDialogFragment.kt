@@ -4,6 +4,8 @@ import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.text.SpannableString
 import android.text.style.ImageSpan
+import androidx.core.text.buildSpannedString
+import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
@@ -70,7 +72,17 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
-          text = String.format("%s, %s", Constants.OVERLAY_STRING, PackageUtils.getTargetApiString(packageInfo))
+          text = buildSpannedString {
+            append(Constants.OVERLAY_STRING).append(", ")
+            scale(0.8f) {
+              append("Target: ")
+            }
+            append(PackageUtils.getTargetApiString(packageInfo))
+            scale(0.8f) {
+              append(" Min: ")
+            }
+            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+          }
         }
       }
 

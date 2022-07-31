@@ -84,7 +84,7 @@ class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter
           setBadge(R.drawable.ic_harmony_badge)
         }
         FreezeUtils.isAppFrozen(item.packageName) -> {
-          setBadge(R.drawable.ic_uninstalled_package)
+          setBadge(R.drawable.ic_disabled_package)
         }
         else -> {
           setBadge(null)

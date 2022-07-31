@@ -165,22 +165,47 @@ object PackageUtils {
 
   /**
    * Get target api string of an app ( API 30 )
-   * @param packageName PackageName
+   * @param packageInfo PackageInfo
    * @return version code as String
    */
-  fun getTargetApiString(packageName: String): String {
-    return getTargetApiString(getPackageInfo(packageName))
-  }
-
   fun getTargetApiString(packageInfo: PackageInfo): String {
-    return try {
-      "targetSdkVersion ${packageInfo.applicationInfo.targetSdkVersion}"
-    } catch (e: PackageManager.NameNotFoundException) {
-      "targetSdkVersion ?"
-    }
+    return runCatching {
+      packageInfo.applicationInfo.targetSdkVersion.toString()
+    }.getOrDefault("?")
   }
 
   fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion"
+
+  private const val minSdkVersion = "minSdkVersion"
+
+  /**
+   * Get minSdkVersion of an app
+   * @param packageInfo PackageInfo
+   * @return minSdkVersion
+   */
+  fun getMinSdkVersion(packageInfo: PackageInfo): Int {
+    val minSdkVersionValue = if (OsUtils.atLeastN()) {
+      packageInfo.applicationInfo.minSdkVersion
+    } else {
+      val demands = ManifestReader.getManifestProperties(
+        File(packageInfo.applicationInfo.sourceDir),
+        arrayOf(minSdkVersion)
+      )
+      demands[minSdkVersion]?.toString()?.toInt() ?: 0
+    }
+    return minSdkVersionValue
+  }
+
+  fun getCompileSdkVersion(packageInfo: PackageInfo): String {
+    return runCatching {
+      val version = packageInfo.applicationInfo.compileSdkVersion
+      if (version == 0) {
+        "?"
+      } else {
+        version.toString()
+      }
+    }.getOrDefault("?")
+  }
 
   /**
    * Get native libraries of an app
@@ -914,7 +939,9 @@ object PackageUtils {
    */
   fun sizeToString(context: Context, item: LibStringItem, showElfInfo: Boolean = true): String {
     val source = item.source?.let { "[${item.source}]" }.orEmpty()
-    val elfType = "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN && showElfInfo }.orEmpty()
+    val elfType =
+      "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN && showElfInfo }
+        .orEmpty()
     return "(${Formatter.formatFileSize(context, item.size)}) $source $elfType"
   }
 
@@ -1077,35 +1104,6 @@ object PackageUtils {
     return runCatching {
       PackageManagerCompat.getApplicationInfo(pkgName, 0).enabled
     }.getOrDefault(false)
-  }
-
-  private const val minSdkVersion = "minSdkVersion"
-
-  /**
-   * Get minSdkVersion of an app
-   * @param packageInfo PackageInfo
-   * @return minSdkVersion
-   */
-  fun getMinSdkVersion(packageInfo: PackageInfo): Int {
-    val minSdkVersionValue = if (OsUtils.atLeastN()) {
-      packageInfo.applicationInfo.minSdkVersion
-    } else {
-      val demands = ManifestReader.getManifestProperties(
-        File(packageInfo.applicationInfo.sourceDir),
-        arrayOf(minSdkVersion)
-      )
-      demands[minSdkVersion]?.toString()?.toInt() ?: 0
-    }
-    return minSdkVersionValue
-  }
-
-  /**
-   * Get minSdkVersion of an app
-   * @param packageInfo PackageInfo
-   * @return minSdkVersion
-   */
-  fun getMinSdkVersionString(packageInfo: PackageInfo): String {
-    return "$minSdkVersion ${getMinSdkVersion(packageInfo)}"
   }
 
   private const val AGP_KEYWORD = "androidGradlePluginVersion"
