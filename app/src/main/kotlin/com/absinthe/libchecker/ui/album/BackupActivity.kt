@@ -179,7 +179,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val formatted = simpleDateFormat.format(date)
 
           if (StorageUtils.isExternalStorageWritable) {
-            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile(context)) > 100 * 1024 * 1024) {
+            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile()) > 100 * 1024 * 1024) {
               val dialog = LCAppUtils.createLoadingDialog(requireActivity())
               dialog.show()
               roomBackup

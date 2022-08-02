@@ -763,9 +763,9 @@ abstract class BaseAppDetailActivity :
       withContext(Dispatchers.Main) {
         initFeatureListView()
         featureAdapter.addData(
-          FeatureItem(R.drawable.ic_lib_play_store) {
+          FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(R.drawable.ic_lib_play_store)
+              .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store)
               .setTitle(R.string.play_app_signing)
               .setMessage(R.string.play_app_signing_details)
               .setPositiveButton(android.R.string.ok, null)

@@ -26,6 +26,8 @@ object GlobalValues {
 
   var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, LCRules.getVersion())
 
+  var localRulesCount: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, 0)
+
   var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)

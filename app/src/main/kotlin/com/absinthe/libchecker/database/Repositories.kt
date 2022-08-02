@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.database
 
 import android.app.Application
-import android.content.Context
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.FileUtils
@@ -18,15 +17,16 @@ object Repositories {
     context = application
   }
 
-  fun getLCDatabaseFile(context: Context): File {
-    val databaseDir = Repositories.context.getDatabasePath(Constants.RULES_DATABASE_NAME).parent
+  fun getLCDatabaseFile(): File {
+    val databaseDir = context.getDatabasePath(Constants.RULES_DATABASE_NAME).parent
     return File(databaseDir, Constants.RULES_DATABASE_NAME)
   }
 
   fun checkRulesDatabase() {
-    if (GlobalValues.localRulesVersion < LCRules.getVersion()) {
+    if (GlobalValues.localRulesVersion < LCRules.getVersion() || GlobalValues.localRulesCount != LCRules.getItemCounts()) {
       deleteRulesDatabase()
       GlobalValues.localRulesVersion = LCRules.getVersion()
+      GlobalValues.localRulesCount = LCRules.getItemCounts()
       ProcessPhoenix.triggerRebirth(context)
     }
   }
