@@ -142,6 +142,7 @@ class AppInfoBottomSheetDialogFragment :
             )
           )
           .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
       )
     )
   }
