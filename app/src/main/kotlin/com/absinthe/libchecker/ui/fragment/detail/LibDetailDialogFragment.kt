@@ -10,6 +10,8 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
@@ -76,9 +78,9 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
           root.showContent()
 
-          if (it.relativeUrl.startsWith("https://github.com/")) {
+          if (it.relativeUrl.startsWith(URLManager.GITHUB) && GlobalValues.isGitHubUnreachable) {
             lifecycleScope.launch(Dispatchers.IO) {
-              val splits = it.relativeUrl.removePrefix("https://github.com/").split("/")
+              val splits = it.relativeUrl.removePrefix(URLManager.GITHUB).split("/")
               if (splits.size >= 2) {
                 val date = viewModel.getRepoUpdatedTime(splits[0], splits[1])
                 withContext(Dispatchers.Main) {

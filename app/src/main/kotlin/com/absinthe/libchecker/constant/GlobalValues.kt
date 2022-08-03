@@ -75,4 +75,6 @@ object GlobalValues {
     }
 
   var uuid: String by SPDelegates(Constants.PREF_UUID, "")
+
+  var isGitHubUnreachable = true
 }

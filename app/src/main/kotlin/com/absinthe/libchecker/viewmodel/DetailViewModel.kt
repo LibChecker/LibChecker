@@ -42,6 +42,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
+import retrofit2.HttpException
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -406,6 +407,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val request: CloudRuleBundleRequest = ApiManager.create()
     val result = runCatching {
       request.requestRepoInfo(owner, repo) ?: return null
+    }.onFailure {
+      if (it is HttpException) {
+        GlobalValues.isGitHubUnreachable = false
+      }
     }.getOrNull() ?: return null
     val instant = Instant.parse(result.pushed_at)
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
