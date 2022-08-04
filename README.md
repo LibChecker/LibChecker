@@ -10,6 +10,8 @@ This app is used to view the third-party libraries used by applications in your 
 ## Supported Versions
 Android 7.0 ~ 13 Beta 4
 
+Android 6 [Marshmallow](https://github.com/zhaobozhen/LibChecker/tree/marshmallow)
+
 ## Document
 [LibChecker-Docs](https://github.com/zhaobozhen/LibChecker-Docs)
 
