@@ -18,9 +18,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:gradle:7.2.1",
+      "name": "Gradle: com.android.tools.build:gradle:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/gradle/7.2.1/51c17e0a7eea8eaaeb39b7e7a1e85a84867dcf2e/gradle-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/gradle/7.2.2/50b664cc081b526c2a2c771626ed7e89806b63d1/gradle-7.2.2.jar!/"
       ]
     },
     {
@@ -42,21 +42,21 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:builder:7.2.1",
+      "name": "Gradle: com.android.tools.build:builder:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder/7.2.1/37e17c1fbf53d8aed49942725d20e60af7fbfe27/builder-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder/7.2.2/45bab7da1d5a144bb0a401d3d92dc91ee5e089d4/builder-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:builder-model:7.2.1",
+      "name": "Gradle: com.android.tools.build:builder-model:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder-model/7.2.1/35f0f5aa396d2a3daa0ab20221d200375784a2aa/builder-model-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder-model/7.2.2/4a03ee626adf07c3fdac9e5fd03d43ecb0d53da7/builder-model-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:gradle-api:7.2.1",
+      "name": "Gradle: com.android.tools.build:gradle-api:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/gradle-api/7.2.1/1c2fdf9606aadaa7f7c837db74b99fa781d84a8f/gradle-api-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/gradle-api/7.2.2/ff773057b490c477db4e46adb8f002dff1bf0c9f/gradle-api-7.2.2.jar!/"
       ]
     },
     {
@@ -91,27 +91,27 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:manifest-merger:30.2.1",
+      "name": "Gradle: com.android.tools.build:manifest-merger:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/manifest-merger/30.2.1/1756d0ad1b6a704a32f73a09f3fa1836243a1586/manifest-merger-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/manifest-merger/30.2.2/a67b1fd0f1e142d9f84af1923aa812f104bfb014/manifest-merger-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android:zipflinger:7.2.1",
+      "name": "Gradle: com.android:zipflinger:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android/zipflinger/7.2.1/3a0ab31aa56c06b9839bc081b30a2c8c6e6a89ac/zipflinger-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android/zipflinger/7.2.2/3a0ab31aa56c06b9839bc081b30a2c8c6e6a89ac/zipflinger-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:apksig:7.2.1",
+      "name": "Gradle: com.android.tools.build:apksig:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/apksig/7.2.1/735df93a1e8f80050ce1e23caf72edd493273970/apksig-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/apksig/7.2.2/735df93a1e8f80050ce1e23caf72edd493273970/apksig-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:apkzlib:7.2.1",
+      "name": "Gradle: com.android.tools.build:apkzlib:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/apkzlib/7.2.1/dea3c50cf709649fccb03ed2f936901e7b8d1c8f/apkzlib-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/apkzlib/7.2.2/dea3c50cf709649fccb03ed2f936901e7b8d1c8f/apkzlib-7.2.2.jar!/"
       ]
     },
     {
@@ -145,45 +145,45 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.lint:lint-model:30.2.1",
+      "name": "Gradle: com.android.tools.lint:lint-model:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.lint/lint-model/30.2.1/4b6bc3603507b9ed592b99b7c4d26d4f675fb1fe/lint-model-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.lint/lint-model/30.2.2/ccf956e3391a66eea697a076655f138be0e9b0a6/lint-model-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools:sdk-common:30.2.1",
+      "name": "Gradle: com.android.tools:sdk-common:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/sdk-common/30.2.1/a7e1e2886a37c26c11e89802708c51f5e5052b26/sdk-common-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/sdk-common/30.2.2/64bf976b32568fb2639b61d9d817238325f2ce88/sdk-common-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools:sdklib:30.2.1",
+      "name": "Gradle: com.android.tools:sdklib:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/sdklib/30.2.1/a96285f990a3ef4e4931f79f811dc3bebb8e9ebe/sdklib-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/sdklib/30.2.2/a96285f990a3ef4e4931f79f811dc3bebb8e9ebe/sdklib-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools:repository:30.2.1",
+      "name": "Gradle: com.android.tools:repository:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/repository/30.2.1/bc22606d2fc0e0d840cb906c3ec90d14e4f377cd/repository-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/repository/30.2.2/19678ceb38d2bbcfe52fb4721e839948832f8927/repository-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:builder-test-api:7.2.1",
+      "name": "Gradle: com.android.tools.build:builder-test-api:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder-test-api/7.2.1/11cecda6e79a9b65996c90c65c5f8f5c06bddfe2/builder-test-api-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/builder-test-api/7.2.2/ce480e37559e82c850069cdd1759b18d8cc6360f/builder-test-api-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.1",
+      "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.ddms/ddmlib/30.2.1/242ed3329eb3b74d57c6a375550f3dfbaf879a12/ddmlib-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.ddms/ddmlib/30.2.2/14cd6bdb1297977d779dc87a8cee074f2816b694/ddmlib-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.1",
+      "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/aaptcompiler/7.2.1/95487f5d7ec14ae3c3d300940a6df4ada056c9f4/aaptcompiler-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/aaptcompiler/7.2.2/9fd19b8406ca9efc017632e249ed71bf115c91ce/aaptcompiler-7.2.2.jar!/"
       ]
     },
     {
@@ -193,87 +193,87 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.1-7984345",
+      "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.2-7984345",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/aapt2-proto/7.2.1-7984345/38a91dd7b31ebc87e3e44d2b9e267f90f90c1bb7/aapt2-proto-7.2.1-7984345.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.build/aapt2-proto/7.2.2-7984345/fecb9786700f740dd1bdfc75359cb4bb1ae47463/aapt2-proto-7.2.2-7984345.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.analytics-library:crash:30.2.1",
+      "name": "Gradle: com.android.tools.analytics-library:crash:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/crash/30.2.1/cc206cb0ead9f1a882d29aeb070437c5bf5eed63/crash-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/crash/30.2.2/cc206cb0ead9f1a882d29aeb070437c5bf5eed63/crash-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.analytics-library:shared:30.2.1",
+      "name": "Gradle: com.android.tools.analytics-library:shared:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/shared/30.2.1/3b8a85f5ff132c28e9f4382e61a1e57618919b89/shared-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/shared/30.2.2/6a126598a23ee92cb3dc722c146d457593c5bbbf/shared-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.1",
+      "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.lint/lint-typedef-remover/30.2.1/58f701ab23acf04b423b7553fc4f4f8b8b824367/lint-typedef-remover-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.lint/lint-typedef-remover/30.2.2/58f701ab23acf04b423b7553fc4f4f8b8b824367/lint-typedef-remover-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.1",
+      "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/androidx.databinding/databinding-compiler-common/7.2.1/4a85b96494288c49d88bb1c521be45f7c36cdbea/databinding-compiler-common-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/androidx.databinding/databinding-compiler-common/7.2.2/1126a86185a1ace3540bb13747bf97c8e93df73/databinding-compiler-common-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: androidx.databinding:databinding-common:7.2.1",
+      "name": "Gradle: androidx.databinding:databinding-common:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/androidx.databinding/databinding-common/7.2.1/cb53bd625b7a99cf218f46634d07d1886441288/databinding-common-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/androidx.databinding/databinding-common/7.2.2/cb53bd625b7a99cf218f46634d07d1886441288/databinding-common-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.databinding:baseLibrary:7.2.1",
+      "name": "Gradle: com.android.databinding:baseLibrary:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.databinding/baseLibrary/7.2.1/64ab5b22730b44026db99a1403ceec3275468edd/baseLibrary-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.databinding/baseLibrary/7.2.2/64ab5b22730b44026db99a1403ceec3275468edd/baseLibrary-7.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.1",
+      "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.layoutlib/layoutlib-api/30.2.1/f2b86f9214ba98e5b44a75b6863e8548885e3634/layoutlib-api-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.layoutlib/layoutlib-api/30.2.2/f2b86f9214ba98e5b44a75b6863e8548885e3634/layoutlib-api-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-device-provider-ddmlib-proto/30.2.1/bebb1d3ccf4362611d1bf979f28e5cf9031a663/android-device-provider-ddmlib-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-device-provider-ddmlib-proto/30.2.2/f826f220511bb2b3189d3c5c97f0362f6b7ef6b/android-device-provider-ddmlib-proto-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-device-provider-gradle-proto/30.2.1/5f52519d313aa596d36cad23f366955ad543d71f/android-device-provider-gradle-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-device-provider-gradle-proto/30.2.2/f388ff4323a3ca9331c44b57f6d79c7888eafb3a/android-device-provider-gradle-proto-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-additional-test-output-proto/30.2.1/3ef1d596205c37cbc0914f6e0ad38c9fbb7ed6f9/android-test-plugin-host-additional-test-output-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-additional-test-output-proto/30.2.2/f061caeed16aa51b30d80d4c46231f5ccda5820b/android-test-plugin-host-additional-test-output-proto-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-coverage-proto/30.2.1/a7ede88b7bcca1d232cf177e4e609b2b56f3a22a/android-test-plugin-host-coverage-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-coverage-proto/30.2.2/b58f7510d5da7fe2889c93b04ff3cbe65716a355/android-test-plugin-host-coverage-proto-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-retention-proto/30.2.1/6c12af8ece914157353f46176e8b1d94de25e711/android-test-plugin-host-retention-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-host-retention-proto/30.2.2/98a4586c90912f95aee51ab75bcf43e5bc7a8764/android-test-plugin-host-retention-proto-30.2.2.jar!/"
       ]
     },
     {
-      "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.1",
+      "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-result-listener-gradle-proto/30.2.1/76359cbcc3f244fb7894d6041ef2ee0750cf5a35/android-test-plugin-result-listener-gradle-proto-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.utp/android-test-plugin-result-listener-gradle-proto/30.2.2/ac5e696b0f3e3036962b43b38a17a7a325be5306/android-test-plugin-result-listener-gradle-proto-30.2.2.jar!/"
       ]
     },
     {
@@ -505,9 +505,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools:common:30.2.1",
+      "name": "Gradle: com.android.tools:common:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/common/30.2.1/2243ffc2818633cea65ed2da911d393908016591/common-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/common/30.2.2/740a2343102f7ee6cd5a24361c4e6a26a5552260/common-30.2.2.jar!/"
       ]
     },
     {
@@ -517,9 +517,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.1",
+      "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/tracker/30.2.1/f2256fa76371dd154b7b83a2b431635d7d981538/tracker-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/tracker/30.2.2/ca5952946e17509429bb608c98bc87c76b196503/tracker-30.2.2.jar!/"
       ]
     },
     {
@@ -529,9 +529,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools.analytics-library:protos:30.2.1",
+      "name": "Gradle: com.android.tools.analytics-library:protos:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/protos/30.2.1/7a4b54b151a2def037f1c384de4cb4af9c5ecdb4/protos-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools.analytics-library/protos/30.2.2/7a4b54b151a2def037f1c384de4cb4af9c5ecdb4/protos-30.2.2.jar!/"
       ]
     },
     {
@@ -547,9 +547,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android:signflinger:7.2.1",
+      "name": "Gradle: com.android:signflinger:7.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android/signflinger/7.2.1/92b0db3c63249ae6ba21f9543b34e7e6a76c92a3/signflinger-7.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android/signflinger/7.2.2/92b0db3c63249ae6ba21f9543b34e7e6a76c92a3/signflinger-7.2.2.jar!/"
       ]
     },
     {
@@ -589,9 +589,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools:dvlib:30.2.1",
+      "name": "Gradle: com.android.tools:dvlib:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/dvlib/30.2.1/957cccd8d81c52fb48d30226233a2d6dd01348a0/dvlib-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/dvlib/30.2.2/957cccd8d81c52fb48d30226233a2d6dd01348a0/dvlib-30.2.2.jar!/"
       ]
     },
     {
@@ -619,9 +619,9 @@
       ]
     },
     {
-      "name": "Gradle: com.android.tools:annotations:30.2.1",
+      "name": "Gradle: com.android.tools:annotations:30.2.2",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/annotations/30.2.1/e0254d7202df74359763abadb4cb48e2ad0365e6/annotations-30.2.1.jar!/"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/modules-2/files-2.1/com.android.tools/annotations/30.2.2/e0254d7202df74359763abadb4cb48e2ad0365e6/annotations-30.2.2.jar!/"
       ]
     },
     {

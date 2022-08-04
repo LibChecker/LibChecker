@@ -206,7 +206,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:gradle:7.2.1",
+          "name": "Gradle: com.android.tools.build:gradle:7.2.2",
           "type": "Library"
         },
         {
@@ -222,15 +222,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder-model:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder-model:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:gradle-api:7.2.1",
+          "name": "Gradle: com.android.tools.build:gradle-api:7.2.2",
           "type": "Library"
         },
         {
@@ -254,19 +254,19 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:manifest-merger:30.2.1",
+          "name": "Gradle: com.android.tools.build:manifest-merger:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android:zipflinger:7.2.1",
+          "name": "Gradle: com.android:zipflinger:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:apksig:7.2.1",
+          "name": "Gradle: com.android.tools.build:apksig:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:apkzlib:7.2.1",
+          "name": "Gradle: com.android.tools.build:apkzlib:7.2.2",
           "type": "Library"
         },
         {
@@ -294,43 +294,43 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.lint:lint-model:30.2.1",
+          "name": "Gradle: com.android.tools.lint:lint-model:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:sdk-common:30.2.1",
+          "name": "Gradle: com.android.tools:sdk-common:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:sdklib:30.2.1",
+          "name": "Gradle: com.android.tools:sdklib:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:repository:30.2.1",
+          "name": "Gradle: com.android.tools:repository:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder-test-api:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder-test-api:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.1",
+          "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.1",
+          "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:shared:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:shared:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.1",
+          "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.2",
           "type": "Library"
         },
         {
@@ -338,7 +338,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.1",
+          "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.2",
           "type": "Library"
         },
         {
@@ -354,43 +354,43 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.1-7984345",
+          "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.2-7984345",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:crash:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:crash:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.1",
+          "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: androidx.databinding:databinding-common:7.2.1",
+          "name": "Gradle: androidx.databinding:databinding-common:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.databinding:baseLibrary:7.2.1",
+          "name": "Gradle: com.android.databinding:baseLibrary:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.2",
           "type": "Library"
         },
         {
@@ -530,7 +530,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:common:30.2.1",
+          "name": "Gradle: com.android.tools:common:30.2.2",
           "type": "Library"
         },
         {
@@ -538,7 +538,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.2",
           "type": "Library"
         },
         {
@@ -546,7 +546,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:protos:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:protos:30.2.2",
           "type": "Library"
         },
         {
@@ -558,7 +558,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android:signflinger:7.2.1",
+          "name": "Gradle: com.android:signflinger:7.2.2",
           "type": "Library"
         },
         {
@@ -582,7 +582,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:dvlib:30.2.1",
+          "name": "Gradle: com.android.tools:dvlib:30.2.2",
           "type": "Library"
         },
         {
@@ -602,7 +602,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:annotations:30.2.1",
+          "name": "Gradle: com.android.tools:annotations:30.2.2",
           "type": "Library"
         },
         {
@@ -967,7 +967,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:gradle:7.2.1",
+          "name": "Gradle: com.android.tools.build:gradle:7.2.2",
           "type": "Library"
         },
         {
@@ -983,15 +983,15 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder-model:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder-model:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:gradle-api:7.2.1",
+          "name": "Gradle: com.android.tools.build:gradle-api:7.2.2",
           "type": "Library"
         },
         {
@@ -1015,19 +1015,19 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:manifest-merger:30.2.1",
+          "name": "Gradle: com.android.tools.build:manifest-merger:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android:zipflinger:7.2.1",
+          "name": "Gradle: com.android:zipflinger:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:apksig:7.2.1",
+          "name": "Gradle: com.android.tools.build:apksig:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:apkzlib:7.2.1",
+          "name": "Gradle: com.android.tools.build:apkzlib:7.2.2",
           "type": "Library"
         },
         {
@@ -1051,31 +1051,31 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.lint:lint-model:30.2.1",
+          "name": "Gradle: com.android.tools.lint:lint-model:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:sdk-common:30.2.1",
+          "name": "Gradle: com.android.tools:sdk-common:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:sdklib:30.2.1",
+          "name": "Gradle: com.android.tools:sdklib:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:repository:30.2.1",
+          "name": "Gradle: com.android.tools:repository:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:builder-test-api:7.2.1",
+          "name": "Gradle: com.android.tools.build:builder-test-api:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.1",
+          "name": "Gradle: com.android.tools.ddms:ddmlib:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.1",
+          "name": "Gradle: com.android.tools.build:aaptcompiler:7.2.2",
           "type": "Library"
         },
         {
@@ -1083,59 +1083,59 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.1-7984345",
+          "name": "Gradle: com.android.tools.build:aapt2-proto:7.2.2-7984345",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:crash:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:crash:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:shared:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:shared:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.1",
+          "name": "Gradle: com.android.tools.lint:lint-typedef-remover:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.1",
+          "name": "Gradle: androidx.databinding:databinding-compiler-common:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: androidx.databinding:databinding-common:7.2.1",
+          "name": "Gradle: androidx.databinding:databinding-common:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.databinding:baseLibrary:7.2.1",
+          "name": "Gradle: com.android.databinding:baseLibrary:7.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.1",
+          "name": "Gradle: com.android.tools.layoutlib:layoutlib-api:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-device-provider-ddmlib-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-device-provider-gradle-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-additional-test-output-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-coverage-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-host-retention-proto:30.2.2",
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.1",
+          "name": "Gradle: com.android.tools.utp:android-test-plugin-result-listener-gradle-proto:30.2.2",
           "type": "Library"
         },
         {
@@ -1291,7 +1291,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:common:30.2.1",
+          "name": "Gradle: com.android.tools:common:30.2.2",
           "type": "Library"
         },
         {
@@ -1299,7 +1299,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:tracker:30.2.2",
           "type": "Library"
         },
         {
@@ -1307,7 +1307,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools.analytics-library:protos:30.2.1",
+          "name": "Gradle: com.android.tools.analytics-library:protos:30.2.2",
           "type": "Library"
         },
         {
@@ -1319,7 +1319,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android:signflinger:7.2.1",
+          "name": "Gradle: com.android:signflinger:7.2.2",
           "type": "Library"
         },
         {
@@ -1347,7 +1347,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:dvlib:30.2.1",
+          "name": "Gradle: com.android.tools:dvlib:30.2.2",
           "type": "Library"
         },
         {
@@ -1367,7 +1367,7 @@
           "type": "Library"
         },
         {
-          "name": "Gradle: com.android.tools:annotations:30.2.1",
+          "name": "Gradle: com.android.tools:annotations:30.2.2",
           "type": "Library"
         },
         {
