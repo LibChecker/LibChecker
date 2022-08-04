@@ -14,7 +14,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
 
   private val image = ImageView(context).apply {
     layoutParams = LayoutParams(200.dp, 200.dp)
-    setImageResource(R.drawable.ic_natural_food)
+    setImageResource(R.drawable.ic_notebook)
     addView(this)
   }
 
