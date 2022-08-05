@@ -32,10 +32,11 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    setPadding(0, measuredWidth / 8, 0, measuredWidth / 8)
     image.autoMeasure()
     text.autoMeasure()
     setMeasuredDimension(
-      paddingStart + image.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
+      measuredWidth,
       paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
     )
   }

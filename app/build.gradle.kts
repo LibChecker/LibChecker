@@ -62,7 +62,8 @@ setupAppModule {
     "kotlin/**",
     "org/**",
     "**.properties",
-    "**.bin"
+    "**.bin",
+    "**/*.proto"
   )
 
   lint {
