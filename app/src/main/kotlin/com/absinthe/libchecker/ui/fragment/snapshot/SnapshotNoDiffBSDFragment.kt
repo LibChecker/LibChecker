@@ -9,7 +9,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
-import com.absinthe.libchecker.view.snapshot.SnapshotNewOrDeletedBSView
+import com.absinthe.libchecker.view.snapshot.SnapshotNoDiffBSView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.launch
@@ -17,11 +17,9 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 
 const val EXTRA_DIFF_ITEM = "EXTRA_DIFF_ITEM"
 
-class SnapshotNewOrDeletedBSDFragment :
-  BaseBottomSheetViewDialogFragment<SnapshotNewOrDeletedBSView>() {
+class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDiffBSView>() {
 
-  override fun initRootView(): SnapshotNewOrDeletedBSView =
-    SnapshotNewOrDeletedBSView(requireContext())
+  override fun initRootView(): SnapshotNoDiffBSView = SnapshotNoDiffBSView(requireContext())
 
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
@@ -58,16 +56,20 @@ class SnapshotNewOrDeletedBSDFragment :
         }
         appNameView.text = item.labelDiff.old
         packageNameView.text = item.packageName
-        versionInfoView.text = "${item.versionNameDiff.old} (${item.versionCodeDiff.old})"
-        targetApiView.text = "API ${item.targetApiDiff.old}"
+        versionInfoView.text =
+          String.format("%s (%s)", item.versionNameDiff.old, item.versionCodeDiff.old)
+        targetApiView.text = String.format("API %s", item.targetApiDiff.old)
       }
 
       when {
         item.newInstalled -> {
-          root.setMode(SnapshotNewOrDeletedBSView.Mode.New)
+          root.setMode(SnapshotNoDiffBSView.Mode.New)
         }
         item.deleted -> {
-          root.setMode(SnapshotNewOrDeletedBSView.Mode.Deleted)
+          root.setMode(SnapshotNoDiffBSView.Mode.Deleted)
+        }
+        item.isNothingChanged() -> {
+          root.setMode(SnapshotNoDiffBSView.Mode.NothingChanged)
         }
         else -> {
           dismiss()
@@ -79,8 +81,8 @@ class SnapshotNewOrDeletedBSDFragment :
   }
 
   companion object {
-    fun newInstance(snapshotDiffItem: SnapshotDiffItem): SnapshotNewOrDeletedBSDFragment {
-      return SnapshotNewOrDeletedBSDFragment().putArguments(
+    fun newInstance(snapshotDiffItem: SnapshotDiffItem): SnapshotNoDiffBSDFragment {
+      return SnapshotNoDiffBSDFragment().putArguments(
         EXTRA_DIFF_ITEM to snapshotDiffItem
       )
     }

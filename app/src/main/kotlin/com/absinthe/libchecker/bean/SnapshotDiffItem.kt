@@ -30,4 +30,6 @@ data class SnapshotDiffItem(
 ) : Serializable {
   @JsonClass(generateAdapter = true)
   data class DiffNode<T>(val old: T, val new: T? = null) : Serializable
+
+  fun isNothingChanged() = !added && !removed && !changed && !moved
 }

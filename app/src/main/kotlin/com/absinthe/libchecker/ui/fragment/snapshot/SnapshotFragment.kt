@@ -215,8 +215,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         }
 
         val item = getItem(position)
-        if (item.deleted || item.newInstalled) {
-          SnapshotNewOrDeletedBSDFragment.newInstance(item).also {
+        if (item.deleted || item.newInstalled || item.isNothingChanged()) {
+          SnapshotNoDiffBSDFragment.newInstance(item).also {
             it.show(context.supportFragmentManager, it.tag)
           }
         } else {

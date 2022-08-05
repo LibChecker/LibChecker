@@ -9,7 +9,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
-class SnapshotNewOrDeletedBSView(context: Context) : LinearLayout(context), IHeaderView {
+class SnapshotNoDiffBSView(context: Context) : LinearLayout(context), IHeaderView {
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -56,6 +56,12 @@ class SnapshotNewOrDeletedBSView(context: Context) : LinearLayout(context), IHea
             LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
       }
+      Mode.NothingChanged -> {
+        stubView = SnapshotEmptyView(context).apply {
+          layoutParams =
+            LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+      }
     }
     addView(stubView)
   }
@@ -67,5 +73,6 @@ class SnapshotNewOrDeletedBSView(context: Context) : LinearLayout(context), IHea
   sealed class Mode {
     object New : Mode()
     object Deleted : Mode()
+    object NothingChanged : Mode()
   }
 }
