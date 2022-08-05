@@ -374,11 +374,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 69,
+      "line": 70,
       "offset": 5,
       "length": 7,
       "code": {
-        "startLine": 67,
+        "startLine": 68,
         "length": 7,
         "offset": 14,
         "surroundingCode": "\n  lint {\n    disable += \"AppCompatResource\"\n  }\n"
@@ -389,7 +389,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "b81dacd6d35cc24ba9d8124bb9b5b541bc44b8833c0ef89b9ccbc669f4d5f06c"
+  "hash": "7f886cebdd8812c26055ebc3df911a59a2dd487eb6c1430bafd1d9ac9c368d2e"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -402,11 +402,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 72,
+      "line": 73,
       "offset": 20,
       "length": 12,
       "code": {
-        "startLine": 70,
+        "startLine": 71,
         "length": 12,
         "offset": 24,
         "surroundingCode": "  }\n\n  dependenciesInfo.includeInApk = false\n\n  applicationVariants.all {"
@@ -417,7 +417,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "2b3aeb5bb3f9c57922bd6cff6f994eea518723b0d9cacba04755b4e9441065e4"
+  "hash": "67704ebecd2639aaa5e5f6f9c97aaf82bb9425adcc366cf521518099ed40be72"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -430,11 +430,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 88,
+      "line": 89,
       "offset": 27,
       "length": 13,
       "code": {
-        "startLine": 86,
+        "startLine": 87,
         "length": 13,
         "offset": 124,
         "surroundingCode": "    val optimizeReleaseRes = task(\"optimize${flavor}ReleaseRes\").doLast {\n      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )"
@@ -445,7 +445,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "beca8a6a95018e64af6c0778178fb25d4929d25c84de86eccbb6a439905e1f1e"
+  "hash": "d70380a35e73acf9b8711ed658170a0e7f931318f7b7b8e8a3e6c531e524cbda"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -458,11 +458,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 88,
+      "line": 89,
       "offset": 41,
       "length": 12,
       "code": {
-        "startLine": 86,
+        "startLine": 87,
         "length": 12,
         "offset": 138,
         "surroundingCode": "    val optimizeReleaseRes = task(\"optimize${flavor}ReleaseRes\").doLast {\n      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )"
@@ -473,7 +473,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "39b6478ccdb1f9dc722050ef33b2c38c5512b1f37baa5ca7ec7619d860456965"
+  "hash": "57688d4b9cd72d8f61bbd9a3e0cbb662c6799c0a0532a5d048ca0876dc8115fa"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -486,11 +486,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 89,
+      "line": 90,
       "offset": 40,
       "length": 17,
       "code": {
-        "startLine": 87,
+        "startLine": 88,
         "length": 17,
         "offset": 130,
         "surroundingCode": "      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )\n      val zip = Paths.get("
@@ -501,7 +501,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "c2e325bc8a4072f660c2f26e8d4127046643be1772399fbd3493805ca5269576"
+  "hash": "f21978bc4213955c8f16cef159b7cf1ff02658d5b11df1cb4bfd21285325e9be"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
