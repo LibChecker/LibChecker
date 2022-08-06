@@ -162,6 +162,7 @@
   <string name="album_item_comparison_title">對比</string>
   <string name="album_item_comparison_subtitle">對比兩個快照</string>
   <string name="album_item_comparison_invalid_compare">無效的對比</string>
+  <string name="album_item_comparison_invalid_shared_items">請選擇兩個 APK 文件進行比較</string>
   <string name="album_item_management_title">管理</string>
   <string name="album_item_management_subtitle">管理所有快照</string>
   <string name="album_item_backup_restore_title">備份與恢復</string>

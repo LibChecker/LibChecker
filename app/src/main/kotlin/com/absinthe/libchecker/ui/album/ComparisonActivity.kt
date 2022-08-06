@@ -2,6 +2,7 @@ package com.absinthe.libchecker.ui.album
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -26,6 +28,7 @@ import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFra
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.snapshot.ComparisonDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -55,6 +58,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         }
       }
     )
+    parseIntent(intent)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -209,6 +213,19 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     viewModel.snapshotDiffItems.observe(this) { list ->
       adapter.setList(list.sortedByDescending { it.updateTime })
       flip(VF_LIST)
+    }
+  }
+
+  private fun parseIntent(intent: Intent) {
+    if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
+      intent.extras?.let {
+        val uriList = BundleCompat.getParcelableArrayList<Uri>(it, Intent.EXTRA_STREAM)
+        if (uriList?.size == 2) {
+          showToast("TODO")
+        } else {
+          showToast(R.string.album_item_comparison_invalid_shared_items)
+        }
+      }
     }
   }
 

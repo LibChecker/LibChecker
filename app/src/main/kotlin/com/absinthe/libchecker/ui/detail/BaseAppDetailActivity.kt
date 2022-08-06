@@ -444,7 +444,7 @@ abstract class BaseAppDetailActivity :
         }
         binding.detailToolbarContainer.addView(processBarView)
       }
-      if (PackageUtils.isAppInstalled(packageInfo.packageName)) {
+      if (this@BaseAppDetailActivity is ApkDetailActivity && PackageUtils.isAppInstalled(packageInfo.packageName)) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
             val basePackage = PackageUtils.getPackageInfo(
