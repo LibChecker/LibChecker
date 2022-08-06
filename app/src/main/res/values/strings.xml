@@ -121,6 +121,7 @@
   <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Process</string>
   <string name="alternative_launch_method">Alternative Launch Method</string>
+  <string name="compare_with_current">Compare with current package</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

@@ -121,6 +121,7 @@
   <string name="format_last_updated">最近更新: %s</string>
   <string name="menu_process">處理程序</string>
   <string name="alternative_launch_method">替代的啟動方法</string>
+  <string name="compare_with_current">與當前包比較</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>

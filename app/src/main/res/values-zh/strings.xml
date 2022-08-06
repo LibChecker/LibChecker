@@ -121,6 +121,7 @@
   <string name="format_last_updated">最近更新: %s</string>
   <string name="menu_process">进程</string>
   <string name="alternative_launch_method">备选的启动方式</string>
+  <string name="compare_with_current">与当前包比较</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>

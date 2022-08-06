@@ -177,6 +177,7 @@ object PackageUtils {
   fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion"
 
   private const val minSdkVersion = "minSdkVersion"
+  private const val compileSdkVersion = "compileSdkVersion"
 
   /**
    * Get minSdkVersion of an app
@@ -196,9 +197,23 @@ object PackageUtils {
     return minSdkVersionValue
   }
 
+  /**
+   * Get compileSdkVersion of an app
+   * @param packageInfo PackageInfo
+   * @return compileSdkVersion
+   */
   fun getCompileSdkVersion(packageInfo: PackageInfo): String {
     return runCatching {
-      val version = packageInfo.applicationInfo.compileSdkVersion
+      val version = if (OsUtils.atLeastS()) {
+        packageInfo.applicationInfo.compileSdkVersion
+      } else {
+        val demands = ManifestReader.getManifestProperties(
+          File(packageInfo.applicationInfo.sourceDir),
+          arrayOf(compileSdkVersion)
+        )
+        demands[compileSdkVersion]?.toString()?.toInt() ?: 0
+      }
+
       if (version == 0) {
         "?"
       } else {
@@ -588,7 +603,7 @@ object PackageUtils {
    * @param isSimpleName Whether to show class name as a simple name
    * @return List of String
    */
-  private fun getComponentStringList(
+  fun getComponentStringList(
     packageInfo: PackageInfo,
     @LibType type: Int,
     isSimpleName: Boolean

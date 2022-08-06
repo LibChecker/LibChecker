@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.ClipData
+import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -34,6 +35,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.METADATA
@@ -47,6 +49,7 @@ import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.AppDetailToolbarItem
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.FeatureItem
+import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
@@ -69,6 +72,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
@@ -83,6 +87,7 @@ import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
+import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.ProcessBarView
@@ -438,6 +443,22 @@ abstract class BaseAppDetailActivity :
           }
         }
         binding.detailToolbarContainer.addView(processBarView)
+      }
+      if (PackageUtils.isAppInstalled(packageInfo.packageName)) {
+        toolbarAdapter.addData(
+          AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
+            val basePackage = PackageUtils.getPackageInfo(
+              viewModel.packageInfo.packageName,
+              PackageManager.GET_ACTIVITIES
+                or PackageManager.GET_RECEIVERS
+                or PackageManager.GET_SERVICES
+                or PackageManager.GET_PROVIDERS
+                or PackageManager.GET_META_DATA
+                or PackageManager.GET_PERMISSIONS
+            )
+            navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
+          }
+        )
       }
 
       rvToolbar.apply {
@@ -866,5 +887,100 @@ abstract class BaseAppDetailActivity :
         }
       }
     }
+  }
+
+  private fun navigateToSnapshotDetailPage(basePackage: PackageInfo, analysisPackage: PackageInfo) {
+    val diff = SnapshotDiffItem(
+      packageName = basePackage.packageName,
+      updateTime = basePackage.lastUpdateTime,
+      labelDiff = SnapshotDiffItem.DiffNode(
+        basePackage.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
+        analysisPackage.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+      ),
+      versionNameDiff = SnapshotDiffItem.DiffNode(
+        basePackage.versionName,
+        analysisPackage.versionName
+      ),
+      versionCodeDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getVersionCode(basePackage),
+        PackageUtils.getVersionCode(analysisPackage)
+      ),
+      abiDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getAbi(basePackage).toShort(),
+        PackageUtils.getAbi(analysisPackage).toShort()
+      ),
+      targetApiDiff = SnapshotDiffItem.DiffNode(
+        basePackage.applicationInfo.targetSdkVersion.toShort(),
+        analysisPackage.applicationInfo.targetSdkVersion.toShort()
+      ),
+      nativeLibsDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
+        PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
+      ),
+      servicesDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getComponentStringList(
+          basePackage,
+          SERVICE,
+          false
+        ).toJson().orEmpty(),
+        PackageUtils.getComponentStringList(
+          analysisPackage,
+          SERVICE,
+          false
+        ).toJson().orEmpty()
+      ),
+      activitiesDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getComponentStringList(
+          basePackage,
+          ACTIVITY,
+          false
+        ).toJson().orEmpty(),
+        PackageUtils.getComponentStringList(
+          analysisPackage,
+          ACTIVITY,
+          false
+        ).toJson().orEmpty()
+      ),
+      receiversDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getComponentStringList(
+          basePackage,
+          RECEIVER,
+          false
+        ).toJson().orEmpty(),
+        PackageUtils.getComponentStringList(
+          analysisPackage,
+          RECEIVER,
+          false
+        ).toJson().orEmpty()
+      ),
+      providersDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getComponentStringList(
+          basePackage,
+          PROVIDER,
+          false
+        ).toJson().orEmpty(),
+        PackageUtils.getComponentStringList(
+          analysisPackage,
+          PROVIDER,
+          false
+        ).toJson().orEmpty()
+      ),
+      permissionsDiff = SnapshotDiffItem.DiffNode(
+        basePackage.getPermissionsList().toJson().orEmpty(),
+        analysisPackage.getPermissionsList().toJson().orEmpty()
+      ),
+      metadataDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getMetaDataItems(basePackage).toJson().orEmpty(),
+        PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
+      ),
+      packageSizeDiff = SnapshotDiffItem.DiffNode(
+        PackageUtils.getPackageSize(basePackage, true),
+        PackageUtils.getPackageSize(analysisPackage, true)
+      )
+    )
+
+    val intent = Intent(this, SnapshotDetailActivity::class.java)
+      .putExtras(bundleOf(EXTRA_ENTITY to diff))
+    startActivity(intent)
   }
 }
