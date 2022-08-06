@@ -7,7 +7,6 @@ import android.text.style.StyleSpan
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.bean.LibReference
@@ -21,7 +20,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val MULTIPLE_APPS_ICON_PROVIDER = 1
 
-class MultipleAppsIconProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
+class MultipleAppsIconProvider : BaseNodeProvider() {
 
   override val itemViewType: Int = MULTIPLE_APPS_ICON_PROVIDER
   override val layoutId: Int = 0

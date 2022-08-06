@@ -26,7 +26,6 @@ import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFra
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.ComparisonDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -41,7 +40,7 @@ const val VF_LIST = 1
 class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   private val viewModel: SnapshotViewModel by viewModels()
-  private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
+  private val adapter = SnapshotAdapter()
   private var leftTimeStamp = 0L
   private var rightTimeStamp = 0L
 

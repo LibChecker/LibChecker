@@ -9,7 +9,8 @@ import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.coroutineScope
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
@@ -36,7 +37,7 @@ import kotlinx.coroutines.withContext
 
 const val LIB_REFERENCE_PROVIDER = 0
 
-class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
+class LibReferenceProvider : BaseNodeProvider() {
 
   override val itemViewType: Int = LIB_REFERENCE_PROVIDER
   override val layoutId: Int = 0
@@ -103,7 +104,7 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
       if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
         val name = ref.libName
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        view.findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch(Dispatchers.IO) {
           val regexName = LCRules.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {

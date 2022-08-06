@@ -59,7 +59,7 @@ class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val appAdapter by lazy { AppAdapter(lifecycleScope) }
+  private val appAdapter = AppAdapter()
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
   private var popup: PopupMenu? = null

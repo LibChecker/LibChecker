@@ -66,7 +66,7 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private lateinit var entity: SnapshotDiffItem
 
-  private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
+  private val adapter = SnapshotDetailAdapter()
   private val viewModel: SnapshotViewModel by viewModels()
   private val _entity by unsafeLazy { IntentCompat.getSerializableExtra<SnapshotDiffItem>(intent, EXTRA_ENTITY) }
 

@@ -7,6 +7,4 @@
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
 
   <string name="snapshot_none" translatable="false">None</string>
-
-  <string name="extract_native_libs_tip_part_b" translatable="false">android:extractNativeLibs="false"</string>
 </resources>

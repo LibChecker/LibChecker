@@ -57,7 +57,6 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -83,7 +82,7 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   private val viewModel: SnapshotViewModel by activityViewModels()
-  private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
+  private val adapter = SnapshotAdapter()
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()

@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
@@ -18,7 +17,7 @@ import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class AppAdapter(val lifecycleScope: LifecycleCoroutineScope) : HighlightAdapter<LCItem>() {
+class AppAdapter : HighlightAdapter<LCItem>() {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(

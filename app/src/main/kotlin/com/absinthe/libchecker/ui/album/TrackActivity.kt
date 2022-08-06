@@ -22,7 +22,6 @@ import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView
@@ -35,7 +34,7 @@ import rikka.widget.borderview.BorderView
 class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTextListener {
 
   private val repository = Repositories.lcRepository
-  private val adapter by unsafeLazy { TrackAdapter(lifecycleScope) }
+  private val adapter = TrackAdapter()
   private val list = mutableListOf<TrackListItem>()
   private var menu: Menu? = null
   private var isListReady = false

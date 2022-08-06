@@ -2,7 +2,6 @@ package com.absinthe.libchecker.recyclerview.adapter
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.TrackListItem
@@ -13,8 +12,7 @@ import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class TrackAdapter(val lifecycleScope: LifecycleCoroutineScope) :
-  BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
+class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
 
   init {
     addChildClickViewIds(android.R.id.toggle)

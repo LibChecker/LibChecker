@@ -186,7 +186,7 @@ class ShootService : LifecycleService() {
           dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
 
           if (dbSnapshotItem?.versionCode == PackageUtils.getVersionCode(info) &&
-            dbSnapshotItem?.lastUpdatedTime == info.lastUpdateTime &&
+            dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
             dbSnapshotItem.packageSize == PackageUtils.getPackageSize(info, true)
           ) {
             Timber.d("computeSnapshots: ${info.packageName} is up to date")

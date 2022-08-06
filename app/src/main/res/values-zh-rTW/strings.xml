@@ -116,7 +116,7 @@
   <string name="play_app_signing_details">借助 Play 應用簽名，Google 可以為您管理和保護您應用的簽名密鑰，並使用它對從您的 app bundle 生成的優化分發 APK 進行簽名。Play App Signing 將您的應用簽名密鑰存儲在 Google 的安全基礎架構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程序 (PWA) 使用現代 API 構建和增強，以提供增強的功能、可靠性和可安裝性，同時使用單個代碼庫在任何設備上訪問任何人、任何地方。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具包，用於建構原生 UI。可簡化及加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
-  <string name="extract_native_libs_tip_part_a">該應用聲明了 </string>
+  <string name="extract_native_libs_tip">該應用聲明了 </string>
   <string name="xml_detail">XML 詳細</string>
   <string name="format_last_updated">最近更新: %s</string>
   <string name="menu_process">處理程序</string>

@@ -19,7 +19,6 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +33,7 @@ const val EXTRA_REF_LIST = "REF_LIST"
 
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
-  private val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
+  private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModels()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }

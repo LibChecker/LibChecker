@@ -51,7 +51,6 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
@@ -76,7 +75,7 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val refAdapter by unsafeLazy { LibReferenceAdapter(lifecycleScope) }
+  private val refAdapter = LibReferenceAdapter()
   private var popup: CascadePopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType

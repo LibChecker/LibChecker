@@ -8,7 +8,6 @@ import android.text.style.ImageSpan
 import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -25,8 +24,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val ARROW = "→"
 
-class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
-  BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
