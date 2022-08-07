@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.annotation.SuppressLint
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -39,7 +38,6 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
     )
   }
 
-  @SuppressLint("SetTextI18n")
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
       val packageInfo = runCatching {

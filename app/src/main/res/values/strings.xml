@@ -163,6 +163,7 @@
   <string name="album_item_comparison_subtitle">Compare with two snapshots</string>
   <string name="album_item_comparison_invalid_compare">Invalid comparison</string>
   <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
+  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
   <string name="album_item_management_title">Management</string>
   <string name="album_item_management_subtitle">Manage all snapshots</string>
   <string name="album_item_backup_restore_title">Backup &amp; Restore</string>

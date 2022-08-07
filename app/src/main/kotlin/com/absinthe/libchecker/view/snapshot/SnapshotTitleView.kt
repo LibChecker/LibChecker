@@ -22,6 +22,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val iconView = AppCompatImageView(context).apply {
     val iconSize = context.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
     layoutParams = LayoutParams(iconSize, iconSize)
+    setImageResource(R.drawable.ic_icon_blueprint)
     addView(this)
   }
 

@@ -22,14 +22,13 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
   }
 
   override fun convert(holder: BaseViewHolder, item: String) {
-    (holder.itemView as AppCompatImageView).also {
-      val packageInfo = runCatching {
-        AppItemRepository.allPackageInfoMap[item]
+    (holder.itemView as AppCompatImageView).also { imageView ->
+      runCatching {
+        val packageInfo = AppItemRepository.allPackageInfoMap[item]
           ?: PackageUtils.getPackageInfo(item)
-      }.getOrNull()
-
-      it.load(packageInfo) {
-        placeholder(R.drawable.ic_icon_blueprint)
+        imageView.load(packageInfo)
+      }.onFailure {
+        imageView.load(R.drawable.ic_icon_blueprint)
       }
     }
   }

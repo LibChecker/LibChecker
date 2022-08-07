@@ -44,6 +44,8 @@ import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.google.protobuf.InvalidProtocolBufferException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okio.buffer
@@ -67,6 +69,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
   val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
   val comparingProgressLiveData = MutableLiveData(0)
+
+  private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
+  val effect = _effect.asSharedFlow()
 
   fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
     snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
@@ -360,6 +365,18 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return
     }
 
+    compareDiffWithSnapshotList(preTimeStamp, preList, currList)
+  }
+
+  suspend fun compareDiffWithSnapshotList(preTimeStamp: Long = -1L, preList: List<SnapshotItem>, currList: List<SnapshotItem>) {
+    if (preList.isEmpty()) {
+      return
+    }
+
+    if (currList.isEmpty()) {
+      return
+    }
+
     val currMap = mutableMapOf<String, SnapshotItem>()
     val diffList = mutableListOf<SnapshotDiffItem>()
 
@@ -372,7 +389,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     for (preItem in preList) {
       currMap[preItem.packageName]?.let {
-        if (it.versionCode > preItem.versionCode || it.lastUpdatedTime > preItem.lastUpdatedTime) {
+        if (it.versionCode != preItem.versionCode || it.lastUpdatedTime != preItem.lastUpdatedTime) {
           snapshotDiffItem = SnapshotDiffItem(
             packageName = it.packageName,
             updateTime = it.lastUpdatedTime,
@@ -472,7 +489,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
 
     snapshotDiffItems.postValue(diffList)
-    if (diffList.isNotEmpty()) {
+    if (diffList.isNotEmpty() && preTimeStamp != -1L) {
       updateTopApps(preTimeStamp, diffList.subList(0, (diffList.size - 1).coerceAtMost(5)))
     }
   }
@@ -1296,5 +1313,22 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
     val date = Date(timestamp)
     return simpleDateFormat.format(date)
+  }
+
+  fun chooseComparedApk(isLeftPart: Boolean) {
+    setEffect {
+      Effect.ChooseComparedApk(isLeftPart)
+    }
+  }
+
+  private fun setEffect(builder: () -> Effect) {
+    val newEffect = builder()
+    viewModelScope.launch {
+      _effect.emit(newEffect)
+    }
+  }
+
+  sealed class Effect {
+    data class ChooseComparedApk(val isLeftPart: Boolean) : Effect()
   }
 }

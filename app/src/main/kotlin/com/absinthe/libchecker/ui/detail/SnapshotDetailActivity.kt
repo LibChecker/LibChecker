@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
@@ -68,7 +67,12 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
 
   private val adapter = SnapshotDetailAdapter()
   private val viewModel: SnapshotViewModel by viewModels()
-  private val _entity by unsafeLazy { IntentCompat.getSerializableExtra<SnapshotDiffItem>(intent, EXTRA_ENTITY) }
+  private val _entity by unsafeLazy {
+    IntentCompat.getSerializableExtra<SnapshotDiffItem>(
+      intent,
+      EXTRA_ENTITY
+    )
+  }
 
   override fun requirePackageName() = entity.packageName
 
@@ -98,7 +102,6 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     return super.onOptionsItemSelected(item)
   }
 
-  @SuppressLint("SetTextI18n")
   private fun initView() {
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
@@ -132,17 +135,15 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
           false,
           this@SnapshotDetailActivity
         )
-        val icon = try {
-          appIconLoader.loadIcon(
+        runCatching {
+          val icon = appIconLoader.loadIcon(
             PackageUtils.getPackageInfo(
               entity.packageName,
               PackageManager.GET_META_DATA
             ).applicationInfo
           )
-        } catch (e: PackageManager.NameNotFoundException) {
-          null
+          load(icon)
         }
-        load(icon)
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
@@ -158,7 +159,8 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
         isNewOrDeleted,
         "%s (%s)"
       )
-      snapshotTitle.targetApiView.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
+      snapshotTitle.targetApiView.text =
+        String.format("API %s", getDiffString(entity.targetApiDiff, isNewOrDeleted))
 
       if (entity.packageSizeDiff.old > 0L) {
         snapshotTitle.packageSizeView.isVisible = true
