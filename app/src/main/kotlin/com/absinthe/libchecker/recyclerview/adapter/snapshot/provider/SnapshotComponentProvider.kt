@@ -2,8 +2,8 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.ADDED
@@ -65,7 +65,7 @@ class SnapshotComponentProvider : BaseNodeProvider() {
 
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
 
-      findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch {
+      (context as? LifecycleOwner)?.lifecycleScope?.launch {
         val rule = LCRules.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
         setChip(rule, colorRes)

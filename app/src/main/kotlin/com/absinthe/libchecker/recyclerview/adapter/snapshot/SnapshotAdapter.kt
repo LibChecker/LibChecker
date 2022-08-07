@@ -6,6 +6,8 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
@@ -67,10 +69,12 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
       }
 
       if (item.isTrackItem) {
-        val imageSpan = ImageSpan(context, R.drawable.ic_track)
-        val spannable = SpannableString(" ${getDiffString(item.labelDiff, isNewOrDeleted)}")
-        spannable.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        appName.text = spannable
+        appName.text = buildSpannedString {
+          inSpans(ImageSpan(context, R.drawable.ic_track)) {
+            append(" ")
+          }
+          append(getDiffString(item.labelDiff, isNewOrDeleted))
+        }
       } else {
         appName.text = getDiffString(item.labelDiff, isNewOrDeleted)
       }

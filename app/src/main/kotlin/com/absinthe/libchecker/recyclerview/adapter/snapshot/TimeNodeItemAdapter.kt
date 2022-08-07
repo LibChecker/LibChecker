@@ -3,6 +3,7 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
@@ -25,9 +26,11 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
       val packageInfo = runCatching {
         AppItemRepository.allPackageInfoMap[item]
           ?: PackageUtils.getPackageInfo(item)
-      }.getOrNull() ?: return
+      }.getOrNull()
 
-      it.load(packageInfo)
+      it.load(packageInfo) {
+        placeholder(R.drawable.ic_icon_blueprint)
+      }
     }
   }
 }

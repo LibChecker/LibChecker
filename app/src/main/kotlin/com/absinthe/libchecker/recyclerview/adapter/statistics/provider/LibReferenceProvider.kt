@@ -2,15 +2,13 @@ package com.absinthe.libchecker.recyclerview.adapter.statistics.provider
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.core.text.buildSpannedString
+import androidx.core.text.italic
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
@@ -84,15 +82,12 @@ class LibReferenceProvider : BaseNodeProvider() {
         } else {
           icon.setImageResource(R.drawable.ic_question)
         }
-        val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
-        val colorSpanit = StyleSpan(Typeface.ITALIC)
-        spannableString.setSpan(
-          colorSpanit,
-          0,
-          spannableString.length,
-          Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-        labelName.text = spannableString
+
+        labelName.text = buildSpannedString {
+          italic {
+            append(context.getString(R.string.not_marked_lib))
+          }
+        }
       }
     }
   }
@@ -104,7 +99,7 @@ class LibReferenceProvider : BaseNodeProvider() {
       if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
         val name = ref.libName
 
-        view.findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch(Dispatchers.IO) {
+        (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
           val regexName = LCRules.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {

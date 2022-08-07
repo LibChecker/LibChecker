@@ -7,12 +7,14 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.graphics.text.LineBreaker
 import android.text.Layout
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StrikethroughSpan
+import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
+import androidx.core.text.set
+import androidx.core.text.strikeThrough
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
@@ -84,20 +86,13 @@ class LibStringAdapter(
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
     val itemName = if (item.item.source == DISABLED) {
-      val sp = SpannableString(item.item.name)
-      sp.setSpan(
-        StrikethroughSpan(),
-        0,
-        item.item.name.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-      )
-      sp.setSpan(
-        StyleSpan(Typeface.BOLD_ITALIC),
-        0,
-        item.item.name.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-      )
-      sp
+      buildSpannedString {
+        strikeThrough {
+          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
+            append(item.item.name)
+          }
+        }
+      }
     } else {
       item.item.name
     }
@@ -177,24 +172,16 @@ class LibStringAdapter(
         // noinspection WrongConstant
         it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
       }
-      val spannableString = SpannableString(item.item.source)
-      val staticPrefixIndex =
-        spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
-      spannableString.setSpan(
-        StyleSpan(Typeface.BOLD),
-        staticPrefixIndex,
-        staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
-        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      val versionCodePrefixIndex =
-        spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
-      spannableString.setSpan(
-        StyleSpan(Typeface.BOLD),
-        versionCodePrefixIndex,
-        versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length,
-        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      it.text = spannableString
+      val sb = SpannableStringBuilder(item.item.source)
+      val staticPrefixIndex = sb.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
+      sb[staticPrefixIndex, staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length] =
+        StyleSpan(Typeface.BOLD)
+
+      val versionCodePrefixIndex = sb.indexOf(PackageUtils.VERSION_CODE_PREFIX)
+      sb[versionCodePrefixIndex, versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length] =
+        StyleSpan(Typeface.BOLD)
+
+      it.text = sb
     }
     itemView.setChip(item.chip)
   }

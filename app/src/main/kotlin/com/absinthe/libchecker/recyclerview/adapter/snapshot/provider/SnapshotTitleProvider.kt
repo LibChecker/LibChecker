@@ -5,8 +5,8 @@ import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -76,7 +76,7 @@ class SnapshotTitleProvider : BaseNodeProvider() {
 
       countAdapter.setList(finalList)
     } ?: run {
-      itemView.findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch(Dispatchers.Default) {
+      (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.Default) {
         @Suppress("UNCHECKED_CAST")
         (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
           countList[diffNode.item.diffType]++
