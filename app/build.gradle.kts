@@ -15,6 +15,7 @@ plugins {
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.moshiX)
 }
 
 ksp {
@@ -156,7 +157,6 @@ dependencies {
   implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
-  ksp(libs.square.moshi.compiler)
 
   implementation(libs.lottie)
   implementation(libs.drakeet.about)
