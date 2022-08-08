@@ -410,7 +410,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         GlobalValues.isGitHubUnreachable = false
       }
     }.getOrNull() ?: return null
-    val pushedAt = DateUtils.parseIso8601DateTime(result.pushed_at) ?: return null
+    val pushedAt = DateUtils.parseIso8601DateTime(result.pushedAt) ?: return null
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return formatter.format(pushedAt)
   }
