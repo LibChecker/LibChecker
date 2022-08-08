@@ -412,7 +412,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         GlobalValues.isGitHubUnreachable = false
       }
     }.getOrNull() ?: return null
-    val instant = Instant.parse(result.pushed_at)
+    val instant = Instant.parse(result.pushedAt)
     val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
       .withLocale(Locale.getDefault())
       .withZone(ZoneId.systemDefault())
