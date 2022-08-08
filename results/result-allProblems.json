@@ -10,11 +10,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 29,
+      "line": 30,
       "offset": 5,
       "length": 13,
       "code": {
-        "startLine": 27,
+        "startLine": 28,
         "length": 13,
         "offset": 39,
         "surroundingCode": "setupAppModule {\n  defaultConfig {\n    applicationId = \"com.absinthe.libchecker\"\n    namespace = \"com.absinthe.libchecker\"\n  }"
@@ -25,7 +25,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "c9782d282da3bf2ede13e9dd69c4987240db413c6a1e3c2d0cac68b54d374e09"
+  "hash": "54b0d1658f4368d1d6d4731be7023a7457a560843c94a53703bf9c63c95eb772"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -38,11 +38,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 33,
+      "line": 34,
       "offset": 3,
       "length": 13,
       "code": {
-        "startLine": 31,
+        "startLine": 32,
         "length": 13,
         "offset": 7,
         "surroundingCode": "  }\n\n  buildFeatures {\n    viewBinding = true\n  }"
@@ -53,7 +53,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "ce07e99433964e00eaa0e2c0104d32570e9a06bef801605533a95f4f05e65817"
+  "hash": "9d402727127824f3ca98c1b891356fe853aa1d7e94e1b6757a53bda40c5de7ab"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -66,11 +66,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 34,
+      "line": 35,
       "offset": 5,
       "length": 11,
       "code": {
-        "startLine": 32,
+        "startLine": 33,
         "length": 11,
         "offset": 23,
         "surroundingCode": "\n  buildFeatures {\n    viewBinding = true\n  }\n"
@@ -81,35 +81,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "a9f4d6bde00a9e9000bdb1e002d342256c906080c12e02a08ad242b5902026fc"
-},{
-  "tool": "Code Inspection",
-  "category": "JVM languages",
-  "type": "Unstable API Usage",
-  "severity": "High",
-  "comment": "'setCoreLibraryDesugaringEnabled(boolean)' is marked unstable with @Incubating",
-  "detailsInfo": "Reports usages of an API marked with one of the annotations as unstable. Such an API may be changed or removed in future versions, breaking the code that uses it.\n\nThe annotations which are used to mark unstable APIs are shown in the list below.\n\nBy default, the inspection ignores usages of unstable APIs\nif their declarations are located in sources of the same project. In such cases it'll be possible to update the usages when you change APIs.\nHowever, it may be inconvenient if the project is big, so one can switch off the **Ignore API declared in this project** option to report\nthe usages of unstable APIs declared in both the project sources and libraries.",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/build.gradle.kts",
-      "language": "kotlin",
-      "line": 38,
-      "offset": 5,
-      "length": 30,
-      "code": {
-        "startLine": 36,
-        "length": 30,
-        "offset": 24,
-        "surroundingCode": "\n  compileOptions {\n    isCoreLibraryDesugaringEnabled = true\n  }\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app",
-    "inspectionName": "UnstableApiUsage"
-  },
-  "hash": "6f0de3d1286fdf51e6d1653d0f018d4870acaef184361263b6479e8c80e9adae"
+  "hash": "55c72255fbb3622a2c2a91d36787e04c4bb1977c5176f00110667fbcf89e7b9a"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -122,11 +94,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 41,
+      "line": 38,
       "offset": 3,
       "length": 10,
       "code": {
-        "startLine": 39,
+        "startLine": 36,
         "length": 10,
         "offset": 7,
         "surroundingCode": "  }\n\n  sourceSets {\n    named(\"main\") {\n      java {"
@@ -137,7 +109,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "495b8c29b9ddbbb4a140eca42f26144bccab55c578ecce4e9efd706d5251637e"
+  "hash": "e0890db3a576883dc7a747367622c3aac909c5158add32706c16db93078ae76b"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -150,11 +122,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 43,
+      "line": 40,
       "offset": 7,
       "length": 4,
       "code": {
-        "startLine": 41,
+        "startLine": 38,
         "length": 4,
         "offset": 41,
         "surroundingCode": "  sourceSets {\n    named(\"main\") {\n      java {\n        srcDirs(\"src/main/kotlin\")\n      }"
@@ -165,7 +137,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "25d22da101f52e7b082123c486a7c930cd1f4f256ec47ff47f70e49f481f9d55"
+  "hash": "1ddfe870f3be8395d3e8221f20073a8d633fb1a046c3937cc9752beb17b64893"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -178,11 +150,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 44,
+      "line": 41,
       "offset": 9,
       "length": 7,
       "code": {
-        "startLine": 42,
+        "startLine": 39,
         "length": 7,
         "offset": 41,
         "surroundingCode": "    named(\"main\") {\n      java {\n        srcDirs(\"src/main/kotlin\")\n      }\n    }"
@@ -193,7 +165,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "3a29cfa02d2c2f02a7a3bc08663cebcbde46d5a944d056a52241b8c429b92c8b"
+  "hash": "65e5073816ac0a804de3a7aacf329875dbeb44835385d5430bb590ad1bc3510f"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -206,11 +178,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 48,
+      "line": 45,
       "offset": 7,
       "length": 4,
       "code": {
-        "startLine": 46,
+        "startLine": 43,
         "length": 4,
         "offset": 32,
         "surroundingCode": "    }\n    named(\"foss\") {\n      java {\n        srcDirs(\"src/foss/kotlin\")\n      }"
@@ -221,7 +193,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "46413b84dcd70a942edcc8823f2408040cf3b4301789ec9ab531be5ca390c612"
+  "hash": "37bf2f467dd50aea3ab0b1f7d9afdf37aa860b2f8f85b9dfbbf1ec7f6dde1f82"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -234,11 +206,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 49,
+      "line": 46,
       "offset": 9,
       "length": 7,
       "code": {
-        "startLine": 47,
+        "startLine": 44,
         "length": 7,
         "offset": 41,
         "surroundingCode": "    named(\"foss\") {\n      java {\n        srcDirs(\"src/foss/kotlin\")\n      }\n    }"
@@ -249,7 +221,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "49e81de911a16b3eaa106178b4cdb2c44999261f755c47b5dac3bd8da49f102c"
+  "hash": "b2c435fc2c7557d53e5ae9c8372a0b4d175f69b4ef1b82a28a3fd98890760dd6"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -262,11 +234,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 53,
+      "line": 50,
       "offset": 7,
       "length": 4,
       "code": {
-        "startLine": 51,
+        "startLine": 48,
         "length": 4,
         "offset": 34,
         "surroundingCode": "    }\n    named(\"market\") {\n      java {\n        srcDirs(\"src/market/kotlin\")\n      }"
@@ -277,7 +249,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "e32b46784aa8cd68a2a226216ce5d667294cccd9c31ee07d947c546d44da6d9c"
+  "hash": "5c4b8b3e1e81220c65a0f4410941cf411e59fbf3e84014d95423f6e3d7801e24"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -290,11 +262,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 54,
+      "line": 51,
       "offset": 9,
       "length": 7,
       "code": {
-        "startLine": 52,
+        "startLine": 49,
         "length": 7,
         "offset": 43,
         "surroundingCode": "    named(\"market\") {\n      java {\n        srcDirs(\"src/market/kotlin\")\n      }\n    }"
@@ -305,7 +277,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "c584b9509ec706c97c6bb7dcb454f128b83feb9995e72c03d3fe7cf5eb64fc8f"
+  "hash": "53202a5cbb8a7b9aed917d1c4120a05adcb2b7e2b16f6d977da1ddc684cf67f5"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -318,11 +290,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 59,
+      "line": 56,
       "offset": 20,
       "length": 9,
       "code": {
-        "startLine": 57,
+        "startLine": 54,
         "length": 9,
         "offset": 24,
         "surroundingCode": "  }\n\n  packagingOptions.resources.excludes += setOf(\n    \"META-INF/**\",\n    \"okhttp3/**\","
@@ -333,7 +305,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "456c84f4f1c93112ac3f50143ab6d6a7beb840b93baa1ebe9c4a195cefe6afad"
+  "hash": "76f04110e00e64bd913ecbdc616c275a3e8b3ef068d9cf86d9bc3e5f74b85c9b"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -346,11 +318,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 59,
+      "line": 56,
       "offset": 30,
       "length": 8,
       "code": {
-        "startLine": 57,
+        "startLine": 54,
         "length": 8,
         "offset": 34,
         "surroundingCode": "  }\n\n  packagingOptions.resources.excludes += setOf(\n    \"META-INF/**\",\n    \"okhttp3/**\","
@@ -361,7 +333,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "37b0eb985ebb9dbb81609a1f6fced97ddc0b517d138002acb3ffb2c1543f3bd1"
+  "hash": "9b854d7570e87cef227bcef52a9bf0912060dad75c4d773e6419abc75766890d"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -374,11 +346,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 70,
+      "line": 67,
       "offset": 5,
       "length": 7,
       "code": {
-        "startLine": 68,
+        "startLine": 65,
         "length": 7,
         "offset": 14,
         "surroundingCode": "\n  lint {\n    disable += \"AppCompatResource\"\n  }\n"
@@ -389,7 +361,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "7f886cebdd8812c26055ebc3df911a59a2dd487eb6c1430bafd1d9ac9c368d2e"
+  "hash": "24a21dc55f446a847b567db82a6f99d386612a229d913d533afca45f7cd11cec"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -402,11 +374,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 73,
+      "line": 70,
       "offset": 20,
       "length": 12,
       "code": {
-        "startLine": 71,
+        "startLine": 68,
         "length": 12,
         "offset": 24,
         "surroundingCode": "  }\n\n  dependenciesInfo.includeInApk = false\n\n  applicationVariants.all {"
@@ -417,7 +389,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "67704ebecd2639aaa5e5f6f9c97aaf82bb9425adcc366cf521518099ed40be72"
+  "hash": "186ab38c2db5f0dbde141bcd3a994387933b561590b39cf02b1ea5495814525c"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -430,11 +402,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 89,
+      "line": 86,
       "offset": 27,
       "length": 13,
       "code": {
-        "startLine": 87,
+        "startLine": 84,
         "length": 13,
         "offset": 124,
         "surroundingCode": "    val optimizeReleaseRes = task(\"optimize${flavor}ReleaseRes\").doLast {\n      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )"
@@ -445,7 +417,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "d70380a35e73acf9b8711ed658170a0e7f931318f7b7b8e8a3e6c531e524cbda"
+  "hash": "edb9e07d490d98ff32f101027b599e187e00117ebf8587d176aca994d3d62ede"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -458,11 +430,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 89,
+      "line": 86,
       "offset": 41,
       "length": 12,
       "code": {
-        "startLine": 87,
+        "startLine": 84,
         "length": 12,
         "offset": 138,
         "surroundingCode": "    val optimizeReleaseRes = task(\"optimize${flavor}ReleaseRes\").doLast {\n      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )"
@@ -473,7 +445,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "57688d4b9cd72d8f61bbd9a3e0cbb662c6799c0a0532a5d048ca0876dc8115fa"
+  "hash": "3c8d98fff9a3e4646086ca878df0642e9444ac99d7e1708a94cb1472abe403de"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -486,11 +458,11 @@
       "type": "file",
       "path": "app/build.gradle.kts",
       "language": "kotlin",
-      "line": 90,
+      "line": 87,
       "offset": 40,
       "length": 17,
       "code": {
-        "startLine": 88,
+        "startLine": 85,
         "length": 17,
         "offset": 130,
         "surroundingCode": "      val aapt2 = File(\n        androidComponents.sdkComponents.sdkDirectory.get().asFile,\n        \"build-tools/${project.android.buildToolsVersion}/aapt2\"\n      )\n      val zip = Paths.get("
@@ -501,7 +473,7 @@
     "module": "LibChecker.app",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "f21978bc4213955c8f16cef159b7cf1ff02658d5b11df1cb4bfd21285325e9be"
+  "hash": "ed18e3229e192cbce4ea30608c41d281adbc60b92e94518ce81cdb6f61685307"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -514,11 +486,11 @@
       "type": "file",
       "path": "build.gradle.kts",
       "language": "kotlin",
-      "line": 17,
+      "line": 18,
       "offset": 5,
       "length": 35,
       "code": {
-        "startLine": 15,
+        "startLine": 16,
         "length": 35,
         "offset": 84,
         "surroundingCode": "    it.name.contains(\"transformClassesWithHiddenApiRefine\")\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9\")\n  }\n  tasks.matching {"
@@ -529,7 +501,7 @@
     "module": "LibChecker",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "01d94da4354fd39b5b7b3a790be10ed5f23d0fd45aa5e3187d63217598de59c2"
+  "hash": "97c995666fb3022a792a1982e0470db4d8c7ff3e9aa90e841d71df73f5a470b4"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
@@ -542,11 +514,11 @@
       "type": "file",
       "path": "build.gradle.kts",
       "language": "kotlin",
-      "line": 22,
+      "line": 23,
       "offset": 5,
       "length": 35,
       "code": {
-        "startLine": 20,
+        "startLine": 21,
         "length": 35,
         "offset": 81,
         "surroundingCode": "    it.name.contains(\"optimize(.*)ReleaseRes\".toRegex())\n  }.configureEach {\n    notCompatibleWithConfigurationCache(\"optimizeReleaseRes tasks haven't support CC.\")\n  }\n}"
@@ -557,7 +529,7 @@
     "module": "LibChecker",
     "inspectionName": "UnstableApiUsage"
   },
-  "hash": "834ea671ce425662a261d98827bbbe9dc3eb4ec53977cea54005493d4ea84079"
+  "hash": "f3cacd274d17fa83e92fbd21501b9660f1de78ba6d227b812e421995277d5dc4"
 },{
   "tool": "Code Inspection",
   "category": "JVM languages",
