@@ -35,10 +35,6 @@ setupAppModule {
     viewBinding = true
   }
 
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-  }
-
   sourceSets {
     named("main") {
       java {
@@ -126,8 +122,6 @@ configurations.all {
 
 dependencies {
   compileOnly(projects.hiddenApi)
-
-  coreLibraryDesugaring(libs.agp.desugering)
 
   implementation(libs.kotlinX.coroutines)
   implementation(libs.androidX.appCompat)
