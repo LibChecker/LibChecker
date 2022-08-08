@@ -8,7 +8,6 @@ hiddenApiRefine = "3.1.1"
 kotlin = "1.7.10"
 protoc = "3.21.4"
 protoc-javalite = "3.21.4"
-square-moshi = "1.13.0"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.1"
 
@@ -21,6 +20,7 @@ kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref =
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.11.1" }
 ksp = { id = "com.google.devtools.ksp", version = "1.7.10-1.0.6" }
 protobuf = { id = "com.google.protobuf", version = "0.8.19" }
+moshiX = "dev.zacsweers.moshix:0.18.3"
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -49,8 +49,7 @@ androidX-window = "androidx.window:window:1.0.0"
 androidX-security = "androidx.security:security-crypto:1.1.0-alpha03"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
-square-moshi = { module = "com.squareup.moshi:moshi", version.ref = "square-moshi" }
-square-moshi-compiler = { module = "com.squareup.moshi:moshi-kotlin-codegen", version.ref = "square-moshi" }
+square-moshi = "com.squareup.moshi:moshi:1.13.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.10.0"
 square-okio = "com.squareup.okio:okio:3.2.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }

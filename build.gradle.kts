@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.kotlinter) apply false
   alias(libs.plugins.hiddenApiRefine) apply false
   alias(libs.plugins.ksp) apply false
+  alias(libs.plugins.moshiX) apply false
 }
 
 allprojects {
