@@ -31,6 +31,7 @@ import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
@@ -44,10 +45,7 @@ import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import retrofit2.HttpException
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
+import java.text.SimpleDateFormat
 import java.util.Locale
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
@@ -412,10 +410,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         GlobalValues.isGitHubUnreachable = false
       }
     }.getOrNull() ?: return null
-    val instant = Instant.parse(result.pushedAt)
-    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-      .withLocale(Locale.getDefault())
-      .withZone(ZoneId.systemDefault())
-    return formatter.format(instant)
+    val pushedAt = DateUtils.parseIso8601DateTime(result.pushed_at) ?: return null
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return formatter.format(pushedAt)
   }
 }

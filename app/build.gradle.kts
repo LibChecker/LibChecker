@@ -15,6 +15,7 @@ plugins {
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.moshiX)
 }
 
 ksp {
@@ -32,10 +33,6 @@ setupAppModule {
 
   buildFeatures {
     viewBinding = true
-  }
-
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
   }
 
   sourceSets {
@@ -126,8 +123,6 @@ configurations.all {
 dependencies {
   compileOnly(projects.hiddenApi)
 
-  coreLibraryDesugaring(libs.agp.desugering)
-
   implementation(libs.kotlinX.coroutines)
   implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
@@ -156,7 +151,6 @@ dependencies {
   implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
-  ksp(libs.square.moshi.compiler)
 
   implementation(libs.lottie)
   implementation(libs.drakeet.about)
