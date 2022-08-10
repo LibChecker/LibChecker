@@ -19,7 +19,9 @@ import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_COMPONENT_PROVIDER = 3
 
@@ -65,26 +67,28 @@ class SnapshotComponentProvider : BaseNodeProvider() {
 
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
 
-      (context as? LifecycleOwner)?.lifecycleScope?.launch {
+      (this@SnapshotComponentProvider.context as? LifecycleOwner)?.lifecycleScope?.launch {
         val rule = LCRules.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
-        setChip(rule, colorRes)
-        if (rule != null) {
-          setChipOnClickListener {
-            if (AntiShakeUtils.isInvalidClick(it)) {
-              return@setChipOnClickListener
-            }
-            val name = item.item.name
-            LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
-              .apply {
-                show(
-                  (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager,
-                  tag
-                )
+        withContext(Dispatchers.Main) {
+          setChip(rule, colorRes)
+          if (rule != null) {
+            setChipOnClickListener {
+              if (AntiShakeUtils.isInvalidClick(it)) {
+                return@setChipOnClickListener
               }
+              val name = item.item.name
+              LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
+                .apply {
+                  show(
+                    (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager,
+                    tag
+                  )
+                }
+            }
+          } else {
+            setChipOnClickListener(null)
           }
-        } else {
-          setChipOnClickListener(null)
         }
       }
     }
