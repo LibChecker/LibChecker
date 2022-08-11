@@ -1,8 +1,8 @@
 <resources>
   <!--  General  -->
   <string name="app_name">LibChecker</string>
-  <string name="title_app_list">應用</string>
-  <string name="title_statistics">統計</string>
+  <string name="title_app_list">應用程式</string>
+  <string name="title_statistics">統計資料</string>
   <string name="title_snapshot">快照</string>
   <string name="title_settings">設定</string>
   <string name="title_album">相簿</string>
@@ -33,7 +33,7 @@
   <string name="title_statistics_dialog">%s架構的 Apps</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
   <string name="tab_chart">圖表</string>
-  <string name="tab_lib_reference_statistics">庫參考統計</string>
+  <string name="tab_lib_reference_statistics">庫參考統計資料</string>
   <string name="not_marked_lib">未標示的庫</string>
 
   <string name="submenu_title_component">元件</string>
