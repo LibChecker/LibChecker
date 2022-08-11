@@ -6,6 +6,9 @@ on:
       - master
       - 'releases/*'
 
+env:
+  APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
+
 jobs:
   qodana:
     runs-on: ubuntu-latest
@@ -14,8 +17,24 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - uses: actions/setup-java@v3.4.1
+        with:
+          distribution: 'zulu'
+          java-version: 17
+      - uses: gradle/wrapper-validation-action@v1.0.4
+      - name: Initialize Gradle Project
+        uses: gradle/gradle-build-action@v2.2.2
+        with:
+          arguments: build
+
+      # Initialize Gradle Project to build BuildConfig.java
+
       - name: 'Qodana Scan'
         uses: JetBrains/qodana-action@v2022.2.1
+        with:
+          args: scan,-l,jetbrains/qodana-jvm-android,--yaml-name,qodana.yaml
+          use-caches: false
+          # DO NOT USE CACHES. Leads to fail
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
