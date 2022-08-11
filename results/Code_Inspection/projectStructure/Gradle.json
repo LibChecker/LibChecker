@@ -2,6 +2,874 @@
   "gradleJvm": "#JAVA_HOME",
   "libraries": [
     {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-stdlib-jdk8",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-stdlib",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-stdlib-common",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains:annotations:13.0",
+      "gradleName": "org.jetbrains:annotations:13.0",
+      "unresolved": false,
+      "groupId": "org.jetbrains",
+      "artifactId": "annotations",
+      "version": "13.0"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-stdlib-jdk7",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.tools.refine:annotation:3.1.1",
+      "gradleName": "dev.rikka.tools.refine:annotation:3.1.1",
+      "unresolved": false,
+      "groupId": "dev.rikka.tools.refine",
+      "artifactId": "annotation",
+      "version": "3.1.1"
+    },
+    {
+      "ideaName": "Gradle: androidx.annotation:annotation:1.4.0",
+      "gradleName": "androidx.annotation:annotation:1.4.0",
+      "unresolved": false,
+      "groupId": "androidx.annotation",
+      "artifactId": "annotation",
+      "version": "1.4.0"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains:annotations:20.1.0",
+      "gradleName": "org.jetbrains:annotations:20.1.0",
+      "unresolved": false,
+      "groupId": "org.jetbrains",
+      "artifactId": "annotations",
+      "version": "20.1.0"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:shark-android:2.9.1",
+      "gradleName": "com.squareup.leakcanary:shark-android:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "shark-android",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:shark:2.9.1",
+      "gradleName": "com.squareup.leakcanary:shark:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "shark",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:shark-graph:2.9.1",
+      "gradleName": "com.squareup.leakcanary:shark-graph:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "shark-graph",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:shark-hprof:2.9.1",
+      "gradleName": "com.squareup.leakcanary:shark-hprof:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "shark-hprof",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:shark-log:2.9.1",
+      "gradleName": "com.squareup.leakcanary:shark-log:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "shark-log",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher:2.9.1",
+      "gradleName": "com.squareup.leakcanary:leakcanary-object-watcher:2.9.1",
+      "unresolved": false,
+      "groupId": "com.squareup.leakcanary",
+      "artifactId": "leakcanary-object-watcher",
+      "version": "2.9.1"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-parcelize-runtime",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.7.10",
+      "gradleName": "org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.7.10",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlin",
+      "artifactId": "kotlin-android-extensions-runtime",
+      "version": "1.7.10"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+      "gradleName": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlinx",
+      "artifactId": "kotlinx-coroutines-android",
+      "version": "1.6.4"
+    },
+    {
+      "ideaName": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4",
+      "gradleName": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4",
+      "unresolved": false,
+      "groupId": "org.jetbrains.kotlinx",
+      "artifactId": "kotlinx-coroutines-core-jvm",
+      "version": "1.6.4"
+    },
+    {
+      "ideaName": "Gradle: androidx.arch.core:core-common:2.1.0",
+      "gradleName": "androidx.arch.core:core-common:2.1.0",
+      "unresolved": false,
+      "groupId": "androidx.arch.core",
+      "artifactId": "core-common",
+      "version": "2.1.0"
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-common:2.5.1",
+      "gradleName": "androidx.lifecycle:lifecycle-common:2.5.1",
+      "unresolved": false,
+      "groupId": "androidx.lifecycle",
+      "artifactId": "lifecycle-common",
+      "version": "2.5.1"
+    },
+    {
+      "ideaName": "Gradle: androidx.collection:collection:1.2.0",
+      "gradleName": "androidx.collection:collection:1.2.0",
+      "unresolved": false,
+      "groupId": "androidx.collection",
+      "artifactId": "collection",
+      "version": "1.2.0"
+    },
+    {
+      "ideaName": "Gradle: androidx.collection:collection-ktx:1.1.0",
+      "gradleName": "androidx.collection:collection-ktx:1.1.0",
+      "unresolved": false,
+      "groupId": "androidx.collection",
+      "artifactId": "collection-ktx",
+      "version": "1.1.0"
+    },
+    {
+      "ideaName": "Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+      "gradleName": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+      "unresolved": false,
+      "groupId": "com.google.guava",
+      "artifactId": "listenablefuture",
+      "version": "9999.0-empty-to-avoid-conflict-with-guava"
+    },
+    {
+      "ideaName": "Gradle: androidx.room:room-common:2.5.0-alpha02",
+      "gradleName": "androidx.room:room-common:2.5.0-alpha02",
+      "unresolved": false,
+      "groupId": "androidx.room",
+      "artifactId": "room-common",
+      "version": "2.5.0-alpha02"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.okhttp3:okhttp:4.10.0",
+      "gradleName": "com.squareup.okhttp3:okhttp:4.10.0",
+      "unresolved": false,
+      "groupId": "com.squareup.okhttp3",
+      "artifactId": "okhttp",
+      "version": "4.10.0"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.okio:okio-jvm:3.2.0",
+      "gradleName": "com.squareup.okio:okio-jvm:3.2.0",
+      "unresolved": false,
+      "groupId": "com.squareup.okio",
+      "artifactId": "okio-jvm",
+      "version": "3.2.0"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.retrofit2:retrofit:2.9.0",
+      "gradleName": "com.squareup.retrofit2:retrofit:2.9.0",
+      "unresolved": false,
+      "groupId": "com.squareup.retrofit2",
+      "artifactId": "retrofit",
+      "version": "2.9.0"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.retrofit2:converter-moshi:2.9.0",
+      "gradleName": "com.squareup.retrofit2:converter-moshi:2.9.0",
+      "unresolved": false,
+      "groupId": "com.squareup.retrofit2",
+      "artifactId": "converter-moshi",
+      "version": "2.9.0"
+    },
+    {
+      "ideaName": "Gradle: com.squareup.moshi:moshi:1.13.0",
+      "gradleName": "com.squareup.moshi:moshi:1.13.0",
+      "unresolved": false,
+      "groupId": "com.squareup.moshi",
+      "artifactId": "moshi",
+      "version": "1.13.0"
+    },
+    {
+      "ideaName": "Gradle: com.google.protobuf:protobuf-javalite:3.21.5",
+      "gradleName": "com.google.protobuf:protobuf-javalite:3.21.5",
+      "unresolved": false,
+      "groupId": "com.google.protobuf",
+      "artifactId": "protobuf-javalite",
+      "version": "3.21.5"
+    },
+    {
+      "ideaName": "Gradle: javax.annotation:javax.annotation-api:1.3.2",
+      "gradleName": "javax.annotation:javax.annotation-api:1.3.2",
+      "unresolved": false,
+      "groupId": "javax.annotation",
+      "artifactId": "javax.annotation-api",
+      "version": "1.3.2"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-okhttp:1.48.1",
+      "gradleName": "io.grpc:grpc-okhttp:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-okhttp",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-core:1.48.1",
+      "gradleName": "io.grpc:grpc-core:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-core",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-api:1.48.1",
+      "gradleName": "io.grpc:grpc-api:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-api",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-context:1.48.1",
+      "gradleName": "io.grpc:grpc-context:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-context",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: com.google.code.findbugs:jsr305:3.0.2",
+      "gradleName": "com.google.code.findbugs:jsr305:3.0.2",
+      "unresolved": false,
+      "groupId": "com.google.code.findbugs",
+      "artifactId": "jsr305",
+      "version": "3.0.2"
+    },
+    {
+      "ideaName": "Gradle: com.google.errorprone:error_prone_annotations:2.14.0",
+      "gradleName": "com.google.errorprone:error_prone_annotations:2.14.0",
+      "unresolved": false,
+      "groupId": "com.google.errorprone",
+      "artifactId": "error_prone_annotations",
+      "version": "2.14.0"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-protobuf-lite:1.48.1",
+      "gradleName": "io.grpc:grpc-protobuf-lite:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-protobuf-lite",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: io.grpc:grpc-stub:1.48.1",
+      "gradleName": "io.grpc:grpc-stub:1.48.1",
+      "unresolved": false,
+      "groupId": "io.grpc",
+      "artifactId": "grpc-stub",
+      "version": "1.48.1"
+    },
+    {
+      "ideaName": "Gradle: com.google.guava:guava:31.1-android",
+      "gradleName": "com.google.guava:guava:31.1-android",
+      "unresolved": false,
+      "groupId": "com.google.guava",
+      "artifactId": "guava",
+      "version": "31.1-android"
+    },
+    {
+      "ideaName": "Gradle: com.google.guava:failureaccess:1.0.1",
+      "gradleName": "com.google.guava:failureaccess:1.0.1",
+      "unresolved": false,
+      "groupId": "com.google.guava",
+      "artifactId": "failureaccess",
+      "version": "1.0.1"
+    },
+    {
+      "ideaName": "Gradle: org.checkerframework:checker-qual:3.12.0",
+      "gradleName": "org.checkerframework:checker-qual:3.12.0",
+      "unresolved": false,
+      "groupId": "org.checkerframework",
+      "artifactId": "checker-qual",
+      "version": "3.12.0"
+    },
+    {
+      "ideaName": "Gradle: com.google.j2objc:j2objc-annotations:1.3",
+      "gradleName": "com.google.j2objc:j2objc-annotations:1.3",
+      "unresolved": false,
+      "groupId": "com.google.j2objc",
+      "artifactId": "j2objc-annotations",
+      "version": "1.3"
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.tools.refine:runtime:3.1.1",
+      "gradleName": "dev.rikka.tools.refine:runtime:3.1.1",
+      "unresolved": false,
+      "groupId": "dev.rikka.tools.refine",
+      "artifactId": "runtime",
+      "version": "3.1.1"
+    },
+    {
+      "ideaName": "Gradle: androidx.databinding:databinding-common:4.2.2",
+      "gradleName": "androidx.databinding:databinding-common:4.2.2",
+      "unresolved": false,
+      "groupId": "androidx.databinding",
+      "artifactId": "databinding-common",
+      "version": "4.2.2"
+    },
+    {
+      "ideaName": "Gradle: org.smali:dexlib2:2.5.2",
+      "gradleName": "org.smali:dexlib2:2.5.2",
+      "unresolved": false,
+      "groupId": "org.smali",
+      "artifactId": "dexlib2",
+      "version": "2.5.2"
+    },
+    {
+      "ideaName": "Gradle: org.slf4j:slf4j-simple:1.7.36",
+      "gradleName": "org.slf4j:slf4j-simple:1.7.36",
+      "unresolved": false,
+      "groupId": "org.slf4j",
+      "artifactId": "slf4j-simple",
+      "version": "1.7.36"
+    },
+    {
+      "ideaName": "Gradle: org.slf4j:slf4j-api:1.7.36",
+      "gradleName": "org.slf4j:slf4j-api:1.7.36",
+      "unresolved": false,
+      "groupId": "org.slf4j",
+      "artifactId": "slf4j-api",
+      "version": "1.7.36"
+    },
+    {
+      "ideaName": "Gradle: commons-io:commons-io:2.11.0",
+      "gradleName": "commons-io:commons-io:2.11.0",
+      "unresolved": false,
+      "groupId": "commons-io",
+      "artifactId": "commons-io",
+      "version": "2.11.0"
+    },
+    {
+      "ideaName": "Gradle: androidx.databinding:viewbinding:7.2.2@aar",
+      "gradleName": "androidx.databinding:viewbinding:7.2.2@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-android:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-android:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-android-core:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-android-core:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-android-utils:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-android-utils:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-support-fragments:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-object-watcher-android-support-fragments:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android:2.9.1@aar",
+      "gradleName": "com.squareup.leakcanary:leakcanary-object-watcher-android:2.9.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.core:core-ktx:1.9.0-alpha05@aar",
+      "gradleName": "androidx.core:core-ktx:1.9.0-alpha05@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.core:core:1.9.0-alpha05@aar",
+      "gradleName": "androidx.core:core:1.9.0-alpha05@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.annotation:annotation-experimental:1.1.0@aar",
+      "gradleName": "androidx.annotation:annotation-experimental:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-runtime:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-runtime:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.versionedparcelable:versionedparcelable:1.1.1@aar",
+      "gradleName": "androidx.versionedparcelable:versionedparcelable:1.1.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.activity:activity-ktx:1.5.1@aar",
+      "gradleName": "androidx.activity:activity-ktx:1.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.activity:activity:1.5.1@aar",
+      "gradleName": "androidx.activity:activity:1.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-viewmodel:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-viewmodel:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-livedata-core:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-livedata-core:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.savedstate:savedstate:1.2.0@aar",
+      "gradleName": "androidx.savedstate:savedstate:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-runtime-ktx:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.savedstate:savedstate-ktx:1.2.0@aar",
+      "gradleName": "androidx.savedstate:savedstate-ktx:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.fragment:fragment-ktx:1.5.1@aar",
+      "gradleName": "androidx.fragment:fragment-ktx:1.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.fragment:fragment:1.5.1@aar",
+      "gradleName": "androidx.fragment:fragment:1.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.loader:loader:1.0.0@aar",
+      "gradleName": "androidx.loader:loader:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-livedata:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-livedata:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.arch.core:core-runtime:2.1.0@aar",
+      "gradleName": "androidx.arch.core:core-runtime:2.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.viewpager:viewpager:1.0.0@aar",
+      "gradleName": "androidx.viewpager:viewpager:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.customview:customview:1.1.0@aar",
+      "gradleName": "androidx.customview:customview:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.constraintlayout:constraintlayout:2.1.4@aar",
+      "gradleName": "androidx.constraintlayout:constraintlayout:2.1.4@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.browser:browser:1.4.0@aar",
+      "gradleName": "androidx.browser:browser:1.4.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.viewpager2:viewpager2:1.1.0-alpha01@aar",
+      "gradleName": "androidx.viewpager2:viewpager2:1.1.0-alpha01@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.recyclerview:recyclerview:1.2.1@aar",
+      "gradleName": "androidx.recyclerview:recyclerview:1.2.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.preference:preference-ktx:1.2.0@aar",
+      "gradleName": "androidx.preference:preference-ktx:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.preference:preference:1.2.0@aar",
+      "gradleName": "androidx.preference:preference:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar",
+      "gradleName": "androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.window:window:1.0.0@aar",
+      "gradleName": "androidx.window:window:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.security:security-crypto:1.1.0-alpha03@aar",
+      "gradleName": "androidx.security:security-crypto:1.1.0-alpha03@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-livedata-ktx:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.lifecycle:lifecycle-service:2.5.1@aar",
+      "gradleName": "androidx.lifecycle:lifecycle-service:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.room:room-runtime:2.5.0-alpha02@aar",
+      "gradleName": "androidx.room:room-runtime:2.5.0-alpha02@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.sqlite:sqlite:2.3.0-alpha03@aar",
+      "gradleName": "androidx.sqlite:sqlite:2.3.0-alpha03@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.sqlite:sqlite-framework:2.3.0-alpha03@aar",
+      "gradleName": "androidx.sqlite:sqlite-framework:2.3.0-alpha03@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.room:room-ktx:2.5.0-alpha02@aar",
+      "gradleName": "androidx.room:room-ktx:2.5.0-alpha02@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
+      "gradleName": "com.google.android.material:material:1.7.0-alpha02@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.cardview:cardview:1.0.0@aar",
+      "gradleName": "androidx.cardview:cardview:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar",
+      "gradleName": "androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.drawerlayout:drawerlayout:1.1.1@aar",
+      "gradleName": "androidx.drawerlayout:drawerlayout:1.1.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.dynamicanimation:dynamicanimation:1.0.0@aar",
+      "gradleName": "androidx.dynamicanimation:dynamicanimation:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar",
+      "gradleName": "androidx.legacy:legacy-support-core-utils:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.documentfile:documentfile:1.0.0@aar",
+      "gradleName": "androidx.documentfile:documentfile:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar",
+      "gradleName": "androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.print:print:1.0.0@aar",
+      "gradleName": "androidx.print:print:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.transition:transition:1.4.1@aar",
+      "gradleName": "androidx.transition:transition:1.4.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.vectordrawable:vectordrawable:1.1.0@aar",
+      "gradleName": "androidx.vectordrawable:vectordrawable:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: io.coil-kt:coil:2.1.0@aar",
+      "gradleName": "io.coil-kt:coil:2.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: io.coil-kt:coil-base:2.1.0@aar",
+      "gradleName": "io.coil-kt:coil-base:2.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.zhaobozhen.libraries:me:1.1.1@aar",
+      "gradleName": "com.github.zhaobozhen.libraries:me:1.1.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.drakeet.about:about:2.5.1@aar",
+      "gradleName": "com.drakeet.about:about:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.drakeet.multitype:multitype:4.3.0@aar",
+      "gradleName": "com.drakeet.multitype:multitype:4.3.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.zhaobozhen.libraries:utils:1.1.1@aar",
+      "gradleName": "com.github.zhaobozhen.libraries:utils:1.1.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.zhaobozhen.libraries:axml:1.1.1@aar",
+      "gradleName": "com.github.zhaobozhen.libraries:axml:1.1.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+      "gradleName": "com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.airbnb.android:lottie:5.2.0@aar",
+      "gradleName": "com.airbnb.android:lottie:5.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7@aar",
+      "gradleName": "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.databinding:databinding-runtime:4.2.2@aar",
+      "gradleName": "androidx.databinding:databinding-runtime:4.2.2@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.databinding:databinding-adapters:4.2.2@aar",
+      "gradleName": "androidx.databinding:databinding-adapters:4.2.2@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.github.PhilJay:MPAndroidChart:3.1.0@aar",
+      "gradleName": "com.github.PhilJay:MPAndroidChart:3.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.jakewharton.timber:timber:5.0.1@aar",
+      "gradleName": "com.jakewharton.timber:timber:5.0.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.jakewharton:process-phoenix:2.1.2@aar",
+      "gradleName": "com.jakewharton:process-phoenix:2.1.2@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: com.jonathanfinerty.once:once:1.3.1@aar",
+      "gradleName": "com.jonathanfinerty.once:once:1.3.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: me.saket.cascade:cascade:1.3.0@aar",
+      "gradleName": "me.saket.cascade:cascade:1.3.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: me.zhanghai.android.fastscroll:library:1.1.8@aar",
+      "gradleName": "me.zhanghai.android.fastscroll:library:1.1.8@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: me.zhanghai.android.appiconloader:appiconloader:1.4.0@aar",
+      "gradleName": "me.zhanghai.android.appiconloader:appiconloader:1.4.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: org.lsposed.hiddenapibypass:hiddenapibypass:4.3@aar",
+      "gradleName": "org.lsposed.hiddenapibypass:hiddenapibypass:4.3@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.core:core:1.4.1@aar",
+      "gradleName": "dev.rikka.rikkax.core:core:1.4.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.insets:insets:1.3.0@aar",
+      "gradleName": "dev.rikka.rikkax.insets:insets:1.3.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.material:material:2.5.1@aar",
+      "gradleName": "dev.rikka.rikkax.material:material:2.5.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.1.0@aar",
+      "gradleName": "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.interpolator:interpolator:1.0.0@aar",
+      "gradleName": "androidx.interpolator:interpolator:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+      "gradleName": "dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar",
+      "gradleName": "androidx.cursoradapter:cursoradapter:1.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
+      "gradleName": "androidx.appcompat:appcompat-resources:1.4.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.vectordrawable:vectordrawable-animated:1.1.0@aar",
+      "gradleName": "androidx.vectordrawable:vectordrawable-animated:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.core:core-ktx:1.4.0@aar",
+      "gradleName": "dev.rikka.rikkax.core:core-ktx:1.4.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0@aar",
+      "gradleName": "dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.widget:borderview:1.1.0@aar",
+      "gradleName": "dev.rikka.rikkax.widget:borderview:1.1.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1@aar",
+      "gradleName": "dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.preference:simplemenu-preference:1.0.3@aar",
+      "gradleName": "dev.rikka.rikkax.preference:simplemenu-preference:1.0.3@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: dev.rikka.rikkax.material:material-preference:2.0.0@aar",
+      "gradleName": "dev.rikka.rikkax.material:material-preference:2.0.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.annotation:annotation:1.3.0",
+      "gradleName": "androidx.annotation:annotation:1.3.0",
+      "unresolved": false,
+      "groupId": "androidx.annotation",
+      "artifactId": "annotation",
+      "version": "1.3.0"
+    },
+    {
+      "ideaName": "Gradle: androidx.collection:collection:1.1.0",
+      "gradleName": "androidx.collection:collection:1.1.0",
+      "unresolved": false,
+      "groupId": "androidx.collection",
+      "artifactId": "collection",
+      "version": "1.1.0"
+    },
+    {
+      "ideaName": "Gradle: androidx.transition:transition:1.2.0@aar",
+      "gradleName": "androidx.transition:transition:1.2.0@aar",
+      "unresolved": false
+    },
+    {
       "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21",
       "gradleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21",
       "unresolved": false,
@@ -104,14 +972,6 @@
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-stdlib-common",
       "version": "1.6.21"
-    },
-    {
-      "ideaName": "Gradle: org.jetbrains:annotations:13.0",
-      "gradleName": "org.jetbrains:annotations:13.0",
-      "unresolved": false,
-      "groupId": "org.jetbrains",
-      "artifactId": "annotations",
-      "version": "13.0"
     },
     {
       "ideaName": "Gradle: com.android.tools.build:manifest-merger:30.2.2",
@@ -1056,38 +1916,6 @@
       "groupId": "org.jetbrains.kotlin",
       "artifactId": "kotlin-build-common",
       "version": "1.7.10"
-    },
-    {
-      "ideaName": "Gradle: com.google.guava:failureaccess:1.0.1",
-      "gradleName": "com.google.guava:failureaccess:1.0.1",
-      "unresolved": false,
-      "groupId": "com.google.guava",
-      "artifactId": "failureaccess",
-      "version": "1.0.1"
-    },
-    {
-      "ideaName": "Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
-      "gradleName": "com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
-      "unresolved": false,
-      "groupId": "com.google.guava",
-      "artifactId": "listenablefuture",
-      "version": "9999.0-empty-to-avoid-conflict-with-guava"
-    },
-    {
-      "ideaName": "Gradle: com.google.code.findbugs:jsr305:3.0.2",
-      "gradleName": "com.google.code.findbugs:jsr305:3.0.2",
-      "unresolved": false,
-      "groupId": "com.google.code.findbugs",
-      "artifactId": "jsr305",
-      "version": "3.0.2"
-    },
-    {
-      "ideaName": "Gradle: com.google.j2objc:j2objc-annotations:1.3",
-      "gradleName": "com.google.j2objc:j2objc-annotations:1.3",
-      "unresolved": false,
-      "groupId": "com.google.j2objc",
-      "artifactId": "j2objc-annotations",
-      "version": "1.3"
     },
     {
       "ideaName": "Gradle: org.jetbrains.kotlin:kotlin-daemon-embeddable:1.7.10",

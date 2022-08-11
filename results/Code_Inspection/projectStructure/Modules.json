@@ -29,7 +29,7 @@
       ],
       "orderEntries": [
         {
-          "name": "jbr-11",
+          "name": "Android API 33, extension level 3 Platform",
           "type": "SDK"
         },
         {
@@ -48,7 +48,7 @@
       ],
       "orderEntries": [
         {
-          "name": "jbr-11",
+          "name": "Android API 33, extension level 3 Platform",
           "type": "SDK"
         },
         {
@@ -73,6 +73,2152 @@
         {
           "name": "<Module source>",
           "type": "Own sources"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.app.main",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/aidl_source_output_dir/fossDebug/out",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/aidl_source_output_dir/fossDebug/out",
+              "type": "GeneratedSource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ap_generated_sources/fossDebug/out",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/ap_generated_sources/fossDebug/out",
+              "type": "GeneratedSource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ksp/fossDebug/java",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/ksp/fossDebug/java",
+              "type": "Source",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/renderscript_source_output_dir/fossDebug/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/res/resValues/foss/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/res/resValues/foss/debug",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/res/rs/foss/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/buildConfig/foss/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/source/buildConfig/foss/debug",
+              "type": "GeneratedSource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebug/grpc",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebug/grpc",
+              "type": "Source",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebug/java",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebug/java",
+              "type": "Source",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/src/debug/res",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/foss",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/src/foss/kotlin",
+              "type": "Source",
+              "packagePrefix": ""
+            },
+            {
+              "path": "file://$PROJECT_DIR$/app/src/foss/res",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/fossDebug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/main",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/src/main/aidl",
+              "type": "Source",
+              "packagePrefix": ""
+            },
+            {
+              "path": "file://$PROJECT_DIR$/app/src/main/kotlin",
+              "type": "Source",
+              "packagePrefix": ""
+            },
+            {
+              "path": "file://$PROJECT_DIR$/app/src/main/assets",
+              "type": "Resource",
+              "packagePrefix": ""
+            },
+            {
+              "path": "file://$PROJECT_DIR$/app/src/main/res",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "LibChecker.hidden-api.main",
+          "type": "Module"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.4.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:20.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-android:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-graph:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-hprof:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-log:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-common:2.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-common:2.5.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection:1.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection-ktx:1.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-common:2.5.0-alpha02",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okhttp3:okhttp:4.10.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okio:okio-jvm:3.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:retrofit:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:converter-moshi:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.moshi:moshi:1.13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.protobuf:protobuf-javalite:3.21.5",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: javax.annotation:javax.annotation-api:1.3.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-okhttp:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-core:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-api:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-context:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.code.findbugs:jsr305:3.0.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.errorprone:error_prone_annotations:2.14.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-protobuf-lite:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-stub:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:guava:31.1-android",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:failureaccess:1.0.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.checkerframework:checker-qual:3.12.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.j2objc:j2objc-annotations:1.3",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.tools.refine:runtime:3.1.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-common:4.2.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.smali:dexlib2:2.5.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-simple:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-api:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: commons-io:commons-io:2.11.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:viewbinding:7.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-utils:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-support-fragments:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core-ktx:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation-experimental:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.versionedparcelable:versionedparcelable:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.loader:loader:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-runtime:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager:viewpager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.customview:customview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.constraintlayout:constraintlayout:2.1.4@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.browser:browser:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager2:viewpager2:1.1.0-alpha01@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.recyclerview:recyclerview:1.2.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.window:window:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.security:security-crypto:1.1.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-service:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-runtime:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite-framework:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-ktx:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cardview:cardview:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.drawerlayout:drawerlayout:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.dynamicanimation:dynamicanimation:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.documentfile:documentfile:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.print:print:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.transition:transition:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil-base:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:me:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.about:about:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.multitype:multitype:4.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:utils:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:axml:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.airbnb.android:lottie:5.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-runtime:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-adapters:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.PhilJay:MPAndroidChart:3.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton.timber:timber:5.0.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton:process-phoenix:2.1.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jonathanfinerty.once:once:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.saket.cascade:cascade:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.fastscroll:library:1.1.8@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.appiconloader:appiconloader:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.lsposed.hiddenapibypass:hiddenapibypass:4.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.insets:insets:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.interpolator:interpolator:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable-animated:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core-ktx:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.widget:borderview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.preference:simplemenu-preference:1.0.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material-preference:2.0.0@aar",
+          "type": "Library"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.app.unitTest",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ap_generated_sources/fossDebugUnitTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ksp/fossDebugUnitTest/java",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebugUnitTest/grpc",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebugUnitTest/java",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/test",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/testDebug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/testFoss",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/testFossDebug",
+          "sourceFolders": []
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "LibChecker.app.main",
+          "type": "Module"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.4.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:20.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-android:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-graph:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-hprof:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-log:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-common:2.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-common:2.5.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection:1.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection-ktx:1.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-common:2.5.0-alpha02",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okhttp3:okhttp:4.10.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okio:okio-jvm:3.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:retrofit:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:converter-moshi:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.moshi:moshi:1.13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.protobuf:protobuf-javalite:3.21.5",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: javax.annotation:javax.annotation-api:1.3.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-okhttp:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-core:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-api:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-context:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.code.findbugs:jsr305:3.0.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.errorprone:error_prone_annotations:2.14.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-protobuf-lite:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-stub:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:guava:31.1-android",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:failureaccess:1.0.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.checkerframework:checker-qual:3.12.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.j2objc:j2objc-annotations:1.3",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.tools.refine:runtime:3.1.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-common:4.2.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.smali:dexlib2:2.5.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-simple:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-api:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: commons-io:commons-io:2.11.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:viewbinding:7.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-utils:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-support-fragments:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core-ktx:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation-experimental:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.versionedparcelable:versionedparcelable:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.loader:loader:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-runtime:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager:viewpager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.customview:customview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.constraintlayout:constraintlayout:2.1.4@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.browser:browser:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager2:viewpager2:1.1.0-alpha01@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.recyclerview:recyclerview:1.2.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.window:window:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.security:security-crypto:1.1.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-service:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-runtime:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite-framework:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-ktx:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cardview:cardview:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.drawerlayout:drawerlayout:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.dynamicanimation:dynamicanimation:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.documentfile:documentfile:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.print:print:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.transition:transition:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil-base:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:me:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.about:about:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.multitype:multitype:4.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:utils:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:axml:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.airbnb.android:lottie:5.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-runtime:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-adapters:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.PhilJay:MPAndroidChart:3.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton.timber:timber:5.0.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton:process-phoenix:2.1.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jonathanfinerty.once:once:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.saket.cascade:cascade:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.fastscroll:library:1.1.8@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.appiconloader:appiconloader:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.lsposed.hiddenapibypass:hiddenapibypass:4.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.insets:insets:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.interpolator:interpolator:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable-animated:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core-ktx:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.widget:borderview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.preference:simplemenu-preference:1.0.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material-preference:2.0.0@aar",
+          "type": "Library"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.app.androidTest",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/aidl_source_output_dir/fossDebugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ap_generated_sources/fossDebugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/ksp/fossDebugAndroidTest/java",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/renderscript_source_output_dir/fossDebugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/res/resValues/androidTest/foss/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/app/build/generated/res/resValues/androidTest/foss/debug",
+              "type": "TestResource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/res/rs/androidTest/foss/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/buildConfig/androidTest/foss/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebugAndroidTest/grpc",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/build/generated/source/proto/fossDebugAndroidTest/java",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/androidTest",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/androidTestDebug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/androidTestFoss",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/app/src/androidTestFossDebug",
+          "sourceFolders": []
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "LibChecker.app.main",
+          "type": "Module"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.3.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-android:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-graph:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-hprof:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:shark-log:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher:2.9.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:20.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-parcelize-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-android-extensions-runtime:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-common:2.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-common:2.5.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection:1.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.collection:collection-ktx:1.1.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-common:2.5.0-alpha02",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okhttp3:okhttp:4.10.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.okio:okio-jvm:3.2.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:retrofit:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.retrofit2:converter-moshi:2.9.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.moshi:moshi:1.13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.protobuf:protobuf-javalite:3.21.5",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: javax.annotation:javax.annotation-api:1.3.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-okhttp:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-core:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-api:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-context:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.code.findbugs:jsr305:3.0.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.errorprone:error_prone_annotations:2.14.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-protobuf-lite:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.grpc:grpc-stub:1.48.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:guava:31.1-android",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.guava:failureaccess:1.0.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.checkerframework:checker-qual:3.12.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.j2objc:j2objc-annotations:1.3",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.tools.refine:runtime:3.1.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-common:4.2.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.smali:dexlib2:2.5.2",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-simple:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.slf4j:slf4j-api:1.7.36",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: commons-io:commons-io:2.11.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:viewbinding:7.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-core:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-android-utils:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-androidx:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android-support-fragments:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.squareup.leakcanary:leakcanary-object-watcher-android:2.9.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core-ktx:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.core:core:1.9.0-alpha05@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation-experimental:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.versionedparcelable:versionedparcelable:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.activity:activity:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-runtime-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.savedstate:savedstate-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment-ktx:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.fragment:fragment:1.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.loader:loader:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.arch.core:core-runtime:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager:viewpager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.customview:customview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-core-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.constraintlayout:constraintlayout:2.1.4@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.browser:browser:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.viewpager2:viewpager2:1.1.0-alpha01@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.recyclerview:recyclerview:1.2.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference-ktx:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.preference:preference:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.slidingpanelayout:slidingpanelayout:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.window:window:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.security:security-crypto:1.1.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-livedata-ktx:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.lifecycle:lifecycle-service:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-runtime:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.sqlite:sqlite-framework:2.3.0-alpha03@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.room:room-ktx:2.5.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cardview:cardview:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.coordinatorlayout:coordinatorlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.drawerlayout:drawerlayout:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.dynamicanimation:dynamicanimation:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.documentfile:documentfile:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.print:print:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.transition:transition:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: io.coil-kt:coil-base:2.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:me:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.about:about:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.drakeet.multitype:multitype:4.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:utils:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen.libraries:axml:1.1.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.airbnb.android:lottie:5.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.7@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-runtime:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.databinding:databinding-adapters:4.2.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.github.PhilJay:MPAndroidChart:3.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton.timber:timber:5.0.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jakewharton:process-phoenix:2.1.2@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: com.jonathanfinerty.once:once:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.saket.cascade:cascade:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.fastscroll:library:1.1.8@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: me.zhanghai.android.appiconloader:appiconloader:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.lsposed.hiddenapibypass:hiddenapibypass:4.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.insets:insets:1.3.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material:2.5.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.interpolator:interpolator:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.vectordrawable:vectordrawable-animated:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.core:core-ktx:1.4.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.layoutinflater:layoutinflater:1.2.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.widget:borderview:1.1.0@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.recyclerview:recyclerview-ktx:1.3.1@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.preference:simplemenu-preference:1.0.3@aar",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.rikkax.material:material-preference:2.0.0@aar",
+          "type": "Library"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.hidden-api.main",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/aidl_source_output_dir/debug/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/ap_generated_sources/debug/out",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/hidden-api/build/generated/ap_generated_sources/debug/out",
+              "type": "GeneratedSource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/renderscript_source_output_dir/debug/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/resValues/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/resValues/debug",
+              "type": "Resource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/rs/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/source/buildConfig/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/hidden-api/build/generated/source/buildConfig/debug",
+              "type": "GeneratedSource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/main",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/hidden-api/src/main/java",
+              "type": "Source",
+              "packagePrefix": ""
+            }
+          ]
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: dev.rikka.tools.refine:annotation:3.1.1",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.4.0",
+          "type": "Library"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.hidden-api.unitTest",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/ap_generated_sources/debugUnitTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/test",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/testDebug",
+          "sourceFolders": []
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "LibChecker.hidden-api.main",
+          "type": "Module"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.4.0",
+          "type": "Library"
+        }
+      ]
+    },
+    {
+      "name": "LibChecker.hidden-api.androidTest",
+      "contentEntries": [
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/aidl_source_output_dir/debugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/ap_generated_sources/debugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/renderscript_source_output_dir/debugAndroidTest/out",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/resValues/androidTest/debug",
+          "sourceFolders": [
+            {
+              "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/resValues/androidTest/debug",
+              "type": "TestResource",
+              "packagePrefix": ""
+            }
+          ]
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/res/rs/androidTest/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/build/generated/source/buildConfig/androidTest/debug",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/androidTest",
+          "sourceFolders": []
+        },
+        {
+          "path": "file://$PROJECT_DIR$/hidden-api/src/androidTestDebug",
+          "sourceFolders": []
+        }
+      ],
+      "orderEntries": [
+        {
+          "name": "Android API 33, extension level 3 Platform",
+          "type": "SDK"
+        },
+        {
+          "name": "<Module source>",
+          "type": "Own sources"
+        },
+        {
+          "name": "LibChecker.hidden-api.main",
+          "type": "Module"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains:annotations:13.0",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.7.10",
+          "type": "Library"
+        },
+        {
+          "name": "Gradle: androidx.annotation:annotation:1.4.0",
+          "type": "Library"
         }
       ]
     },

@@ -66,6 +66,15 @@
       ],
       "sdkType": "JavaSDK",
       "sdkVersion": "java version \"11.0.11\""
+    },
+    {
+      "name": "Android API 33, extension level 3 Platform",
+      "roots": [
+        "jar:///opt/android-sdk/platforms/android-33/android.jar!/",
+        "file:///opt/android-sdk/platforms/android-33/data/res"
+      ],
+      "sdkType": "Android SDK",
+      "sdkVersion": "java version \"11.0.11\""
     }
   ]
 }

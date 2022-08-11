@@ -3,10 +3,13 @@
     "XML",
     "Kotlin",
     "Java",
+    "AIDL",
     "Plain text",
     "JSON",
+    "Shrinker Config",
     "Groovy",
     "Properties",
+    "SVG",
     ".gitignore (GitIgnore)",
     "EditorConfig"
   ]

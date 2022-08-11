@@ -17,6 +17,30 @@
       "languageLevel": 11
     },
     {
+      "name": "LibChecker.app.main",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.app.unitTest",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.app.androidTest",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.hidden-api.main",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.hidden-api.unitTest",
+      "languageLevel": 11
+    },
+    {
+      "name": "LibChecker.hidden-api.androidTest",
+      "languageLevel": 11
+    },
+    {
       "name": "LibChecker.buildSrc.test",
       "languageLevel": 11
     },
