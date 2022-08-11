@@ -303,3 +303,4 @@
       "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '45352965cba4fd489678d90853e792a9')"
     ]
   }
+}
