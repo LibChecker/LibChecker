@@ -38,11 +38,14 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
+import com.absinthe.libchecker.annotation.JAVA
+import com.absinthe.libchecker.annotation.KOTLIN
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
+import com.absinthe.libchecker.annotation.RxType
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
@@ -77,6 +80,8 @@ import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.PackageUtils.isPWA
 import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
+import com.absinthe.libchecker.utils.PackageUtils.isRxJavaUsed
+import com.absinthe.libchecker.utils.PackageUtils.isRxKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
 import com.absinthe.libchecker.utils.PackageUtils.isUseJetpackCompose
 import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
@@ -359,6 +364,8 @@ abstract class BaseAppDetailActivity :
           lifecycleScope.launch(Dispatchers.IO) {
             val isSplitApk = extraBean?.isSplitApk ?: packageInfo.isSplitsApk()
             val isKotlinUsed = extraBean?.isKotlinUsed ?: packageInfo.isKotlinUsed()
+            val isRxJavaUsed = extraBean?.isRxJavaUsed ?: packageInfo.isRxJavaUsed()
+            val isRxKotlinUsed = extraBean?.isRxKotlinUsed ?: packageInfo.isRxKotlinUsed()
 
             if (isSplitApk) {
               withContext(Dispatchers.Main) {
@@ -382,6 +389,28 @@ abstract class BaseAppDetailActivity :
                   val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
                   withContext(Dispatchers.Main) {
                     showKotlinUsedLabel(kotlinPluginVersion)
+                  }
+                }
+              }
+            }
+            if (isRxJavaUsed) {
+              withContext(Dispatchers.Main) {
+                initFeatureListView()
+                withContext(Dispatchers.IO) {
+                  val rxJavaVersion = PackageUtils.getRxJavaVersion(packageInfo)
+                  withContext(Dispatchers.Main) {
+                    showReactiveXUsedLabel(rxJavaVersion, JAVA)
+                  }
+                }
+              }
+            }
+            if (isRxKotlinUsed) {
+              withContext(Dispatchers.Main) {
+                initFeatureListView()
+                withContext(Dispatchers.IO) {
+                  val rxKotlinVersion = PackageUtils.getRxKotlinVersion(packageInfo)
+                  withContext(Dispatchers.Main) {
+                    showReactiveXUsedLabel(rxKotlinVersion, KOTLIN)
                   }
                 }
               }
@@ -717,6 +746,33 @@ abstract class BaseAppDetailActivity :
           .setIcon(R.drawable.ic_kotlin_logo)
           .setTitle(title)
           .setMessage(R.string.kotlin_details)
+          .setPositiveButton(android.R.string.ok, null)
+          .show()
+      }
+    )
+  }
+
+  private fun showReactiveXUsedLabel(rxVersion: String?, @RxType type: Int) {
+    initFeatureListView()
+    val title = StringBuilder(
+      getString(
+        when (type) {
+          JAVA -> R.string.rxjava
+          KOTLIN -> R.string.rxkotlin
+          else -> R.string.empty
+        }
+      )
+    )
+    rxVersion?.let {
+      title.append(" ").append(it)
+    }
+
+    featureAdapter.addData(
+      FeatureItem(R.drawable.ic_reactivex) {
+        BaseAlertDialogBuilder(this)
+          .setIcon(R.drawable.ic_reactivex)
+          .setTitle(title)
+          .setMessage(R.string.rx_detail)
           .setPositiveButton(android.R.string.ok, null)
           .show()
       }

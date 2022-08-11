@@ -202,6 +202,8 @@ object LCAppUtils {
             EXTRA_DETAIL_BEAN to DetailExtraBean(
               item.isSplitApk,
               item.isKotlinUsed,
+              item.isRxJavaUsed,
+              item.isRxKotlinUsed,
               item.variant
             )
           )

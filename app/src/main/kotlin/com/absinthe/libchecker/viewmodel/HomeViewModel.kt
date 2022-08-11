@@ -47,6 +47,8 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
+import com.absinthe.libchecker.utils.PackageUtils.isRxJavaUsed
+import com.absinthe.libchecker.utils.PackageUtils.isRxKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
@@ -169,6 +171,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               abi = abiType.toShort(),
               isSplitApk = info.isSplitsApk(),
               isKotlinUsed = null/* delay init */,
+              isRxJavaUsed = null/* delay init */,
+              isRxKotlinUsed = null/* delay init */,
               targetApi = ai.targetSdkVersion.toShort(),
               variant = variant
             )
@@ -266,6 +270,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 PackageUtils.getAbi(it).toShort(),
                 it.isSplitsApk(),
                 it.isKotlinUsed(),
+                it.isRxJavaUsed(),
+                it.isRxKotlinUsed(),
                 ai.targetSdkVersion.toShort(),
                 variant
               )
@@ -307,6 +313,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             PackageUtils.getAbi(info).toShort(),
             info.isSplitsApk(),
             info.isKotlinUsed(),
+            info.isRxJavaUsed(),
+            info.isRxKotlinUsed(),
             ai.targetSdkVersion.toShort(),
             variant
           )

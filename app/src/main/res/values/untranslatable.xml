@@ -5,6 +5,10 @@
   <string name="agp" translatable="false">Android Gradle Plugin</string>
   <string name="pwa" translatable="false">Progressive Web Apps</string>
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
+  <string name="rxjava" translatable="false">RxJava</string>
+  <string name="rxkotlin" translatable="false">RxKotlin</string>
+
+  <string name="empty" translatable="false"> </string>
 
   <string name="snapshot_none" translatable="false">None</string>
 </resources>

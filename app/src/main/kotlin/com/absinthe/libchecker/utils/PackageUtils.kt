@@ -1327,4 +1327,66 @@ object PackageUtils {
       ELF32EhdrParser(input).getEType()
     }
   }
+
+  /**
+   * Check if an app uses RxJava framework
+   * @return true if it uses RxJava framework
+   */
+  fun PackageInfo.isRxJavaUsed(): Boolean {
+    return runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META-INF/rxjava.properties") != null
+      }
+    }.getOrDefault(false)
+  }
+
+  private const val REACTIVEX_KEYWORD = "Implementation-Version"
+
+  fun getRxJavaVersion(packageInfo: PackageInfo): String? {
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
+          Properties().apply {
+            load(zipFile.getInputStream(ze))
+            getProperty(REACTIVEX_KEYWORD)?.let {
+              return it
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
+
+  /**
+   * Check if an app uses RxKotlin framework
+   * @return true if it uses RxKotlin framework
+   */
+  fun PackageInfo.isRxKotlinUsed(): Boolean {
+    return runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META_INF/rxkotlin.properties") != null
+      }
+    }.getOrDefault(false)
+  }
+
+  fun getRxKotlinVersion(packageInfo: PackageInfo): String? {
+    runCatching {
+      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
+          Properties().apply {
+            load(zipFile.getInputStream(ze))
+            getProperty(REACTIVEX_KEYWORD)?.let {
+              return it
+            }
+          }
+        }
+      }
+    }
+    return null
+  }
 }

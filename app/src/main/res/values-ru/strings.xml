@@ -121,6 +121,7 @@
   <string name="menu_process">Приложение</string>
   <string name="alternative_launch_method">Alternative Launch Method</string>
   <string name="compare_with_current">Compare with current package</string>
+  <string name="rx_detail">RxJava — это реализация Reactive Extensions на виртуальной машине Java: библиотека для составления асинхронных и событийных программ с использованием наблюдаемых последовательностей.</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
