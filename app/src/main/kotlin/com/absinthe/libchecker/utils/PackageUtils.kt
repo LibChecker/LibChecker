@@ -1328,6 +1328,10 @@ object PackageUtils {
     }
   }
 
+  private const val RX_MAJOR_ONE = "1"
+  private const val RX_MAJOR_TWO = "2"
+  private const val RX_MAJOR_THREE = "3"
+
   /**
    * Check if an app uses RxJava framework
    * @return true if it uses RxJava framework
@@ -1337,7 +1341,10 @@ object PackageUtils {
       val file = File(applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        it.getEntry("META-INF/rxjava.properties") != null
+        it.getEntry("META-INF/rxjava.properties") != null ||
+          hasDexClass(File(applicationInfo.sourceDir), "rx.*") ||
+          hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.*") ||
+          hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxjava3.*")
       }
     }.getOrDefault(false)
   }
@@ -1356,6 +1363,12 @@ object PackageUtils {
           }
         }
       }
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxjava3.*"))
+        return RX_MAJOR_THREE
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.*"))
+        return RX_MAJOR_TWO
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.*"))
+        return RX_MAJOR_ONE
     }
     return null
   }
@@ -1369,7 +1382,10 @@ object PackageUtils {
       val file = File(applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        it.getEntry("META_INF/rxkotlin.properties") != null
+        it.getEntry("META_INF/rxkotlin.properties") != null ||
+          hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxjava3.kotlin.*") ||
+          hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxkotlin") ||
+          hasDexClass(File(applicationInfo.sourceDir), "rx.lang.kotlin")
       }
     }.getOrDefault(false)
   }
@@ -1386,6 +1402,40 @@ object PackageUtils {
           }
         }
       }
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxjava3.kotlin.*"))
+        return RX_MAJOR_THREE
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxkotlin"))
+        return RX_MAJOR_TWO
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.lang.kotlin"))
+        return RX_MAJOR_ONE
+    }
+    return null
+  }
+
+  /**
+   * Check if an app uses RxAndroid framework
+   * @return true if it uses RxAndroid framework
+   */
+  fun PackageInfo.isRxAndroidUsed(): Boolean {
+    return runCatching {
+      hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxjava3.android.*") ||
+        hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.android.*") ||
+        hasDexClass(File(applicationInfo.sourceDir), "rx.android.*")
+    }.getOrDefault(false)
+  }
+
+  fun getRxAndroidVersion(packageInfo: PackageInfo): String? {
+    runCatching {
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.rxjava3.android.*"
+        )
+      )
+        return RX_MAJOR_THREE
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.android.*"))
+        return RX_MAJOR_TWO
+      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.android.*"))
+        return RX_MAJOR_ONE
     }
     return null
   }

@@ -7,6 +7,7 @@
   <string name="jetpack_compose" translatable="false">Jetpack Compose</string>
   <string name="rxjava" translatable="false">RxJava</string>
   <string name="rxkotlin" translatable="false">RxKotlin</string>
+  <string name="rxandroid" translatable="false">RxAndroid</string>
 
   <string name="empty" translatable="false"> </string>
 

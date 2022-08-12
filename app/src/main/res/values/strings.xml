@@ -123,6 +123,8 @@
   <string name="alternative_launch_method">Alternative Launch Method</string>
   <string name="compare_with_current">Compare with current package</string>
   <string name="rx_detail">RxJava is a Java VM implementation of Reactive Extensions: a library for composing asynchronous and event-based programs by using observable sequences.</string>
+  <string name="rx_android_detail">Reactive Extensions for Android</string>
+  <string name="rx_kotlin_detail">Kotlin Extensions for RxJava</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 20,
-    "identityHash": "aebf21819cf229e2102d5f8709db612e",
+    "identityHash": "7da91ae8f2475dd9e16fcf6e73400e1f",
     "entities": [
       {
         "tableName": "item_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageName` TEXT NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `isSplitApk` INTEGER NOT NULL, `isKotlinUsed` INTEGER, `isRxJavaUsed` INTEGER, `isRxKotlinUsed` INTEGER, `targetApi` INTEGER NOT NULL, `variant` INTEGER NOT NULL, PRIMARY KEY(`packageName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageName` TEXT NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `isSplitApk` INTEGER NOT NULL, `isKotlinUsed` INTEGER, `isRxJavaUsed` INTEGER, `isRxKotlinUsed` INTEGER, `isRxAndroidUsed` INTEGER, `targetApi` INTEGER NOT NULL, `variant` INTEGER NOT NULL, PRIMARY KEY(`packageName`))",
         "fields": [
           {
             "fieldPath": "packageName",
@@ -77,6 +77,12 @@
           {
             "fieldPath": "isRxKotlinUsed",
             "columnName": "isRxKotlinUsed",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isRxAndroidUsed",
+            "columnName": "isRxAndroidUsed",
             "affinity": "INTEGER",
             "notNull": false
           },
@@ -312,7 +318,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'aebf21819cf229e2102d5f8709db612e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7da91ae8f2475dd9e16fcf6e73400e1f')"
     ]
   }
 }

@@ -47,6 +47,7 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
+import com.absinthe.libchecker.utils.PackageUtils.isRxAndroidUsed
 import com.absinthe.libchecker.utils.PackageUtils.isRxJavaUsed
 import com.absinthe.libchecker.utils.PackageUtils.isRxKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
@@ -173,6 +174,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               isKotlinUsed = null/* delay init */,
               isRxJavaUsed = null/* delay init */,
               isRxKotlinUsed = null/* delay init */,
+              isRxAndroidUsed = null/* delay init */,
               targetApi = ai.targetSdkVersion.toShort(),
               variant = variant
             )
@@ -272,6 +274,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 it.isKotlinUsed(),
                 it.isRxJavaUsed(),
                 it.isRxKotlinUsed(),
+                it.isRxAndroidUsed(),
                 ai.targetSdkVersion.toShort(),
                 variant
               )
@@ -315,6 +318,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             info.isKotlinUsed(),
             info.isRxJavaUsed(),
             info.isRxKotlinUsed(),
+            info.isRxAndroidUsed(),
             ai.targetSdkVersion.toShort(),
             variant
           )

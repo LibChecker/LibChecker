@@ -204,6 +204,7 @@ object LCAppUtils {
               item.isKotlinUsed,
               item.isRxJavaUsed,
               item.isRxKotlinUsed,
+              item.isRxAndroidUsed,
               item.variant
             )
           )

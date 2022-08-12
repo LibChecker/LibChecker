@@ -21,6 +21,7 @@ data class LCItem(
   @ColumnInfo val isKotlinUsed: Boolean?,
   @ColumnInfo val isRxJavaUsed: Boolean?,
   @ColumnInfo val isRxKotlinUsed: Boolean?,
+  @ColumnInfo val isRxAndroidUsed: Boolean?,
   @ColumnInfo val targetApi: Short,
   @ColumnInfo val variant: Short
 ) : Parcelable

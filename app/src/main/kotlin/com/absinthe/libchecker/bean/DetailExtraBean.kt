@@ -9,5 +9,6 @@ data class DetailExtraBean(
   val isKotlinUsed: Boolean?,
   val isRxJavaUsed: Boolean?,
   val isRxKotlinUsed: Boolean?,
+  val isRxAndroidUsed: Boolean?,
   val variant: Short
 ) : Parcelable

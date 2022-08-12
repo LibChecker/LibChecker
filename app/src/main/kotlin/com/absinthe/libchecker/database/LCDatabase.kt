@@ -304,6 +304,9 @@ abstract class LCDatabase : RoomDatabase() {
         database.execSQL(
           "ALTER TABLE item_table ADD COLUMN isRxKotlinUsed INTEGER NOT NULL DEFAULT 0"
         )
+        database.execSQL(
+          "ALTER TABLE item_table ADD COLUMN isRxAndroidUsed INTEGER NOT NULL DEFAULT 0"
+        )
       }
     }
   }
