@@ -1391,7 +1391,7 @@ object PackageUtils {
       val file = File(applicationInfo.sourceDir)
 
       ZipFile(file).use {
-        it.getEntry("META_INF/rxkotlin.properties") != null ||
+        it.getEntry("META-INF/rxkotlin.properties") != null ||
           hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxjava3.kotlin.*") ||
           hasDexClass(File(applicationInfo.sourceDir), "io.reactivex.rxkotlin") ||
           hasDexClass(File(applicationInfo.sourceDir), "rx.lang.kotlin")
