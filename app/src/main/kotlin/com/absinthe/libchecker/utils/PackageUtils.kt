@@ -1363,12 +1363,21 @@ object PackageUtils {
           }
         }
       }
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxjava3.*"))
-        return RX_MAJOR_THREE
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.*"))
-        return RX_MAJOR_TWO
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.*"))
-        return RX_MAJOR_ONE
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.rxjava3.*"
+        )
+      ) return RX_MAJOR_THREE
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.*"
+        )
+      ) return RX_MAJOR_TWO
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "rx.*"
+        )
+      ) return RX_MAJOR_ONE
     }
     return null
   }
@@ -1402,12 +1411,21 @@ object PackageUtils {
           }
         }
       }
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxjava3.kotlin.*"))
-        return RX_MAJOR_THREE
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.rxkotlin"))
-        return RX_MAJOR_TWO
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.lang.kotlin"))
-        return RX_MAJOR_ONE
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.rxjava3.kotlin.*"
+        )
+      ) return RX_MAJOR_THREE
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.rxkotlin"
+        )
+      ) return RX_MAJOR_TWO
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "rx.lang.kotlin"
+        )
+      ) return RX_MAJOR_ONE
     }
     return null
   }
@@ -1430,12 +1448,17 @@ object PackageUtils {
           File(packageInfo.applicationInfo.sourceDir),
           "io.reactivex.rxjava3.android.*"
         )
-      )
-        return RX_MAJOR_THREE
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "io.reactivex.android.*"))
-        return RX_MAJOR_TWO
-      if (hasDexClass(File(packageInfo.applicationInfo.sourceDir), "rx.android.*"))
-        return RX_MAJOR_ONE
+      ) return RX_MAJOR_THREE
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "io.reactivex.android.*"
+        )
+      ) return RX_MAJOR_TWO
+      if (hasDexClass(
+          File(packageInfo.applicationInfo.sourceDir),
+          "rx.android.*"
+        )
+      ) return RX_MAJOR_ONE
     }
     return null
   }
