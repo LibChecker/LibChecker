@@ -59,7 +59,9 @@ import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
@@ -1351,35 +1353,37 @@ object PackageUtils {
 
   private const val REACTIVEX_KEYWORD = "Implementation-Version"
 
-  fun getRxJavaVersion(packageInfo: PackageInfo): String? {
-    runCatching {
-      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
-        zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
-          Properties().apply {
-            load(zipFile.getInputStream(ze))
-            getProperty(REACTIVEX_KEYWORD)?.let {
-              return it
+  suspend fun getRxJavaVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      runCatching {
+        ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+          zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
+            Properties().apply {
+              load(zipFile.getInputStream(ze))
+              getProperty(REACTIVEX_KEYWORD)?.let {
+                return@withContext it
+              }
             }
           }
         }
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.rxjava3.*"
+          )
+        ) return@withContext RX_MAJOR_THREE
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.*"
+          )
+        ) return@withContext RX_MAJOR_TWO
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "rx.*"
+          )
+        ) return@withContext RX_MAJOR_ONE
       }
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.rxjava3.*"
-        )
-      ) return RX_MAJOR_THREE
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.*"
-        )
-      ) return RX_MAJOR_TWO
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "rx.*"
-        )
-      ) return RX_MAJOR_ONE
+      return@withContext null
     }
-    return null
   }
 
   /**
@@ -1399,35 +1403,37 @@ object PackageUtils {
     }.getOrDefault(false)
   }
 
-  fun getRxKotlinVersion(packageInfo: PackageInfo): String? {
-    runCatching {
-      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
-        zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
-          Properties().apply {
-            load(zipFile.getInputStream(ze))
-            getProperty(REACTIVEX_KEYWORD)?.let {
-              return it
+  suspend fun getRxKotlinVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      runCatching {
+        ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+          zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
+            Properties().apply {
+              load(zipFile.getInputStream(ze))
+              getProperty(REACTIVEX_KEYWORD)?.let {
+                return@withContext it
+              }
             }
           }
         }
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.rxjava3.kotlin.*"
+          )
+        ) return@withContext RX_MAJOR_THREE
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.rxkotlin"
+          )
+        ) return@withContext RX_MAJOR_TWO
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "rx.lang.kotlin"
+          )
+        ) return@withContext RX_MAJOR_ONE
       }
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.rxjava3.kotlin.*"
-        )
-      ) return RX_MAJOR_THREE
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.rxkotlin"
-        )
-      ) return RX_MAJOR_TWO
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "rx.lang.kotlin"
-        )
-      ) return RX_MAJOR_ONE
+      return@withContext null
     }
-    return null
   }
 
   /**
@@ -1442,24 +1448,26 @@ object PackageUtils {
     }.getOrDefault(false)
   }
 
-  fun getRxAndroidVersion(packageInfo: PackageInfo): String? {
-    runCatching {
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.rxjava3.android.*"
-        )
-      ) return RX_MAJOR_THREE
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "io.reactivex.android.*"
-        )
-      ) return RX_MAJOR_TWO
-      if (hasDexClass(
-          File(packageInfo.applicationInfo.sourceDir),
-          "rx.android.*"
-        )
-      ) return RX_MAJOR_ONE
+  suspend fun getRxAndroidVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      runCatching {
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.rxjava3.android.*"
+          )
+        ) return@withContext RX_MAJOR_THREE
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "io.reactivex.android.*"
+          )
+        ) return@withContext RX_MAJOR_TWO
+        if (hasDexClass(
+            File(packageInfo.applicationInfo.sourceDir),
+            "rx.android.*"
+          )
+        ) return@withContext RX_MAJOR_ONE
+      }
+      return@withContext null
     }
-    return null
   }
 }

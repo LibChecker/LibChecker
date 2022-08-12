@@ -399,37 +399,21 @@ abstract class BaseAppDetailActivity :
             if (isRxJavaUsed) {
               withContext(Dispatchers.Main) {
                 initFeatureListView()
-                withContext(Dispatchers.IO) {
-                  val rxJavaVersion = PackageUtils.getRxJavaVersion(packageInfo)
-                  withContext(Dispatchers.Main) {
-                    showReactiveXUsedLabel(rxJavaVersion, JAVA)
-                  }
-                }
+                showReactiveXUsedLabel(PackageUtils.getRxJavaVersion(packageInfo), JAVA)
               }
             }
             if (isRxKotlinUsed) {
               withContext(Dispatchers.Main) {
                 initFeatureListView()
-                withContext(Dispatchers.IO) {
-                  val rxKotlinVersion = PackageUtils.getRxKotlinVersion(packageInfo)
-                  withContext(Dispatchers.Main) {
-                    showReactiveXUsedLabel(rxKotlinVersion, KOTLIN)
-                  }
-                }
+                showReactiveXUsedLabel(PackageUtils.getRxKotlinVersion(packageInfo), KOTLIN)
               }
             }
             if (isRxAndroidUsed) {
               withContext(Dispatchers.Main) {
                 initFeatureListView()
-                withContext(Dispatchers.IO) {
-                  val rxAndroidVersion = PackageUtils.getRxAndroidVersion(packageInfo)
-                  withContext(Dispatchers.Main) {
-                    showReactiveXUsedLabel(rxAndroidVersion, ANDROID)
-                  }
-                }
+                showReactiveXUsedLabel(PackageUtils.getRxAndroidVersion(packageInfo), ANDROID)
               }
             }
-
             initMoreFeatures(packageInfo)
           }
         }
