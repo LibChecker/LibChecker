@@ -730,12 +730,10 @@ abstract class BaseAppDetailActivity :
       }
     }
     if ((features and Features.KOTLIN_USED) > 0) {
-      withContext(Dispatchers.Main) {
-        withContext(Dispatchers.IO) {
-          val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
-          withContext(Dispatchers.Main) {
-            showKotlinUsedLabel(kotlinPluginVersion)
-          }
+      withContext(Dispatchers.IO) {
+        val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
+        withContext(Dispatchers.Main) {
+          showKotlinUsedLabel(kotlinPluginVersion)
         }
       }
     }
