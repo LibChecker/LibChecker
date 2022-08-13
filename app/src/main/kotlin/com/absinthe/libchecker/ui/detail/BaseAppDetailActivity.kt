@@ -679,24 +679,6 @@ abstract class BaseAppDetailActivity :
     return false
   }
 
-  private fun showKotlinUsedLabel(kotlinPluginVersion: String?) {
-    val title = StringBuilder(getString(R.string.kotlin_string))
-    kotlinPluginVersion?.let {
-      title.append(" ").append(it)
-    }
-
-    featureAdapter.addData(
-      FeatureItem(R.drawable.ic_kotlin_logo) {
-        BaseAlertDialogBuilder(this)
-          .setIcon(R.drawable.ic_kotlin_logo)
-          .setTitle(title)
-          .setMessage(R.string.kotlin_details)
-          .setPositiveButton(android.R.string.ok, null)
-          .show()
-      }
-    )
-  }
-
   private fun initFeatureListView(): Boolean {
     if (featureListView != null) {
       return false
@@ -717,6 +699,8 @@ abstract class BaseAppDetailActivity :
   }
 
   private suspend fun initFeatures(packageInfo: PackageInfo, features: Int) {
+    initFeatureListView()
+
     if ((features and Features.SPLIT_APKS) > 0) {
       featureAdapter.addData(
         FeatureItem(R.drawable.ic_aab) {
@@ -912,10 +896,6 @@ abstract class BaseAppDetailActivity :
           }
         }
       }
-    }
-
-    if (featureAdapter.data.isNotEmpty()) {
-      initFeatureListView()
     }
   }
 

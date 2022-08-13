@@ -975,7 +975,8 @@ object PackageUtils {
   /**
    * Check if a package contains a class
    * @param sourceFile Source file
-   * @param className Class name
+   * @param classes Class name
+   * @param hasAny true if has any class, false if has all classes
    */
   fun findDexClasses(
     sourceFile: File,
@@ -989,7 +990,7 @@ object PackageUtils {
           getEntry(entry)?.dexFile?.classes?.forEach { def ->
             classes.forEach {
               val foundClass = if (it.last() == '*') {
-                def.type.startsWith(it)
+                def.type.startsWith(it.removeSuffix("*"))
               } else {
                 def.type == it
               }
