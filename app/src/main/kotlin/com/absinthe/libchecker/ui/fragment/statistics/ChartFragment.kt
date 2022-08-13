@@ -83,7 +83,7 @@ class ChartFragment :
       addOnButtonCheckedListener(this@ChartFragment)
       check(R.id.btn_abi)
     }
-    binding.btnKotlin.isVisible = !WorkerService.initializingKotlinUsage
+    binding.btnKotlin.isVisible = !WorkerService.initializingFeatures
 
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {

@@ -50,7 +50,7 @@ class WorkerService : LifecycleService() {
   override fun onCreate() {
     super.onCreate()
     Timber.d("onCreate")
-    initializingKotlinUsage = false
+    initializingFeatures = false
     initAllApplicationInfoItems()
 
     val intentFilter = IntentFilter().apply {
@@ -107,7 +107,7 @@ class WorkerService : LifecycleService() {
     val map = mutableMapOf<String, Int>()
     var count = 0
 
-    initializingKotlinUsage = true
+    initializingFeatures = true
 
     lifecycleScope.launch(Dispatchers.IO) {
       while (Repositories.lcRepository.allDatabaseItems.value == null) {
@@ -137,7 +137,7 @@ class WorkerService : LifecycleService() {
         count = 0
       }
 
-      initializingKotlinUsage = false
+      initializingFeatures = false
     }
   }
 
@@ -168,6 +168,6 @@ class WorkerService : LifecycleService() {
   }
 
   companion object {
-    var initializingKotlinUsage: Boolean = false
+    var initializingFeatures: Boolean = false
   }
 }

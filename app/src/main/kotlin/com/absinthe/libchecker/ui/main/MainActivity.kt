@@ -6,7 +6,9 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -41,7 +43,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -268,10 +269,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
-  private fun initFeatures() = lifecycleScope.launch(Dispatchers.IO) {
-    do {
-      appViewModel.workerBinder?.initFeatures()
-      delay(300)
-    } while (appViewModel.workerBinder == null)
+  private fun initFeatures() {
+    Handler(Looper.getMainLooper()).also {
+      it.post(object : Runnable {
+        override fun run() {
+          if (appViewModel.workerBinder == null) {
+            it.postDelayed(this, 300)
+          } else {
+            Timber.d("initFeatures")
+            appViewModel.workerBinder?.initFeatures()
+          }
+        }
+      })
+    }
   }
 }
