@@ -53,6 +53,7 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
 import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
@@ -1250,6 +1251,39 @@ object PackageUtils {
       }
     }
     return size
+  }
+
+  fun PackageInfo.getFeatures(): Int {
+    var features = 0
+    if (isSplitsApk()) {
+      features = features or Features.SPLIT_APKS
+    }
+    if (isKotlinUsed()) {
+      features = features or Features.KOTLIN_USED
+    }
+    if (getAGPVersion(this)?.isNotBlank() == true) {
+      features = features or Features.AGP
+    }
+    if (isXposedModule()) {
+      features = features or Features.XPOSED_MODULE
+    }
+    if (isPWA()) {
+      features = features or Features.PWA
+    }
+    if (isUseJetpackCompose()) {
+      features = features or Features.JETPACK_COMPOSE
+    }
+    if (isRxJavaUsed()) {
+      features = features or Features.RX_JAVA
+    }
+    if (isRxKotlinUsed()) {
+      features = features or Features.RX_KOTLIN
+    }
+    if (isRxAndroidUsed()) {
+      features = features or Features.RX_ANDROID
+    }
+
+    return features
   }
 
   fun PackageInfo.isXposedModule(): Boolean {

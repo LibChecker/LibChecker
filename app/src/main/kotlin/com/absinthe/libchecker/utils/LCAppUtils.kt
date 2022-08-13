@@ -200,11 +200,7 @@ object LCAppUtils {
             EXTRA_REF_NAME to refName,
             EXTRA_REF_TYPE to refType,
             EXTRA_DETAIL_BEAN to DetailExtraBean(
-              item.isSplitApk,
-              item.isKotlinUsed,
-              item.isRxJavaUsed,
-              item.isRxKotlinUsed,
-              item.isRxAndroidUsed,
+              item.features,
               item.variant
             )
           )

@@ -298,15 +298,38 @@ abstract class LCDatabase : RoomDatabase() {
 
     private val MIGRATION_19_20: Migration = object : Migration(19, 20) {
       override fun migrate(database: SupportSQLiteDatabase) {
+        // Create the new table
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN isRxJavaUsed INTEGER NOT NULL DEFAULT 0"
+          "CREATE TABLE item_table_new (" +
+            "packageName TEXT NOT NULL, label TEXT NOT NULL, " +
+            "versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, " +
+            "installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, " +
+            "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
+            "features INTEGER NOT NULL, " +
+            "targetApi INTEGER NOT NULL, variant INTEGER NOT NULL, " +
+            "PRIMARY KEY(packageName))"
         )
+        // Copy the data
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN isRxKotlinUsed INTEGER NOT NULL DEFAULT 0"
+          "INSERT INTO item_table_new (" +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, features, targetApi, " +
+            "variant) " +
+            "SELECT " +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, -1, targetApi, variant " +
+            "FROM item_table"
         )
-        database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN isRxAndroidUsed INTEGER NOT NULL DEFAULT 0"
-        )
+        // Remove the old table
+        database.execSQL("DROP TABLE item_table")
+        // Change the table name to the correct one
+        database.execSQL("ALTER TABLE item_table_new RENAME TO item_table")
       }
     }
   }

@@ -46,11 +46,7 @@ import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
-import com.absinthe.libchecker.utils.PackageUtils.isRxAndroidUsed
-import com.absinthe.libchecker.utils.PackageUtils.isRxJavaUsed
-import com.absinthe.libchecker.utils.PackageUtils.isRxKotlinUsed
-import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
+import com.absinthe.libchecker.utils.PackageUtils.getFeatures
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -170,11 +166,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               lastUpdatedTime = info.lastUpdateTime,
               isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
               abi = abiType.toShort(),
-              isSplitApk = info.isSplitsApk(),
-              isKotlinUsed = null/* delay init */,
-              isRxJavaUsed = null/* delay init */,
-              isRxKotlinUsed = null/* delay init */,
-              isRxAndroidUsed = null/* delay init */,
+              features = -1 /* delay init */,
               targetApi = ai.targetSdkVersion.toShort(),
               variant = variant
             )
@@ -270,11 +262,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 it.lastUpdateTime,
                 (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
                 PackageUtils.getAbi(it).toShort(),
-                it.isSplitsApk(),
-                it.isKotlinUsed(),
-                it.isRxJavaUsed(),
-                it.isRxKotlinUsed(),
-                it.isRxAndroidUsed(),
+                it.getFeatures(),
                 ai.targetSdkVersion.toShort(),
                 variant
               )
@@ -314,11 +302,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             info.lastUpdateTime,
             (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
             PackageUtils.getAbi(info).toShort(),
-            info.isSplitsApk(),
-            info.isKotlinUsed(),
-            info.isRxJavaUsed(),
-            info.isRxKotlinUsed(),
-            info.isRxAndroidUsed(),
+            info.getFeatures(),
             ai.targetSdkVersion.toShort(),
             variant
           )

@@ -37,16 +37,12 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.ANDROID
 import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.annotation.JAVA
-import com.absinthe.libchecker.annotation.KOTLIN
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.RxType
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
@@ -58,6 +54,8 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
@@ -76,17 +74,9 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getFeatures
 import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
-import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
-import com.absinthe.libchecker.utils.PackageUtils.isPWA
-import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
-import com.absinthe.libchecker.utils.PackageUtils.isRxAndroidUsed
-import com.absinthe.libchecker.utils.PackageUtils.isRxJavaUsed
-import com.absinthe.libchecker.utils.PackageUtils.isRxKotlinUsed
-import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
-import com.absinthe.libchecker.utils.PackageUtils.isUseJetpackCompose
-import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -364,57 +354,13 @@ abstract class BaseAppDetailActivity :
 
         if (featureListView == null) {
           lifecycleScope.launch(Dispatchers.IO) {
-            val isSplitApk = extraBean?.isSplitApk ?: packageInfo.isSplitsApk()
-            val isKotlinUsed = extraBean?.isKotlinUsed ?: packageInfo.isKotlinUsed()
-            val isRxJavaUsed = extraBean?.isRxJavaUsed ?: packageInfo.isRxJavaUsed()
-            val isRxKotlinUsed = extraBean?.isRxKotlinUsed ?: packageInfo.isRxKotlinUsed()
-            val isRxAndroidUsed = extraBean?.isRxAndroidUsed ?: packageInfo.isRxAndroidUsed()
+            var features = extraBean?.features ?: -1
+            if (features == -1) {
+              features = packageInfo.getFeatures()
+              Repositories.lcRepository.updateFeatures(packageInfo.packageName, features)
+            }
 
-            if (isSplitApk) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                featureAdapter.addData(
-                  FeatureItem(R.drawable.ic_aab) {
-                    AppBundleBottomSheetDialogFragment().apply {
-                      arguments = bundleOf(
-                        EXTRA_PACKAGE_NAME to packageInfo.packageName
-                      )
-                      show(supportFragmentManager, tag)
-                    }
-                  }
-                )
-              }
-            }
-            if (isKotlinUsed) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                withContext(Dispatchers.IO) {
-                  val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
-                  withContext(Dispatchers.Main) {
-                    showKotlinUsedLabel(kotlinPluginVersion)
-                  }
-                }
-              }
-            }
-            if (isRxJavaUsed) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                showReactiveXUsedLabel(PackageUtils.getRxJavaVersion(packageInfo), JAVA)
-              }
-            }
-            if (isRxKotlinUsed) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                showReactiveXUsedLabel(PackageUtils.getRxKotlinVersion(packageInfo), KOTLIN)
-              }
-            }
-            if (isRxAndroidUsed) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                showReactiveXUsedLabel(PackageUtils.getRxAndroidVersion(packageInfo), ANDROID)
-              }
-            }
-            initMoreFeatures(packageInfo)
+            initFeatures(packageInfo, features)
           }
         }
       } catch (e: Exception) {
@@ -732,7 +678,6 @@ abstract class BaseAppDetailActivity :
   }
 
   private fun showKotlinUsedLabel(kotlinPluginVersion: String?) {
-    initFeatureListView()
     val title = StringBuilder(getString(R.string.kotlin_string))
     kotlinPluginVersion?.let {
       title.append(" ").append(it)
@@ -744,46 +689,6 @@ abstract class BaseAppDetailActivity :
           .setIcon(R.drawable.ic_kotlin_logo)
           .setTitle(title)
           .setMessage(R.string.kotlin_details)
-          .setPositiveButton(android.R.string.ok, null)
-          .show()
-      }
-    )
-  }
-
-  private fun showReactiveXUsedLabel(rxVersion: String?, @RxType type: Int) {
-    initFeatureListView()
-    val title = StringBuilder(
-      getString(
-        when (type) {
-          JAVA -> R.string.rxjava
-          KOTLIN -> R.string.rxkotlin
-          ANDROID -> R.string.rxandroid
-          else -> R.string.empty
-        }
-      )
-    )
-    rxVersion?.let {
-      title.append(" ").append(it)
-    }
-    val icon = when (type) {
-      JAVA -> R.drawable.ic_reactivex
-      KOTLIN -> R.drawable.ic_rxkotlin
-      ANDROID -> R.drawable.ic_rxandroid
-      else -> R.drawable.empty
-    }
-    val detail = when (type) {
-      JAVA -> R.string.rx_detail
-      KOTLIN -> R.string.rx_kotlin_detail
-      ANDROID -> R.string.rx_android_detail
-      else -> R.string.empty
-    }
-
-    featureAdapter.addData(
-      FeatureItem(icon) {
-        BaseAlertDialogBuilder(this)
-          .setIcon(icon)
-          .setTitle(title)
-          .setMessage(detail)
           .setPositiveButton(android.R.string.ok, null)
           .show()
       }
@@ -809,17 +714,101 @@ abstract class BaseAppDetailActivity :
     return true
   }
 
-  private suspend fun initMoreFeatures(packageInfo: PackageInfo) {
-    PackageUtils.getAGPVersion(packageInfo)?.let {
+  private suspend fun initFeatures(packageInfo: PackageInfo, features: Int) {
+    if ((features and Features.SPLIT_APKS) > 0) {
       withContext(Dispatchers.Main) {
-        initFeatureListView()
+        featureAdapter.addData(
+          FeatureItem(R.drawable.ic_aab) {
+            AppBundleBottomSheetDialogFragment().apply {
+              arguments = bundleOf(
+                EXTRA_PACKAGE_NAME to packageInfo.packageName
+              )
+              show(supportFragmentManager, tag)
+            }
+          }
+        )
+      }
+    }
+    if ((features and Features.KOTLIN_USED) > 0) {
+      withContext(Dispatchers.Main) {
+        withContext(Dispatchers.IO) {
+          val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
+          withContext(Dispatchers.Main) {
+            showKotlinUsedLabel(kotlinPluginVersion)
+          }
+        }
+      }
+    }
+    if ((features and Features.RX_JAVA) > 0) {
+      val version = PackageUtils.getRxJavaVersion(packageInfo)
+      withContext(Dispatchers.Main) {
+        featureAdapter.addData(
+          FeatureItem(R.drawable.ic_reactivex) {
+            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+              .setIcon(R.drawable.ic_reactivex)
+              .setTitle(
+                HtmlCompat.fromHtml(
+                  "${getString(R.string.rxjava)} <b>$version</b>",
+                  HtmlCompat.FROM_HTML_MODE_COMPACT
+                )
+              )
+              .setMessage(R.string.rx_detail)
+              .setPositiveButton(android.R.string.ok, null)
+              .show()
+          }
+        )
+      }
+    }
+    if ((features and Features.RX_KOTLIN) > 0) {
+      val version = PackageUtils.getRxKotlinVersion(packageInfo)
+      withContext(Dispatchers.Main) {
+        featureAdapter.addData(
+          FeatureItem(R.drawable.ic_rxkotlin) {
+            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+              .setIcon(R.drawable.ic_rxkotlin)
+              .setTitle(
+                HtmlCompat.fromHtml(
+                  "${getString(R.string.rxkotlin)} <b>$version</b>",
+                  HtmlCompat.FROM_HTML_MODE_COMPACT
+                )
+              )
+              .setMessage(R.string.rx_kotlin_detail)
+              .setPositiveButton(android.R.string.ok, null)
+              .show()
+          }
+        )
+      }
+    }
+    if ((features and Features.RX_ANDROID) > 0) {
+      val version = PackageUtils.getRxAndroidVersion(packageInfo)
+      withContext(Dispatchers.Main) {
+        featureAdapter.addData(
+          FeatureItem(R.drawable.ic_rxandroid) {
+            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+              .setIcon(R.drawable.ic_rxandroid)
+              .setTitle(
+                HtmlCompat.fromHtml(
+                  "${getString(R.string.rxandroid)} <b>$version</b>",
+                  HtmlCompat.FROM_HTML_MODE_COMPACT
+                )
+              )
+              .setMessage(R.string.rx_android_detail)
+              .setPositiveButton(android.R.string.ok, null)
+              .show()
+          }
+        )
+      }
+    }
+    if ((features and Features.AGP) > 0) {
+      val version = PackageUtils.getAGPVersion(packageInfo)
+      withContext(Dispatchers.Main) {
         featureAdapter.addData(
           FeatureItem(R.drawable.ic_gradle) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
               .setIcon(R.drawable.ic_gradle)
               .setTitle(
                 HtmlCompat.fromHtml(
-                  "${getString(R.string.agp)} <b>$it</b>",
+                  "${getString(R.string.agp)} <b>$version</b>",
                   HtmlCompat.FROM_HTML_MODE_COMPACT
                 )
               )
@@ -831,9 +820,8 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    if (packageInfo.isXposedModule()) {
+    if ((features and Features.XPOSED_MODULE) > 0) {
       withContext(Dispatchers.Main) {
-        initFeatureListView()
         featureAdapter.addData(
           FeatureItem(R.drawable.ic_xposed) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
@@ -847,9 +835,8 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    if (packageInfo.isPlayAppSigning()) {
+    if ((features and Features.PLAY_SIGNING) > 0) {
       withContext(Dispatchers.Main) {
-        initFeatureListView()
         featureAdapter.addData(
           FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
@@ -863,9 +850,8 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    if (packageInfo.isPWA()) {
+    if ((features and Features.PWA) > 0) {
       withContext(Dispatchers.Main) {
-        initFeatureListView()
         featureAdapter.addData(
           FeatureItem(R.drawable.ic_pwa) {
             BaseAlertDialogBuilder(this@BaseAppDetailActivity)
@@ -879,9 +865,8 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    if (packageInfo.isUseJetpackCompose()) {
+    if ((features and Features.JETPACK_COMPOSE) > 0) {
       withContext(Dispatchers.Main) {
-        initFeatureListView()
         val title = PackageUtils.getJetpackComposeVersion(packageInfo)?.let {
           HtmlCompat.fromHtml(
             "${getString(R.string.jetpack_compose)} <b>$it</b>",
@@ -899,6 +884,10 @@ abstract class BaseAppDetailActivity :
           }
         )
       }
+    }
+
+    if (featureAdapter.data.isNotEmpty()) {
+      initFeatureListView()
     }
   }
 
