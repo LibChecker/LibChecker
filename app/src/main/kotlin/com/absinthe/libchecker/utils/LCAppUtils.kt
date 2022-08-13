@@ -43,6 +43,7 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
@@ -126,44 +127,46 @@ object LCAppUtils {
       if (source == null) {
         return ruleEntity
       }
-      when (name) {
-        "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        "libapp.so" -> {
-          return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
-              source,
-              "io.flutter.FlutterInjector"
-            )
-          ) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        else -> return ruleEntity
+      if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
+        return null
       }
+      return ruleEntity
     } else {
       return ruleEntity
     }
   }
 
-  fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
+  private val checkNativeLibs =
+    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libapp.so")
+
+  fun checkNativeLibValidation(
+    packageName: String,
+    nativeLib: String,
+    otherNativeLibs: List<LibStringItem>? = null
+  ): Boolean {
+    if (!checkNativeLibs.contains(nativeLib)) {
+      return true
+    }
+    val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
     return when (nativeLib) {
-      "libjiagu.so" -> {
+      "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")
+          PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "com.qihoo.util.QHClassLoader".toClassDefType()
+            )
+          ).any { it == "com.qihoo.util.QHClassLoader".toClassDefType() }
         }.getOrDefault(false)
       }
       "libapp.so" -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "io.flutter.FlutterInjector")
+          otherNativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "io.flutter.FlutterInjector".toClassDefType()
+            )
+          ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
         }.getOrDefault(false)
       }
       else -> true
