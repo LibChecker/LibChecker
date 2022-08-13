@@ -1349,6 +1349,20 @@ object PackageUtils {
   }
 
   fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.entries().asSequence().any { entry ->
+          entry.isDirectory.not() &&
+            entry.name.startsWith("androidx.compose") &&
+            entry.name.endsWith(".version")
+        }
+      }
+    }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
     if (foundList.isNullOrEmpty().not()) {
       return foundList?.contains("androidx.compose.*".toClassDefType()) == true
     }
@@ -1395,6 +1409,16 @@ object PackageUtils {
    * @return true if it uses RxJava framework
    */
   fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META-INF/rxjava.properties") != null
+      }
+    }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
     if (foundList.isNullOrEmpty().not()) {
       return foundList?.contains("rx.*".toClassDefType()) == true ||
         foundList?.contains("io.reactivex.*".toClassDefType()) == true ||
@@ -1454,6 +1478,16 @@ object PackageUtils {
    * @return true if it uses RxKotlin framework
    */
   fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META-INF/rxkotlin.properties") != null
+      }
+    }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
     if (foundList.isNullOrEmpty().not()) {
       return foundList?.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType()) == true ||
         foundList?.contains("io.reactivex.rxkotlin".toClassDefType()) == true ||
