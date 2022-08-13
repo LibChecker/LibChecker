@@ -8,3 +8,6 @@ fun String.toClassDefType(): String {
     "$tmp;"
   }
 }
+
+fun String.test() {
+}

@@ -1266,7 +1266,7 @@ object PackageUtils {
         "rx.lang.kotlin".toClassDefType(),
         "io.reactivex.rxjava3.android.*".toClassDefType(),
         "io.reactivex.android.*".toClassDefType(),
-        "rx.android.*".toClassDefType(),
+        "rx.android.*".toClassDefType()
       )
     )
     if (isSplitsApk()) {
@@ -1287,16 +1287,16 @@ object PackageUtils {
     if (isPWA()) {
       features = features or Features.PWA
     }
-    if (isUseJetpackCompose()) {
+    if (isUseJetpackCompose(resultList)) {
       features = features or Features.JETPACK_COMPOSE
     }
-    if (isRxJavaUsed()) {
+    if (isRxJavaUsed(resultList)) {
       features = features or Features.RX_JAVA
     }
-    if (isRxKotlinUsed()) {
+    if (isRxKotlinUsed(resultList)) {
       features = features or Features.RX_KOTLIN
     }
-    if (isRxAndroidUsed()) {
+    if (isRxAndroidUsed(resultList)) {
       features = features or Features.RX_ANDROID
     }
 
