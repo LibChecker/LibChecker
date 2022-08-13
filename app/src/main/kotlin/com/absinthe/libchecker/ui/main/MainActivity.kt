@@ -239,7 +239,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems()
       } else {
-        initKotlinUsage()
+        initFeatures()
       }
 
       lifecycleScope.launchWhenStarted {
@@ -254,7 +254,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
                   hideNavigationView()
                 }
               } else if (it.status == STATUS_INIT_END) {
-                initKotlinUsage()
+                initFeatures()
               }
             }
             else -> {}
@@ -268,9 +268,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
-  private fun initKotlinUsage() = lifecycleScope.launch(Dispatchers.IO) {
+  private fun initFeatures() = lifecycleScope.launch(Dispatchers.IO) {
     do {
-      appViewModel.workerBinder?.initKotlinUsage()
+      appViewModel.workerBinder?.initFeatures()
       delay(300)
     } while (appViewModel.workerBinder == null)
   }
