@@ -20,7 +20,7 @@ import com.absinthe.rulesbundle.LCRules
     SnapshotItem::class, TimeStampItem::class,
     TrackItem::class, SnapshotDiffStoringItem::class
   ],
-  version = 19,
+  version = 20,
   exportSchema = true
 )
 abstract class LCDatabase : RoomDatabase() {
@@ -50,7 +50,8 @@ abstract class LCDatabase : RoomDatabase() {
             MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10,
             MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
             MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
-            MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19
+            MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
+            MIGRATION_19_20
           )
           .createFromAsset(LCRules.getRulesAssetPath())
           .build()
@@ -292,6 +293,43 @@ abstract class LCDatabase : RoomDatabase() {
           "ALTER TABLE snapshot_table ADD COLUMN packageSize INTEGER NOT NULL DEFAULT 0"
         )
         Repositories.lcRepository.deleteAllSnapshotDiffItems()
+      }
+    }
+
+    private val MIGRATION_19_20: Migration = object : Migration(19, 20) {
+      override fun migrate(database: SupportSQLiteDatabase) {
+        // Create the new table
+        database.execSQL(
+          "CREATE TABLE item_table_new (" +
+            "packageName TEXT NOT NULL, label TEXT NOT NULL, " +
+            "versionName TEXT NOT NULL, versionCode INTEGER NOT NULL, " +
+            "installedTime INTEGER NOT NULL, lastUpdatedTime INTEGER NOT NULL, " +
+            "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
+            "features INTEGER NOT NULL, " +
+            "targetApi INTEGER NOT NULL, variant INTEGER NOT NULL, " +
+            "PRIMARY KEY(packageName))"
+        )
+        // Copy the data
+        database.execSQL(
+          "INSERT INTO item_table_new (" +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, features, targetApi, " +
+            "variant) " +
+            "SELECT " +
+            "packageName, " +
+            "label, versionName, " +
+            "versionCode, installedTime, " +
+            "lastUpdatedTime, isSystem, " +
+            "abi, -1, targetApi, variant " +
+            "FROM item_table"
+        )
+        // Remove the old table
+        database.execSQL("DROP TABLE item_table")
+        // Change the table name to the correct one
+        database.execSQL("ALTER TABLE item_table_new RENAME TO item_table")
       }
     }
   }

@@ -14,7 +14,7 @@ import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
+import com.absinthe.libchecker.utils.PackageUtils.getFeatures
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -103,8 +103,8 @@ class WorkerService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
-  private fun initKotlinUsage() {
-    val map = mutableMapOf<String, Boolean>()
+  private fun initFeatures() {
+    val map = mutableMapOf<String, Int>()
     var count = 0
 
     initializingKotlinUsage = true
@@ -115,9 +115,9 @@ class WorkerService : LifecycleService() {
       }
 
       Repositories.lcRepository.allDatabaseItems.value!!.forEach { lcItem ->
-        if (lcItem.isKotlinUsed == null) {
+        if (lcItem.features == -1) {
           runCatching {
-            map[lcItem.packageName] = PackageUtils.getPackageInfo(lcItem.packageName).isKotlinUsed()
+            map[lcItem.packageName] = PackageUtils.getPackageInfo(lcItem.packageName).getFeatures()
           }.onFailure {
             Timber.w(it)
           }
@@ -125,14 +125,14 @@ class WorkerService : LifecycleService() {
         }
 
         if (count == 20) {
-          Repositories.lcRepository.updateKotlinUsage(map)
+          Repositories.lcRepository.updateFeatures(map)
           map.clear()
           count = 0
         }
       }
 
       if (count > 0) {
-        Repositories.lcRepository.updateKotlinUsage(map)
+        Repositories.lcRepository.updateFeatures(map)
         map.clear()
         count = 0
       }
@@ -145,9 +145,9 @@ class WorkerService : LifecycleService() {
 
     private val serviceRef: WeakReference<WorkerService> = WeakReference(service)
 
-    override fun initKotlinUsage() {
-      Timber.d("initKotlinUsage")
-      serviceRef.get()?.initKotlinUsage()
+    override fun initFeatures() {
+      Timber.d("initFeatures")
+      serviceRef.get()?.initFeatures()
     }
 
     override fun getLastPackageChangedTime(): Long {

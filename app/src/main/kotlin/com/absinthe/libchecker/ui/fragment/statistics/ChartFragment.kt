@@ -18,6 +18,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.services.WorkerService
@@ -226,7 +227,7 @@ class ChartFragment :
         val list = mutableListOf(0, 0)
 
         for (item in it) {
-          if (item.isKotlinUsed == true) {
+          if ((item.features and Features.KOTLIN_USED) > 0) {
             list[0]++
           } else {
             list[1]++
@@ -488,14 +489,14 @@ class ChartFragment :
           when (legendList.getOrNull(h.x.toInt())) {
             getString(R.string.string_kotlin_used) -> {
               dialogTitle = getString(R.string.string_kotlin_used)
-              filteredList?.filter { it.isKotlinUsed == true }
+              filteredList?.filter { (it.features and Features.KOTLIN_USED) > 0 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
             }
             getString(R.string.string_kotlin_unused) -> {
               dialogTitle = getString(R.string.string_kotlin_unused)
-              filteredList?.filter { it.isKotlinUsed == false }
+              filteredList?.filter { (it.features and Features.KOTLIN_USED) == 0 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }

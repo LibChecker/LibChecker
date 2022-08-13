@@ -159,13 +159,13 @@ class LCRepository(private val lcDao: LCDao) {
   suspend fun getSnapshotDiff(packageName: String): SnapshotDiffStoringItem? =
     lcDao.getSnapshotDiff(packageName)
 
-  fun updateKotlinUsage(packageName: String, used: Boolean) {
+  fun updateFeatures(packageName: String, features: Int) {
     if (checkDatabaseStatus().not()) return
-    lcDao.updateKotlinUsage(packageName, used)
+    lcDao.updateFeatures(packageName, features)
   }
 
-  fun updateKotlinUsage(map: Map<String, Boolean>) {
+  fun updateFeatures(map: Map<String, Int>) {
     if (checkDatabaseStatus().not()) return
-    lcDao.updateKotlinUsage(map)
+    lcDao.updateFeatures(map)
   }
 }

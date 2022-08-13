@@ -40,12 +40,12 @@ interface LCDao {
   @Query("DELETE FROM item_table")
   fun deleteAllItems()
 
-  @Query("UPDATE item_table SET isKotlinUsed = :used WHERE packageName = :packageName")
-  fun updateKotlinUsage(packageName: String, used: Boolean)
+  @Query("UPDATE item_table SET features = :features WHERE packageName = :packageName")
+  fun updateFeatures(packageName: String, features: Int)
 
   @Transaction
-  fun updateKotlinUsage(map: Map<String, Boolean>) {
-    map.forEach { updateKotlinUsage(it.key, it.value) }
+  fun updateFeatures(map: Map<String, Int>) {
+    map.forEach { updateFeatures(it.key, it.value) }
   }
 
   // Snapshot Table

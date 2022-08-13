@@ -17,8 +17,7 @@ data class LCItem(
   @ColumnInfo val lastUpdatedTime: Long,
   @ColumnInfo val isSystem: Boolean,
   @ColumnInfo val abi: Short,
-  @ColumnInfo val isSplitApk: Boolean,
-  @ColumnInfo val isKotlinUsed: Boolean?,
+  @ColumnInfo val features: Int,
   @ColumnInfo val targetApi: Short,
   @ColumnInfo val variant: Short
 ) : Parcelable

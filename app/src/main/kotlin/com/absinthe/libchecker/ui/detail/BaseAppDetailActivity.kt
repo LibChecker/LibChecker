@@ -54,6 +54,8 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
@@ -72,14 +74,9 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getFeatures
 import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
-import com.absinthe.libchecker.utils.PackageUtils.isKotlinUsed
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
-import com.absinthe.libchecker.utils.PackageUtils.isPWA
-import com.absinthe.libchecker.utils.PackageUtils.isPlayAppSigning
-import com.absinthe.libchecker.utils.PackageUtils.isSplitsApk
-import com.absinthe.libchecker.utils.PackageUtils.isUseJetpackCompose
-import com.absinthe.libchecker.utils.PackageUtils.isXposedModule
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -357,37 +354,15 @@ abstract class BaseAppDetailActivity :
 
         if (featureListView == null) {
           lifecycleScope.launch(Dispatchers.IO) {
-            val isSplitApk = extraBean?.isSplitApk ?: packageInfo.isSplitsApk()
-            val isKotlinUsed = extraBean?.isKotlinUsed ?: packageInfo.isKotlinUsed()
-
-            if (isSplitApk) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                featureAdapter.addData(
-                  FeatureItem(R.drawable.ic_aab) {
-                    AppBundleBottomSheetDialogFragment().apply {
-                      arguments = bundleOf(
-                        EXTRA_PACKAGE_NAME to packageInfo.packageName
-                      )
-                      show(supportFragmentManager, tag)
-                    }
-                  }
-                )
-              }
-            }
-            if (isKotlinUsed) {
-              withContext(Dispatchers.Main) {
-                initFeatureListView()
-                withContext(Dispatchers.IO) {
-                  val kotlinPluginVersion = PackageUtils.getKotlinPluginVersion(packageInfo)
-                  withContext(Dispatchers.Main) {
-                    showKotlinUsedLabel(kotlinPluginVersion)
-                  }
-                }
-              }
+            var features = extraBean?.features ?: -1
+            if (features == -1) {
+              features = packageInfo.getFeatures()
+              Repositories.lcRepository.updateFeatures(packageInfo.packageName, features)
             }
 
-            initMoreFeatures(packageInfo)
+            withContext(Dispatchers.Main) {
+              initFeatures(packageInfo, features)
+            }
           }
         }
       } catch (e: Exception) {
@@ -704,25 +679,6 @@ abstract class BaseAppDetailActivity :
     return false
   }
 
-  private fun showKotlinUsedLabel(kotlinPluginVersion: String?) {
-    initFeatureListView()
-    val title = StringBuilder(getString(R.string.kotlin_string))
-    kotlinPluginVersion?.let {
-      title.append(" ").append(it)
-    }
-
-    featureAdapter.addData(
-      FeatureItem(R.drawable.ic_kotlin_logo) {
-        BaseAlertDialogBuilder(this)
-          .setIcon(R.drawable.ic_kotlin_logo)
-          .setTitle(title)
-          .setMessage(R.string.kotlin_details)
-          .setPositiveButton(android.R.string.ok, null)
-          .show()
-      }
-    )
-  }
-
   private fun initFeatureListView(): Boolean {
     if (featureListView != null) {
       return false
@@ -742,95 +698,203 @@ abstract class BaseAppDetailActivity :
     return true
   }
 
-  private suspend fun initMoreFeatures(packageInfo: PackageInfo) {
-    PackageUtils.getAGPVersion(packageInfo)?.let {
-      withContext(Dispatchers.Main) {
-        initFeatureListView()
-        featureAdapter.addData(
-          FeatureItem(R.drawable.ic_gradle) {
-            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(R.drawable.ic_gradle)
-              .setTitle(
-                HtmlCompat.fromHtml(
-                  "${getString(R.string.agp)} <b>$it</b>",
-                  HtmlCompat.FROM_HTML_MODE_COMPACT
-                )
+  private suspend fun initFeatures(packageInfo: PackageInfo, features: Int) {
+    initFeatureListView()
+
+    if ((features and Features.SPLIT_APKS) > 0) {
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_aab) {
+          AppBundleBottomSheetDialogFragment().apply {
+            arguments = bundleOf(
+              EXTRA_PACKAGE_NAME to packageInfo.packageName
+            )
+            show(supportFragmentManager, tag)
+          }
+        }
+      )
+    }
+    if ((features and Features.KOTLIN_USED) > 0) {
+      val dialog = BaseAlertDialogBuilder(this)
+        .setIcon(R.drawable.ic_kotlin_logo)
+        .setTitle(R.string.kotlin_string)
+        .setMessage(R.string.kotlin_details)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_kotlin_logo) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getKotlinPluginVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.kotlin_string)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
               )
-              .setMessage(R.string.agp_details)
-              .setPositiveButton(android.R.string.ok, null)
-              .show()
+            )
           }
-        )
+        }
+      }
+    }
+    if ((features and Features.RX_JAVA) > 0) {
+      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+        .setIcon(R.drawable.ic_reactivex)
+        .setTitle(R.string.rxjava)
+        .setMessage(R.string.rx_detail)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_reactivex) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getRxJavaVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.rxjava)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+              )
+            )
+          }
+        }
+      }
+    }
+    if ((features and Features.RX_KOTLIN) > 0) {
+      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+        .setIcon(R.drawable.ic_rxkotlin)
+        .setTitle(R.string.rxkotlin)
+        .setMessage(R.string.rx_kotlin_detail)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_rxkotlin) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getRxKotlinVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.rxkotlin)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+              )
+            )
+          }
+        }
+      }
+    }
+    if ((features and Features.RX_ANDROID) > 0) {
+      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+        .setIcon(R.drawable.ic_rxandroid)
+        .setTitle(R.string.rxandroid)
+        .setMessage(R.string.rx_android_detail)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_rxandroid) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getRxAndroidVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.rxandroid)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+              )
+            )
+          }
+        }
+      }
+    }
+    if ((features and Features.AGP) > 0) {
+      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+        .setIcon(R.drawable.ic_gradle)
+        .setTitle(R.string.agp)
+        .setMessage(R.string.agp_details)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_gradle) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getAGPVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.agp)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+              )
+            )
+          }
+        }
       }
     }
 
-    if (packageInfo.isXposedModule()) {
-      withContext(Dispatchers.Main) {
-        initFeatureListView()
-        featureAdapter.addData(
-          FeatureItem(R.drawable.ic_xposed) {
-            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(R.drawable.ic_xposed)
-              .setTitle(R.string.xposed_module)
-              .setMessage(R.string.xposed_module_details)
-              .setPositiveButton(android.R.string.ok, null)
-              .show()
-          }
-        )
-      }
+    if ((features and Features.XPOSED_MODULE) > 0) {
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_xposed) {
+          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+            .setIcon(R.drawable.ic_xposed)
+            .setTitle(R.string.xposed_module)
+            .setMessage(R.string.xposed_module_details)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+        }
+      )
     }
 
-    if (packageInfo.isPlayAppSigning()) {
-      withContext(Dispatchers.Main) {
-        initFeatureListView()
-        featureAdapter.addData(
-          FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
-            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store)
-              .setTitle(R.string.play_app_signing)
-              .setMessage(R.string.play_app_signing_details)
-              .setPositiveButton(android.R.string.ok, null)
-              .show()
-          }
-        )
-      }
+    if ((features and Features.PLAY_SIGNING) > 0) {
+      featureAdapter.addData(
+        FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
+          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+            .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store)
+            .setTitle(R.string.play_app_signing)
+            .setMessage(R.string.play_app_signing_details)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+        }
+      )
     }
 
-    if (packageInfo.isPWA()) {
-      withContext(Dispatchers.Main) {
-        initFeatureListView()
-        featureAdapter.addData(
-          FeatureItem(R.drawable.ic_pwa) {
-            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(R.drawable.ic_pwa)
-              .setTitle(R.string.pwa)
-              .setMessage(R.string.pwa_details)
-              .setPositiveButton(android.R.string.ok, null)
-              .show()
-          }
-        )
-      }
+    if ((features and Features.PWA) > 0) {
+      featureAdapter.addData(
+        FeatureItem(R.drawable.ic_pwa) {
+          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+            .setIcon(R.drawable.ic_pwa)
+            .setTitle(R.string.pwa)
+            .setMessage(R.string.pwa_details)
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+        }
+      )
     }
 
-    if (packageInfo.isUseJetpackCompose()) {
-      withContext(Dispatchers.Main) {
-        initFeatureListView()
-        val title = PackageUtils.getJetpackComposeVersion(packageInfo)?.let {
-          HtmlCompat.fromHtml(
-            "${getString(R.string.jetpack_compose)} <b>$it</b>",
-            HtmlCompat.FROM_HTML_MODE_COMPACT
-          )
-        } ?: getString(R.string.jetpack_compose)
-        featureAdapter.addData(
-          FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
-            BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-              .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose)
-              .setTitle(title)
-              .setMessage(R.string.jetpack_compose_details)
-              .setPositiveButton(android.R.string.ok, null)
-              .show()
+    if ((features and Features.JETPACK_COMPOSE) > 0) {
+      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
+        .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose)
+        .setTitle(R.string.jetpack_compose)
+        .setMessage(R.string.jetpack_compose_details)
+        .setPositiveButton(android.R.string.ok, null)
+      featureAdapter.addData(
+        FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
+          dialog.show()
+        }
+      )
+      withContext(Dispatchers.IO) {
+        PackageUtils.getJetpackComposeVersion(packageInfo)?.let { version ->
+          withContext(Dispatchers.Main) {
+            dialog.setTitle(
+              HtmlCompat.fromHtml(
+                "${getString(R.string.jetpack_compose)} <b>$version</b>",
+                HtmlCompat.FROM_HTML_MODE_COMPACT
+              )
+            )
           }
-        )
+        }
       }
     }
   }

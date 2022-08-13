@@ -53,13 +53,17 @@ import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
 import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
 import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
@@ -506,21 +510,10 @@ object PackageUtils {
    * @return true if it uses Kotlin language
    */
   private fun isKotlinUsedInClassDex(file: File): Boolean {
-    return try {
-      FastDexFileFactory.loadDexContainer(file, Opcodes.getDefault()).apply {
-        dexEntryNames.forEach { entry ->
-          val isKotlinUsage = getEntry(entry)?.dexFile?.classes?.any {
-            it.type.startsWith("Lkotlin/") || it.type.startsWith("Lkotlinx/")
-          } ?: false
-          if (isKotlinUsage) {
-            return true
-          }
-        }
-      }
-      return false
-    } catch (e: Throwable) {
-      false
-    }
+    return findDexClasses(
+      file,
+      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType())
+    ).isNotEmpty()
   }
 
   /**
@@ -982,28 +975,38 @@ object PackageUtils {
   /**
    * Check if a package contains a class
    * @param sourceFile Source file
-   * @param className Class name
+   * @param classes Class name
+   * @param hasAny true if has any class, false if has all classes
    */
-  fun hasDexClass(sourceFile: File, className: String): Boolean {
+  fun findDexClasses(
+    sourceFile: File,
+    classes: List<String>,
+    hasAny: Boolean = false
+  ): List<String> {
+    val findList = mutableListOf<String>()
     return runCatching {
-      val typeName = "L${className.replace(".", "/")};".replace("*;", "")
       FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
-          val hasDex = getEntry(entry)?.dexFile?.classes
-            ?.any {
-              if (className.last() == '*') {
-                it.type.startsWith(typeName)
+          getEntry(entry)?.dexFile?.classes?.forEach { def ->
+            classes.forEach {
+              val foundClass = if (it.last() == '*') {
+                def.type.startsWith(it.removeSuffix("*"))
               } else {
-                it.type == typeName
+                def.type == it
               }
-            } ?: false
-          if (hasDex) {
-            return true
+              if (foundClass && !findList.contains(it)) {
+                findList.add(it)
+
+                if (findList.size == classes.size || hasAny) {
+                  return@runCatching findList
+                }
+              }
+            }
           }
         }
       }
-      return false
-    }.getOrDefault(false)
+      return findList
+    }.getOrDefault(emptyList())
   }
 
   /**
@@ -1250,6 +1253,57 @@ object PackageUtils {
     return size
   }
 
+  fun PackageInfo.getFeatures(): Int {
+    var features = 0
+    val resultList = findDexClasses(
+      File(applicationInfo.sourceDir),
+      listOf(
+        "androidx.compose.*".toClassDefType(),
+        "rx.*".toClassDefType(),
+        "io.reactivex.*".toClassDefType(),
+        "io.reactivex.rxjava3.*".toClassDefType(),
+        "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
+        "io.reactivex.rxkotlin".toClassDefType(),
+        "rx.lang.kotlin".toClassDefType(),
+        "io.reactivex.rxjava3.android.*".toClassDefType(),
+        "io.reactivex.android.*".toClassDefType(),
+        "rx.android.*".toClassDefType()
+      )
+    )
+    if (isSplitsApk()) {
+      features = features or Features.SPLIT_APKS
+    }
+    if (isKotlinUsed()) {
+      features = features or Features.KOTLIN_USED
+    }
+    if (getAGPVersion(this)?.isNotBlank() == true) {
+      features = features or Features.AGP
+    }
+    if (isXposedModule()) {
+      features = features or Features.XPOSED_MODULE
+    }
+    if (isPlayAppSigning()) {
+      features = features or Features.PLAY_SIGNING
+    }
+    if (isPWA()) {
+      features = features or Features.PWA
+    }
+    if (isUseJetpackCompose(resultList)) {
+      features = features or Features.JETPACK_COMPOSE
+    }
+    if (isRxJavaUsed(resultList)) {
+      features = features or Features.RX_JAVA
+    }
+    if (isRxKotlinUsed(resultList)) {
+      features = features or Features.RX_KOTLIN
+    }
+    if (isRxAndroidUsed(resultList)) {
+      features = features or Features.RX_ANDROID
+    }
+
+    return features
+  }
+
   fun PackageInfo.isXposedModule(): Boolean {
     return applicationInfo.metaData?.getBoolean("xposedmodule") == true ||
       applicationInfo.metaData?.containsKey("xposedminversion") == true
@@ -1294,10 +1348,28 @@ object PackageUtils {
     }.getOrNull()
   }
 
-  fun PackageInfo.isUseJetpackCompose(): Boolean {
-    return runCatching {
-      hasDexClass(File(applicationInfo.sourceDir), "androidx.compose.*")
+  fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.entries().asSequence().any { entry ->
+          entry.isDirectory.not() &&
+            entry.name.startsWith("androidx.compose") &&
+            entry.name.endsWith(".version")
+        }
+      }
     }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
+    if (foundList.isNullOrEmpty().not()) {
+      return foundList?.contains("androidx.compose.*".toClassDefType()) == true
+    }
+    return findDexClasses(
+      File(applicationInfo.sourceDir),
+      listOf("androidx.compose.*".toClassDefType())
+    ).isNotEmpty()
   }
 
   fun getJetpackComposeVersion(packageInfo: PackageInfo): String? {
@@ -1325,6 +1397,191 @@ object PackageUtils {
       ELF64EhdrParser(input).getEType()
     } else {
       ELF32EhdrParser(input).getEType()
+    }
+  }
+
+  private const val RX_MAJOR_ONE = "1"
+  private const val RX_MAJOR_TWO = "2"
+  private const val RX_MAJOR_THREE = "3"
+
+  /**
+   * Check if an app uses RxJava framework
+   * @return true if it uses RxJava framework
+   */
+  fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META-INF/rxjava.properties") != null
+      }
+    }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
+    if (foundList.isNullOrEmpty().not()) {
+      return foundList?.contains("rx.*".toClassDefType()) == true ||
+        foundList?.contains("io.reactivex.*".toClassDefType()) == true ||
+        foundList?.contains("io.reactivex.rxjava3.*".toClassDefType()) == true
+    }
+    return findDexClasses(
+      File(applicationInfo.sourceDir),
+      listOf(
+        "rx.*".toClassDefType(),
+        "io.reactivex.*".toClassDefType(),
+        "io.reactivex.rxjava3.*".toClassDefType()
+      ),
+      hasAny = true
+    ).isNotEmpty()
+  }
+
+  private const val REACTIVEX_KEYWORD = "Implementation-Version"
+
+  suspend fun getRxJavaVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      runCatching {
+        ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+          zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
+            Properties().apply {
+              load(zipFile.getInputStream(ze))
+              getProperty(REACTIVEX_KEYWORD)?.let {
+                return@withContext it
+              }
+            }
+          }
+        }
+        val resultList = findDexClasses(
+          File(packageInfo.applicationInfo.sourceDir),
+          listOf(
+            "rx.*".toClassDefType(),
+            "io.reactivex.*".toClassDefType(),
+            "io.reactivex.rxjava3.*".toClassDefType()
+          ),
+          hasAny = true
+        )
+        if (resultList.contains("io.reactivex.rxjava3.*".toClassDefType())) {
+          return@withContext RX_MAJOR_THREE
+        }
+        if (resultList.contains("io.reactivex.*".toClassDefType())) {
+          return@withContext RX_MAJOR_TWO
+        }
+        if (resultList.contains("rx.*".toClassDefType())) {
+          return@withContext RX_MAJOR_ONE
+        }
+      }
+      return@withContext null
+    }
+  }
+
+  /**
+   * Check if an app uses RxKotlin framework
+   * @return true if it uses RxKotlin framework
+   */
+  fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
+    val usedInMetaInf = runCatching {
+      val file = File(applicationInfo.sourceDir)
+
+      ZipFile(file).use {
+        it.getEntry("META-INF/rxkotlin.properties") != null
+      }
+    }.getOrDefault(false)
+    if (usedInMetaInf) {
+      return true
+    }
+    if (foundList.isNullOrEmpty().not()) {
+      return foundList?.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType()) == true ||
+        foundList?.contains("io.reactivex.rxkotlin".toClassDefType()) == true ||
+        foundList?.contains("rx.lang.kotlin".toClassDefType()) == true
+    }
+    return findDexClasses(
+      File(applicationInfo.sourceDir),
+      listOf(
+        "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
+        "io.reactivex.rxkotlin".toClassDefType(),
+        "rx.lang.kotlin".toClassDefType()
+      ),
+      hasAny = true
+    ).isNotEmpty()
+  }
+
+  suspend fun getRxKotlinVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      runCatching {
+        ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+          zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
+            Properties().apply {
+              load(zipFile.getInputStream(ze))
+              getProperty(REACTIVEX_KEYWORD)?.let {
+                return@withContext it
+              }
+            }
+          }
+        }
+        val resultList = findDexClasses(
+          File(packageInfo.applicationInfo.sourceDir),
+          listOf(
+            "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
+            "io.reactivex.rxkotlin".toClassDefType(),
+            "rx.lang.kotlin".toClassDefType()
+          ),
+          hasAny = true
+        )
+        if (resultList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType())) {
+          return@withContext RX_MAJOR_THREE
+        }
+        if (resultList.contains("io.reactivex.rxkotlin".toClassDefType())) {
+          return@withContext RX_MAJOR_TWO
+        }
+        if (resultList.contains("rx.lang.kotlin".toClassDefType())) {
+          return@withContext RX_MAJOR_ONE
+        }
+      }
+      return@withContext null
+    }
+  }
+
+  /**
+   * Check if an app uses RxAndroid framework
+   * @return true if it uses RxAndroid framework
+   */
+  fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {
+    if (foundList.isNullOrEmpty().not()) {
+      return foundList?.contains("io.reactivex.rxjava3.android.*".toClassDefType()) == true ||
+        foundList?.contains("io.reactivex.android.*".toClassDefType()) == true ||
+        foundList?.contains("rx.android.*".toClassDefType()) == true
+    }
+    return findDexClasses(
+      File(applicationInfo.sourceDir),
+      listOf(
+        "io.reactivex.rxjava3.android.*".toClassDefType(),
+        "io.reactivex.android.*".toClassDefType(),
+        "rx.android.*".toClassDefType()
+      ),
+      hasAny = true
+    ).isNotEmpty()
+  }
+
+  suspend fun getRxAndroidVersion(packageInfo: PackageInfo): String? {
+    return withContext(Dispatchers.IO) {
+      val resultList = findDexClasses(
+        File(packageInfo.applicationInfo.sourceDir),
+        listOf(
+          "io.reactivex.rxjava3.android.*".toClassDefType(),
+          "io.reactivex.android.*".toClassDefType(),
+          "rx.android.*".toClassDefType()
+        ),
+        hasAny = true
+      )
+      if (resultList.contains("io.reactivex.rxjava3.android.*".toClassDefType())) {
+        return@withContext RX_MAJOR_THREE
+      }
+      if (resultList.contains("io.reactivex.android.*".toClassDefType())) {
+        return@withContext RX_MAJOR_TWO
+      }
+      if (resultList.contains("rx.android.*".toClassDefType())) {
+        return@withContext RX_MAJOR_ONE
+      }
+      return@withContext null
     }
   }
 }

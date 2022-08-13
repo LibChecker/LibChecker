@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 19,
-    "identityHash": "45352965cba4fd489678d90853e792a9",
+    "version": 20,
+    "identityHash": "94843680ebce81b402ad7d9fce0a798b",
     "entities": [
       {
         "tableName": "item_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageName` TEXT NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `isSplitApk` INTEGER NOT NULL, `isKotlinUsed` INTEGER, `targetApi` INTEGER NOT NULL, `variant` INTEGER NOT NULL, PRIMARY KEY(`packageName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`packageName` TEXT NOT NULL, `label` TEXT NOT NULL, `versionName` TEXT NOT NULL, `versionCode` INTEGER NOT NULL, `installedTime` INTEGER NOT NULL, `lastUpdatedTime` INTEGER NOT NULL, `isSystem` INTEGER NOT NULL, `abi` INTEGER NOT NULL, `features` INTEGER NOT NULL, `targetApi` INTEGER NOT NULL, `variant` INTEGER NOT NULL, PRIMARY KEY(`packageName`))",
         "fields": [
           {
             "fieldPath": "packageName",
@@ -57,16 +57,10 @@
             "notNull": true
           },
           {
-            "fieldPath": "isSplitApk",
-            "columnName": "isSplitApk",
+            "fieldPath": "features",
+            "columnName": "features",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "isKotlinUsed",
-            "columnName": "isKotlinUsed",
-            "affinity": "INTEGER",
-            "notNull": false
           },
           {
             "fieldPath": "targetApi",
@@ -82,10 +76,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "packageName"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -210,10 +204,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": true,
           "columnNames": [
             "id"
-          ],
-          "autoGenerate": true
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -236,10 +230,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "timestamp"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -256,10 +250,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "packageName"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -288,10 +282,10 @@
           }
         ],
         "primaryKey": {
+          "autoGenerate": false,
           "columnNames": [
             "packageName"
-          ],
-          "autoGenerate": false
+          ]
         },
         "indices": [],
         "foreignKeys": []
@@ -300,7 +294,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '45352965cba4fd489678d90853e792a9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '94843680ebce81b402ad7d9fce0a798b')"
     ]
   }
 }

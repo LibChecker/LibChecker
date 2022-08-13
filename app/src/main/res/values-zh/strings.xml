@@ -122,6 +122,9 @@
   <string name="menu_process">进程</string>
   <string name="alternative_launch_method">备选的启动方式</string>
   <string name="compare_with_current">与当前包比较</string>
+  <string name="rx_detail">RxJava 是 Reactive Extensions 的 Java VM 实现：一个使用可观察序列组成异步和基于事件的程序的库。</string>
+  <string name="rx_android_detail">适用于 Android 的 Reactive Extensions</string>
+  <string name="rx_kotlin_detail">RxJava 的 Kotlin 扩展</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
