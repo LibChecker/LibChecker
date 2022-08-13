@@ -886,8 +886,10 @@ abstract class BaseAppDetailActivity :
       }
     }
 
-    if (featureAdapter.data.isNotEmpty()) {
-      initFeatureListView()
+    withContext(Dispatchers.Main) {
+      if (featureAdapter.data.isNotEmpty()) {
+        initFeatureListView()
+      }
     }
   }
 
