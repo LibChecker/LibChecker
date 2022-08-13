@@ -1,18 +1,18 @@
 {
-  "total": 248,
+  "total": 268,
   "tools inspection": {
-    "Code Inspection": 248
+    "Code Inspection": 268
   },
   "attributes": {
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/zhaobozhen/LibChecker",
-        "revisionId": "c0484b7a611b39d4344fb8a831e82681a1e3295d",
+        "revisionId": "5bd8fabfd0ae4d9059a9b6869f6fe8b32e3695c2",
         "branch": "master"
       }
     },
     "deviceId": "200820300000000-9a51-bd2c-aa09-1801369fd0c6",
-    "jobUrl": "https://github.com/zhaobozhen/LibChecker/actions/runs/2838180372",
+    "jobUrl": "https://github.com/zhaobozhen/LibChecker/actions/runs/2851596435",
     "repoUrl": "https://github.com/zhaobozhen/LibChecker"
   }
 }
