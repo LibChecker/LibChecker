@@ -12,3 +12,5 @@ exclude:
       - hidden-api/build.gradle.kts
       - build.gradle.kts
       - settings.gradle.kts
+  # Disable Gradle Kotlin DSL check
+  - name: UnusedSymbol
