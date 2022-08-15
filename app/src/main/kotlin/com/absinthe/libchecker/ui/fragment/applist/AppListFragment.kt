@@ -7,10 +7,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,8 +26,11 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
+import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
+import com.absinthe.libchecker.ui.fragment.detail.AlternativeLaunchBSDFragment
+import com.absinthe.libchecker.ui.fragment.main.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
@@ -62,7 +63,6 @@ class AppListFragment :
   private val appAdapter = AppAdapter()
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
-  private var popup: PopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
   private var keyword: String = ""
@@ -164,11 +164,6 @@ class AppListFragment :
     }
   }
 
-  override fun onPause() {
-    super.onPause()
-    popup?.dismiss()
-  }
-
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     inflater.inflate(R.menu.app_list_menu, menu)
     this.menu = menu
@@ -235,35 +230,15 @@ class AppListFragment :
     return false
   }
 
-  @SuppressLint("RestrictedApi")
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.sort -> {
-        activity?.let { a ->
-          popup = PopupMenu(a, a.findViewById(R.id.sort)).apply {
-            menuInflater.inflate(R.menu.sort_menu, menu)
+        activity?.let {
+          AdvancedMenuBSDFragment().apply {
+            arguments = bundleOf(
 
-            if (menu is MenuBuilder) {
-              (menu as MenuBuilder).setOptionalIconsVisible(true)
-            }
-
-            menu[GlobalValues.appSortMode].isChecked = true
-            setOnMenuItemClickListener { menuItem ->
-              val mode = when (menuItem.itemId) {
-                R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
-                R.id.sort_by_target_api_desc -> Constants.SORT_MODE_TARGET_API_DESC
-                R.id.sort_default -> Constants.SORT_MODE_DEFAULT
-                else -> Constants.SORT_MODE_DEFAULT
-              }
-              GlobalValues.appSortMode = mode
-              GlobalValues.appSortModeLiveData.value = mode
-              true
-            }
-            setOnDismissListener {
-              popup = null
-            }
-          }.also {
-            it.show()
+            )
+            show(it.supportFragmentManager, tag)
           }
         }
       }
