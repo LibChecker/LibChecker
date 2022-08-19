@@ -124,7 +124,7 @@ dependencies {
   compileOnly(projects.hiddenApi)
 
   implementation(libs.kotlinX.coroutines)
-  implementation(libs.androidX.appCompat)
+  //implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)

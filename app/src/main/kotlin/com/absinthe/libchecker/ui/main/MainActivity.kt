@@ -137,8 +137,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     binding.progressHorizontal.hide()
   }
 
-  override fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
-    Timber.d("scheduleAppbarLiftingStatus: isLifted: $isLifted, from: $from")
+  override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted
   }
 

@@ -43,6 +43,7 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
 
   override fun onApplyUserThemeResource(theme: Resources.Theme, isDecorView: Boolean) {
     theme.applyStyle(R.style.ThemeOverlay, true)
+    theme.applyStyle(rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference, true)
 
     if (GlobalValues.rengeTheme) {
       theme.applyStyle(R.style.ThemeOverlay_Renge, true)

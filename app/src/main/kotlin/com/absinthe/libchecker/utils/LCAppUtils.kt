@@ -32,6 +32,7 @@ import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
@@ -173,8 +174,8 @@ object LCAppUtils {
     }
   }
 
-  fun getNightMode(nightModeString: String): Int {
-    return when (nightModeString) {
+  fun getNightMode(): Int {
+    return when (GlobalValues.darkMode) {
       Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
       Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
       Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM

@@ -234,10 +234,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "SnapshotFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
 
@@ -417,16 +414,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     binding.list.layoutManager = getSuitableLayoutManager()
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.snapshot_menu, menu)
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.snapshot_menu, menu)
     this.menu = menu
-
-    super.onCreateOptionsMenu(menu, inflater)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (this.context as? BaseActivity<*>) ?: return false
-    if (item.itemId == R.id.save) {
+    if (menuItem.itemId == R.id.save) {
       if (viewModel.isComparingActive() || shootBinder?.isShooting == true) {
         return false
       }
@@ -499,7 +494,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           .show()
       }
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun flip(child: Int) {

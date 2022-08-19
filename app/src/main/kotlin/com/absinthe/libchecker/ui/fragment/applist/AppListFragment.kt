@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.applist
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Color
 import android.view.Menu
@@ -26,10 +25,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
-import com.absinthe.libchecker.ui.fragment.detail.AlternativeLaunchBSDFragment
 import com.absinthe.libchecker.ui.fragment.main.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -91,10 +88,7 @@ class AppListFragment :
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "AppListFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
         setHasFixedSize(true)
@@ -160,34 +154,8 @@ class AppListFragment :
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     if (homeViewModel.appListStatus == STATUS_START_INIT) {
       flip(VF_INIT)
-      setHasOptionsMenu(false)
+      activity?.removeMenuProvider(this)
     }
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.app_list_menu, menu)
-    this.menu = menu
-
-    val searchView = SearchView(requireContext()).apply {
-      setIconifiedByDefault(false)
-      setOnQueryTextListener(this@AppListFragment)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-
-      if (!isListReady) {
-        isVisible = false
-      }
-    }
-    super.onCreateOptionsMenu(menu, inflater)
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
@@ -230,8 +198,33 @@ class AppListFragment :
     return false
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.app_list_menu, menu)
+    this.menu = menu
+
+    val searchView = SearchView(requireContext()).apply {
+      setIconifiedByDefault(false)
+      setOnQueryTextListener(this@AppListFragment)
+      queryHint = getText(R.string.search_hint)
+      isQueryRefinementEnabled = true
+
+      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+        setBackgroundColor(Color.TRANSPARENT)
+      }
+    }
+
+    menu.findItem(R.id.search).apply {
+      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+      actionView = searchView
+
+      if (!isListReady) {
+        isVisible = false
+      }
+    }
+  }
+
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    when (menuItem.itemId) {
       R.id.sort -> {
         activity?.let {
           AdvancedMenuBSDFragment().apply {
@@ -243,8 +236,7 @@ class AppListFragment :
         }
       }
     }
-
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun initObserver() {
@@ -281,7 +273,7 @@ class AppListFragment :
                     Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                   }
                   (activity as? INavViewContainer)?.showNavigationView()
-                  setHasOptionsMenu(true)
+                  activity?.addMenuProvider(this@AppListFragment)
                 }
                 STATUS_START_REQUEST_CHANGE_END -> {
                   dbItems.value?.let { dbItems -> updateItems(dbItems) }
@@ -430,7 +422,7 @@ class AppListFragment :
 
   private fun initApps() {
     flip(VF_INIT)
-    setHasOptionsMenu(false)
+    activity?.removeMenuProvider(this)
     homeViewModel.initItems()
   }
 

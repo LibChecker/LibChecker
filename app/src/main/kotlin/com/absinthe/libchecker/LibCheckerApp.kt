@@ -71,7 +71,7 @@ class LibCheckerApp : Application() {
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
+    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()
