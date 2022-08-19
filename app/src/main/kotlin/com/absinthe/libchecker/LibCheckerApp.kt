@@ -75,8 +75,8 @@ class LibCheckerApp : Application() {
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()
-    initSplitController()
     DynamicColors.applyToActivitiesIfAvailable(this)
+    initSplitController()
 
     Coil.setImageLoader {
       ImageLoader(this).newBuilder()

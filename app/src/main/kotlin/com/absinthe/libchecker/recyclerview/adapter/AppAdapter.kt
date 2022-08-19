@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
@@ -29,7 +28,6 @@ class AppAdapter : HighlightAdapter<LCItem>() {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
           it.setMargins(0, margin, 0, margin)
         }
-        setCardBackgroundColor(Color.TRANSPARENT)
       }
     )
   }
