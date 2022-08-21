@@ -370,20 +370,20 @@
       "version": "2.5.2"
     },
     {
-      "ideaName": "Gradle: org.slf4j:slf4j-simple:1.7.36",
-      "gradleName": "org.slf4j:slf4j-simple:1.7.36",
+      "ideaName": "Gradle: org.slf4j:slf4j-simple:2.0.0",
+      "gradleName": "org.slf4j:slf4j-simple:2.0.0",
       "unresolved": false,
       "groupId": "org.slf4j",
       "artifactId": "slf4j-simple",
-      "version": "1.7.36"
+      "version": "2.0.0"
     },
     {
-      "ideaName": "Gradle: org.slf4j:slf4j-api:1.7.36",
-      "gradleName": "org.slf4j:slf4j-api:1.7.36",
+      "ideaName": "Gradle: org.slf4j:slf4j-api:2.0.0",
+      "gradleName": "org.slf4j:slf4j-api:2.0.0",
       "unresolved": false,
       "groupId": "org.slf4j",
       "artifactId": "slf4j-api",
-      "version": "1.7.36"
+      "version": "2.0.0"
     },
     {
       "ideaName": "Gradle: commons-io:commons-io:2.11.0",
@@ -434,13 +434,13 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: androidx.core:core-ktx:1.9.0-alpha05@aar",
-      "gradleName": "androidx.core:core-ktx:1.9.0-alpha05@aar",
+      "ideaName": "Gradle: androidx.core:core-ktx:1.8.0@aar",
+      "gradleName": "androidx.core:core-ktx:1.8.0@aar",
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: androidx.core:core:1.9.0-alpha05@aar",
-      "gradleName": "androidx.core:core:1.9.0-alpha05@aar",
+      "ideaName": "Gradle: androidx.core:core:1.8.0@aar",
+      "gradleName": "androidx.core:core:1.8.0@aar",
       "unresolved": false
     },
     {
@@ -504,13 +504,13 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: androidx.fragment:fragment-ktx:1.5.1@aar",
-      "gradleName": "androidx.fragment:fragment-ktx:1.5.1@aar",
+      "ideaName": "Gradle: androidx.fragment:fragment-ktx:1.5.2@aar",
+      "gradleName": "androidx.fragment:fragment-ktx:1.5.2@aar",
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: androidx.fragment:fragment:1.5.1@aar",
-      "gradleName": "androidx.fragment:fragment:1.5.1@aar",
+      "ideaName": "Gradle: androidx.fragment:fragment:1.5.2@aar",
+      "gradleName": "androidx.fragment:fragment:1.5.2@aar",
       "unresolved": false
     },
     {
@@ -674,13 +674,13 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: io.coil-kt:coil:2.1.0@aar",
-      "gradleName": "io.coil-kt:coil:2.1.0@aar",
+      "ideaName": "Gradle: io.coil-kt:coil:2.2.0@aar",
+      "gradleName": "io.coil-kt:coil:2.2.0@aar",
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: io.coil-kt:coil-base:2.1.0@aar",
-      "gradleName": "io.coil-kt:coil-base:2.1.0@aar",
+      "ideaName": "Gradle: io.coil-kt:coil-base:2.2.0@aar",
+      "gradleName": "io.coil-kt:coil-base:2.2.0@aar",
       "unresolved": false
     },
     {
@@ -774,6 +774,11 @@
       "unresolved": false
     },
     {
+      "ideaName": "Gradle: com.google.android.flexbox:flexbox:3.0.0@aar",
+      "gradleName": "com.google.android.flexbox:flexbox:3.0.0@aar",
+      "unresolved": false
+    },
+    {
       "ideaName": "Gradle: dev.rikka.rikkax.core:core:1.4.1@aar",
       "gradleName": "dev.rikka.rikkax.core:core:1.4.1@aar",
       "unresolved": false
@@ -809,8 +814,8 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
-      "gradleName": "androidx.appcompat:appcompat-resources:1.4.1@aar",
+      "ideaName": "Gradle: androidx.appcompat:appcompat-resources:1.5.0@aar",
+      "gradleName": "androidx.appcompat:appcompat-resources:1.5.0@aar",
       "unresolved": false
     },
     {
@@ -867,6 +872,11 @@
     {
       "ideaName": "Gradle: androidx.transition:transition:1.2.0@aar",
       "gradleName": "androidx.transition:transition:1.2.0@aar",
+      "unresolved": false
+    },
+    {
+      "ideaName": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
+      "gradleName": "androidx.appcompat:appcompat-resources:1.4.1@aar",
       "unresolved": false
     },
     {
