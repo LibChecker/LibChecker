@@ -10,8 +10,6 @@ import androidx.core.text.inSpans
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.AdvancedMenuItem
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.SafeFlexboxLayoutManager
 import com.absinthe.libchecker.recyclerview.adapter.applist.AdvancedMenuAdapter
 import com.absinthe.libchecker.utils.extensions.dp
@@ -19,7 +17,6 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -94,19 +91,6 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     addView(header)
     addView(demoView)
     addView(list)
-
-    val item = AdvancedMenuItem(
-      R.string.show_system_apps,
-      GlobalValues.isShowSystemApps.valueUnsafe,
-      {
-
-      }
-    )
-    val list = mutableListOf<AdvancedMenuItem>()
-    repeat(10) {
-      list.add(item)
-    }
-    adapter.setList(list)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

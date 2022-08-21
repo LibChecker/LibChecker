@@ -77,4 +77,7 @@ object GlobalValues {
   var uuid: String by SPDelegates(Constants.PREF_UUID, "")
 
   var isGitHubUnreachable = true
+
+  var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
+  val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
 }

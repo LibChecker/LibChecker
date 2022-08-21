@@ -132,6 +132,8 @@ class CheckableChipView @JvmOverloads constructor(
 
   private lateinit var textLayout: StaticLayout
 
+  private var maxTextWidth: Int = 0
+
   private val progressAnimator: ValueAnimator by lazy {
     ValueAnimator.ofFloat().apply {
       interpolator =
@@ -192,7 +194,10 @@ class CheckableChipView @JvmOverloads constructor(
       MeasureSpec.UNSPECIFIED -> Int.MAX_VALUE
       else -> Int.MAX_VALUE
     }
-    createLayout(availableTextWidth)
+    if (availableTextWidth > maxTextWidth && availableTextWidth < Int.MAX_VALUE) {
+      maxTextWidth = availableTextWidth
+    }
+    createLayout(maxTextWidth)
     val desiredWidth = nonTextWidth + textLayout.textWidth()
     val width = when (widthMode) {
       MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec)

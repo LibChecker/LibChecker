@@ -7,7 +7,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -225,13 +224,14 @@ class AppListFragment :
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     when (menuItem.itemId) {
-      R.id.sort -> {
+      R.id.advanced -> {
         activity?.let {
           AdvancedMenuBSDFragment().apply {
-            arguments = bundleOf(
-
-            )
             show(it.supportFragmentManager, tag)
+            setOnDismissListener {
+              //noinspection NotifyDataSetChanged
+              appAdapter.notifyDataSetChanged()
+            }
           }
         }
       }

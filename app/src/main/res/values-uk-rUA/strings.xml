@@ -26,10 +26,6 @@
   <string name="get_app_list_denied_tip">Будь ласка надайте\nLibChecker дозвіл отримати\nінформацію про встановлені додатки</string>
   <string name="advanced_menu">Advanced Menu</string>
 
-  <string name="menu_sort_by_time_desc">По часу оновлення ↓</string>
-  <string name="menu_sort_by_target_api_desc">По цільовому API ↓</string>
-  <string name="menu_sort_default">За замовчуванням</string>
-
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Додатки з %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Додатки без нативных бібліотек</string>
@@ -69,7 +65,6 @@
   <string name="pref_group_normal">Загальні</string>
   <string name="pref_group_others">Інші</string>
 
-  <string name="show_system_apps">Показувати системні додатки</string>
   <string name="apk_analytics">Аналізування АРК</string>
   <string name="colorful_icon">Кольорові іконки</string>
   <string name="rules_repo_title">Сховище правил</string>
@@ -81,7 +76,6 @@
   <string name="cloud_rules">Правила в хмарі</string>
   <string name="dark_mode">Dark Mode</string>
 
-  <string name="show_system_apps_summary">Управління відображенням системних додатків в списку додатків</string>
   <string name="apk_analytics_summary">Відкриває сторінку подробиць при натисканні на APK-файл</string>
   <string name="colorful_icon_summary">Частина позначених бібліотек буде відображатися у вигляді кольорових іконок.</string>
   <string name="lib_ref_threshold_summary">Відображаються лише ті бібліотеки, число посилань на які перевищує заданий поріг</string>
@@ -193,5 +187,18 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">поновити</string>
   <string name="languages">Мова</string>
+
+  <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Show System Apps</string>
+  <string name="adv_show_overlays">Show Overlays</string>
+  <string name="adv_show_64_bit">Show 64-bit Apps</string>
+  <string name="adv_show_32_bit">Show 32-bit Apps</string>
+  <string name="adv_sort_by_time">Sort by Updated Time</string>
+  <string name="adv_sort_by_target_version">Sort by Target Version</string>
+  <string name="adv_sort_by_name">Sort by Name</string>
+  <string name="adv_show_android_version">Show Android Version</string>
+  <string name="adv_show_target_version">Show Target Version</string>
+  <string name="adv_show_min_version">Show Min Version</string>
+  <string name="adv_tint_abi_label">Tint ABI Label</string>
 
 </resources>

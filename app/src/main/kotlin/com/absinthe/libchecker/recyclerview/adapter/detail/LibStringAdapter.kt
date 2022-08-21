@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
@@ -63,15 +62,15 @@ class LibStringAdapter(
 
   private var processMode: Boolean = false
 
-  @SuppressLint("NotifyDataSetChanged")
   fun switchProcessMode() {
     processMode = !processMode
+    //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 
-  @SuppressLint("NotifyDataSetChanged")
   fun setProcessMode(isProcessMode: Boolean) {
     processMode = isProcessMode
+    //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 

@@ -7,13 +7,6 @@
     app:title="@string/pref_group_normal">
 
     <rikka.material.preference.MaterialSwitchPreference
-      app:defaultValue="false"
-      app:icon="@drawable/ic_android_outline"
-      app:key="showSystemApps"
-      app:summary="@string/show_system_apps_summary"
-      app:title="@string/show_system_apps" />
-
-    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
       app:icon="@drawable/ic_apk_analytics"
       app:key="apkAnalytics"
