@@ -3,6 +3,426 @@
   "category": "Naming conventions",
   "type": "Property naming convention",
   "severity": "Moderate",
+  "comment": "Property name 'e_phentsize' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 17,
+      "offset": 7,
+      "length": 11,
+      "code": {
+        "startLine": 15,
+        "length": 11,
+        "offset": 83,
+        "surroundingCode": "  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "fea0a4496fb52ed62caa8bf585f9691c5922eab9d4ae313487fad6a32d166e28"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_machine' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 10,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 8,
+        "length": 9,
+        "offset": 96,
+        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "64a7f591cccf171a8695b66e06ae23f51199c433ed9df790729b9403ce989487"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_shentsize' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 19,
+      "offset": 7,
+      "length": 11,
+      "code": {
+        "startLine": 17,
+        "length": 11,
+        "offset": 86,
+        "surroundingCode": "  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "3778335f88e4c5a1bba88d9ece2b1a00a38dc99c90b8e808397956beef81a9e5"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_phnum' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 18,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 16,
+        "length": 7,
+        "offset": 87,
+        "surroundingCode": "  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "d660ee1c6396b7d0cb8d312f6df0b501128f74492656637bd491584db1a3c829"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_flags' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 15,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 13,
+        "length": 7,
+        "offset": 80,
+        "surroundingCode": "  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "1a19f7bbb177f22f1486f26c182df54de0ed0b1909ccc964ae7fc77b8582ce26"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_ehsize' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 16,
+      "offset": 7,
+      "length": 8,
+      "code": {
+        "startLine": 14,
+        "length": 8,
+        "offset": 81,
+        "surroundingCode": "  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "666501378075baad30aa219ec3bd0e84986028ac9b8149d84b8f6d05ca4d4634"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_ident' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 8,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 6,
+        "length": 7,
+        "offset": 31,
+        "surroundingCode": "class ELF32EhdrParser {\n\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "9c94144c8b059efee381d5704d516a89dc2d547e542caa1ffc1aae12caf17e29"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_phoff' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 13,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 11,
+        "length": 7,
+        "offset": 84,
+        "surroundingCode": "  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "808ddec02205af03078e344bfe5a57d96de3279aa0c87a78ae1c35489408ae7f"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_type' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 9,
+      "offset": 7,
+      "length": 6,
+      "code": {
+        "startLine": 7,
+        "length": 6,
+        "offset": 60,
+        "surroundingCode": "\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "67116a3a98385f393da584604f7349f64d639fb54f6a60cbf498872e8f487584"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_version' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 11,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 9,
+        "length": 9,
+        "offset": 83,
+        "surroundingCode": "  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "6fe36a26851ef935a53c45e4d897fc1c80aea4d034ca53ee62e625c5f0b80177"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_shoff' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 14,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 12,
+        "length": 7,
+        "offset": 81,
+        "surroundingCode": "  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "2a329fad0041e7111b4b5a39287511b15debf2881d699b34592d1dbd14834420"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_entry' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 10,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "bf788f5842334e80a65204743e878e68214fc7574db5653f81e62729b5d8c6cf"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_shstrndx' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 21,
+      "offset": 7,
+      "length": 10,
+      "code": {
+        "startLine": 19,
+        "length": 10,
+        "offset": 86,
+        "surroundingCode": "  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n\n  private constructor()"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "626b8bf5faff52f114dd5b78db5d982437e17231ad341da5730ed9c781ade551"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_shnum' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 20,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 18,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "592aaf49aeb927bcac630e08d78220add354f22f48929cb88a6ec86ee1637b36"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_version' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 10,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 8,
+        "length": 9,
+        "offset": 83,
+        "surroundingCode": "  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "58b7eb88742b19e7025329aab46b63b2202b5ac190761d28fb5ad3a13516bed6"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
   "comment": "Property name 'e_ident' should not contain underscores",
   "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
   "sources": [
@@ -26,174 +446,6 @@
     "inspectionName": "PropertyName"
   },
   "hash": "6e9abca1d6fce5e5c815fd9aad39f93e131d029d03d965a959a7726bfff0271d"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_flags' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 14,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 12,
-        "length": 7,
-        "offset": 80,
-        "surroundingCode": "  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "310a4aa7925eefb947927523d5b14498af22fc6070eaa79f814a0d2babb3041d"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_type' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 8,
-      "offset": 7,
-      "length": 6,
-      "code": {
-        "startLine": 6,
-        "length": 6,
-        "offset": 83,
-        "surroundingCode": "class ELF64EhdrParser {\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "7ea2920318e0c27229524d798135993de6328ee100e3c71c2d83cb2fb26bda7c"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_entry' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 11,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 9,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "e7f40e58a729079b4458cbb8092a8489d62f48d93fca2f5e17492fece29345db"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_ehsize' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 15,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 13,
-        "length": 8,
-        "offset": 81,
-        "surroundingCode": "  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "b4619956ea7b7dbaa93ed50b075734d45dda7e6fb5063d9c2ba1b30a5372a31c"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_machine' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 9,
-      "offset": 7,
-      "length": 9,
-      "code": {
-        "startLine": 7,
-        "length": 9,
-        "offset": 96,
-        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "ca6c8b0571ead38d5301290468c32fbb278ebdb050445d59f56e8a4c4a6793f2"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_shnum' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 19,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 17,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)\n  val e_shstrndx = ByteArray(ELF64_HALF)\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "4c40f0e539b52770afc81003a03f2a0c6c3480efad91cb149839ede5279a7f26"
 },{
   "tool": "Code Inspection",
   "category": "Naming conventions",
@@ -255,21 +507,21 @@
   "category": "Naming conventions",
   "type": "Property naming convention",
   "severity": "Moderate",
-  "comment": "Property name 'e_version' should not contain underscores",
+  "comment": "Property name 'e_phnum' should not contain underscores",
   "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
-      "line": 10,
+      "line": 17,
       "offset": 7,
-      "length": 9,
+      "length": 7,
       "code": {
-        "startLine": 8,
-        "length": 9,
-        "offset": 83,
-        "surroundingCode": "  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)"
+        "startLine": 15,
+        "length": 7,
+        "offset": 87,
+        "surroundingCode": "  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)"
       }
     }
   ],
@@ -277,7 +529,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "PropertyName"
   },
-  "hash": "58b7eb88742b19e7025329aab46b63b2202b5ac190761d28fb5ad3a13516bed6"
+  "hash": "9c943e0c5d8c3f9965de858c49e964c5cce229fd4cc85ec9bfa48e9cc414c798"
 },{
   "tool": "Code Inspection",
   "category": "Naming conventions",
@@ -311,6 +563,62 @@
   "category": "Naming conventions",
   "type": "Property naming convention",
   "severity": "Moderate",
+  "comment": "Property name 'e_entry' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 11,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 9,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "e7f40e58a729079b4458cbb8092a8489d62f48d93fca2f5e17492fece29345db"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_shnum' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 19,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 17,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)\n  val e_shstrndx = ByteArray(ELF64_HALF)\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "4c40f0e539b52770afc81003a03f2a0c6c3480efad91cb149839ede5279a7f26"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
   "comment": "Property name 'e_shstrndx' should not contain underscores",
   "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
   "sources": [
@@ -339,21 +647,21 @@
   "category": "Naming conventions",
   "type": "Property naming convention",
   "severity": "Moderate",
-  "comment": "Property name 'e_phnum' should not contain underscores",
+  "comment": "Property name 'e_type' should not contain underscores",
   "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
-      "line": 17,
+      "line": 8,
       "offset": 7,
-      "length": 7,
+      "length": 6,
       "code": {
-        "startLine": 15,
-        "length": 7,
-        "offset": 87,
-        "surroundingCode": "  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)"
+        "startLine": 6,
+        "length": 6,
+        "offset": 83,
+        "surroundingCode": "class ELF64EhdrParser {\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)"
       }
     }
   ],
@@ -361,7 +669,63 @@
     "module": "LibChecker.app.main",
     "inspectionName": "PropertyName"
   },
-  "hash": "9c943e0c5d8c3f9965de858c49e964c5cce229fd4cc85ec9bfa48e9cc414c798"
+  "hash": "7ea2920318e0c27229524d798135993de6328ee100e3c71c2d83cb2fb26bda7c"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_ehsize' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 15,
+      "offset": 7,
+      "length": 8,
+      "code": {
+        "startLine": 13,
+        "length": 8,
+        "offset": 81,
+        "surroundingCode": "  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "b4619956ea7b7dbaa93ed50b075734d45dda7e6fb5063d9c2ba1b30a5372a31c"
+},{
+  "tool": "Code Inspection",
+  "category": "Naming conventions",
+  "type": "Property naming convention",
+  "severity": "Moderate",
+  "comment": "Property name 'e_machine' should not contain underscores",
+  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 9,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 7,
+        "length": 9,
+        "offset": 96,
+        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "PropertyName"
+  },
+  "hash": "ca6c8b0571ead38d5301290468c32fbb278ebdb050445d59f56e8a4c4a6793f2"
 },{
   "tool": "Code Inspection",
   "category": "Naming conventions",
@@ -395,12 +759,12 @@
   "category": "Naming conventions",
   "type": "Property naming convention",
   "severity": "Moderate",
-  "comment": "Property name 'e_shoff' should not contain underscores",
+  "comment": "Property name 'e_flags' should not contain underscores",
   "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
       "line": 14,
       "offset": 7,
@@ -408,176 +772,8 @@
       "code": {
         "startLine": 12,
         "length": 7,
-        "offset": 81,
-        "surroundingCode": "  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "2a329fad0041e7111b4b5a39287511b15debf2881d699b34592d1dbd14834420"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_machine' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 10,
-      "offset": 7,
-      "length": 9,
-      "code": {
-        "startLine": 8,
-        "length": 9,
-        "offset": 96,
-        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "64a7f591cccf171a8695b66e06ae23f51199c433ed9df790729b9403ce989487"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_shstrndx' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 21,
-      "offset": 7,
-      "length": 10,
-      "code": {
-        "startLine": 19,
-        "length": 10,
-        "offset": 86,
-        "surroundingCode": "  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n\n  private constructor()"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "626b8bf5faff52f114dd5b78db5d982437e17231ad341da5730ed9c781ade551"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_shentsize' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 19,
-      "offset": 7,
-      "length": 11,
-      "code": {
-        "startLine": 17,
-        "length": 11,
-        "offset": 86,
-        "surroundingCode": "  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "3778335f88e4c5a1bba88d9ece2b1a00a38dc99c90b8e808397956beef81a9e5"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_phoff' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 13,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 11,
-        "length": 7,
-        "offset": 84,
-        "surroundingCode": "  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "808ddec02205af03078e344bfe5a57d96de3279aa0c87a78ae1c35489408ae7f"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_version' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 11,
-      "offset": 7,
-      "length": 9,
-      "code": {
-        "startLine": 9,
-        "length": 9,
-        "offset": 83,
-        "surroundingCode": "  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "6fe36a26851ef935a53c45e4d897fc1c80aea4d034ca53ee62e625c5f0b80177"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_flags' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 15,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 13,
-        "length": 7,
         "offset": 80,
-        "surroundingCode": "  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)"
+        "surroundingCode": "  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)"
       }
     }
   ],
@@ -585,203 +781,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "PropertyName"
   },
-  "hash": "1a19f7bbb177f22f1486f26c182df54de0ed0b1909ccc964ae7fc77b8582ce26"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_ident' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 8,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 6,
-        "length": 7,
-        "offset": 31,
-        "surroundingCode": "class ELF32EhdrParser {\n\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "9c94144c8b059efee381d5704d516a89dc2d547e542caa1ffc1aae12caf17e29"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_ehsize' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 16,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 14,
-        "length": 8,
-        "offset": 81,
-        "surroundingCode": "  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "666501378075baad30aa219ec3bd0e84986028ac9b8149d84b8f6d05ca4d4634"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_shnum' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 20,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 18,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "592aaf49aeb927bcac630e08d78220add354f22f48929cb88a6ec86ee1637b36"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_entry' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 12,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 10,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "bf788f5842334e80a65204743e878e68214fc7574db5653f81e62729b5d8c6cf"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_phentsize' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 17,
-      "offset": 7,
-      "length": 11,
-      "code": {
-        "startLine": 15,
-        "length": 11,
-        "offset": 83,
-        "surroundingCode": "  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "fea0a4496fb52ed62caa8bf585f9691c5922eab9d4ae313487fad6a32d166e28"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_type' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 9,
-      "offset": 7,
-      "length": 6,
-      "code": {
-        "startLine": 7,
-        "length": 6,
-        "offset": 60,
-        "surroundingCode": "\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "67116a3a98385f393da584604f7349f64d639fb54f6a60cbf498872e8f487584"
-},{
-  "tool": "Code Inspection",
-  "category": "Naming conventions",
-  "type": "Property naming convention",
-  "severity": "Moderate",
-  "comment": "Property name 'e_phnum' should not contain underscores",
-  "detailsInfo": "Reports property names that do not follow the recommended naming conventions.\n\n\nConsistent naming allows for easier code reading and understanding.\nAccording to the [Kotlin official style guide](https://kotlinlang.org/docs/coding-conventions.html#naming-rules),\nproperty names should start with a lowercase letter and use camel case.\n\nIt is possible to introduce other naming rules by changing the \"Pattern\" regular expression.\n\n**Example:**\n\n\n      val My_Cool_Property = \"\"\n\nA quick-fix renames the class according to the Kotlin naming conventions:\n\n\n      val myCoolProperty = \"\"\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 18,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 16,
-        "length": 7,
-        "offset": 87,
-        "surroundingCode": "  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "PropertyName"
-  },
-  "hash": "d660ee1c6396b7d0cb8d312f6df0b501128f74492656637bd491584db1a3c829"
+  "hash": "310a4aa7925eefb947927523d5b14498af22fc6070eaa79f814a0d2babb3041d"
 },{
   "tool": "Code Inspection",
   "category": "Class",
@@ -988,16 +988,16 @@
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/manifest/ManifestReader.java",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/ui/about/ContributorViewBinder.java",
       "language": "JAVA",
-      "line": 53,
-      "offset": 9,
+      "line": 80,
+      "offset": 13,
       "length": 15,
       "code": {
-        "startLine": 51,
+        "startLine": 78,
         "length": 15,
-        "offset": 68,
-        "surroundingCode": "      return bos.toByteArray();\n    } catch (Exception e) {\n      e.printStackTrace();\n    }\n    return null;"
+        "offset": 108,
+        "surroundingCode": "          v.getContext().startActivity(intent);\n        } catch (ActivityNotFoundException e) {\n          e.printStackTrace();\n        }\n      }"
       }
     }
   ],
@@ -1005,7 +1005,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "fc49b38dfe19e130fd0ba1f390b5f770fe33a432e8ece5fdb63c5de94eff97d9"
+  "hash": "1b47509d1a89dde06e32f86890d16e5a4e6d9f92c06ca536df4887ada8999b7d"
 },{
   "tool": "Code Inspection",
   "category": "Code maturity",
@@ -1044,16 +1044,16 @@
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/ui/about/ContributorViewBinder.java",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/manifest/ManifestReader.java",
       "language": "JAVA",
-      "line": 80,
-      "offset": 13,
+      "line": 53,
+      "offset": 9,
       "length": 15,
       "code": {
-        "startLine": 78,
+        "startLine": 51,
         "length": 15,
-        "offset": 108,
-        "surroundingCode": "          v.getContext().startActivity(intent);\n        } catch (ActivityNotFoundException e) {\n          e.printStackTrace();\n        }\n      }"
+        "offset": 68,
+        "surroundingCode": "      return bos.toByteArray();\n    } catch (Exception e) {\n      e.printStackTrace();\n    }\n    return null;"
       }
     }
   ],
@@ -1061,7 +1061,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "ThrowablePrintStackTrace"
   },
-  "hash": "1b47509d1a89dde06e32f86890d16e5a4e6d9f92c06ca536df4887ada8999b7d"
+  "hash": "fc49b38dfe19e130fd0ba1f390b5f770fe33a432e8ece5fdb63c5de94eff97d9"
 },{
   "tool": "Code Inspection",
   "category": "Naming conventions",
@@ -1123,6 +1123,902 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
+  "comment": "Property 'e_phentsize' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 17,
+      "offset": 7,
+      "length": 11,
+      "code": {
+        "startLine": 15,
+        "length": 11,
+        "offset": 83,
+        "surroundingCode": "  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "1e8f295dee6d642d32f366b29271c96f3adb9103eadf6caac4e95acbfec126e8"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_machine' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 10,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 8,
+        "length": 9,
+        "offset": 96,
+        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "d8cf97b67354df0d8507cdb6c73b468370e460e5e2cc96507174617da355071a"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_shentsize' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 19,
+      "offset": 7,
+      "length": 11,
+      "code": {
+        "startLine": 17,
+        "length": 11,
+        "offset": 86,
+        "surroundingCode": "  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "5922ef143921086219603a9998138fe58b3b4d2ac3f8f85e6e3ea42490218b22"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_phnum' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 18,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 16,
+        "length": 7,
+        "offset": 87,
+        "surroundingCode": "  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "35a1762076666ad31a798ee6ad88df8bea4b37df8b28215842a7b10f9397b6f6"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_flags' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 15,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 13,
+        "length": 7,
+        "offset": 80,
+        "surroundingCode": "  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "22aa7d887e86251c1dff4ff6f5d5fbe53e5a6e594c3216daded0710a04001c69"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_ehsize' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 16,
+      "offset": 7,
+      "length": 8,
+      "code": {
+        "startLine": 14,
+        "length": 8,
+        "offset": 81,
+        "surroundingCode": "  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "199b99b93ee7698608a58d3351dc07954ea25130fdb1a92af7663c97ce97c911"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_ident' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 8,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 6,
+        "length": 7,
+        "offset": 31,
+        "surroundingCode": "class ELF32EhdrParser {\n\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "28cd4be30c73a95447e12c1a6a119e95b84867989ae81c1ac0b9088740178393"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_phoff' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 13,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 11,
+        "length": 7,
+        "offset": 84,
+        "surroundingCode": "  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "bd17c586d3fa56c234fd0de3679e1799d5638bb607f11b16b426d0beba1853cd"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_type' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 9,
+      "offset": 7,
+      "length": 6,
+      "code": {
+        "startLine": 7,
+        "length": 6,
+        "offset": 60,
+        "surroundingCode": "\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "135ae52b6bcad0c96afe42b0c8748dac6317527eabf03dc6378adbfb23dccb70"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_version' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 11,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 9,
+        "length": 9,
+        "offset": 83,
+        "surroundingCode": "  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "069611eeabfe60bbf21b15647973043fdda29a19d97b302a87710478fed76ee1"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isElf' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 29,
+      "offset": 7,
+      "length": 5,
+      "code": {
+        "startLine": 27,
+        "length": 5,
+        "offset": 11,
+        "surroundingCode": "  }\n\n  fun isElf(): Boolean {\n    return e_ident[0].toInt() == 0x7F &&\n      e_ident[1].toInt().toChar() == 'E' &&"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "f0cc6708f92a4b0fc7d94b9fcebe734238abb55e507361e0ef168126fda7132e"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_shoff' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 14,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 12,
+        "length": 7,
+        "offset": 81,
+        "surroundingCode": "  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "fcbdc1a3582eccd9edd26db0203c2761d78a04ab4bde422cdd55a206ffc83322"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_entry' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 12,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 10,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "1590d6b87f01fd2590a0692d2e6cb19bf48fe944154e84bf2129035fb3ce8f31"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_shstrndx' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 21,
+      "offset": 7,
+      "length": 10,
+      "code": {
+        "startLine": 19,
+        "length": 10,
+        "offset": 86,
+        "surroundingCode": "  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n\n  private constructor()"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "b735658726eca5c2793de236a3ae30d9a54ebc68d3852332d4cc926070515e23"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_shnum' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "language": "kotlin",
+      "line": 20,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 18,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "d84189e223bb22da4edf115b66c20a5e714165abc8e350a4013339311d1b2350"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'refreshList' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/viewmodel/HomeViewModel.kt",
+      "language": "kotlin",
+      "line": 86,
+      "offset": 7,
+      "length": 11,
+      "code": {
+        "startLine": 84,
+        "length": 11,
+        "offset": 11,
+        "surroundingCode": "  }\n\n  fun refreshList() {\n    setEffect {\n      Effect.RefreshList()"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "a51dc0c91822d52f2f255b8a1a950ca68b1b0b6c81c14d8266ee71596801a474"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isUseJetpackCompose' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1351,
+      "offset": 19,
+      "length": 19,
+      "code": {
+        "startLine": 1349,
+        "length": 19,
+        "offset": 23,
+        "surroundingCode": "  }\n\n  fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "ebdd9e1761cad5522a426684714034e3cc575a2d5226e16c00e583a205e7bf73"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isSplitsApk' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 406,
+      "offset": 19,
+      "length": 11,
+      "code": {
+        "startLine": 404,
+        "length": 11,
+        "offset": 64,
+        "surroundingCode": "   * @return true if it uses split apks\n   */\n  fun PackageInfo.isSplitsApk(): Boolean {\n    return !applicationInfo.splitSourceDirs.isNullOrEmpty()\n  }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "dc80ce41c762c8f91df0d2eb0913d8d96394ddc4e809e396d70da5d6d8d943f3"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isPWA' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1317,
+      "offset": 19,
+      "length": 5,
+      "code": {
+        "startLine": 1315,
+        "length": 5,
+        "offset": 23,
+        "surroundingCode": "  }\n\n  fun PackageInfo.isPWA(): Boolean {\n    return applicationInfo.metaData?.keySet()\n      ?.any { it.startsWith(\"org.chromium.webapk.shell_apk\") } == true"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "225ae50ade93bfab3051d354f3d7efe77ab2dd02cfa0ad370060bb015d0737ec"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isComponentEnabled' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 620,
+      "offset": 7,
+      "length": 18,
+      "code": {
+        "startLine": 618,
+        "length": 18,
+        "offset": 47,
+        "surroundingCode": "   * @return true if it is enabled\n   */\n  fun isComponentEnabled(info: ComponentInfo): Boolean {\n    val state = runCatching {\n      SystemServices.packageManager.getComponentEnabledSetting("
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "e693a07fe346eca390c19f3ed38fcf5282e98fd460e2ae366b52b7d2bac1dab0"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isXposedModule' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1307,
+      "offset": 19,
+      "length": 14,
+      "code": {
+        "startLine": 1305,
+        "length": 14,
+        "offset": 23,
+        "surroundingCode": "  }\n\n  fun PackageInfo.isXposedModule(): Boolean {\n    return applicationInfo.metaData?.getBoolean(\"xposedmodule\") == true ||\n      applicationInfo.metaData?.containsKey(\"xposedminversion\") == true"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "87099a44a0038438016f947d75d7521cec7b73e716cf722fb8288303f6804d80"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isPlayAppSigning' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1312,
+      "offset": 19,
+      "length": 16,
+      "code": {
+        "startLine": 1310,
+        "length": 16,
+        "offset": 23,
+        "surroundingCode": "  }\n\n  fun PackageInfo.isPlayAppSigning(): Boolean {\n    return applicationInfo.metaData?.getString(\"com.android.stamp.type\") == \"STAMP_TYPE_DISTRIBUTION_APK\" &&\n      applicationInfo.metaData?.getString(\"com.android.stamp.source\") == \"https://play.google.com/store\""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "ca3478df53824f4c32281e9266558e9093be5f1991bb3518e3d0be25634dff97"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isRxJavaUsed' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1411,
+      "offset": 19,
+      "length": 12,
+      "code": {
+        "startLine": 1409,
+        "length": 12,
+        "offset": 70,
+        "surroundingCode": "   * @return true if it uses RxJava framework\n   */\n  fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "762a73711bad308d79330e7c3c7697a36370e71e9328d2d18101b03725f46812"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'elfTypeToString' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 961,
+      "offset": 7,
+      "length": 15,
+      "code": {
+        "startLine": 959,
+        "length": 15,
+        "offset": 44,
+        "surroundingCode": "   * @return String of ELF type\n   */\n  fun elfTypeToString(@ElfType type: Int): String {\n    return when (type) {\n      ET_NOT_ELF -> \"Not ELF\""
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "bbd1392a8dea811fbb76615aa4009ef2bf9ab4b38277524661a67d2a5e1f5187"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isUse32BitAbi' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1332,
+      "offset": 23,
+      "length": 13,
+      "code": {
+        "startLine": 1330,
+        "length": 13,
+        "offset": 27,
+        "surroundingCode": "  }\n\n  fun ApplicationInfo.isUse32BitAbi(): Boolean {\n    runCatching {\n      val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf(\"use32bitAbi\"))"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "029ac4ea7b3725d6e3d91dfbd60b17292a60c76d3c4c064735bd1e82a7b12e26"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isRxAndroidUsed' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1547,
+      "offset": 19,
+      "length": 15,
+      "code": {
+        "startLine": 1545,
+        "length": 15,
+        "offset": 73,
+        "surroundingCode": "   * @return true if it uses RxAndroid framework\n   */\n  fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {\n    if (foundList.isNullOrEmpty().not()) {\n      return foundList?.contains(\"io.reactivex.rxjava3.android.*\".toClassDefType()) == true ||"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "dd65799baf3a52f4800d3fb5877c1fc84af42351eeed0b28f1ea85536bae843b"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isRxKotlinUsed' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 1480,
+      "offset": 19,
+      "length": 14,
+      "code": {
+        "startLine": 1478,
+        "length": 14,
+        "offset": 72,
+        "surroundingCode": "   * @return true if it uses RxKotlin framework\n   */\n  fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "f7c53b7d8b1a8b8c961f143a141630110f636212343f51e78ba9575ce56dde3e"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isKotlinUsed' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
+      "language": "kotlin",
+      "line": 414,
+      "offset": 19,
+      "length": 12,
+      "code": {
+        "startLine": 412,
+        "length": 12,
+        "offset": 69,
+        "surroundingCode": "   * @return true if it uses Kotlin language\n   */\n  fun PackageInfo.isKotlinUsed(): Boolean {\n    return runCatching {\n      val file = File(applicationInfo.sourceDir)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "0b3217e8e4cfa32202a648a5c2abcfc4491737ee4b4624fa9ff9339d6b2dfe19"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'enableRoundCorner' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/snapshot/SnapshotStateIndicatorView.kt",
+      "language": "kotlin",
+      "line": 14,
+      "offset": 7,
+      "length": 17,
+      "code": {
+        "startLine": 12,
+        "length": 17,
+        "offset": 76,
+        "surroundingCode": "\nclass SnapshotStateIndicatorView(context: Context) : View(context) {\n  var enableRoundCorner: Boolean = true\n  var added: Boolean = false\n  var removed: Boolean = false"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "4dde55e920f9fbbf5a19d772190d8aad32900efc7b5dbba384e8dc86fb91dc5f"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'updatedTime' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/LibDetailBottomSheetView.kt",
+      "language": "kotlin",
+      "line": 298,
+      "offset": 9,
+      "length": 11,
+      "code": {
+        "startLine": 296,
+        "length": 11,
+        "offset": 15,
+        "surroundingCode": "    }\n\n    var updatedTime: LibDetailItemView? = null\n\n    init {"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "c90522d8d1eb131335434fa10e2c0896538d8127ec88b56e63e31e0838aff01e"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Function 'isElf' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 28,
+      "offset": 7,
+      "length": 5,
+      "code": {
+        "startLine": 26,
+        "length": 5,
+        "offset": 11,
+        "surroundingCode": "  }\n\n  fun isElf(): Boolean {\n    return e_ident[0].toInt() == 0x7F &&\n      e_ident[1].toInt().toChar() == 'E' &&"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "fda17b0194f02b8cd824d8feb7128f1a1aedfa2fd0de6c2adb554cc9f7609a8d"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_version' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 10,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 8,
+        "length": 9,
+        "offset": 83,
+        "surroundingCode": "  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "ba137b9f3d5150f481fd5a1e54daccdd0fdb5ae784ff74a37dd7107996a512c3"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
   "comment": "Property 'e_ident' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
@@ -1146,174 +2042,6 @@
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
   "hash": "ef12b2225827813175135220f8e284be8bce3ea94a198c43b3a348f9b8e4ea57"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_flags' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 14,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 12,
-        "length": 7,
-        "offset": 80,
-        "surroundingCode": "  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "b38043bacc3e52343f085ede3331dd9275184168e6a3cf53665d220cdc71dd2c"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_type' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 8,
-      "offset": 7,
-      "length": 6,
-      "code": {
-        "startLine": 6,
-        "length": 6,
-        "offset": 83,
-        "surroundingCode": "class ELF64EhdrParser {\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "bfecf2099ff375954adf08ddcece9c19248e5a142312e04009068495dedf07be"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_entry' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 11,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 9,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "b73cb018d2808b91567eabad1a7319b701dc6e86f53d53fbb9a3c166dfdad3fd"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_ehsize' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 15,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 13,
-        "length": 8,
-        "offset": 81,
-        "surroundingCode": "  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "5ef0cc6706e9b1dc558bfe0aa96fe8299d30df1c8f964d6fb72645ad5ac80b5f"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_machine' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 9,
-      "offset": 7,
-      "length": 9,
-      "code": {
-        "startLine": 7,
-        "length": 9,
-        "offset": 96,
-        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "3469592c58b8b8b2fefd3763435bbcffb91ea281898ccb7fff0f7de70a56c7e2"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_shnum' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
-      "language": "kotlin",
-      "line": 19,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 17,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)\n  val e_shstrndx = ByteArray(ELF64_HALF)\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "ca025d46ed5664be1dc54ea41d89ec2722456a0b7fddb84d5fdc2fd28705d96a"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -1375,21 +2103,21 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_version' could be private",
+  "comment": "Property 'e_phnum' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
-      "line": 10,
+      "line": 17,
       "offset": 7,
-      "length": 9,
+      "length": 7,
       "code": {
-        "startLine": 8,
-        "length": 9,
-        "offset": 83,
-        "surroundingCode": "  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)"
+        "startLine": 15,
+        "length": 7,
+        "offset": 87,
+        "surroundingCode": "  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)"
       }
     }
   ],
@@ -1397,7 +2125,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "ba137b9f3d5150f481fd5a1e54daccdd0fdb5ae784ff74a37dd7107996a512c3"
+  "hash": "c0f4e059af5d77001ed078fc1abbe8030476a485744bf9b862aed6a139c0aca5"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -1431,21 +2159,21 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Function 'isElf' could be private",
+  "comment": "Property 'e_entry' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
-      "line": 28,
+      "line": 11,
       "offset": 7,
-      "length": 5,
+      "length": 7,
       "code": {
-        "startLine": 26,
-        "length": 5,
-        "offset": 11,
-        "surroundingCode": "  }\n\n  fun isElf(): Boolean {\n    return e_ident[0].toInt() == 0x7F &&\n      e_ident[1].toInt().toChar() == 'E' &&"
+        "startLine": 9,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)\n  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)"
       }
     }
   ],
@@ -1453,7 +2181,35 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "fda17b0194f02b8cd824d8feb7128f1a1aedfa2fd0de6c2adb554cc9f7609a8d"
+  "hash": "b73cb018d2808b91567eabad1a7319b701dc6e86f53d53fbb9a3c166dfdad3fd"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_shnum' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 19,
+      "offset": 7,
+      "length": 7,
+      "code": {
+        "startLine": 17,
+        "length": 7,
+        "offset": 86,
+        "surroundingCode": "  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)\n  val e_shstrndx = ByteArray(ELF64_HALF)\n"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "ca025d46ed5664be1dc54ea41d89ec2722456a0b7fddb84d5fdc2fd28705d96a"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -1487,21 +2243,21 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_phnum' could be private",
+  "comment": "Property 'e_type' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
-      "line": 17,
+      "line": 8,
       "offset": 7,
-      "length": 7,
+      "length": 6,
       "code": {
-        "startLine": 15,
-        "length": 7,
-        "offset": 87,
-        "surroundingCode": "  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)\n  val e_shentsize = ByteArray(ELF64_HALF)\n  val e_shnum = ByteArray(ELF64_HALF)"
+        "startLine": 6,
+        "length": 6,
+        "offset": 83,
+        "surroundingCode": "class ELF64EhdrParser {\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)"
       }
     }
   ],
@@ -1509,7 +2265,63 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "c0f4e059af5d77001ed078fc1abbe8030476a485744bf9b862aed6a139c0aca5"
+  "hash": "bfecf2099ff375954adf08ddcece9c19248e5a142312e04009068495dedf07be"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_ehsize' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 15,
+      "offset": 7,
+      "length": 8,
+      "code": {
+        "startLine": 13,
+        "length": 8,
+        "offset": 81,
+        "surroundingCode": "  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)\n  val e_phnum = ByteArray(ELF64_HALF)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "5ef0cc6706e9b1dc558bfe0aa96fe8299d30df1c8f964d6fb72645ad5ac80b5f"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'e_machine' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
+      "language": "kotlin",
+      "line": 9,
+      "offset": 7,
+      "length": 9,
+      "code": {
+        "startLine": 7,
+        "length": 9,
+        "offset": 96,
+        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF64_HALF)\n  val e_machine = ByteArray(ELF64_HALF)\n  val e_version = ByteArray(ELF64_WORD)\n  val e_entry = ByteArray(ELF64_ADDR)"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "3469592c58b8b8b2fefd3763435bbcffb91ea281898ccb7fff0f7de70a56c7e2"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -1543,49 +2355,21 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'updatedTime' could be private",
+  "comment": "Property 'e_flags' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/LibDetailBottomSheetView.kt",
-      "language": "kotlin",
-      "line": 298,
-      "offset": 9,
-      "length": 11,
-      "code": {
-        "startLine": 296,
-        "length": 11,
-        "offset": 15,
-        "surroundingCode": "    }\n\n    var updatedTime: LibDetailItemView? = null\n\n    init {"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "c90522d8d1eb131335434fa10e2c0896538d8127ec88b56e63e31e0838aff01e"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'enableRoundCorner' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/snapshot/SnapshotStateIndicatorView.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF64EhdrParser.kt",
       "language": "kotlin",
       "line": 14,
       "offset": 7,
-      "length": 17,
+      "length": 7,
       "code": {
         "startLine": 12,
-        "length": 17,
-        "offset": 76,
-        "surroundingCode": "\nclass SnapshotStateIndicatorView(context: Context) : View(context) {\n  var enableRoundCorner: Boolean = true\n  var added: Boolean = false\n  var removed: Boolean = false"
+        "length": 7,
+        "offset": 80,
+        "surroundingCode": "  val e_phoff = ByteArray(ELF64_OFF)\n  val e_shoff = ByteArray(ELF64_OFF)\n  val e_flags = ByteArray(ELF64_WORD)\n  val e_ehsize = ByteArray(ELF64_HALF)\n  val e_phentsize = ByteArray(ELF64_HALF)"
       }
     }
   ],
@@ -1593,539 +2377,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "4dde55e920f9fbbf5a19d772190d8aad32900efc7b5dbba384e8dc86fb91dc5f"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'animationDuration' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/HeightAnimatableLinearLayout.kt",
-      "language": "kotlin",
-      "line": 14,
-      "offset": 7,
-      "length": 17,
-      "code": {
-        "startLine": 12,
-        "length": 17,
-        "offset": 88,
-        "surroundingCode": "\nclass HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {\n  var animationDuration = 350L\n  private var animator: ValueAnimator = ObjectAnimator()\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "7d57c13a2db122db4e3515042f47fe625945e5d2320db988ac099476967c8c2f"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isRxKotlinUsed' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1480,
-      "offset": 19,
-      "length": 14,
-      "code": {
-        "startLine": 1478,
-        "length": 14,
-        "offset": 72,
-        "surroundingCode": "   * @return true if it uses RxKotlin framework\n   */\n  fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "f7c53b7d8b1a8b8c961f143a141630110f636212343f51e78ba9575ce56dde3e"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isComponentEnabled' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 620,
-      "offset": 7,
-      "length": 18,
-      "code": {
-        "startLine": 618,
-        "length": 18,
-        "offset": 47,
-        "surroundingCode": "   * @return true if it is enabled\n   */\n  fun isComponentEnabled(info: ComponentInfo): Boolean {\n    val state = runCatching {\n      SystemServices.packageManager.getComponentEnabledSetting("
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "e693a07fe346eca390c19f3ed38fcf5282e98fd460e2ae366b52b7d2bac1dab0"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isKotlinUsed' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 414,
-      "offset": 19,
-      "length": 12,
-      "code": {
-        "startLine": 412,
-        "length": 12,
-        "offset": 69,
-        "surroundingCode": "   * @return true if it uses Kotlin language\n   */\n  fun PackageInfo.isKotlinUsed(): Boolean {\n    return runCatching {\n      val file = File(applicationInfo.sourceDir)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "0b3217e8e4cfa32202a648a5c2abcfc4491737ee4b4624fa9ff9339d6b2dfe19"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isSplitsApk' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 406,
-      "offset": 19,
-      "length": 11,
-      "code": {
-        "startLine": 404,
-        "length": 11,
-        "offset": 64,
-        "surroundingCode": "   * @return true if it uses split apks\n   */\n  fun PackageInfo.isSplitsApk(): Boolean {\n    return !applicationInfo.splitSourceDirs.isNullOrEmpty()\n  }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "dc80ce41c762c8f91df0d2eb0913d8d96394ddc4e809e396d70da5d6d8d943f3"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isRxJavaUsed' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1411,
-      "offset": 19,
-      "length": 12,
-      "code": {
-        "startLine": 1409,
-        "length": 12,
-        "offset": 70,
-        "surroundingCode": "   * @return true if it uses RxJava framework\n   */\n  fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "762a73711bad308d79330e7c3c7697a36370e71e9328d2d18101b03725f46812"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isUse32BitAbi' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1332,
-      "offset": 23,
-      "length": 13,
-      "code": {
-        "startLine": 1330,
-        "length": 13,
-        "offset": 27,
-        "surroundingCode": "  }\n\n  fun ApplicationInfo.isUse32BitAbi(): Boolean {\n    runCatching {\n      val demands = ManifestReader.getManifestProperties(File(sourceDir), arrayOf(\"use32bitAbi\"))"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "029ac4ea7b3725d6e3d91dfbd60b17292a60c76d3c4c064735bd1e82a7b12e26"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isPWA' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1317,
-      "offset": 19,
-      "length": 5,
-      "code": {
-        "startLine": 1315,
-        "length": 5,
-        "offset": 23,
-        "surroundingCode": "  }\n\n  fun PackageInfo.isPWA(): Boolean {\n    return applicationInfo.metaData?.keySet()\n      ?.any { it.startsWith(\"org.chromium.webapk.shell_apk\") } == true"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "225ae50ade93bfab3051d354f3d7efe77ab2dd02cfa0ad370060bb015d0737ec"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isXposedModule' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1307,
-      "offset": 19,
-      "length": 14,
-      "code": {
-        "startLine": 1305,
-        "length": 14,
-        "offset": 23,
-        "surroundingCode": "  }\n\n  fun PackageInfo.isXposedModule(): Boolean {\n    return applicationInfo.metaData?.getBoolean(\"xposedmodule\") == true ||\n      applicationInfo.metaData?.containsKey(\"xposedminversion\") == true"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "87099a44a0038438016f947d75d7521cec7b73e716cf722fb8288303f6804d80"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isUseJetpackCompose' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1351,
-      "offset": 19,
-      "length": 19,
-      "code": {
-        "startLine": 1349,
-        "length": 19,
-        "offset": 23,
-        "surroundingCode": "  }\n\n  fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {\n    val usedInMetaInf = runCatching {\n      val file = File(applicationInfo.sourceDir)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "ebdd9e1761cad5522a426684714034e3cc575a2d5226e16c00e583a205e7bf73"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isPlayAppSigning' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1312,
-      "offset": 19,
-      "length": 16,
-      "code": {
-        "startLine": 1310,
-        "length": 16,
-        "offset": 23,
-        "surroundingCode": "  }\n\n  fun PackageInfo.isPlayAppSigning(): Boolean {\n    return applicationInfo.metaData?.getString(\"com.android.stamp.type\") == \"STAMP_TYPE_DISTRIBUTION_APK\" &&\n      applicationInfo.metaData?.getString(\"com.android.stamp.source\") == \"https://play.google.com/store\""
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "ca3478df53824f4c32281e9266558e9093be5f1991bb3518e3d0be25634dff97"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'isRxAndroidUsed' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 1547,
-      "offset": 19,
-      "length": 15,
-      "code": {
-        "startLine": 1545,
-        "length": 15,
-        "offset": 73,
-        "surroundingCode": "   * @return true if it uses RxAndroid framework\n   */\n  fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {\n    if (foundList.isNullOrEmpty().not()) {\n      return foundList?.contains(\"io.reactivex.rxjava3.android.*\".toClassDefType()) == true ||"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "dd65799baf3a52f4800d3fb5877c1fc84af42351eeed0b28f1ea85536bae843b"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'elfTypeToString' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/PackageUtils.kt",
-      "language": "kotlin",
-      "line": 961,
-      "offset": 7,
-      "length": 15,
-      "code": {
-        "startLine": 959,
-        "length": 15,
-        "offset": 44,
-        "surroundingCode": "   * @return String of ELF type\n   */\n  fun elfTypeToString(@ElfType type: Int): String {\n    return when (type) {\n      ET_NOT_ELF -> \"Not ELF\""
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "bbd1392a8dea811fbb76615aa4009ef2bf9ab4b38277524661a67d2a5e1f5187"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'animationDuration' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
-      "language": "kotlin",
-      "line": 18,
-      "offset": 7,
-      "length": 17,
-      "code": {
-        "startLine": 16,
-        "length": 17,
-        "offset": 54,
-        "surroundingCode": "  var isExpand: Boolean = false\n    private set\n  var animationDuration = 350L\n\n  private val libStringAdapter = LibStringAdapter(\"\", ACTIVITY)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "2d54681887075226939299f8f9771e554b09dfa06d4acbd432664bb7e0d6f54c"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'isExpand' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
-      "language": "kotlin",
-      "line": 16,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 14,
-        "length": 8,
-        "offset": 46,
-        "surroundingCode": "  FrameLayout(context, attributeSet) {\n\n  var isExpand: Boolean = false\n    private set\n  var animationDuration = 350L"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "0e9e1b26e8149784bb56312c99c47277bfe358efa881e587662f37fbbf6ddcf4"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'collapse' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
-      "language": "kotlin",
-      "line": 59,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 57,
-        "length": 8,
-        "offset": 11,
-        "surroundingCode": "  }\n\n  fun collapse() {\n    isExpand = false\n    animateToggle(animationDuration)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "69790851af5408ffde7471b0a840cf5c032e19efb5a6670ca194498d4cafbbea"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'expand' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
-      "language": "kotlin",
-      "line": 64,
-      "offset": 7,
-      "length": 6,
-      "code": {
-        "startLine": 62,
-        "length": 6,
-        "offset": 11,
-        "surroundingCode": "  }\n\n  fun expand() {\n    isExpand = true\n    animateToggle(animationDuration)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "6ed2c8bcce094df75f6410d6ca03567997de1a0dda0302cd71b54e22383f9757"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'textSize' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/CheckableChipView.kt",
-      "language": "kotlin",
-      "line": 94,
-      "offset": 7,
-      "length": 8,
-      "code": {
-        "startLine": 92,
-        "length": 8,
-        "offset": 52,
-        "surroundingCode": "   * Sets the textSize to be displayed.\n   */\n  var textSize: Float by viewProperty(0f, requestLayout = true) { textPaint.textSize = it }\n\n  /**"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "e1db2df1854198153a6fb0281f01b6e7c730c00b296b9106e90aac26fede0042"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'checkedColor' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/CheckableChipView.kt",
-      "language": "kotlin",
-      "line": 74,
-      "offset": 7,
-      "length": 12,
-      "code": {
-        "startLine": 72,
-        "length": 12,
-        "offset": 85,
-        "surroundingCode": "   * Sets the indicator and background color when the widget is checked.\n   */\n  var checkedColor: Int by viewProperty(0) { indicatorPaint.color = it }\n\n  /**"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "d833adbcf7cececc1751968005209ba4f9278ecc61619b653f9d46ee35786dc4"
+  "hash": "b38043bacc3e52343f085ede3331dd9275184168e6a3cf53665d220cdc71dd2c"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -2154,6 +2406,62 @@
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
   "hash": "e12498db45c58f295c7b3cb277840123308af4d16a8d0d46bc64d780611699a8"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'outlineColor' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/CheckableChipView.kt",
+      "language": "kotlin",
+      "line": 99,
+      "offset": 7,
+      "length": 12,
+      "code": {
+        "startLine": 97,
+        "length": 12,
+        "offset": 52,
+        "surroundingCode": "   * Controls the color of the outline.\n   */\n  var outlineColor: Int by viewProperty(0) { outlinePaint.color = it }\n\n  /**"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "6443bde6fde1798de809c88e447e7d5f181a856a971f921b148f861a8b92524c"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'textSize' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/CheckableChipView.kt",
+      "language": "kotlin",
+      "line": 94,
+      "offset": 7,
+      "length": 8,
+      "code": {
+        "startLine": 92,
+        "length": 8,
+        "offset": 52,
+        "surroundingCode": "   * Sets the textSize to be displayed.\n   */\n  var textSize: Float by viewProperty(0f, requestLayout = true) { textPaint.textSize = it }\n\n  /**"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "e1db2df1854198153a6fb0281f01b6e7c730c00b296b9106e90aac26fede0042"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -2215,21 +2523,21 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'outlineColor' could be private",
+  "comment": "Property 'checkedColor' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
       "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/CheckableChipView.kt",
       "language": "kotlin",
-      "line": 99,
+      "line": 74,
       "offset": 7,
       "length": 12,
       "code": {
-        "startLine": 97,
+        "startLine": 72,
         "length": 12,
-        "offset": 52,
-        "surroundingCode": "   * Controls the color of the outline.\n   */\n  var outlineColor: Int by viewProperty(0) { outlinePaint.color = it }\n\n  /**"
+        "offset": 85,
+        "surroundingCode": "   * Sets the indicator and background color when the widget is checked.\n   */\n  var checkedColor: Int by viewProperty(0) { indicatorPaint.color = it }\n\n  /**"
       }
     }
   ],
@@ -2237,35 +2545,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "6443bde6fde1798de809c88e447e7d5f181a856a971f921b148f861a8b92524c"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'toAtMostMeasureSpec' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/AViewGroup.kt",
-      "language": "kotlin",
-      "line": 40,
-      "offset": 3,
-      "length": 9,
-      "code": {
-        "startLine": 38,
-        "length": 9,
-        "offset": 7,
-        "surroundingCode": "  }\n\n  protected fun Int.toAtMostMeasureSpec(): Int {\n    return MeasureSpec.makeMeasureSpec(this, MeasureSpec.AT_MOST)\n  }"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "2553b0fa99f0de9b7587d4556eaf8fdd0367554ece46f3be9e50f40e2ab04a06"
+  "hash": "d833adbcf7cececc1751968005209ba4f9278ecc61619b653f9d46ee35786dc4"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
@@ -2299,21 +2579,49 @@
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_shoff' could be private",
+  "comment": "Function 'toAtMostMeasureSpec' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/AViewGroup.kt",
+      "language": "kotlin",
+      "line": 40,
+      "offset": 3,
+      "length": 9,
+      "code": {
+        "startLine": 38,
+        "length": 9,
+        "offset": 7,
+        "surroundingCode": "  }\n\n  protected fun Int.toAtMostMeasureSpec(): Int {\n    return MeasureSpec.makeMeasureSpec(this, MeasureSpec.AT_MOST)\n  }"
+      }
+    }
+  ],
+  "attributes": {
+    "module": "LibChecker.app.main",
+    "inspectionName": "MemberVisibilityCanBePrivate"
+  },
+  "hash": "2553b0fa99f0de9b7587d4556eaf8fdd0367554ece46f3be9e50f40e2ab04a06"
+},{
+  "tool": "Code Inspection",
+  "category": "Style issues",
+  "type": "Class member can have 'private' visibility",
+  "severity": "Info",
+  "comment": "Property 'animationDuration' could be private",
+  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
+  "sources": [
+    {
+      "type": "file",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/app/HeightAnimatableLinearLayout.kt",
       "language": "kotlin",
       "line": 14,
       "offset": 7,
-      "length": 7,
+      "length": 17,
       "code": {
         "startLine": 12,
-        "length": 7,
-        "offset": 81,
-        "surroundingCode": "  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)"
+        "length": 17,
+        "offset": 88,
+        "surroundingCode": "\nclass HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {\n  var animationDuration = 350L\n  private var animator: ValueAnimator = ObjectAnimator()\n"
       }
     }
   ],
@@ -2321,27 +2629,27 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "fcbdc1a3582eccd9edd26db0203c2761d78a04ab4bde422cdd55a206ffc83322"
+  "hash": "7d57c13a2db122db4e3515042f47fe625945e5d2320db988ac099476967c8c2f"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Function 'isElf' could be private",
+  "comment": "Function 'expand' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
       "language": "kotlin",
-      "line": 29,
+      "line": 64,
       "offset": 7,
-      "length": 5,
+      "length": 6,
       "code": {
-        "startLine": 27,
-        "length": 5,
+        "startLine": 62,
+        "length": 6,
         "offset": 11,
-        "surroundingCode": "  }\n\n  fun isElf(): Boolean {\n    return e_ident[0].toInt() == 0x7F &&\n      e_ident[1].toInt().toChar() == 'E' &&"
+        "surroundingCode": "  }\n\n  fun expand() {\n    isExpand = true\n    animateToggle(animationDuration)"
       }
     }
   ],
@@ -2349,27 +2657,27 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "f0cc6708f92a4b0fc7d94b9fcebe734238abb55e507361e0ef168126fda7132e"
+  "hash": "6ed2c8bcce094df75f6410d6ca03567997de1a0dda0302cd71b54e22383f9757"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_machine' could be private",
+  "comment": "Function 'collapse' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
       "language": "kotlin",
-      "line": 10,
+      "line": 59,
       "offset": 7,
-      "length": 9,
+      "length": 8,
       "code": {
-        "startLine": 8,
-        "length": 9,
-        "offset": 96,
-        "surroundingCode": "  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)"
+        "startLine": 57,
+        "length": 8,
+        "offset": 11,
+        "surroundingCode": "  }\n\n  fun collapse() {\n    isExpand = false\n    animateToggle(animationDuration)"
       }
     }
   ],
@@ -2377,186 +2685,18 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "d8cf97b67354df0d8507cdb6c73b468370e460e5e2cc96507174617da355071a"
+  "hash": "69790851af5408ffde7471b0a840cf5c032e19efb5a6670ca194498d4cafbbea"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_shstrndx' could be private",
+  "comment": "Property 'isExpand' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 21,
-      "offset": 7,
-      "length": 10,
-      "code": {
-        "startLine": 19,
-        "length": 10,
-        "offset": 86,
-        "surroundingCode": "  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n\n  private constructor()"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "b735658726eca5c2793de236a3ae30d9a54ebc68d3852332d4cc926070515e23"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_shentsize' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 19,
-      "offset": 7,
-      "length": 11,
-      "code": {
-        "startLine": 17,
-        "length": 11,
-        "offset": 86,
-        "surroundingCode": "  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "5922ef143921086219603a9998138fe58b3b4d2ac3f8f85e6e3ea42490218b22"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_phoff' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 13,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 11,
-        "length": 7,
-        "offset": 84,
-        "surroundingCode": "  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "bd17c586d3fa56c234fd0de3679e1799d5638bb607f11b16b426d0beba1853cd"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_version' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 11,
-      "offset": 7,
-      "length": 9,
-      "code": {
-        "startLine": 9,
-        "length": 9,
-        "offset": 83,
-        "surroundingCode": "  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "069611eeabfe60bbf21b15647973043fdda29a19d97b302a87710478fed76ee1"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_flags' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 15,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 13,
-        "length": 7,
-        "offset": 80,
-        "surroundingCode": "  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "22aa7d887e86251c1dff4ff6f5d5fbe53e5a6e594c3216daded0710a04001c69"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_ident' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 8,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 6,
-        "length": 7,
-        "offset": 31,
-        "surroundingCode": "class ELF32EhdrParser {\n\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "28cd4be30c73a95447e12c1a6a119e95b84867989ae81c1ac0b9088740178393"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_ehsize' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
       "language": "kotlin",
       "line": 16,
       "offset": 7,
@@ -2564,8 +2704,8 @@
       "code": {
         "startLine": 14,
         "length": 8,
-        "offset": 81,
-        "surroundingCode": "  val e_shoff = ByteArray(ELF32_OFF)\n  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)"
+        "offset": 46,
+        "surroundingCode": "  FrameLayout(context, attributeSet) {\n\n  var isExpand: Boolean = false\n    private set\n  var animationDuration = 350L"
       }
     }
   ],
@@ -2573,139 +2713,27 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "199b99b93ee7698608a58d3351dc07954ea25130fdb1a92af7663c97ce97c911"
+  "hash": "0e9e1b26e8149784bb56312c99c47277bfe358efa881e587662f37fbbf6ddcf4"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
   "type": "Class member can have 'private' visibility",
   "severity": "Info",
-  "comment": "Property 'e_shnum' could be private",
+  "comment": "Property 'animationDuration' could be private",
   "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
   "sources": [
     {
       "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 20,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 18,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)\n  val e_shstrndx = ByteArray(ELF32_HALF)\n"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "d84189e223bb22da4edf115b66c20a5e714165abc8e350a4013339311d1b2350"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_entry' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 12,
-      "offset": 7,
-      "length": 7,
-      "code": {
-        "startLine": 10,
-        "length": 7,
-        "offset": 86,
-        "surroundingCode": "  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)\n  val e_entry = ByteArray(ELF32_ADDR)\n  val e_phoff = ByteArray(ELF32_OFF)\n  val e_shoff = ByteArray(ELF32_OFF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "1590d6b87f01fd2590a0692d2e6cb19bf48fe944154e84bf2129035fb3ce8f31"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_phentsize' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 17,
-      "offset": 7,
-      "length": 11,
-      "code": {
-        "startLine": 15,
-        "length": 11,
-        "offset": 83,
-        "surroundingCode": "  val e_flags = ByteArray(ELF32_WORD)\n  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "1e8f295dee6d642d32f366b29271c96f3adb9103eadf6caac4e95acbfec126e8"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_type' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
-      "language": "kotlin",
-      "line": 9,
-      "offset": 7,
-      "length": 6,
-      "code": {
-        "startLine": 7,
-        "length": 6,
-        "offset": 60,
-        "surroundingCode": "\n  val e_ident = ByteArray(UNSIGNED_CHAR * EI_NIDENT)\n  val e_type = ByteArray(ELF32_HALF)\n  val e_machine = ByteArray(ELF32_HALF)\n  val e_version = ByteArray(ELF32_WORD)"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "135ae52b6bcad0c96afe42b0c8748dac6317527eabf03dc6378adbfb23dccb70"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Property 'e_phnum' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/utils/elf/ELF32EhdrParser.kt",
+      "path": "app/src/main/kotlin/com/absinthe/libchecker/view/detail/ProcessIndicatorView.kt",
       "language": "kotlin",
       "line": 18,
       "offset": 7,
-      "length": 7,
+      "length": 17,
       "code": {
         "startLine": 16,
-        "length": 7,
-        "offset": 87,
-        "surroundingCode": "  val e_ehsize = ByteArray(ELF32_HALF)\n  val e_phentsize = ByteArray(ELF32_HALF)\n  val e_phnum = ByteArray(ELF32_HALF)\n  val e_shentsize = ByteArray(ELF32_HALF)\n  val e_shnum = ByteArray(ELF32_HALF)"
+        "length": 17,
+        "offset": 54,
+        "surroundingCode": "  var isExpand: Boolean = false\n    private set\n  var animationDuration = 350L\n\n  private val libStringAdapter = LibStringAdapter(\"\", ACTIVITY)"
       }
     }
   ],
@@ -2713,35 +2741,7 @@
     "module": "LibChecker.app.main",
     "inspectionName": "MemberVisibilityCanBePrivate"
   },
-  "hash": "35a1762076666ad31a798ee6ad88df8bea4b37df8b28215842a7b10f9397b6f6"
-},{
-  "tool": "Code Inspection",
-  "category": "Style issues",
-  "type": "Class member can have 'private' visibility",
-  "severity": "Info",
-  "comment": "Function 'refreshList' could be private",
-  "detailsInfo": "Reports declarations that can be made `private` to follow the encapsulation principle.\n\n**Example:**\n\n\n    class Service(val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n\nAfter the quick-fix is applied (considering there are no usages of `url` outside of `Service` class):\n\n\n    class Service(private val url: String) {\n        fun connect(): URLConnection = URL(url).openConnection()\n    }\n",
-  "sources": [
-    {
-      "type": "file",
-      "path": "app/src/main/kotlin/com/absinthe/libchecker/viewmodel/HomeViewModel.kt",
-      "language": "kotlin",
-      "line": 86,
-      "offset": 7,
-      "length": 11,
-      "code": {
-        "startLine": 84,
-        "length": 11,
-        "offset": 11,
-        "surroundingCode": "  }\n\n  fun refreshList() {\n    setEffect {\n      Effect.RefreshList()"
-      }
-    }
-  ],
-  "attributes": {
-    "module": "LibChecker.app.main",
-    "inspectionName": "MemberVisibilityCanBePrivate"
-  },
-  "hash": "a51dc0c91822d52f2f255b8a1a950ca68b1b0b6c81c14d8266ee71596801a474"
+  "hash": "2d54681887075226939299f8f9771e554b09dfa06d4acbd432664bb7e0d6f54c"
 },{
   "tool": "Code Inspection",
   "category": "Style issues",
