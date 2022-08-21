@@ -24,6 +24,7 @@
   <string name="empty_list">Список порожній</string>
   <string name="uncharted_territory">Недосліджена територія</string>
   <string name="get_app_list_denied_tip">Будь ласка надайте\nLibChecker дозвіл отримати\nінформацію про встановлені додатки</string>
+  <string name="advanced_menu">Advanced Menu</string>
 
   <string name="menu_sort_by_time_desc">По часу оновлення ↓</string>
   <string name="menu_sort_by_target_api_desc">По цільовому API ↓</string>

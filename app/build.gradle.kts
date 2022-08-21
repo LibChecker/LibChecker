@@ -167,6 +167,7 @@ dependencies {
   implementation(libs.dexLib2)
   implementation(libs.slf4j)
   implementation(libs.commons.io)
+  implementation(libs.flexbox)
 
   implementation(libs.bundles.rikkax)
 

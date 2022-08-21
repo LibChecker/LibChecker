@@ -24,6 +24,7 @@
   <string name="empty_list">Список пуст</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
+  <string name="advanced_menu">Advanced Menu</string>
 
   <string name="menu_sort_by_time_desc">По времени обновления ↓</string>
   <string name="menu_sort_by_target_api_desc">По целевой API ↓</string>

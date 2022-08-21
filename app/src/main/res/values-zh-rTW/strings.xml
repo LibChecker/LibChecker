@@ -24,6 +24,7 @@
   <string name="empty_list">空清單</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
+  <string name="advanced_menu">高級菜單</string>
 
   <string name="menu_sort_by_time_desc">依升級時間遞減</string>
   <string name="menu_sort_by_target_api_desc">依 Target API 遞減</string>
