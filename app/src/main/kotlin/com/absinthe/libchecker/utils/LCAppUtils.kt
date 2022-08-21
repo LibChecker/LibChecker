@@ -194,7 +194,7 @@ object LCAppUtils {
         arguments = bundleOf(
           EXTRA_LC_ITEM to item
         )
-        show(context.supportFragmentManager, tag)
+        show(context.supportFragmentManager, OverlayDetailBottomSheetDialogFragment::class.java.name)
       }
     } else {
       val intent = Intent(context, AppDetailActivity::class.java)

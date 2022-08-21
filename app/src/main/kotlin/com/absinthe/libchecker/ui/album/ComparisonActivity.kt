@@ -154,7 +154,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
                   dismiss()
                 }
               }
-            dialog.show(supportFragmentManager, dialog.tag)
+            dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
           }
         }
       }
@@ -177,7 +177,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
                   dismiss()
                 }
               }
-            dialog.show(supportFragmentManager, dialog.tag)
+            dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
           }
         }
       }

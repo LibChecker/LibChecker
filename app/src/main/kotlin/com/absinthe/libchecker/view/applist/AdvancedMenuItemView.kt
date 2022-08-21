@@ -17,7 +17,7 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
     }
   }
 
-  private var onCheckedChangeCallback: (isChecked: Boolean) -> Unit = {}
+  private var onCheckedChangeCallback: ((isChecked: Boolean) -> Unit)? = null
 
   init {
     addView(chip)
@@ -34,7 +34,7 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
           GlobalValues.advancedOptions and option.inv()
         }
         GlobalValues.advancedOptions = newOptions
-        onCheckedChangeCallback(isChecked)
+        onCheckedChangeCallback?.invoke(isChecked)
       }
     }
   }

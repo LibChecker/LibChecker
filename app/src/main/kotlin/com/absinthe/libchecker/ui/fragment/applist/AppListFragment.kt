@@ -256,7 +256,7 @@ class AppListFragment :
               advancedMenuBSDFragment = null
             }
           }
-          advancedMenuBSDFragment?.show(it.supportFragmentManager, tag)
+          advancedMenuBSDFragment?.show(it.supportFragmentManager, AdvancedMenuBSDFragment::class.java.name)
         }
       }
     }

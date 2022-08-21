@@ -78,13 +78,10 @@ class SnapshotComponentProvider : BaseNodeProvider() {
                 return@setChipOnClickListener
               }
               val name = item.item.name
+              val fragmentManager =
+                (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager
               LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
-                .apply {
-                  show(
-                    (this@SnapshotComponentProvider.context as BaseActivity<*>).supportFragmentManager,
-                    tag
-                  )
-                }
+                .show(fragmentManager, LibDetailDialogFragment::class.java.name)
             }
           } else {
             setChipOnClickListener(null)

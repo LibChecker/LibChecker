@@ -544,7 +544,7 @@ class ChartFragment :
       })
     }.also {
       activity?.let { activity ->
-        it.show(activity.supportFragmentManager, tag)
+        it.show(activity.supportFragmentManager, ClassifyBottomSheetDialogFragment::class.java.name)
       }
     }
   }

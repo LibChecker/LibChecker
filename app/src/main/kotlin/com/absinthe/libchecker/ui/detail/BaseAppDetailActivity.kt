@@ -181,7 +181,7 @@ abstract class BaseAppDetailActivity :
                   arguments = bundleOf(
                     EXTRA_PACKAGE_NAME to packageInfo.packageName
                   )
-                  show(supportFragmentManager, tag)
+                  show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
                 }
               }
             }
@@ -711,7 +711,7 @@ abstract class BaseAppDetailActivity :
             arguments = bundleOf(
               EXTRA_PACKAGE_NAME to packageInfo.packageName
             )
-            show(supportFragmentManager, tag)
+            show(supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
           }
         }
       )
@@ -909,7 +909,7 @@ abstract class BaseAppDetailActivity :
           arguments = bundleOf(
             EXTRA_PACKAGE_NAME to viewModel.packageInfo.packageName
           )
-          show(supportFragmentManager, tag)
+          show(supportFragmentManager, AppInfoBottomSheetDialogFragment::class.java.name)
         }
       }
     }

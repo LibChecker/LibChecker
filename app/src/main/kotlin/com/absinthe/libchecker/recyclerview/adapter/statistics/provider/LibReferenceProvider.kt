@@ -104,7 +104,7 @@ class LibReferenceProvider : BaseNodeProvider() {
 
           withContext(Dispatchers.Main) {
             LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-              .show((context as BaseActivity<*>).supportFragmentManager, "LibDetailDialogFragment")
+              .show((context as BaseActivity<*>).supportFragmentManager, LibDetailDialogFragment::class.java.name)
           }
         }
       }

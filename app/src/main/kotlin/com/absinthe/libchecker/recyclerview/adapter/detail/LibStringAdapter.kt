@@ -234,7 +234,7 @@ class LibStringAdapter(
                           arguments = bundleOf(
                             EXTRA_TEXT to text
                           )
-                          show(fm, tag)
+                          show(fm, XmlBSDFragment::class.java.name)
                         }
                       }
                     }

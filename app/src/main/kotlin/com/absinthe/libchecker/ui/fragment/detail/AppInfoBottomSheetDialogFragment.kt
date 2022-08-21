@@ -62,7 +62,7 @@ class AppInfoBottomSheetDialogFragment :
             arguments = bundleOf(
               EXTRA_PACKAGE_NAME to packageName
             )
-            show(it.supportFragmentManager, tag)
+            show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
           }
         }
       } finally {

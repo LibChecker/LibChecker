@@ -145,7 +145,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          CloudRulesDialogFragment().show(childFragmentManager, tag)
+          CloudRulesDialogFragment().show(childFragmentManager, CloudRulesDialogFragment::class.java.name)
           true
         }
       }
@@ -155,7 +155,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, tag)
+          LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, LibThresholdDialogFragment::class.java.name)
           true
         }
       }

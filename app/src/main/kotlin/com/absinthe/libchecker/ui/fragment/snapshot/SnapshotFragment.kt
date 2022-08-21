@@ -158,7 +158,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
             }
-          dialog.show(context.supportFragmentManager, dialog.tag)
+          dialog.show(context.supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
         }
       }
 
@@ -216,7 +216,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         val item = getItem(position)
         if (item.deleted || item.newInstalled || item.isNothingChanged()) {
           SnapshotNoDiffBSDFragment.newInstance(item).also {
-            it.show(context.supportFragmentManager, it.tag)
+            it.show(context.supportFragmentManager, SnapshotNoDiffBSDFragment::class.java.name)
           }
         } else {
           val intent = Intent(context, SnapshotDetailActivity::class.java)

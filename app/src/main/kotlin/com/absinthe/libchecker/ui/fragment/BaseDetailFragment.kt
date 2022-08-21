@@ -235,7 +235,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
       withContext(Dispatchers.Main) {
         LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-          .show(childFragmentManager, tag)
+          .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
   }
