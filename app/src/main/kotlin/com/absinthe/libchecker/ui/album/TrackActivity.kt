@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.Checkable
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
@@ -31,7 +33,10 @@ import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTextListener {
+class TrackActivity :
+  BaseActivity<ActivityTrackBinding>(),
+  SearchView.OnQueryTextListener,
+  MenuProvider {
 
   private val repository = Repositories.lcRepository
   private val adapter = TrackAdapter()
@@ -53,6 +58,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
   }
 
   private fun initView() {
+    addMenuProvider(this)
     setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -130,14 +136,7 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
     }
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
-      onBackPressedDispatcher.onBackPressed()
-    }
-    return super.onOptionsItemSelected(item)
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.track_menu, menu)
     this.menu = menu
 
@@ -160,7 +159,13 @@ class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTe
         isVisible = false
       }
     }
-    return super.onCreateOptionsMenu(menu)
+  }
+
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == android.R.id.home) {
+      onBackPressedDispatcher.onBackPressed()
+    }
+    return true
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {

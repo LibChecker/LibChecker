@@ -124,7 +124,7 @@ dependencies {
   compileOnly(projects.hiddenApi)
 
   implementation(libs.kotlinX.coroutines)
-  implementation(libs.androidX.appCompat)
+  //implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
@@ -167,6 +167,7 @@ dependencies {
   implementation(libs.dexLib2)
   implementation(libs.slf4j)
   implementation(libs.commons.io)
+  implementation(libs.flexbox)
 
   implementation(libs.bundles.rikkax)
 

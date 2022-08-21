@@ -14,6 +14,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.StrikethroughSpan
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,7 @@ import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
+import androidx.core.view.MenuProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -108,7 +110,8 @@ import kotlin.math.abs
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
   IDetailContainer,
-  SearchView.OnQueryTextListener {
+  SearchView.OnQueryTextListener,
+  MenuProvider {
 
   protected val viewModel: DetailViewModel by viewModels()
   protected var isListReady = false
@@ -136,6 +139,7 @@ abstract class BaseAppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
+    addMenuProvider(this)
     setSupportActionBar(getToolbar())
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
@@ -636,14 +640,14 @@ abstract class BaseAppDetailActivity :
 
   protected open fun onStaticLibsAvailable() {}
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == android.R.id.home) {
       finish()
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.app_detail_menu, menu)
     this.menu = menu
 
@@ -666,7 +670,6 @@ abstract class BaseAppDetailActivity :
       //   isVisible = false
       // }
     }
-    return super.onCreateOptionsMenu(menu)
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {

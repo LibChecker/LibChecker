@@ -135,7 +135,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.darkMode = newValue.toString()
-        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(newValue.toString()))
+        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode())
         activity?.recreate()
         true
       }
@@ -300,10 +300,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       viewModel.controller = this
       activity?.invalidateOptionsMenu()
     }
-    scheduleAppbarRaisingStatus(
-      !getBorderViewDelegate().isShowingTopBorder,
-      "SettingsFragment onResume"
-    )
+    scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(prefRecyclerView)
   }
 
@@ -331,18 +328,15 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     borderViewDelegate = recyclerView.borderViewDelegate
     borderViewDelegate.borderVisibilityChangedListener =
       BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-        scheduleAppbarRaisingStatus(
-          !top,
-          "SettingsFragment OnBorderVisibilityChangedListener: top=$top"
-        )
+        scheduleAppbarRaisingStatus(!top)
       }
 
     prefRecyclerView = recyclerView
     return recyclerView
   }
 
-  private fun scheduleAppbarRaisingStatus(isLifted: Boolean, from: String) {
-    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted, from)
+  private fun scheduleAppbarRaisingStatus(isLifted: Boolean) {
+    (activity as? IAppBarContainer)?.scheduleAppbarLiftingStatus(isLifted)
   }
 
   override fun onDetach() {

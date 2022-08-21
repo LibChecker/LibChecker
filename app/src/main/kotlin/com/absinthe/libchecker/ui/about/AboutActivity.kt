@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,6 +16,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BuildConfig
@@ -41,7 +43,7 @@ import java.lang.ref.WeakReference
 
 private const val RENGE_CHECKER = "RengeChecker"
 
-class AboutActivity : AbsAboutActivityProxy() {
+class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
 
   private var shouldShowEasterEggCount = 1
   private val configuration by lazy {
@@ -436,12 +438,11 @@ class AboutActivity : AbsAboutActivityProxy() {
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.about_menu, menu)
-    return true
   }
 
-  override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     if (menuItem.itemId == R.id.toolbar_rate) {
       try {
         startActivity(
@@ -454,10 +455,11 @@ class AboutActivity : AbsAboutActivityProxy() {
         showLongToast(R.string.toast_not_existing_market)
       }
     }
-    return super.onOptionsItemSelected(menuItem)
+    return true
   }
 
   private fun initView() {
+    addMenuProvider(this)
     findViewById<Toolbar>(R.id.toolbar)?.let {
       it.title = getString(R.string.settings_about)
     }

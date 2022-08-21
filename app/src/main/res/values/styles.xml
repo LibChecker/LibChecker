@@ -88,4 +88,19 @@
     <item name="android:windowIsTranslucent">true</item>
   </style>
 
+  <style name="Widget.CheckableChipView" parent="">
+    <item name="android:padding">8dp</item>
+
+    <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
+    <item name="android:textSize">14sp</item>
+
+    <item name="ccv_outlineWidth">1dp</item>
+    <item name="ccv_outlineColor">?attr/colorOnPrimaryContainer</item>
+
+    <item name="android:color">?attr/colorPrimaryContainer</item>
+
+    <item name="ccv_clearIcon">@drawable/ic_check</item>
+    <item name="ccv_foreground">?android:selectableItemBackground</item>
+  </style>
+
 </resources>

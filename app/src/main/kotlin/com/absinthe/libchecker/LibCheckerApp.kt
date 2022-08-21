@@ -71,12 +71,12 @@ class LibCheckerApp : Application() {
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
+    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()
-    initSplitController()
     DynamicColors.applyToActivitiesIfAvailable(this)
+    initSplitController()
 
     Coil.setImageLoader {
       ImageLoader(this).newBuilder()

@@ -25,6 +25,7 @@ object Constants {
   const val TEMP_PACKAGE = "lc_temp_package.apk"
   const val TEMP_PACKAGE_2 = "lc_temp_package_2.apk"
   const val TEMP_ICON = "lc_temp_icon.png"
+  const val EXAMPLE_PACKAGE = "this.is.an.example"
 
   const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
   const val PREF_APK_ANALYTICS = "apkAnalytics"
@@ -39,7 +40,6 @@ object Constants {
   const val PREF_ANONYMOUS_ANALYTICS = "analytics"
   const val PREF_CLOUD_RULES = "cloudRules"
 
-  const val PREF_APP_SORT_MODE = "appSortMode"
   const val PREF_LIB_SORT_MODE = "libSortMode"
   const val PREF_PROCESS_MODE = "processMode"
   const val PREF_SNAPSHOT_TIMESTAMP = "snapshotTimestamp"
@@ -52,10 +52,6 @@ object Constants {
   const val PREF_LOCALE = "locale"
 
   const val PREF_DEBUG_MODE = "debugMode"
-
-  const val SORT_MODE_UPDATE_TIME_DESC = 0
-  const val SORT_MODE_TARGET_API_DESC = 1
-  const val SORT_MODE_DEFAULT = 2
 
   const val CURRENT_LIB_REF_TYPE = "currentLibRefType"
 
@@ -81,6 +77,7 @@ object Constants {
   const val RENGE_THEME = "rengeTheme"
 
   const val PREF_UUID = "uuid"
+  const val PREF_ADVANCED_OPTIONS = "advancedOptions"
 
   object Event {
     const val LAUNCH_ACTION = "Launch Action"

@@ -4,9 +4,11 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.activity.viewModels
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -61,7 +63,9 @@ import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>() {
+class SnapshotDetailActivity :
+  CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
+  MenuProvider {
 
   private lateinit var entity: SnapshotDiffItem
 
@@ -88,21 +92,21 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.snapshot_detail_menu, menu)
-    return super.onCreateOptionsMenu(menu)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == android.R.id.home) {
       finish()
-    } else if (item.itemId == R.id.report_generate) {
+    } else if (menuItem.itemId == R.id.report_generate) {
       generateReport()
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun initView() {
+    addMenuProvider(this)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)

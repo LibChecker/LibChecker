@@ -94,10 +94,7 @@ class LibReferenceFragment :
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "LibReferenceFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
         FastScrollerBuilder(this).useMd2Style().build()
@@ -238,8 +235,8 @@ class LibReferenceFragment :
     popup?.dismiss()
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.lib_ref_menu, menu)
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.lib_ref_menu, menu)
     this.menu = menu
 
     val context = (context as? BaseActivity<*>) ?: return
@@ -262,14 +259,12 @@ class LibReferenceFragment :
         isVisible = false
       }
     }
-
-    super.onCreateOptionsMenu(menu, inflater)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
     val contextRef = WeakReference(context)
-    if (item.itemId == R.id.filter) {
+    if (menuItem.itemId == R.id.filter) {
       val color = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
       val styler = CascadePopupMenu.Styler(
         background = {
@@ -310,11 +305,10 @@ class LibReferenceFragment :
         }
       }
       popup?.show()
-    } else if (item.itemId == R.id.chart) {
+    } else if (menuItem.itemId == R.id.chart) {
       startActivity(Intent(context, ChartActivity::class.java))
     }
-
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun MenuItem.initMenu(@LibType type: Int) {

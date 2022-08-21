@@ -24,10 +24,7 @@
   <string name="empty_list">空清單</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
-
-  <string name="menu_sort_by_time_desc">依升級時間遞減</string>
-  <string name="menu_sort_by_target_api_desc">依 Target API 遞減</string>
-  <string name="menu_sort_default">預設順序</string>
+  <string name="advanced_menu">高級菜單</string>
 
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的 Apps</string>
@@ -68,7 +65,6 @@
   <string name="pref_group_normal">一般</string>
   <string name="pref_group_others">其他</string>
 
-  <string name="show_system_apps">顯示系統應用程式</string>
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩圖示</string>
   <string name="rules_repo_title">規則存放庫</string>
@@ -81,7 +77,6 @@
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
 
-  <string name="show_system_apps_summary">控制是否在應用程式清單中顯示系統應用</string>
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
   <string name="colorful_icon_summary">部分標示庫會呈現為彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
@@ -193,4 +188,16 @@
   <string name="rules_btn_restart_to_update">重啟以更新</string>
   <string name="rules_btn_update">更新</string>
 
+  <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Show System Apps</string>
+  <string name="adv_show_overlays">Show Overlays</string>
+  <string name="adv_show_64_bit">Show 64-bit Apps</string>
+  <string name="adv_show_32_bit">Show 32-bit Apps</string>
+  <string name="adv_sort_by_time">Sort by Updated Time</string>
+  <string name="adv_sort_by_target_version">Sort by Target Version</string>
+  <string name="adv_sort_by_name">Sort by Name</string>
+  <string name="adv_show_android_version">Show Android Version</string>
+  <string name="adv_show_target_version">Show Target Version</string>
+  <string name="adv_show_min_version">Show Min Version</string>
+  <string name="adv_tint_abi_label">Tint ABI Label</string>
 </resources>

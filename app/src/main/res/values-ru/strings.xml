@@ -24,10 +24,7 @@
   <string name="empty_list">Список пуст</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
-
-  <string name="menu_sort_by_time_desc">По времени обновления ↓</string>
-  <string name="menu_sort_by_target_api_desc">По целевой API ↓</string>
-  <string name="menu_sort_default">По умолчанию</string>
+  <string name="advanced_menu">Advanced Menu</string>
 
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Приложения с %s ABI</string>
@@ -68,7 +65,6 @@
   <string name="pref_group_normal">Общие</string>
   <string name="pref_group_others">Другие</string>
 
-  <string name="show_system_apps">Показывать системные приложения</string>
   <string name="apk_analytics">Анализирование АРК</string>
   <string name="colorful_icon">Цветные значки</string>
   <string name="rules_repo_title">Репозиторий правил</string>
@@ -80,7 +76,6 @@
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
 
-  <string name="show_system_apps_summary">Управление отображением системных приложений в списке приложений</string>
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
@@ -192,5 +187,18 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">Обновить</string>
   <string name="languages">Язык</string>
+
+  <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Show System Apps</string>
+  <string name="adv_show_overlays">Show Overlays</string>
+  <string name="adv_show_64_bit">Show 64-bit Apps</string>
+  <string name="adv_show_32_bit">Show 32-bit Apps</string>
+  <string name="adv_sort_by_time">Sort by Updated Time</string>
+  <string name="adv_sort_by_target_version">Sort by Target Version</string>
+  <string name="adv_sort_by_name">Sort by Name</string>
+  <string name="adv_show_android_version">Show Android Version</string>
+  <string name="adv_show_target_version">Show Target Version</string>
+  <string name="adv_show_min_version">Show Min Version</string>
+  <string name="adv_tint_abi_label">Tint ABI Label</string>
 
 </resources>

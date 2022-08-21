@@ -45,7 +45,7 @@ class EmptyListView(context: Context) : AViewGroup(context) {
   }
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-    icon.layout(icon.toHorizontalCenter(this), paddingTop)
+    icon.layout(icon.toHorizontalCenter(this), icon.toVerticalCenter(this))
     text.layout(text.toHorizontalCenter(this), icon.bottom + text.marginTop)
   }
 }
