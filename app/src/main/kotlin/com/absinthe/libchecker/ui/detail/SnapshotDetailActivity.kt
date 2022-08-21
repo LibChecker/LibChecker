@@ -63,7 +63,8 @@ import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
+class SnapshotDetailActivity :
+  CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
   MenuProvider {
 
   private lateinit var entity: SnapshotDiffItem

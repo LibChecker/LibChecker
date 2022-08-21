@@ -20,4 +20,10 @@ object AdvancedOptions {
       SHOW_32_BIT_APPS or
       SORT_BY_NAME or
       SHOW_TARGET_API
+
+  fun isSortModeNothingChoose(): Boolean {
+    return (GlobalValues.advancedOptions and SORT_BY_NAME) == 0 &&
+      (GlobalValues.advancedOptions and SORT_BY_UPDATE_TIME) == 0 &&
+      (GlobalValues.advancedOptions and SORT_BY_TARGET_API) == 0
+  }
 }

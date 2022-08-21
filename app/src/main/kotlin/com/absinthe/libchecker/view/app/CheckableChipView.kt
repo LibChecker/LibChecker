@@ -169,7 +169,10 @@ class CheckableChipView @JvmOverloads constructor(
 
       clearDrawable = getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon).apply {
         setBounds(
-          -intrinsicWidth / 2, -intrinsicHeight / 2, intrinsicWidth / 2, intrinsicHeight / 2
+          -intrinsicWidth / 2,
+          -intrinsicHeight / 2,
+          intrinsicWidth / 2,
+          intrinsicHeight / 2
         )
       }
       touchFeedbackDrawable =

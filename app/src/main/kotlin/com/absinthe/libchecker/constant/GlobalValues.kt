@@ -20,6 +20,9 @@ object GlobalValues {
     return SPUtils.sp
   }
 
+  var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
+  val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
@@ -36,8 +39,6 @@ object GlobalValues {
 
   var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
 
-  var appSortMode: Int by SPDelegates(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
-
   var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
 
   var processMode: Boolean by SPDelegates(Constants.PREF_PROCESS_MODE, false)
@@ -45,15 +46,13 @@ object GlobalValues {
   var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
   val isShowSystemApps: MutableLiveData<Boolean> =
-    MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
+    MutableLiveData((advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS) > 0)
 
   val isColorfulIcon: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
 
   val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
-
-  val appSortModeLiveData: MutableLiveData<Int> = MutableLiveData(appSortMode)
 
   val libSortModeLiveData: MutableLiveData<Int> = MutableLiveData(libSortMode)
 
@@ -77,7 +76,4 @@ object GlobalValues {
   var uuid: String by SPDelegates(Constants.PREF_UUID, "")
 
   var isGitHubUnreachable = true
-
-  var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
-  val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
 }

@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +18,8 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
+import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -33,6 +36,7 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -62,10 +66,12 @@ class AppListFragment :
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
   private var keyword: String = ""
+  private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
+    val context = (context as? BaseActivity<*>) ?: return
     appAdapter.also {
       it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
@@ -77,6 +83,14 @@ class AppListFragment :
       }
       it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
+      it.setEmptyView(
+        EmptyListView(context).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+          )
+        }
+      )
     }
 
     binding.apply {
@@ -157,6 +171,12 @@ class AppListFragment :
     }
   }
 
+  override fun onPause() {
+    super.onPause()
+    advancedMenuBSDFragment?.dismiss()
+    advancedMenuBSDFragment = null
+  }
+
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     binding.list.layoutManager = getSuitableLayoutManagerImpl()
@@ -226,13 +246,17 @@ class AppListFragment :
     when (menuItem.itemId) {
       R.id.advanced -> {
         activity?.let {
-          AdvancedMenuBSDFragment().apply {
-            show(it.supportFragmentManager, tag)
+          advancedMenuBSDFragment?.dismiss()
+          advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
             setOnDismissListener {
+              GlobalValues.advancedOptionsLiveData.postValue(GlobalValues.advancedOptions)
+              GlobalValues.isShowSystemApps.postValue(GlobalValues.advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS > 0)
               //noinspection NotifyDataSetChanged
               appAdapter.notifyDataSetChanged()
+              advancedMenuBSDFragment = null
             }
           }
+          advancedMenuBSDFragment?.show(it.supportFragmentManager, tag)
         }
       }
     }
@@ -322,25 +346,6 @@ class AppListFragment :
           updateItems(homeViewModel.dbItems.value!!)
         }
       }
-      appSortModeLiveData.observe(viewLifecycleOwner) { mode ->
-        if (isListReady) {
-          homeViewModel.dbItems.value?.let { allDatabaseItems ->
-            val list = allDatabaseItems.toMutableList()
-
-            when (mode) {
-              Constants.SORT_MODE_DEFAULT -> list.sortWith(
-                compareBy(
-                  { it.abi },
-                  { it.label }
-                )
-              )
-              Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.lastUpdatedTime }
-              Constants.SORT_MODE_TARGET_API_DESC -> list.sortByDescending { it.targetApi }
-            }
-            updateItems(list)
-          }
-        }
-      }
     }
   }
 
@@ -349,12 +354,27 @@ class AppListFragment :
     highlightRefresh: Boolean = false
   ) {
     Timber.d("updateItems")
-    var filterList: MutableList<LCItem>
+    var filterList: MutableList<LCItem> = newItems.toMutableList()
 
-    filterList = if (GlobalValues.isShowSystemApps.value == false) {
-      newItems.filter { !it.isSystem }.toMutableList()
-    } else {
-      newItems.toMutableList()
+    val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
+    val options = GlobalValues.advancedOptions
+    if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
+      filterList = filterList.filter { !it.isSystem }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
+      filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
+      filterList = filterList.filter {
+        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86 || trueAbi == Constants.ARMV7 || trueAbi == Constants.ARMV5 || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
+      }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
+      filterList = filterList.filter {
+        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86_64 || trueAbi == Constants.ARMV8 || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
+      }.toMutableList()
     }
 
     if (keyword.isNotEmpty()) {
@@ -368,10 +388,12 @@ class AppListFragment :
       }
     }
 
-    when (GlobalValues.appSortMode) {
-      Constants.SORT_MODE_DEFAULT -> filterList.sortWith(compareBy({ it.abi }, { it.label }))
-      Constants.SORT_MODE_UPDATE_TIME_DESC -> filterList.sortByDescending { it.lastUpdatedTime }
-      Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
+    if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
+      filterList.sortWith(compareBy({ it.abi }, { it.label }))
+    } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
+      filterList.sortByDescending { it.lastUpdatedTime }
+    } else if ((options and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
+      filterList.sortByDescending { it.targetApi }
     }
 
     appAdapter.setDiffNewData(filterList) {

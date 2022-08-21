@@ -10,7 +10,9 @@ import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
-abstract class BaseListControllerFragment<T : ViewBinding> : BaseFragment<T>(), IListController,
+abstract class BaseListControllerFragment<T : ViewBinding> :
+  BaseFragment<T>(),
+  IListController,
   MenuProvider {
 
   protected var borderDelegate: BorderViewDelegate? = null

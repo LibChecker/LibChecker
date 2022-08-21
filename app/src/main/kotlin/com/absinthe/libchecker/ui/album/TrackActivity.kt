@@ -33,7 +33,9 @@ import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
-class TrackActivity : BaseActivity<ActivityTrackBinding>(), SearchView.OnQueryTextListener,
+class TrackActivity :
+  BaseActivity<ActivityTrackBinding>(),
+  SearchView.OnQueryTextListener,
   MenuProvider {
 
   private val repository = Repositories.lcRepository
