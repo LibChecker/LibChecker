@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.main
 
+import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.GlobalValues
@@ -85,6 +86,11 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   override fun onDestroyView() {
     super.onDestroyView()
     optionsViewMap.clear()
+  }
+
+  override fun onCancel(dialog: DialogInterface) {
+    super.onCancel(dialog)
+    dismiss()
   }
 
   fun setOnDismissListener(action: () -> Unit) {

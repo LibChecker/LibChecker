@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
+import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
+import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import androidx.core.text.buildSpannedString
@@ -10,7 +12,10 @@ import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.compat.BundleCompat
+import com.absinthe.libchecker.constant.AdvancedOptions
+import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.LCAppUtils
@@ -96,13 +101,10 @@ class OverlayDetailBottomSheetDialogFragment :
             return
           }
 
-          try {
-            val ai = PackageUtils.getPackageInfo(targetPackage).applicationInfo
-            it.icon.load(ai.loadIcon(SystemServices.packageManager))
-          } catch (e: PackageManager.NameNotFoundException) {
-            Timber.e(e)
-          }
-
+          val pi = runCatching {
+            PackageUtils.getPackageInfo(targetPackage)
+          }.getOrNull()
+          it.icon.load(pi)
           it.appName.text = targetLCItem.label
           it.packageName.text = targetPackage
           it.versionInfo.text =
@@ -110,8 +112,7 @@ class OverlayDetailBottomSheetDialogFragment :
 
           val str = StringBuilder()
             .append(PackageUtils.getAbiString(context, targetLCItem.abi.toInt(), true))
-            .append(", ")
-            .append(PackageUtils.getTargetApiString(targetLCItem.targetApi))
+            .append(getBuildVersionsInfo(pi, targetPackage))
           val spanString: SpannableString
           val abiBadgeRes = PackageUtils.getAbiBadgeResource(targetLCItem.abi.toInt())
 
@@ -136,6 +137,46 @@ class OverlayDetailBottomSheetDialogFragment :
           targetPackageView.setOnClickListener {
             LCAppUtils.launchDetailPage(requireActivity(), targetLCItem)
           }
+        }
+      }
+    }
+  }
+
+  private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
+    if (packageInfo == null && packageName != Constants.EXAMPLE_PACKAGE) {
+      return ""
+    }
+    val showAndroidVersion =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_ANDROID_VERSION) > 0
+    val showTarget =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_TARGET_API) > 0
+    val showMin =
+      (GlobalValues.advancedOptions and AdvancedOptions.SHOW_MIN_API) > 0
+    val target = packageInfo?.applicationInfo?.targetSdkVersion ?: Build.VERSION.SDK_INT
+    val min = packageInfo?.applicationInfo?.minSdkVersion ?: Build.VERSION.SDK_INT
+
+    return buildSpannedString {
+      if (showTarget) {
+        append(", ")
+        scale(0.8f) {
+          append("Target: ")
+        }
+        append(target.toString())
+        if (showAndroidVersion) {
+          append(" (${AndroidVersions.simpleVersions[target]})")
+        }
+      }
+
+      if (showMin) {
+        if (showTarget) {
+          append(", ")
+        }
+        scale(0.8f) {
+          append(" Min: ")
+        }
+        append(min.toString())
+        if (showAndroidVersion) {
+          append(" (${AndroidVersions.simpleVersions[min]})")
         }
       }
     }

@@ -178,8 +178,6 @@ object PackageUtils {
     }.getOrDefault("?")
   }
 
-  fun getTargetApiString(targetSdkVersion: Short) = "Target API $targetSdkVersion"
-
   private const val minSdkVersion = "minSdkVersion"
   private const val compileSdkVersion = "compileSdkVersion"
 

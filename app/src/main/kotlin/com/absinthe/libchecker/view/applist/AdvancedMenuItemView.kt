@@ -46,4 +46,10 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
   fun setOnCheckedChangeCallback(action: (isChecked: Boolean) -> Unit) {
     onCheckedChangeCallback = action
   }
+
+  override fun onDetachedFromWindow() {
+    super.onDetachedFromWindow()
+    chip.onCheckedChangeListener = null
+    onCheckedChangeCallback = null
+  }
 }
