@@ -7,12 +7,12 @@
     "vcs": {
       "sarifIdea": {
         "repositoryUri": "https://github.com/zhaobozhen/LibChecker",
-        "revisionId": "de65beaa6c4f0fe8fc71ad159f4be1d244c5e4ca",
+        "revisionId": "08d0b4078cb2ecd0116232c2946ad8d4e12c254f",
         "branch": "master"
       }
     },
     "deviceId": "200820300000000-9a51-bd2c-aa09-1801369fd0c6",
-    "jobUrl": "https://github.com/zhaobozhen/LibChecker/actions/runs/2903812375",
+    "jobUrl": "https://github.com/zhaobozhen/LibChecker/actions/runs/2904201719",
     "repoUrl": "https://github.com/zhaobozhen/LibChecker"
   }
 }
