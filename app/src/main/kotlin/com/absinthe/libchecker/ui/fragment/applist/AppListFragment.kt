@@ -320,6 +320,7 @@ class AppListFragment :
                 updateItems(dbItems)
               }
             }
+            else -> {}
           }
         }
       }

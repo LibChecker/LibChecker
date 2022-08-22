@@ -108,6 +108,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     appListStatus = status
   }
 
+  private fun updateLibRefProgress(progress: Int) {
+    setEffect {
+      Effect.UpdateLibRefProgress(progress)
+    }
+  }
+
   private fun setEffect(builder: () -> Effect) {
     val newEffect = builder()
     viewModelScope.launch {
@@ -432,6 +438,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
       var onlyShowNotMarked = false
+      var progressCount = 0
+
+      updateLibRefProgress(0)
 
       when (type) {
         ALL, NOT_MARKED -> {
@@ -440,89 +449,127 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           }
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             arrayOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA).forEach {
               computeComponentReference(map, item.packageName, it)
             }
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         NATIVE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, NATIVE)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         SERVICE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, SERVICE)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         ACTIVITY -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, ACTIVITY)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         RECEIVER -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, RECEIVER)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         PROVIDER -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, PROVIDER)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         DEX -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, DEX)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         PERMISSION -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, PERMISSION)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         METADATA -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
             computeComponentReference(map, item.packageName, METADATA)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         PACKAGE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
@@ -532,11 +579,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               map[packagePrefix] = mutableSetOf<String>() to PACKAGE
             }
             map[packagePrefix]!!.first.add(item.packageName)
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
         SHARED_UID -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+              progressCount++
+              updateLibRefProgress(progressCount * 100 / appMap.size)
               continue
             }
 
@@ -546,6 +597,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               }
               map[item.sharedUserId]!!.first.add(item.packageName)
             }
+            progressCount++
+            updateLibRefProgress(progressCount * 100 / appMap.size)
           }
         }
       }
@@ -762,5 +815,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     data class UpdateAppListStatus(val status: Int) : Effect()
     data class PackageChanged(val packageName: String, val action: String) : Effect()
     data class RefreshList(val obj: Any? = null) : Effect()
+    data class UpdateLibRefProgress(val progress: Int) : Effect()
   }
 }
