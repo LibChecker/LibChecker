@@ -18,6 +18,7 @@ import androidx.core.os.bundleOf
 import androidx.core.text.toSpannable
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
+import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -87,7 +88,11 @@ object LCAppUtils {
     if (BuildConfig.IS_DEV_VERSION) {
       val spanString = SpannableString("   ")
       val span = CenterAlignImageSpan(
-        R.drawable.ic_ci_label.getDrawable(context)!!.also {
+        if ("debug" in LibCheckerApp.app.applicationInfo.packageName) {
+          R.drawable.ic_debug_label
+        } else {
+          R.drawable.ic_ci_label
+        }.getDrawable(context)!!.also {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
         }
       )
