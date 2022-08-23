@@ -92,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: mappings
-          path: "app/build/outputs/mapping/fossRelease"
+          path: "app/build/outputs/mapping/marketRelease"
       - name: Set apk path
         id: apk-path
         run: |
@@ -110,7 +110,7 @@ jobs:
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
-          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/fossRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
+          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/marketRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
           token: ${{secrets.APP_CENTER_TOKEN}}
       - name: Send commit to telegram
         if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
