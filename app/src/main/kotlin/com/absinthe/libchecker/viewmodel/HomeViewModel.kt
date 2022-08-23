@@ -440,6 +440,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       var onlyShowNotMarked = false
       var progressCount = 0
 
+      fun updateLibRefProgressImpl() {
+        if (appMap.isNotEmpty()) {
+          updateLibRefProgress(progressCount * 100 / appMap.size)
+        }
+      }
+
       updateLibRefProgress(0)
 
       when (type) {
@@ -450,7 +456,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
@@ -458,118 +464,118 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               computeComponentReference(map, item.packageName, it)
             }
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         NATIVE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, NATIVE)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         SERVICE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, SERVICE)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         ACTIVITY -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, ACTIVITY)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         RECEIVER -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, RECEIVER)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         PROVIDER -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, PROVIDER)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         DEX -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, DEX)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         PERMISSION -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, PERMISSION)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         METADATA -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
             computeComponentReference(map, item.packageName, METADATA)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         PACKAGE -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
@@ -580,14 +586,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
             map[packagePrefix]!!.first.add(item.packageName)
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
         SHARED_UID -> {
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
-              updateLibRefProgress(progressCount * 100 / appMap.size)
+              updateLibRefProgressImpl()
               continue
             }
 
@@ -598,7 +604,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               map[item.sharedUserId]!!.first.add(item.packageName)
             }
             progressCount++
-            updateLibRefProgress(progressCount * 100 / appMap.size)
+            updateLibRefProgressImpl()
           }
         }
       }

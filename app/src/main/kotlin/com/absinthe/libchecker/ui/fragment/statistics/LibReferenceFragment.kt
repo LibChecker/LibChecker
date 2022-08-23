@@ -188,7 +188,7 @@ class LibReferenceFragment :
               computeRef(false)
             }
             is HomeViewModel.Effect.UpdateLibRefProgress -> {
-              binding.loadingView.progressIndicator.setProgressCompat(it.progress, true)
+              binding.loadingView.progressIndicator.setProgressCompat(it.progress, it.progress > 0)
             }
             else -> {}
           }
