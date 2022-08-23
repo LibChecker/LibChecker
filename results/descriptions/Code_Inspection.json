@@ -1397,16 +1397,16 @@
           "description": "Malformed Device Admin  \n\nIf you register a broadcast receiver which acts as a device admin, you must also register an `<intent-filter>` for the action `android.app.action.DEVICE_ADMIN_ENABLED`, without any `<data>`, such that the device admin can be activated/deactivated.  \n\nTo do this, add\n\n```\n`<intent-filter>`\n    `<action android:name=\"android.app.action.DEVICE_ADMIN_ENABLED\" />`\n`</intent-filter>`\n```\n\nto your `<receiver>`.  \n\nIssue id: DeviceAdmin"
         },
         {
-          "shortName": "AndroidLintValidActionsXml",
-          "displayName": "Invalid Action Descriptor",
-          "enabled": false,
-          "description": "Invalid Action Descriptor  \n\nEnsures that an actions XML file is properly formed  \n\nIssue id: ValidActionsXml"
-        },
-        {
           "shortName": "AndroidLintDataBindingWithoutKapt",
           "displayName": "Data Binding without Annotation Processing",
           "enabled": true,
           "description": "Data Binding without Annotation Processing  \n\nApps that use Kotlin and data binding should also apply the kotlin-kapt plugin.  \n\nIssue id: DataBindingWithoutKapt  \n\n<https://kotlinlang.org/docs/reference/kapt.html>"
+        },
+        {
+          "shortName": "AndroidLintValidActionsXml",
+          "displayName": "Invalid Action Descriptor",
+          "enabled": false,
+          "description": "Invalid Action Descriptor  \n\nEnsures that an actions XML file is properly formed  \n\nIssue id: ValidActionsXml"
         },
         {
           "shortName": "AndroidLintInstantApps",
@@ -1961,16 +1961,16 @@
           "description": "Battery Life Issues  \n\nThis issue flags code that either  \n\\* negatively affects battery life, or  \n\\* uses APIs that have recently changed behavior to prevent background tasks from consuming memory and battery excessively.  \n\nGenerally, you should be using `WorkManager` instead.  \n\nFor more details on how to update your code, please see <https://developer.android.com/topic/performance/background-optimization>  \n\nIssue id: BatteryLife"
         },
         {
-          "shortName": "AndroidLintUseAlpha2",
-          "displayName": "Using 3-letter Codes",
-          "enabled": true,
-          "description": "Using 3-letter Codes  \n\nFor compatibility with earlier devices, you should only use 3-letter language and region codes when there is no corresponding 2 letter code.  \n\nIssue id: UseAlpha2  \n\n<https://tools.ietf.org/html/bcp47>"
-        },
-        {
           "shortName": "AndroidLintPermissionImpliesUnsupportedHardware",
           "displayName": "Permission Implies Unsupported Hardware",
           "enabled": true,
           "description": "Permission Implies Unsupported Hardware  \n\nThe `<uses-permission>` element should not require a permission that implies an unsupported TV hardware feature. Google Play assumes that certain hardware related permissions indicate that the underlying hardware features are required by default. To fix the issue, consider declaring the corresponding `uses-feature` element with `required=\"false\"` attribute.  \n\nIssue id: PermissionImpliesUnsupportedHardware  \n\n<https://developer.android.com/guide/topics/manifest/uses-feature-element.html#permissions>"
+        },
+        {
+          "shortName": "AndroidLintUseAlpha2",
+          "displayName": "Using 3-letter Codes",
+          "enabled": true,
+          "description": "Using 3-letter Codes  \n\nFor compatibility with earlier devices, you should only use 3-letter language and region codes when there is no corresponding 2 letter code.  \n\nIssue id: UseAlpha2  \n\n<https://tools.ietf.org/html/bcp47>"
         },
         {
           "shortName": "AndroidLintUnsupportedTvHardware",
@@ -2129,6 +2129,12 @@
           "description": "Likely cut \\& paste mistakes  \n\nThis lint check looks for cases where you have cut \\& pasted calls to `findViewById` but have forgotten to update the R.id field. It's possible that your code is simply (redundantly) looking up the field repeatedly, but lint cannot distinguish that from a case where you for example want to initialize fields `prev` and `next` and you cut \\& pasted `findViewById(R.id.prev)` and forgot to update the second initialization to `R.id.next`.  \n\nIssue id: CutPasteId"
         },
         {
+          "shortName": "AndroidLintResourceName",
+          "displayName": "Resource with Wrong Prefix",
+          "enabled": true,
+          "description": "Resource with Wrong Prefix  \n\nIn Gradle projects you can specify a resource prefix that all resources in the project must conform to. This makes it easier to ensure that you don't accidentally combine resources from different libraries, since they all end up in the same shared app namespace.  \n\nIssue id: ResourceName"
+        },
+        {
           "shortName": "AndroidLintMissingIntentFilterForMediaSearch",
           "displayName": "Missing MEDIA_PLAY_FROM_SEARCH intent-filter",
           "enabled": true,
@@ -2139,12 +2145,6 @@
           "displayName": "Incompatible screenOrientation manifest value",
           "enabled": true,
           "description": "Incompatible screenOrientation value  \n\nThe `<activity>` element should not be locked to any orientation so that users can take advantage of the multi-window environments and larger screens available on Android. To fix the issue, consider declaring the corresponding activity element with \\`screenOrientation=\"unspecified\"`or `\"fullSensor\"\\` attribute.  \n\nIssue id: LockedOrientationActivity  \n\n<https://developer.android.com/topic/arc/window-management>"
-        },
-        {
-          "shortName": "AndroidLintResourceName",
-          "displayName": "Resource with Wrong Prefix",
-          "enabled": true,
-          "description": "Resource with Wrong Prefix  \n\nIn Gradle projects you can specify a resource prefix that all resources in the project must conform to. This makes it easier to ensure that you don't accidentally combine resources from different libraries, since they all end up in the same shared app namespace.  \n\nIssue id: ResourceName"
         },
         {
           "shortName": "AndroidLintImpliedTouchscreenHardware",
@@ -2183,16 +2183,16 @@
           "description": "Cannot use `ACCESS_FINE_LOCATION` without `ACCESS_COARSE_LOCATION`  \n\nIf your app requires access to FINE location, on Android 12 and higher you must now request both FINE and COARSE. Users will have the option to grant only COARSE location. Ensure your app can work with just COARSE location.  \n\nIssue id: CoarseFineLocation"
         },
         {
-          "shortName": "AndroidLintLeanbackUsesWifi",
-          "displayName": "android.hardware.wifi on TV device",
-          "enabled": true,
-          "description": "Using android.hardware.wifi on TV  \n\nWiFi is not required for Android TV and many devices connect to the internet via alternative methods e.g. Ethernet.  \n\nIf your app is not focused specifically on WiFi functionality and only wishes to connect to the internet, please modify your Manifest to contain: `<uses-feature android:name=\"android.hardware.wifi\" android:required=\"false\" />`  \n\nUn-metered or non-roaming connections can be detected in software using  \n`NetworkCapabilities#NET_CAPABILITY_NOT_METERED` and `NetworkCapabilities#NET_CAPABILITY_NOT_ROAMING.`  \n\nIssue id: LeanbackUsesWifi"
-        },
-        {
           "shortName": "AndroidLintPinSetExpiry",
           "displayName": "Validate <pin-set> expiration attribute",
           "enabled": true,
           "description": "Validate `<pin-set>` expiration attribute  \n\nEnsures that the `expiration` attribute of the `<pin-set>` element is valid and has not already expired or is expiring soon  \n\nIssue id: PinSetExpiry  \n\n<https://developer.android.com/preview/features/security-config.html>"
+        },
+        {
+          "shortName": "AndroidLintLeanbackUsesWifi",
+          "displayName": "android.hardware.wifi on TV device",
+          "enabled": true,
+          "description": "Using android.hardware.wifi on TV  \n\nWiFi is not required for Android TV and many devices connect to the internet via alternative methods e.g. Ethernet.  \n\nIf your app is not focused specifically on WiFi functionality and only wishes to connect to the internet, please modify your Manifest to contain: `<uses-feature android:name=\"android.hardware.wifi\" android:required=\"false\" />`  \n\nUn-metered or non-roaming connections can be detected in software using  \n`NetworkCapabilities#NET_CAPABILITY_NOT_METERED` and `NetworkCapabilities#NET_CAPABILITY_NOT_ROAMING.`  \n\nIssue id: LeanbackUsesWifi"
         },
         {
           "shortName": "AndroidLintAppCompatMethod",
@@ -5898,6 +5898,167 @@
       ]
     },
     {
+      "name": "Numeric issues",
+      "inspections": [
+        {
+          "shortName": "RemoveLiteralUnderscores",
+          "displayName": "Underscores in numeric literal",
+          "enabled": true,
+          "description": "Reports numeric literals with underscores and suggests removing them with a quick-fix. This may be useful if you need to lower the language level.\n\nThe quick-fix removes underscores from numeric literals. For example `1_000_000` will be converted to `1000000`.\n\n\n*Numeric literals with underscores* appeared in Java 7.\nThis inspection can help to downgrade for backward compatibility with earlier Java versions.\n\nNew in 2020.2"
+        },
+        {
+          "shortName": "BadOddness",
+          "displayName": "Suspicious oddness check",
+          "enabled": false,
+          "description": "Reports odd-even checks of the following form: `x % 2 == 1`. Such checks fail when used with negative odd values. Consider using `x % 2 != 0` or `(x & 1) == 1` instead."
+        },
+        {
+          "shortName": "InsertLiteralUnderscores",
+          "displayName": "Unreadable numeric literal",
+          "enabled": true,
+          "description": "Reports long numeric literals without underscores and suggests adding them. Underscores make such literals easier to read.\n\nExample:\n\n\n      1000000\n\nAfter the quick-fix is applied:\n\n\n      1_000_000\n\nThis inspection only reports if the language level of the project of module is 7 or higher.\n\nNew in 2020.2"
+        },
+        {
+          "shortName": "ConfusingFloatingPointLiteral",
+          "displayName": "Confusing floating point literal",
+          "enabled": false,
+          "description": "Reports any floating point numbers that don't have a decimal point, numbers before the decimal point, or numbers after the decimal point.\n\nSuch literals may be confusing, and violate several coding standards.\n\n**Example:**\n\n    double d = .03;\n\nAfter the quick-fix is applied:\n\n    double d = 0.03;\n\n\nUse the **Ignore floating point literals in scientific notation** option to ignore floating point numbers in scientific notation."
+        },
+        {
+          "shortName": "OctalAndDecimalIntegersMixed",
+          "displayName": "Octal and decimal integers in same array",
+          "enabled": false,
+          "description": "Reports mixed octal and decimal integer literals in a single array initializer. This situation might happen when you copy a list of numbers into an array initializer. Some numbers in the array might be zero-padded and the compiler will interpret them as octal.\n\n**Example:**\n\n    int[] elapsed = {1, 13, 052};\n\nAfter the quick-fix that removes a leading zero is applied:\n\n    int[] elapsed = {1, 13, 52};\n\nIf it is an octal number (for example, after a variable inline), then you can use another quick-fix that converts octal to decimal:\n`int[] elapsed = {1, 13, 42};`"
+        },
+        {
+          "shortName": "UnnecessaryUnaryMinus",
+          "displayName": "Unnecessary unary minus",
+          "enabled": false,
+          "description": "Reports unnecessary unary minuses. Such expressions might be hard to understand and might contain errors.\n\n**For example:**\n\n    void unaryMinus(int i) {\n        int x = - -i;\n      }\n\nThe following quick fixes are suggested here:\n\n* Remove `-` operators before the `i` variable:\n\n      void unaryMinus(int i) {\n          int x = i;\n        }\n\n* Replace `-` operators with the prefix decrement operator:\n\n      void unaryMinus(int i) {\n          int x = --i;\n        }\n\n**Another example:**\n\n    void unaryMinus(int i) {\n        i += - 8;\n      }\n\nAfter the quick-fix is applied:\n\n    void unaryMinus(int i) {\n        i -= 8;\n      }\n"
+        },
+        {
+          "shortName": "ImplicitNumericConversion",
+          "displayName": "Implicit numeric conversion",
+          "enabled": false,
+          "description": "Reports implicit conversion between numeric types.\n\nImplicit numeric conversion is not a problem in itself but, if unexpected, may cause difficulties when tracing bugs.\n\n**Example:**\n\n\n      double m(int i) {\n        return i * 10;\n      }\n\nAfter the quick-fix is applied:\n\n\n      double m(int i) {\n        return (double) (i * 10);\n      }\n\nConfigure the inspection:\n\n* Use the **Ignore widening conversions** option to ignore implicit conversion that cannot result in data loss (for example, `int`-\\>`long`).\n* Use the **Ignore conversions from and to 'char'** option to ignore conversion from and to `char`. The inspection will still report conversion from and to floating-point numbers.\n* Use the **Ignore conversion from constants and literals** to make the inspection ignore conversion from literals and compile-time constants."
+        },
+        {
+          "shortName": "OctalLiteral",
+          "displayName": "Octal integer",
+          "enabled": true,
+          "description": "Reports octal integer literals. Some coding standards prohibit the use of octal literals, as they may be easily confused with decimal literals.\n\nExample:\n\n\n      int i = 015;\n      int j = 0_777;\n\nThis inspection has two different quick-fixes.\nAfter the **Convert octal literal to decimal literal** quick-fix is applied, the code changes to:\n\n\n      int i = 13;\n      int j = 511;\n\nAfter the **Remove leading zero to make decimal** quick-fix is applied, the code changes to:\n\n\n      int i = 15;\n      int j = 777;\n"
+        },
+        {
+          "shortName": "NumericOverflow",
+          "displayName": "Numeric overflow",
+          "enabled": true,
+          "description": "Reports expressions that overflow during computation. Usually, this happens by accident and indicates a bug. For example, a wrong type is used or a shift should be done in an opposite direction .\n\n**Examples:**\n\n\n      float a = 1.0f/0.0f;\n      long b = 30 * 24 * 60 * 60 * 1000;\n      long c = 1000L << 62;\n"
+        },
+        {
+          "shortName": "SuspiciousLiteralUnderscore",
+          "displayName": "Suspicious underscore in number literal",
+          "enabled": false,
+          "description": "Reports decimal number literals that use the underscore numeric separator with groups where the number of digits is not three. Such literals may contain a typo.\n\nThis inspection will not warn on literals containing two consecutive underscores.\nIt is also allowed to omit underscores in the fractional part of `double` and `float` literals.\n\n**Example:** `int oneMillion = 1_000_0000;`"
+        },
+        {
+          "shortName": "ComparisonOfShortAndChar",
+          "displayName": "Comparison of 'short' and 'char' values",
+          "enabled": true,
+          "description": "Reports equality comparisons between `short` and `char` values.\n\nSuch comparisons may cause subtle bugs because while both values are 2-byte long, `short` values are\nsigned, and `char` values are unsigned.\n\n**Example:**\n\n\n    if (Character.MAX_VALUE == shortValue()) {} //never can be true\n"
+        },
+        {
+          "shortName": "DivideByZero",
+          "displayName": "Division by zero",
+          "enabled": false,
+          "description": "Reports division by zero or remainder by zero. Such expressions will produce an `Infinity`, `-Infinity` or `NaN` result for doubles or floats, and will throw an `ArithmeticException` for integers.\n\nWhen the expression has a `NaN` result, the fix suggests replacing the division expression with the `NaN` constant."
+        },
+        {
+          "shortName": "ComparisonToNaN",
+          "displayName": "Comparison to 'Double.NaN' or 'Float.NaN'",
+          "enabled": false,
+          "description": "Reports any comparisons to `Double.NaN` or `Float.NaN`. Such comparisons are never meaningful, as NaN is not equal to anything, including itself. Use the `Double.isNaN()` or `Float.isNaN()` methods instead.\n\n**Example:**\n\n\n      if (x == Double.NaN) {...}\n\nAfter the quick-fix is applied:\n\n\n      if (Double.isNaN(x)) {...}\n"
+        },
+        {
+          "shortName": "UnaryPlus",
+          "displayName": "Unary plus",
+          "enabled": false,
+          "description": "Reports usages of the `+` unary operator. The unary plus is usually a null operation, and its presence might represent a coding error. For example, in a combination with the increment operator (like in `+++`) or with the equal operator (like in `=+`).\n\n**Example:**\n\n\n      void unaryPlus(int i) {\n        int x = + +i;\n      }\n\nThe following quick fixes are suggested:\n\n* Remove `+` operators before the `i` variable:\n\n\n        void unaryPlus(int i) {\n          int x = i;\n        }\n\n* Replace `+` operators with the prefix increment operator:\n\n\n        void unaryPlus(int i) {\n          int x = ++i;\n        }\n\n\nUse the checkbox below to report unary pluses that are used together with a binary or another unary expression.\nIt means the inspection will not report situations when a unary plus expression is used in array\ninitializer expressions or as a method argument."
+        },
+        {
+          "shortName": "CachedNumberConstructorCall",
+          "displayName": "Number constructor call with primitive argument",
+          "enabled": false,
+          "description": "Reports instantiations of new `Long`, `Integer`, `Short`, or `Byte` objects that have a primitive `long`, `integer`, `short`, or `byte` argument.\n\nIt is recommended that you use the static method `valueOf()`\nintroduced in Java 5. By default, this method caches objects for values between -128 and\n127 inclusive.\n\n**Example:**\n\n\n      Integer i = new Integer(1);\n      Long l = new Long(1L);\n\nAfter the quick-fix is applied, the code changes to:\n\n\n      Integer i = Integer.valueOf(1);\n      Long l = Long.valueOf(1L);\n\nThis inspection only reports if the language level of the project or module is 5 or higher\n\n\nUse the **Ignore new number expressions with a String argument** option to ignore calls to number constructors with a `String` argument.\n\n\nUse the **Report only when constructor is @Deprecated** option to only report calls to deprecated constructors.\n`Long`, `Integer`, `Short` and `Byte` constructors are deprecated since JDK 9."
+        },
+        {
+          "shortName": "PointlessArithmeticExpression",
+          "displayName": "Pointless arithmetic expression",
+          "enabled": true,
+          "description": "Reports pointless arithmetic expressions. Such expressions include adding or subtracting zero, multiplying by zero or one, and division by one.\n\nSuch expressions may be the result of automated refactorings and they are unlikely to be what the developer intended to do.\n\nThe quick-fix simplifies such expressions.\n\n**Example:**\n\n\n      void f(int a) {\n        int x = a - a;\n        int y = a + 0;\n        int res = x / x;\n      }\n\nAfter the quick-fix is applied:\n\n\n      void f(int a) {\n        int x = 0;\n        int y = a;\n        int res = 1;\n      }\n\n\nNote that in rare cases, the suggested replacement might not be completely equivalent to the original code\nfor all possible inputs. For example, the inspection suggests replacing `x / x` with `1`.\nHowever, if `x` is zero, the original code throws `ArithmeticException` or results in `NaN`.\nAlso, if `x` is `NaN`, then the result is also `NaN`. It's very unlikely that such behavior is intended."
+        },
+        {
+          "shortName": "CharUsedInArithmeticContext",
+          "displayName": "'char' expression used in arithmetic context",
+          "enabled": false,
+          "description": "Reports expressions of the `char` type used in addition or subtraction expressions.\n\nSuch code is not necessarily an issue but may result in bugs (for example,\nif a string is expected).\n\n**Example:** `int a = 'a' + 42;`\n\nAfter the quick-fix is applied: `int a = (int) 'a' + 42;`\n\nFor the `String` context:\n\n    int i1 = 1;\n    int i2 = 2;\n    System.out.println(i2 + '-' + i1 + \" = \" + (i2 - i1));\n\nAfter the quick-fix is applied:\n`System.out.println(i2 + \"-\" + i1 + \" = \" + (i2 - i1));`"
+        },
+        {
+          "shortName": "UnpredictableBigDecimalConstructorCall",
+          "displayName": "Unpredictable 'BigDecimal' constructor call",
+          "enabled": false,
+          "description": "Reports calls to `BigDecimal` constructors that accept a `double` value. These constructors produce `BigDecimal` that is exactly equal to the supplied `double` value. However, because doubles are encoded in the IEEE 754 64-bit double-precision binary floating-point format, the exact value can be unexpected.\n\nFor example, `new BigDecimal(0.1)` yields a `BigDecimal` object. Its value is\n`0.1000000000000000055511151231257827021181583404541015625`\nwhich is the nearest number to 0.1 representable as a double.\nTo get `BigDecimal` that stores the same value as written in the source code,\nuse either `new BigDecimal(\"0.1\")` or `BigDecimal.valueOf(0.1)`.\n\n**Example:**\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(0.1);\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(\"0.1\");\n        }\n      }\n"
+        },
+        {
+          "shortName": "IntegerDivisionInFloatingPointContext",
+          "displayName": "Integer division in floating point context",
+          "enabled": false,
+          "description": "Reports integer divisions where the result is used as a floating-point number. Such division is often an error and may have unexpected results due to the truncation that happens in integer division.\n\n**Example:**\n\n\n      float x = 3.0F + 3/5;\n"
+        },
+        {
+          "shortName": "BigDecimalEquals",
+          "displayName": "'equals()' called on 'BigDecimal'",
+          "enabled": false,
+          "description": "Reports `.equals()` being called to compare two `java.math.BigDecimal` numbers.\n\nThis is normally a mistake, as two `java.math.BigDecimal` numbers are only equal if\nthey are equal in both value and scale.\n\n**Example:**\n\n    if (new BigDecimal(\"2.0\").equals(new BigDecimal(\"2.00\"))) {}\n\nAfter the quick-fix is applied:\n\n    if (new BigDecimal(\"2.0\").compareTo(new BigDecimal(\"2.00\")) == 0) {}\n"
+        },
+        {
+          "shortName": "ConstantMathCall",
+          "displayName": "Constant call to 'Math'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Math` or `java.lang.StrictMath` methods that can be replaced with simple compile-time constants.\n\n**Example:**\n\n    double v = Math.sin(0.0);\n\nAfter the quick-fix is applied:\n\n    double v = 0.0;\n"
+        },
+        {
+          "shortName": "NonReproducibleMathCall",
+          "displayName": "Non-reproducible call to 'Math'",
+          "enabled": false,
+          "description": "Reports calls to `java.lang.Math` methods, which results are not guaranteed to be reproduced precisely.\n\nIn environments where reproducibility of results is required, `java.lang.StrictMath`\nshould be used instead."
+        },
+        {
+          "shortName": "FloatingPointEquality",
+          "displayName": "Floating point equality comparison",
+          "enabled": false,
+          "description": "Reports floating-point values that are being compared using the `==` or `!=` operator.\n\nFloating-point values are inherently inaccurate, and comparing them for exact equality is seldom the desired semantics.\n\nThis inspection ignores comparisons with zero and infinity literals.\n\n**Example:**\n\n\n      void m(double d1, double d2) {\n        if (d1 == d2) {}\n      }\n"
+        },
+        {
+          "shortName": "LongLiteralsEndingWithLowercaseL",
+          "displayName": "'long' literal ending with 'l' instead of 'L'",
+          "enabled": true,
+          "description": "Reports `long` literals ending with lowercase 'l'. These literals may be confusing, as the lowercase 'l' looks very similar to a literal '1' (one).\n\n**Example:**\n\n\n      long nights = 100l;\n\nAfter the quick-fix is applied:\n\n\n      long nights = 100L;\n"
+        },
+        {
+          "shortName": "BigDecimalMethodWithoutRoundingCalled",
+          "displayName": "Call to 'BigDecimal' method without a rounding mode argument",
+          "enabled": true,
+          "description": "Reports calls to `divide()` or `setScale()` without a rounding mode argument.\n\nSuch calls can lead to an `ArithmeticException` when the exact value cannot be represented in the result\n(for example, because it has a non-terminating decimal expansion).\n\nSpecifying a rounding mode prevents the `ArithmeticException`.\n\n**Example:**\n\n\n      BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3));\n"
+        },
+        {
+          "shortName": "OverlyComplexArithmeticExpression",
+          "displayName": "Overly complex arithmetic expression",
+          "enabled": false,
+          "description": "Reports arithmetic expressions with the excessive number of terms. Such expressions might be hard to understand and might contain errors.\n\nParameters, field references, and other primary expressions are counted as a term.\n\n**Example:**\n\n    int calc(int a, int b) {\n            return a + a + a + b + b + b + b; // The line contains 7 terms and will be reported.\n        }\n\nUse the field below to specify a number of terms allowed in arithmetic expressions."
+        }
+      ]
+    },
+    {
       "name": "Control flow issues",
       "inspections": [
         {
@@ -6295,167 +6456,6 @@
           "displayName": "'return' statement can be implicit",
           "enabled": false,
           "description": "Reports return statements at the end of closures which can be made implicit.\n\n\nGroovy closures implicitly return the value of the last statement in them.\n\n**Example:**\n\n\n      def foo = {\n        return 1\n      }\n\nAfter the quick-fix is applied:\n\n\n      def foo = {\n        1\n      }\n"
-        }
-      ]
-    },
-    {
-      "name": "Numeric issues",
-      "inspections": [
-        {
-          "shortName": "RemoveLiteralUnderscores",
-          "displayName": "Underscores in numeric literal",
-          "enabled": true,
-          "description": "Reports numeric literals with underscores and suggests removing them with a quick-fix. This may be useful if you need to lower the language level.\n\nThe quick-fix removes underscores from numeric literals. For example `1_000_000` will be converted to `1000000`.\n\n\n*Numeric literals with underscores* appeared in Java 7.\nThis inspection can help to downgrade for backward compatibility with earlier Java versions.\n\nNew in 2020.2"
-        },
-        {
-          "shortName": "BadOddness",
-          "displayName": "Suspicious oddness check",
-          "enabled": false,
-          "description": "Reports odd-even checks of the following form: `x % 2 == 1`. Such checks fail when used with negative odd values. Consider using `x % 2 != 0` or `(x & 1) == 1` instead."
-        },
-        {
-          "shortName": "InsertLiteralUnderscores",
-          "displayName": "Unreadable numeric literal",
-          "enabled": true,
-          "description": "Reports long numeric literals without underscores and suggests adding them. Underscores make such literals easier to read.\n\nExample:\n\n\n      1000000\n\nAfter the quick-fix is applied:\n\n\n      1_000_000\n\nThis inspection only reports if the language level of the project of module is 7 or higher.\n\nNew in 2020.2"
-        },
-        {
-          "shortName": "ConfusingFloatingPointLiteral",
-          "displayName": "Confusing floating point literal",
-          "enabled": false,
-          "description": "Reports any floating point numbers that don't have a decimal point, numbers before the decimal point, or numbers after the decimal point.\n\nSuch literals may be confusing, and violate several coding standards.\n\n**Example:**\n\n    double d = .03;\n\nAfter the quick-fix is applied:\n\n    double d = 0.03;\n\n\nUse the **Ignore floating point literals in scientific notation** option to ignore floating point numbers in scientific notation."
-        },
-        {
-          "shortName": "OctalAndDecimalIntegersMixed",
-          "displayName": "Octal and decimal integers in same array",
-          "enabled": false,
-          "description": "Reports mixed octal and decimal integer literals in a single array initializer. This situation might happen when you copy a list of numbers into an array initializer. Some numbers in the array might be zero-padded and the compiler will interpret them as octal.\n\n**Example:**\n\n    int[] elapsed = {1, 13, 052};\n\nAfter the quick-fix that removes a leading zero is applied:\n\n    int[] elapsed = {1, 13, 52};\n\nIf it is an octal number (for example, after a variable inline), then you can use another quick-fix that converts octal to decimal:\n`int[] elapsed = {1, 13, 42};`"
-        },
-        {
-          "shortName": "UnnecessaryUnaryMinus",
-          "displayName": "Unnecessary unary minus",
-          "enabled": false,
-          "description": "Reports unnecessary unary minuses. Such expressions might be hard to understand and might contain errors.\n\n**For example:**\n\n    void unaryMinus(int i) {\n        int x = - -i;\n      }\n\nThe following quick fixes are suggested here:\n\n* Remove `-` operators before the `i` variable:\n\n      void unaryMinus(int i) {\n          int x = i;\n        }\n\n* Replace `-` operators with the prefix decrement operator:\n\n      void unaryMinus(int i) {\n          int x = --i;\n        }\n\n**Another example:**\n\n    void unaryMinus(int i) {\n        i += - 8;\n      }\n\nAfter the quick-fix is applied:\n\n    void unaryMinus(int i) {\n        i -= 8;\n      }\n"
-        },
-        {
-          "shortName": "ImplicitNumericConversion",
-          "displayName": "Implicit numeric conversion",
-          "enabled": false,
-          "description": "Reports implicit conversion between numeric types.\n\nImplicit numeric conversion is not a problem in itself but, if unexpected, may cause difficulties when tracing bugs.\n\n**Example:**\n\n\n      double m(int i) {\n        return i * 10;\n      }\n\nAfter the quick-fix is applied:\n\n\n      double m(int i) {\n        return (double) (i * 10);\n      }\n\nConfigure the inspection:\n\n* Use the **Ignore widening conversions** option to ignore implicit conversion that cannot result in data loss (for example, `int`-\\>`long`).\n* Use the **Ignore conversions from and to 'char'** option to ignore conversion from and to `char`. The inspection will still report conversion from and to floating-point numbers.\n* Use the **Ignore conversion from constants and literals** to make the inspection ignore conversion from literals and compile-time constants."
-        },
-        {
-          "shortName": "OctalLiteral",
-          "displayName": "Octal integer",
-          "enabled": true,
-          "description": "Reports octal integer literals. Some coding standards prohibit the use of octal literals, as they may be easily confused with decimal literals.\n\nExample:\n\n\n      int i = 015;\n      int j = 0_777;\n\nThis inspection has two different quick-fixes.\nAfter the **Convert octal literal to decimal literal** quick-fix is applied, the code changes to:\n\n\n      int i = 13;\n      int j = 511;\n\nAfter the **Remove leading zero to make decimal** quick-fix is applied, the code changes to:\n\n\n      int i = 15;\n      int j = 777;\n"
-        },
-        {
-          "shortName": "NumericOverflow",
-          "displayName": "Numeric overflow",
-          "enabled": true,
-          "description": "Reports expressions that overflow during computation. Usually, this happens by accident and indicates a bug. For example, a wrong type is used or a shift should be done in an opposite direction .\n\n**Examples:**\n\n\n      float a = 1.0f/0.0f;\n      long b = 30 * 24 * 60 * 60 * 1000;\n      long c = 1000L << 62;\n"
-        },
-        {
-          "shortName": "SuspiciousLiteralUnderscore",
-          "displayName": "Suspicious underscore in number literal",
-          "enabled": false,
-          "description": "Reports decimal number literals that use the underscore numeric separator with groups where the number of digits is not three. Such literals may contain a typo.\n\nThis inspection will not warn on literals containing two consecutive underscores.\nIt is also allowed to omit underscores in the fractional part of `double` and `float` literals.\n\n**Example:** `int oneMillion = 1_000_0000;`"
-        },
-        {
-          "shortName": "ComparisonOfShortAndChar",
-          "displayName": "Comparison of 'short' and 'char' values",
-          "enabled": true,
-          "description": "Reports equality comparisons between `short` and `char` values.\n\nSuch comparisons may cause subtle bugs because while both values are 2-byte long, `short` values are\nsigned, and `char` values are unsigned.\n\n**Example:**\n\n\n    if (Character.MAX_VALUE == shortValue()) {} //never can be true\n"
-        },
-        {
-          "shortName": "DivideByZero",
-          "displayName": "Division by zero",
-          "enabled": false,
-          "description": "Reports division by zero or remainder by zero. Such expressions will produce an `Infinity`, `-Infinity` or `NaN` result for doubles or floats, and will throw an `ArithmeticException` for integers.\n\nWhen the expression has a `NaN` result, the fix suggests replacing the division expression with the `NaN` constant."
-        },
-        {
-          "shortName": "ComparisonToNaN",
-          "displayName": "Comparison to 'Double.NaN' or 'Float.NaN'",
-          "enabled": false,
-          "description": "Reports any comparisons to `Double.NaN` or `Float.NaN`. Such comparisons are never meaningful, as NaN is not equal to anything, including itself. Use the `Double.isNaN()` or `Float.isNaN()` methods instead.\n\n**Example:**\n\n\n      if (x == Double.NaN) {...}\n\nAfter the quick-fix is applied:\n\n\n      if (Double.isNaN(x)) {...}\n"
-        },
-        {
-          "shortName": "UnaryPlus",
-          "displayName": "Unary plus",
-          "enabled": false,
-          "description": "Reports usages of the `+` unary operator. The unary plus is usually a null operation, and its presence might represent a coding error. For example, in a combination with the increment operator (like in `+++`) or with the equal operator (like in `=+`).\n\n**Example:**\n\n\n      void unaryPlus(int i) {\n        int x = + +i;\n      }\n\nThe following quick fixes are suggested:\n\n* Remove `+` operators before the `i` variable:\n\n\n        void unaryPlus(int i) {\n          int x = i;\n        }\n\n* Replace `+` operators with the prefix increment operator:\n\n\n        void unaryPlus(int i) {\n          int x = ++i;\n        }\n\n\nUse the checkbox below to report unary pluses that are used together with a binary or another unary expression.\nIt means the inspection will not report situations when a unary plus expression is used in array\ninitializer expressions or as a method argument."
-        },
-        {
-          "shortName": "CachedNumberConstructorCall",
-          "displayName": "Number constructor call with primitive argument",
-          "enabled": false,
-          "description": "Reports instantiations of new `Long`, `Integer`, `Short`, or `Byte` objects that have a primitive `long`, `integer`, `short`, or `byte` argument.\n\nIt is recommended that you use the static method `valueOf()`\nintroduced in Java 5. By default, this method caches objects for values between -128 and\n127 inclusive.\n\n**Example:**\n\n\n      Integer i = new Integer(1);\n      Long l = new Long(1L);\n\nAfter the quick-fix is applied, the code changes to:\n\n\n      Integer i = Integer.valueOf(1);\n      Long l = Long.valueOf(1L);\n\nThis inspection only reports if the language level of the project or module is 5 or higher\n\n\nUse the **Ignore new number expressions with a String argument** option to ignore calls to number constructors with a `String` argument.\n\n\nUse the **Report only when constructor is @Deprecated** option to only report calls to deprecated constructors.\n`Long`, `Integer`, `Short` and `Byte` constructors are deprecated since JDK 9."
-        },
-        {
-          "shortName": "PointlessArithmeticExpression",
-          "displayName": "Pointless arithmetic expression",
-          "enabled": true,
-          "description": "Reports pointless arithmetic expressions. Such expressions include adding or subtracting zero, multiplying by zero or one, and division by one.\n\nSuch expressions may be the result of automated refactorings and they are unlikely to be what the developer intended to do.\n\nThe quick-fix simplifies such expressions.\n\n**Example:**\n\n\n      void f(int a) {\n        int x = a - a;\n        int y = a + 0;\n        int res = x / x;\n      }\n\nAfter the quick-fix is applied:\n\n\n      void f(int a) {\n        int x = 0;\n        int y = a;\n        int res = 1;\n      }\n\n\nNote that in rare cases, the suggested replacement might not be completely equivalent to the original code\nfor all possible inputs. For example, the inspection suggests replacing `x / x` with `1`.\nHowever, if `x` is zero, the original code throws `ArithmeticException` or results in `NaN`.\nAlso, if `x` is `NaN`, then the result is also `NaN`. It's very unlikely that such behavior is intended."
-        },
-        {
-          "shortName": "CharUsedInArithmeticContext",
-          "displayName": "'char' expression used in arithmetic context",
-          "enabled": false,
-          "description": "Reports expressions of the `char` type used in addition or subtraction expressions.\n\nSuch code is not necessarily an issue but may result in bugs (for example,\nif a string is expected).\n\n**Example:** `int a = 'a' + 42;`\n\nAfter the quick-fix is applied: `int a = (int) 'a' + 42;`\n\nFor the `String` context:\n\n    int i1 = 1;\n    int i2 = 2;\n    System.out.println(i2 + '-' + i1 + \" = \" + (i2 - i1));\n\nAfter the quick-fix is applied:\n`System.out.println(i2 + \"-\" + i1 + \" = \" + (i2 - i1));`"
-        },
-        {
-          "shortName": "UnpredictableBigDecimalConstructorCall",
-          "displayName": "Unpredictable 'BigDecimal' constructor call",
-          "enabled": false,
-          "description": "Reports calls to `BigDecimal` constructors that accept a `double` value. These constructors produce `BigDecimal` that is exactly equal to the supplied `double` value. However, because doubles are encoded in the IEEE 754 64-bit double-precision binary floating-point format, the exact value can be unexpected.\n\nFor example, `new BigDecimal(0.1)` yields a `BigDecimal` object. Its value is\n`0.1000000000000000055511151231257827021181583404541015625`\nwhich is the nearest number to 0.1 representable as a double.\nTo get `BigDecimal` that stores the same value as written in the source code,\nuse either `new BigDecimal(\"0.1\")` or `BigDecimal.valueOf(0.1)`.\n\n**Example:**\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(0.1);\n        }\n      }\n\nAfter the quick-fix is applied:\n\n\n      class Constructor {\n        void foo() {\n          new BigDecimal(\"0.1\");\n        }\n      }\n"
-        },
-        {
-          "shortName": "IntegerDivisionInFloatingPointContext",
-          "displayName": "Integer division in floating point context",
-          "enabled": false,
-          "description": "Reports integer divisions where the result is used as a floating-point number. Such division is often an error and may have unexpected results due to the truncation that happens in integer division.\n\n**Example:**\n\n\n      float x = 3.0F + 3/5;\n"
-        },
-        {
-          "shortName": "BigDecimalEquals",
-          "displayName": "'equals()' called on 'BigDecimal'",
-          "enabled": false,
-          "description": "Reports `.equals()` being called to compare two `java.math.BigDecimal` numbers.\n\nThis is normally a mistake, as two `java.math.BigDecimal` numbers are only equal if\nthey are equal in both value and scale.\n\n**Example:**\n\n    if (new BigDecimal(\"2.0\").equals(new BigDecimal(\"2.00\"))) {}\n\nAfter the quick-fix is applied:\n\n    if (new BigDecimal(\"2.0\").compareTo(new BigDecimal(\"2.00\")) == 0) {}\n"
-        },
-        {
-          "shortName": "ConstantMathCall",
-          "displayName": "Constant call to 'Math'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Math` or `java.lang.StrictMath` methods that can be replaced with simple compile-time constants.\n\n**Example:**\n\n    double v = Math.sin(0.0);\n\nAfter the quick-fix is applied:\n\n    double v = 0.0;\n"
-        },
-        {
-          "shortName": "NonReproducibleMathCall",
-          "displayName": "Non-reproducible call to 'Math'",
-          "enabled": false,
-          "description": "Reports calls to `java.lang.Math` methods, which results are not guaranteed to be reproduced precisely.\n\nIn environments where reproducibility of results is required, `java.lang.StrictMath`\nshould be used instead."
-        },
-        {
-          "shortName": "FloatingPointEquality",
-          "displayName": "Floating point equality comparison",
-          "enabled": false,
-          "description": "Reports floating-point values that are being compared using the `==` or `!=` operator.\n\nFloating-point values are inherently inaccurate, and comparing them for exact equality is seldom the desired semantics.\n\nThis inspection ignores comparisons with zero and infinity literals.\n\n**Example:**\n\n\n      void m(double d1, double d2) {\n        if (d1 == d2) {}\n      }\n"
-        },
-        {
-          "shortName": "LongLiteralsEndingWithLowercaseL",
-          "displayName": "'long' literal ending with 'l' instead of 'L'",
-          "enabled": true,
-          "description": "Reports `long` literals ending with lowercase 'l'. These literals may be confusing, as the lowercase 'l' looks very similar to a literal '1' (one).\n\n**Example:**\n\n\n      long nights = 100l;\n\nAfter the quick-fix is applied:\n\n\n      long nights = 100L;\n"
-        },
-        {
-          "shortName": "BigDecimalMethodWithoutRoundingCalled",
-          "displayName": "Call to 'BigDecimal' method without a rounding mode argument",
-          "enabled": true,
-          "description": "Reports calls to `divide()` or `setScale()` without a rounding mode argument.\n\nSuch calls can lead to an `ArithmeticException` when the exact value cannot be represented in the result\n(for example, because it has a non-terminating decimal expansion).\n\nSpecifying a rounding mode prevents the `ArithmeticException`.\n\n**Example:**\n\n\n      BigDecimal.valueOf(1).divide(BigDecimal.valueOf(3));\n"
-        },
-        {
-          "shortName": "OverlyComplexArithmeticExpression",
-          "displayName": "Overly complex arithmetic expression",
-          "enabled": false,
-          "description": "Reports arithmetic expressions with the excessive number of terms. Such expressions might be hard to understand and might contain errors.\n\nParameters, field references, and other primary expressions are counted as a term.\n\n**Example:**\n\n    int calc(int a, int b) {\n            return a + a + a + b + b + b + b; // The line contains 7 terms and will be reported.\n        }\n\nUse the field below to specify a number of terms allowed in arithmetic expressions."
         }
       ]
     },

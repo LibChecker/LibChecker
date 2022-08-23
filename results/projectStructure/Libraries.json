@@ -1617,11 +1617,11 @@
       ]
     },
     {
-      "name": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
+      "name": "Gradle: com.google.android.material:material:1.7.0-beta01@aar",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d35fd31575467e34b9517b0449d6ac8a/transformed/material-1.7.0-alpha02/jars/classes.jar!/",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d35fd31575467e34b9517b0449d6ac8a/transformed/material-1.7.0-alpha02/res",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d35fd31575467e34b9517b0449d6ac8a/transformed/material-1.7.0-alpha02/AndroidManifest.xml"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/51687209594e33afc908e5be625abfa7/transformed/material-1.7.0-beta01/jars/classes.jar!/",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/51687209594e33afc908e5be625abfa7/transformed/material-1.7.0-beta01/res",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/51687209594e33afc908e5be625abfa7/transformed/material-1.7.0-beta01/AndroidManifest.xml"
       ]
     },
     {
@@ -1761,11 +1761,11 @@
       ]
     },
     {
-      "name": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+      "name": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:27@aar",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d51da448e381bcbd6727e3d2fdcf6ab5/transformed/LibChecker-Rules-Bundle-26.3/jars/classes.jar!/",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d51da448e381bcbd6727e3d2fdcf6ab5/transformed/LibChecker-Rules-Bundle-26.3/res",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/d51da448e381bcbd6727e3d2fdcf6ab5/transformed/LibChecker-Rules-Bundle-26.3/AndroidManifest.xml"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/702480a2b5785aa88c30871527f7ca19/transformed/LibChecker-Rules-Bundle-27/jars/classes.jar!/",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/702480a2b5785aa88c30871527f7ca19/transformed/LibChecker-Rules-Bundle-27/res",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/702480a2b5785aa88c30871527f7ca19/transformed/LibChecker-Rules-Bundle-27/AndroidManifest.xml"
       ]
     },
     {
@@ -1913,11 +1913,11 @@
       ]
     },
     {
-      "name": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+      "name": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.5.0.1@aar",
       "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/6b1bfdfb7cd09fb8aac2a4b6bef4a2f1/transformed/appcompat-1.4.1/jars/classes.jar!/",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/6b1bfdfb7cd09fb8aac2a4b6bef4a2f1/transformed/appcompat-1.4.1/res",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/6b1bfdfb7cd09fb8aac2a4b6bef4a2f1/transformed/appcompat-1.4.1/AndroidManifest.xml"
+        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/b55fd9f70d14a2378546b3efdb405c4b/transformed/appcompat-1.5.0.1-debug/jars/classes.jar!/",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/b55fd9f70d14a2378546b3efdb405c4b/transformed/appcompat-1.5.0.1-debug/res",
+        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/b55fd9f70d14a2378546b3efdb405c4b/transformed/appcompat-1.5.0.1-debug/AndroidManifest.xml"
       ]
     },
     {
@@ -2010,14 +2010,6 @@
         "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/85cf8640f01757d3f8f5d6f1e2857348/transformed/transition-1.2.0/jars/classes.jar!/",
         "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/85cf8640f01757d3f8f5d6f1e2857348/transformed/transition-1.2.0/res",
         "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/85cf8640f01757d3f8f5d6f1e2857348/transformed/transition-1.2.0/AndroidManifest.xml"
-      ]
-    },
-    {
-      "name": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
-      "roots": [
-        "jar://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/eaedc87e624ef4aff3342a804240e030/transformed/appcompat-resources-1.4.1/jars/classes.jar!/",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/eaedc87e624ef4aff3342a804240e030/transformed/appcompat-resources-1.4.1/res",
-        "file://$PROJECT_DIR$/../cache/gradle/caches/transforms-3/eaedc87e624ef4aff3342a804240e030/transformed/appcompat-resources-1.4.1/AndroidManifest.xml"
       ]
     }
   ]

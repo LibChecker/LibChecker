@@ -619,8 +619,8 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: com.google.android.material:material:1.7.0-alpha02@aar",
-      "gradleName": "com.google.android.material:material:1.7.0-alpha02@aar",
+      "ideaName": "Gradle: com.google.android.material:material:1.7.0-beta01@aar",
+      "gradleName": "com.google.android.material:material:1.7.0-beta01@aar",
       "unresolved": false
     },
     {
@@ -709,8 +709,8 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
-      "gradleName": "com.github.zhaobozhen:LibChecker-Rules-Bundle:26.3@aar",
+      "ideaName": "Gradle: com.github.zhaobozhen:LibChecker-Rules-Bundle:27@aar",
+      "gradleName": "com.github.zhaobozhen:LibChecker-Rules-Bundle:27@aar",
       "unresolved": false
     },
     {
@@ -804,8 +804,8 @@
       "unresolved": false
     },
     {
-      "ideaName": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
-      "gradleName": "dev.rikka.rikkax.appcompat:appcompat:1.4.1@aar",
+      "ideaName": "Gradle: dev.rikka.rikkax.appcompat:appcompat:1.5.0.1@aar",
+      "gradleName": "dev.rikka.rikkax.appcompat:appcompat:1.5.0.1@aar",
       "unresolved": false
     },
     {
@@ -872,11 +872,6 @@
     {
       "ideaName": "Gradle: androidx.transition:transition:1.2.0@aar",
       "gradleName": "androidx.transition:transition:1.2.0@aar",
-      "unresolved": false
-    },
-    {
-      "ideaName": "Gradle: androidx.appcompat:appcompat-resources:1.4.1@aar",
-      "gradleName": "androidx.appcompat:appcompat-resources:1.4.1@aar",
       "unresolved": false
     },
     {
