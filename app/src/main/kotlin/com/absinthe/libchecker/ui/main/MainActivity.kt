@@ -12,6 +12,11 @@ import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -217,7 +222,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
           true
         }
         setOnClickListener { /*Do nothing*/ }
+        fixBottomNavigationViewInsets(this)
       }
+    }
+  }
+
+  /**
+   * 覆盖掉 BottomNavigationView 内部的 OnApplyWindowInsetsListener 并避免其被软键盘顶起来
+   * @see BottomNavigationView.applyWindowInsets
+   */
+  private fun fixBottomNavigationViewInsets(view: BottomNavigationView) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      // 这里不直接使用 windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+      // 因为它的结果可能受到 insets 传播链上层某环节的影响，出现了错误的 navigationBarsInsets
+      val navigationBarsInsets =
+        ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.navigationBars())
+      view.updatePadding(bottom = navigationBarsInsets.bottom)
+      windowInsets
     }
   }
 
