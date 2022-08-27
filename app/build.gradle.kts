@@ -8,6 +8,13 @@ import com.google.protobuf.gradle.protoc
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.nio.file.Paths
 
+@Suppress(
+  "DSL_SCOPE_VIOLATION",
+  "MISSING_DEPENDENCY_CLASS",
+  "UNRESOLVED_REFERENCE_WRONG_RECEIVER",
+  "FUNCTION_CALL_EXPECTED"
+)
+
 plugins {
   id(libs.plugins.android.application.get().pluginId)
   id(libs.plugins.kotlin.android.get().pluginId)

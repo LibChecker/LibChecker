@@ -1,3 +1,10 @@
+@Suppress(
+  "DSL_SCOPE_VIOLATION",
+  "MISSING_DEPENDENCY_CLASS",
+  "UNRESOLVED_REFERENCE_WRONG_RECEIVER",
+  "FUNCTION_CALL_EXPECTED"
+)
+
 plugins {
   id(libs.plugins.android.application.get().pluginId) apply false
   id(libs.plugins.android.library.get().pluginId) apply false

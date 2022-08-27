@@ -23,9 +23,6 @@
 -keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
 
 -keep class * extends androidx.fragment.app.Fragment{}
--dontnote com.android.vending.licensing.ILicensingService
--dontnote com.google.vending.licensing.ILicensingService
--dontnote com.google.android.vending.licensing.ILicensingService
 
 # For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
 -keepclasseswithmembernames class * {
@@ -125,21 +122,9 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
--dontwarn java.lang.ClassValue
-
 # OkHttp
 -dontwarn org.conscrypt.**
--dontwarn org.conscrypt.ConscryptHostnameVerifier
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
-
--dontwarn org.bouncycastle.jsse.BCSSLParameters
--dontwarn org.bouncycastle.jsse.BCSSLSocket
--dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
-
--dontwarn org.openjsse.javax.net.ssl.SSLParameters
--dontwarn org.openjsse.javax.net.ssl.SSLSocket
--dontwarn org.openjsse.net.ssl.OpenJSSE
--dontwarn org.slf4j.impl.StaticLoggerBinder
 
 # ViewBinding
 -keep public class * extends androidx.viewbinding.ViewBinding {*;}
