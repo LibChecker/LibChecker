@@ -13,11 +13,13 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
@@ -30,6 +32,7 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -136,7 +139,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     super.onVisibilityChanged(visible)
     if (visible) {
       if (viewModel.processesMap.isNotEmpty()) {
-        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
+        viewModel.processToolIconVisibilityLiveData.postValue((GlobalValues.processMode && isComponentFragment()) || hasNonGrantedPermissions())
       }
     }
   }
@@ -242,5 +245,9 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   private fun isComponentFragment(): Boolean {
     return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
+  }
+
+  protected fun hasNonGrantedPermissions(): Boolean {
+    return type == PERMISSION && viewModel.permissionsItems.valueUnsafe.any { it.item.size == 0L }
   }
 }

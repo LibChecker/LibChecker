@@ -13,9 +13,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -25,6 +23,7 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibChip
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
@@ -34,6 +33,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -245,61 +245,29 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     return chipList
   }
 
-  private suspend fun getMetaDataChipList(): List<LibStringItemChip> {
+  private fun getMetaDataChipList(): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
     val list = PackageUtils.getMetaDataItems(packageInfo)
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
 
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      list.forEach {
-        chip = null
-        LCRules.getRule(it.name, METADATA, false)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.name }
-      } else {
-        chipList.sortByDescending { it.chip != null }
-      }
+    list.forEach {
+      chipList.add(LibStringItemChip(it, null))
     }
+    chipList.sortByDescending { it.item.name }
     return chipList
   }
 
-  private suspend fun getPermissionChipList(): List<LibStringItemChip> {
+  private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
-    val list = PackageUtils.getPermissionsItems(packageInfo)
+    val list = packageInfo.getStatefulPermissionsList().asSequence()
+      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0) }
+      .toList()
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
 
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      list.forEach {
-        chip = null
-        LCRules.getRule(it.name, PERMISSION, false)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.name }
-      } else {
-        chipList.sortByDescending { it.chip != null }
-      }
+    list.forEach {
+      chipList.add(LibStringItemChip(it, null))
     }
+    chipList.sortByDescending { it.item.name }
     return chipList
   }
 

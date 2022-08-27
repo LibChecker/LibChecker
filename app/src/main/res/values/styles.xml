@@ -106,6 +106,8 @@
   <style name="App.Widget.AdvancedMenuToggle" parent="Base.AppTheme">
     <item name="materialButtonStyle">@style/Widget.Material3.Button.OutlinedButton</item>
     <item name="colorSecondaryContainer">@color/advanced_menu_item_overlay</item>
+    <item name="colorOnSecondaryContainer">@color/advanced_menu_item_text_checked</item>
     <item name="colorOutline">@color/advanced_menu_item_overlay</item>
+    <item name="colorOnSurface">@color/advanced_menu_item_text_not_checked</item>
   </style>
 </resources>

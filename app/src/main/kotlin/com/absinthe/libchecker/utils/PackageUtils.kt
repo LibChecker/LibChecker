@@ -492,17 +492,6 @@ object PackageUtils {
   }
 
   /**
-   * Get all permissions in an app
-   * @param packageInfo PackageInfo
-   * @return permissions list
-   */
-  fun getPermissionsItems(packageInfo: PackageInfo): List<LibStringItem> {
-    return packageInfo.getPermissionsList().asSequence()
-      .map { perm -> LibStringItem(perm, 0) }
-      .toList()
-  }
-
-  /**
    * Check if an app uses Kotlin language from classes.dex
    * @param file APK file of the app
    * @return true if it uses Kotlin language
@@ -1110,6 +1099,28 @@ object PackageUtils {
 
   fun PackageInfo.getPermissionsList(): List<String> {
     return requestedPermissions?.toList() ?: emptyList()
+  }
+
+  /**
+   * Get permissions of an application with granted state
+   * @param packageName Package name of the app
+   * @return Permissions list with granted state
+   */
+  fun getStatefulPermissionsList(packageName: String): List<Pair<String, Boolean>> {
+    return runCatching {
+      getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getStatefulPermissionsList()
+    }.getOrElse { emptyList() }
+  }
+
+  fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
+    val flags = requestedPermissionsFlags
+
+    if (flags?.size != requestedPermissions?.size) {
+      return requestedPermissions?.map { it to true } ?: emptyList()
+    }
+    return requestedPermissions?.mapIndexed { index, s ->
+      s to (flags[index] and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
+    } ?: emptyList()
   }
 
   /**

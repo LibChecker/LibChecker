@@ -21,6 +21,7 @@ import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -98,6 +99,7 @@ class LibStringAdapter(
 
     when (type) {
       NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
+      PERMISSION -> setPermissionContent(holder.itemView as ComponentLibItemView, item, itemName)
       METADATA -> setMetadataContent(holder.itemView as MetadataLibItemView, item, itemName)
       STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
       else -> {
@@ -183,6 +185,19 @@ class LibStringAdapter(
       it.text = sb
     }
     itemView.setChip(item.chip)
+  }
+
+  private fun setPermissionContent(
+    itemView: ComponentLibItemView,
+    item: LibStringItemChip,
+    itemName: CharSequence
+  ) {
+    itemView.processLabelColor = if (item.item.size == 0L) {
+      R.color.material_red_500.getColor(context)
+    } else {
+      -1
+    }
+    setOrHighlightText(itemView.libName, itemName)
   }
 
   private fun setMetadataContent(

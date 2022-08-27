@@ -119,6 +119,7 @@
   <string name="rx_detail">RxJava — це реалізація віртуальної машини Java Reactive Extensions: бібліотека для створення асинхронних програм і програм на основі подій за допомогою спостережуваних послідовностей.</string>
   <string name="rx_android_detail">Reactive Extensions для Android</string>
   <string name="rx_kotlin_detail">Розширення Kotlin для RxJava</string>
+  <string name="permission_not_granted">Not Granted</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>

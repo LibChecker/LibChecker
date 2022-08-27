@@ -10,6 +10,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
 import rikka.core.util.ClipboardUtils
 
@@ -44,6 +45,10 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         viewModel.itemsCountList[type] = it.size
         isListReady = true
       }
+
+      if (isFragmentVisible() && hasNonGrantedPermissions()) {
+        viewModel.processToolIconVisibilityLiveData.value = true
+      }
     }
 
     adapter.apply {
@@ -61,6 +66,20 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       if (it != null) {
         viewModel.initPermissionData()
       }
+    }
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (context != null && visible && hasNonGrantedPermissions()) {
+      val label = requireContext().getString(R.string.permission_not_granted)
+      val color = R.color.material_red_400.getColor(requireContext())
+      viewModel.processMapLiveData.postValue(
+        mapOf(label to color)
+      )
+      viewModel.processToolIconVisibilityLiveData.postValue(true)
+    } else {
+      viewModel.processMapLiveData.postValue(viewModel.processesMap)
     }
   }
 

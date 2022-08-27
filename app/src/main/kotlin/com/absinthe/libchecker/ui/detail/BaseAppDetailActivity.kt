@@ -406,22 +406,7 @@ abstract class BaseAppDetailActivity :
         )
       }
       if (GlobalValues.processMode && processBarView == null) {
-        processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
-          it.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
-        }.also {
-          it.setOnItemClickListener { isSelected, process ->
-            if (isSelected) {
-              viewModel.queriedProcess = process
-            } else {
-              viewModel.queriedProcess = null
-            }
-            detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
-          }
-        }
-        binding.detailToolbarContainer.addView(processBarView)
+        initProcessBarView()
       }
       if (this@BaseAppDetailActivity is ApkDetailActivity && PackageUtils.isAppInstalled(packageInfo.packageName)) {
         toolbarAdapter.addData(
@@ -607,6 +592,9 @@ abstract class BaseAppDetailActivity :
       if (visible) {
         if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
           toolbarAdapter.addData(toolbarProcessItem)
+        }
+        if (processBarView == null) {
+          initProcessBarView()
         }
         processBarView?.isVisible = true
       } else {
@@ -921,29 +909,15 @@ abstract class BaseAppDetailActivity :
       GlobalValues.processMode = viewModel.processMode
 
       if (processBarView == null) {
-        processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
-          it.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-          )
-          it.setData(
-            viewModel.processesMap.map { mapItem ->
-              ProcessBarAdapter.ProcessBarItem(
-                mapItem.key,
-                mapItem.value
-              )
-            }
-          )
-          it.setOnItemClickListener { isSelected, process ->
-            if (isSelected) {
-              viewModel.queriedProcess = process
-            } else {
-              viewModel.queriedProcess = null
-            }
-            detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+        initProcessBarView()
+        processBarView!!.setData(
+          viewModel.processesMap.map { mapItem ->
+            ProcessBarAdapter.ProcessBarItem(
+              mapItem.key,
+              mapItem.value
+            )
           }
-        }
-        binding.detailToolbarContainer.addView(processBarView)
+        )
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
@@ -1049,5 +1023,23 @@ abstract class BaseAppDetailActivity :
     val intent = Intent(this, SnapshotDetailActivity::class.java)
       .putExtras(bundleOf(EXTRA_ENTITY to diff))
     startActivity(intent)
+  }
+
+  private fun initProcessBarView() {
+    processBarView = ProcessBarView(this@BaseAppDetailActivity).also {
+      it.layoutParams = ViewGroup.LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      it.setOnItemClickListener { isSelected, process ->
+        if (isSelected) {
+          viewModel.queriedProcess = process
+        } else {
+          viewModel.queriedProcess = null
+        }
+        detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+      }
+    }
+    binding.detailToolbarContainer.addView(processBarView)
   }
 }

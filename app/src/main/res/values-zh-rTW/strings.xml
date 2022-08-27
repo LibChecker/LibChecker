@@ -120,6 +120,7 @@
   <string name="rx_detail">RxJava 是 Reactive Extensions 的 Java VM 實現：一個使用可觀察序列組成異步和基於事件的程序的庫。</string>
   <string name="rx_android_detail">適用於 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 擴展</string>
+  <string name="permission_not_granted">未授權</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
