@@ -309,7 +309,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    dbName = roomDatabase!!.getOpenHelper().databaseName!!
+    dbName = roomDatabase!!.openHelper.databaseName!!
     INTERNAL_BACKUP_PATH = File("${context.filesDir}/databasebackup/")
     TEMP_BACKUP_PATH = File("${context.filesDir}/databasebackup-temp/")
     TEMP_BACKUP_FILE = File("$TEMP_BACKUP_PATH/tempbackup.sqlite3")

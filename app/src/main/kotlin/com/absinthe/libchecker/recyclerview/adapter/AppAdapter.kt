@@ -105,6 +105,9 @@ class AppAdapter : HighlightAdapter<LCItem>() {
       }
 
       when {
+        item.packageName == Constants.EXAMPLE_PACKAGE -> {
+          setBadge(null)
+        }
         item.variant == Constants.VARIANT_HAP -> {
           setBadge(R.drawable.ic_harmony_badge)
         }
