@@ -193,9 +193,10 @@
   <string name="adv_show_overlays">显示 Overlay</string>
   <string name="adv_show_64_bit">显示 64 位应用</string>
   <string name="adv_show_32_bit">显示 32 位应用</string>
-  <string name="adv_sort_by_time">按更新时间排序</string>
-  <string name="adv_sort_by_target_version">按 Target 版本排序</string>
-  <string name="adv_sort_by_name">按名称排序</string>
+  <string name="adv_sort_mode">排序模式</string>
+  <string name="adv_sort_by_time">更新时间</string>
+  <string name="adv_sort_by_target_version">Target 版本</string>
+  <string name="adv_sort_by_name">名称</string>
   <string name="adv_show_android_version">显示 Android 版本</string>
   <string name="adv_show_target_version">显示 Target 版本</string>
   <string name="adv_show_min_version">显示 Min 版本</string>

@@ -58,12 +58,21 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     )
   }
 
-  private val flexLayout = FlexboxLayout(context).apply {
+  private val sortView = AdvancedMenuSortView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 24.dp
+    }
+  }
+
+  private val flexLayout = FlexboxLayout(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 8.dp
     }
     flexWrap = FlexWrap.WRAP
     justifyContent = JustifyContent.FLEX_START
@@ -88,6 +97,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     setPadding(padding, padding, padding, 0)
     addView(header)
     addView(demoView)
+    addView(sortView)
     addView(flexLayout)
   }
 

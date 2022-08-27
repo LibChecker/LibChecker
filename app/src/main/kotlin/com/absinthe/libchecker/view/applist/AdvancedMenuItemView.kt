@@ -3,8 +3,10 @@ package com.absinthe.libchecker.view.applist
 import android.content.Context
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.view.app.CheckableChipView
 
 class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
@@ -15,6 +17,9 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
     ).also { lp ->
       lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
     }
+    val checkedColor = R.color.advanced_menu_item_text_checked.getColor(context)
+    val uncheckedColor = R.color.advanced_menu_item_text_not_checked.getColor(context)
+    it.textColorPair = checkedColor to uncheckedColor
   }
 
   private var onCheckedChangeCallback: ((isChecked: Boolean) -> Unit)? = null

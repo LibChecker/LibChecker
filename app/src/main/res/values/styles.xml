@@ -91,13 +91,13 @@
   <style name="Widget.CheckableChipView" parent="">
     <item name="android:padding">8dp</item>
 
-    <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
+    <item name="android:textColor">@color/advanced_menu_item_text_not_checked</item>
     <item name="android:textSize">14sp</item>
 
     <item name="ccv_outlineWidth">1dp</item>
-    <item name="ccv_outlineColor">?attr/colorOnTertiaryContainer</item>
+    <item name="ccv_outlineColor">@color/advanced_menu_item_overlay</item>
 
-    <item name="android:color">?attr/colorTertiaryContainer</item>
+    <item name="android:color">@color/advanced_menu_item_overlay</item>
 
     <item name="ccv_clearIcon">@drawable/ic_check</item>
     <item name="ccv_foreground">?android:selectableItemBackground</item>

@@ -113,6 +113,8 @@ class CheckableChipView @JvmOverloads constructor(
    */
   var onCheckedChangeListener: ((view: CheckableChipView, checked: Boolean) -> Unit)? = null
 
+  var textColorPair = Color.BLACK to Color.WHITE
+
   private var targetProgress: Float = 0f
 
   private var progress: Float by viewProperty(0f) {
@@ -337,6 +339,11 @@ class CheckableChipView @JvmOverloads constructor(
         start()
       }
     }
+    checkedTextColor = if (checked) {
+      textColorPair.first
+    } else {
+      textColorPair.second
+    }
   }
 
   override fun performClick(): Boolean {
@@ -357,6 +364,11 @@ class CheckableChipView @JvmOverloads constructor(
   override fun setChecked(checked: Boolean) {
     targetProgress = if (checked) 1f else 0f
     progress = targetProgress
+    checkedTextColor = if (checked) {
+      textColorPair.first
+    } else {
+      textColorPair.second
+    }
   }
 
   private fun createLayout(textWidth: Int) {

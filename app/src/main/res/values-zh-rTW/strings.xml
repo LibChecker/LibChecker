@@ -189,15 +189,16 @@
   <string name="rules_btn_update">更新</string>
 
   <!-- Advanced menu -->
-  <string name="adv_show_system_apps">Show System Apps</string>
-  <string name="adv_show_overlays">Show Overlays</string>
-  <string name="adv_show_64_bit">Show 64-bit Apps</string>
-  <string name="adv_show_32_bit">Show 32-bit Apps</string>
-  <string name="adv_sort_by_time">Sort by Updated Time</string>
-  <string name="adv_sort_by_target_version">Sort by Target Version</string>
-  <string name="adv_sort_by_name">Sort by Name</string>
-  <string name="adv_show_android_version">Show Android Version</string>
-  <string name="adv_show_target_version">Show Target Version</string>
-  <string name="adv_show_min_version">Show Min Version</string>
-  <string name="adv_tint_abi_label">Tint ABI Label</string>
+  <string name="adv_show_system_apps">顯示系統應用程式</string>
+  <string name="adv_show_overlays">顯示 Overlay</string>
+  <string name="adv_show_64_bit">顯示 64 位元應用程式</string>
+  <string name="adv_show_32_bit">顯示 32 位應用程式</string>
+  <string name="adv_sort_mode">排序模式</string>
+  <string name="adv_sort_by_time">升級時間</string>
+  <string name="adv_sort_by_target_version">Target 版本</string>
+  <string name="adv_sort_by_name">名稱</string>
+  <string name="adv_show_android_version">顯示 Android 版本</string>
+  <string name="adv_show_target_version">顯示 Target 版本</string>
+  <string name="adv_show_min_version">顯示 Min 版本</string>
+  <string name="adv_tint_abi_label">ABI 標籤染色</string>
 </resources>

@@ -193,9 +193,10 @@
   <string name="adv_show_overlays">Show Overlays</string>
   <string name="adv_show_64_bit">Show 64-bit Apps</string>
   <string name="adv_show_32_bit">Show 32-bit Apps</string>
-  <string name="adv_sort_by_time">Sort by Updated Time</string>
-  <string name="adv_sort_by_target_version">Sort by Target Version</string>
-  <string name="adv_sort_by_name">Sort by Name</string>
+  <string name="adv_sort_mode">Sort Mode</string>
+  <string name="adv_sort_by_time">Updated Time</string>
+  <string name="adv_sort_by_target_version">Target Version</string>
+  <string name="adv_sort_by_name">Name</string>
   <string name="adv_show_android_version">Show Android Version</string>
   <string name="adv_show_target_version">Show Target Version</string>
   <string name="adv_show_min_version">Show Min Version</string>
