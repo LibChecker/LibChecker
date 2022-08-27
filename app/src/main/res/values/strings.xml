@@ -31,7 +31,7 @@
   <string name="title_statistics_dialog_no_native_libs">Apps without native libraries</string>
   <string name="tab_chart">Chart</string>
   <string name="tab_lib_reference_statistics">Lib reference</string>
-  <string name="not_marked_lib">Not marked library</string>
+  <string name="not_marked_lib">Unmarked library</string>
 
   <string name="submenu_title_component">Component</string>
   <string name="submenu_title_manifest">Manifest</string>
