@@ -23,7 +23,6 @@
     <item name="albumCardBorderColor">?attr/colorOutline</item>
 
     <item name="chipStyle">@style/App.LibChip.Material3</item>
-    <item name="materialButtonStyle">@style/Widget.Material3.Button.OutlinedButton</item>
   </style>
 
   <style name="Theme" parent="Base.AppTheme" />

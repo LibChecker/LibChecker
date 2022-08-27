@@ -103,4 +103,9 @@
     <item name="ccv_foreground">?android:selectableItemBackground</item>
   </style>
 
+  <style name="App.Widget.AdvancedMenuToggle" parent="Base.AppTheme">
+    <item name="materialButtonStyle">@style/Widget.Material3.Button.OutlinedButton</item>
+    <item name="colorSecondaryContainer">@color/advanced_menu_item_overlay</item>
+    <item name="colorOutline">@color/advanced_menu_item_overlay</item>
+  </style>
 </resources>

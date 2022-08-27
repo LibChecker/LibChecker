@@ -3,6 +3,7 @@ package com.absinthe.libchecker.view.applist
 import android.content.Context
 import android.graphics.Typeface
 import android.widget.LinearLayout
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.AdvancedOptions
@@ -11,12 +12,14 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 
-class AdvancedMenuSortView(context: Context) : LinearLayout(context),
+class AdvancedMenuSortView(context: Context) :
+  LinearLayout(context),
   MaterialButtonToggleGroup.OnButtonCheckedListener {
 
   private val title = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
-      LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     )
     setTypeface(null, Typeface.BOLD)
     text = context.getString(R.string.adv_sort_mode)
@@ -24,7 +27,8 @@ class AdvancedMenuSortView(context: Context) : LinearLayout(context),
 
   private val toggleGroup = MaterialButtonToggleGroup(context).apply {
     layoutParams = LayoutParams(
-      LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -51,10 +55,13 @@ class AdvancedMenuSortView(context: Context) : LinearLayout(context),
   }
 
   private fun addButton(context: Context, titleRes: Int, viewId: Int) {
-    val chip = MaterialButton(context).apply {
+    val chip = MaterialButton(
+      ContextThemeWrapper(context, R.style.App_Widget_AdvancedMenuToggle)
+    ).apply {
       id = viewId
       layoutParams = LayoutParams(
-        LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+        LayoutParams.WRAP_CONTENT,
+        LayoutParams.WRAP_CONTENT
       )
       text = context.getString(titleRes)
     }
