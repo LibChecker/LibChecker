@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.database.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -8,22 +7,22 @@ import androidx.room.PrimaryKey
 data class SnapshotItem(
   @PrimaryKey(autoGenerate = true)
   var id: Int?,
-  @ColumnInfo val packageName: String,
-  @ColumnInfo var timeStamp: Long,
-  @ColumnInfo val label: String,
-  @ColumnInfo val versionName: String,
-  @ColumnInfo val versionCode: Long,
-  @ColumnInfo val installedTime: Long,
-  @ColumnInfo val lastUpdatedTime: Long,
-  @ColumnInfo val isSystem: Boolean,
-  @ColumnInfo val abi: Short,
-  @ColumnInfo val targetApi: Short,
-  @ColumnInfo val nativeLibs: String,
-  @ColumnInfo val services: String,
-  @ColumnInfo val activities: String,
-  @ColumnInfo val receivers: String,
-  @ColumnInfo val providers: String,
-  @ColumnInfo val permissions: String,
-  @ColumnInfo val metadata: String,
-  @ColumnInfo val packageSize: Long
+  val packageName: String,
+  var timeStamp: Long,
+  val label: String,
+  val versionName: String,
+  val versionCode: Long,
+  val installedTime: Long,
+  val lastUpdatedTime: Long,
+  val isSystem: Boolean,
+  val abi: Short,
+  val targetApi: Short,
+  val nativeLibs: String,
+  val services: String,
+  val activities: String,
+  val receivers: String,
+  val providers: String,
+  val permissions: String,
+  val metadata: String,
+  val packageSize: Long
 )
