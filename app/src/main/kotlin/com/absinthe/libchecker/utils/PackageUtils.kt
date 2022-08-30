@@ -249,10 +249,7 @@ object PackageUtils {
               LibStringItem(
                 name = it.name,
                 size = FileUtils.getFileSize(it),
-                elfType = getElfType(
-                  it.inputStream(),
-                  specifiedAbi == ARMV8 || specifiedAbi == X86_64
-                )
+                elfType = getElfType(it, specifiedAbi == ARMV8 || specifiedAbi == X86_64)
               )
             }
             .toMutableList()
@@ -354,16 +351,13 @@ object PackageUtils {
       ZipFile(File(it)).use { zipFile ->
         zipFile.entries().asSequence().forEach { entry ->
           if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
+            val is64Bit =
+              entry.name.startsWith("lib/$X86_64_STRING") || entry.name.startsWith("lib/$ARMV8_STRING")
             libList.add(
               LibStringItem(
                 name = entry.name.split("/").last(),
                 size = entry.size,
-                elfType = getElfType(
-                  zipFile.getInputStream(entry),
-                  entry.name.startsWith("lib/$X86_64_STRING") || entry.name.startsWith(
-                    "lib/$ARMV8_STRING"
-                  )
-                )
+                elfType = getElfType(zipFile.getInputStream(entry), is64Bit)
               )
             )
           }
@@ -1399,6 +1393,18 @@ object PackageUtils {
     }
 
     return null
+  }
+
+  private fun getElfType(file: File, is64Bit: Boolean): Int {
+    return runCatching {
+      if (is64Bit) {
+        ELF64EhdrParser(file.inputStream()).getEType()
+      } else {
+        ELF32EhdrParser(file.inputStream()).getEType()
+      }
+    }.onFailure {
+      Timber.e(it)
+    }.getOrDefault(ET_NONE)
   }
 
   private fun getElfType(input: InputStream, is64Bit: Boolean): Int {
