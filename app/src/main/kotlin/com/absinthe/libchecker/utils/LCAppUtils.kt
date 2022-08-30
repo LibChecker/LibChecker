@@ -2,9 +2,6 @@ package com.absinthe.libchecker.utils
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
@@ -19,7 +16,6 @@ import androidx.core.text.toSpannable
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -29,10 +25,7 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
@@ -49,7 +42,6 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import rikka.material.app.DayNightDelegate
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -95,15 +87,6 @@ object LCAppUtils {
       sb.append(spanString)
     }
     return sb.toSpannable()
-  }
-
-  fun getAppIcon(packageName: String): Drawable {
-    return runCatching {
-      PackageManagerCompat.getPackageInfo(
-        packageName,
-        0
-      ).applicationInfo.loadIcon(SystemServices.packageManager)
-    }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
   }
 
   suspend fun getRuleWithRegex(
@@ -171,15 +154,6 @@ object LCAppUtils {
         }.getOrDefault(false)
       }
       else -> true
-    }
-  }
-
-  fun getNightMode(): Int {
-    return when (GlobalValues.darkMode) {
-      Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
-      Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
-      Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-      else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
   }
 

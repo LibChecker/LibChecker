@@ -28,7 +28,6 @@ import com.absinthe.libchecker.ui.about.AboutActivity
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -135,7 +134,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.darkMode = newValue.toString()
-        DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode())
+        DayNightDelegate.setDefaultNightMode(com.absinthe.libchecker.utils.UiUtils.getNightMode())
         activity?.recreate()
         true
       }

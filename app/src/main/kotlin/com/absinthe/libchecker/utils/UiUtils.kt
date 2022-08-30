@@ -2,7 +2,10 @@ package com.absinthe.libchecker.utils
 
 import android.graphics.Color
 import androidx.annotation.ColorInt
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.utils.UiUtils.isDarkMode
+import rikka.material.app.DayNightDelegate
 
 object UiUtils {
   fun getRandomColor(): Int {
@@ -24,5 +27,14 @@ object UiUtils {
     val b = Color.blue(color)
     val brightness = (r * 299 + g * 587 + b * 114) / 1000
     return brightness >= 192
+  }
+
+  fun getNightMode(): Int {
+    return when (GlobalValues.darkMode) {
+      Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
+      Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
+      Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+      else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+    }
   }
 }

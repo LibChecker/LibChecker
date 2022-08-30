@@ -11,9 +11,9 @@ import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -71,7 +71,7 @@ class LibCheckerApp : Application() {
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode())
+    DayNightDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()

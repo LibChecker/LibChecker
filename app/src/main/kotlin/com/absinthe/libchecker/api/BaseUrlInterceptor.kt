@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.api
 
+import com.absinthe.libchecker.api.request.OWNER
+import com.absinthe.libchecker.api.request.REPO
+import com.absinthe.libchecker.api.request.REPO_INFO
 import okhttp3.Interceptor
 import okhttp3.Request
 import timber.log.Timber
@@ -12,15 +15,15 @@ class BaseUrlInterceptor : Interceptor {
     val builder: Request.Builder = originalRequest.newBuilder()
     val headers: List<String> = originalRequest.headers(HEADER_BASE_URL)
     if (headers.isNotEmpty()) {
-      if ("Repo-Info" == headers[0]) {
+      if (REPO_INFO == headers[0]) {
         val owner =
-          originalRequest.headers("Owner").getOrNull(0) ?: return chain.proceed(builder.build())
+          originalRequest.headers(OWNER).getOrNull(0) ?: return chain.proceed(builder.build())
         val repo =
-          originalRequest.headers("Repo").getOrNull(0) ?: return chain.proceed(builder.build())
+          originalRequest.headers(REPO).getOrNull(0) ?: return chain.proceed(builder.build())
         Timber.d("BaseUrlInterceptor: %s/%s", owner, repo)
         builder.removeHeader(HEADER_BASE_URL)
-        builder.removeHeader("Owner")
-        builder.removeHeader("Repo")
+        builder.removeHeader(OWNER)
+        builder.removeHeader(REPO)
         builder.url(String.format(ApiManager.GITHUB_API_REPO_INFO, owner, repo))
       }
     }
