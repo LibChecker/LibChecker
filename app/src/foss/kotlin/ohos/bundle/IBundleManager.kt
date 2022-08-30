@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package ohos.bundle
 
 object IBundleManager {

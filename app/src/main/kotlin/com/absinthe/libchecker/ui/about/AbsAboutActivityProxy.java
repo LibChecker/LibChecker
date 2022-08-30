@@ -52,7 +52,7 @@ import rikka.material.app.MaterialActivity;
 /**
  * @author drakeet
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings("deprecation")
 public abstract class AbsAboutActivityProxy extends MaterialActivity {
 
   private Toolbar toolbar;

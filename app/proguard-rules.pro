@@ -125,6 +125,13 @@
 # OkHttp
 -dontwarn org.conscrypt.**
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # ViewBinding
 -keep public class * extends androidx.viewbinding.ViewBinding {*;}

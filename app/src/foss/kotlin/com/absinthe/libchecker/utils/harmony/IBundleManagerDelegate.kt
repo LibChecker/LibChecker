@@ -1,3 +1,5 @@
+@file:Suppress("ALL")
+
 package com.absinthe.libchecker.utils.harmony
 
 import ohos.bundle.BundleInfo
