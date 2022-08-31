@@ -882,8 +882,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return emptyList()
     }
 
-    val removeList = (oldSet - newSet) as MutableSet<String>
-    val addList = (newSet - oldSet) as MutableSet<String>
+    val removeList = (oldSet - newSet).toMutableSet()
+    val addList = (newSet - oldSet).toMutableSet()
 
     val pendingRemovedOldSet = mutableSetOf<String>()
     val pendingRemovedNewSet = mutableSetOf<String>()
@@ -1099,8 +1099,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       String::class.java
     ).orEmpty().toSet()
 
-    val removeList = (oldSet - newSet) as MutableSet<String>
-    val addList = (newSet - oldSet) as MutableSet<String>
+    val removeList = (oldSet - newSet).toMutableSet()
+    val addList = (newSet - oldSet).toMutableSet()
     val node = CompareDiffNode()
     val pendingRemovedOldSet = mutableSetOf<String>()
     val pendingRemovedNewSet = mutableSetOf<String>()
