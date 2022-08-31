@@ -764,7 +764,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           entity.permissionsDiff.old.fromJson<List<String>>(
             List::class.java,
             String::class.java
-          )?.toSet() ?: emptySet(),
+          ).orEmpty().toSet(),
           entity.permissionsDiff.new?.fromJson<List<String>>(
             List::class.java,
             String::class.java
@@ -794,7 +794,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     @LibType libType: Int
   ) {
     val old =
-      diffNode.old.fromJson<List<String>>(List::class.java, String::class.java)?.toSet() ?: emptySet()
+      diffNode.old.fromJson<List<String>>(List::class.java, String::class.java).orEmpty().toSet()
     val new =
       diffNode.new?.fromJson<List<String>>(List::class.java, String::class.java)?.toSet()
     list.addAll(getComponentsDiffList(old, new, libType))
@@ -1019,7 +1019,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       item.permissionsDiff.old.fromJson<List<String>>(
         List::class.java,
         String::class.java
-      )?.toSet() ?: emptySet(),
+      ).orEmpty().toSet(),
       item.permissionsDiff.new?.fromJson<List<String>>(
         List::class.java,
         String::class.java
@@ -1093,11 +1093,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val oldSet = diffNode.old.fromJson<List<String>>(
       List::class.java,
       String::class.java
-    )?.toSet() ?: emptySet()
+    ).orEmpty().toSet()
     val newSet = diffNode.new.fromJson<List<String>>(
       List::class.java,
       String::class.java
-    )?.toSet() ?: emptySet()
+    ).orEmpty().toSet()
 
     val removeList = (oldSet - newSet) as MutableSet<String>
     val addList = (newSet - oldSet) as MutableSet<String>
