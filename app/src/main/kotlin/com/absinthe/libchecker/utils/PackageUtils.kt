@@ -1397,11 +1397,7 @@ object PackageUtils {
 
   private fun getElfType(file: File, is64Bit: Boolean): Int {
     return runCatching {
-      if (is64Bit) {
-        ELF64EhdrParser(file.inputStream()).getEType()
-      } else {
-        ELF32EhdrParser(file.inputStream()).getEType()
-      }
+      getElfType(file.inputStream(), is64Bit)
     }.onFailure {
       Timber.e(it)
     }.getOrDefault(ET_NONE)

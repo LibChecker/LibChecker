@@ -86,7 +86,7 @@ setupAppModule {
 
 tasks.whenTaskAdded {
   if (name == "optimizeFossReleaseResources" || name == "optimizeMarketReleaseResources") {
-    val flavor = name.removePrefix("optimize").removeSuffix("ReleaseResources")
+    val flavor = name.removeSurrounding("optimize", "ReleaseResources")
     val flavorLowerCase = flavor.toLowerCaseAsciiOnly()
     val optimizeReleaseRes = task("optimize${flavor}ReleaseRes").doLast {
       val aapt2 = File(

@@ -30,7 +30,7 @@ class AppBundleBottomSheetDialogFragment :
       } else {
         list.map { split ->
           val name = split.substringAfterLast("/")
-          val middleName = name.removePrefix("split_config.").removeSuffix(".apk")
+          val middleName = name.removeSurrounding("split_config.", ".apk")
           val type = when {
             middleName.startsWith("arm") || middleName.startsWith("x86") -> AppBundleItemView.IconType.TYPE_NATIVE_LIBS
             middleName.endsWith("dpi") -> AppBundleItemView.IconType.TYPE_MATERIALS
