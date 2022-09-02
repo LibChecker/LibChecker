@@ -206,7 +206,7 @@ class CheckableChipView @JvmOverloads constructor(
     val desiredWidth = nonTextWidth + textLayout.textWidth()
     val width = when (widthMode) {
       MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec)
-      MeasureSpec.AT_MOST -> Math.min(MeasureSpec.getSize(widthMeasureSpec), desiredWidth)
+      MeasureSpec.AT_MOST -> MeasureSpec.getSize(widthMeasureSpec).coerceAtMost(desiredWidth)
       MeasureSpec.UNSPECIFIED -> desiredWidth
       else -> desiredWidth
     }
@@ -215,7 +215,7 @@ class CheckableChipView @JvmOverloads constructor(
     val desiredHeight = padding + textLayout.height + padding
     val height = when (heightMode) {
       MeasureSpec.EXACTLY -> MeasureSpec.getSize(heightMeasureSpec)
-      MeasureSpec.AT_MOST -> Math.min(MeasureSpec.getSize(heightMeasureSpec), desiredHeight)
+      MeasureSpec.AT_MOST -> MeasureSpec.getSize(heightMeasureSpec).coerceAtMost(desiredHeight)
       MeasureSpec.UNSPECIFIED -> desiredHeight
       else -> desiredHeight
     }
@@ -261,7 +261,7 @@ class CheckableChipView @JvmOverloads constructor(
 
     val indicatorSize = lerp(
       initialIndicatorSize,
-      Math.max((width - indicatorCenterX) * 2f, (height - indicatorCenterY) * 2f),
+      ((width - indicatorCenterX) * 2f).coerceAtLeast((height - indicatorCenterY) * 2f),
       progress
     )
 

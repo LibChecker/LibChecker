@@ -186,18 +186,7 @@ object PackageUtils {
    * @param packageInfo PackageInfo
    * @return minSdkVersion
    */
-  fun getMinSdkVersion(packageInfo: PackageInfo): Int {
-    val minSdkVersionValue = if (OsUtils.atLeastN()) {
-      packageInfo.applicationInfo.minSdkVersion
-    } else {
-      val demands = ManifestReader.getManifestProperties(
-        File(packageInfo.applicationInfo.sourceDir),
-        arrayOf(minSdkVersion)
-      )
-      demands[minSdkVersion]?.toString()?.toInt() ?: 0
-    }
-    return minSdkVersionValue
-  }
+  fun getMinSdkVersion(packageInfo: PackageInfo): Int = packageInfo.applicationInfo.minSdkVersion
 
   /**
    * Get compileSdkVersion of an app
@@ -464,7 +453,7 @@ object PackageUtils {
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
         .map { key ->
-          var value = it.get(key).toString()
+          var value = it.getString(key).orEmpty()
           var id = 0L
 
           if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {

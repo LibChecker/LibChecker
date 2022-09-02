@@ -10,7 +10,7 @@ plugins {
   alias(libs.plugins.kotlin.android)
 }
 
-setupLibraryModule() {
+setupLibraryModule {
   defaultConfig {
     namespace = "com.absinthe.libchecker.hidden_api"
   }
