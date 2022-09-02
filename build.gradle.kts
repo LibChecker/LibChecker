@@ -15,6 +15,7 @@ plugins {
   alias(libs.plugins.hiddenApiRefine) apply false
   alias(libs.plugins.ksp) apply false
   alias(libs.plugins.moshiX) apply false
+  id("build-logic") apply false
 }
 
 allprojects {
