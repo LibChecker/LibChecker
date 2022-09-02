@@ -16,9 +16,9 @@ import java.nio.file.Paths
 )
 
 plugins {
-  id(libs.plugins.android.application.get().pluginId)
-  id(libs.plugins.kotlin.android.get().pluginId)
-  id(libs.plugins.kotlin.parcelize.get().pluginId)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
@@ -42,21 +42,18 @@ setupAppModule {
     viewBinding = true
   }
 
-  sourceSets {
-    named("main") {
-      java {
-        srcDirs("src/main/kotlin")
-      }
+  productFlavors {
+    flavorDimensions += "channel"
+
+    create("foss") {
+      isDefault = true
+      dimension = flavorDimensionList[0]
     }
-    named("foss") {
-      java {
-        srcDirs("src/foss/kotlin")
-      }
+    create("market") {
+      dimension = flavorDimensionList[0]
     }
-    named("market") {
-      java {
-        srcDirs("src/market/kotlin")
-      }
+    all {
+      manifestPlaceholders["channel"] = this.name
     }
   }
 

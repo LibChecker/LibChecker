@@ -3,8 +3,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.File
 import java.nio.charset.Charset
 import java.time.Instant
@@ -14,6 +12,7 @@ val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
 val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
 val versionNameSuffix = if (isDevVersion) ".dev" else ""
+val javaLevel = JavaVersion.VERSION_11
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
@@ -26,15 +25,15 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
       versionName = verName
       resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "ru", "uk-rUA")
     }
-    if (project.hasProperty("releaseStoreFile")) {
-      signingConfigs {
-        create("config") {
-          storeFile = File(project.properties["releaseStoreFile"] as String)
-          storePassword = project.properties["releaseStorePassword"] as String
-          keyAlias = project.properties["releaseKeyAlias"] as String
-          keyPassword = project.properties["releaseKeyPassword"] as String
-        }
+    val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
+      signingConfigs.create("release") {
+        storeFile = File(project.properties["releaseStoreFile"] as String)
+        storePassword = project.properties["releaseStorePassword"] as String
+        keyAlias = project.properties["releaseKeyAlias"] as String
+        keyPassword = project.properties["releaseKeyPassword"] as String
       }
+    } else {
+      signingConfigs.getByName("debug")
     }
     buildTypes {
       debug {
@@ -49,11 +48,7 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         )
       }
       all {
-        signingConfig = if (project.hasProperty("releaseStoreFile")) {
-          signingConfigs.getByName("config")
-        } else {
-          signingConfigs.getByName("debug")
-        }
+        signingConfig = releaseSigning
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
         buildConfigField(
           "String",
@@ -61,21 +56,6 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
           "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\""
         )
         buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
-      }
-    }
-
-    productFlavors {
-      flavorDimensions += "channel"
-
-      create("foss") {
-        isDefault = true
-        dimension = flavorDimensionList[0]
-      }
-      create("market") {
-        dimension = flavorDimensionList[0]
-      }
-      all {
-        manifestPlaceholders["channel"] = this.name
       }
     }
 
@@ -89,21 +69,16 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
     defaultConfig {
       minSdk = 24
       targetSdk = 33
-      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    kotlinOptions {
-      jvmTarget = JavaVersion.VERSION_11.toString()
+    sourceSets.configureEach {
+      java.srcDirs("src/$name/kotlin")
     }
     compileOptions {
-      targetCompatibility(JavaVersion.VERSION_11)
-      sourceCompatibility(JavaVersion.VERSION_11)
+      targetCompatibility(javaLevel)
+      sourceCompatibility(javaLevel)
     }
     (this as T).block()
   }
-}
-
-private fun BaseExtension.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-  (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }
 
 fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
