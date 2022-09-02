@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.about;
 
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,7 +15,6 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -110,14 +108,11 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
     }
     onApplyPresetAttrs();
     recyclerView = findViewById(R.id.list);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      applyEdgeToEdge();
-    }
+    applyEdgeToEdge();
   }
 
   private boolean givenInsetsToDecorView = false;
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   private void applyEdgeToEdge() {
     Window window = getWindow();
     int navigationBarColor = ContextCompat.getColor(this, R.color.about_page_navigationBarColor);
@@ -130,8 +125,9 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
     givenInsetsToDecorView = false;
     WindowCompat.setDecorFitsSystemWindows(window, false);
     ViewCompat.setOnApplyWindowInsetsListener(decorView, new OnApplyWindowInsetsListener() {
+      @NonNull
       @Override
-      public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat windowInsets) {
+      public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
         Insets navigationBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
         boolean isGestureNavigation = navigationBarsInsets.bottom <= 24 * getResources().getDisplayMetrics().density;
 

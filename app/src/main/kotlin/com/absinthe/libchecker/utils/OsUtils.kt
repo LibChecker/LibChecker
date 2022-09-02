@@ -33,9 +33,4 @@ object OsUtils {
   fun atLeastO(): Boolean {
     return Build.VERSION.SDK_INT >= 26
   }
-
-  @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.N)
-  fun atLeastN(): Boolean {
-    return Build.VERSION.SDK_INT >= 24
-  }
 }
