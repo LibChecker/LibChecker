@@ -49,13 +49,17 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         )
       }
       all {
-        if (project.hasProperty("releaseStoreFile")) {
-          signingConfig = signingConfigs.getByName("config")
+        signingConfig = if (project.hasProperty("releaseStoreFile")) {
+          signingConfigs.getByName("config")
         } else {
-          signingConfig = signingConfigs.getByName("debug")
+          signingConfigs.getByName("debug")
         }
         buildConfigField("Boolean", "IS_DEV_VERSION", isDevVersion.toString())
-        buildConfigField("String", "APP_CENTER_SECRET", "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\"")
+        buildConfigField(
+          "String",
+          "APP_CENTER_SECRET",
+          "\"" + System.getenv("APP_CENTER_SECRET").orEmpty() + "\""
+        )
         buildConfigField("String", "BUILD_TIME", "\"" + Instant.now().toString() + "\"")
       }
     }
