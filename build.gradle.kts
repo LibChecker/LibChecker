@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 @Suppress(
   "DSL_SCOPE_VIOLATION",
   "MISSING_DEPENDENCY_CLASS",
@@ -20,6 +22,12 @@ plugins {
 
 allprojects {
   apply(plugin = rootProject.libs.plugins.kotlinter.get().pluginId)
+
+  tasks.withType<KotlinCompile> {
+    kotlinOptions {
+      jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+  }
 
   tasks.matching {
     it.name.contains("transformClassesWithHiddenApiRefine")

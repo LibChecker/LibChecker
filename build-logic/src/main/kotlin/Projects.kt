@@ -3,8 +3,6 @@ import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.plugins.ExtensionAware
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import java.io.File
 import java.nio.charset.Charset
 import java.time.Instant
@@ -87,19 +85,12 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
       minSdk = 24
       targetSdk = 33
     }
-    kotlinOptions {
-      jvmTarget = javaLevel.toString()
-    }
     compileOptions {
       targetCompatibility(javaLevel)
       sourceCompatibility(javaLevel)
     }
     (this as T).block()
   }
-}
-
-private fun BaseExtension.kotlinOptions(block: KotlinJvmOptions.() -> Unit) {
-  (this as ExtensionAware).extensions.configure("kotlinOptions", block)
 }
 
 fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
