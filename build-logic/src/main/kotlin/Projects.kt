@@ -59,21 +59,6 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
       }
     }
 
-    productFlavors {
-      flavorDimensions += "channel"
-
-      create("foss") {
-        isDefault = true
-        dimension = flavorDimensionList[0]
-      }
-      create("market") {
-        dimension = flavorDimensionList[0]
-      }
-      all {
-        manifestPlaceholders["channel"] = this.name
-      }
-    }
-
     block()
   }
 }
@@ -84,6 +69,9 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
     defaultConfig {
       minSdk = 24
       targetSdk = 33
+    }
+    sourceSets.configureEach {
+      java.srcDirs("src/$name/kotlin")
     }
     compileOptions {
       targetCompatibility(javaLevel)

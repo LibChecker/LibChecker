@@ -42,21 +42,18 @@ setupAppModule {
     viewBinding = true
   }
 
-  sourceSets {
-    named("main") {
-      java {
-        srcDirs("src/main/kotlin")
-      }
+  productFlavors {
+    flavorDimensions += "channel"
+
+    create("foss") {
+      isDefault = true
+      dimension = flavorDimensionList[0]
     }
-    named("foss") {
-      java {
-        srcDirs("src/foss/kotlin")
-      }
+    create("market") {
+      dimension = flavorDimensionList[0]
     }
-    named("market") {
-      java {
-        srcDirs("src/market/kotlin")
-      }
+    all {
+      manifestPlaceholders["channel"] = this.name
     }
   }
 
