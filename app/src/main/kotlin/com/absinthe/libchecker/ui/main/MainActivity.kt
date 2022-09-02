@@ -181,6 +181,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         // 禁止左右滑动
         isUserInputEnabled = false
         offscreenPageLimit = 2
+        fixViewPager2Insets(this)
       }
 
       navView.apply {
@@ -236,6 +237,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       val navigationBarsInsets =
         ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.navigationBars())
       view.updatePadding(bottom = navigationBarsInsets.bottom)
+      windowInsets
+    }
+  }
+
+  private fun fixViewPager2Insets(view: ViewPager2) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      /* Do nothing */
       windowInsets
     }
   }
