@@ -19,7 +19,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -120,36 +119,32 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
 
     final AppBarLayout appBarLayout = findViewById(R.id.header_layout);
     final View decorView = window.getDecorView();
-    final int originalRecyclerViewPaddingBottom =recyclerView.getPaddingBottom();
+    final int originalRecyclerViewPaddingBottom = recyclerView.getPaddingBottom();
 
     givenInsetsToDecorView = false;
     WindowCompat.setDecorFitsSystemWindows(window, false);
-    ViewCompat.setOnApplyWindowInsetsListener(decorView, new OnApplyWindowInsetsListener() {
-      @NonNull
-      @Override
-      public WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat windowInsets) {
-        Insets navigationBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
-        boolean isGestureNavigation = navigationBarsInsets.bottom <= 24 * getResources().getDisplayMetrics().density;
+    ViewCompat.setOnApplyWindowInsetsListener(decorView, (v, windowInsets) -> {
+      Insets navigationBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+      boolean isGestureNavigation = navigationBarsInsets.bottom <= 24 * getResources().getDisplayMetrics().density;
 
-        if (!isGestureNavigation) {
-          ViewCompat.onApplyWindowInsets(decorView, windowInsets);
-          givenInsetsToDecorView = true;
-        } else if (givenInsetsToDecorView) {
-          ViewCompat.onApplyWindowInsets(
-            decorView,
-            new WindowInsetsCompat.Builder()
-              .setInsets(
-                WindowInsetsCompat.Type.navigationBars(),
-                Insets.of(navigationBarsInsets.left, navigationBarsInsets.top, navigationBarsInsets.right, 0)
-              )
-              .build()
-          );
-        }
-        decorView.setPadding(windowInsets.getSystemWindowInsetLeft(), decorView.getPaddingTop(), windowInsets.getSystemWindowInsetRight(), decorView.getPaddingBottom());
-        appBarLayout.setPadding(appBarLayout.getPaddingLeft(), windowInsets.getSystemWindowInsetTop(), appBarLayout.getPaddingRight(), appBarLayout.getPaddingBottom());
-        recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), originalRecyclerViewPaddingBottom + navigationBarsInsets.bottom);
-        return windowInsets;
+      if (!isGestureNavigation) {
+        ViewCompat.onApplyWindowInsets(decorView, windowInsets);
+        givenInsetsToDecorView = true;
+      } else if (givenInsetsToDecorView) {
+        ViewCompat.onApplyWindowInsets(
+          decorView,
+          new WindowInsetsCompat.Builder()
+            .setInsets(
+              WindowInsetsCompat.Type.navigationBars(),
+              Insets.of(navigationBarsInsets.left, navigationBarsInsets.top, navigationBarsInsets.right, 0)
+            )
+            .build()
+        );
       }
+      decorView.setPadding(windowInsets.getSystemWindowInsetLeft(), decorView.getPaddingTop(), windowInsets.getSystemWindowInsetRight(), decorView.getPaddingBottom());
+      appBarLayout.setPadding(appBarLayout.getPaddingLeft(), windowInsets.getSystemWindowInsetTop(), appBarLayout.getPaddingRight(), appBarLayout.getPaddingBottom());
+      recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), originalRecyclerViewPaddingBottom + navigationBarsInsets.bottom);
+      return windowInsets;
     });
   }
 
