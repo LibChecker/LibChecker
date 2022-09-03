@@ -4,16 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
-import android.view.LayoutInflater
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.viewbinding.ViewBinding
 import java.io.Closeable
-import java.lang.reflect.ParameterizedType
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -34,15 +30,6 @@ fun @receiver:ColorRes Int.toColorStateList(context: Context): ColorStateList {
 
 fun @receiver:ColorInt Int.toColorStateListByColor(): ColorStateList {
   return ColorStateList.valueOf(this)
-}
-
-@Suppress("UNCHECKED_CAST")
-fun <T : ViewBinding> LifecycleOwner.inflateBinding(inflater: LayoutInflater): T {
-  return (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
-    .filterIsInstance<Class<T>>()
-    .first()
-    .getDeclaredMethod("inflate", LayoutInflater::class.java)
-    .invoke(null, inflater) as T
 }
 
 /**
