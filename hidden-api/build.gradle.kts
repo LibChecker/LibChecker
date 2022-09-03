@@ -10,9 +10,7 @@ plugins {
 }
 
 setupLibraryModule {
-  defaultConfig {
-    namespace = "com.absinthe.libchecker.hidden_api"
-  }
+  namespace = "com.absinthe.libchecker.hidden_api"
 }
 
 dependencies {
