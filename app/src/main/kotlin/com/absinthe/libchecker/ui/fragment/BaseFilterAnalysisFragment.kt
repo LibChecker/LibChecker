@@ -9,12 +9,12 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class BaseComponentFragment<T : ViewBinding> : BaseDetailFragment<T>() {
+abstract class BaseFilterAnalysisFragment<T : ViewBinding> : BaseDetailFragment<T>() {
 
-  abstract fun getFilterProcessesList(process: String?): List<LibStringItemChip>?
+  abstract fun getFilterList(process: String?): List<LibStringItemChip>?
 
-  fun filterProcesses(process: String?) {
-    getFilterProcessesList(process)?.let {
+  fun filterItems(process: String?) {
+    getFilterList(process)?.let {
       lifecycleScope.launch(Dispatchers.Main) {
         if (it.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {

@@ -20,7 +20,7 @@ import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
-import com.absinthe.libchecker.ui.fragment.BaseComponentFragment
+import com.absinthe.libchecker.ui.fragment.BaseFilterAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBinding>() {
+class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>() {
 
   private val hasIntegration by unsafeLazy {
     BlockerManager.isSupportInteraction ||
@@ -112,7 +112,7 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
             }
 
             if (viewModel.queriedProcess?.isNotEmpty() == true) {
-              filterProcesses(viewModel.queriedProcess!!)
+              filterItems(viewModel.queriedProcess!!)
             }
           }
         }
@@ -135,11 +135,11 @@ class ComponentsAnalysisFragment : BaseComponentFragment<FragmentLibComponentBin
     }
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return itemsList?.filter { it.item.name.contains(text, true) }
   }
 
-  override fun getFilterProcessesList(process: String?): List<LibStringItemChip>? {
+  override fun getFilterList(process: String?): List<LibStringItemChip>? {
     return if (process.isNullOrEmpty()) {
       itemsList
     } else {

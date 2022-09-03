@@ -76,7 +76,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
     }
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return viewModel.nativeLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 

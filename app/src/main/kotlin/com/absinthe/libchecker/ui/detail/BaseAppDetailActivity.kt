@@ -666,7 +666,7 @@ abstract class BaseAppDetailActivity :
 
   override fun onQueryTextChange(newText: String): Boolean {
     viewModel.queriedText = newText
-    detailFragmentManager.deliverFilterItems(newText)
+    detailFragmentManager.deliverFilterItemsByText(newText)
     return false
   }
 
@@ -924,7 +924,7 @@ abstract class BaseAppDetailActivity :
 
         doOnMainThreadIdle {
           viewModel.queriedProcess = null
-          detailFragmentManager.deliverFilterProcesses(null)
+          detailFragmentManager.deliverFilterItems(null)
         }
       }
     }
@@ -1037,7 +1037,7 @@ abstract class BaseAppDetailActivity :
         } else {
           viewModel.queriedProcess = null
         }
-        detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+        detailFragmentManager.deliverFilterItems(viewModel.queriedProcess)
       }
     }
     binding.detailToolbarContainer.addView(processBarView)

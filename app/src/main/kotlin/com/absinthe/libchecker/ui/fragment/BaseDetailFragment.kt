@@ -19,7 +19,6 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
@@ -79,7 +78,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   protected var afterListReadyTask: Runnable? = null
 
   abstract fun getRecyclerView(): RecyclerView
-  abstract fun getFilterList(text: String): List<LibStringItemChip>?
+  abstract fun getFilterListByText(text: String): List<LibStringItemChip>?
 
   protected abstract val needShowLibDetailDialog: Boolean
 
@@ -103,10 +102,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
               filterList(it)
             }
           }
-          if (this@BaseDetailFragment is BaseComponentFragment) {
+          if (this@BaseDetailFragment is BaseFilterAnalysisFragment) {
             viewModel.queriedProcess?.let {
               if (it.isNotEmpty()) {
-                filterProcesses(it)
+                filterItems(it)
               }
             }
           }
@@ -139,7 +138,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     super.onVisibilityChanged(visible)
     if (visible) {
       if (viewModel.processesMap.isNotEmpty()) {
-        viewModel.processToolIconVisibilityLiveData.postValue((GlobalValues.processMode && isComponentFragment()) || hasNonGrantedPermissions())
+        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment() || hasNonGrantedPermissions())
       }
     }
   }
@@ -177,7 +176,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   override fun filterList(text: String) {
     adapter.highlightText = text
-    getFilterList(text)?.let {
+    getFilterListByText(text)?.let {
       lifecycleScope.launch(Dispatchers.Main) {
         if (it.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
