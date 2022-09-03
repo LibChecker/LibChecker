@@ -11,9 +11,9 @@ import com.absinthe.libchecker.utils.OsUtils
 import rikka.material.app.MaterialActivity
 import java.lang.reflect.ParameterizedType
 
-abstract class BaseActivity<VB : ViewBinding> : MaterialActivity() {
+abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB> {
 
-  protected lateinit var binding: VB
+  override lateinit var binding: VB
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
