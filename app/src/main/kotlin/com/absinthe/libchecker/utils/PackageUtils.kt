@@ -453,7 +453,7 @@ object PackageUtils {
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
         .map { key ->
-          var value = it.getString(key).orEmpty()
+          var value = it.get(key).toString()
           var id = 0L
 
           if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {
