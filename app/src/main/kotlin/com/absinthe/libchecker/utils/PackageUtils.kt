@@ -178,7 +178,6 @@ object PackageUtils {
     }.getOrDefault("?")
   }
 
-  private const val minSdkVersion = "minSdkVersion"
   private const val compileSdkVersion = "compileSdkVersion"
 
   /**
@@ -453,11 +452,13 @@ object PackageUtils {
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
         .map { key ->
+          @Suppress("DEPRECATION")
           var value = it.get(key).toString()
           var id = 0L
 
           if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {
             id = value.toLong()
+            @Suppress("KotlinConstantConditions")
             if ((id and 0xFF000000) == 0x7F000000.toLong() && (id and 0x00FF0000) >= 0x00010000 && (id and 0x0000FFFF) >= 0x00000000) {
               // This may be an android resource id
               Timber.d("Found android resource id: $key")
