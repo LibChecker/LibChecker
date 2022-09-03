@@ -9,7 +9,7 @@ kotlin = "1.7.10"
 protoc = "3.21.5"
 protoc-javalite = "3.21.5"
 square-retrofit = "2.9.0"
-zhaobozhen = "1.1.1"
+zhaobozhen = "1.1.2"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
