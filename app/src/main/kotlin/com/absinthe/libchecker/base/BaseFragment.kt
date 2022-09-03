@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.utils.extensions.inflateBinding
+import com.absinthe.libchecker.base.BaseActivity.Companion.inflateBinding
 import timber.log.Timber
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment() {

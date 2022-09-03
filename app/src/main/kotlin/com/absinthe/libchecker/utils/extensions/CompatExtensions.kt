@@ -36,15 +36,6 @@ fun @receiver:ColorInt Int.toColorStateListByColor(): ColorStateList {
   return ColorStateList.valueOf(this)
 }
 
-@Suppress("UNCHECKED_CAST")
-fun <T : ViewBinding> LifecycleOwner.inflateBinding(inflater: LayoutInflater): T {
-  return (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments
-    .filterIsInstance<Class<T>>()
-    .first()
-    .getDeclaredMethod("inflate", LayoutInflater::class.java)
-    .invoke(null, inflater) as T
-}
-
 /**
  * [issue](https://youtrack.jetbrains.com/issue/KT-35216)
  */
