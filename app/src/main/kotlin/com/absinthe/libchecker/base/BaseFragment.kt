@@ -16,7 +16,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
   /**
    * You can't call [binding] after [onDestroyView]
    */
-  override val binding: VB get() = _binding ?: throw IllegalArgumentException("Binding has been destroyed")
+  override val binding: VB get() = checkNotNull(_binding) { "Binding has been destroyed" }
 
   private var parentActivityVisible = false
   private var visible = false
