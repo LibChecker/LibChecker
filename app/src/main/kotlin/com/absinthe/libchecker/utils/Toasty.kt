@@ -21,7 +21,7 @@ import java.lang.ref.WeakReference
 object Toasty {
 
   private val handler = Handler(Looper.getMainLooper())
-  private var toast: Toast? = null
+  private var toast: WeakReference<Toast>? = null
 
   @AnyThread
   fun showShort(context: Context, message: String) {
@@ -56,14 +56,14 @@ object Toasty {
   @Suppress("deprecation")
   @MainThread
   private fun show(context: Context, message: String, duration: Int) {
-    toast?.cancel()
+    toast?.get()?.cancel()
 
     WeakReference(context).get()?.let { ctx ->
       if (OsUtils.atLeastR() && context !is ContextThemeWrapper) {
         Toast(ctx).also {
           it.duration = duration
           it.setText(message)
-          toast = it
+          toast = WeakReference(it)
         }.show()
       } else {
         val view = ToastView(ctx).also {
@@ -73,7 +73,7 @@ object Toasty {
           it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
           it.duration = duration
           it.view = view
-          toast = it
+          toast = WeakReference(it)
         }.show()
       }
     }
