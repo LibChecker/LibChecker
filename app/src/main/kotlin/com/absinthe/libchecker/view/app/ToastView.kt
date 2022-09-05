@@ -4,11 +4,9 @@ import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.view.AViewGroup
 
 class ToastView(context: Context) : AViewGroup(context) {
@@ -25,8 +23,6 @@ class ToastView(context: Context) : AViewGroup(context) {
     setBackgroundResource(R.drawable.bg_toast)
     addView(this)
   }
-
-  var parent: Toast? = null
 
   private val icon = AppCompatImageView(context).apply {
     layoutParams = LayoutParams(24.dp, 24.dp)
@@ -47,10 +43,5 @@ class ToastView(context: Context) : AViewGroup(context) {
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     icon.let { it.layout(it.toHorizontalCenter(this), 0) }
     message.layout(0, icon.measuredHeight / 2)
-  }
-
-  override fun onDetachedFromWindow() {
-    super.onDetachedFromWindow()
-    Toasty.cancel(false, parent)
   }
 }

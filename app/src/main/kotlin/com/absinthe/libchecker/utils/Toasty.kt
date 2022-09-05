@@ -23,12 +23,6 @@ object Toasty {
   private val handler = Handler(Looper.getMainLooper())
   private var toast: Toast? = null
 
-  fun cancel(needCancel: Boolean, parent: Toast? = null) {
-    if (needCancel) toast?.cancel()
-    if (parent != toast && parent != null) return
-    toast = null
-  }
-
   @AnyThread
   fun showShort(context: Context, message: String) {
     if (Looper.getMainLooper().thread === Thread.currentThread()) {
@@ -62,19 +56,13 @@ object Toasty {
   @Suppress("deprecation")
   @MainThread
   private fun show(context: Context, message: String, duration: Int) {
-    cancel(true)
+    toast?.cancel()
 
     WeakReference(context).get()?.let { ctx ->
       if (OsUtils.atLeastR() && context !is ContextThemeWrapper) {
         Toast(ctx).also {
           it.duration = duration
           it.setText(message)
-          it.addCallback(object : Toast.Callback() {
-            override fun onToastHidden() {
-              super.onToastHidden()
-              cancel(false)
-            }
-          })
           toast = it
         }.show()
       } else {
@@ -85,7 +73,6 @@ object Toasty {
           it.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM, 0, 200)
           it.duration = duration
           it.view = view
-          view.parent = it
           toast = it
         }.show()
       }
