@@ -47,7 +47,7 @@ androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-beta01"
 androidX-window = "androidx.window:window:1.0.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
-square-moshi = "com.squareup.moshi:moshi:1.13.0"
+square-moshi = "com.squareup.moshi:moshi:1.14.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.10.0"
 square-okio = "com.squareup.okio:okio:3.2.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
