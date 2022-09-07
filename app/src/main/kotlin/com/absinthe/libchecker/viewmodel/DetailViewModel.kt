@@ -210,7 +210,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.size }
       } else {
-        chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
+        chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.size })
       }
     }
     return chipList
