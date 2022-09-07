@@ -250,7 +250,7 @@ object PackageUtils {
       if (specifiedAbi != null) {
         abi = specifiedAbi
       } else {
-        abi = getAbi(packageInfo)
+        abi = runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
         if (abi == NO_LIBS) {
           abi = if (Process.is64Bit()) {
             ARMV8
@@ -1316,6 +1316,7 @@ object PackageUtils {
     return try {
       Refine.unsafeCast<PackageInfoHidden>(this).isOverlayPackage
     } catch (t: Throwable) {
+      if (applicationInfo.sourceDir == null) return false
       val demands =
         ManifestReader.getManifestProperties(File(applicationInfo.sourceDir), arrayOf("overlay"))
       return demands["overlay"] as? Boolean ?: false
