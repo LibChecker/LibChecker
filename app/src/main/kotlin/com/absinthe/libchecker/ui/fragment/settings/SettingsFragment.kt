@@ -144,7 +144,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          CloudRulesDialogFragment().show(childFragmentManager, CloudRulesDialogFragment::class.java.name)
+          CloudRulesDialogFragment().show(
+            childFragmentManager,
+            CloudRulesDialogFragment::class.java.name
+          )
           true
         }
       }
@@ -154,7 +157,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, LibThresholdDialogFragment::class.java.name)
+          LibThresholdDialogFragment().show(
+            requireActivity().supportFragmentManager,
+            LibThresholdDialogFragment::class.java.name
+          )
           true
         }
       }
@@ -295,12 +301,16 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
   override fun onResume() {
     super.onResume()
+    val container = (activity as? IAppBarContainer) ?: return
     if (this != viewModel.controller) {
       viewModel.controller = this
-      activity?.invalidateOptionsMenu()
+      container.currentMenuProvider?.let { current ->
+        activity?.removeMenuProvider(current)
+      }
+      container.currentMenuProvider = null
     }
     scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
-    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(prefRecyclerView)
+    container.setLiftOnScrollTargetView(prefRecyclerView)
   }
 
   override fun onCreateRecyclerView(

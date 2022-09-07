@@ -12,6 +12,7 @@ import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -92,6 +93,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       appViewModel.workerBinder = null
     }
   }
+  private var _menuProvider: MenuProvider? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -139,6 +141,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     Timber.d("hideProgressBar")
     binding.progressHorizontal.hide()
   }
+
+  override var currentMenuProvider: MenuProvider?
+    get() = _menuProvider
+    set(value) {
+      _menuProvider = value
+    }
 
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted

@@ -22,19 +22,22 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   protected var menu: Menu? = null
 
   private var lastPackageChangedTime: Long = 0
-  private var addedMenuProvider = false
 
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
-    if (visible && this != homeViewModel.controller) {
-      homeViewModel.controller = this
-    }
-    addedMenuProvider = if (visible) {
-      activity?.addMenuProvider(this)
-      true
-    } else {
-      activity?.removeMenuProvider(this)
-      false
+    if (visible) {
+      if (this != homeViewModel.controller) {
+        homeViewModel.controller = this
+      }
+      (activity as? IAppBarContainer)?.let { container ->
+        if (container.currentMenuProvider != this) {
+          container.currentMenuProvider?.let { current ->
+            activity?.removeMenuProvider(current)
+          }
+          activity?.addMenuProvider(this)
+          container.currentMenuProvider = this
+        }
+      }
     }
   }
 
