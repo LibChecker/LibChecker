@@ -29,10 +29,10 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
 androidX-activity = "androidx.activity:activity-ktx:1.5.1"
-androidX-appCompat = "androidx.appcompat:appcompat:1.6.0-beta01"
+androidX-appCompat = "androidx.appcompat:appcompat:1.6.0-rc01"
 androidX-browser = "androidx.browser:browser:1.4.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
-androidX-core = "androidx.core:core-ktx:1.8.0"
+androidX-core = "androidx.core:core-ktx:1.9.0"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.5.2"
 androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
@@ -81,7 +81,7 @@ appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
 brvah = "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.8"
 cascade = "me.saket.cascade:cascade:1.3.0"
-coil = "io.coil-kt:coil:2.2.0"
+coil = "io.coil-kt:coil:2.2.1"
 commons-io = "commons-io:commons-io:2.11.0"
 dexLib2 = "org.smali:dexlib2:2.5.2"
 drakeet-about = "com.drakeet.about:about:2.5.2"
