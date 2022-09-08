@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest an idea for this project
+labels: [ "awaiting assessment", "enhancement" ]
+title: "[FR] "
+assignees: [ zhaobozhen ]
+body:
+  - type: textarea
+    id: propose
+    attributes:
+      label: Enhancement propose / 改进目的
+      description: Propose of the enhancement. / 改进有什么用
+      placeholder: |
+        Show your idea here.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution / 解决方案
+      description: What's your solution for this enhancement? / 你会怎么完成这个改进？
+      placeholder: |
+        How to do it on your opinion? Or left this blank
+  - type: textarea
+    id: addition
+    attributes:
+      label: Additional info / 额外信息
+      description: Everything else you consider worthy that we didn't ask for. / 任何你觉得值得说的。
