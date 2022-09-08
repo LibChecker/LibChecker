@@ -1,6 +1,6 @@
 name: Feature Request
 description: Suggest an idea for this project
-labels: [ "awaiting assessment", "enhancement" ]
+labels: [ "enhancement" ]
 title: "[FR] "
 assignees: [ zhaobozhen ]
 body:
