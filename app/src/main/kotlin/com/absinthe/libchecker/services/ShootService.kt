@@ -13,7 +13,6 @@ import android.os.IBinder
 import android.os.Process
 import android.os.RemoteCallbackList
 import android.os.RemoteException
-import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
@@ -33,8 +32,8 @@ import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
-import com.absinthe.libraries.utils.extensions.getColorByAttr
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -347,17 +346,17 @@ class ShootService : LifecycleService() {
       },
       PendingIntent.FLAG_IMMUTABLE
     )
-    val ctw = ContextThemeWrapper(this, R.style.AppTheme)
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
       .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-      .setColor(ctw.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .setContentIntent(pi)
       .setProgress(0, 0, true)
       .setSilent(true)
       .setOngoing(true)
-      .setAutoCancel(false)
+      .setAutoCancel(false).apply {
+        if (!OsUtils.atLeastS()) color = R.color.colorPrimary.getColor(this@ShootService)
+      }
   }
 
   companion object {
