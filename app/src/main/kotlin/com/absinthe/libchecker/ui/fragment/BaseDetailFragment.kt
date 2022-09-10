@@ -138,7 +138,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     super.onVisibilityChanged(visible)
     if (visible) {
       if (viewModel.processesMap.isNotEmpty()) {
-        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment() || hasNonGrantedPermissions())
+        viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
       }
     }
   }
@@ -242,7 +242,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     }
   }
 
-  private fun isComponentFragment(): Boolean {
+  fun isComponentFragment(): Boolean {
     return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
   }
 

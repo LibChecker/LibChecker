@@ -590,13 +590,17 @@ abstract class BaseAppDetailActivity :
     }
     viewModel.processToolIconVisibilityLiveData.observe(this) { visible ->
       if (visible) {
-        if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-          toolbarAdapter.addData(toolbarProcessItem)
+        if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
+          if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+            toolbarAdapter.addData(toolbarProcessItem)
+          }
         }
-        if (processBarView == null) {
-          initProcessBarView()
+        if (GlobalValues.processMode || detailFragmentManager.currentFragment is PermissionAnalysisFragment) {
+          if (processBarView == null) {
+            initProcessBarView()
+          }
+          processBarView?.isVisible = true
         }
-        processBarView?.isVisible = true
       } else {
         if (toolbarAdapter.data.contains(toolbarProcessItem)) {
           toolbarAdapter.remove(toolbarProcessItem)
