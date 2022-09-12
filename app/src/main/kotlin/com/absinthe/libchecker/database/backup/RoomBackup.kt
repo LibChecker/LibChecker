@@ -287,10 +287,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
     }
 
     if (backupLocation == BACKUP_FILE_LOCATION_CUSTOM_FILE && backupLocationCustomFile == null) {
-      if (enableLogDebug) Log.d(
-        TAG,
-        "backupLocation is set to custom backup file, but no file is defined"
-      )
+      if (enableLogDebug) {
+        Log.d(TAG, "backupLocation is set to custom backup file, but no file is defined")
+      }
       onCompleteListener?.onComplete(
         false,
         "backupLocation is set to custom backup file, but no file is defined",
@@ -329,10 +328,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       Log.d(TAG, "Database Location: $DATABASE_FILE")
       Log.d(TAG, "INTERNAL_BACKUP_PATH: $INTERNAL_BACKUP_PATH")
       Log.d(TAG, "EXTERNAL_BACKUP_PATH: $EXTERNAL_BACKUP_PATH")
-      if (backupLocationCustomFile != null) Log.d(
-        TAG,
-        "backupLocationCustomFile: $backupLocationCustomFile"
-      )
+      if (backupLocationCustomFile != null) {
+        Log.d(TAG, "backupLocationCustomFile: $backupLocationCustomFile")
+      }
     }
     return true
   }
@@ -416,10 +414,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       if (!deleted) return
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Backup done, encrypted($backupIsEncrypted) and saved to $destination"
-    )
+    if (enableLogDebug) {
+      Log.d(TAG, "Backup done, encrypted($backupIsEncrypted) and saved to $destination")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -444,10 +441,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       val deleted = deleteOldBackup()
       if (!deleted) return
     }
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Backup done, encrypted($backupIsEncrypted) and saved to $destination"
-    )
+    if (enableLogDebug) {
+      Log.d(TAG, "Backup done, encrypted($backupIsEncrypted) and saved to $destination")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -589,10 +585,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       bos.close()
     } else {
       if (fileExtension == "aes") {
-        if (enableLogDebug) Log.d(
-          TAG,
-          "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)"
-        )
+        if (enableLogDebug) {
+          Log.d(TAG, "Cannot restore database, it is encrypted. Maybe you forgot to add the property .fileIsEncrypted(true)")
+        }
         onCompleteListener?.onComplete(
           false,
           "cannot restore database, see Log for more details (if enabled)",
@@ -604,10 +599,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       copy(source, DATABASE_FILE)
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Restore done, decrypted($backupIsEncrypted) and restored from $source"
-    )
+    if (enableLogDebug) {
+      Log.d(TAG, "Restore done, decrypted($backupIsEncrypted) and restored from $source")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
@@ -646,10 +640,9 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       }
     }
 
-    if (enableLogDebug) Log.d(
-      TAG,
-      "Restore done, decrypted($backupIsEncrypted) and restored from $source"
-    )
+    if (enableLogDebug) {
+      Log.d(TAG, "Restore done, decrypted($backupIsEncrypted) and restored from $source")
+    }
     onCompleteListener?.onComplete(true, "success", OnCompleteListener.EXIT_CODE_SUCCESS)
   }
 
