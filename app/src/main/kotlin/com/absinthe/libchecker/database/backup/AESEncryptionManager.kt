@@ -52,7 +52,9 @@ class AESEncryptionManager {
     // Prepare your key/password
     val secretKey = if (encryptPassword != null) {
       aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
-    } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
+    } else {
+      aesEncryptionHelper.getSecretKey(sharedPref, iv)
+    }
 
     val cipher = Cipher.getInstance("AES/GCM/NoPadding")
     val parameterSpec = GCMParameterSpec(128, iv)
@@ -103,7 +105,9 @@ class AESEncryptionManager {
     // Prepare your key/password
     val secretKey = if (encryptPassword != null) {
       aesEncryptionHelper.getSecretKeyWithCustomPw(encryptPassword, iv)
-    } else aesEncryptionHelper.getSecretKey(sharedPref, iv)
+    } else {
+      aesEncryptionHelper.getSecretKey(sharedPref, iv)
+    }
 
     // get the rest of encrypted data
     val cipherBytes = ByteArray(byteBuffer.remaining())

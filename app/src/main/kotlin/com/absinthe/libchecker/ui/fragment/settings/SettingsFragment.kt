@@ -265,14 +265,18 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     for (i in 1 until languagePreference.entries.size) {
       val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
       localeName.add(
-        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(
-          locale
-        )
+        if (!TextUtils.isEmpty(locale.script)) {
+          locale.getDisplayScript(locale)
+        } else {
+          locale.getDisplayName(locale)
+        }
       )
       localeNameUser.add(
-        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(
-          userLocale
-        ) else locale.getDisplayName(userLocale)
+        if (!TextUtils.isEmpty(locale.script)) {
+          locale.getDisplayScript(userLocale)
+        } else {
+          locale.getDisplayName(userLocale)
+        }
       )
     }
 
