@@ -1,6 +1,5 @@
 <resources>
   <!--  General  -->
-  <string name="app_name">LibChecker</string>
   <string name="title_app_list">Apps</string>
   <string name="title_statistics">Statistics</string>
   <string name="title_snapshot">Snapshot</string>
