@@ -3,6 +3,7 @@ agp = "7.2.2"
 androidX-lifecycle = "2.5.1"
 androidX-room = "2.5.0-alpha03"
 appCenter = "4.4.5"
+coil = "2.2.1"
 grpc = "1.49.0"
 hiddenApiRefine = "3.1.1"
 kotlin = "1.7.10"
@@ -81,7 +82,8 @@ appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
 brvah = "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.8"
 cascade = "me.saket.cascade:cascade:1.3.0"
-coil = "io.coil-kt:coil:2.2.1"
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 commons-io = "commons-io:commons-io:2.11.0"
 dexLib2 = "org.smali:dexlib2:2.5.2"
 drakeet-about = "com.drakeet.about:about:2.5.2"
@@ -114,6 +116,10 @@ androidX-room = [
 appCenter = [
   "appCenter-analytics",
   "appCenter-crashes"
+]
+coil = [
+  "coil",
+  "coil-svg"
 ]
 grpc = [
   "javax-annotation",

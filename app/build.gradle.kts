@@ -142,7 +142,7 @@ dependencies {
   implementation(libs.bundles.androidX.lifecycle)
   implementation(libs.bundles.androidX.room)
   implementation(libs.google.material)
-  implementation(libs.coil)
+  implementation(libs.bundles.coil)
   implementation(libs.square.okHttp)
   implementation(libs.square.okio)
   implementation(libs.square.retrofit)

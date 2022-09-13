@@ -6,6 +6,7 @@ import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
+import coil.decode.SvgDecoder
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -83,6 +84,7 @@ class LibCheckerApp : Application() {
     Coil.setImageLoader {
       ImageLoader.Builder(this)
         .components {
+          add(SvgDecoder.Factory(false))
           add(AppIconKeyer())
           add(AppIconFetcher.Factory(40.dp, false, this@LibCheckerApp))
         }
