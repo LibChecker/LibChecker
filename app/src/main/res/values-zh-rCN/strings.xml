@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
   <string name="title_app_list">应用</string>
@@ -9,7 +10,6 @@
   <string name="channel_shoot">保存快照</string>
   <string name="noti_shoot_title">正在保存当前快照</string>
   <string name="noti_shoot_title_saved">快照已保存</string>
-
   <!--  App list  -->
   <string name="menu_search">搜索</string>
   <string name="menu_sort">排序</string>
@@ -24,14 +24,12 @@
   <string name="uncharted_territory">未知领域</string>
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
-
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架构的 Apps</string>
   <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
   <string name="tab_chart">图表</string>
   <string name="tab_lib_reference_statistics">库引用统计</string>
   <string name="not_marked_lib">未标记的库</string>
-
   <string name="submenu_title_component">组件</string>
   <string name="submenu_title_manifest">清单</string>
   <string name="ref_category_all">全部</string>
@@ -40,30 +38,27 @@
   <string name="ref_category_activity">活动</string>
   <string name="ref_category_br">广播接收器</string>
   <string name="ref_category_cp">内容提供器</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">权限</string>
   <string name="ref_category_static">静态库</string>
   <string name="ref_category_metadata">元数据</string>
   <string name="ref_category_package">包</string>
   <string name="ref_category_shared_uid">共享的 UID</string>
-
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
-
   <!--  About  -->
   <string name="settings_about">关于</string>
+  <string name="settings_translate">参与翻译</string>
+  <string name="settings_translate_summary">帮助我们翻译此应用</string>
   <string name="settings_rate_us">给我们评分</string>
   <string name="settings_rate_us_summary">这可以使我们被更多的人发现</string>
   <string name="settings_about_summary">这里是 LibChecker!</string>
   <string name="about_info">本应用用来查看设备上的应用使用到的第三方库的情况。</string>
   <string name="toolbar_rate">评分</string>
-  <string name="resource_declaration">应用中的部分素材来自于： </string>
-  <string name="library_declaration">LibChecker 中的所有标记库信息均来自于其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
-
+  <string name="resource_declaration">应用中的部分素材来自：</string>
+  <string name="library_declaration">LibChecker 中的所有标记库信息均来自其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">常规</string>
   <string name="pref_group_others">其它</string>
-
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩图标</string>
   <string name="rules_repo_title">规则仓库</string>
@@ -75,7 +70,6 @@
   <string name="anonymous_statistics">匿名统计</string>
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
-
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
@@ -84,13 +78,11 @@
   <string name="join_telegram_group_summary">来一起划水</string>
   <string name="anonymous_statistics_summary">我们使用 Microsoft AppCenter 来匿名发送最常被人们使用的标记库和一些使用习惯数据来使得 LibChecker 变得更加实用</string>
   <string name="cloud_rules_summary">在此更新最新的标记库</string>
-
   <string name="array_dark_mode_off">关闭</string>
   <string name="array_dark_mode_on">开启</string>
   <string name="array_dark_mode_auto">自动</string>
   <string name="array_dark_mode_system">系统默认</string>
   <string name="array_dark_mode_battery">由省电模式设置</string>
-
   <!--  Detail  -->
   <string name="detail">详情</string>
   <string name="detail_label">查看 App 详情</string>
@@ -106,7 +98,6 @@
   <string name="agp_details">Android Studio 构建系统以 Gradle 为基础，并且 Android Gradle 插件添加了几项专用于构建 Android 应用的功能。虽然 Android 插件通常会与 Android Studio 的更新步调保持一致，但插件（以及 Gradle 系统的其余部分）可独立于 Android Studio 运行并单独更新。</string>
   <string name="xposed_module">Xposed 模块</string>
   <string name="xposed_module_details">Xposed 是一个模块框架，可以在不接触任何 APK 的情况下更改系统和应用程序的行为。这很棒，因为这意味着模块可以在不同版本甚至 ROM 上工作而无需任何更改。</string>
-  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 应用签名，Google 可以为您管理和保护您应用的签名密钥，并使用它对从您的 app bundle 生成的优化分发 APK 进行签名。Play App Signing 将您的应用签名密钥存储在 Google 的安全基础架构中，并提供升级选项以提高安全性。</string>
   <string name="pwa_details">渐进式 Web 应用程序 (PWA) 使用现代 API 构建和增强，以提供增强的功能、可靠性和可安装性，同时使用单个代码库在任何设备上访问任何人、任何地方。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
@@ -120,7 +111,6 @@
   <string name="rx_android_detail">适用于 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 扩展</string>
   <string name="permission_not_granted">未授予</string>
-
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
@@ -128,7 +118,6 @@
   <string name="toast_cant_open_app">无法启动此 App</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
-
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>
@@ -144,7 +133,6 @@
   <string name="snapshot_time_node_uninitialized">（未初始化）</string>
   <string name="snapshot_generate_text_report">生成文字报告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示: 现在您可以通过<br><b>%s</b><br>在后台生成快照。]]></string>
-
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">确定要重载应用列表吗？</string>
   <string name="dialog_subtitle_reload_apps">这可能会花费一点时间</string>
@@ -154,7 +142,6 @@
   <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">丢弃</string>
-
   <!--  Album  -->
   <string name="album_compare">对比</string>
   <string name="album_item_comparison_title">对比</string>
@@ -174,20 +161,17 @@
   <string name="album_restore_summary">从备份文件恢复快照</string>
   <string name="album_click_to_choose">点击选择</string>
   <string name="album_dialog_delete_snapshot_message">处理中…</string>
-
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大圣净化」禁用此组件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大圣净化」解禁此组件</string>
   <string name="integration_blocker_menu_block">使用「Blocker」禁用此组件</string>
   <string name="integration_blocker_menu_unblock">使用「Blocker」解禁此组件</string>
   <string name="integration_anywhere_menu_editor">在「Anywhere- 编辑器」中打开</string>
-
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">本地规则库版本</string>
   <string name="rules_remote_repo_version">远端规则库版本</string>
   <string name="rules_btn_restart_to_update">重启以更新</string>
   <string name="rules_btn_update">更新</string>
-
   <!-- Advanced menu -->
   <string name="adv_show_system_apps">显示系统应用</string>
   <string name="adv_show_overlays">显示 Overlay</string>
