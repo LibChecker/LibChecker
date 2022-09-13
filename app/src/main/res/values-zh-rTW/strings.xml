@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
   <string name="title_app_list">應用程式</string>
@@ -9,7 +10,6 @@
   <string name="channel_shoot">儲存快照</string>
   <string name="noti_shoot_title">正在儲存目前快照</string>
   <string name="noti_shoot_title_saved">快照已儲存</string>
-
   <!--  App list  -->
   <string name="menu_search">搜尋</string>
   <string name="menu_sort">排序</string>
@@ -24,14 +24,12 @@
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">高級菜單</string>
-
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的 Apps</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
   <string name="tab_chart">圖表</string>
   <string name="tab_lib_reference_statistics">庫參考統計資料</string>
   <string name="not_marked_lib">未標示的庫</string>
-
   <string name="submenu_title_component">元件</string>
   <string name="submenu_title_manifest">清單</string>
   <string name="ref_category_all">全部</string>
@@ -40,16 +38,13 @@
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
   <string name="ref_category_cp">内容提供者</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">中繼資料</string>
   <string name="ref_category_package">套件</string>
   <string name="ref_category_shared_uid">共用的 UID</string>
-
   <string name="string_kotlin_used">已使用 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
-
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_rate_us">給我們評分</string>
@@ -59,11 +54,9 @@
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>
   <string name="library_declaration">LibChecker 中所有標示的程式庫資訊均來自於其所屬的 SDK 的開發文件或程式碼存放庫，如果資訊有有誤，請聯絡：absinthe@absinthe.life</string>
-
   <!--  Settings  -->
   <string name="pref_group_normal">一般</string>
   <string name="pref_group_others">其他</string>
-
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩圖示</string>
   <string name="rules_repo_title">規則存放庫</string>
@@ -75,7 +68,6 @@
   <string name="anonymous_statistics">匿名統計資料</string>
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
-
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
   <string name="colorful_icon_summary">部分標示庫會呈現為彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
@@ -84,13 +76,11 @@
   <string name="join_telegram_group_summary">一起來閒聊</string>
   <string name="anonymous_statistics_summary">我們使用 Microsoft AppCenter 來匿名傳送最常被人們使用的標示庫和一些使用習慣資料來使得 LibChecker 變得更加實用</string>
   <string name="cloud_rules_summary">在此更新最新的標示庫</string>
-
   <string name="array_dark_mode_off">關閉</string>
   <string name="array_dark_mode_on">開啟</string>
   <string name="array_dark_mode_auto">自動</string>
   <string name="array_dark_mode_system">系統預設</string>
   <string name="array_dark_mode_battery">由省電模式設定</string>
-
   <!--  Detail  -->
   <string name="detail">詳細資料</string>
   <string name="detail_label">檢視 App 詳細資料</string>
@@ -106,9 +96,8 @@
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 插件新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
-  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 應用程式簽署，Google 可以為您管理並保護您應用程式的簽署金鑰，並使用它對從您的 App bundle 生成的最佳化分配 APK 進行簽署。Play App Signing 將您的應用程式簽署金鑰儲存在 Google 的安全基礎結構中，並提供升級選項以提高安全性。</string>
-  <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
+  <string name="pwa_details">"漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。"</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="extract_native_libs_tip">此應用宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
@@ -120,7 +109,6 @@
   <string name="rx_android_detail">適用於 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 擴展</string>
   <string name="permission_not_granted">未授權</string>
-
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
@@ -128,7 +116,6 @@
   <string name="toast_cant_open_app">無法啟動此 App</string>
   <string name="toast_cloud_rules_update_error">雲端規則更新失敗，請重試</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
-
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
@@ -144,7 +131,6 @@
   <string name="snapshot_time_node_uninitialized">(未初始化)</string>
   <string name="snapshot_generate_text_report">產生文字報告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示: 現在您可以透過<br><b>%s</b><br>在背景產生快照。]]></string>
-
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">確定要重載應用程式清單嗎？</string>
   <string name="dialog_subtitle_reload_apps">這可能會花費一點時間</string>
@@ -154,7 +140,6 @@
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">捨棄</string>
-
   <!--  Album  -->
   <string name="album_compare">比較</string>
   <string name="album_item_comparison_title">比較</string>
@@ -174,20 +159,17 @@
   <string name="album_restore_summary">從備份檔案還原快照</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
-
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">使用「大聖淨化」封鎖此元件</string>
   <string name="integration_monkey_king_menu_unblock">使用「大聖淨化」解除封鎖此元件</string>
   <string name="integration_blocker_menu_block">使用「Blocker」封鎖此元件</string>
   <string name="integration_blocker_menu_unblock">使用「Blocker」解除封鎖此元件</string>
   <string name="integration_anywhere_menu_editor">在「Anywhere- 編輯器」中開啟</string>
-
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">本機存放庫版本</string>
   <string name="rules_remote_repo_version">遠端存放庫版本</string>
   <string name="rules_btn_restart_to_update">重啟以更新</string>
   <string name="rules_btn_update">更新</string>
-
   <!-- Advanced menu -->
   <string name="adv_show_system_apps">顯示系統應用程式</string>
   <string name="adv_show_overlays">顯示 Overlay</string>
