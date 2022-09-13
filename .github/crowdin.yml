@@ -5,3 +5,8 @@ base_path: ".."
 files:
   - source: /app/src/main/res/values/strings.xml
     translation: /app/src/main/res/values-%android_code%/%original_file_name%
+    translation_replace: {
+      "values-zh-rCN/strings.xml": "values-zh/strings.xml",
+      "values-ru_rRU/strings.xml": "values-ru/strings.xml",
+      "values-ja_rJP/strings.xml": "values-ja/strings.xml"
+    }
