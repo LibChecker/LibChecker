@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
   <string name="title_app_list">Приложения</string>
@@ -9,47 +10,32 @@
   <string name="channel_shoot">Сохранить</string>
   <string name="noti_shoot_title">Сохранение текущего снимка</string>
   <string name="noti_shoot_title_saved">Снимок сохранен</string>
-
   <!--  App list  -->
   <string name="menu_search">Поиск</string>
   <string name="menu_sort">Сортировка</string>
   <string name="menu_filter">Фильтр</string>
   <string name="search_hint">Поиск…</string>
-  <string name="string_64_bit">64bit</string>
-  <string name="string_32_bit">32bit</string>
   <string name="no_libs">Нет нативных библиотек</string>
   <string name="cannot_read">«Невозможно прочитать»</string>
   <string name="unknown">Неизвестно</string>
   <string name="empty_list">Список пуст</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
-  <string name="advanced_menu">Advanced Menu</string>
-
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Приложения с %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Приложения без нативных библиотек</string>
   <string name="tab_chart">Диаграмма</string>
   <string name="tab_lib_reference_statistics">Ссылка на библиотеку</string>
   <string name="not_marked_lib">Не отмеченная библиотека</string>
-
-  <string name="submenu_title_component">Component</string>
-  <string name="submenu_title_manifest">Manifest</string>
   <string name="ref_category_all">Все</string>
   <string name="ref_category_native">Нативные библиотеки</string>
   <string name="ref_category_service">Службы</string>
   <string name="ref_category_activity">Активити</string>
   <string name="ref_category_br">Широковещательные приемники</string>
   <string name="ref_category_cp">Поставщики контента</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">Разрешения</string>
-  <string name="ref_category_static">Static Libraries</string>
-  <string name="ref_category_metadata">Meta Data</string>
-  <string name="ref_category_package">Package</string>
-  <string name="ref_category_shared_uid">Shared UID</string>
-
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
-
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_rate_us">Оценить приложение</string>
@@ -59,22 +45,20 @@
   <string name="toolbar_rate">Оценка</string>
   <string name="resource_declaration">Часть ресурсов в приложении поступает из: </string>
   <string name="library_declaration">Вся информация о отмеченных библиотеках в LibChecker берется из документации для разработчиков или из репозитория кода SDK, которому он принадлежит. Если информация неверна, пожалуйста, обращайтесь: absinthe@absinthe.life</string>
-
   <!--  Settings  -->
   <string name="pref_group_normal">Общие</string>
   <string name="pref_group_others">Другие</string>
-
   <string name="apk_analytics">Анализирование АРК</string>
   <string name="colorful_icon">Цветные значки</string>
   <string name="rules_repo_title">Репозиторий правил</string>
   <string name="lib_ref_threshold">Порог числа ссылок на библиотеку</string>
+  <string name="languages">Язык</string>
   <string name="reload_apps">Обновить список приложений</string>
   <string name="help_docs">Справочная документация</string>
   <string name="join_telegram_group">Связь</string>
   <string name="anonymous_statistics">Анонимная статистика</string>
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
-
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
@@ -83,20 +67,18 @@
   <string name="join_telegram_group_summary">Присоединяйтесь к нашей группе в Telegram</string>
   <string name="anonymous_statistics_summary">Мы используем Microsoft AppCenter для анонимной отправки наиболее часто используемых помеченных библиотек и некоторых данных о привычках использования, чтобы сделать LibChecker более практичным.</string>
   <string name="cloud_rules_summary">Обновите последние отмеченные правила библиотеки здесь</string>
-
   <string name="array_dark_mode_off">Выкл</string>
   <string name="array_dark_mode_on">Вкл</string>
   <string name="array_dark_mode_auto">Авто</string>
   <string name="array_dark_mode_system">Как в системе</string>
   <string name="array_dark_mode_battery">Зависит от режима энергосбережения</string>
-
   <!--  Detail  -->
   <string name="detail">подробности</string>
   <string name="detail_label">Просмотр сведений о приложении</string>
   <string name="not_found">Не найдено</string>
   <string name="create_an_issue">Помогите нам дополнить информацию</string>
-  <string name="app_bundle_details">"Android App Bundle - это новый официальный формат публикации приложений в ОС Android, который предлагает более эффективный способ создания и выпуска вашего приложения. Android App Bundle позволяет выпускать приложения меньшего размера, что может повысить успешность установки и сократить количество удалений. Переключиться на App Bundle легко. Вам не нужно проводить рефакторинг кода, чтобы получить пользу от небольшого размера приложения. И после перехода вы получите выгоду от разработки модульных приложений и настраиваемой доставки функций."</string>
-  <string name="kotlin_details">"Kotlin - это кроссплатформенный язык программирования общего назначения со статической типизацией и выводом типов. Kotlin разработан для полного взаимодействия с Java, а версия JVM стандартной библиотеки Kotlin зависит от библиотеки классов Java, но вывод типа позволяет его синтаксису быть более лаконичным."</string>
+  <string name="app_bundle_details">Android App Bundle - это новый официальный формат публикации приложений в ОС Android, который предлагает более эффективный способ создания и выпуска вашего приложения. Android App Bundle позволяет выпускать приложения меньшего размера, что может повысить успешность установки и сократить количество удалений. Переключиться на App Bundle легко. Вам не нужно проводить рефакторинг кода, чтобы получить пользу от небольшого размера приложения. И после перехода вы получите выгоду от разработки модульных приложений и настраиваемой доставки функций.</string>
+  <string name="kotlin_details">Kotlin - это кроссплатформенный язык программирования общего назначения со статической типизацией и выводом типов. Kotlin разработан для полного взаимодействия с Java, а версия JVM стандартной библиотеки Kotlin зависит от библиотеки классов Java, но вывод типа позволяет его синтаксису быть более лаконичным.</string>
   <string name="items_count">Кол-во пунктов: </string>
   <string name="further_operation">Дополнительные опции</string>
   <string name="app_info_launch">Запустить</string>
@@ -105,29 +87,20 @@
   <string name="agp_details">Система сборки Android Studio основана на Gradle, а подключаемый модуль Android Gradle добавляет несколько функций, характерных для создания приложений для Android. Хотя подключаемый модуль Android обычно обновляется одновременно с Android Studio, этот подключаемый модуль (и остальная часть системы Gradle) может работать независимо от Android Studio и обновляться отдельно.</string>
   <string name="xposed_module">Xposed модуль</string>
   <string name="xposed_module_details">Xposed — это фреймворк для модулей, которые могут изменить поведение системы и приложений, не затрагивая никаких APK. Это здорово, потому что это означает, что модули могут работать с разными версиями ОС и прошивками без каких-либо изменений.</string>
-  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
-  <string name="pwa_details">"Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы."</string>
-  <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
+  <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы.</string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
-  <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Приложение</string>
-  <string name="alternative_launch_method">Alternative Launch Method</string>
-  <string name="compare_with_current">Compare with current package</string>
   <string name="rx_detail">RxJava — это реализация Reactive Extensions на виртуальной машине Java: библиотека для составления асинхронных и событийных программ с использованием наблюдаемых последовательностей.</string>
   <string name="rx_android_detail">Reactive Extensions для Android</string>
   <string name="rx_kotlin_detail">Расширения Kotlin для RxJava</string>
-  <string name="permission_not_granted">Not Granted</string>
-
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
-  <string name="toast_not_existing_market">"Нет магазина приложений"</string>
+  <string name="toast_not_existing_market">Нет магазина приложений</string>
   <string name="toast_use_another_file_manager">Пожалуйста, используйте другой файловый менеджер, чтобы открыть APK</string>
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
-  <string name="toast_not_enough_storage_space">Not enough storage space</string>
-
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
@@ -143,7 +116,6 @@
   <string name="snapshot_time_node_uninitialized">(Неинициализировано)</string>
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
-
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Вы уверены, что хотите перезагрузить все приложения?</string>
   <string name="dialog_subtitle_reload_apps">Это может занять несколько секунд</string>
@@ -153,14 +125,11 @@
   <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
   <string name="btn_keep">Оставить</string>
   <string name="btn_drop">Удалить</string>
-
   <!--  Album  -->
   <string name="album_compare">Сравнить</string>
   <string name="album_item_comparison_title">Сравнение</string>
   <string name="album_item_comparison_subtitle">Сравнение двух снимков</string>
   <string name="album_item_comparison_invalid_compare">Недопустимое сравнение</string>
-  <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
-  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Управление всеми снимками</string>
   <string name="album_item_backup_restore_title">Бекап и восстановление</string>
@@ -173,33 +142,16 @@
   <string name="album_restore_summary">Восстановление снимков из бекапа</string>
   <string name="album_click_to_choose">Нажмите, чтобы выбрать</string>
   <string name="album_dialog_delete_snapshot_message">Обработка…</string>
-
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">Заблокировать с помощью \"MonkeyKing Purify\"</string>
   <string name="integration_monkey_king_menu_unblock">Разблокировать с помощью \"MonkeyKing Purify\"</string>
   <string name="integration_blocker_menu_block">Заблокировать через \"Blocker\"</string>
   <string name="integration_blocker_menu_unblock">Разблокировать через \"Blocker\"</string>
   <string name="integration_anywhere_menu_editor">Открыть в \"Anywhere- Editor\"</string>
-
   <!--  Cloud rules  -->
   <string name="rules_local_repo_version">Версия локального репозитория</string>
   <string name="rules_remote_repo_version">Версия удаленного репозитория</string>
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">Обновить</string>
-  <string name="languages">Язык</string>
-
   <!-- Advanced menu -->
-  <string name="adv_show_system_apps">Show System Apps</string>
-  <string name="adv_show_overlays">Show Overlays</string>
-  <string name="adv_show_64_bit">Show 64-bit Apps</string>
-  <string name="adv_show_32_bit">Show 32-bit Apps</string>
-  <string name="adv_sort_mode">Sort Mode</string>
-  <string name="adv_sort_by_time">Updated Time</string>
-  <string name="adv_sort_by_target_version">Target Version</string>
-  <string name="adv_sort_by_name">Name</string>
-  <string name="adv_show_android_version">Show Android Version</string>
-  <string name="adv_show_target_version">Show Target Version</string>
-  <string name="adv_show_min_version">Show Min Version</string>
-  <string name="adv_tint_abi_label">Tint ABI Label</string>
-
 </resources>
