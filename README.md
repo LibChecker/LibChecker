@@ -3,7 +3,7 @@
 [![Android CI](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml/badge.svg)](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml)
 [![License](https://img.shields.io/github/license/zhaobozhen/LibChecker?label=License)](https://choosealicense.com/licenses/apache-2.0/)
 [![Discussion](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/libcheckerr)
-[![Crowdin](https://img.shields.io/badge/Localization-Crowdin-blueviolet?logo=Crowdin)](https://crowdin.com/project/libchecker)
+[![Crowdin](https://badges.crowdin.net/libchecker/localized.svg)](https://crowdin.com/project/libchecker)
 
 ![Header](./source/header.png)
 

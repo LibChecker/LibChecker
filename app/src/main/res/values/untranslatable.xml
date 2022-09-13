@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="app_name">LibChecker</string>
   <string name="app_bundle" translatable="false">App Bundles</string>
   <string name="kotlin_string" translatable="false">Kotlin</string>
   <string name="agp" translatable="false">Android Gradle Plugin</string>

@@ -1,6 +1,5 @@
 <resources>
   <!--  General  -->
-  <string name="app_name">LibChecker</string>
   <string name="title_app_list">應用程式</string>
   <string name="title_statistics">統計資料</string>
   <string name="title_snapshot">快照</string>
