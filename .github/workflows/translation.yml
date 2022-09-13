@@ -36,7 +36,7 @@ jobs:
           pull_request_labels: 'enhancement, documentation'
 
           # Global settings
-          config: '.github/crowdin.yml'
+          config: 'crowdin.yml'
           crowdin_branch_name: master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
