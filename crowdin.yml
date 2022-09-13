@@ -4,8 +4,3 @@ api_token_env: CROWDIN_API_TOKEN
 files:
   - source: /app/src/main/res/values/strings.xml
     translation: /app/src/main/res/values-%android_code%/%original_file_name%
-    translation_replace: {
-      "values-zh-rCN/strings.xml": "values-zh/strings.xml",
-      "values-ru-rRU/strings.xml": "values-ru/strings.xml",
-      "values-ja-rJP/strings.xml": "values-ja/strings.xml"
-    }
