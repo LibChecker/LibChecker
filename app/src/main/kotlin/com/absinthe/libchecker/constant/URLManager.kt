@@ -14,6 +14,7 @@ object URLManager {
   const val GITHUB_REPO_PAGE = "https://github.com/zhaobozhen/LibChecker"
 
   const val DOCS_PAGE = "https://absinthe.life/LibChecker-Docs"
+  const val CROWDIN_PAGE = "https://crowdin.com/project/libchecker"
 
   const val TELEGRAM_GROUP = "https://t.me/libcheckerr"
 }

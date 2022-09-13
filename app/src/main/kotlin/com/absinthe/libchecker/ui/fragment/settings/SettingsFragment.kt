@@ -195,6 +195,26 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
+    findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
+      setOnPreferenceClickListener {
+        runCatching {
+          CustomTabsIntent.Builder().build().apply {
+            launchUrl(requireActivity(), URLManager.CROWDIN_PAGE.toUri())
+          }
+        }.onFailure {
+          Timber.e(it)
+          runCatching {
+            val intent = Intent(Intent.ACTION_VIEW)
+              .setData(URLManager.CROWDIN_PAGE.toUri())
+            requireActivity().startActivity(intent)
+          }.onFailure { inner ->
+            Timber.e(inner)
+            Toasty.showShort(requireActivity(), "No browser application")
+          }
+        }
+        true
+      }
+    }
     findPreference<Preference>(Constants.PREF_HELP)?.apply {
       setOnPreferenceClickListener {
         runCatching {

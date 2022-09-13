@@ -80,6 +80,14 @@
     </Preference>
 
     <Preference
+      app:icon="@drawable/ic_translate_settings"
+      app:key="translation"
+      app:summary="@string/settings_translate_summary"
+      app:title="@string/settings_translate">
+
+    </Preference>
+
+    <Preference
       app:icon="@drawable/ic_help"
       app:key="help"
       app:summary="@string/help_docs_summary"
