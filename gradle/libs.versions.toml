@@ -7,7 +7,7 @@ grpc = "1.49.0"
 hiddenApiRefine = "3.1.1"
 kotlin = "1.7.10"
 protoc = "3.21.5"
-protoc-javalite = "3.21.5"
+protoc-javalite = "3.21.6"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.2"
 
