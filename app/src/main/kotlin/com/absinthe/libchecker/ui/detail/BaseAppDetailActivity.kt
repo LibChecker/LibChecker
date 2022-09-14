@@ -600,6 +600,8 @@ abstract class BaseAppDetailActivity :
             initProcessBarView()
           }
           processBarView?.isVisible = true
+        } else {
+          processBarView?.isGone = true
         }
       } else {
         if (toolbarAdapter.data.contains(toolbarProcessItem)) {
@@ -915,10 +917,11 @@ abstract class BaseAppDetailActivity :
     AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
       detailFragmentManager.deliverSwitchProcessMode()
       viewModel.processMode = !viewModel.processMode
-      GlobalValues.processMode = viewModel.processMode
 
-      if (processBarView == null) {
-        initProcessBarView()
+      if (viewModel.processMode) {
+        if (processBarView == null) {
+          initProcessBarView()
+        }
         processBarView!!.setData(
           viewModel.processesMap.map { mapItem ->
             ProcessBarAdapter.ProcessBarItem(
@@ -927,6 +930,7 @@ abstract class BaseAppDetailActivity :
             )
           }
         )
+        processBarView?.isVisible = true
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
@@ -936,6 +940,7 @@ abstract class BaseAppDetailActivity :
           detailFragmentManager.deliverFilterItems(null)
         }
       }
+      GlobalValues.processMode = viewModel.processMode
     }
   }
 
@@ -1050,5 +1055,10 @@ abstract class BaseAppDetailActivity :
       }
     }
     binding.detailToolbarContainer.addView(processBarView)
+    if (viewModel.processToolIconVisibilityLiveData.value == false && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+      processBarView?.isGone = true
+    } else {
+      processBarView?.isVisible = true
+    }
   }
 }

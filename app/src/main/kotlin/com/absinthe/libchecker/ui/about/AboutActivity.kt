@@ -235,7 +235,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
       add(Card(getStringByConfiguration(R.string.library_declaration)))
 
       add(Category("Privacy Policy"))
-      add(Card("https://absinthe.life/LibChecker-Docs/guide/PRIVACY"))
+      add(Card("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
 
       add(Category("Open Source Licenses"))
       add(
