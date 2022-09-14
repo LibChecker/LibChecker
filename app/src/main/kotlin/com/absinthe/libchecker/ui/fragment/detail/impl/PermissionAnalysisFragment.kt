@@ -45,10 +45,6 @@ class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
         viewModel.itemsCountList[type] = it.size
         isListReady = true
       }
-
-      if (isFragmentVisible() && hasNonGrantedPermissions()) {
-        viewModel.processToolIconVisibilityLiveData.value = true
-      }
     }
 
     adapter.apply {
@@ -77,7 +73,6 @@ class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
       viewModel.processMapLiveData.postValue(
         mapOf(label to color)
       )
-      viewModel.processToolIconVisibilityLiveData.postValue(true)
     } else {
       viewModel.processMapLiveData.postValue(viewModel.processesMap)
     }

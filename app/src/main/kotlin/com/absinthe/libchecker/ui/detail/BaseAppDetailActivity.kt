@@ -539,7 +539,7 @@ abstract class BaseAppDetailActivity :
             binding.tsComponentCount.setText(count.toString())
             detailFragmentManager.currentItemsCount = count
           }
-          detailFragmentManager.selectedPosition = tab.position
+          detailFragmentManager.selectedPosition = typeList[tab.position]
 
           if ((easterEggCount % 2) == 0) {
             if (tab.position == easterEggTabA || easterEggTabA == -1) {
@@ -605,10 +605,15 @@ abstract class BaseAppDetailActivity :
         if (toolbarAdapter.data.contains(toolbarProcessItem)) {
           toolbarAdapter.remove(toolbarProcessItem)
         }
-        processBarView?.isGone = true
+        if (detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+          processBarView?.isGone = true
+        }
       }
     }
     viewModel.processMapLiveData.observe(this) {
+      if (processBarView == null) {
+        initProcessBarView()
+      }
       processBarView?.setData(
         it.map { mapItem ->
           ProcessBarAdapter.ProcessBarItem(
