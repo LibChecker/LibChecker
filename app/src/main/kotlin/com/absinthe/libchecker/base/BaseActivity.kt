@@ -8,8 +8,8 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.OsUtils
-import rikka.material.app.MaterialActivity
 import java.lang.reflect.ParameterizedType
+import rikka.material.app.MaterialActivity
 
 abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB> {
 

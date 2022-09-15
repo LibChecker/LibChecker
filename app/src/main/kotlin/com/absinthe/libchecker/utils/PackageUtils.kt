@@ -61,6 +61,11 @@ import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
+import java.io.File
+import java.io.InputStream
+import java.util.Properties
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -68,11 +73,6 @@ import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
-import java.io.File
-import java.io.InputStream
-import java.util.Properties
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 
 object PackageUtils {
 
