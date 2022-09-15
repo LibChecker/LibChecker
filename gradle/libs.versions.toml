@@ -1,5 +1,5 @@
 [versions]
-agp = "7.3.0-rc01"
+agp = "7.3.0"
 androidX-lifecycle = "2.5.1"
 androidX-room = "2.5.0-alpha03"
 appCenter = "4.4.5"
@@ -7,7 +7,7 @@ grpc = "1.49.0"
 hiddenApiRefine = "3.1.1"
 kotlin = "1.7.10"
 protoc = "3.21.5"
-protoc-javalite = "3.21.5"
+protoc-javalite = "3.21.6"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.1"
 
@@ -96,7 +96,7 @@ zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref
 zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "zhaobozhen" }
 zhaobozhen-utils = { module = "com.github.zhaobozhen.libraries:utils", version.ref = "zhaobozhen" }
 lc-rules = "com.github.zhaobozhen:LibChecker-Rules-Bundle:27"
-slf4j = "org.slf4j:slf4j-simple:2.0.0"
+slf4j = "org.slf4j:slf4j-simple:2.0.1"
 commons-io = "commons-io:commons-io:2.11.0"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 
