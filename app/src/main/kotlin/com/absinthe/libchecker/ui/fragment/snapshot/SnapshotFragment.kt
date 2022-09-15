@@ -64,6 +64,8 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.util.LinkedList
+import java.util.Queue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -73,8 +75,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
-import java.util.LinkedList
-import java.util.Queue
 
 const val VF_LOADING = 0
 const val VF_LIST = 1

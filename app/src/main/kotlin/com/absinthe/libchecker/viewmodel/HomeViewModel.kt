@@ -441,8 +441,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       var progressCount = 0
 
       fun updateLibRefProgressImpl() {
-        if (appMap.isNotEmpty()) {
-          updateLibRefProgress(progressCount * 100 / appMap.size)
+        val size = appMap.size
+        if (size > 0) {
+          updateLibRefProgress(progressCount * 100 / size)
         }
       }
 
@@ -636,7 +637,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               refList.add(
                 LibReference(
                   entry.key,
-                  chip,
+                  null,
                   entry.value.first,
                   entry.value.second
                 )

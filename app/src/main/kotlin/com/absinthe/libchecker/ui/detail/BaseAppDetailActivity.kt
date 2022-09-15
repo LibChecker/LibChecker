@@ -97,6 +97,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.io.File
+import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -104,8 +106,6 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
-import java.io.File
-import kotlin.math.abs
 
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),
@@ -539,7 +539,7 @@ abstract class BaseAppDetailActivity :
             binding.tsComponentCount.setText(count.toString())
             detailFragmentManager.currentItemsCount = count
           }
-          detailFragmentManager.selectedPosition = tab.position
+          detailFragmentManager.selectedPosition = typeList[tab.position]
 
           if ((easterEggCount % 2) == 0) {
             if (tab.position == easterEggTabA || easterEggTabA == -1) {
@@ -590,21 +590,32 @@ abstract class BaseAppDetailActivity :
     }
     viewModel.processToolIconVisibilityLiveData.observe(this) { visible ->
       if (visible) {
-        if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-          toolbarAdapter.addData(toolbarProcessItem)
+        if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
+          if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+            toolbarAdapter.addData(toolbarProcessItem)
+          }
         }
-        if (processBarView == null) {
-          initProcessBarView()
+        if (GlobalValues.processMode || detailFragmentManager.currentFragment is PermissionAnalysisFragment) {
+          if (processBarView == null) {
+            initProcessBarView()
+          }
+          processBarView?.isVisible = true
+        } else {
+          processBarView?.isGone = true
         }
-        processBarView?.isVisible = true
       } else {
         if (toolbarAdapter.data.contains(toolbarProcessItem)) {
           toolbarAdapter.remove(toolbarProcessItem)
         }
-        processBarView?.isGone = true
+        if (detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+          processBarView?.isGone = true
+        }
       }
     }
     viewModel.processMapLiveData.observe(this) {
+      if (processBarView == null) {
+        initProcessBarView()
+      }
       processBarView?.setData(
         it.map { mapItem ->
           ProcessBarAdapter.ProcessBarItem(
@@ -666,7 +677,7 @@ abstract class BaseAppDetailActivity :
 
   override fun onQueryTextChange(newText: String): Boolean {
     viewModel.queriedText = newText
-    detailFragmentManager.deliverFilterItems(newText)
+    detailFragmentManager.deliverFilterItemsByText(newText)
     return false
   }
 
@@ -906,10 +917,11 @@ abstract class BaseAppDetailActivity :
     AppDetailToolbarItem(R.drawable.ic_processes, R.string.menu_process) {
       detailFragmentManager.deliverSwitchProcessMode()
       viewModel.processMode = !viewModel.processMode
-      GlobalValues.processMode = viewModel.processMode
 
-      if (processBarView == null) {
-        initProcessBarView()
+      if (viewModel.processMode) {
+        if (processBarView == null) {
+          initProcessBarView()
+        }
         processBarView!!.setData(
           viewModel.processesMap.map { mapItem ->
             ProcessBarAdapter.ProcessBarItem(
@@ -918,15 +930,17 @@ abstract class BaseAppDetailActivity :
             )
           }
         )
+        processBarView?.isVisible = true
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
 
         doOnMainThreadIdle {
           viewModel.queriedProcess = null
-          detailFragmentManager.deliverFilterProcesses(null)
+          detailFragmentManager.deliverFilterItems(null)
         }
       }
+      GlobalValues.processMode = viewModel.processMode
     }
   }
 
@@ -1037,9 +1051,14 @@ abstract class BaseAppDetailActivity :
         } else {
           viewModel.queriedProcess = null
         }
-        detailFragmentManager.deliverFilterProcesses(viewModel.queriedProcess)
+        detailFragmentManager.deliverFilterItems(viewModel.queriedProcess)
       }
     }
     binding.detailToolbarContainer.addView(processBarView)
+    if (viewModel.processToolIconVisibilityLiveData.value == false && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+      processBarView?.isGone = true
+    } else {
+      processBarView?.isVisible = true
+    }
   }
 }

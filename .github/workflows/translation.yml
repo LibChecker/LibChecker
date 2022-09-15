@@ -1,0 +1,44 @@
+name: Crowdin Action
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - app/src/main/res/values/strings.xml
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  synchronize-with-crowdin:
+    runs-on: ubuntu-latest
+    if: github.repository == 'zhaobozhen/LibChecker'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: crowdin action
+        uses: crowdin/github-action@master
+        with:
+          # Upload and download translation settings
+          upload_sources: true
+          upload_translations: true
+          download_translations: true
+          skip_untranslated_strings: true
+
+          # Pull request settings
+          create_pull_request: true
+          localization_branch_name: crowdin_branch
+          pull_request_labels: 'enhancement, documentation'
+
+          # Global settings
+          config: 'crowdin.yml'
+          crowdin_branch_name: master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_API_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

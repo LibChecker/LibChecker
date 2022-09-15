@@ -35,11 +35,11 @@ import com.drakeet.about.Contributor
 import com.drakeet.about.License
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.ref.WeakReference
 
 private const val RENGE_CHECKER = "RengeChecker"
 
@@ -233,6 +233,9 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
 
       add(Category("Declaration"))
       add(Card(getStringByConfiguration(R.string.library_declaration)))
+
+      add(Category("Privacy Policy"))
+      add(Card("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
 
       add(Category("Open Source Licenses"))
       add(

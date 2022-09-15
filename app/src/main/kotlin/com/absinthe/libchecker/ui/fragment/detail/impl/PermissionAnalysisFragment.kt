@@ -7,14 +7,14 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.BaseFilterAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
 import rikka.core.util.ClipboardUtils
 
-class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
@@ -45,10 +45,6 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
         viewModel.itemsCountList[type] = it.size
         isListReady = true
       }
-
-      if (isFragmentVisible() && hasNonGrantedPermissions()) {
-        viewModel.processToolIconVisibilityLiveData.value = true
-      }
     }
 
     adapter.apply {
@@ -77,14 +73,21 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       viewModel.processMapLiveData.postValue(
         mapOf(label to color)
       )
-      viewModel.processToolIconVisibilityLiveData.postValue(true)
     } else {
       viewModel.processMapLiveData.postValue(viewModel.processesMap)
     }
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return viewModel.permissionsItems.value?.filter { it.item.name.contains(text, true) }
+  }
+
+  override fun getFilterList(process: String?): List<LibStringItemChip>? {
+    return if (process.isNullOrEmpty()) {
+      viewModel.permissionsItems.value
+    } else {
+      viewModel.permissionsItems.value?.filter { it.item.size == 0L }
+    }
   }
 
   companion object {

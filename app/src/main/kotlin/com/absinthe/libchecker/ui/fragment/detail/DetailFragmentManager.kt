@@ -5,8 +5,8 @@ import androidx.core.util.forEach
 import androidx.core.util.valueIterator
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.ui.fragment.BaseComponentFragment
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.BaseFilterAnalysisFragment
 
 const val MODE_SORT_BY_SIZE = 0
 const val MODE_SORT_BY_LIB = 1
@@ -42,7 +42,7 @@ class DetailFragmentManager {
     }
   }
 
-  fun deliverFilterItems(text: String) {
+  fun deliverFilterItemsByText(text: String) {
     map.forEach { _, value ->
       value.filterList(text)
     }
@@ -54,9 +54,9 @@ class DetailFragmentManager {
     }
   }
 
-  fun deliverFilterProcesses(process: String?) {
+  fun deliverFilterItems(condition: String?) {
     map.forEach { _, value ->
-      (value as? BaseComponentFragment)?.filterProcesses(process)
+      (value as? BaseFilterAnalysisFragment)?.filterItems(condition)
     }
   }
 

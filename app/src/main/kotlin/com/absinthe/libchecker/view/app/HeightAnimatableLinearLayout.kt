@@ -69,8 +69,11 @@ class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
   }
 
   private fun enqueueAnimation(action: () -> Unit) {
-    if (!animator.isRunning) action()
-    else animator.doOnEnd { action() }
+    if (!animator.isRunning) {
+      action()
+    } else {
+      animator.doOnEnd { action() }
+    }
   }
 
   private fun setClippedHeight(newHeight: Int) {

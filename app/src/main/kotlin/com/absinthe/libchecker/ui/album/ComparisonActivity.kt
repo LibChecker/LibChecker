@@ -49,6 +49,7 @@ import com.absinthe.libchecker.view.snapshot.ComparisonDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,7 +58,6 @@ import okio.sink
 import okio.source
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
-import java.io.File
 
 const val VF_LOADING = 0
 const val VF_LIST = 1

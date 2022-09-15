@@ -35,13 +35,13 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 
@@ -349,13 +349,14 @@ class ShootService : LifecycleService() {
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
       .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-      .setColor(R.color.colorPrimary.getColor(this))
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .setContentIntent(pi)
       .setProgress(0, 0, true)
       .setSilent(true)
       .setOngoing(true)
-      .setAutoCancel(false)
+      .setAutoCancel(false).apply {
+        if (!OsUtils.atLeastS()) color = R.color.colorPrimary.getColor(this@ShootService)
+      }
   }
 
   companion object {

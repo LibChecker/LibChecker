@@ -15,11 +15,11 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getFeatures
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.ref.WeakReference
 
 class WorkerService : LifecycleService() {
 

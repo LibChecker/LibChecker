@@ -19,7 +19,9 @@ class ApplicationDelegate(context: Context) {
     get() {
       return if (ohosContext != null) {
         ohosContext!!.bundleManager
-      } else null
+      } else {
+        null
+      }
     }
   private val ohosContext: ohos.app.Context?
     get() {

@@ -13,8 +13,9 @@
   <string-array name="language" translatable="false">
     <item>@string/follow_system</item>
     <item>en</item>
-    <item>zh-Hans</item>
-    <item>zh-Hant</item>
+    <item>zh-CN</item>
+    <item>zh-TW</item>
+    <item>zh-HK</item>
     <item>ru</item>
     <item>uk</item>
   </string-array>
@@ -24,8 +25,9 @@
     <item>en-US</item>
     <item>zh-CN</item>
     <item>zh-TW</item>
+    <item>zh-HK</item>
     <item>ru-RU</item>
-    <item>uk-UA</item>
+    <item>ru-UA</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">

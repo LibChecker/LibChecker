@@ -12,6 +12,7 @@ import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -45,11 +46,11 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.io.File
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
@@ -92,6 +93,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       appViewModel.workerBinder = null
     }
   }
+  private var _menuProvider: MenuProvider? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -140,6 +142,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     binding.progressHorizontal.hide()
   }
 
+  override var currentMenuProvider: MenuProvider?
+    get() = _menuProvider
+    set(value) {
+      _menuProvider = value
+    }
+
   override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted
   }
@@ -181,6 +189,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         // 禁止左右滑动
         isUserInputEnabled = false
         offscreenPageLimit = 2
+        fixViewPager2Insets(this)
       }
 
       navView.apply {
@@ -236,6 +245,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       val navigationBarsInsets =
         ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.navigationBars())
       view.updatePadding(bottom = navigationBarsInsets.bottom)
+      windowInsets
+    }
+  }
+
+  private fun fixViewPager2Insets(view: ViewPager2) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      /* Do nothing */
       windowInsets
     }
   }

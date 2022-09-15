@@ -167,6 +167,7 @@ dependencies {
   implementation(libs.cascade)
   implementation(libs.fastScroll)
   implementation(libs.appIconLoader)
+  implementation(libs.appIconLoader.coil)
   implementation(libs.hiddenApiBypass)
   implementation(libs.dexLib2)
   implementation(libs.slf4j)

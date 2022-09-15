@@ -1,6 +1,5 @@
 <resources>
   <!--  General  -->
-  <string name="app_name">LibChecker</string>
   <string name="title_app_list">Apps</string>
   <string name="title_statistics">Statistics</string>
   <string name="title_snapshot">Snapshot</string>
@@ -53,6 +52,8 @@
 
   <!--  About  -->
   <string name="settings_about">About</string>
+  <string name="settings_translate">Participate in translation</string>
+  <string name="settings_translate_summary">Help us translate this app</string>
   <string name="settings_rate_us">Rate us</string>
   <string name="settings_rate_us_summary">This can make us found by more people</string>
   <string name="settings_about_summary">This is LibChecker!</string>
@@ -109,7 +110,7 @@
   <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes.</string>
   <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
-  <string name="pwa_details">"Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. "</string>
+  <string name="pwa_details">Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase.</string>
   <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="extract_native_libs_tip">The app declares </string>
   <string name="xml_detail">XML Detail</string>

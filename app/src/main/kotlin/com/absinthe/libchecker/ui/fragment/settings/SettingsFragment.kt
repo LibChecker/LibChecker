@@ -39,6 +39,7 @@ import com.absinthe.rulesbundle.LCRemoteRepo
 import com.absinthe.rulesbundle.LCRules
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.util.Locale
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import rikka.preference.SimpleMenuPreference
@@ -47,7 +48,6 @@ import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import rikka.widget.borderview.BorderViewDelegate
 import timber.log.Timber
-import java.util.Locale
 
 class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
@@ -144,7 +144,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          CloudRulesDialogFragment().show(childFragmentManager, CloudRulesDialogFragment::class.java.name)
+          CloudRulesDialogFragment().show(
+            childFragmentManager,
+            CloudRulesDialogFragment::class.java.name
+          )
           true
         }
       }
@@ -154,7 +157,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         if (AntiShakeUtils.isInvalidClick(prefRecyclerView)) {
           false
         } else {
-          LibThresholdDialogFragment().show(requireActivity().supportFragmentManager, LibThresholdDialogFragment::class.java.name)
+          LibThresholdDialogFragment().show(
+            requireActivity().supportFragmentManager,
+            LibThresholdDialogFragment::class.java.name
+          )
           true
         }
       }
@@ -186,6 +192,26 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       summary = "${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
       setOnPreferenceClickListener {
         startActivity(Intent(requireContext(), AboutActivity::class.java))
+        true
+      }
+    }
+    findPreference<Preference>(Constants.PREF_TRANSLATION)?.apply {
+      setOnPreferenceClickListener {
+        runCatching {
+          CustomTabsIntent.Builder().build().apply {
+            launchUrl(requireActivity(), URLManager.CROWDIN_PAGE.toUri())
+          }
+        }.onFailure {
+          Timber.e(it)
+          runCatching {
+            val intent = Intent(Intent.ACTION_VIEW)
+              .setData(URLManager.CROWDIN_PAGE.toUri())
+            requireActivity().startActivity(intent)
+          }.onFailure { inner ->
+            Timber.e(inner)
+            Toasty.showShort(requireActivity(), "No browser application")
+          }
+        }
         true
       }
     }
@@ -259,14 +285,18 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     for (i in 1 until languagePreference.entries.size) {
       val locale = Locale.forLanguageTag(languagePreference.entries[i].toString())
       localeName.add(
-        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(locale) else locale.getDisplayName(
-          locale
-        )
+        if (!TextUtils.isEmpty(locale.script)) {
+          locale.getDisplayScript(locale)
+        } else {
+          locale.getDisplayName(locale)
+        }
       )
       localeNameUser.add(
-        if (!TextUtils.isEmpty(locale.script)) locale.getDisplayScript(
-          userLocale
-        ) else locale.getDisplayName(userLocale)
+        if (!TextUtils.isEmpty(locale.script)) {
+          locale.getDisplayScript(userLocale)
+        } else {
+          locale.getDisplayName(userLocale)
+        }
       )
     }
 
@@ -295,12 +325,16 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
 
   override fun onResume() {
     super.onResume()
+    val container = (activity as? IAppBarContainer) ?: return
     if (this != viewModel.controller) {
       viewModel.controller = this
-      activity?.invalidateOptionsMenu()
+      container.currentMenuProvider?.let { current ->
+        activity?.removeMenuProvider(current)
+      }
+      container.currentMenuProvider = null
     }
     scheduleAppbarRaisingStatus(!getBorderViewDelegate().isShowingTopBorder)
-    (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(prefRecyclerView)
+    container.setLiftOnScrollTargetView(prefRecyclerView)
   }
 
   override fun onCreateRecyclerView(

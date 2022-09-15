@@ -61,6 +61,11 @@ import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
+import java.io.File
+import java.io.InputStream
+import java.util.Properties
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -68,11 +73,6 @@ import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
-import java.io.File
-import java.io.InputStream
-import java.util.Properties
-import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 
 object PackageUtils {
 
@@ -178,7 +178,6 @@ object PackageUtils {
     }.getOrDefault("?")
   }
 
-  private const val minSdkVersion = "minSdkVersion"
   private const val compileSdkVersion = "compileSdkVersion"
 
   /**
@@ -251,7 +250,7 @@ object PackageUtils {
       if (specifiedAbi != null) {
         abi = specifiedAbi
       } else {
-        abi = getAbi(packageInfo)
+        abi = runCatching { getAbi(packageInfo) }.getOrNull() ?: return emptyList()
         if (abi == NO_LIBS) {
           abi = if (Process.is64Bit()) {
             ARMV8
@@ -453,11 +452,13 @@ object PackageUtils {
     packageInfo.applicationInfo.metaData?.let {
       return it.keySet().asSequence()
         .map { key ->
-          var value = it.getString(key).orEmpty()
+          @Suppress("DEPRECATION")
+          var value = it.get(key).toString()
           var id = 0L
 
           if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {
             id = value.toLong()
+            @Suppress("KotlinConstantConditions")
             if ((id and 0xFF000000) == 0x7F000000.toLong() && (id and 0x00FF0000) >= 0x00010000 && (id and 0x0000FFFF) >= 0x00000000) {
               // This may be an android resource id
               Timber.d("Found android resource id: $key")
@@ -1315,6 +1316,7 @@ object PackageUtils {
     return try {
       Refine.unsafeCast<PackageInfoHidden>(this).isOverlayPackage
     } catch (t: Throwable) {
+      if (applicationInfo.sourceDir == null) return false
       val demands =
         ManifestReader.getManifestProperties(File(applicationInfo.sourceDir), arrayOf("overlay"))
       return demands["overlay"] as? Boolean ?: false

@@ -134,7 +134,9 @@
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # ViewBinding
--keep public class * extends androidx.viewbinding.ViewBinding {*;}
+-keep,allowoptimization public class * extends androidx.viewbinding.ViewBinding {
+  public static * inflate(android.view.LayoutInflater);
+}
 
 # BottomSheetBehavior
 -keepclassmembers public class com.google.android.material.bottomsheet.BottomSheetBehavior {
