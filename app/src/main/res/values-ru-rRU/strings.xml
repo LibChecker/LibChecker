@@ -34,6 +34,7 @@
   <string name="ref_category_br">Широковещательные приемники</string>
   <string name="ref_category_cp">Поставщики контента</string>
   <string name="ref_category_perm">Разрешения</string>
+  <string name="ref_category_signatures">подпись</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <!--  About  -->

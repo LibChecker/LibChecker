@@ -8,6 +8,7 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
@@ -67,12 +68,17 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
+import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 import java.io.File
 import java.io.InputStream
+import java.security.interfaces.DSAPublicKey
+import java.security.interfaces.RSAPublicKey
+import java.text.DateFormat
 import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import javax.security.cert.X509Certificate
 
 object PackageUtils {
 
@@ -1584,6 +1590,67 @@ object PackageUtils {
         return@withContext RX_MAJOR_ONE
       }
       return@withContext null
+    }
+  }
+
+  /**
+   * Get signatures of an app
+   * @param packageInfo PackageInfo
+   * @return List of LibStringItem
+   */
+  fun getSignatures(context: Context, packageInfo: PackageInfo): List<LibStringItem> {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      if (packageInfo.signingInfo.hasMultipleSigners()) {
+        packageInfo.signingInfo.apkContentsSigners
+      } else {
+        packageInfo.signingInfo.signingCertificateHistory
+      }
+    } else {
+      packageInfo.signatures
+    }.mapIndexed { index, signature ->
+      val bytes = signature.toByteArray()
+      val certificate = X509Certificate.getInstance(bytes)
+      val lc = context.createConfigurationContext(
+        Configuration(context.resources.configuration).apply {
+          setLocale(LocaleDelegate.defaultLocale)
+        }
+      )
+      val rsaSource: RSAPublicKey.() -> String = {
+        """${lc.getString(R.string.signature_public_key_exponent)}:${publicExponent}(0x${publicExponent.toString(16)})
+        ${lc.getString(R.string.signature_public_key_modulus_size)}:${modulus.toString(2).length}
+        ${lc.getString(R.string.signature_public_key_modulus)}:${modulus.toByteArray().toHexString(":")}"""
+      }
+      val dsaSource: DSAPublicKey.() -> String = {
+        "${lc.getString(R.string.signature_public_key_y)}:${y}"
+      }
+      val dateFormat = DateFormat.getDateTimeInstance(
+        DateFormat.LONG,
+        DateFormat.LONG,
+        LocaleDelegate.defaultLocale
+      )
+      val source = """
+        ${lc.getString(R.string.signature_version)}:v${certificate.version + 1}
+        ${lc.getString(R.string.signature_serial_number)}:${certificate.serialNumber}(0x${certificate.serialNumber.toString(16)})
+        ${lc.getString(R.string.signature_issuer)}:${certificate.issuerDN}
+        ${lc.getString(R.string.signature_subject)}:${certificate.subjectDN}
+        ${lc.getString(R.string.signature_validity_not_before)}:${dateFormat.format(certificate.notBefore)}
+        ${lc.getString(R.string.signature_validity_not_after)}:${dateFormat.format(certificate.notAfter)}
+        ${lc.getString(R.string.signature_public_key_format)}:${certificate.publicKey.format}
+        ${lc.getString(R.string.signature_public_key_algorithm)}:${certificate.publicKey.algorithm}
+        ${
+        when (certificate.publicKey) {
+          is RSAPublicKey -> rsaSource(certificate.publicKey as RSAPublicKey)
+          is DSAPublicKey -> dsaSource(certificate.publicKey as DSAPublicKey)
+          else -> "${lc.getString(R.string.signature_public_key_type)}:${certificate.publicKey.javaClass.simpleName}"
+        }}
+        ${lc.getString(R.string.signature_algorithm_name)}:${certificate.sigAlgName}
+        ${lc.getString(R.string.signature_algorithm_oid)}:${certificate.sigAlgOID}
+        ${lc.getString(R.string.signature_md5)}:${MessageDigestUtils.md5(bytes, ":")}
+        ${lc.getString(R.string.signature_sha1)}:${MessageDigestUtils.sha1(bytes, ":")}
+        ${lc.getString(R.string.signature_sha256)}:${MessageDigestUtils.sha256(bytes, ":")}
+        ${lc.getString(R.string.signature_char_string)}:${signature.toCharsString()}
+      """.trimIndent()
+      LibStringItem("0x${certificate.serialNumber.toString(16)}", 0, source, null)
     }
   }
 }

@@ -43,6 +43,7 @@
   <string name="ref_category_metadata">中繼資料</string>
   <string name="ref_category_package">套件</string>
   <string name="ref_category_shared_uid">共用的 UID</string>
+  <string name="ref_category_signatures">簽名</string>
   <string name="string_kotlin_used">已使用 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <!--  About  -->
@@ -111,6 +112,20 @@
   <string name="rx_android_detail">適用於 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 擴展</string>
   <string name="permission_not_granted">未授權</string>
+  <string name="signature_detail">簽名詳情</string>
+  <string name="signature_version">版本</string>
+  <string name="signature_serial_number">序列號</string>
+  <string name="signature_issuer">發行人</string>
+  <string name="signature_subject">主題</string>
+  <string name="signature_validity_not_before">有效期始</string>
+  <string name="signature_validity_not_after">有效期至</string>
+  <string name="signature_public_key_format">公鑰格式</string>
+  <string name="signature_public_key_algorithm">公鑰算法</string>
+  <string name="signature_public_key_exponent">公鑰指數</string>
+  <string name="signature_public_key_modulus_size">模數大小</string>
+  <string name="signature_public_key_modulus">模數</string>
+  <string name="signature_public_key_y">公鑰值Y</string>
+  <string name="signature_public_key_type">公鑰類型</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
