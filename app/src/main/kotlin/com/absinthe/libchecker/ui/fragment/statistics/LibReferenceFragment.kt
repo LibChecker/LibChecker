@@ -58,6 +58,7 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -66,7 +67,6 @@ import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
-import java.lang.ref.WeakReference
 
 const val VF_LOADING = 0
 const val VF_LIST = 1

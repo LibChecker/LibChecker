@@ -9,11 +9,11 @@ import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.view.snapshot.TimeNodeItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import timber.log.Timber
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import timber.log.Timber
 
 class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
 

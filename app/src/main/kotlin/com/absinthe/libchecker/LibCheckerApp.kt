@@ -24,6 +24,7 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import java.util.UUID
 import jonathanfinerty.once.Once
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
@@ -31,7 +32,6 @@ import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import timber.log.Timber
-import java.util.UUID
 
 class LibCheckerApp : Application() {
 

@@ -99,6 +99,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.io.File
+import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -106,8 +108,6 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
 import rikka.core.util.ClipboardUtils
 import timber.log.Timber
-import java.io.File
-import kotlin.math.abs
 
 abstract class BaseAppDetailActivity :
   CheckPackageOnResumingActivity<ActivityAppDetailBinding>(),

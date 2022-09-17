@@ -10,10 +10,10 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.TintTypedArray
 import androidx.core.content.ContextCompat
 import java.io.Closeable
+import kotlin.comparisons.reversed as kotlinReversed
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.comparisons.reversed as kotlinReversed
 import kotlin.io.use as kotlinUse
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)

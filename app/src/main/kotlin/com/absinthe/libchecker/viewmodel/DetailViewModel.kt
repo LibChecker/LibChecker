@@ -38,6 +38,8 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -45,8 +47,6 @@ import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import retrofit2.HttpException
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 

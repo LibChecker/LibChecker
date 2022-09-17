@@ -16,8 +16,6 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.common.io.Files.copy
-import kotlinx.coroutines.runBlocking
-import org.apache.commons.io.comparator.LastModifiedFileComparator
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -29,6 +27,8 @@ import java.util.Arrays
 import java.util.Calendar
 import java.util.Locale
 import javax.crypto.BadPaddingException
+import kotlinx.coroutines.runBlocking
+import org.apache.commons.io.comparator.LastModifiedFileComparator
 
 /**
  *  MIT License

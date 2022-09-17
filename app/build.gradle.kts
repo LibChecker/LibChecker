@@ -33,9 +33,9 @@ ksp {
 }
 
 setupAppModule {
+  namespace = "com.absinthe.libchecker"
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
-    namespace = "com.absinthe.libchecker"
   }
 
   buildFeatures {

@@ -5,10 +5,10 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import java.util.concurrent.TimeUnit
 
 private const val BRANCH_MASTER = "master"
 private const val WORKING_BRANCH = BRANCH_MASTER

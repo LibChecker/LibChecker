@@ -62,14 +62,6 @@ import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import okio.buffer
-import okio.source
-import org.jf.dexlib2.Opcodes
-import rikka.material.app.LocaleDelegate
-import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.security.interfaces.DSAPublicKey
@@ -79,6 +71,14 @@ import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import okio.buffer
+import okio.source
+import org.jf.dexlib2.Opcodes
+import rikka.material.app.LocaleDelegate
+import timber.log.Timber
 
 object PackageUtils {
 
@@ -1616,9 +1616,15 @@ object PackageUtils {
         }
       )
       val rsaSource: RSAPublicKey.() -> String = {
-        """${lc.getString(R.string.signature_public_key_exponent)}:${publicExponent}(0x${publicExponent.toString(16)})
+        """${lc.getString(R.string.signature_public_key_exponent)}:${publicExponent}(0x${
+          publicExponent.toString(
+            16
+          )
+        })
         ${lc.getString(R.string.signature_public_key_modulus_size)}:${modulus.toString(2).length}
-        ${lc.getString(R.string.signature_public_key_modulus)}:${modulus.toByteArray().toHexString(":")}"""
+        ${lc.getString(R.string.signature_public_key_modulus)}:${
+          modulus.toByteArray().toHexString(":")
+        }"""
       }
       val dsaSource: DSAPublicKey.() -> String = {
         "${lc.getString(R.string.signature_public_key_y)}:${y}"
@@ -1630,7 +1636,11 @@ object PackageUtils {
       )
       val source = """
         ${lc.getString(R.string.signature_version)}:v${certificate.version + 1}
-        ${lc.getString(R.string.signature_serial_number)}:${certificate.serialNumber}(0x${certificate.serialNumber.toString(16)})
+        ${lc.getString(R.string.signature_serial_number)}:${certificate.serialNumber}(0x${
+        certificate.serialNumber.toString(
+          16
+        )
+      })
         ${lc.getString(R.string.signature_issuer)}:${certificate.issuerDN}
         ${lc.getString(R.string.signature_subject)}:${certificate.subjectDN}
         ${lc.getString(R.string.signature_validity_not_before)}:${dateFormat.format(certificate.notBefore)}
@@ -1642,7 +1652,8 @@ object PackageUtils {
           is RSAPublicKey -> rsaSource(certificate.publicKey as RSAPublicKey)
           is DSAPublicKey -> dsaSource(certificate.publicKey as DSAPublicKey)
           else -> "${lc.getString(R.string.signature_public_key_type)}:${certificate.publicKey.javaClass.simpleName}"
-        }}
+        }
+      }
         ${lc.getString(R.string.signature_algorithm_name)}:${certificate.sigAlgName}
         ${lc.getString(R.string.signature_algorithm_oid)}:${certificate.sigAlgOID}
         ${lc.getString(R.string.signature_md5)}:${MessageDigestUtils.md5(bytes, ":")}

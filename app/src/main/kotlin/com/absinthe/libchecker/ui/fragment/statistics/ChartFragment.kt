@@ -49,12 +49,12 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.button.MaterialButtonToggleGroup
+import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.TreeMap
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
