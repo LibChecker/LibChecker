@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.utils
 
+import com.absinthe.libchecker.utils.extensions.toHexString
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream

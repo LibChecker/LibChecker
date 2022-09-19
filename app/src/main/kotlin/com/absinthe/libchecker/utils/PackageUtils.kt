@@ -59,6 +59,7 @@ import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
 import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
 import com.absinthe.libchecker.utils.extensions.toClassDefType
+import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
