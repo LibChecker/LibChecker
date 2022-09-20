@@ -18,7 +18,7 @@ import rikka.core.util.ClipboardUtils
 const val EXTRA_SIGNATURE_NAME = "EXTRA_SIGNATURE_NAME"
 const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
 
-class SignatureDetailBottomSheetDetailFragment :
+class SignatureDetailBSDFragment :
   BaseBottomSheetViewDialogFragment<SignatureDetailBottomSheetView>() {
 
   private val detail by unsafeLazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
@@ -66,8 +66,8 @@ class SignatureDetailBottomSheetDetailFragment :
   companion object {
     fun newInstance(
       libName: String, detail: String
-    ): SignatureDetailBottomSheetDetailFragment {
-      return SignatureDetailBottomSheetDetailFragment().putArguments(
+    ): SignatureDetailBSDFragment {
+      return SignatureDetailBSDFragment().putArguments(
         EXTRA_SIGNATURE_NAME to libName,
         EXTRA_SIGNATURE_DETAIL to detail
       )

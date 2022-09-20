@@ -10,7 +10,7 @@ import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
-import com.absinthe.libchecker.ui.fragment.detail.SignatureDetailBottomSheetDetailFragment
+import com.absinthe.libchecker.ui.fragment.detail.SignatureDetailBSDFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import rikka.core.util.ClipboardUtils
@@ -70,8 +70,8 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   private fun openSignatureDetailDialog(position: Int) {
     val name = adapter.getItem(position).item.name
     val source = adapter.getItem(position).item.source
-    SignatureDetailBottomSheetDetailFragment.newInstance(name, source.orEmpty())
-      .show(childFragmentManager, SignatureDetailBottomSheetDetailFragment::class.java.name)
+    SignatureDetailBSDFragment.newInstance(name, source.orEmpty())
+      .show(childFragmentManager, SignatureDetailBSDFragment::class.java.name)
   }
 
   companion object {

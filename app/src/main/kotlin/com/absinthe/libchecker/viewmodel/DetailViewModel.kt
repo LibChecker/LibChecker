@@ -43,6 +43,7 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import retrofit2.HttpException
@@ -131,7 +132,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
   }
 
-  fun initSignatures() = signaturesLibItems.postValue(getSignatureChipList())
+  fun initSignatures() = viewModelScope.launch(Dispatchers.IO) {
+    val signatures = getSignatureChipList()
+    withContext(Dispatchers.Main) {
+      signaturesLibItems.value = signatures
+    }
+  }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
     val processesSet = hashSetOf<String>()
