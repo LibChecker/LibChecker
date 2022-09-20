@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.bean.SignatureDetailItem
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.utils.extensions.putArguments
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.SignatureDetailBottomSheetView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -20,7 +21,7 @@ const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
 class SignatureDetailBottomSheetDetailFragment :
   BaseBottomSheetViewDialogFragment<SignatureDetailBottomSheetView>() {
 
-  private val detail by lazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
+  private val detail by unsafeLazy { arguments?.getString(EXTRA_SIGNATURE_DETAIL).orEmpty() }
 
   override fun initRootView(): SignatureDetailBottomSheetView =
     SignatureDetailBottomSheetView(requireContext())
@@ -36,17 +37,17 @@ class SignatureDetailBottomSheetDetailFragment :
       VersionCompat.showCopiedOnClipboardToast(requireContext())
       true
     }
-    lifecycleScope.launch(Dispatchers.IO) {
-      val data = detail.lines().map {
-        val values = it.split(":", limit = 2)
-        SignatureDetailItem(
-          values.getOrNull(0).orEmpty(),
-          values.getOrNull(1).orEmpty()
-        )
-      }.toMutableList()
-      withContext(Dispatchers.Main) {
-        root.adapter.setNewInstance(data)
+    lifecycleScope.launch {
+      val data = withContext(Dispatchers.IO) {
+        detail.lines().map {
+          val values = it.split(":", limit = 2)
+          SignatureDetailItem(
+            values.getOrNull(0).orEmpty(),
+            values.getOrNull(1).orEmpty()
+          )
+        }.toMutableList()
       }
+      root.adapter.setNewInstance(data)
     }
   }
 

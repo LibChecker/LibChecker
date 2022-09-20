@@ -58,6 +58,9 @@ import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
 import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
+import com.absinthe.libchecker.utils.extensions.md5
+import com.absinthe.libchecker.utils.extensions.sha1
+import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.ManifestReader
@@ -1657,9 +1660,9 @@ object PackageUtils {
       }
         ${lc.getString(R.string.signature_algorithm_name)}:${certificate.sigAlgName}
         ${lc.getString(R.string.signature_algorithm_oid)}:${certificate.sigAlgOID}
-        ${lc.getString(R.string.signature_md5)}:${MessageDigestUtils.md5(bytes, ":")}
-        ${lc.getString(R.string.signature_sha1)}:${MessageDigestUtils.sha1(bytes, ":")}
-        ${lc.getString(R.string.signature_sha256)}:${MessageDigestUtils.sha256(bytes, ":")}
+        ${lc.getString(R.string.signature_md5)}:${bytes.md5(":")}
+        ${lc.getString(R.string.signature_sha1)}:${bytes.sha1(":")}
+        ${lc.getString(R.string.signature_sha256)}:${bytes.sha256(":")}
         ${lc.getString(R.string.signature_char_string)}:${signature.toCharsString()}
       """.trimIndent()
       LibStringItem("0x${certificate.serialNumber.toString(16)}", 0, source, null)

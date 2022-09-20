@@ -131,9 +131,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
   }
 
-  fun initSignatures() = viewModelScope.launch(Dispatchers.IO) {
-    signaturesLibItems.postValue(getSignatureChipList())
-  }
+  fun initSignatures() = signaturesLibItems.postValue(getSignatureChipList())
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
     val processesSet = hashSetOf<String>()

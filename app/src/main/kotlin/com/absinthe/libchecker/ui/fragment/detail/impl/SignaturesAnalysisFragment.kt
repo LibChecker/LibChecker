@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.ui.fragment.detail.impl
 
-import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -14,8 +13,6 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.SignatureDetailBottomSheetDetailFragment
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import rikka.core.util.ClipboardUtils
 
 class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
@@ -24,11 +21,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   override val needShowLibDetailDialog = false
 
   override fun init() {
-    binding.apply {
-      list.apply {
-        adapter = this@SignaturesAnalysisFragment.adapter
-      }
-    }
+    binding.list.adapter = adapter
 
     viewModel.signaturesLibItems.observe(viewLifecycleOwner) {
       if (it.isEmpty()) {
@@ -77,11 +70,8 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   private fun openSignatureDetailDialog(position: Int) {
     val name = adapter.getItem(position).item.name
     val source = adapter.getItem(position).item.source
-
-    lifecycleScope.launch(Dispatchers.Main) {
-      SignatureDetailBottomSheetDetailFragment.newInstance(name, source.orEmpty())
-        .show(childFragmentManager, SignatureDetailBottomSheetDetailFragment::class.java.name)
-    }
+    SignatureDetailBottomSheetDetailFragment.newInstance(name, source.orEmpty())
+      .show(childFragmentManager, SignatureDetailBottomSheetDetailFragment::class.java.name)
   }
 
   companion object {
