@@ -132,11 +132,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
   }
 
-  fun initSignatures() = viewModelScope.launch(Dispatchers.IO) {
-    val signatures = getSignatureChipList()
-    withContext(Dispatchers.Main) {
-      signaturesLibItems.value = signatures
-    }
+  fun initSignatures() = viewModelScope.launch {
+    signaturesLibItems.value = getSignatureChipList()
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
@@ -314,12 +311,12 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     return chipList
   }
 
-  private fun getSignatureChipList(): List<LibStringItemChip> {
-    Timber.d("getDexChipList")
-    return PackageUtils.getSignatures(getApplication(), packageInfo).map {
-      LibStringItemChip(it, null)
-    }.toList()
-  }
+  private suspend fun getSignatureChipList(): List<LibStringItemChip> =
+    withContext(Dispatchers.IO) {
+      PackageUtils.getSignatures(getApplication(), packageInfo).map {
+        LibStringItemChip(it, null)
+      }.toList()
+    }
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
