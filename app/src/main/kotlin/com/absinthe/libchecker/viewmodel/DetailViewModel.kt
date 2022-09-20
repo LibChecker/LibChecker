@@ -308,11 +308,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     return chipList
   }
 
-  private fun getSignatureChipList():List<LibStringItemChip> {
+  private fun getSignatureChipList(): List<LibStringItemChip> {
     Timber.d("getDexChipList")
     return PackageUtils.getSignatures(getApplication(), packageInfo).map {
       LibStringItemChip(it, null)
-    }
+    }.toList()
   }
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
