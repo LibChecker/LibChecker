@@ -15,7 +15,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.core.util.ClipboardUtils
 
-const val EXTRA_SIGNATURE_NAME = "EXTRA_SIGNATURE_NAME"
 const val EXTRA_SIGNATURE_DETAIL = "EXTRA_SIGNATURE_DETAIL"
 
 class SignatureDetailBSDFragment :
@@ -64,11 +63,8 @@ class SignatureDetailBSDFragment :
   }
 
   companion object {
-    fun newInstance(
-      libName: String, detail: String
-    ): SignatureDetailBSDFragment {
+    fun newInstance(detail: String): SignatureDetailBSDFragment {
       return SignatureDetailBSDFragment().putArguments(
-        EXTRA_SIGNATURE_NAME to libName,
         EXTRA_SIGNATURE_DETAIL to detail
       )
     }

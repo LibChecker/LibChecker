@@ -68,9 +68,8 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
   }
 
   private fun openSignatureDetailDialog(position: Int) {
-    val name = adapter.getItem(position).item.name
     val source = adapter.getItem(position).item.source
-    SignatureDetailBSDFragment.newInstance(name, source.orEmpty())
+    SignatureDetailBSDFragment.newInstance(source.orEmpty())
       .show(childFragmentManager, SignatureDetailBSDFragment::class.java.name)
   }
 
