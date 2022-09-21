@@ -32,7 +32,6 @@ import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -250,6 +249,6 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   protected fun hasNonGrantedPermissions(): Boolean {
-    return type == PERMISSION && viewModel.permissionsItems.valueUnsafe.any { it.item.size == 0L }
+    return type == PERMISSION && (viewModel.permissionsItems.value?.any { it.item.size == 0L } == true)
   }
 }
