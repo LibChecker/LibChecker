@@ -33,6 +33,7 @@ class SignatureDetailBottomSheetView(context: Context) : LinearLayout(context), 
       it.gravity = Gravity.CENTER_HORIZONTAL
     }
     setImageResource(R.drawable.ic_signatures)
+    setBackgroundResource(R.drawable.bg_circle_outline)
   }
 
   val list = BottomSheetRecyclerView(context).apply {
@@ -40,7 +41,7 @@ class SignatureDetailBottomSheetView(context: Context) : LinearLayout(context), 
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 24.dp
+      it.topMargin = 12.dp
     }
     overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     adapter = this@SignatureDetailBottomSheetView.adapter
