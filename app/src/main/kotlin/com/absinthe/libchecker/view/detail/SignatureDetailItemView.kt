@@ -16,7 +16,7 @@ class SignatureDetailItemView(context: Context) : LinearLayout(context) {
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
-      it.gravity = Gravity.LEFT
+      it.gravity = Gravity.START
     }
     setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
@@ -28,7 +28,7 @@ class SignatureDetailItemView(context: Context) : LinearLayout(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
-      it.gravity = Gravity.LEFT
+      it.gravity = Gravity.START
     }
   }
 
