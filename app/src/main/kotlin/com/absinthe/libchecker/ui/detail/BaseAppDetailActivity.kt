@@ -46,6 +46,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
+import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.AppDetailToolbarItem
@@ -74,6 +75,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.MetaDataAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getFeatures
@@ -449,7 +451,17 @@ abstract class BaseAppDetailActivity :
     }
 
     typeList = if (!isHarmonyMode) {
-      mutableListOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA, DEX)
+      mutableListOf(
+        NATIVE,
+        SERVICE,
+        ACTIVITY,
+        RECEIVER,
+        PROVIDER,
+        PERMISSION,
+        METADATA,
+        DEX,
+        SIGNATURES
+      )
     } else {
       mutableListOf(
         NATIVE,
@@ -457,7 +469,8 @@ abstract class BaseAppDetailActivity :
         AbilityType.SERVICE,
         AbilityType.WEB,
         AbilityType.DATA,
-        DEX
+        DEX,
+        SIGNATURES
       )
     }
     val tabTitles = if (!isHarmonyMode) {
@@ -469,7 +482,8 @@ abstract class BaseAppDetailActivity :
         getText(R.string.ref_category_cp),
         getText(R.string.ref_category_perm),
         getText(R.string.ref_category_metadata),
-        getText(R.string.ref_category_dex)
+        getText(R.string.ref_category_dex),
+        getText(R.string.ref_category_signatures)
       )
     } else {
       mutableListOf(
@@ -478,7 +492,8 @@ abstract class BaseAppDetailActivity :
         getText(R.string.ability_service),
         getText(R.string.ability_web),
         getText(R.string.ability_data),
-        getText(R.string.ref_category_dex)
+        getText(R.string.ref_category_dex),
+        getText(R.string.ref_category_signatures)
       )
     }
 
@@ -518,6 +533,7 @@ abstract class BaseAppDetailActivity :
             PERMISSION -> PermissionAnalysisFragment.newInstance(packageInfo.packageName)
             METADATA -> MetaDataAnalysisFragment.newInstance(packageInfo.packageName)
             DEX -> DexAnalysisFragment.newInstance(packageInfo.packageName)
+            SIGNATURES -> SignaturesAnalysisFragment.newInstance(packageInfo.packageName)
             else -> if (!isHarmonyMode) {
               ComponentsAnalysisFragment.newInstance(type)
             } else {

@@ -8,6 +8,8 @@ import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
+import android.content.pm.Signature
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
@@ -57,21 +59,30 @@ import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
 import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
+import com.absinthe.libchecker.utils.extensions.md5
+import com.absinthe.libchecker.utils.extensions.sha1
+import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.toClassDefType
+import com.absinthe.libchecker.utils.extensions.toHexString
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
 import java.io.File
 import java.io.InputStream
+import java.security.interfaces.DSAPublicKey
+import java.security.interfaces.RSAPublicKey
+import java.text.DateFormat
 import java.util.Properties
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import javax.security.cert.X509Certificate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
 import org.jf.dexlib2.Opcodes
+import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
 object PackageUtils {
@@ -1585,5 +1596,137 @@ object PackageUtils {
       }
       return@withContext null
     }
+  }
+
+  /**
+   * Get signatures of an app
+   * @param packageInfo PackageInfo
+   * @return List of LibStringItem
+   */
+  fun getSignatures(context: Context, packageInfo: PackageInfo): Sequence<LibStringItem> {
+    val localedContext = context.createConfigurationContext(
+      Configuration(context.resources.configuration).apply {
+        setLocale(LocaleDelegate.defaultLocale)
+      }
+    )
+    val dateFormat = DateFormat.getDateTimeInstance(
+      DateFormat.LONG,
+      DateFormat.LONG,
+      LocaleDelegate.defaultLocale
+    )
+    return if (OsUtils.atLeastP()) {
+      if (packageInfo.signingInfo.hasMultipleSigners()) {
+        packageInfo.signingInfo.apkContentsSigners
+      } else {
+        packageInfo.signingInfo.signingCertificateHistory
+      }
+    } else {
+      @Suppress("DEPRECATION")
+      packageInfo.signatures
+    }.asSequence().map {
+      describeSignature(localedContext, dateFormat, it)
+    }
+  }
+
+  private fun describeSignature(
+    context: Context,
+    dateFormat: DateFormat,
+    signature: Signature
+  ): LibStringItem {
+    val bytes = signature.toByteArray()
+    val certificate = X509Certificate.getInstance(bytes)
+    val serialNumber = "0x${certificate.serialNumber.toString(16)}"
+    val source = buildString {
+      // Signature Version
+      append(context.getString(R.string.signature_version))
+      append(":v")
+      appendLine(certificate.version + 1)
+      // Signature Serial Number
+      append(context.getString(R.string.signature_serial_number))
+      append(":")
+      append(certificate.serialNumber)
+      append("(")
+      append(serialNumber)
+      appendLine(")")
+      // Signature Issuer
+      append(context.getString(R.string.signature_issuer))
+      append(":")
+      appendLine(certificate.issuerDN)
+      // Signature Subject
+      append(context.getString(R.string.signature_subject))
+      append(":")
+      appendLine(certificate.subjectDN)
+      // Signature Validity Not Before
+      append(context.getString(R.string.signature_validity_not_before))
+      append(":")
+      appendLine(dateFormat.format(certificate.notBefore))
+      // Signature Validity Not After
+      append(context.getString(R.string.signature_validity_not_after))
+      append(":")
+      appendLine(dateFormat.format(certificate.notAfter))
+      // Signature Public Key Format
+      append(context.getString(R.string.signature_public_key_format))
+      append(":")
+      appendLine(certificate.publicKey.format)
+      append(context.getString(R.string.signature_public_key_algorithm))
+      append(":")
+      appendLine(certificate.publicKey.algorithm)
+      when (val key = certificate.publicKey) {
+        is RSAPublicKey -> {
+          // Public Key Exponent
+          append(context.getString(R.string.signature_public_key_exponent))
+          append(":")
+          append(key.publicExponent)
+          append("(0x")
+          append(key.publicExponent.toString(16))
+          appendLine(")")
+          // Public Key Modulus Size
+          append(context.getString(R.string.signature_public_key_modulus_size))
+          append(":")
+          appendLine(key.modulus.toString(2).length)
+          // Public Key Modulus
+          append(context.getString(R.string.signature_public_key_modulus))
+          append(":")
+          appendLine(key.modulus.toByteArray().toHexString(":"))
+        }
+        is DSAPublicKey -> {
+          // Public Key Y
+          append(context.getString(R.string.signature_public_key_y))
+          append(":")
+          appendLine(key.y)
+        }
+        else -> {
+          // Public Key Type
+          append(context.getString(R.string.signature_public_key_type))
+          append(":")
+          appendLine(key.javaClass.simpleName)
+        }
+      }
+      // Signature Algorithm Name
+      append(context.getString(R.string.signature_algorithm_name))
+      append(":")
+      appendLine(certificate.sigAlgName)
+      // Signature Algorithm OID
+      append(context.getString(R.string.signature_algorithm_oid))
+      append(":")
+      appendLine(certificate.sigAlgOID)
+      // Signature MD5
+      append(context.getString(R.string.signature_md5))
+      append(":")
+      appendLine(bytes.md5(":"))
+      // Signature SHA1
+      append(context.getString(R.string.signature_sha1))
+      append(":")
+      appendLine(bytes.sha1(":"))
+      // Signature SHA256
+      append(context.getString(R.string.signature_sha256))
+      append(":")
+      appendLine(bytes.sha256(":"))
+      // Signature CharString
+      append(context.getString(R.string.signature_char_string))
+      append(":")
+      append(signature.toCharsString())
+    }
+    return LibStringItem(serialNumber, 0, source, null)
   }
 }

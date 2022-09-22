@@ -43,6 +43,7 @@
   <string name="ref_category_metadata">元数据</string>
   <string name="ref_category_package">包</string>
   <string name="ref_category_shared_uid">共享的 UID</string>
+  <string name="ref_category_signatures">签名</string>
   <string name="string_kotlin_used">使用了 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <!--  About  -->
@@ -111,6 +112,22 @@
   <string name="rx_android_detail">适用于 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 扩展</string>
   <string name="permission_not_granted">未授予</string>
+  <string name="signature_detail">签名详情</string>
+  <string name="signature_version">版本</string>
+  <string name="signature_serial_number">序列号</string>
+  <string name="signature_issuer">发行人</string>
+  <string name="signature_subject">主题</string>
+  <string name="signature_validity_not_before">有效期始</string>
+  <string name="signature_validity_not_after">有效期至</string>
+  <string name="signature_public_key_format">公钥格式</string>
+  <string name="signature_public_key_algorithm">公钥算法</string>
+  <string name="signature_public_key_exponent">公钥指数</string>
+  <string name="signature_public_key_modulus_size">模数大小</string>
+  <string name="signature_public_key_modulus">模数</string>
+  <string name="signature_public_key_y">公钥值Y</string>
+  <string name="signature_public_key_type">公钥类型</string>
+  <string name="signature_algorithm_name">签名算法</string>
+  <string name="signature_algorithm_oid">签名算法 OID</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>

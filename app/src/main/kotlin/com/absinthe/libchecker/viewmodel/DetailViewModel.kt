@@ -43,6 +43,7 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
 import retrofit2.HttpException
@@ -57,12 +58,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val metaDataItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val permissionsItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
+  val signaturesLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
   val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
   val processMapLiveData = MutableLiveData<Map<String, Int>>()
-  val itemsCountList = MutableList(9) { 0 }
+  val itemsCountList = MutableList(12) { 0 }
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
@@ -128,6 +130,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }.also {
       it.start()
     }
+  }
+
+  fun initSignatures() = viewModelScope.launch {
+    signaturesLibItems.value = getSignatureChipList()
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
@@ -304,6 +310,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
     return chipList
   }
+
+  private suspend fun getSignatureChipList(): List<LibStringItemChip> =
+    withContext(Dispatchers.IO) {
+      PackageUtils.getSignatures(getApplication(), packageInfo).map {
+        LibStringItemChip(it, null)
+      }.toList()
+    }
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
