@@ -47,7 +47,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: buildjet-16vcpu-ubuntu-2204
+    runs-on: buildjet-8vcpu-ubuntu-2204
     if: ${{ !startsWith(github.event.head_commit.message, '[skip ci]') }}
 
     steps:
