@@ -38,12 +38,9 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: Check style
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: lintKotlin
+      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/gradle-build-action@v2
+      - run: ./gradlew lintKotlin
 
   build:
     name: Build
@@ -58,6 +55,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - uses: gradle/gradle-build-action@v2
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
@@ -72,9 +70,7 @@ jobs:
             echo ${{ secrets.SIGNING_KEY }} | base64 --decode > ${{ github.workspace }}/key.jks
           fi
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: -PappVerName=${{ env.VERSION }} assembleRelease
+        run: ./gradlew -PappVerName=${{ env.VERSION }} app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3

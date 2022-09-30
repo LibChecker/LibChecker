@@ -22,10 +22,8 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - uses: gradle/wrapper-validation-action@v1
-      - name: Initialize Gradle Project
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+      - uses: gradle/gradle-build-action@v2
+      - run: ./gradlew build
 
       # Initialize Gradle Project to build BuildConfig.java
 
