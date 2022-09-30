@@ -74,7 +74,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: -PappVerName=${{ env.VERSION }} assembleRelease
+          arguments: -PappVerName=${{ env.VERSION }} app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
