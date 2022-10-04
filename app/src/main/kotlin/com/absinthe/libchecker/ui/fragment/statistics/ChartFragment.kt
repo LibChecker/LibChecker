@@ -63,6 +63,9 @@ private const val TYPE_KOTLIN = 1
 private const val TYPE_TARGET_API = 2
 private const val TYPE_MIN_SDK = 3
 
+private val ABI_64_BIT = setOf(ARMV8, X86_64)
+private val ABI_32_BIT = setOf(ARMV5, ARMV7, X86)
+
 class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
   OnChartValueSelectedListener,
@@ -141,8 +144,8 @@ class ChartFragment :
             if (item.isSystem) continue
           }
           when (item.abi % 10) {
-            ARMV8, X86_64 -> list[0]++
-            ARMV5, ARMV7, X86 -> list[1]++
+            in ABI_64_BIT -> list[0]++
+            in ABI_32_BIT -> list[1]++
             else -> list[2]++
           }
         }
@@ -463,7 +466,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_64_bit)
               )
-              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV8 || (it.abi % MULTI_ARCH) == X86_64 }
+              filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_64_BIT }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
@@ -473,7 +476,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_32_bit)
               )
-              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV7 || (it.abi % MULTI_ARCH) == ARMV5 || (it.abi % MULTI_ARCH) == X86 }
+              filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_32_BIT }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
