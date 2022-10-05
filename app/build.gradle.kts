@@ -5,8 +5,8 @@ import com.google.protobuf.gradle.id
 import com.google.protobuf.gradle.plugins
 import com.google.protobuf.gradle.protobuf
 import com.google.protobuf.gradle.protoc
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.nio.file.Paths
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
 @Suppress(
   "DSL_SCOPE_VIOLATION",
@@ -81,40 +81,38 @@ setupAppModule {
   }
 }
 
-tasks.whenTaskAdded {
-  if (name == "optimizeFossReleaseResources" || name == "optimizeMarketReleaseResources") {
-    val flavor = name.removeSurrounding("optimize", "ReleaseResources")
-    val flavorLowerCase = flavor.toLowerCaseAsciiOnly()
-    val optimizeReleaseRes = task("optimize${flavor}ReleaseRes").doLast {
-      val aapt2 = File(
-        androidComponents.sdkComponents.sdkDirectory.get().asFile,
-        "build-tools/${project.android.buildToolsVersion}/aapt2"
+tasks.matching {
+  it.name.contains("optimize(.*)ReleaseRes".toRegex())
+}.configureEach {
+  notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
+  val flavor = name.removeSurrounding("optimize", "ReleaseResources").toLowerCaseAsciiOnly()
+  doLast {
+    val aapt2 = File(
+      androidComponents.sdkComponents.sdkDirectory.get().asFile,
+      "build-tools/${project.android.buildToolsVersion}/aapt2"
+    )
+    val zip = Paths.get(
+      buildDir.path,
+      "intermediates",
+      "optimized_processed_res",
+      "${flavor}Release",
+      "resources-${flavor}-release-optimize.ap_"
+    )
+    val optimized = File("${zip}.opt")
+    val cmd = exec {
+      commandLine(
+        aapt2, "optimize",
+        "--collapse-resource-names",
+        "--resources-config-path", "aapt2-resources.cfg",
+        "-o", optimized,
+        zip
       )
-      val zip = Paths.get(
-        buildDir.path,
-        "intermediates",
-        "optimized_processed_res",
-        "${flavorLowerCase}Release",
-        "resources-${flavorLowerCase}-release-optimize.ap_"
-      )
-      val optimized = File("${zip}.opt")
-      val cmd = exec {
-        commandLine(
-          aapt2, "optimize",
-          "--collapse-resource-names",
-          "--resources-config-path", "aapt2-resources.cfg",
-          "-o", optimized,
-          zip
-        )
-        isIgnoreExitValue = false
-      }
-      if (cmd.exitValue == 0) {
-        delete(zip)
-        optimized.renameTo(zip.toFile())
-      }
+      isIgnoreExitValue = false
     }
-
-    finalizedBy(optimizeReleaseRes)
+    if (cmd.exitValue == 0) {
+      delete(zip)
+      optimized.renameTo(zip.toFile())
+    }
   }
 }
 
