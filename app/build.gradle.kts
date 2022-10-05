@@ -73,8 +73,8 @@ setupAppModule {
 
   dependenciesInfo.includeInApk = false
 
-  applicationVariants.all {
-    outputs.all {
+  applicationVariants.configureEach {
+    outputs.configureEach {
       (this as? ApkVariantOutputImpl)?.outputFileName =
         "LibChecker-${verName}-${verCode}-${name}.apk"
     }
@@ -116,7 +116,7 @@ tasks.matching {
   }
 }
 
-configurations.all {
+configurations.configureEach {
   exclude("androidx.appcompat", "appcompat")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
