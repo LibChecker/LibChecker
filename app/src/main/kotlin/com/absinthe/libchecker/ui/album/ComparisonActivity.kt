@@ -354,16 +354,20 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   }
 
   private fun compareDiffContainsApk() = lifecycleScope.launch(Dispatchers.IO) {
-    val leftPackage = if (leftTimeStamp == -1L && leftUri != null) {
-      getSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
-    } else {
-      null
-    }
-    val rightPackage = if (rightTimeStamp == -1L && rightUri != null) {
-      getSnapshotItemByUri(rightUri!!, Constants.TEMP_PACKAGE_2)
-    } else {
-      null
-    }
+    val leftPackage = runCatching {
+      if (leftTimeStamp == -1L && leftUri != null) {
+        getSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
+      } else {
+        null
+      }
+    }.getOrNull()
+    val rightPackage = runCatching {
+      if (rightTimeStamp == -1L && rightUri != null) {
+        getSnapshotItemByUri(rightUri!!, Constants.TEMP_PACKAGE_2)
+      } else {
+        null
+      }
+    }.getOrNull()
     val leftSnapshots: List<SnapshotItem> = if (leftPackage != null) {
       listOf(leftPackage)
     } else if (leftTimeStamp > 0) {
