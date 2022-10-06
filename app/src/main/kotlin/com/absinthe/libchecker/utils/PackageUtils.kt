@@ -1614,7 +1614,7 @@ object PackageUtils {
       DateFormat.LONG,
       LocaleDelegate.defaultLocale
     )
-    return if (OsUtils.atLeastP()) {
+    return if (OsUtils.atLeastP() && packageInfo.signingInfo != null) {
       if (packageInfo.signingInfo.hasMultipleSigners()) {
         packageInfo.signingInfo.apkContentsSigners
       } else {
