@@ -34,13 +34,8 @@ allprojects {
   }.configureEach {
     notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
   }
-  tasks.matching {
-    it.name.contains("optimize(.*)ReleaseRes".toRegex())
-  }.configureEach {
-    notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
-  }
 }
 
-task<Delete>("clean") {
+tasks.register<Delete>("clean") {
   delete(rootProject.buildDir)
 }
