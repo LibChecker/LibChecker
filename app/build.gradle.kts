@@ -1,10 +1,5 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
 import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.plugins
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
 import java.nio.file.Paths
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
