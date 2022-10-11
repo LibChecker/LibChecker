@@ -55,6 +55,7 @@ import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
+import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -83,6 +84,7 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
@@ -312,22 +314,29 @@ abstract class BaseAppDetailActivity :
             ).let { str ->
               spanString = SpannableString("  $str")
             }
-            PackageUtils.getAbiBadgeResource(it)
-              .getDrawable(this@BaseAppDetailActivity)?.mutate()?.let { drawable ->
-                drawable.setBounds(
-                  0,
-                  0,
-                  drawable.intrinsicWidth,
-                  drawable.intrinsicHeight
-                )
-                if (it != abi % Constants.MULTI_ARCH) {
-                  drawable.alpha = 128
+            val abiRes = PackageUtils.getAbiBadgeResource(it)
+            abiRes.getDrawable(this@BaseAppDetailActivity)?.mutate()?.let { drawable ->
+              if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+                if (abiRes == R.drawable.ic_abi_label_64bit) {
+                  drawable.setTint(this@BaseAppDetailActivity.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
                 } else {
-                  drawable.alpha = 255
+                  drawable.setTint(this@BaseAppDetailActivity.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
                 }
-                val span = CenterAlignImageSpan(drawable)
-                spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
               }
+              drawable.setBounds(
+                0,
+                0,
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight
+              )
+              if (it != abi % Constants.MULTI_ARCH) {
+                drawable.alpha = 128
+              } else {
+                drawable.alpha = 255
+              }
+              val span = CenterAlignImageSpan(drawable)
+              spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
+            }
             if (!apkAnalyticsMode && it != abi % Constants.MULTI_ARCH) {
               spanString.setSpan(
                 StrikethroughSpan(),
