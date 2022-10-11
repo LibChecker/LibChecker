@@ -475,7 +475,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
     val sb = StringBuilder()
 
     sb.append(getStringByConfiguration(R.string.resource_declaration)).append("<br>")
-    list.forEach { sb.append(getHyperLink(it)) }
+    list.forEach { sb.append(getHyperLink(it)).append("<br>") }
     return sb.toString()
   }
 
