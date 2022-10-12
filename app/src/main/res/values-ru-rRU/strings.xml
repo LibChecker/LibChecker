@@ -60,6 +60,7 @@
   <string name="anonymous_statistics">Анонимная статистика</string>
   <string name="cloud_rules">Облачные правила</string>
   <string name="dark_mode">Темный режим</string>
+  <string name="snapshot_keep">Правило сохранения моментальных снимков по умолчанию</string>
   <string name="apk_analytics_summary">Открывает страницу сведений при нажатии на APK-файл</string>
   <string name="colorful_icon_summary">Часть отмеченных библиотек будет отображаться в виде цветных значков.</string>
   <string name="lib_ref_threshold_summary">В списке отображаются только те библиотеки, число ссылок на которые превысило заданный порог</string>
@@ -73,6 +74,9 @@
   <string name="array_dark_mode_auto">Авто</string>
   <string name="array_dark_mode_system">Как в системе</string>
   <string name="array_dark_mode_battery">Зависит от режима энергосбережения</string>
+  <string name="array_snapshot_default">спросить</string>
+  <string name="array_snapshot_keep">резерв</string>
+  <string name="array_snapshot_discard">выбрасывать</string>
   <!--  Detail  -->
   <string name="detail">подробности</string>
   <string name="detail_label">Просмотр сведений о приложении</string>
