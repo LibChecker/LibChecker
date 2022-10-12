@@ -480,18 +480,24 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
           it.setLongClickCopiedToClipboard(scheme)
         }
-        BaseAlertDialogBuilder(context)
-          .setTitle(R.string.dialog_title_keep_previous_snapshot)
-          .setMessage(R.string.dialog_message_keep_previous_snapshot)
-          .setView(tipView)
-          .setPositiveButton(R.string.btn_keep) { _, _ ->
-            computeNewSnapshot(false)
+        when (GlobalValues.snapshotKeep) {
+          Constants.SNAPSHOT_DEFAULT -> {
+            BaseAlertDialogBuilder(context)
+              .setTitle(R.string.dialog_title_keep_previous_snapshot)
+              .setMessage(R.string.dialog_message_keep_previous_snapshot)
+              .setView(tipView)
+              .setPositiveButton(R.string.btn_keep) { _, _ ->
+                computeNewSnapshot(false)
+              }
+              .setNegativeButton(R.string.btn_drop) { _, _ ->
+                computeNewSnapshot(true)
+              }
+              .setNeutralButton(android.R.string.cancel, null)
+              .show()
           }
-          .setNegativeButton(R.string.btn_drop) { _, _ ->
-            computeNewSnapshot(true)
-          }
-          .setNeutralButton(android.R.string.cancel, null)
-          .show()
+          Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
+          Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
+        }
       }
     }
     return true

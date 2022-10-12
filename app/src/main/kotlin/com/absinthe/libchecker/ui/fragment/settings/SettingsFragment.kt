@@ -131,6 +131,12 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           true
         }
       }!!
+    findPreference<SimpleMenuPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.snapshotKeep = newValue.toString()
+        true
+      }
+    }
     findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.darkMode = newValue.toString()

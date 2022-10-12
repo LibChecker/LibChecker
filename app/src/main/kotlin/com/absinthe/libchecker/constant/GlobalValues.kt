@@ -35,6 +35,8 @@ object GlobalValues {
 
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
 
+  var snapshotKeep: String by SPDelegates(Constants.PREF_SNAPSHOT_KEEP, Constants.SNAPSHOT_DEFAULT)
+
   var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
 
   var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)

@@ -40,6 +40,7 @@ object Constants {
   const val PREF_TELEGRAM = "tg"
   const val PREF_ANONYMOUS_ANALYTICS = "analytics"
   const val PREF_CLOUD_RULES = "cloudRules"
+  const val PREF_SNAPSHOT_KEEP = "snapshotKeep"
 
   const val PREF_LIB_SORT_MODE = "libSortMode"
   const val PREF_PROCESS_MODE = "processMode"
@@ -64,6 +65,10 @@ object Constants {
 
   const val REPO_GITHUB = "github"
   const val REPO_GITLAB = "gitlab"
+
+  const val SNAPSHOT_DEFAULT = "notify"
+  const val SNAPSHOT_KEEP = "keep"
+  const val SNAPSHOT_DISCARD = "discard"
 
   const val ACTION_APP_LIST = "com.absinthe.libchecker.intent.action.START_APP_LIST"
   const val ACTION_STATISTICS = "com.absinthe.libchecker.intent.action.START_STATISTICS"

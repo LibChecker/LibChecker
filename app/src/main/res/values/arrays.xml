@@ -41,4 +41,16 @@
     <item>on</item>
     <item>system</item>
   </string-array>
+
+  <string-array name="snapshot_keep" tools:ignore="InconsistentArrays">
+    <item>@string/array_snapshot_default</item>
+    <item>@string/array_snapshot_keep</item>
+    <item>@string/array_snapshot_discard</item>
+  </string-array>
+
+  <string-array name="snapshot_keep_value" tools:ignore="InconsistentArrays">
+    <item>notify</item>
+    <item>keep</item>
+    <item>discard</item>
+  </string-array>
 </resources>

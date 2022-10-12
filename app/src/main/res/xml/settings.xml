@@ -21,6 +21,15 @@
       app:title="@string/colorful_icon" />
 
     <rikka.preference.SimpleMenuPreference
+      app:defaultValue="notify"
+      app:entries="@array/snapshot_keep"
+      app:entryValues="@array/snapshot_keep_value"
+      app:icon="@drawable/ic_outline_save"
+      app:key="snapshotKeep"
+      app:summary="%s"
+      app:title="@string/snapshot_keep" />
+
+    <rikka.preference.SimpleMenuPreference
       app:defaultValue="system"
       app:entries="@array/list_dark_mode"
       app:entryValues="@array/list_dark_mode_value"

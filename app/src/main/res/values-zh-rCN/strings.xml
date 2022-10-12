@@ -71,6 +71,7 @@
   <string name="anonymous_statistics">匿名统计</string>
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
+  <string name="snapshot_keep">快照默认保留规则</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
@@ -84,6 +85,9 @@
   <string name="array_dark_mode_auto">自动</string>
   <string name="array_dark_mode_system">系统默认</string>
   <string name="array_dark_mode_battery">由省电模式设置</string>
+  <string name="array_snapshot_default">询问</string>
+  <string name="array_snapshot_keep">保留</string>
+  <string name="array_snapshot_discard">丢弃</string>
   <!--  Detail  -->
   <string name="detail">详情</string>
   <string name="detail_label">查看 App 详情</string>
