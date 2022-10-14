@@ -58,7 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
     setPreferencesFromResource(R.xml.settings, null)
 
-    (findPreference<TwoStatePreference>(Constants.PREF_SHOW_SYSTEM_APPS))?.apply {
+    findPreference<TwoStatePreference>(Constants.PREF_SHOW_SYSTEM_APPS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isShowSystemApps.value = newValue as Boolean
         Analytics.trackEvent(
@@ -68,7 +68,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS))?.apply {
+    findPreference<TwoStatePreference>(Constants.PREF_APK_ANALYTICS)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         val flag = if (newValue as Boolean) {
           PackageManager.COMPONENT_ENABLED_STATE_ENABLED
@@ -88,7 +88,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON))?.apply {
+    findPreference<TwoStatePreference>(Constants.PREF_COLORFUL_ICON)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isColorfulIcon.value = newValue as Boolean
         Analytics.trackEvent(
@@ -98,7 +98,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO))?.apply {
+    findPreference<SimpleMenuPreference>(Constants.PREF_RULES_REPO)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.repo = newValue as String
         LCRules.setRemoteRepo(
@@ -116,7 +116,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     val languagePreference =
-      (findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE))?.apply {
+      findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE)?.apply {
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
             val locale: Locale = if ("SYSTEM" == newValue) {
@@ -131,6 +131,12 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           true
         }
       }!!
+    findPreference<SimpleMenuPreference>(Constants.PREF_SNAPSHOT_KEEP)?.apply {
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.snapshotKeep = newValue.toString()
+        true
+      }
+    }
     findPreference<SimpleMenuPreference>(Constants.PREF_DARK_MODE)?.apply {
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.darkMode = newValue.toString()
@@ -269,7 +275,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         true
       }
     }
-    (findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS))?.apply {
+    findPreference<TwoStatePreference>(Constants.PREF_ANONYMOUS_ANALYTICS)?.apply {
       isVisible = getBoolean(R.bool.is_foss).not()
       setOnPreferenceChangeListener { _, newValue ->
         GlobalValues.isAnonymousAnalyticsEnabled.value = newValue as Boolean
