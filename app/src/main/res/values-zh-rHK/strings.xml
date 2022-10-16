@@ -72,7 +72,7 @@
   <string name="anonymous_statistics">匿名統計資料</string>
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
-  <string name="snapshot_keep">快照默認保留規則</string>
+  <string name="snapshot_keep">快照預設保留規則</string>
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
   <string name="colorful_icon_summary">部分標示庫會呈現為彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
