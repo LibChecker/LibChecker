@@ -1623,7 +1623,7 @@ object PackageUtils {
     } else {
       @Suppress("DEPRECATION")
       packageInfo.signatures
-    }.asSequence().map {
+    }.orEmpty().asSequence().map {
       describeSignature(localedContext, dateFormat, it)
     }
   }
