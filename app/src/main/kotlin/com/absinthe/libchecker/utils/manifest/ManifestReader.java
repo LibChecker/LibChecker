@@ -63,6 +63,9 @@ public class ManifestReader {
   }
 
   private class ManifestTagVisitor extends NodeVisitor {
+    public String name = null;
+    public Object value = null;
+
     public ManifestTagVisitor(NodeVisitor child) {
       super(child);
     }
@@ -81,6 +84,27 @@ public class ManifestReader {
         default:
       }
       return child;
+    }
+
+    @Override
+    public void attr(String ns, String name, int resourceId, int type, Object obj) {
+      if (contains(name)) {
+        this.name = name;
+        value = obj;
+
+        if (name != null && value != null) {
+          properties.put(name, value);
+        }
+      }
+      super.attr(ns, name, resourceId, type, obj);
+    }
+
+    @Override
+    public void end() {
+      if (name != null && value != null) {
+        properties.put(name, value);
+      }
+      super.end();
     }
 
     private class ApplicationTagVisitor extends NodeVisitor {

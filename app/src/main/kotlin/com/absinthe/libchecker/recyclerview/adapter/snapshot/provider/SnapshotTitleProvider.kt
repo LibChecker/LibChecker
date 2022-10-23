@@ -5,7 +5,8 @@ import android.util.SparseArray
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -29,7 +30,7 @@ import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_TITLE_PROVIDER = 1
 
-class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
+class SnapshotTitleProvider : BaseNodeProvider() {
 
   override val itemViewType: Int = SNAPSHOT_TITLE_PROVIDER
   override val layoutId: Int = 0
@@ -74,22 +75,24 @@ class SnapshotTitleProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseN
       }
 
       countAdapter.setList(finalList)
-    } ?: lifecycleScope.launch(Dispatchers.Default) {
-      @Suppress("UNCHECKED_CAST")
-      (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
-        countList[diffNode.item.diffType]++
-      }
-
-      countMap.put(node.type, countList)
-
-      for (i in countList.indices) {
-        if (countList[i] != 0) {
-          finalList.add(SnapshotDetailCountNode(countList[i], i))
+    } ?: run {
+      (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.Default) {
+        @Suppress("UNCHECKED_CAST")
+        (item.childNode as List<BaseSnapshotNode>).forEach { diffNode ->
+          countList[diffNode.item.diffType]++
         }
-      }
 
-      withContext(Dispatchers.Main) {
-        countAdapter.setList(finalList)
+        countMap.put(node.type, countList)
+
+        for (i in countList.indices) {
+          if (countList[i] != 0) {
+            finalList.add(SnapshotDetailCountNode(countList[i], i))
+          }
+        }
+
+        withContext(Dispatchers.Main) {
+          countAdapter.setList(finalList)
+        }
       }
     }
 

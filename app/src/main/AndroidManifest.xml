@@ -4,13 +4,13 @@
   tools:ignore="QueryAllPackagesPermission">
 
   <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-  <uses-permission android:name="ohos.permission.GET_BUNDLE_INFO" />
+  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
   <application
     android:name=".LibCheckerApp"
+    android:appCategory="productivity"
     android:dataExtractionRules="@xml/data_extraction_rules"
     android:enableOnBackInvokedCallback="true"
     android:fullBackupContent="@xml/backup_rules"

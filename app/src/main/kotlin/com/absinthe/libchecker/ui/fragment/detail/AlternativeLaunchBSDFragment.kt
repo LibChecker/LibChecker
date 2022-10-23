@@ -31,8 +31,10 @@ class AlternativeLaunchBSDFragment :
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
     }
     packageName?.let { packageName ->
-      val packageInfo = PackageUtils.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
-      if (packageInfo.activities == null) {
+      val packageInfo = runCatching {
+        PackageUtils.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES)
+      }.getOrNull()
+      if (packageInfo?.activities == null) {
         activity?.showToast(R.string.toast_cant_open_app)
         dismiss()
         return

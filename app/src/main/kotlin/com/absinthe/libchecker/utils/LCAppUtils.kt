@@ -2,9 +2,6 @@ package com.absinthe.libchecker.utils
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import android.os.MessageQueue
@@ -19,7 +16,6 @@ import androidx.core.text.toSpannable
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.AUTUMN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.NATIVE
@@ -29,8 +25,6 @@ import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.compat.PackageManagerCompat
-import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.ui.detail.AppDetailActivity
@@ -43,26 +37,25 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
+import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
-import rikka.material.app.DayNightDelegate
 import java.io.File
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.Month
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
 object LCAppUtils {
 
   fun getCurrentSeason(): Int {
-    return when (LocalDate.now().month) {
-      Month.MARCH, Month.APRIL, Month.MAY -> SPRING
-      Month.JUNE, Month.JULY, Month.AUGUST -> SUMMER
-      Month.SEPTEMBER, Month.OCTOBER, Month.NOVEMBER -> AUTUMN
-      Month.DECEMBER, Month.JANUARY, Month.FEBRUARY -> WINTER
+    return when (Calendar.getInstance(Locale.getDefault()).get(Calendar.MONTH) + 1) {
+      3, 4, 5 -> SPRING
+      6, 7, 8 -> SUMMER
+      9, 10, 11 -> AUTUMN
+      12, 1, 2 -> WINTER
       else -> -1
     }
   }
@@ -96,15 +89,6 @@ object LCAppUtils {
     return sb.toSpannable()
   }
 
-  fun getAppIcon(packageName: String): Drawable {
-    return runCatching {
-      PackageManagerCompat.getPackageInfo(
-        packageName,
-        0
-      ).applicationInfo.loadIcon(SystemServices.packageManager)
-    }.getOrDefault(ColorDrawable(Color.TRANSPARENT))
-  }
-
   suspend fun getRuleWithRegex(
     name: String,
     @LibType type: Int,
@@ -127,56 +111,49 @@ object LCAppUtils {
       if (source == null) {
         return ruleEntity
       }
-      when (name) {
-        "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
-          return if (PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        "libapp.so" -> {
-          return if (nativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.hasDexClass(
-              source,
-              "io.flutter.FlutterInjector"
-            )
-          ) {
-            ruleEntity
-          } else {
-            null
-          }
-        }
-        else -> return ruleEntity
+      if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
+        return null
       }
+      return ruleEntity
     } else {
       return ruleEntity
     }
   }
 
-  fun checkNativeLibValidation(packageName: String, nativeLib: String): Boolean {
+  private val checkNativeLibs =
+    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libapp.so")
+
+  fun checkNativeLibValidation(
+    packageName: String,
+    nativeLib: String,
+    otherNativeLibs: List<LibStringItem>? = null
+  ): Boolean {
+    if (!checkNativeLibs.contains(nativeLib)) {
+      return true
+    }
+    val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
     return when (nativeLib) {
-      "libjiagu.so" -> {
+      "libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so" -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "com.qihoo.util.QHClassLoader")
+          PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "com.qihoo.util.QHClassLoader".toClassDefType()
+            )
+          ).any { it == "com.qihoo.util.QHClassLoader".toClassDefType() }
         }.getOrDefault(false)
       }
       "libapp.so" -> {
         runCatching {
-          val source = File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-          PackageUtils.hasDexClass(source, "io.flutter.FlutterInjector")
+          otherNativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.findDexClasses(
+            source,
+            listOf(
+              "io.flutter.FlutterInjector".toClassDefType()
+            )
+          ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
         }.getOrDefault(false)
       }
       else -> true
-    }
-  }
-
-  fun getNightMode(nightModeString: String): Int {
-    return when (nightModeString) {
-      Constants.DARK_MODE_OFF -> DayNightDelegate.MODE_NIGHT_NO
-      Constants.DARK_MODE_ON -> DayNightDelegate.MODE_NIGHT_YES
-      Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-      else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
   }
 
@@ -191,7 +168,10 @@ object LCAppUtils {
         arguments = bundleOf(
           EXTRA_LC_ITEM to item
         )
-        show(context.supportFragmentManager, tag)
+        show(
+          context.supportFragmentManager,
+          OverlayDetailBottomSheetDialogFragment::class.java.name
+        )
       }
     } else {
       val intent = Intent(context, AppDetailActivity::class.java)
@@ -201,8 +181,7 @@ object LCAppUtils {
             EXTRA_REF_NAME to refName,
             EXTRA_REF_TYPE to refType,
             EXTRA_DETAIL_BEAN to DetailExtraBean(
-              item.isSplitApk,
-              item.isKotlinUsed,
+              item.features,
               item.variant
             )
           )
@@ -246,10 +225,6 @@ fun doOnMainThreadIdle(action: () -> Unit) {
   if (Looper.getMainLooper() == Looper.myLooper()) {
     setupIdleHandler(Looper.myQueue())
   } else {
-    if (OsUtils.atLeastM()) {
-      setupIdleHandler(Looper.getMainLooper().queue)
-    } else {
-      handler.post { setupIdleHandler(Looper.myQueue()) }
-    }
+    setupIdleHandler(Looper.getMainLooper().queue)
   }
 }

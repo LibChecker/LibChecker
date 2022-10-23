@@ -7,13 +7,14 @@ import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
+import com.absinthe.libchecker.ui.fragment.BaseFilterAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
+import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.putArguments
 import rikka.core.util.ClipboardUtils
 
-class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
+class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
   override val needShowLibDetailDialog = false
@@ -64,8 +65,29 @@ class PermissionAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     }
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (context != null && visible && hasNonGrantedPermissions()) {
+      val label = requireContext().getString(R.string.permission_not_granted)
+      val color = R.color.material_red_400.getColor(requireContext())
+      viewModel.processMapLiveData.postValue(
+        mapOf(label to color)
+      )
+    } else {
+      viewModel.processMapLiveData.postValue(viewModel.processesMap)
+    }
+  }
+
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return viewModel.permissionsItems.value?.filter { it.item.name.contains(text, true) }
+  }
+
+  override fun getFilterList(process: String?): List<LibStringItemChip>? {
+    return if (process.isNullOrEmpty()) {
+      viewModel.permissionsItems.value
+    } else {
+      viewModel.permissionsItems.value?.filter { it.item.size == 0L }
+    }
   }
 
   companion object {

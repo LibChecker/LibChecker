@@ -6,14 +6,14 @@ import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
-import com.absinthe.libchecker.app.AppIconFetcherFactory
 import com.absinthe.libchecker.app.Global
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.timber.ReleaseTree
 import com.absinthe.libchecker.utils.timber.ThreadAwareDebugTree
 import com.absinthe.libraries.utils.utils.Utility
@@ -24,12 +24,14 @@ import com.jakewharton.processphoenix.ProcessPhoenix
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.crashes.Crashes
+import java.util.UUID
 import jonathanfinerty.once.Once
+import me.zhanghai.android.appiconloader.coil.AppIconFetcher
+import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import timber.log.Timber
-import java.util.UUID
 
 class LibCheckerApp : Application() {
 
@@ -71,17 +73,18 @@ class LibCheckerApp : Application() {
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
     DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(LCAppUtils.getNightMode(GlobalValues.darkMode))
+    DayNightDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
     Repositories.checkRulesDatabase()
-    initSplitController()
     DynamicColors.applyToActivitiesIfAvailable(this)
+    initSplitController()
 
     Coil.setImageLoader {
-      ImageLoader(this).newBuilder()
+      ImageLoader.Builder(this)
         .components {
-          add(AppIconFetcherFactory(this@LibCheckerApp))
+          add(AppIconKeyer())
+          add(AppIconFetcher.Factory(40.dp, false, this@LibCheckerApp))
         }
         .build()
     }

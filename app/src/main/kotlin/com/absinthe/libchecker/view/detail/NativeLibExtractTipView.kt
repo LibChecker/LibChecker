@@ -2,12 +2,12 @@ package com.absinthe.libchecker.view.detail
 
 import android.content.Context
 import android.graphics.Typeface
-import android.text.Spannable
-import android.text.SpannableString
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import com.absinthe.libchecker.R
@@ -40,17 +40,13 @@ class NativeLibExtractTipView(context: Context) : AViewGroup(context) {
     ).also {
       it.marginStart = 8.dp
     }
-    val extractLibsTipPartA = context.getString(R.string.extract_native_libs_tip_part_a)
-    val extractLibsTipPartB = context.getString(R.string.extract_native_libs_tip_part_b)
 
-    val sb = SpannableString(extractLibsTipPartA + extractLibsTipPartB)
-    sb.setSpan(
-      CustomTypefaceSpan(Typeface.MONOSPACE),
-      extractLibsTipPartA.length,
-      extractLibsTipPartA.length + extractLibsTipPartB.length,
-      Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-    )
-    text = sb
+    text = buildSpannedString {
+      append(context.getString(R.string.extract_native_libs_tip)).append(" ")
+      inSpans(CustomTypefaceSpan(Typeface.MONOSPACE)) {
+        append("android:extractNativeLibs=\"false\"")
+      }
+    }
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceListItemSecondary))
     addView(this)
   }

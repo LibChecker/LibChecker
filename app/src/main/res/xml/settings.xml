@@ -7,13 +7,6 @@
     app:title="@string/pref_group_normal">
 
     <rikka.material.preference.MaterialSwitchPreference
-      app:defaultValue="false"
-      app:icon="@drawable/ic_android_outline"
-      app:key="showSystemApps"
-      app:summary="@string/show_system_apps_summary"
-      app:title="@string/show_system_apps" />
-
-    <rikka.material.preference.MaterialSwitchPreference
       app:defaultValue="true"
       app:icon="@drawable/ic_apk_analytics"
       app:key="apkAnalytics"
@@ -26,6 +19,15 @@
       app:key="colorfulIcon"
       app:summary="@string/colorful_icon_summary"
       app:title="@string/colorful_icon" />
+
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="notify"
+      app:entries="@array/snapshot_keep"
+      app:entryValues="@array/snapshot_keep_value"
+      app:icon="@drawable/ic_outline_save"
+      app:key="snapshotKeep"
+      app:summary="%s"
+      app:title="@string/snapshot_keep" />
 
     <rikka.preference.SimpleMenuPreference
       app:defaultValue="system"
@@ -83,6 +85,14 @@
       app:key="about"
       app:summary="@string/settings_about_summary"
       app:title="@string/settings_about">
+
+    </Preference>
+
+    <Preference
+      app:icon="@drawable/ic_translate_settings"
+      app:key="translation"
+      app:summary="@string/settings_translate_summary"
+      app:title="@string/settings_translate">
 
     </Preference>
 

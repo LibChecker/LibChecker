@@ -1,8 +1,10 @@
 package com.absinthe.libchecker.ui.fragment
 
 import android.view.View
+import androidx.core.view.MenuProvider
 
 interface IAppBarContainer {
-  fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String)
+  var currentMenuProvider: MenuProvider?
+  fun scheduleAppbarLiftingStatus(isLifted: Boolean)
   fun setLiftOnScrollTargetView(targetView: View)
 }

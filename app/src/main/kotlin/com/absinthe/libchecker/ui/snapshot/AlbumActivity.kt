@@ -130,7 +130,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                 }
               }
             }
-          dialog.show(supportFragmentManager, dialog.tag)
+          dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
         }
       }
     }

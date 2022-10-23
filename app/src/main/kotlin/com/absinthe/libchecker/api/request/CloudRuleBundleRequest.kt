@@ -11,14 +11,18 @@ import retrofit2.http.Headers
 
 const val VERSION = 3
 
+const val REPO_INFO = "Repo-Info"
+const val OWNER = "Owner"
+const val REPO = "Repo"
+
 interface CloudRuleBundleRequest {
   @GET("cloud/md5/v$VERSION")
   suspend fun requestCloudRuleInfo(@Header("Referer") referer: String = BuildConfig.APPLICATION_ID): CloudRuleInfo?
 
-  @Headers("Accept: application/vnd.github.v3+json", "$HEADER_BASE_URL: Repo-Info")
+  @Headers("Accept: application/vnd.github.v3+json", "$HEADER_BASE_URL: $REPO_INFO")
   @GET(ApiManager.GITHUB_API_REPO_INFO)
   suspend fun requestRepoInfo(
-    @Header("Owner") owner: String,
-    @Header("Repo") repo: String
+    @Header(OWNER) owner: String,
+    @Header(REPO) repo: String
   ): RepoInfoResp?
 }

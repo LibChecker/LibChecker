@@ -1,24 +1,27 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.graphics.text.LineBreaker
 import android.text.Layout
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StrikethroughSpan
+import android.text.SpannableStringBuilder
 import android.text.style.StyleSpan
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
+import androidx.core.text.set
+import androidx.core.text.strikeThrough
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -29,6 +32,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
 import com.absinthe.libchecker.view.detail.MetadataLibItemView
@@ -59,15 +63,15 @@ class LibStringAdapter(
 
   private var processMode: Boolean = false
 
-  @SuppressLint("NotifyDataSetChanged")
   fun switchProcessMode() {
     processMode = !processMode
+    //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 
-  @SuppressLint("NotifyDataSetChanged")
   fun setProcessMode(isProcessMode: Boolean) {
     processMode = isProcessMode
+    //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
 
@@ -82,26 +86,20 @@ class LibStringAdapter(
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
     val itemName = if (item.item.source == DISABLED) {
-      val sp = SpannableString(item.item.name)
-      sp.setSpan(
-        StrikethroughSpan(),
-        0,
-        item.item.name.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-      )
-      sp.setSpan(
-        StyleSpan(Typeface.BOLD_ITALIC),
-        0,
-        item.item.name.length,
-        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-      )
-      sp
+      buildSpannedString {
+        strikeThrough {
+          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
+            append(item.item.name)
+          }
+        }
+      }
     } else {
       item.item.name
     }
 
     when (type) {
       NATIVE -> setNativeContent(holder.itemView as NativeLibItemView, item, itemName)
+      PERMISSION -> setPermissionContent(holder.itemView as ComponentLibItemView, item, itemName)
       METADATA -> setMetadataContent(holder.itemView as MetadataLibItemView, item, itemName)
       STATIC -> setStaticContent(holder.itemView as StaticLibItemView, item, itemName)
       else -> {
@@ -155,6 +153,11 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item)
     itemView.setChip(item.chip)
+
+    if (item.item.elfType != ET_DYN) {
+      itemView.libName.tintTextToPrimary()
+      itemView.libSize.tintTextToPrimary()
+    }
   }
 
   private fun setStaticContent(
@@ -170,26 +173,31 @@ class LibStringAdapter(
         // noinspection WrongConstant
         it.breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
       }
-      val spannableString = SpannableString(item.item.source)
-      val staticPrefixIndex =
-        spannableString.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
-      spannableString.setSpan(
-        StyleSpan(Typeface.BOLD),
-        staticPrefixIndex,
-        staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length,
-        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      val versionCodePrefixIndex =
-        spannableString.indexOf(PackageUtils.VERSION_CODE_PREFIX)
-      spannableString.setSpan(
-        StyleSpan(Typeface.BOLD),
-        versionCodePrefixIndex,
-        versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length,
-        Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-      )
-      it.text = spannableString
+      val sb = SpannableStringBuilder(item.item.source)
+      val staticPrefixIndex = sb.indexOf(PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX)
+      sb[staticPrefixIndex, staticPrefixIndex + PackageUtils.STATIC_LIBRARY_SOURCE_PREFIX.length] =
+        StyleSpan(Typeface.BOLD)
+
+      val versionCodePrefixIndex = sb.indexOf(PackageUtils.VERSION_CODE_PREFIX)
+      sb[versionCodePrefixIndex, versionCodePrefixIndex + PackageUtils.VERSION_CODE_PREFIX.length] =
+        StyleSpan(Typeface.BOLD)
+
+      it.text = sb
     }
     itemView.setChip(item.chip)
+  }
+
+  private fun setPermissionContent(
+    itemView: ComponentLibItemView,
+    item: LibStringItemChip,
+    itemName: CharSequence
+  ) {
+    itemView.processLabelColor = if (item.item.size == 0L) {
+      R.color.material_red_500.getColor(context)
+    } else {
+      -1
+    }
+    setOrHighlightText(itemView.libName, itemName)
   }
 
   private fun setMetadataContent(
@@ -241,7 +249,7 @@ class LibStringAdapter(
                           arguments = bundleOf(
                             EXTRA_TEXT to text
                           )
-                          show(fm, tag)
+                          show(fm, XmlBSDFragment::class.java.name)
                         }
                       }
                     }

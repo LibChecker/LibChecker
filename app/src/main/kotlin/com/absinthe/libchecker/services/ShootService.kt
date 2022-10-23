@@ -35,13 +35,13 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val SHOOT_CHANNEL_ID = "shoot_channel"
 
@@ -165,9 +165,10 @@ class ShootService : LifecycleService() {
       repository.deleteAllSnapshotDiffItems()
 
       val size = appList.size
-      var count = 0
       val dbList = mutableListOf<SnapshotItem>()
       val exceptionInfoList = mutableListOf<PackageInfo>()
+      val currentSnapshotTimestamp = GlobalValues.snapshotTimestamp
+      var count = 0
 
       if (areNotificationsEnabled) {
         builder.setProgress(size, count, false)
@@ -177,37 +178,54 @@ class ShootService : LifecycleService() {
       var currentProgress: Int
       var lastProgress = 0
       var ai: ApplicationInfo
+      var dbSnapshotItem: SnapshotItem?
 
       for (info in appList) {
         try {
           ai = info.applicationInfo
-          dbList.add(
-            SnapshotItem(
-              id = null,
-              packageName = info.packageName,
-              timeStamp = ts,
-              label = ai.loadLabel(packageManager).toString(),
-              versionName = info.versionName ?: "null",
-              versionCode = PackageUtils.getVersionCode(info),
-              installedTime = info.firstInstallTime,
-              lastUpdatedTime = info.lastUpdateTime,
-              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-              abi = PackageUtils.getAbi(info).toShort(),
-              targetApi = ai.targetSdkVersion.toShort(),
-              nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
-              services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
-                .toJson().orEmpty(),
-              activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
-                .toJson().orEmpty(),
-              receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
-                .toJson().orEmpty(),
-              providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
-                .toJson().orEmpty(),
-              permissions = info.getPermissionsList().toJson().orEmpty(),
-              metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
-              packageSize = PackageUtils.getPackageSize(info, true)
+          dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
+
+          if (dbSnapshotItem?.versionCode == PackageUtils.getVersionCode(info) &&
+            dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
+            dbSnapshotItem.packageSize == PackageUtils.getPackageSize(info, true)
+          ) {
+            Timber.d("computeSnapshots: ${info.packageName} is up to date")
+            dbList.add(
+              dbSnapshotItem.copy().also {
+                it.id = null
+                it.timeStamp = ts
+              }
             )
-          )
+          } else {
+            dbList.add(
+              SnapshotItem(
+                id = null,
+                packageName = info.packageName,
+                timeStamp = ts,
+                label = ai.loadLabel(packageManager).toString(),
+                versionName = info.versionName ?: "null",
+                versionCode = PackageUtils.getVersionCode(info),
+                installedTime = info.firstInstallTime,
+                lastUpdatedTime = info.lastUpdateTime,
+                isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+                abi = PackageUtils.getAbi(info).toShort(),
+                targetApi = ai.targetSdkVersion.toShort(),
+                nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
+                services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
+                  .toJson().orEmpty(),
+                activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
+                  .toJson().orEmpty(),
+                receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
+                  .toJson().orEmpty(),
+                providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
+                  .toJson().orEmpty(),
+                permissions = info.getPermissionsList().toJson().orEmpty(),
+                metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
+                packageSize = PackageUtils.getPackageSize(info, true)
+              )
+            )
+          }
+
           count++
           currentProgress = count * 100 / size
           if (currentProgress > lastProgress) {
@@ -331,13 +349,14 @@ class ShootService : LifecycleService() {
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
       .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
-      .setColor(R.color.colorPrimary.getColor(this))
       .setPriority(NotificationCompat.PRIORITY_LOW)
       .setContentIntent(pi)
       .setProgress(0, 0, true)
       .setSilent(true)
       .setOngoing(true)
-      .setAutoCancel(false)
+      .setAutoCancel(false).apply {
+        if (!OsUtils.atLeastS()) color = R.color.colorPrimary.getColor(this@ShootService)
+      }
   }
 
   companion object {

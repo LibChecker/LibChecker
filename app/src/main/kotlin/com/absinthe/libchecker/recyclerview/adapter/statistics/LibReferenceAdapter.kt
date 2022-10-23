@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.statistics
 
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.bean.LibReference
@@ -11,11 +10,11 @@ import com.absinthe.libchecker.recyclerview.adapter.statistics.provider.Multiple
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
-class LibReferenceAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeAdapter() {
+class LibReferenceAdapter : BaseNodeAdapter() {
 
   init {
-    addNodeProvider(LibReferenceProvider(lifecycleScope))
-    addNodeProvider(MultipleAppsIconProvider(lifecycleScope))
+    addNodeProvider(LibReferenceProvider())
+    addNodeProvider(MultipleAppsIconProvider())
   }
 
   override fun getItemType(data: List<BaseNode>, position: Int): Int {

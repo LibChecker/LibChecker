@@ -13,7 +13,6 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libchecker.view.detail.AndroidVersionLabelView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
@@ -23,7 +22,7 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutineScope) :
   LinearLayout(context), IHeaderView {
 
-  val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
+  val adapter = AppAdapter()
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =

@@ -13,9 +13,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -25,29 +23,31 @@ import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.bean.LibChip
+import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.PackageUtils.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
 import ohos.bundle.IBundleManager
+import retrofit2.HttpException
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 class DetailViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -58,16 +58,16 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val metaDataItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val permissionsItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val dexLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
+  val signaturesLibItems: MutableLiveData<List<LibStringItemChip>> = MutableLiveData()
   val componentsMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val abilitiesMap = SparseArray<MutableLiveData<List<StatefulComponent>>>()
   val itemsCountLiveData: MutableLiveData<LocatedCount> = MutableLiveData(LocatedCount(0, 0))
   val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
   val processMapLiveData = MutableLiveData<Map<String, Int>>()
-  val itemsCountList = MutableList(9) { 0 }
+  val itemsCountList = MutableList(12) { 0 }
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
-  var abiSet: Set<Int>? = null
   var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
   var queriedProcess: String? = null
@@ -98,7 +98,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
 
         list.addAll(
-          getNativeChipList(info, abiSet?.firstOrNull())
+          getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk))
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {
@@ -130,6 +130,10 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }.also {
       it.start()
     }
+  }
+
+  fun initSignatures() = viewModelScope.launch {
+    signaturesLibItems.value = getSignatureChipList()
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
@@ -212,7 +216,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
         chipList.sortByDescending { it.item.size }
       } else {
-        chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenBy { it.item.name })
+        chipList.sortWith(compareByDescending<LibStringItemChip> { it.chip != null }.thenByDescending { it.item.size })
       }
     }
     return chipList
@@ -247,61 +251,29 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     return chipList
   }
 
-  private suspend fun getMetaDataChipList(): List<LibStringItemChip> {
+  private fun getMetaDataChipList(): List<LibStringItemChip> {
     Timber.d("getMetaDataChipList")
     val list = PackageUtils.getMetaDataItems(packageInfo)
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
 
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      list.forEach {
-        chip = null
-        LCRules.getRule(it.name, METADATA, false)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.name }
-      } else {
-        chipList.sortByDescending { it.chip != null }
-      }
+    list.forEach {
+      chipList.add(LibStringItemChip(it, null))
     }
+    chipList.sortByDescending { it.item.name }
     return chipList
   }
 
-  private suspend fun getPermissionChipList(): List<LibStringItemChip> {
+  private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
-    val list = PackageUtils.getPermissionsItems(packageInfo)
+    val list = packageInfo.getStatefulPermissionsList().asSequence()
+      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0) }
+      .toList()
     val chipList = mutableListOf<LibStringItemChip>()
-    var chip: LibChip?
 
-    if (list.isEmpty()) {
-      return chipList
-    } else {
-      list.forEach {
-        chip = null
-        LCRules.getRule(it.name, PERMISSION, false)?.let { rule ->
-          chip = LibChip(
-            iconRes = rule.iconRes,
-            name = rule.label,
-            regexName = rule.regexName
-          )
-        }
-        chipList.add(LibStringItemChip(it, chip))
-      }
-      if (GlobalValues.libSortMode == MODE_SORT_BY_SIZE) {
-        chipList.sortByDescending { it.item.name }
-      } else {
-        chipList.sortByDescending { it.chip != null }
-      }
+    list.forEach {
+      chipList.add(LibStringItemChip(it, null))
     }
+    chipList.sortByDescending { it.item.name }
     return chipList
   }
 
@@ -338,6 +310,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
     return chipList
   }
+
+  private suspend fun getSignatureChipList(): List<LibStringItemChip> =
+    withContext(Dispatchers.IO) {
+      PackageUtils.getSignatures(getApplication(), packageInfo).map {
+        LibStringItemChip(it, null)
+      }.toList()
+    }
 
   fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
@@ -407,11 +386,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val request: CloudRuleBundleRequest = ApiManager.create()
     val result = runCatching {
       request.requestRepoInfo(owner, repo) ?: return null
+    }.onFailure {
+      if (it is HttpException) {
+        GlobalValues.isGitHubUnreachable = false
+      }
     }.getOrNull() ?: return null
-    val instant = Instant.parse(result.pushed_at)
-    val formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-      .withLocale(Locale.getDefault())
-      .withZone(ZoneId.systemDefault())
-    return formatter.format(instant)
+    val pushedAt = DateUtils.parseIso8601DateTime(result.pushedAt) ?: return null
+    val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return formatter.format(pushedAt)
   }
 }

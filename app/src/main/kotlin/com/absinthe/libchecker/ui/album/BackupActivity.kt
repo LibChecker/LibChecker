@@ -30,6 +30,10 @@ import com.absinthe.libchecker.utils.StorageUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,10 +44,6 @@ import rikka.recyclerview.fixEdgeEffect
 import rikka.widget.borderview.BorderRecyclerView
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
@@ -179,8 +179,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           val formatted = simpleDateFormat.format(date)
 
           if (StorageUtils.isExternalStorageWritable) {
-
-            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile(context)) > 100 * 1024 * 1024) {
+            if (FileUtils.getFileSize(Repositories.getLCDatabaseFile()) > 100 * 1024 * 1024) {
               val dialog = LCAppUtils.createLoadingDialog(requireActivity())
               dialog.show()
               roomBackup

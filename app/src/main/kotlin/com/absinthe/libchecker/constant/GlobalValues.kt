@@ -20,21 +20,26 @@ object GlobalValues {
     return SPUtils.sp
   }
 
+  var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
+  val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
 
   var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, LCRules.getVersion())
 
+  var localRulesCount: Int by SPDelegates(Constants.PREF_LOCAL_RULES_COUNT, 0)
+
   var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
 
+  var snapshotKeep: String by SPDelegates(Constants.PREF_SNAPSHOT_KEEP, Constants.SNAPSHOT_DEFAULT)
+
   var darkMode: String by SPDelegates(Constants.PREF_DARK_MODE, Constants.DARK_MODE_FOLLOW_SYSTEM)
 
   var rengeTheme: Boolean by SPDelegates(Constants.RENGE_THEME, false)
-
-  var appSortMode: Int by SPDelegates(Constants.PREF_APP_SORT_MODE, Constants.SORT_MODE_DEFAULT)
 
   var libSortMode: Int by SPDelegates(Constants.PREF_LIB_SORT_MODE, MODE_SORT_BY_SIZE)
 
@@ -43,15 +48,13 @@ object GlobalValues {
   var libReferenceThreshold: Int by SPDelegates(Constants.PREF_LIB_REF_THRESHOLD, 2)
 
   val isShowSystemApps: MutableLiveData<Boolean> =
-    MutableLiveData(getPreferences().getBoolean(Constants.PREF_SHOW_SYSTEM_APPS, false))
+    MutableLiveData((advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS) > 0)
 
   val isColorfulIcon: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_COLORFUL_ICON, true))
 
   val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
-
-  val appSortModeLiveData: MutableLiveData<Int> = MutableLiveData(appSortMode)
 
   val libSortModeLiveData: MutableLiveData<Int> = MutableLiveData(libSortMode)
 
@@ -74,5 +77,5 @@ object GlobalValues {
 
   var uuid: String by SPDelegates(Constants.PREF_UUID, "")
 
-  var agreedPrivacy: Boolean by SPDelegates(Constants.PREF_AGREED_PRIVACY, false)
+  var isGitHubUnreachable = true
 }

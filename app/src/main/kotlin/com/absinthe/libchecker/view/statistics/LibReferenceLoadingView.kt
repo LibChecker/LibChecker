@@ -3,6 +3,7 @@ package com.absinthe.libchecker.view.statistics
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -14,6 +15,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.AViewGroup
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.LottieDrawable
+import com.google.android.material.progressindicator.LinearProgressIndicator
 
 class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = null) :
   AViewGroup(context, attributeSet) {
@@ -26,10 +28,10 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
     imageAssetsFolder = "/"
     repeatCount = LottieDrawable.INFINITE
     val assetName = when (GlobalValues.season) {
-      SPRING -> "anim/lib_reference_spring.json"
-      SUMMER -> "anim/lib_reference_summer.json"
-      AUTUMN -> "anim/lib_reference_autumn.json"
-      WINTER -> "anim/lib_reference_winter.json"
+      SPRING -> "anim/lib_reference_spring.json.zip"
+      SUMMER -> "anim/lib_reference_summer.json.zip"
+      AUTUMN -> "anim/lib_reference_autumn.json.zip"
+      WINTER -> "anim/lib_reference_winter.json.zip"
       else -> throw IllegalArgumentException("Are you living on earth?")
     }
 
@@ -38,9 +40,16 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
     addView(this)
   }
 
+  val progressIndicator = LinearProgressIndicator(context).apply {
+    layoutParams = LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT)
+    trackCornerRadius = 3.dp
+    addView(this)
+  }
+
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     loadingView.autoMeasure()
+    progressIndicator.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
       measuredHeight
@@ -49,6 +58,7 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
 
   override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     loadingView.layout(loadingView.toHorizontalCenter(this), loadingView.toVerticalCenter(this))
+    progressIndicator.layout(progressIndicator.toHorizontalCenter(this), loadingView.bottom)
   }
 
   override fun onAttachedToWindow() {

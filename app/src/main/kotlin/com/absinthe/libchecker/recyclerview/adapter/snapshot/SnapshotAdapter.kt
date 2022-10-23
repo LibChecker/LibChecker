@@ -1,20 +1,23 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.annotation.SuppressLint
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import androidx.core.text.buildSpannedString
+import androidx.core.text.inSpans
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleCoroutineScope
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -25,8 +28,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 const val ARROW = "→"
 
-class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
-  BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -39,7 +41,6 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
     )
   }
 
-  @SuppressLint("SetTextI18n")
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
       val packageInfo = runCatching {
@@ -69,10 +70,12 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
       }
 
       if (item.isTrackItem) {
-        val imageSpan = ImageSpan(context, R.drawable.ic_track)
-        val spannable = SpannableString(" ${getDiffString(item.labelDiff, isNewOrDeleted)}")
-        spannable.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
-        appName.text = spannable
+        appName.text = buildSpannedString {
+          inSpans(ImageSpan(context, R.drawable.ic_track)) {
+            append(" ")
+          }
+          append(getDiffString(item.labelDiff, isNewOrDeleted))
+        }
       } else {
         appName.text = getDiffString(item.labelDiff, isNewOrDeleted)
       }
@@ -150,6 +153,13 @@ class SnapshotAdapter(val lifecycleScope: LifecycleCoroutineScope) :
           }
           newAbiSpanString = SpannableString(newPaddingString)
           abiBadgeRes.getDrawable(context)?.let {
+            if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
+              if (abiBadgeRes == R.drawable.ic_abi_label_64bit) {
+                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
+              } else {
+                it.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
+              }
+            }
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
             val span = CenterAlignImageSpan(it)
             newAbiSpanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)

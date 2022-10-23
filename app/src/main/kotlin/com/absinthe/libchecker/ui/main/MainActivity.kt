@@ -6,10 +6,16 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -40,12 +46,11 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.io.File
 import jonathanfinerty.once.Once
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.File
 
 const val PAGE_TRANSFORM_DURATION = 300L
 
@@ -88,6 +93,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       appViewModel.workerBinder = null
     }
   }
+  private var _menuProvider: MenuProvider? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -136,8 +142,13 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     binding.progressHorizontal.hide()
   }
 
-  override fun scheduleAppbarLiftingStatus(isLifted: Boolean, from: String) {
-    Timber.d("scheduleAppbarLiftingStatus: isLifted: $isLifted, from: $from")
+  override var currentMenuProvider: MenuProvider?
+    get() = _menuProvider
+    set(value) {
+      _menuProvider = value
+    }
+
+  override fun scheduleAppbarLiftingStatus(isLifted: Boolean) {
     binding.appbar.isLifted = isLifted
   }
 
@@ -178,6 +189,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         // 禁止左右滑动
         isUserInputEnabled = false
         offscreenPageLimit = 2
+        fixViewPager2Insets(this)
       }
 
       navView.apply {
@@ -217,7 +229,30 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
           true
         }
         setOnClickListener { /*Do nothing*/ }
+        fixBottomNavigationViewInsets(this)
       }
+    }
+  }
+
+  /**
+   * 覆盖掉 BottomNavigationView 内部的 OnApplyWindowInsetsListener 并避免其被软键盘顶起来
+   * @see BottomNavigationView.applyWindowInsets
+   */
+  private fun fixBottomNavigationViewInsets(view: BottomNavigationView) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      // 这里不直接使用 windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
+      // 因为它的结果可能受到 insets 传播链上层某环节的影响，出现了错误的 navigationBarsInsets
+      val navigationBarsInsets =
+        ViewCompat.getRootWindowInsets(view)!!.getInsets(WindowInsetsCompat.Type.navigationBars())
+      view.updatePadding(bottom = navigationBarsInsets.bottom)
+      windowInsets
+    }
+  }
+
+  private fun fixViewPager2Insets(view: ViewPager2) {
+    ViewCompat.setOnApplyWindowInsetsListener(view) { _, windowInsets ->
+      /* Do nothing */
+      windowInsets
     }
   }
 
@@ -239,7 +274,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       if (!Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)) {
         initItems()
       } else {
-        initKotlinUsage()
+        initFeatures()
       }
 
       lifecycleScope.launchWhenStarted {
@@ -254,7 +289,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
                   hideNavigationView()
                 }
               } else if (it.status == STATUS_INIT_END) {
-                initKotlinUsage()
+                initFeatures()
               }
             }
             else -> {}
@@ -268,10 +303,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
-  private fun initKotlinUsage() = lifecycleScope.launch(Dispatchers.IO) {
-    do {
-      appViewModel.workerBinder?.initKotlinUsage()
-      delay(300)
-    } while (appViewModel.workerBinder == null)
+  private fun initFeatures() {
+    Handler(Looper.getMainLooper()).also {
+      it.post(object : Runnable {
+        override fun run() {
+          if (appViewModel.workerBinder == null) {
+            it.postDelayed(this, 300)
+          } else {
+            Timber.d("initFeatures")
+            appViewModel.workerBinder?.initFeatures()
+          }
+        }
+      })
+    }
   }
 }

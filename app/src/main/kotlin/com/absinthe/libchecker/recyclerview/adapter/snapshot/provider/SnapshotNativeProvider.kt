@@ -2,7 +2,8 @@ package com.absinthe.libchecker.recyclerview.adapter.snapshot.provider
 
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.bean.ADDED
@@ -17,11 +18,13 @@ import com.absinthe.rulesbundle.LCRules
 import com.chad.library.adapter.base.entity.node.BaseNode
 import com.chad.library.adapter.base.provider.BaseNodeProvider
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val SNAPSHOT_NATIVE_PROVIDER = 2
 
-class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
+class SnapshotNativeProvider : BaseNodeProvider() {
 
   override val itemViewType: Int = SNAPSHOT_NATIVE_PROVIDER
   override val layoutId: Int = 0
@@ -62,26 +65,25 @@ class SnapshotNativeProvider(val lifecycleScope: LifecycleCoroutineScope) : Base
 
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)
 
-      lifecycleScope.launch {
+      (this@SnapshotNativeProvider.context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
         val rule = LCRules.getRule(snapshotItem.name, snapshotItem.itemType, true)
 
-        setChip(rule, colorRes)
-        if (rule != null) {
-          setChipOnClickListener {
-            if (AntiShakeUtils.isInvalidClick(it)) {
-              return@setChipOnClickListener
-            }
-            val name = item.item.name
-            LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
-              .apply {
-                show(
-                  (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager,
-                  tag
-                )
+        withContext(Dispatchers.Main) {
+          setChip(rule, colorRes)
+          if (rule != null) {
+            setChipOnClickListener {
+              if (AntiShakeUtils.isInvalidClick(it)) {
+                return@setChipOnClickListener
               }
+              val name = item.item.name
+              val fragmentManager =
+                (this@SnapshotNativeProvider.context as BaseActivity<*>).supportFragmentManager
+              LibDetailDialogFragment.newInstance(name, item.item.itemType, rule.regexName)
+                .show(fragmentManager, LibDetailDialogFragment::class.java.name)
+            }
+          } else {
+            setChipOnClickListener(null)
           }
-        } else {
-          setChipOnClickListener(null)
         }
       }
     }

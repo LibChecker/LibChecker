@@ -50,11 +50,12 @@ public class ContributorViewBinder extends ItemViewBinder<Contributor, Contribut
 
   public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public ImageView avatar;
-    public TextView name;
-    public TextView desc;
+    public final ImageView avatar;
+    public final TextView name;
+    public final TextView desc;
     public Contributor data;
-    protected @NonNull final AbsAboutActivityProxy activity;
+    protected @NonNull
+    final AbsAboutActivityProxy activity;
 
     public ViewHolder(View itemView, @NonNull AbsAboutActivityProxy activity) {
       super(itemView);

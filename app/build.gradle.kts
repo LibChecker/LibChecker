@@ -1,20 +1,23 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
-import com.google.protobuf.gradle.builtins
-import com.google.protobuf.gradle.generateProtoTasks
 import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.plugins
-import com.google.protobuf.gradle.protobuf
-import com.google.protobuf.gradle.protoc
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 import java.nio.file.Paths
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
+
+@Suppress(
+  "DSL_SCOPE_VIOLATION",
+  "MISSING_DEPENDENCY_CLASS",
+  "UNRESOLVED_REFERENCE_WRONG_RECEIVER",
+  "FUNCTION_CALL_EXPECTED"
+)
 
 plugins {
-  id(libs.plugins.android.application.get().pluginId)
-  id(libs.plugins.kotlin.android.get().pluginId)
-  id(libs.plugins.kotlin.parcelize.get().pluginId)
+  alias(libs.plugins.android.application)
+  alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.protobuf)
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
+  alias(libs.plugins.moshiX)
 }
 
 ksp {
@@ -25,34 +28,27 @@ ksp {
 }
 
 setupAppModule {
+  namespace = "com.absinthe.libchecker"
   defaultConfig {
     applicationId = "com.absinthe.libchecker"
-    namespace = "com.absinthe.libchecker"
   }
 
   buildFeatures {
     viewBinding = true
   }
 
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-  }
+  productFlavors {
+    flavorDimensions += "channel"
 
-  sourceSets {
-    named("main") {
-      java {
-        srcDirs("src/main/kotlin")
-      }
+    create("foss") {
+      isDefault = true
+      dimension = flavorDimensionList[0]
     }
-    named("foss") {
-      java {
-        srcDirs("src/foss/kotlin")
-      }
+    create("market") {
+      dimension = flavorDimensionList[0]
     }
-    named("market") {
-      java {
-        srcDirs("src/market/kotlin")
-      }
+    all {
+      manifestPlaceholders["channel"] = this.name
     }
   }
 
@@ -62,7 +58,8 @@ setupAppModule {
     "kotlin/**",
     "org/**",
     "**.properties",
-    "**.bin"
+    "**.bin",
+    "**/*.proto"
   )
 
   lint {
@@ -71,66 +68,60 @@ setupAppModule {
 
   dependenciesInfo.includeInApk = false
 
-  applicationVariants.all {
-    outputs.all {
+  applicationVariants.configureEach {
+    outputs.configureEach {
       (this as? ApkVariantOutputImpl)?.outputFileName =
         "LibChecker-${verName}-${verCode}-${name}.apk"
     }
   }
 }
 
-tasks.whenTaskAdded {
-  if (name == "optimizeFossReleaseResources" || name == "optimizeMarketReleaseResources") {
-    val flavor = name.removePrefix("optimize").removeSuffix("ReleaseResources")
-    val flavorLowerCase = flavor.toLowerCaseAsciiOnly()
-    val optimizeReleaseRes = task("optimize${flavor}ReleaseRes").doLast {
-      val aapt2 = File(
-        androidComponents.sdkComponents.sdkDirectory.get().asFile,
-        "build-tools/${project.android.buildToolsVersion}/aapt2"
+tasks.matching {
+  it.name.contains("optimize(.*)ReleaseRes".toRegex())
+}.configureEach {
+  notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
+  val flavor = name.removeSurrounding("optimize", "ReleaseResources").toLowerCaseAsciiOnly()
+  doLast {
+    val aapt2 = File(
+      androidComponents.sdkComponents.sdkDirectory.get().asFile,
+      "build-tools/${project.android.buildToolsVersion}/aapt2"
+    )
+    val zip = Paths.get(
+      buildDir.path,
+      "intermediates",
+      "optimized_processed_res",
+      "${flavor}Release",
+      "resources-${flavor}-release-optimize.ap_"
+    )
+    val optimized = File("${zip}.opt")
+    val cmd = exec {
+      commandLine(
+        aapt2, "optimize",
+        "--collapse-resource-names",
+        "--resources-config-path", "aapt2-resources.cfg",
+        "-o", optimized,
+        zip
       )
-      val zip = Paths.get(
-        buildDir.path,
-        "intermediates",
-        "optimized_processed_res",
-        "${flavorLowerCase}Release",
-        "resources-${flavorLowerCase}-release-optimize.ap_"
-      )
-      val optimized = File("${zip}.opt")
-      val cmd = exec {
-        commandLine(
-          aapt2, "optimize",
-          "--collapse-resource-names",
-          "--resources-config-path", "aapt2-resources.cfg",
-          "-o", optimized,
-          zip
-        )
-        isIgnoreExitValue = false
-      }
-      if (cmd.exitValue == 0) {
-        delete(zip)
-        optimized.renameTo(zip.toFile())
-      }
+      isIgnoreExitValue = false
     }
-
-    finalizedBy(optimizeReleaseRes)
+    if (cmd.exitValue == 0) {
+      delete(zip)
+      optimized.renameTo(zip.toFile())
+    }
   }
 }
 
-configurations.all {
+configurations.configureEach {
   exclude("androidx.appcompat", "appcompat")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk7")
   exclude("org.jetbrains.kotlin", "kotlin-stdlib-jdk8")
 }
 
 dependencies {
-  compileOnly(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
-  compileOnly(fileTree("ohos"))
   compileOnly(projects.hiddenApi)
 
-  coreLibraryDesugaring(libs.agp.desugering)
-
   implementation(libs.kotlinX.coroutines)
-  implementation(libs.androidX.appCompat)
+  //implementation(libs.androidX.appCompat)
   implementation(libs.androidX.core)
   implementation(libs.androidX.activity)
   implementation(libs.androidX.fragment)
@@ -154,11 +145,9 @@ dependencies {
   implementation(libs.bundles.grpc)
   implementation(libs.rikka.refine.runtime)
   implementation(libs.bundles.zhaobozhen)
-  implementation(libs.bundles.appCenter)
   implementation(libs.lc.rules)
 
   ksp(libs.androidX.room.compiler)
-  ksp(libs.square.moshi.compiler)
 
   implementation(libs.lottie)
   implementation(libs.drakeet.about)
@@ -171,14 +160,18 @@ dependencies {
   implementation(libs.cascade)
   implementation(libs.fastScroll)
   implementation(libs.appIconLoader)
+  implementation(libs.appIconLoader.coil)
   implementation(libs.hiddenApiBypass)
   implementation(libs.dexLib2)
   implementation(libs.slf4j)
   implementation(libs.commons.io)
+  implementation(libs.flexbox)
 
   implementation(libs.bundles.rikkax)
 
   debugImplementation(libs.square.leakCanary)
+  "marketCompileOnly"(fileTree("ohos"))
+  "marketImplementation"(libs.bundles.appCenter)
 }
 
 protobuf {

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <string name="privacy_title">隐私政策</string>
-  <string name="privacy_content"><![CDATA[请务必审慎阅读、充分理解「服务协议」和「隐私政策」各条款，包括但不限于：为了更好的向你提供服务，我们需要收集你的设备标识、操作日志等信息用于分析、优化应用性能。<br/>您可阅读<a href=\"https://absinthe.life/LibChecker-Docs/guide/TERMS/\">《服务协议》</a>和<a href=\"https://absinthe.life/LibChecker-Docs/guide/PRIVACY/\">《隐私政策》</a>了解详细信息。如果您同意，请点击下面按钮开始接受我们的服务。]]></string>
-  <string name="agree">同意</string>
-  <string name="deny">拒绝</string>
-</resources>

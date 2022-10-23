@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import androidx.lifecycle.LifecycleCoroutineScope
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
@@ -13,12 +12,12 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.provider.SnapshotTi
 import com.chad.library.adapter.base.BaseNodeAdapter
 import com.chad.library.adapter.base.entity.node.BaseNode
 
-class SnapshotDetailAdapter(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeAdapter() {
+class SnapshotDetailAdapter : BaseNodeAdapter() {
 
   init {
-    addNodeProvider(SnapshotTitleProvider(lifecycleScope))
-    addNodeProvider(SnapshotNativeProvider(lifecycleScope))
-    addNodeProvider(SnapshotComponentProvider(lifecycleScope))
+    addNodeProvider(SnapshotTitleProvider())
+    addNodeProvider(SnapshotNativeProvider())
+    addNodeProvider(SnapshotComponentProvider())
   }
 
   override fun getItemType(data: List<BaseNode>, position: Int): Int {

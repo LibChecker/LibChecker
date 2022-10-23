@@ -14,7 +14,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
 
   private val image = ImageView(context).apply {
     layoutParams = LayoutParams(200.dp, 200.dp)
-    setImageResource(R.drawable.ic_natural_food)
+    setImageResource(R.drawable.ic_notebook)
     addView(this)
   }
 
@@ -23,7 +23,7 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
-      it.topMargin = 16.dp
+      it.topMargin = (-16).dp
     }
     text = context.getString(R.string.snapshot_empty_list_title)
     setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline5))
@@ -32,10 +32,11 @@ class SnapshotEmptyView(context: Context) : AViewGroup(context) {
 
   override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    setPadding(0, measuredWidth / 8, 0, measuredWidth / 8)
     image.autoMeasure()
     text.autoMeasure()
     setMeasuredDimension(
-      paddingStart + image.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
+      measuredWidth,
       paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
     )
   }

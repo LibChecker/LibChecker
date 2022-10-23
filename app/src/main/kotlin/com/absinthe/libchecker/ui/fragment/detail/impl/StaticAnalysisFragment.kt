@@ -61,7 +61,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
     }
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return viewModel.staticLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 

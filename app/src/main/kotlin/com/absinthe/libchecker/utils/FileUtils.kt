@@ -10,7 +10,9 @@ object FileUtils {
     if (file == null) return false
     return if (file.isDirectory) {
       deleteDir(file)
-    } else deleteFile(file)
+    } else {
+      deleteFile(file)
+    }
   }
 
   private fun deleteDir(dir: File?): Boolean {

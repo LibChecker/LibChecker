@@ -1,16 +1,13 @@
 package com.absinthe.libchecker.ui.fragment.applist
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.graphics.Color
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.appcompat.view.menu.MenuBuilder
-import androidx.appcompat.widget.PopupMenu
+import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +18,8 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
+import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -30,12 +29,14 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
+import com.absinthe.libchecker.ui.fragment.main.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
@@ -59,17 +60,18 @@ class AppListFragment :
   BaseListControllerFragment<FragmentAppListBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val appAdapter by lazy { AppAdapter(lifecycleScope) }
+  private val appAdapter = AppAdapter()
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
-  private var popup: PopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
   private var keyword: String = ""
+  private var advancedMenuBSDFragment: AdvancedMenuBSDFragment? = null
 
   private lateinit var layoutManager: RecyclerView.LayoutManager
 
   override fun init() {
+    val context = (context as? BaseActivity<*>) ?: return
     appAdapter.also {
       it.setOnItemClickListener { _, view, position ->
         if (AntiShakeUtils.isInvalidClick(view)) {
@@ -81,20 +83,25 @@ class AppListFragment :
       }
       it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
+      it.setEmptyView(
+        EmptyListView(context).apply {
+          layoutParams = FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+          )
+        }
+      )
     }
 
     binding.apply {
       list.apply {
         adapter = appAdapter
         borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManager()
+        layoutManager = getSuitableLayoutManagerImpl()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "AppListFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
         setHasFixedSize(true)
@@ -112,7 +119,7 @@ class AppListFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (isListCanScroll(appAdapter.data.size)) {
+              if (canListScroll(appAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -160,44 +167,19 @@ class AppListFragment :
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
     if (homeViewModel.appListStatus == STATUS_START_INIT) {
       flip(VF_INIT)
-      setHasOptionsMenu(false)
+      activity?.removeMenuProvider(this)
     }
   }
 
   override fun onPause() {
     super.onPause()
-    popup?.dismiss()
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.app_list_menu, menu)
-    this.menu = menu
-
-    val searchView = SearchView(requireContext()).apply {
-      setIconifiedByDefault(false)
-      setOnQueryTextListener(this@AppListFragment)
-      queryHint = getText(R.string.search_hint)
-      isQueryRefinementEnabled = true
-
-      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
-        setBackgroundColor(Color.TRANSPARENT)
-      }
-    }
-
-    menu.findItem(R.id.search).apply {
-      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
-      actionView = searchView
-
-      if (!isListReady) {
-        isVisible = false
-      }
-    }
-    super.onCreateOptionsMenu(menu, inflater)
+    advancedMenuBSDFragment?.dismiss()
+    advancedMenuBSDFragment = null
   }
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManager()
+    binding.list.layoutManager = getSuitableLayoutManagerImpl()
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -235,41 +217,50 @@ class AppListFragment :
     return false
   }
 
-  @SuppressLint("RestrictedApi")
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    when (item.itemId) {
-      R.id.sort -> {
-        activity?.let { a ->
-          popup = PopupMenu(a, a.findViewById(R.id.sort)).apply {
-            menuInflater.inflate(R.menu.sort_menu, menu)
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.app_list_menu, menu)
+    this.menu = menu
 
-            if (menu is MenuBuilder) {
-              (menu as MenuBuilder).setOptionalIconsVisible(true)
-            }
+    val searchView = SearchView(requireContext()).apply {
+      setIconifiedByDefault(false)
+      setOnQueryTextListener(this@AppListFragment)
+      queryHint = getText(R.string.search_hint)
+      isQueryRefinementEnabled = true
 
-            menu[GlobalValues.appSortMode].isChecked = true
-            setOnMenuItemClickListener { menuItem ->
-              val mode = when (menuItem.itemId) {
-                R.id.sort_by_update_time_desc -> Constants.SORT_MODE_UPDATE_TIME_DESC
-                R.id.sort_by_target_api_desc -> Constants.SORT_MODE_TARGET_API_DESC
-                R.id.sort_default -> Constants.SORT_MODE_DEFAULT
-                else -> Constants.SORT_MODE_DEFAULT
-              }
-              GlobalValues.appSortMode = mode
-              GlobalValues.appSortModeLiveData.value = mode
-              true
-            }
-            setOnDismissListener {
-              popup = null
-            }
-          }.also {
-            it.show()
-          }
-        }
+      findViewById<View>(androidx.appcompat.R.id.search_plate).apply {
+        setBackgroundColor(Color.TRANSPARENT)
       }
     }
 
-    return super.onOptionsItemSelected(item)
+    menu.findItem(R.id.search).apply {
+      setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
+      actionView = searchView
+
+      if (!isListReady) {
+        isVisible = false
+      }
+    }
+  }
+
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    when (menuItem.itemId) {
+      R.id.advanced -> {
+        activity?.let {
+          advancedMenuBSDFragment?.dismiss()
+          advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
+            setOnDismissListener {
+              GlobalValues.advancedOptionsLiveData.postValue(GlobalValues.advancedOptions)
+              GlobalValues.isShowSystemApps.postValue(GlobalValues.advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS > 0)
+              //noinspection NotifyDataSetChanged
+              appAdapter.notifyDataSetChanged()
+              advancedMenuBSDFragment = null
+            }
+          }
+          advancedMenuBSDFragment?.show(it.supportFragmentManager, AdvancedMenuBSDFragment::class.java.name)
+        }
+      }
+    }
+    return true
   }
 
   private fun initObserver() {
@@ -306,7 +297,7 @@ class AppListFragment :
                     Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                   }
                   (activity as? INavViewContainer)?.showNavigationView()
-                  setHasOptionsMenu(true)
+                  activity?.addMenuProvider(this@AppListFragment)
                 }
                 STATUS_START_REQUEST_CHANGE_END -> {
                   dbItems.value?.let { dbItems -> updateItems(dbItems) }
@@ -329,6 +320,7 @@ class AppListFragment :
                 updateItems(dbItems)
               }
             }
+            else -> {}
           }
         }
       }
@@ -355,25 +347,6 @@ class AppListFragment :
           updateItems(homeViewModel.dbItems.value!!)
         }
       }
-      appSortModeLiveData.observe(viewLifecycleOwner) { mode ->
-        if (isListReady) {
-          homeViewModel.dbItems.value?.let { allDatabaseItems ->
-            val list = allDatabaseItems.toMutableList()
-
-            when (mode) {
-              Constants.SORT_MODE_DEFAULT -> list.sortWith(
-                compareBy(
-                  { it.abi },
-                  { it.label }
-                )
-              )
-              Constants.SORT_MODE_UPDATE_TIME_DESC -> list.sortByDescending { it.lastUpdatedTime }
-              Constants.SORT_MODE_TARGET_API_DESC -> list.sortByDescending { it.targetApi }
-            }
-            updateItems(list)
-          }
-        }
-      }
     }
   }
 
@@ -382,12 +355,27 @@ class AppListFragment :
     highlightRefresh: Boolean = false
   ) {
     Timber.d("updateItems")
-    var filterList: MutableList<LCItem>
+    var filterList: MutableList<LCItem> = newItems.toMutableList()
 
-    filterList = if (GlobalValues.isShowSystemApps.value == false) {
-      newItems.filter { !it.isSystem }.toMutableList()
-    } else {
-      newItems.toMutableList()
+    val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
+    val options = GlobalValues.advancedOptions
+    if ((options and AdvancedOptions.SHOW_SYSTEM_APPS) == 0) {
+      filterList = filterList.filter { !it.isSystem }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
+      filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_64_BIT_APPS) == 0) {
+      filterList = filterList.filter {
+        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86 || trueAbi == Constants.ARMV7 || trueAbi == Constants.ARMV5 || (trueAbi == Constants.NO_LIBS && !isNonNativeLibApp64Bit)
+      }.toMutableList()
+    }
+    if ((options and AdvancedOptions.SHOW_32_BIT_APPS) == 0) {
+      filterList = filterList.filter {
+        val trueAbi = it.abi.mod(Constants.MULTI_ARCH)
+        it.abi.toInt() == Constants.OVERLAY || trueAbi == Constants.X86_64 || trueAbi == Constants.ARMV8 || (trueAbi == Constants.NO_LIBS && isNonNativeLibApp64Bit)
+      }.toMutableList()
     }
 
     if (keyword.isNotEmpty()) {
@@ -401,10 +389,12 @@ class AppListFragment :
       }
     }
 
-    when (GlobalValues.appSortMode) {
-      Constants.SORT_MODE_DEFAULT -> filterList.sortWith(compareBy({ it.abi }, { it.label }))
-      Constants.SORT_MODE_UPDATE_TIME_DESC -> filterList.sortByDescending { it.lastUpdatedTime }
-      Constants.SORT_MODE_TARGET_API_DESC -> filterList.sortByDescending { it.targetApi }
+    if ((options and AdvancedOptions.SORT_BY_NAME) > 0) {
+      filterList.sortWith(compareBy({ it.abi }, { it.label }))
+    } else if ((options and AdvancedOptions.SORT_BY_UPDATE_TIME) > 0) {
+      filterList.sortByDescending { it.lastUpdatedTime }
+    } else if ((options and AdvancedOptions.SORT_BY_TARGET_API) > 0) {
+      filterList.sortByDescending { it.targetApi }
     }
 
     appAdapter.setDiffNewData(filterList) {
@@ -426,7 +416,9 @@ class AppListFragment :
     }
   }
 
-  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
+  override fun getSuitableLayoutManager() = binding.list.layoutManager
+
+  private fun getSuitableLayoutManagerImpl(): RecyclerView.LayoutManager {
     layoutManager = when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->
@@ -453,7 +445,7 @@ class AppListFragment :
 
   private fun initApps() {
     flip(VF_INIT)
-    setHasOptionsMenu(false)
+    activity?.removeMenuProvider(this)
     homeViewModel.initItems()
   }
 

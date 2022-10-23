@@ -12,6 +12,7 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.showToast
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,7 +20,6 @@ import okio.buffer
 import okio.sink
 import okio.source
 import timber.log.Timber
-import java.io.File
 
 class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
 
@@ -96,8 +96,8 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                     or PackageManager.GET_PROVIDERS
                     or PackageManager.GET_PERMISSIONS
                     or PackageManager.GET_META_DATA
-                    or PackageManagerCompat.MATCH_DISABLED_COMPONENTS
-                    or PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
+                    or PackageManager.MATCH_DISABLED_COMPONENTS
+                    or PackageManager.MATCH_UNINSTALLED_PACKAGES
                   )
                 PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
                   it.applicationInfo.sourceDir = tf.path

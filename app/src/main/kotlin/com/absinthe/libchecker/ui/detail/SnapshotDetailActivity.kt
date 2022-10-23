@@ -1,13 +1,14 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
 import androidx.activity.viewModels
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -62,13 +63,20 @@ import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
 
-class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>() {
+class SnapshotDetailActivity :
+  CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
+  MenuProvider {
 
   private lateinit var entity: SnapshotDiffItem
 
-  private val adapter by unsafeLazy { SnapshotDetailAdapter(lifecycleScope) }
+  private val adapter = SnapshotDetailAdapter()
   private val viewModel: SnapshotViewModel by viewModels()
-  private val _entity by unsafeLazy { IntentCompat.getSerializableExtra<SnapshotDiffItem>(intent, EXTRA_ENTITY) }
+  private val _entity by unsafeLazy {
+    IntentCompat.getSerializableExtra<SnapshotDiffItem>(
+      intent,
+      EXTRA_ENTITY
+    )
+  }
 
   override fun requirePackageName() = entity.packageName
 
@@ -84,22 +92,21 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.snapshot_detail_menu, menu)
-    return super.onCreateOptionsMenu(menu)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == android.R.id.home) {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+    if (menuItem.itemId == android.R.id.home) {
       finish()
-    } else if (item.itemId == R.id.report_generate) {
+    } else if (menuItem.itemId == R.id.report_generate) {
       generateReport()
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
-  @SuppressLint("SetTextI18n")
   private fun initView() {
+    addMenuProvider(this)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
@@ -132,17 +139,15 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
           false,
           this@SnapshotDetailActivity
         )
-        val icon = try {
-          appIconLoader.loadIcon(
+        runCatching {
+          val icon = appIconLoader.loadIcon(
             PackageUtils.getPackageInfo(
               entity.packageName,
               PackageManager.GET_META_DATA
             ).applicationInfo
           )
-        } catch (e: PackageManager.NameNotFoundException) {
-          null
+          load(icon)
         }
-        load(icon)
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
@@ -158,7 +163,8 @@ class SnapshotDetailActivity : CheckPackageOnResumingActivity<ActivitySnapshotDe
         isNewOrDeleted,
         "%s (%s)"
       )
-      snapshotTitle.targetApiView.text = "API ${getDiffString(entity.targetApiDiff, isNewOrDeleted)}"
+      snapshotTitle.targetApiView.text =
+        String.format("API %s", getDiffString(entity.targetApiDiff, isNewOrDeleted))
 
       if (entity.packageSizeDiff.old > 0L) {
         snapshotTitle.packageSizeView.isVisible = true

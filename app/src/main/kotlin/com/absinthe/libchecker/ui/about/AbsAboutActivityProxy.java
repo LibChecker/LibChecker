@@ -2,7 +2,6 @@ package com.absinthe.libchecker.ui.about;
 
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,12 +15,10 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
-import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -52,7 +49,7 @@ import rikka.material.app.MaterialActivity;
 /**
  * @author drakeet
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings("deprecation")
 public abstract class AbsAboutActivityProxy extends MaterialActivity {
 
   private Toolbar toolbar;
@@ -110,14 +107,11 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
     }
     onApplyPresetAttrs();
     recyclerView = findViewById(R.id.list);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      applyEdgeToEdge();
-    }
+    applyEdgeToEdge();
   }
 
   private boolean givenInsetsToDecorView = false;
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   private void applyEdgeToEdge() {
     Window window = getWindow();
     int navigationBarColor = ContextCompat.getColor(this, R.color.about_page_navigationBarColor);
@@ -125,35 +119,32 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
 
     final AppBarLayout appBarLayout = findViewById(R.id.header_layout);
     final View decorView = window.getDecorView();
-    final int originalRecyclerViewPaddingBottom =recyclerView.getPaddingBottom();
+    final int originalRecyclerViewPaddingBottom = recyclerView.getPaddingBottom();
 
     givenInsetsToDecorView = false;
     WindowCompat.setDecorFitsSystemWindows(window, false);
-    ViewCompat.setOnApplyWindowInsetsListener(decorView, new OnApplyWindowInsetsListener() {
-      @Override
-      public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat windowInsets) {
-        Insets navigationBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
-        boolean isGestureNavigation = navigationBarsInsets.bottom <= 20 * getResources().getDisplayMetrics().density;
+    ViewCompat.setOnApplyWindowInsetsListener(decorView, (v, windowInsets) -> {
+      Insets navigationBarsInsets = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+      boolean isGestureNavigation = navigationBarsInsets.bottom <= 24 * getResources().getDisplayMetrics().density;
 
-        if (!isGestureNavigation) {
-          ViewCompat.onApplyWindowInsets(decorView, windowInsets);
-          givenInsetsToDecorView = true;
-        } else if (givenInsetsToDecorView) {
-          ViewCompat.onApplyWindowInsets(
-            decorView,
-            new WindowInsetsCompat.Builder()
-              .setInsets(
-                WindowInsetsCompat.Type.navigationBars(),
-                Insets.of(navigationBarsInsets.left, navigationBarsInsets.top, navigationBarsInsets.right, 0)
-              )
-              .build()
-          );
-        }
-        decorView.setPadding(windowInsets.getSystemWindowInsetLeft(), decorView.getPaddingTop(), windowInsets.getSystemWindowInsetRight(), decorView.getPaddingBottom());
-        appBarLayout.setPadding(appBarLayout.getPaddingLeft(), windowInsets.getSystemWindowInsetTop(), appBarLayout.getPaddingRight(), appBarLayout.getPaddingBottom());
-        recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), originalRecyclerViewPaddingBottom + navigationBarsInsets.bottom);
-        return windowInsets;
+      if (!isGestureNavigation) {
+        ViewCompat.onApplyWindowInsets(decorView, windowInsets);
+        givenInsetsToDecorView = true;
+      } else if (givenInsetsToDecorView) {
+        ViewCompat.onApplyWindowInsets(
+          decorView,
+          new WindowInsetsCompat.Builder()
+            .setInsets(
+              WindowInsetsCompat.Type.navigationBars(),
+              Insets.of(navigationBarsInsets.left, navigationBarsInsets.top, navigationBarsInsets.right, 0)
+            )
+            .build()
+        );
       }
+      decorView.setPadding(windowInsets.getSystemWindowInsetLeft(), decorView.getPaddingTop(), windowInsets.getSystemWindowInsetRight(), decorView.getPaddingBottom());
+      appBarLayout.setPadding(appBarLayout.getPaddingLeft(), windowInsets.getSystemWindowInsetTop(), appBarLayout.getPaddingRight(), appBarLayout.getPaddingBottom());
+      recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(), originalRecyclerViewPaddingBottom + navigationBarsInsets.bottom);
+      return windowInsets;
     });
   }
 
@@ -254,11 +245,6 @@ public abstract class AbsAboutActivityProxy extends MaterialActivity {
       onBackPressed();
     }
     return super.onOptionsItemSelected(menuItem);
-  }
-
-  @Override
-  public void setTitle(@NonNull CharSequence title) {
-    collapsingToolbar.setTitle(title);
   }
 
   public Toolbar getToolbar() {

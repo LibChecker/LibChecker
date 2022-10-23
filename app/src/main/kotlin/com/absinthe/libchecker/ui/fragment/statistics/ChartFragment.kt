@@ -17,7 +17,10 @@ import com.absinthe.libchecker.constant.Constants.ARMV7
 import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
+import com.absinthe.libchecker.constant.Constants.X86
+import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.services.WorkerService
@@ -48,17 +51,20 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.github.mikephil.charting.utils.MPPointF
 import com.google.android.material.button.MaterialButtonToggleGroup
+import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.util.TreeMap
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
 private const val TYPE_TARGET_API = 2
 private const val TYPE_MIN_SDK = 3
+
+private val ABI_64_BIT = setOf(ARMV8, X86_64)
+private val ABI_32_BIT = setOf(ARMV5, ARMV7, X86)
 
 class ChartFragment :
   BaseFragment<FragmentPieChartBinding>(),
@@ -82,7 +88,7 @@ class ChartFragment :
       addOnButtonCheckedListener(this@ChartFragment)
       check(R.id.btn_abi)
     }
-    binding.btnKotlin.isVisible = !WorkerService.initializingKotlinUsage
+    binding.btnKotlin.isVisible = !WorkerService.initializingFeatures
 
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {
@@ -138,8 +144,8 @@ class ChartFragment :
             if (item.isSystem) continue
           }
           when (item.abi % 10) {
-            ARMV8 -> list[0]++
-            ARMV5, ARMV7 -> list[1]++
+            in ABI_64_BIT -> list[0]++
+            in ABI_32_BIT -> list[1]++
             else -> list[2]++
           }
         }
@@ -226,7 +232,7 @@ class ChartFragment :
         val list = mutableListOf(0, 0)
 
         for (item in it) {
-          if (item.isKotlinUsed == true) {
+          if ((item.features and Features.KOTLIN_USED) > 0) {
             list[0]++
           } else {
             list[1]++
@@ -460,7 +466,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_64_bit)
               )
-              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV8 }
+              filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_64_BIT }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
@@ -470,7 +476,7 @@ class ChartFragment :
                 getString(R.string.title_statistics_dialog),
                 getString(R.string.string_32_bit)
               )
-              filteredList?.filter { (it.abi % MULTI_ARCH) == ARMV7 || (it.abi % MULTI_ARCH) == ARMV5 }
+              filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_32_BIT }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
@@ -488,14 +494,14 @@ class ChartFragment :
           when (legendList.getOrNull(h.x.toInt())) {
             getString(R.string.string_kotlin_used) -> {
               dialogTitle = getString(R.string.string_kotlin_used)
-              filteredList?.filter { it.isKotlinUsed == true }
+              filteredList?.filter { (it.features and Features.KOTLIN_USED) > 0 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
             }
             getString(R.string.string_kotlin_unused) -> {
               dialogTitle = getString(R.string.string_kotlin_unused)
-              filteredList?.filter { it.isKotlinUsed == false }
+              filteredList?.filter { (it.features and Features.KOTLIN_USED) == 0 }
                 ?.let { filter ->
                   item = ArrayList(filter)
                 }
@@ -543,7 +549,7 @@ class ChartFragment :
       })
     }.also {
       activity?.let { activity ->
-        it.show(activity.supportFragmentManager, tag)
+        it.show(activity.supportFragmentManager, ClassifyBottomSheetDialogFragment::class.java.name)
       }
     }
   }

@@ -59,7 +59,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
     viewModel.initDexData(packageName)
   }
 
-  override fun getFilterList(text: String): List<LibStringItemChip>? {
+  override fun getFilterListByText(text: String): List<LibStringItemChip>? {
     return viewModel.dexLibItems.value?.filter { it.item.name.contains(text, true) }
   }
 

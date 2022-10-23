@@ -3,12 +3,11 @@ package com.absinthe.libchecker.ui.about
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.BitmapFactory
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -17,10 +16,12 @@ import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.about.Renge
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
@@ -34,6 +35,7 @@ import com.drakeet.about.Contributor
 import com.drakeet.about.License
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,7 +43,7 @@ import timber.log.Timber
 
 private const val RENGE_CHECKER = "RengeChecker"
 
-class AboutActivity : AbsAboutActivityProxy() {
+class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
 
   private var shouldShowEasterEggCount = 1
   private val configuration by lazy {
@@ -51,7 +53,7 @@ class AboutActivity : AbsAboutActivityProxy() {
       )
     }
   }
-  private val mediaPlayer by lazy { MediaPlayer() }
+  private val renge by lazy { Renge(WeakReference(this)) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -65,7 +67,7 @@ class AboutActivity : AbsAboutActivityProxy() {
   override fun onDestroy() {
     super.onDestroy()
     if (shouldShowEasterEggCount == 20) {
-      mediaPlayer.release()
+      renge.sayonara()
     }
   }
 
@@ -107,7 +109,9 @@ class AboutActivity : AbsAboutActivityProxy() {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
 
-          icon.setImageBitmap(BitmapFactory.decodeStream(assets.open("renge.webp")))
+          renge.renge?.let {
+            icon.setImageBitmap(it)
+          }
           slogan.text = "ええ、私もよ。"
           val headerContentLayout =
             findViewById<LinearLayout>(com.drakeet.about.R.id.header_content_layout)
@@ -122,12 +126,7 @@ class AboutActivity : AbsAboutActivityProxy() {
           window.statusBarColor = R.color.renge.getColor(this)
           drawable.startTransition(250)
 
-          val fd = assets.openFd("renge_no_koe.aac")
-          mediaPlayer.also {
-            it.setDataSource(fd.fileDescriptor, fd.startOffset, fd.length)
-            it.prepare()
-            it.start()
-          }
+          renge.inori()
           GlobalValues.rengeTheme = !GlobalValues.rengeTheme
           Analytics.trackEvent(
             Constants.Event.EASTER_EGG,
@@ -215,11 +214,12 @@ class AboutActivity : AbsAboutActivityProxy() {
       val list = listOf(
         "https://www.iconfont.cn/",
         "https://lottiefiles.com/22122-fanimation",
+        "https://lottiefiles.com/77311-sweet-teapot-with-autumn-herbs-and-birds",
+        "https://lottiefiles.com/51686-a-botanical-wreath-loading",
         "https://lottiefiles.com/21836-blast-off",
         "https://lottiefiles.com/1309-smiley-stack",
         "https://lottiefiles.com/44836-gray-down-arrow",
-        "https://lottiefiles.com/66818-holographic-radar",
-        "https://chojugiga.com/2017/09/05/da4choju53_0031/"
+        "https://lottiefiles.com/66818-holographic-radar"
       )
       add(Category("Acknowledgement"))
       add(
@@ -233,6 +233,9 @@ class AboutActivity : AbsAboutActivityProxy() {
 
       add(Category("Declaration"))
       add(Card(getStringByConfiguration(R.string.library_declaration)))
+
+      add(Category("Privacy Policy"))
+      add(Card("https://absinthe.life/LibChecker-Docs/guide/PRIVACY/"))
 
       add(Category("Open Source Licenses"))
       add(
@@ -438,12 +441,11 @@ class AboutActivity : AbsAboutActivityProxy() {
     }
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.about_menu, menu)
-    return true
   }
 
-  override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     if (menuItem.itemId == R.id.toolbar_rate) {
       try {
         startActivity(
@@ -456,10 +458,11 @@ class AboutActivity : AbsAboutActivityProxy() {
         showLongToast(R.string.toast_not_existing_market)
       }
     }
-    return super.onOptionsItemSelected(menuItem)
+    return true
   }
 
   private fun initView() {
+    addMenuProvider(this)
     findViewById<Toolbar>(R.id.toolbar)?.let {
       it.title = getString(R.string.settings_about)
     }
@@ -472,7 +475,7 @@ class AboutActivity : AbsAboutActivityProxy() {
     val sb = StringBuilder()
 
     sb.append(getStringByConfiguration(R.string.resource_declaration)).append("<br>")
-    list.forEach { sb.append(getHyperLink(it)) }
+    list.forEach { sb.append(getHyperLink(it)).append("<br>") }
     return sb.toString()
   }
 

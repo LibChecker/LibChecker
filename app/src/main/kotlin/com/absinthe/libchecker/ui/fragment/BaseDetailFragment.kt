@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
+import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
@@ -26,6 +27,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
+import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
@@ -76,7 +78,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   protected var afterListReadyTask: Runnable? = null
 
   abstract fun getRecyclerView(): RecyclerView
-  abstract fun getFilterList(text: String): List<LibStringItemChip>?
+  abstract fun getFilterListByText(text: String): List<LibStringItemChip>?
 
   protected abstract val needShowLibDetailDialog: Boolean
 
@@ -100,10 +102,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
               filterList(it)
             }
           }
-          if (this@BaseDetailFragment is BaseComponentFragment) {
+          if (this@BaseDetailFragment is BaseFilterAnalysisFragment) {
             viewModel.queriedProcess?.let {
               if (it.isNotEmpty()) {
-                filterProcesses(it)
+                filterItems(it)
               }
             }
           }
@@ -135,8 +137,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
-      if (viewModel.processesMap.isNotEmpty()) {
+      if (this is ComponentsAnalysisFragment && viewModel.processesMap.isNotEmpty()) {
         viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
+      } else {
+        viewModel.processToolIconVisibilityLiveData.postValue(false)
       }
     }
   }
@@ -174,7 +178,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   override fun filterList(text: String) {
     adapter.highlightText = text
-    getFilterList(text)?.let {
+    getFilterListByText(text)?.let {
       lifecycleScope.launch(Dispatchers.Main) {
         if (it.isEmpty()) {
           if (getRecyclerView().itemDecorationCount > 0) {
@@ -235,12 +239,16 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
       withContext(Dispatchers.Main) {
         LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
-          .show(childFragmentManager, tag)
+          .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
   }
 
-  private fun isComponentFragment(): Boolean {
+  fun isComponentFragment(): Boolean {
     return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
+  }
+
+  protected fun hasNonGrantedPermissions(): Boolean {
+    return type == PERMISSION && (viewModel.permissionsItems.value?.any { it.item.size == 0L } == true)
   }
 }

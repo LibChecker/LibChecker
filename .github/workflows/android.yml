@@ -34,21 +34,21 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v3
+      - name: Skip duplicate actions
+        uses: fkirc/skip-duplicate-actions@v5
+        with:
+          cancel_others: true
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: 17
-      - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
-      - name: Check style
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: lintKotlin
+      - uses: gradle/wrapper-validation-action@v1
+      - uses: gradle/gradle-build-action@v2
+      - run: ./gradlew lintKotlin
 
   build:
     name: Build
-    runs-on: ubuntu-latest
-    if: ${{ !startsWith(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: buildjet-8vcpu-ubuntu-2204
 
     steps:
       - uses: actions/checkout@v3
@@ -58,74 +58,66 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 17
+      - uses: gradle/gradle-build-action@v2
       - name: Retrieve version
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
+      - name: Write sign info
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'zhaobozhen/LibChecker'
+        run: |
+          if [ ! -z "${{ secrets.SIGNING_KEY }}" ]; then
+            echo releaseStorePassword='${{ secrets.KEY_STORE_PASSWORD }}' >> gradle.properties
+            echo releaseKeyAlias='${{ secrets.ALIAS }}' >> gradle.properties
+            echo releaseKeyPassword='${{ secrets.KEY_PASSWORD }}' >> gradle.properties
+            echo releaseStoreFile='${{ github.workspace }}/key.jks' >> gradle.properties
+            echo ${{ secrets.SIGNING_KEY }} | base64 --decode > ${{ github.workspace }}/key.jks
+          fi
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: -PappVerName=${{ env.VERSION }} assembleRelease
-      - name: Sign Foss release
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        id: signFossRelease
-        uses: r0adkll/sign-android-release@v1.0.4
-        env:
-          BUILD_TOOLS_VERSION: "32.0.0"
-        with:
-          releaseDirectory: app/build/outputs/apk/foss/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew -PappVerName=${{ env.VERSION }} app:assembleRelease
       - name: Upload built Foss apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Foss
-          path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
-      - name: Sign Market release
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
-        id: signMarketRelease
-        uses: r0adkll/sign-android-release@v1.0.4
-        env:
-          BUILD_TOOLS_VERSION: "32.0.0"
-        with:
-          releaseDirectory: app/build/outputs/apk/market/release
-          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-          alias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          path: ${{ github.workspace }}/app/build/outputs/apk/foss/release
       - name: Upload built Market apk
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Market
-          path: ${{ steps.signMarketRelease.outputs.signedReleaseFile }}
+          path: ${{ github.workspace }}/app/build/outputs/apk/market/release
       - name: Upload mappings
         if: success() && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v3
         with:
           name: mappings
-          path: "app/build/outputs/mapping/fossRelease"
+          path: "app/build/outputs/mapping/marketRelease"
+      - name: Set apk path
+        id: apk-path
+        run: |
+          foss_path=$(find **/build/outputs/apk/foss -name '*.apk' -type f | head -1)
+          echo "::set-output name=foss_path::$foss_path"
+          market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
+          echo "::set-output name=market_path::$market_path"
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         id: apk-info
         uses: hkusu/apk-info-action@v1
         with:
-          apk-path: ${{ steps.signFossRelease.outputs.signedReleaseFile }}
+          apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
         if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
-          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/fossRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
+          command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/marketRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
           token: ${{secrets.APP_CENTER_TOKEN}}
       - name: Send commit to telegram
         if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         env:
           CHANNEL_ID: ${{ secrets.TELEGRAM_TO }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          FOSS_FILE: ${{ github.workspace }}/${{ steps.signFossRelease.outputs.signedReleaseFile }}
-          MARKET_FILE: ${{ github.workspace }}/${{ steps.signMarketRelease.outputs.signedReleaseFile }}
+          FOSS_FILE: ${{ steps.apk-path.outputs.foss_path }}
+          MARKET_FILE: ${{ steps.apk-path.outputs.market_path }}
           COMMIT_MESSAGE: |+
             New push to github\!
             ```
@@ -135,7 +127,7 @@ jobs:
             Snapshot apk is attached
         run: |
           ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FfossRelease%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F fossRelease="@$FOSS_FILE" -F marketRelease="@$MARKET_FILE"
+          curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2FmarketRelease%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22:${ESCAPED}%7D%5D" -F marketRelease="@$MARKET_FILE"
 
   skipped:
     runs-on: ubuntu-latest

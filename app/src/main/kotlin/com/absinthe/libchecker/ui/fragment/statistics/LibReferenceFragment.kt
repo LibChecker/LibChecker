@@ -51,7 +51,6 @@ import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
@@ -59,6 +58,7 @@ import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -67,7 +67,6 @@ import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
-import java.lang.ref.WeakReference
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -76,7 +75,7 @@ class LibReferenceFragment :
   BaseListControllerFragment<FragmentLibReferenceBinding>(),
   SearchView.OnQueryTextListener {
 
-  private val refAdapter by unsafeLazy { LibReferenceAdapter(lifecycleScope) }
+  private val refAdapter = LibReferenceAdapter()
   private var popup: CascadePopupMenu? = null
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
@@ -95,10 +94,7 @@ class LibReferenceFragment :
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "LibReferenceFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
         FastScrollerBuilder(this).useMd2Style().build()
@@ -114,7 +110,7 @@ class LibReferenceFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (isListCanScroll(refAdapter.data.size)) {
+              if (canListScroll(refAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -191,6 +187,9 @@ class LibReferenceFragment :
             is HomeViewModel.Effect.PackageChanged -> {
               computeRef(false)
             }
+            is HomeViewModel.Effect.UpdateLibRefProgress -> {
+              binding.loadingView.progressIndicator.setProgressCompat(it.progress, it.progress > 0)
+            }
             else -> {}
           }
         }
@@ -239,8 +238,8 @@ class LibReferenceFragment :
     popup?.dismiss()
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.lib_ref_menu, menu)
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.lib_ref_menu, menu)
     this.menu = menu
 
     val context = (context as? BaseActivity<*>) ?: return
@@ -263,14 +262,12 @@ class LibReferenceFragment :
         isVisible = false
       }
     }
-
-    super.onCreateOptionsMenu(menu, inflater)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
     val contextRef = WeakReference(context)
-    if (item.itemId == R.id.filter) {
+    if (menuItem.itemId == R.id.filter) {
       val color = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
       val styler = CascadePopupMenu.Styler(
         background = {
@@ -311,11 +308,10 @@ class LibReferenceFragment :
         }
       }
       popup?.show()
-    } else if (item.itemId == R.id.chart) {
+    } else if (menuItem.itemId == R.id.chart) {
       startActivity(Intent(context, ChartActivity::class.java))
     }
-
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun MenuItem.initMenu(@LibType type: Int) {

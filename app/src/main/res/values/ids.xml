@@ -3,4 +3,8 @@
   <item name="last_click_time" type="id" />
   <item name="viewpager_tab_click" type="id" />
   <item name="meta_data_transform_id" type="id" />
+
+  <item name="sort_by_name" type="id" />
+  <item name="sort_by_time" type="id" />
+  <item name="sort_by_target_version" type="id" />
 </resources>

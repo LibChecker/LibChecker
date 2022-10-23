@@ -19,7 +19,6 @@ import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +33,7 @@ const val EXTRA_REF_LIST = "REF_LIST"
 
 class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
-  private val adapter by unsafeLazy { AppAdapter(lifecycleScope) }
+  private val adapter = AppAdapter()
   private val viewModel: LibReferenceViewModel by viewModels()
   private val refName by lazy { intent.extras?.getString(EXTRA_REF_NAME) }
   private val refType by lazy { intent.extras?.getInt(EXTRA_REF_TYPE) ?: NATIVE }
@@ -118,11 +117,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         imageAssetsFolder = "/"
 
         val assetName = when (GlobalValues.season) {
-          SPRING -> "anim/lib_reference_spring.json"
-          SUMMER -> "anim/lib_reference_summer.json"
-          AUTUMN -> "anim/lib_reference_autumn.json"
-          WINTER -> "anim/lib_reference_winter.json"
-          else -> "anim/lib_reference_summer.json"
+          SPRING -> "anim/lib_reference_spring.json.zip"
+          SUMMER -> "anim/lib_reference_summer.json.zip"
+          AUTUMN -> "anim/lib_reference_autumn.json.zip"
+          WINTER -> "anim/lib_reference_winter.json.zip"
+          else -> "anim/lib_reference_summer.json.zip"
         }
 
         setAnimation(assetName)

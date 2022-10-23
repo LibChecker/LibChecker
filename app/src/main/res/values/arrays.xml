@@ -13,8 +13,9 @@
   <string-array name="language" translatable="false">
     <item>@string/follow_system</item>
     <item>en</item>
-    <item>zh-Hans</item>
-    <item>zh-Hant</item>
+    <item>zh-CN</item>
+    <item>zh-TW</item>
+    <item>zh-HK</item>
     <item>ru</item>
     <item>uk</item>
   </string-array>
@@ -24,8 +25,9 @@
     <item>en-US</item>
     <item>zh-CN</item>
     <item>zh-TW</item>
+    <item>zh-HK</item>
     <item>ru-RU</item>
-    <item>uk-UA</item>
+    <item>ru-UA</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
@@ -38,5 +40,17 @@
     <item>off</item>
     <item>on</item>
     <item>system</item>
+  </string-array>
+
+  <string-array name="snapshot_keep" tools:ignore="InconsistentArrays">
+    <item>@string/array_snapshot_default</item>
+    <item>@string/array_snapshot_keep</item>
+    <item>@string/array_snapshot_discard</item>
+  </string-array>
+
+  <string-array name="snapshot_keep_value" tools:ignore="InconsistentArrays">
+    <item>notify</item>
+    <item>keep</item>
+    <item>discard</item>
   </string-array>
 </resources>

@@ -28,4 +28,24 @@
     <attr name="albumCardViewColorSurface" format="color" />
     <attr name="albumCardBorderColor" format="color" />
   </declare-styleable>
+
+  <attr name="checkableChipViewStyle" format="reference"/>
+
+  <declare-styleable name="CheckableChipView">
+    <attr name="android:checked"/>
+    <attr name="android:text"/>
+    <attr name="android:textColor"/>
+    <attr name="android:textSize"/>
+    <attr name="ccv_checkedTextColor" format="color"/>
+
+    <attr name="android:color"/>
+    <attr name="android:padding"/>
+
+    <attr name="ccv_outlineCornerRadius" format="dimension"/>
+    <attr name="ccv_outlineColor" format="color"/>
+    <attr name="ccv_outlineWidth" format="dimension"/>
+
+    <attr name="ccv_foreground" format="reference"/>
+    <attr name="ccv_clearIcon" format="reference"/>
+  </declare-styleable>
 </resources>

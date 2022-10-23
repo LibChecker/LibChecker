@@ -57,7 +57,6 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
-import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -65,6 +64,8 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
+import java.util.LinkedList
+import java.util.Queue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -74,8 +75,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
-import java.util.LinkedList
-import java.util.Queue
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -83,10 +82,11 @@ const val VF_LIST = 1
 class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   private val viewModel: SnapshotViewModel by activityViewModels()
-  private val adapter by unsafeLazy { SnapshotAdapter(lifecycleScope) }
+  private val adapter = SnapshotAdapter()
   private var isSnapshotDatabaseItemsReady = false
   private var dropPrevious = false
   private var shouldCompare = true and ShootService.isComputing.not()
+  private var shootServiceStarted = false
 
   private var shootBinder: IShootService? = null
   private val shootListener = object : OnShootListener.Stub() {
@@ -109,7 +109,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
   private val shootServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-      if (shootBinder == null) {
+      shootServiceStarted = true
+      if (shootBinder == null && service?.pingBinder() == true) {
         shootBinder = IShootService.Stub.asInterface(service).also {
           it.registerOnShootOverListener(shootListener)
         }
@@ -117,6 +118,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+      shootServiceStarted = false
       shootBinder = null
     }
   }
@@ -125,17 +127,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
-    context.applicationContext.also {
-      val intent = Intent(it, ShootService::class.java).apply {
-        setPackage(it.packageName)
-      }
-      it.startService(intent)
-      it.bindService(
-        intent,
-        shootServiceConnection,
-        Service.BIND_AUTO_CREATE
-      )
-    }
 
     val dashboard =
       SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
@@ -167,7 +158,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                 viewModel.compareDiff(item.timestamp, shouldClearDiff = true)
               }
             }
-          dialog.show(context.supportFragmentManager, dialog.tag)
+          dialog.show(context.supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
         }
       }
 
@@ -223,9 +214,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         }
 
         val item = getItem(position)
-        if (item.deleted || item.newInstalled) {
-          SnapshotNewOrDeletedBSDFragment.newInstance(item).also {
-            it.show(context.supportFragmentManager, it.tag)
+        if (item.deleted || item.newInstalled || item.isNothingChanged()) {
+          SnapshotNoDiffBSDFragment.newInstance(item).also {
+            it.show(context.supportFragmentManager, SnapshotNoDiffBSDFragment::class.java.name)
           }
         } else {
           val intent = Intent(context, SnapshotDetailActivity::class.java)
@@ -243,10 +234,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
-              scheduleAppbarLiftingStatus(
-                !top,
-                "SnapshotFragment OnBorderVisibilityChangedListener: top=$top"
-              )
+              scheduleAppbarLiftingStatus(!top)
             }
           }
 
@@ -361,6 +349,21 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     super.onResume()
     menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
 
+    if (!shootServiceStarted && isFragmentVisible()) {
+      context?.applicationContext?.also {
+        val intent = Intent(it, ShootService::class.java).apply {
+          setPackage(it.packageName)
+        }
+        it.startService(intent)
+        it.bindService(
+          intent,
+          shootServiceConnection,
+          Service.BIND_AUTO_CREATE
+        )
+        shootServiceStarted = true
+      }
+    }
+
     if (AppItemRepository.trackItemsChanged) {
       AppItemRepository.trackItemsChanged = false
       flip(VF_LOADING)
@@ -411,16 +414,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     binding.list.layoutManager = getSuitableLayoutManager()
   }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.snapshot_menu, menu)
+  override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+    menuInflater.inflate(R.menu.snapshot_menu, menu)
     this.menu = menu
-
-    super.onCreateOptionsMenu(menu, inflater)
   }
 
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+  override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (this.context as? BaseActivity<*>) ?: return false
-    if (item.itemId == R.id.save) {
+    if (menuItem.itemId == R.id.save) {
       if (viewModel.isComparingActive() || shootBinder?.isShooting == true) {
         return false
       }
@@ -479,21 +480,27 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           it.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
           it.setLongClickCopiedToClipboard(scheme)
         }
-        BaseAlertDialogBuilder(context)
-          .setTitle(R.string.dialog_title_keep_previous_snapshot)
-          .setMessage(R.string.dialog_message_keep_previous_snapshot)
-          .setView(tipView)
-          .setPositiveButton(R.string.btn_keep) { _, _ ->
-            computeNewSnapshot(false)
+        when (GlobalValues.snapshotKeep) {
+          Constants.SNAPSHOT_DEFAULT -> {
+            BaseAlertDialogBuilder(context)
+              .setTitle(R.string.dialog_title_keep_previous_snapshot)
+              .setMessage(R.string.dialog_message_keep_previous_snapshot)
+              .setView(tipView)
+              .setPositiveButton(R.string.btn_keep) { _, _ ->
+                computeNewSnapshot(false)
+              }
+              .setNegativeButton(R.string.btn_drop) { _, _ ->
+                computeNewSnapshot(true)
+              }
+              .setNeutralButton(android.R.string.cancel, null)
+              .show()
           }
-          .setNegativeButton(R.string.btn_drop) { _, _ ->
-            computeNewSnapshot(true)
-          }
-          .setNeutralButton(android.R.string.cancel, null)
-          .show()
+          Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
+          Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
+        }
       }
     }
-    return super.onOptionsItemSelected(item)
+    return true
   }
 
   private fun flip(child: Int) {

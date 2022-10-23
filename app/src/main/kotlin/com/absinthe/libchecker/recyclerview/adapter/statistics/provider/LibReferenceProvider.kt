@@ -2,14 +2,13 @@ package com.absinthe.libchecker.recyclerview.adapter.statistics.provider
 
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.Typeface
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.core.text.buildSpannedString
+import androidx.core.text.italic
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.NATIVE
@@ -36,7 +35,7 @@ import kotlinx.coroutines.withContext
 
 const val LIB_REFERENCE_PROVIDER = 0
 
-class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNodeProvider() {
+class LibReferenceProvider : BaseNodeProvider() {
 
   override val itemViewType: Int = LIB_REFERENCE_PROVIDER
   override val layoutId: Int = 0
@@ -83,15 +82,12 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
         } else {
           icon.setImageResource(R.drawable.ic_question)
         }
-        val spannableString = SpannableString(context.getString(R.string.not_marked_lib))
-        val colorSpanit = StyleSpan(Typeface.ITALIC)
-        spannableString.setSpan(
-          colorSpanit,
-          0,
-          spannableString.length,
-          Spanned.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-        labelName.text = spannableString
+
+        labelName.text = buildSpannedString {
+          italic {
+            append(context.getString(R.string.not_marked_lib))
+          }
+        }
       }
     }
   }
@@ -103,12 +99,12 @@ class LibReferenceProvider(val lifecycleScope: LifecycleCoroutineScope) : BaseNo
       if (ref.type == NATIVE || ref.type == SERVICE || ref.type == ACTIVITY || ref.type == RECEIVER || ref.type == PROVIDER) {
         val name = ref.libName
 
-        lifecycleScope.launch(Dispatchers.IO) {
+        (context as? LifecycleOwner)?.lifecycleScope?.launch(Dispatchers.IO) {
           val regexName = LCRules.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {
             LibDetailDialogFragment.newInstance(name, ref.type, regexName)
-              .show((context as BaseActivity<*>).supportFragmentManager, "LibDetailDialogFragment")
+              .show((context as BaseActivity<*>).supportFragmentManager, LibDetailDialogFragment::class.java.name)
           }
         }
       }

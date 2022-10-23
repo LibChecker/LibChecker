@@ -11,7 +11,6 @@ import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.compat.IntentCompat
-import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils
@@ -39,6 +38,7 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
     pkgName?.let { packageName ->
       Timber.d("packageName: $packageName")
       runCatching {
+        @Suppress("DEPRECATION")
         val flag = (
           PackageManager.GET_SERVICES
             or PackageManager.GET_ACTIVITIES
@@ -46,8 +46,10 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
             or PackageManager.GET_PROVIDERS
             or PackageManager.GET_PERMISSIONS
             or PackageManager.GET_META_DATA
-            or PackageManagerCompat.MATCH_DISABLED_COMPONENTS
-            or PackageManagerCompat.MATCH_UNINSTALLED_PACKAGES
+            or PackageManager.MATCH_DISABLED_COMPONENTS
+            or PackageManager.MATCH_UNINSTALLED_PACKAGES
+            or PackageManager.GET_SIGNATURES
+            or PackageManager.GET_SIGNING_CERTIFICATES
           )
         PackageUtils.getPackageInfo(packageName, flag)
       }.getOrNull()?.let { packageInfo ->
