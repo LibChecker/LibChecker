@@ -6,7 +6,10 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.graphics.text.LineBreaker
 import android.text.Layout
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
@@ -25,6 +28,7 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.bean.NOT_EXPORTED
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_TEXT
 import com.absinthe.libchecker.ui.fragment.detail.XmlBSDFragment
@@ -85,16 +89,32 @@ class LibStringAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
-    val itemName = if (item.item.source == DISABLED) {
-      buildSpannedString {
-        strikeThrough {
-          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
-            append(item.item.name)
+    val itemName = when (item.item.source) {
+      DISABLED -> {
+        buildSpannedString {
+          strikeThrough {
+            inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
+              append(item.item.name)
+            }
           }
         }
       }
-    } else {
-      item.item.name
+      NOT_EXPORTED -> {
+        buildSpannedString {
+          val spannableString = SpannableString(item.item.name)
+          val color = context.getColor(R.color.material_grey_500)
+          spannableString.setSpan(
+            ForegroundColorSpan(color),
+            0,
+            item.item.name.length,
+            Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+          )
+          append(spannableString)
+        }
+      }
+      else -> {
+        item.item.name
+      }
     }
 
     when (type) {
