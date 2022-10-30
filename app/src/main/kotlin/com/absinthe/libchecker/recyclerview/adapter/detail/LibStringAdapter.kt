@@ -7,7 +7,6 @@ import android.graphics.drawable.TransitionDrawable
 import android.graphics.text.LineBreaker
 import android.text.Layout
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
@@ -101,15 +100,13 @@ class LibStringAdapter(
       }
       NOT_EXPORTED -> {
         buildSpannedString {
-          val spannableString = SpannableString(item.item.name)
-          val color = context.getColor(R.color.material_grey_500)
-          spannableString.setSpan(
-            ForegroundColorSpan(color),
+          append(item.item.name)
+          setSpan(
+            ForegroundColorSpan(context.getColor(R.color.material_grey_500)),
             0,
             item.item.name.length,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
           )
-          append(spannableString)
         }
       }
       else -> {
