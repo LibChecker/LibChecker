@@ -86,7 +86,6 @@ import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
-import com.absinthe.libchecker.utils.extensions.isOrientationPortrait
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -349,9 +348,6 @@ abstract class BaseAppDetailActivity :
             if (itemCount < abiSet.size) {
               spanStringBuilder.append(", ")
             }
-            if (itemCount == 3 && abiSet.size > 3 && isOrientationPortrait) {
-              spanStringBuilder.appendLine()
-            }
           }
           extraInfo.append(spanStringBuilder).appendLine()
         }
@@ -388,7 +384,7 @@ abstract class BaseAppDetailActivity :
 
       if (hasReloadVariant) {
         hasReloadVariant = false
-        return
+        return@apply
       }
 
       toolbarAdapter.data.clear()
