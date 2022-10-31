@@ -1,18 +1,41 @@
 package com.absinthe.libchecker.utils.harmony
 
 import android.content.Context
+import ohos.app.Application
+import ohos.app.ContextDeal
 import ohos.bundle.IBundleManager
 import timber.log.Timber
 
 /**
  * Created by su1216 on 21-6-28.
  */
-class ApplicationDelegate(context: Context) {
+class ApplicationDelegate(val context: Context) {
 
-  init {
-    if (sOhosApplication == null) {
-      initApplication(context)
+  private fun initApplication() {
+    val applicationContext = context.applicationContext
+    val classLoader = applicationContext.classLoader
+    try {
+      sOhosApplication = Application()
+      val contextDeal = ContextDeal(applicationContext, classLoader)
+      if (!setApplication(contextDeal, sOhosApplication!!)) {
+        contextDeal.setApplication(sOhosApplication)
+      }
+      sOhosApplication!!.attachBaseContext(contextDeal)
+    } catch (e: Throwable) {
+      Timber.w(e)
     }
+  }
+
+  private fun setApplication(contextDeal: ContextDeal, application: Application): Boolean {
+    val fields = ContextDeal::class.java.declaredFields
+    for (field in fields) {
+      if (field.type == Application::class.java) {
+        field.isAccessible = true
+        field.set(contextDeal, application)
+        return true
+      }
+    }
+    return false
   }
 
   val iBundleManager: IBundleManager?
@@ -23,43 +46,23 @@ class ApplicationDelegate(context: Context) {
         null
       }
     }
-  private val ohosContext: ohos.app.Context?
+  val ohosContext: ohos.app.Context?
     get() {
       try {
-        val clazzOhosApplication = Class.forName("ohos.app.Application")
-        val getApplicationContextMethod =
-          clazzOhosApplication.getMethod("getApplicationContext")
-        return getApplicationContextMethod.invoke(sOhosApplication) as ohos.app.Context
+        return sOhosApplication!!.context
       } catch (e: Throwable) {
         Timber.w(e)
       }
       return null
     }
 
-  private fun initApplication(context: Context) {
-    val applicationContext = context.applicationContext
-    val classLoader = applicationContext.classLoader
-    try {
-      val clazzOhosApplication = Class.forName("ohos.app.Application")
-      sOhosApplication = clazzOhosApplication.newInstance()
-      val clazzContextDeal = Class.forName("ohos.app.ContextDeal")
-      val contextDealConstructor = clazzContextDeal.getConstructor(
-        Context::class.java,
-        ClassLoader::class.java
-      )
-      val contextDeal = contextDealConstructor.newInstance(applicationContext, classLoader)
-      val setApplicationMethod =
-        clazzContextDeal.getDeclaredMethod("setApplication", clazzOhosApplication)
-      setApplicationMethod.invoke(contextDeal, sOhosApplication)
-      val attachBaseContextMethod =
-        clazzOhosApplication.getMethod("attachBaseContext", ohos.app.Context::class.java)
-      attachBaseContextMethod.invoke(sOhosApplication, contextDeal)
-    } catch (e: Throwable) {
-      Timber.w(e)
-    }
+  companion object {
+    private var sOhosApplication: Application? = null
   }
 
-  companion object {
-    private var sOhosApplication: Any? = null
+  init {
+    if (sOhosApplication == null) {
+      initApplication()
+    }
   }
 }

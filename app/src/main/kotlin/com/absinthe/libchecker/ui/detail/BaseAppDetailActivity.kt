@@ -388,7 +388,7 @@ abstract class BaseAppDetailActivity :
 
       if (hasReloadVariant) {
         hasReloadVariant = false
-        return
+        return@apply
       }
 
       toolbarAdapter.data.clear()
