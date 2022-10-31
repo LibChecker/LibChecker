@@ -122,7 +122,9 @@ class AppAdapter : HighlightAdapter<LCItem>() {
   }
 
   override fun getItemId(position: Int): Long {
-    if (data.isEmpty()) return super.getItemId(position)
+    if (data.isEmpty() || position >= data.size) {
+      return super.getItemId(position)
+    }
     return data[position].hashCode().toLong()
   }
 
