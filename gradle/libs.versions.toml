@@ -1,11 +1,11 @@
 [versions]
 agp = "7.3.1"
 androidX-lifecycle = "2.5.1"
-androidX-room = "2.5.0-beta01"
-appCenter = "4.4.5"
-grpc = "1.50.2"
+androidX-room = "2.5.0-beta02"
+appCenter = "5.0.0"
+grpc = "1.51.0"
 hiddenApiRefine = "3.1.1"
-kotlin = "1.7.20"
+kotlin = "1.7.21"
 protoc = "3.21.9"
 protoc-javalite = "3.21.9"
 square-retrofit = "2.9.0"
@@ -18,7 +18,7 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.12.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.7.20-1.0.8" }
+ksp = { id = "com.google.devtools.ksp", version = "1.7.21-1.0.8" }
 protobuf = { id = "com.google.protobuf", version = "0.9.1" }
 moshiX = "dev.zacsweers.moshix:0.19.0"
 
@@ -42,11 +42,11 @@ androidX-recyclerView = "androidx.recyclerview:recyclerview:1.2.1"
 androidX-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidX-room" }
 androidX-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidX-room" }
 androidX-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidX-room" }
-androidX-security = "androidx.security:security-crypto:1.1.0-alpha03"
+androidX-security = "androidx.security:security-crypto:1.1.0-alpha04"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-beta01"
 androidX-window = "androidx.window:window:1.0.0"
 
-square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.9.1"
+square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.10"
 square-moshi = "com.squareup.moshi:moshi:1.14.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.10.0"
 square-okio = "com.squareup.okio:okio:3.2.0"
@@ -90,12 +90,12 @@ fastScroll = "me.zhanghai.android.fastscroll:library:1.1.8"
 flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 hiddenApiBypass = "org.lsposed.hiddenapibypass:hiddenapibypass:4.3"
 javax-annotation = "javax.annotation:javax.annotation-api:1.3.2"
-lc-rules = "com.github.zhaobozhen:LibChecker-Rules-Bundle:28"
+lc-rules = "com.github.LibChecker:LibChecker-Rules-Bundle:29.1"
 lottie = "com.airbnb.android:lottie:5.2.0"
 mpAndroidChart = "com.github.PhilJay:MPAndroidChart:3.1.0"
 once = "com.jonathanfinerty.once:once:1.3.1"
 processPhoenix = "com.jakewharton:process-phoenix:2.1.2"
-slf4j = "org.slf4j:slf4j-simple:2.0.3"
+slf4j = "org.slf4j:slf4j-simple:2.0.4"
 timber = "com.jakewharton.timber:timber:5.0.1"
 zhaobozhen-axml = { module = "com.github.zhaobozhen.libraries:axml", version.ref = "zhaobozhen" }
 zhaobozhen-me = { module = "com.github.zhaobozhen.libraries:me", version.ref = "zhaobozhen" }
