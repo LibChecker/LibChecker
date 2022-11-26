@@ -1,7 +1,7 @@
 # LibChecker
 
-[![Android CI](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml/badge.svg)](https://github.com/zhaobozhen/LibChecker/actions/workflows/android.yml)
-[![License](https://img.shields.io/github/license/zhaobozhen/LibChecker?label=License)](https://choosealicense.com/licenses/apache-2.0/)
+[![Android CI](https://github.com/LibChecker/LibChecker/actions/workflows/android.yml/badge.svg)](https://github.com/LibChecker/LibChecker/actions/workflows/android.yml)
+[![License](https://img.shields.io/github/license/LibChecker/LibChecker?label=License)](https://choosealicense.com/licenses/apache-2.0/)
 [![Discussion](https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram)](https://t.me/libcheckerr)
 [![Crowdin](https://badges.crowdin.net/libchecker/localized.svg)](https://crowdin.com/project/libchecker)
 
@@ -13,7 +13,7 @@ This app is used to view the third-party libraries used by applications in your 
 ## Supported Versions
 Android 7.0 ~ 13
 
-Android 6 [Marshmallow](https://github.com/zhaobozhen/LibChecker/tree/marshmallow)
+Android 6 [Marshmallow](https://github.com/LibChecker/LibChecker/tree/marshmallow)
 
 ## Document
 [LibChecker-Docs](https://github.com/LibChecker/LibChecker-Docs)
@@ -24,7 +24,7 @@ Android 6 [Marshmallow](https://github.com/zhaobozhen/LibChecker/tree/marshmallo
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" width="323" height="125" />](https://f-droid.org/packages/com.absinthe.libchecker/)
 
 ## Discussions
-[Github Discussions](https://github.com/zhaobozhen/LibChecker/discussions)
+[Github Discussions](https://github.com/LibChecker/LibChecker/discussions)
 
 ### Telegram Group
 <img src="/source/tg_group_dark.png#gh-dark-mode-only" width="240" height="240" />

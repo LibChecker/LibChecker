@@ -63,7 +63,7 @@ jobs:
         run: |
           echo VERSION=$(echo ${{ github.event.head_commit.id }} | head -c 10) >> $GITHUB_ENV
       - name: Write sign info
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'zhaobozhen/LibChecker'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'LibChecker/LibChecker'
         run: |
           if [ ! -z "${{ secrets.SIGNING_KEY }}" ]; then
             echo releaseStorePassword='${{ secrets.KEY_STORE_PASSWORD }}' >> gradle.properties
@@ -75,13 +75,13 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew -PappVerName=${{ env.VERSION }} app:assembleRelease
       - name: Upload built Foss apk
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Foss
           path: ${{ github.workspace }}/app/build/outputs/apk/foss/release
       - name: Upload built Market apk
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: actions/upload-artifact@v3
         with:
           name: Market
@@ -100,19 +100,19 @@ jobs:
           market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
           echo "::set-output name=market_path::$market_path"
       - name: Get apk info
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
         uses: hkusu/apk-info-action@v1
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
-        if: success() && github.event_name != 'pull_request' && github.repository == 'zhaobozhen/LibChecker'
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: avocaddo/AppCenter-Github-Action@v1.0.2
         with:
           command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/marketRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
           token: ${{secrets.APP_CENTER_TOKEN}}
       - name: Send commit to telegram
-        if: success() && github.repository == 'zhaobozhen/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+        if: success() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
         env:
           CHANNEL_ID: ${{ secrets.TELEGRAM_TO }}
           BOT_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
