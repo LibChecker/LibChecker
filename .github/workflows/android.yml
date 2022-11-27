@@ -48,7 +48,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
