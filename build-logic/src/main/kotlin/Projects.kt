@@ -4,14 +4,13 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import java.io.File
-import java.nio.charset.Charset
 import java.time.Instant
 
 const val baseVersionName = "2.3.5"
-val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
-val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
-val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
-val versionNameSuffix = if (isDevVersion) ".dev" else ""
+val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${exec("git rev-parse --short HEAD")}"
+val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
+val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()
+val Project.versionNameSuffix: String get() = if (isDevVersion) ".dev" else ""
 val javaLevel = JavaVersion.VERSION_11
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
@@ -81,5 +80,6 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
   }
 }
 
-fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
-  .toString(Charset.defaultCharset()).trim()
+fun Project.exec(command: String): String = providers.exec {
+  commandLine(command.split(" "))
+}.standardOutput.asText.get().trim()
