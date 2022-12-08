@@ -1,13 +1,13 @@
 [versions]
 agp = "7.3.1"
 androidX-lifecycle = "2.5.1"
-androidX-room = "2.5.0-beta02"
+androidX-room = "2.5.0-rc01"
 appCenter = "5.0.0"
 grpc = "1.51.0"
 hiddenApiRefine = "3.1.1"
-kotlin = "1.7.21"
-protoc = "3.21.9"
-protoc-javalite = "3.21.9"
+kotlin = "1.7.22"
+protoc = "3.21.11"
+protoc-javalite = "3.21.10"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.3"
 
@@ -18,9 +18,9 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.12.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.7.21-1.0.8" }
+ksp = { id = "com.google.devtools.ksp", version = "1.7.22-1.0.8" }
 protobuf = { id = "com.google.protobuf", version = "0.9.1" }
-moshiX = "dev.zacsweers.moshix:0.19.0"
+moshiX = "dev.zacsweers.moshix:0.20.0"
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -33,7 +33,7 @@ androidX-appCompat = "androidx.appcompat:appcompat:1.6.0-rc01"
 androidX-browser = "androidx.browser:browser:1.4.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.9.0"
-androidX-fragment = "androidx.fragment:fragment-ktx:1.5.4"
+androidX-fragment = "androidx.fragment:fragment-ktx:1.5.5"
 androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidX-lifecycle" }
