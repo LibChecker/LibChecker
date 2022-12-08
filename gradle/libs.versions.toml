@@ -1,7 +1,7 @@
 [versions]
 agp = "7.3.1"
 androidX-lifecycle = "2.5.1"
-androidX-room = "2.5.0-beta02"
+androidX-room = "2.5.0-rc01"
 appCenter = "5.0.0"
 grpc = "1.51.0"
 hiddenApiRefine = "3.1.1"
