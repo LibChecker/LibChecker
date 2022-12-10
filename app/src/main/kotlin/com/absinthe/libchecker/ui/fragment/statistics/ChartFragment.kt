@@ -538,15 +538,10 @@ class ChartFragment :
     }
 
     dialog = ClassifyBottomSheetDialogFragment().apply {
-      setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
-        override fun onDismiss() {
-          this@ChartFragment.dialog = null
-          (chartView as? Chart<*>)?.highlightValue(null)
-          viewModel.dialogTitle.postValue("")
-          viewModel.filteredList.postValue(emptyList())
-          viewModel.androidVersion.postValue(null)
-        }
-      })
+      setOnDismiss {
+        this@ChartFragment.dialog = null
+        (chartView as? Chart<*>)?.highlightValue(null)
+      }
     }.also {
       activity?.let { activity ->
         it.show(activity.supportFragmentManager, ClassifyBottomSheetDialogFragment::class.java.name)
