@@ -69,9 +69,16 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setEmptyView(emptyView)
     }
 
-    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
-      if (it != null) {
-        viewModel.initSoAnalysisData()
+    viewModel.apply {
+      packageInfoLiveData.observe(viewLifecycleOwner) {
+        if (it != null) {
+          viewModel.initSoAnalysisData()
+        }
+      }
+      is64Bit.observe(viewLifecycleOwner) {
+        if (it != null) {
+          adapter.set64Bit(it)
+        }
       }
     }
   }

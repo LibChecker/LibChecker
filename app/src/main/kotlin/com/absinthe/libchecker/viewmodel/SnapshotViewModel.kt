@@ -861,7 +861,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         SnapshotDetailItem(
           item.name,
           item.name,
-          PackageUtils.sizeToString(context, item),
+          PackageUtils.sizeToString(context, item, false),
           ADDED,
           NATIVE
         )
