@@ -57,8 +57,7 @@ import com.absinthe.libchecker.constant.librarymap.DexLibMap
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
-import com.absinthe.libchecker.utils.elf.ELF32EhdrParser
-import com.absinthe.libchecker.utils.elf.ELF64EhdrParser
+import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
@@ -240,15 +239,18 @@ object PackageUtils {
 
     if (nativePath != null) {
       File(nativePath).listFiles()?.let { files ->
+        var elfParser: ELFParser?
         list.addAll(
           files.asSequence()
             .filter { it.isFile }
             .distinctBy { it.name }
             .map {
+              elfParser = ELFParser(it.inputStream())
               LibStringItem(
                 name = it.name,
                 size = FileUtils.getFileSize(it),
-                elfType = getElfType(it, specifiedAbi == ARMV8 || specifiedAbi == X86_64)
+                elfType = elfParser!!.getEType(),
+                elfClass = elfParser!!.getEClass()
               )
             }
             .toMutableList()
@@ -274,8 +276,7 @@ object PackageUtils {
       list.addAll(
         getSourceLibs(
           packageInfo = packageInfo,
-          childDir = "lib/$abiString",
-          is64Bit = abi == ARMV8 || abi == X86_64
+          childDir = "lib/$abiString"
         )
       )
     }
@@ -283,7 +284,6 @@ object PackageUtils {
       getSourceLibs(
         packageInfo = packageInfo,
         childDir = "assets/",
-        is64Bit = false,
         source = "/assets"
       )
     )
@@ -303,7 +303,6 @@ object PackageUtils {
   private fun getSourceLibs(
     packageInfo: PackageInfo,
     childDir: String,
-    is64Bit: Boolean,
     source: String? = null
   ): List<LibStringItem> {
     if (packageInfo.applicationInfo.sourceDir == null) {
@@ -311,16 +310,19 @@ object PackageUtils {
     }
     return runCatching {
       ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+        var elfParser: ELFParser?
         return zipFile.entries()
           .asSequence()
           .filter { (it.isDirectory.not() && it.name.startsWith(childDir)) && it.name.endsWith(".so") }
           .distinctBy { it.name.split("/").last() }
           .map {
+            elfParser = getElfParser(zipFile.getInputStream(it))
             LibStringItem(
               name = it.name.split("/").last(),
               size = it.size,
               source = source,
-              elfType = getElfType(zipFile.getInputStream(it), is64Bit)
+              elfType = elfParser!!.getEType(),
+              elfClass = elfParser!!.getEClass()
             )
           }
           .toList()
@@ -348,15 +350,16 @@ object PackageUtils {
       fileName.startsWith("split_config.arm") || fileName.startsWith("split_config.x86")
     }?.let {
       ZipFile(File(it)).use { zipFile ->
+        var elfParser: ELFParser?
         zipFile.entries().asSequence().forEach { entry ->
           if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
-            val is64Bit =
-              entry.name.startsWith("lib/$X86_64_STRING") || entry.name.startsWith("lib/$ARMV8_STRING")
+            elfParser = getElfParser(zipFile.getInputStream(entry))
             libList.add(
               LibStringItem(
                 name = entry.name.split("/").last(),
                 size = entry.size,
-                elfType = getElfType(zipFile.getInputStream(entry), is64Bit)
+                elfType = elfParser!!.getEType(),
+                elfClass = elfParser!!.getEClass()
               )
             )
           }
@@ -927,12 +930,29 @@ object PackageUtils {
    * @param item LibStringItem
    * @return String of size number (100KB)
    */
-  fun sizeToString(context: Context, item: LibStringItem, showElfInfo: Boolean = true): String {
+  fun sizeToString(
+    context: Context,
+    item: LibStringItem,
+    showElfInfo: Boolean = true,
+    is64Bit: Boolean = false
+  ): String {
     val source = item.source?.let { "[${item.source}]" }.orEmpty()
+    if (showElfInfo.not()) {
+      return "(${Formatter.formatFileSize(context, item.size)}) $source"
+    }
     val elfType =
-      "[${elfTypeToString(item.elfType)}]".takeIf { item.elfType != ET_DYN && showElfInfo }
+      "[${elfTypeToString(item.elfType)}]"
+        .takeIf { item.elfType != ET_DYN }
         .orEmpty()
-    return "(${Formatter.formatFileSize(context, item.size)}) $source $elfType"
+    val elfClass =
+      "[${elfClassToString(item.elfClass)}]"
+        .takeIf {
+          item.elfType != ET_NOT_ELF &&
+            ((is64Bit && item.elfClass == ELFParser.EIdent.ELFCLASS32) || (!is64Bit && item.elfClass == ELFParser.EIdent.ELFCLASS64))
+        }
+        .orEmpty()
+
+    return "(${Formatter.formatFileSize(context, item.size)}) $source $elfType $elfClass"
   }
 
   /**
@@ -940,7 +960,7 @@ object PackageUtils {
    * @param type ELF type
    * @return String of ELF type
    */
-  fun elfTypeToString(@ElfType type: Int): String {
+  private fun elfTypeToString(@ElfType type: Int): String {
     return when (type) {
       ET_NOT_ELF -> "Not ELF"
       ET_NONE -> "No file type"
@@ -950,6 +970,20 @@ object PackageUtils {
       ET_CORE -> "Core file"
       ET_LOPROC -> "Processor-specific"
       ET_HIPROC -> "Processor-specific"
+      else -> "Not Standard ELF"
+    }
+  }
+
+  /**
+   * Format ELF class to string
+   * @param type ELF class
+   * @return String of ELF class
+   */
+  private fun elfClassToString(elfClass: Int): String {
+    return when (elfClass) {
+      ELFParser.EIdent.ELFCLASSNONE -> "ELFCLASSNONE"
+      ELFParser.EIdent.ELFCLASS32 -> "ELFCLASS32"
+      ELFParser.EIdent.ELFCLASS64 -> "ELFCLASS64"
       else -> "Not Standard ELF"
     }
   }
@@ -1397,20 +1431,16 @@ object PackageUtils {
     return null
   }
 
-  private fun getElfType(file: File, is64Bit: Boolean): Int {
+  private fun getElfType(file: File): Int {
     return runCatching {
-      getElfType(file.inputStream(), is64Bit)
+      getElfParser(file.inputStream()).getEType()
     }.onFailure {
       Timber.e(it)
     }.getOrDefault(ET_NONE)
   }
 
-  private fun getElfType(input: InputStream, is64Bit: Boolean): Int {
-    return if (is64Bit) {
-      ELF64EhdrParser(input).getEType()
-    } else {
-      ELF32EhdrParser(input).getEType()
-    }
+  private fun getElfParser(input: InputStream): ELFParser {
+    return ELFParser(input)
   }
 
   private const val RX_MAJOR_ONE = "1"
