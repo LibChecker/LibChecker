@@ -138,9 +138,9 @@ object LCAppUtils {
           PackageUtils.findDexClasses(
             source,
             listOf(
-              "com.qihoo.util.QHClassLoader".toClassDefType()
+              "com.qihoo.util.Configuration".toClassDefType()
             )
-          ).any { it == "com.qihoo.util.QHClassLoader".toClassDefType() }
+          ).any { it == "com.qihoo.util.Configuration".toClassDefType() }
         }.getOrDefault(false)
       }
       "libapp.so" -> {
