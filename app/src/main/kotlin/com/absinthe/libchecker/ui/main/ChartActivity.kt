@@ -3,7 +3,7 @@ package com.absinthe.libchecker.ui.main
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.databinding.ActivityChartBinding
@@ -24,14 +24,9 @@ class ChartActivity : BaseActivity<ActivityChartBinding>() {
         .commit()
     }
 
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
+    onBackPressedDispatcher.addCallback(this, true) {
+      finish()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
