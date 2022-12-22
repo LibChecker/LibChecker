@@ -10,7 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Checkable
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
@@ -47,14 +47,9 @@ class TrackActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     initView()
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
+    onBackPressedDispatcher.addCallback(this, true) {
+      finish()
+    }
   }
 
   private fun initView() {

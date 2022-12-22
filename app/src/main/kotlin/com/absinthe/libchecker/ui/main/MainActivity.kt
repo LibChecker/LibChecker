@@ -10,7 +10,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.view.View
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
@@ -110,19 +110,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     handleIntent(intent)
     initObserver()
     clearApkCache()
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-          if (closeBtn != null) {
-            binding.toolbar.collapseActionView()
-          } else {
-            finish()
-          }
-        }
+    onBackPressedDispatcher.addCallback(this, true) {
+      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+      if (closeBtn != null) {
+        binding.toolbar.collapseActionView()
+      } else {
+        finish()
       }
-    )
+    }
   }
 
   override fun onNewIntent(intent: Intent) {
