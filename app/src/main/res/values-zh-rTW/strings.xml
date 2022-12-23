@@ -38,7 +38,6 @@
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
   <string name="ref_category_cp">内容提供者</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">中繼資料</string>
@@ -134,10 +133,6 @@
   <string name="signature_public_key_type">公鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
-  <string name="signature_md5">MD5</string>
-  <string name="signature_sha1">SHA-1</string>
-  <string name="signature_sha256">SHA-256</string>
-  <string name="signature_char_string">CharString</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
