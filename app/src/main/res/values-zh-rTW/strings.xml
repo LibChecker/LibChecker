@@ -23,7 +23,7 @@
   <string name="empty_list">空清單</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
-  <string name="advanced_menu">高級菜單</string>
+  <string name="advanced_menu">進階選單</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的 Apps</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
@@ -91,7 +91,7 @@
   <string name="array_snapshot_discard">捨棄</string>
   <!--  Detail  -->
   <string name="detail">詳細資料</string>
-  <string name="detail_label">檢視 App 詳細資料</string>
+  <string name="detail_label">檢視應用程式詳細資料</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">協助我們來補充資訊</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一種官方發布格式，可讓您以更高效的方式開發並發布應用程式。借助 Android App Bundle，您可以更輕鬆地以更小的應用程式提供優質的使用體驗，從而提升安裝成功率並減少解除安裝次數。轉換過程輕鬆便捷。您無需重構程式碼即可開始獲享較小應用程式的優勢。改用這種格式後，您可以體驗模塊化應用程式開發並自訂功能交付，並從中受益。</string>
@@ -112,7 +112,7 @@
   <string name="xml_detail">XML 詳細資料</string>
   <string name="format_last_updated">最近更新：%s</string>
   <string name="menu_process">處理序</string>
-  <string name="alternative_launch_method">替代的啟動方法</string>
+  <string name="alternative_launch_method">替代啟動方法</string>
   <string name="compare_with_current">與目前套件比較</string>
   <string name="rx_detail">RxJava 是 Reactive Extensions 的 Java VM 實現：一個使用可觀察序列組成異步和基於事件的程序的庫。</string>
   <string name="rx_android_detail">適用於 Android 的 Reactive Extensions</string>
@@ -203,7 +203,7 @@
   <string name="adv_show_system_apps">顯示系統應用程式</string>
   <string name="adv_show_overlays">顯示 Overlay</string>
   <string name="adv_show_64_bit">顯示 64 位元應用程式</string>
-  <string name="adv_show_32_bit">顯示 32 位應用程式</string>
+  <string name="adv_show_32_bit">顯示 32 位元應用程式</string>
   <string name="adv_sort_mode">排序模式</string>
   <string name="adv_sort_by_time">升級時間</string>
   <string name="adv_sort_by_target_version">Target 版本</string>
