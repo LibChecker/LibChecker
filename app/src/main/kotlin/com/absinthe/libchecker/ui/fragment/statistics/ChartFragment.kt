@@ -538,14 +538,13 @@ class ChartFragment :
       viewModel.dialogTitle.postValue(dialogTitle)
       viewModel.filteredList.postValue(item)
 
-      dialog = ClassifyBottomSheetDialogFragment().apply {
-        setOnDismiss {
-          this@ChartFragment.dialog = null
-          (chartView as? Chart<*>)?.highlightValue(null)
-        }
-      }.also {
-        withContext(Dispatchers.Main) {
-          activity?.let { activity ->
+      withContext(Dispatchers.Main) {
+        activity?.let { activity ->
+          dialog = ClassifyBottomSheetDialogFragment().also {
+            it.setOnDismiss {
+              this@ChartFragment.dialog = null
+              (chartView as? Chart<*>)?.highlightValue(null)
+            }
             it.show(
               activity.supportFragmentManager,
               ClassifyBottomSheetDialogFragment::class.java.name
