@@ -489,6 +489,7 @@ class ChartFragment :
                 }
             }
           }
+          viewModel.androidVersion.postValue(null)
         }
         TYPE_KOTLIN -> {
           when (legendList.getOrNull(h.x.toInt())) {
@@ -507,6 +508,7 @@ class ChartFragment :
                 }
             }
           }
+          viewModel.androidVersion.postValue(null)
         }
         TYPE_TARGET_API -> {
           val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
@@ -535,16 +537,21 @@ class ChartFragment :
 
       viewModel.dialogTitle.postValue(dialogTitle)
       viewModel.filteredList.postValue(item)
-    }
 
-    dialog = ClassifyBottomSheetDialogFragment().apply {
-      setOnDismiss {
-        this@ChartFragment.dialog = null
-        (chartView as? Chart<*>)?.highlightValue(null)
-      }
-    }.also {
-      activity?.let { activity ->
-        it.show(activity.supportFragmentManager, ClassifyBottomSheetDialogFragment::class.java.name)
+      dialog = ClassifyBottomSheetDialogFragment().apply {
+        setOnDismiss {
+          this@ChartFragment.dialog = null
+          (chartView as? Chart<*>)?.highlightValue(null)
+        }
+      }.also {
+        withContext(Dispatchers.Main) {
+          activity?.let { activity ->
+            it.show(
+              activity.supportFragmentManager,
+              ClassifyBottomSheetDialogFragment::class.java.name
+            )
+          }
+        }
       }
     }
   }
