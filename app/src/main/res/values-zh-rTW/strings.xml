@@ -23,7 +23,7 @@
   <string name="empty_list">空清單</string>
   <string name="uncharted_territory">未知領域</string>
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
-  <string name="advanced_menu">高級菜單</string>
+  <string name="advanced_menu">進階選單</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">%s架構的 Apps</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的 Apps</string>
@@ -53,7 +53,7 @@
   <string name="settings_translate_summary">協助我們翻譯本程式</string>
   <string name="settings_rate_us">給我們評分</string>
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
-  <string name="settings_about_summary">這裡是 LibChecker!</string>
+  <string name="settings_about_summary">這裡是 LibChecker！</string>
   <string name="about_info">本應用程式用於檢視裝置上的應用程式使用第三方程式庫的狀況。</string>
   <string name="toolbar_rate">評分</string>
   <string name="resource_declaration">應用程式中的部分資源來自於： </string>
@@ -134,10 +134,6 @@
   <string name="signature_public_key_type">公鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
-  <string name="signature_md5">MD5</string>
-  <string name="signature_sha1">SHA-1</string>
-  <string name="signature_sha256">SHA-256</string>
-  <string name="signature_char_string">CharString</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
