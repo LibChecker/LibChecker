@@ -15,35 +15,25 @@
   <string name="menu_sort">Сортування</string>
   <string name="menu_filter">Фільтр</string>
   <string name="search_hint">Пошук…</string>
-  <string name="string_64_bit">64bit</string>
-  <string name="string_32_bit">32bit</string>
   <string name="no_libs">Немає нативных бібліотек</string>
   <string name="cannot_read">Неможливо прочитати</string>
   <string name="unknown">Невідомо</string>
   <string name="empty_list">Список порожній</string>
   <string name="uncharted_territory">Недосліджена територія</string>
   <string name="get_app_list_denied_tip">Будь ласка надайте\nLibChecker дозвіл отримати\nінформацію про встановлені додатки</string>
-  <string name="advanced_menu">Advanced Menu</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Додатки з %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Додатки без нативных бібліотек</string>
   <string name="tab_chart">Діаграма</string>
   <string name="tab_lib_reference_statistics">Посилання на бібліотеки</string>
   <string name="not_marked_lib">Не позначена бібліотека</string>
-  <string name="submenu_title_component">Component</string>
-  <string name="submenu_title_manifest">Manifest</string>
   <string name="ref_category_all">Всі</string>
   <string name="ref_category_native">Нативні бібліотеки</string>
   <string name="ref_category_service">Служби</string>
   <string name="ref_category_activity">Activity</string>
   <string name="ref_category_br">Ресівери</string>
   <string name="ref_category_cp">Провайдери</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">Дозволи</string>
-  <string name="ref_category_static">Static Libraries</string>
-  <string name="ref_category_metadata">Meta Data</string>
-  <string name="ref_category_package">Package</string>
-  <string name="ref_category_shared_uid">Shared UID</string>
   <string name="ref_category_signatures">підпис</string>
   <string name="string_kotlin_used">Використовується Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не використовується</string>
@@ -79,11 +69,6 @@
   <string name="join_telegram_group_summary">Приєднуйтесь до нашої групи в Telegram</string>
   <string name="anonymous_statistics_summary">Ми використовуємо Microsoft AppCenter для анонімної відправки найбільш часто використовуваних позначених бібліотек і деяких даних про звички використання, щоб зробити LibChecker більш корисним.</string>
   <string name="cloud_rules_summary">Оновіть останні позначені правила бібліотеки тут</string>
-  <string name="array_dark_mode_off">Off</string>
-  <string name="array_dark_mode_on">On</string>
-  <string name="array_dark_mode_auto">Auto</string>
-  <string name="array_dark_mode_system">System Default</string>
-  <string name="array_dark_mode_battery">Set by Battery Saver</string>
   <string name="array_snapshot_default">запитати</string>
   <string name="array_snapshot_keep">резерв</string>
   <string name="array_snapshot_discard">викинути</string>
@@ -98,31 +83,18 @@
   <string name="further_operation">Додаткові опції</string>
   <string name="app_info_launch">Запустити</string>
   <string name="app_info_settings">Налаштування</string>
-  <string name="lib_detail_dialog_title">Library Details</string>
-  <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
-  <string name="xposed_module">Xposed Module</string>
-  <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes.</string>
-  <string name="play_app_signing">Play App Signing</string>
-  <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
   <string name="pwa_details">Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase. </string>
-  <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
-  <string name="extract_native_libs_tip">The app declares </string>
   <string name="xml_detail">XML Деталь</string>
-  <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Приложение</string>
-  <string name="alternative_launch_method">Alternative Launch Method</string>
-  <string name="compare_with_current">Compare with current package</string>
   <string name="rx_detail">RxJava — це реалізація віртуальної машини Java Reactive Extensions: бібліотека для створення асинхронних програм і програм на основі подій за допомогою спостережуваних послідовностей.</string>
   <string name="rx_android_detail">Reactive Extensions для Android</string>
   <string name="rx_kotlin_detail">Розширення Kotlin для RxJava</string>
-  <string name="permission_not_granted">Not Granted</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопійовано до буферу обміну</string>
   <string name="toast_not_existing_market">Немає магазину додатків</string>
   <string name="toast_use_another_file_manager">Будь ласка використовуйте інший файловий менеджер, щоб відкрити АРК</string>
   <string name="toast_cant_open_app">Не вдається відкрити цей додаток</string>
   <string name="toast_cloud_rules_update_error">Не вдалося оновити хмарні правила. Будь ласка, спробуйте ще раз.</string>
-  <string name="toast_not_enough_storage_space">Not enough storage space</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Зберегти поточний знімок</string>
   <string name="snapshot_current_timestamp">Відмітка часу поточного знімка</string>
@@ -136,7 +108,6 @@
   <string name="snapshot_detail_new_install_title">Цей додаток нещодавно встановлено</string>
   <string name="snapshot_detail_deleted_title">Цей додаток був видалений</string>
   <string name="snapshot_time_node_uninitialized">(неініціалізований)</string>
-  <string name="snapshot_generate_text_report">Generate Text Report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">Ви впевнені, що хочете перезавантажити весь список додатків?</string>
@@ -152,8 +123,6 @@
   <string name="album_item_comparison_title">Порівняння</string>
   <string name="album_item_comparison_subtitle">Порівняння двох знімків</string>
   <string name="album_item_comparison_invalid_compare">Недійсне порівняння</string>
-  <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
-  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Керування усіма знімками</string>
   <string name="album_item_backup_restore_title">Бекап і відновлення</string>
@@ -178,16 +147,4 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">поновити</string>
   <!-- Advanced menu -->
-  <string name="adv_show_system_apps">Show System Apps</string>
-  <string name="adv_show_overlays">Show Overlays</string>
-  <string name="adv_show_64_bit">Show 64-bit Apps</string>
-  <string name="adv_show_32_bit">Show 32-bit Apps</string>
-  <string name="adv_sort_mode">Sort Mode</string>
-  <string name="adv_sort_by_time">Updated Time</string>
-  <string name="adv_sort_by_target_version">Target Version</string>
-  <string name="adv_sort_by_name">Name</string>
-  <string name="adv_show_android_version">Show Android Version</string>
-  <string name="adv_show_target_version">Show Target Version</string>
-  <string name="adv_show_min_version">Show Min Version</string>
-  <string name="adv_tint_abi_label">Tint ABI Label</string>
 </resources>
