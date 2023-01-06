@@ -43,8 +43,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
             val list = mutableListOf<LibStringItemChip>()
 
             for (item in componentList) {
-              val source =
-                if (!item.enabled) DISABLED else if (item.exported) EXPORTED else null
+              val source = if (!item.enabled) DISABLED else if (item.exported) EXPORTED else null
 
               list += LibStringItemChip(
                 LibStringItem(
