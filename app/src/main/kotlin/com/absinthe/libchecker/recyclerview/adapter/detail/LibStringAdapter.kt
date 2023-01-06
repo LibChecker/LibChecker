@@ -65,6 +65,7 @@ class LibStringAdapter(
   }
 
   private var processMode: Boolean = false
+  private var is64Bit: Boolean = false
 
   fun switchProcessMode() {
     processMode = !processMode
@@ -74,6 +75,12 @@ class LibStringAdapter(
 
   fun setProcessMode(isProcessMode: Boolean) {
     processMode = isProcessMode
+    //noinspection NotifyDataSetChanged
+    notifyDataSetChanged()
+  }
+
+  fun set64Bit(is64Bit: Boolean) {
+    this.is64Bit = is64Bit
     //noinspection NotifyDataSetChanged
     notifyDataSetChanged()
   }
@@ -168,7 +175,7 @@ class LibStringAdapter(
     itemName: CharSequence
   ) {
     setOrHighlightText(itemView.libName, itemName)
-    itemView.libSize.text = PackageUtils.sizeToString(context, item.item)
+    itemView.libSize.text = PackageUtils.sizeToString(context, item.item, showElfInfo = true, is64Bit = is64Bit)
     itemView.setChip(item.chip)
 
     if (item.item.elfType != ET_DYN) {

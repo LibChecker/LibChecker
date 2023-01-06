@@ -240,6 +240,9 @@ abstract class BaseAppDetailActivity :
         val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
         abiSet = abiSet.sortedByDescending { it == abi }.toSet()
 
+        val trueAbi = abi.mod(Constants.MULTI_ARCH)
+        viewModel.is64Bit.postValue(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
+
         val versionInfo = buildSpannedString {
           if (!isHarmonyMode) {
             scale(0.8f) {

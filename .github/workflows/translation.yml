@@ -16,7 +16,7 @@ permissions:
 jobs:
   synchronize-with-crowdin:
     runs-on: ubuntu-latest
-    if: github.repository == 'zhaobozhen/LibChecker'
+    if: github.repository == 'LibChecker/LibChecker'
     steps:
       - name: Checkout
         uses: actions/checkout@v3

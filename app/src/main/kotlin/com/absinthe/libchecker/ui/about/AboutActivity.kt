@@ -241,9 +241,9 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
       add(
         License(
           "LibChecker-Rules-Bundle",
-          "zhaobozhen",
+          "LibChecker",
           License.APACHE_2,
-          "https://github.com/zhaobozhen/LibChecker-Rules-Bundle"
+          "https://github.com/LibChecker/LibChecker-Rules-Bundle"
         )
       )
       add(

@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
@@ -35,14 +35,9 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     initView()
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
+    onBackPressedDispatcher.addCallback(this, true) {
+      finish()
+    }
   }
 
   private fun initView() {

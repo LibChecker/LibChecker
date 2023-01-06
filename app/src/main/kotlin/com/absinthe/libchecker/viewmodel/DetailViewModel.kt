@@ -65,6 +65,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   val processToolIconVisibilityLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
   val processMapLiveData = MutableLiveData<Map<String, Int>>()
   val itemsCountList = MutableList(12) { 0 }
+  val is64Bit = MutableLiveData<Boolean>(null)
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false

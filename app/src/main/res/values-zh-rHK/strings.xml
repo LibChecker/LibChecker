@@ -38,7 +38,6 @@
   <string name="ref_category_activity">活動</string>
   <string name="ref_category_br">廣播接收器</string>
   <string name="ref_category_cp">内容提供者</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">權限</string>
   <string name="ref_category_static">靜態庫</string>
   <string name="ref_category_metadata">中繼資料</string>
@@ -104,7 +103,6 @@
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 插件新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
-  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">借助 Play 應用程式簽署，Google 可以為您管理並保護您應用程式的簽署金鑰，並使用它對從您的 App bundle 生成的最佳化分配 APK 進行簽署。Play App Signing 將您的應用程式簽署金鑰儲存在 Google 的安全基礎結構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
@@ -134,10 +132,6 @@
   <string name="signature_public_key_type">公鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
-  <string name="signature_md5">MD5</string>
-  <string name="signature_sha1">SHA-1</string>
-  <string name="signature_sha256">SHA-256</string>
-  <string name="signature_char_string">CharString</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>

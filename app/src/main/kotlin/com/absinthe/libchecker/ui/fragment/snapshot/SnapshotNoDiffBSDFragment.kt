@@ -6,6 +6,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
@@ -56,8 +57,12 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
         }
         appNameView.text = item.labelDiff.old
         packageNameView.text = item.packageName
-        versionInfoView.text =
-          String.format("%s (%s)", item.versionNameDiff.old, item.versionCodeDiff.old)
+        versionInfoView.text = getDiffString(
+          item.versionNameDiff,
+          item.versionCodeDiff,
+          item.deleted || item.newInstalled,
+          "%s (%s)"
+        )
         targetApiView.text = String.format("API %s", item.targetApiDiff.old)
       }
 
@@ -77,6 +82,19 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
       }
     } ?: run {
       dismiss()
+    }
+  }
+
+  private fun getDiffString(
+    diff1: SnapshotDiffItem.DiffNode<*>,
+    diff2: SnapshotDiffItem.DiffNode<*>,
+    isNewOrDeleted: Boolean = false,
+    format: String = "%s"
+  ): String {
+    return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
+      "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
+    } else {
+      format.format(diff1.old, diff2.old)
     }
   }
 
