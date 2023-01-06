@@ -14,12 +14,20 @@ object AdvancedOptions {
   const val SHOW_MIN_API = 1 shl 10
   const val TINT_ABI_LABEL = 1 shl 11
 
+  const val MARK_EXPORTED = 1 shl 0
+  const val MARK_DISABLED = 1 shl 1
+  const val SHOW_MARKED_LIB = 1 shl 2
+
   const val DEFAULT_OPTIONS =
     SHOW_OVERLAYS or
       SHOW_64_BIT_APPS or
       SHOW_32_BIT_APPS or
       SORT_BY_NAME or
       SHOW_TARGET_API
+
+  const val ITEM_DEFAULT_OPTIONS =
+    MARK_DISABLED or
+      SHOW_MARKED_LIB
 
   fun isSortModeNothingChoose(): Boolean {
     return (GlobalValues.advancedOptions and SORT_BY_NAME) == 0 &&

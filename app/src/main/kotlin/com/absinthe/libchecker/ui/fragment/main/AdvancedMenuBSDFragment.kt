@@ -12,7 +12,9 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {
 
   private val previousAdvancedOptions = GlobalValues.advancedOptions
+  private val previousItemAdvancedOptions = GlobalValues.itemAdvancedOptions
   private val optionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
+  private val itemOptionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
 
   private var onDismissCallback: () -> Unit = {}
 
@@ -43,8 +45,25 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       root.updateDemoView()
     }
 
+    itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED] =
+      root.addOptionItemViewForItem(R.string.adv_mark_exported, AdvancedOptions.MARK_EXPORTED)
+    itemOptionsViewMap[AdvancedOptions.MARK_DISABLED] =
+      root.addOptionItemViewForItem(R.string.adv_mark_disabled, AdvancedOptions.MARK_DISABLED)
+    itemOptionsViewMap[AdvancedOptions.SHOW_MARKED_LIB] =
+      root.addOptionItemViewForItem(R.string.adv_show_marked_lib, AdvancedOptions.SHOW_MARKED_LIB)
+
+    itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED]?.setOnCheckedChangeCallback {
+      root.updateDemoView()
+    }
+    itemOptionsViewMap[AdvancedOptions.MARK_DISABLED]?.setOnCheckedChangeCallback {
+      root.updateDemoView()
+    }
+    itemOptionsViewMap[AdvancedOptions.SHOW_MARKED_LIB]?.setOnCheckedChangeCallback {
+      root.updateDemoView()
+    }
+
     dialog?.setOnDismissListener {
-      if (GlobalValues.advancedOptions != previousAdvancedOptions) {
+      if (GlobalValues.advancedOptions != previousAdvancedOptions || GlobalValues.itemAdvancedOptions != previousItemAdvancedOptions) {
         onDismissCallback()
       }
     }
@@ -53,6 +72,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   override fun onDestroyView() {
     super.onDestroyView()
     optionsViewMap.clear()
+    itemOptionsViewMap.clear()
   }
 
   override fun onCancel(dialog: DialogInterface) {

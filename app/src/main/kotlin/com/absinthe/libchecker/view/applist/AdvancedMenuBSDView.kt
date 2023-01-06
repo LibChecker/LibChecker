@@ -7,16 +7,26 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.ACTIVITY
+import com.absinthe.libchecker.bean.DISABLED
+import com.absinthe.libchecker.bean.EXPORTED
+import com.absinthe.libchecker.bean.LibChip
+import com.absinthe.libchecker.bean.LibStringItem
+import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
+import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
 import com.google.android.flexbox.JustifyContent
+import com.google.android.material.card.MaterialCardView
 
 class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView {
 
@@ -29,6 +39,8 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val demoAdapter = AppAdapter().also {
     it.cardMode = AppAdapter.CardMode.DEMO
   }
+
+  private val itemAdapter = LibStringAdapter(Constants.EXAMPLE_PACKAGE, ACTIVITY)
 
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
@@ -79,6 +91,76 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     flexDirection = FlexDirection.ROW
   }
 
+  private val itemView = MaterialCardView(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 24.dp
+    }
+    overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+    strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
+    setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
+
+    val view = RecyclerView(context).apply {
+      overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+      layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+      adapter = itemAdapter
+
+      itemAdapter.apply {
+        addData(
+          LibStringItemChip(
+            LibStringItem(
+              name = Constants.EXAMPLE_EXPORTED,
+              source = EXPORTED
+            ),
+            LibChip(
+              R.drawable.ic_logo,
+              Constants.EXAMPLE_RULE
+            )
+          )
+        )
+        addData(
+          LibStringItemChip(
+            LibStringItem(
+              name = Constants.EXAMPLE_NORMAL
+            ),
+            LibChip(
+              R.drawable.ic_logo,
+              Constants.EXAMPLE_RULE
+            )
+          )
+        )
+        addData(
+          LibStringItemChip(
+            LibStringItem(
+              name = Constants.EXAMPLE_DISABLED,
+              source = DISABLED
+            ),
+            LibChip(
+              R.drawable.ic_logo,
+              Constants.EXAMPLE_RULE
+            )
+          )
+        )
+      }
+    }
+
+    addView(view)
+  }
+
+  private val itemFlexLayout = FlexboxLayout(context).apply {
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.MATCH_PARENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 8.dp
+    }
+    flexWrap = FlexWrap.WRAP
+    justifyContent = JustifyContent.FLEX_START
+    flexDirection = FlexDirection.ROW
+  }
+
   fun addOptionItemView(labelRes: Int, option: Int): AdvancedMenuItemView {
     val view = AdvancedMenuItemView(context).apply {
       setOption(labelRes, option)
@@ -87,8 +169,19 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     return view
   }
 
+  fun addOptionItemViewForItem(labelRes: Int, option: Int): AdvancedMenuItemView {
+    val view = AdvancedMenuItemView(context).apply {
+      setItemOption(labelRes, option)
+    }
+    itemFlexLayout.addView(view)
+    return view
+  }
+
   fun updateDemoView() {
     demoAdapter.notifyItemChanged(0)
+    itemAdapter.notifyItemChanged(0)
+    itemAdapter.notifyItemChanged(1)
+    itemAdapter.notifyItemChanged(2)
   }
 
   init {
@@ -99,6 +192,8 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     addView(demoView)
     addView(sortView)
     addView(flexLayout)
+    addView(itemView)
+    addView(itemFlexLayout)
   }
 
   override fun getHeaderView(): BottomSheetHeaderView {

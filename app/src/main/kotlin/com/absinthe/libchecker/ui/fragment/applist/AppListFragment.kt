@@ -250,6 +250,7 @@ class AppListFragment :
           advancedMenuBSDFragment = AdvancedMenuBSDFragment().apply {
             setOnDismissListener {
               GlobalValues.advancedOptionsLiveData.postValue(GlobalValues.advancedOptions)
+              GlobalValues.itemAdvancedOptionsLiveData.postValue(GlobalValues.itemAdvancedOptions)
               GlobalValues.isShowSystemApps.postValue(GlobalValues.advancedOptions and AdvancedOptions.SHOW_SYSTEM_APPS > 0)
               //noinspection NotifyDataSetChanged
               appAdapter.notifyDataSetChanged()

@@ -229,5 +229,8 @@
   <string name="adv_show_target_version">Show Target Version</string>
   <string name="adv_show_min_version">Show Min Version</string>
   <string name="adv_tint_abi_label">Tint ABI Label</string>
+  <string name="adv_mark_exported">Mark Exported Component</string>
+  <string name="adv_mark_disabled">Mark Disabled Component</string>
+  <string name="adv_show_marked_lib">Show Marked Libraries</string>
 
 </resources>
