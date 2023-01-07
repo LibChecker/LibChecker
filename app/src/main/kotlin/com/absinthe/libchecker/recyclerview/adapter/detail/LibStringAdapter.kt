@@ -6,7 +6,9 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.TransitionDrawable
 import android.graphics.text.LineBreaker
 import android.text.Layout
+import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
@@ -24,7 +26,10 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.bean.DISABLED
+import com.absinthe.libchecker.bean.EXPORTED
 import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.constant.AdvancedOptions
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_TEXT
 import com.absinthe.libchecker.ui.fragment.detail.XmlBSDFragment
@@ -32,6 +37,7 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.tintTextToPrimary
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.detail.ComponentLibItemView
@@ -92,16 +98,38 @@ class LibStringAdapter(
   }
 
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
-    val itemName = if (item.item.source == DISABLED) {
-      buildSpannedString {
-        strikeThrough {
-          inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
-            append(item.item.name)
+    val itemName = when (item.item.source) {
+      DISABLED -> {
+        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_DISABLED) > 0) {
+          buildSpannedString {
+            strikeThrough {
+              inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
+                append(item.item.name)
+              }
+            }
           }
+        } else {
+          item.item.name
         }
       }
-    } else {
-      item.item.name
+      EXPORTED -> {
+        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_EXPORTED) > 0) {
+          buildSpannedString {
+            append(item.item.name)
+            setSpan(
+              ForegroundColorSpan(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)),
+              0,
+              item.item.name.length,
+              Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+            )
+          }
+        } else {
+          item.item.name
+        }
+      }
+      else -> {
+        item.item.name
+      }
     }
 
     when (type) {
@@ -117,7 +145,11 @@ class LibStringAdapter(
             processMap[item.item.process] ?: UiUtils.getRandomColor()
           }
           setOrHighlightText(libName, itemName)
-          setChip(item.chip)
+          if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+            setChip(item.chip)
+          } else {
+            setChip(null)
+          }
         }
       }
     }
@@ -159,7 +191,11 @@ class LibStringAdapter(
   ) {
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item, showElfInfo = true, is64Bit = is64Bit)
-    itemView.setChip(item.chip)
+    if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+      itemView.setChip(item.chip)
+    } else {
+      itemView.setChip(null)
+    }
 
     if (item.item.elfType != ET_DYN) {
       itemView.libName.tintTextToPrimary()
@@ -191,7 +227,11 @@ class LibStringAdapter(
 
       it.text = sb
     }
-    itemView.setChip(item.chip)
+    if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {
+      itemView.setChip(item.chip)
+    } else {
+      itemView.setChip(null)
+    }
   }
 
   private fun setPermissionContent(

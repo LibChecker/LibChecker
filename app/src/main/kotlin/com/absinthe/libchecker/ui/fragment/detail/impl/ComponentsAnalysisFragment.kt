@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.bean.DISABLED
+import com.absinthe.libchecker.bean.EXPORTED
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -81,7 +82,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
               } else {
                 null
               }
-              source = if (item.enabled) null else DISABLED
+              source = if (!item.enabled) DISABLED else if (item.exported) EXPORTED else null
 
               list += LibStringItemChip(
                 LibStringItem(

@@ -12,7 +12,9 @@ import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBSDView>() {
 
   private val previousAdvancedOptions = GlobalValues.advancedOptions
+  private val previousItemAdvancedOptions = GlobalValues.itemAdvancedOptions
   private val optionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
+  private val itemOptionsViewMap = mutableMapOf<Int, AdvancedMenuItemView>()
 
   private var onDismissCallback: () -> Unit = {}
 
@@ -21,6 +23,9 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   override fun getHeaderView(): BottomSheetHeaderView = root.getHeaderView()
 
   override fun init() {
+    root.post {
+      maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.67).toInt()
+    }
     optionsViewMap[AdvancedOptions.SHOW_SYSTEM_APPS] = root.addOptionItemView(R.string.adv_show_system_apps, AdvancedOptions.SHOW_SYSTEM_APPS)
     optionsViewMap[AdvancedOptions.SHOW_OVERLAYS] = root.addOptionItemView(R.string.adv_show_overlays, AdvancedOptions.SHOW_OVERLAYS)
     optionsViewMap[AdvancedOptions.SHOW_64_BIT_APPS] = root.addOptionItemView(R.string.adv_show_64_bit, AdvancedOptions.SHOW_64_BIT_APPS)
@@ -43,8 +48,25 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       root.updateDemoView()
     }
 
+    itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED] =
+      root.addOptionItemViewForItem(R.string.adv_mark_exported, AdvancedOptions.MARK_EXPORTED)
+    itemOptionsViewMap[AdvancedOptions.MARK_DISABLED] =
+      root.addOptionItemViewForItem(R.string.adv_mark_disabled, AdvancedOptions.MARK_DISABLED)
+    itemOptionsViewMap[AdvancedOptions.SHOW_MARKED_LIB] =
+      root.addOptionItemViewForItem(R.string.adv_show_marked_lib, AdvancedOptions.SHOW_MARKED_LIB)
+
+    itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED]?.setOnCheckedChangeCallback {
+      root.updateItemDemoView()
+    }
+    itemOptionsViewMap[AdvancedOptions.MARK_DISABLED]?.setOnCheckedChangeCallback {
+      root.updateItemDemoView()
+    }
+    itemOptionsViewMap[AdvancedOptions.SHOW_MARKED_LIB]?.setOnCheckedChangeCallback {
+      root.updateItemDemoView()
+    }
+
     dialog?.setOnDismissListener {
-      if (GlobalValues.advancedOptions != previousAdvancedOptions) {
+      if (GlobalValues.advancedOptions != previousAdvancedOptions || GlobalValues.itemAdvancedOptions != previousItemAdvancedOptions) {
         onDismissCallback()
       }
     }
@@ -53,6 +75,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
   override fun onDestroyView() {
     super.onDestroyView()
     optionsViewMap.clear()
+    itemOptionsViewMap.clear()
   }
 
   override fun onCancel(dialog: DialogInterface) {

@@ -44,6 +44,22 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
     }
   }
 
+  fun setItemOption(labelRes: Int, option: Int) {
+    chip.apply {
+      text = context.getString(labelRes)
+      isChecked = (GlobalValues.itemAdvancedOptions and option) > 0
+      onCheckedChangeListener = { _: CheckableChipView, isChecked: Boolean ->
+        val newOptions = if (isChecked) {
+          GlobalValues.itemAdvancedOptions or option
+        } else {
+          GlobalValues.itemAdvancedOptions and option.inv()
+        }
+        GlobalValues.itemAdvancedOptions = newOptions
+        onCheckedChangeCallback?.invoke(isChecked)
+      }
+    }
+  }
+
   fun setChecked(isChecked: Boolean) {
     chip.setCheckedAnimated(isChecked, null)
   }

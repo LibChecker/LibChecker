@@ -8,6 +8,7 @@ import com.squareup.moshi.JsonClass
 import kotlinx.parcelize.Parcelize
 
 const val DISABLED = "DISABLED"
+const val EXPORTED = "EXPORTED"
 
 @Parcelize
 @JsonClass(generateAdapter = true)

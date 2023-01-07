@@ -617,6 +617,20 @@ object PackageUtils {
   }
 
   /**
+   * Check if a component is exported
+   * @param info ComponentInfo
+   * @return true if it is exported
+   */
+  fun isComponentExported(info: ComponentInfo): Boolean {
+    return runCatching {
+      info.exported
+    }.getOrElse {
+      Timber.e(it)
+      false
+    }
+  }
+
+  /**
    * Get components list of an app
    * @param packageName Package name of the app
    * @param list List of components(can be nullable)
@@ -641,6 +655,7 @@ object PackageUtils {
         StatefulComponent(
           name,
           isComponentEnabled(it),
+          isComponentExported(it),
           it.processName.orEmpty().removePrefix(it.packageName)
         )
       }
