@@ -338,7 +338,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             StatefulComponent(
               it.className,
               it.enabled,
-              true,
+              false,
               it.process.removePrefix((it.bundleName))
             )
           }
@@ -349,7 +349,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             StatefulComponent(
               it.className,
               it.enabled,
-              true,
+              false,
               it.process.removePrefix((it.bundleName))
             )
           }
@@ -360,7 +360,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             StatefulComponent(
               it.className,
               it.enabled,
-              true,
+              false,
               it.process.removePrefix((it.bundleName))
             )
           }
@@ -371,7 +371,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
             StatefulComponent(
               it.className,
               it.enabled,
-              true,
+              false,
               it.process.removePrefix((it.bundleName))
             )
           }
