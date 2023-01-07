@@ -53,13 +53,13 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       root.addOptionItemViewForItem(R.string.adv_show_marked_lib, AdvancedOptions.SHOW_MARKED_LIB)
 
     itemOptionsViewMap[AdvancedOptions.MARK_EXPORTED]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateItemDemoView()
     }
     itemOptionsViewMap[AdvancedOptions.MARK_DISABLED]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateItemDemoView()
     }
     itemOptionsViewMap[AdvancedOptions.SHOW_MARKED_LIB]?.setOnCheckedChangeCallback {
-      root.updateDemoView()
+      root.updateItemDemoView()
     }
 
     dialog?.setOnDismissListener {

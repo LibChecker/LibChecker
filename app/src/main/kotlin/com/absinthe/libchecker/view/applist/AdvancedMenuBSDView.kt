@@ -179,6 +179,9 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
 
   fun updateDemoView() {
     demoAdapter.notifyItemChanged(0)
+  }
+
+  fun updateItemDemoView() {
     itemAdapter.notifyItemChanged(0)
     itemAdapter.notifyItemChanged(1)
     itemAdapter.notifyItemChanged(2)
