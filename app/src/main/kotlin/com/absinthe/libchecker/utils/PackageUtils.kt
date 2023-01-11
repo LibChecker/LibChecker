@@ -991,7 +991,7 @@ object PackageUtils {
 
   /**
    * Format ELF class to string
-   * @param type ELF class
+   * @param elfClass ELF class
    * @return String of ELF class
    */
   private fun elfClassToString(elfClass: Int): String {
