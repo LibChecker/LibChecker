@@ -31,7 +31,7 @@
   <string name="tab_lib_reference_statistics">庫參考統計資料</string>
   <string name="not_marked_lib">未標示的庫</string>
   <string name="submenu_title_component">元件</string>
-  <string name="submenu_title_manifest">清單</string>
+  <string name="submenu_title_manifest">資訊清單</string>
   <string name="ref_category_all">全部</string>
   <string name="ref_category_native">原生庫</string>
   <string name="ref_category_service">服務</string>
@@ -50,7 +50,7 @@
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_translate">參與翻譯</string>
-  <string name="settings_translate_summary">協助我們翻譯本程式</string>
+  <string name="settings_translate_summary">協助我們翻譯這個應用程式</string>
   <string name="settings_rate_us">給我們評分</string>
   <string name="settings_rate_us_summary">這可以使我們被更多的人發現</string>
   <string name="settings_about_summary">這裡是 LibChecker！</string>
@@ -101,7 +101,7 @@
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
   <string name="lib_detail_dialog_title">庫詳細資料</string>
-  <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 插件新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
+  <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 外掛程式新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
   <string name="play_app_signing">Play 應用程式簽署</string>
@@ -208,4 +208,7 @@
   <string name="adv_show_target_version">顯示 Target 版本</string>
   <string name="adv_show_min_version">顯示 Min 版本</string>
   <string name="adv_tint_abi_label">ABI 標籤染色</string>
+  <string name="adv_mark_exported">標示已匯出的元件</string>
+  <string name="adv_mark_disabled">標示已停用的元件</string>
+  <string name="adv_show_marked_lib">顯示已標示的庫</string>
 </resources>
