@@ -134,6 +134,10 @@
   <string name="signature_public_key_type">公鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
+  <string name="signature_md5">MD5</string>
+  <string name="signature_sha1">SHA-1</string>
+  <string name="signature_sha256">SHA-256</string>
+  <string name="signature_char_string">CharString</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
@@ -201,7 +205,7 @@
   <string name="adv_show_64_bit">顯示 64 位元應用程式</string>
   <string name="adv_show_32_bit">顯示 32 位應用程式</string>
   <string name="adv_sort_mode">排序模式</string>
-  <string name="adv_sort_by_time">升級時間</string>
+  <string name="adv_sort_by_time">更新時間</string>
   <string name="adv_sort_by_target_version">Target 版本</string>
   <string name="adv_sort_by_name">名稱</string>
   <string name="adv_show_android_version">顯示 Android 版本</string>
