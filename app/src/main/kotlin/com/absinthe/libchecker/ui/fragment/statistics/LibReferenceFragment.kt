@@ -226,6 +226,7 @@ class LibReferenceFragment :
   override fun onPause() {
     super.onPause()
     popup?.dismiss()
+    (activity as? INavViewContainer)?.hideProgressBar()
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
