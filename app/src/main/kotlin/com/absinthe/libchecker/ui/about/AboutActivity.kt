@@ -91,6 +91,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           shouldShowEasterEggCount++
           rebornCoroutine.start()
         }
+
         10 -> {
           slogan.text = RENGE_CHECKER
           rebornCoroutine.cancel()
@@ -100,11 +101,13 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
             EventProperties().set("EASTER_EGG", "Renge 10 hits")
           )
         }
+
         in 11..19 -> {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
           rebornCoroutine.start()
         }
+
         20 -> {
           rebornCoroutine.cancel()
           shouldShowEasterEggCount++
@@ -150,8 +153,30 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
       } else {
         URLManager.GITHUB_PAGE
       }
-      add(Contributor(R.drawable.pic_rabbit, Absinthe.ME, "Developer & Designer", developerUrl))
-      add(Contributor(R.drawable.pic_kali, "Goooler", "Code Tidy & Optimize", "https://github.com/Goooler"))
+      add(
+        Contributor(
+          R.drawable.pic_rabbit,
+          Absinthe.ME,
+          "Developer & Designer",
+          developerUrl
+        )
+      )
+      add(
+        Contributor(
+          R.drawable.pic_kali,
+          "Goooler",
+          "Code Tidy & Optimize",
+          "https://github.com/Goooler"
+        )
+      )
+      add(
+        Contributor(
+          R.drawable.pic_qhy040404,
+          "qhy040404",
+          "Developer",
+          "https://github.com/qhy040404"
+        )
+      )
       add(
         Contributor(
           R.drawable.ic_github,
