@@ -40,7 +40,6 @@
   <string name="ref_category_activity">Activities</string>
   <string name="ref_category_br">Broadcast Receivers</string>
   <string name="ref_category_cp">Content Providers</string>
-  <string name="ref_category_dex">Dex</string>
   <string name="ref_category_perm">Permissions</string>
   <string name="ref_category_static">Static Libraries</string>
   <string name="ref_category_metadata">Meta Data</string>
@@ -144,10 +143,6 @@
   <string name="signature_public_key_type">Public key Type</string>
   <string name="signature_algorithm_name">Signature Algorithm Name</string>
   <string name="signature_algorithm_oid">Signature Algorithm OID</string>
-  <string name="signature_md5">MD5</string>
-  <string name="signature_sha1">SHA-1</string>
-  <string name="signature_sha256">SHA-256</string>
-  <string name="signature_char_string">CharString</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

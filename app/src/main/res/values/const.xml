@@ -10,4 +10,8 @@
   <string name="ability_service" translatable="false">Service</string>
   <string name="ability_data" translatable="false">Data</string>
   <string name="ability_web" translatable="false">Web</string>
+  <string name="signature_md5" translatable="false">MD5</string>
+  <string name="signature_sha1" translatable="false">SHA-1</string>
+  <string name="signature_sha256" translatable="false">SHA-256</string>
+  <string name="signature_char_string" translatable="false">CharString</string>
 </resources>

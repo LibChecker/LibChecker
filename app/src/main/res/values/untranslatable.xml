@@ -12,5 +12,7 @@
 
   <string name="empty" translatable="false"> </string>
 
+  <string name="ref_category_dex" translatable="false">Dex</string>
+
   <string name="snapshot_none" translatable="false">None</string>
 </resources>
