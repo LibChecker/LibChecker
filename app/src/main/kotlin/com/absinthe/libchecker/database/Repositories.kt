@@ -23,7 +23,7 @@ object Repositories {
   }
 
   fun checkRulesDatabase() {
-    if (GlobalValues.localRulesVersion < LCRules.getVersion() || GlobalValues.localRulesCount != LCRules.getItemCounts()) {
+    if (GlobalValues.localRulesVersion < LCRules.getVersion()) {
       deleteRulesDatabase()
       GlobalValues.localRulesVersion = LCRules.getVersion()
       GlobalValues.localRulesCount = LCRules.getItemCounts()

@@ -28,7 +28,6 @@ import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.ChartViewModel
@@ -440,16 +439,17 @@ class ChartFragment :
   override fun onValueSelected(e: Entry?, h: Highlight?) {
     if (e == null) return
     if (h == null) return
-    if (dialog?.isShowing() == true) return
+    if (dialog != null) return
 
     if (OsUtils.atLeastR()) {
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
-    var dialogTitle = ""
+    dialog = ClassifyBottomSheetDialogFragment()
     viewModel.filteredList.postValue(emptyList())
 
     lifecycleScope.launch(Dispatchers.IO) {
+      var dialogTitle = ""
       var item: List<LCItem> = emptyList()
 
       val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
@@ -540,7 +540,7 @@ class ChartFragment :
 
       withContext(Dispatchers.Main) {
         activity?.let { activity ->
-          dialog = ClassifyBottomSheetDialogFragment().also {
+          dialog?.also {
             it.setOnDismiss {
               this@ChartFragment.dialog = null
               (chartView as? Chart<*>)?.highlightValue(null)

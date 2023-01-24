@@ -131,6 +131,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     unbindService(workerServiceConnection)
   }
 
+  override fun removeMenuProvider(provider: MenuProvider) {
+    if (hasWindowFocus()) {
+      super.removeMenuProvider(provider)
+    }
+  }
+
   override fun showNavigationView() {
     Timber.d("showNavigationView")
     navViewBehavior.slideUp(binding.navView)
