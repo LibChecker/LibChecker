@@ -314,7 +314,7 @@ abstract class BaseAppDetailActivity :
               it,
               false
             ).let { str ->
-              spanString = SpannableString("  $str")
+              spanString = SpannableString("\uFFFC $str")
             }
             val abiRes = PackageUtils.getAbiBadgeResource(it)
             abiRes.getDrawable(this@BaseAppDetailActivity)?.mutate()?.let { drawable ->
