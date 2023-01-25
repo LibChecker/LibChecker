@@ -149,6 +149,7 @@ jobs:
   cancelled:
     runs-on: ubuntu-latest
     if: ${{ cancelled() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
+    needs: [check, build]
     steps:
       - name: Send commit to telegram if cancelled
         if: cancelled() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
