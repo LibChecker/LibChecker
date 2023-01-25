@@ -103,6 +103,7 @@ class LibReferenceProvider : BaseNodeProvider() {
           val regexName = LCRules.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {
+            (context as BaseActivity<*>).findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
             LibDetailDialogFragment.newInstance(name, ref.type, regexName)
               .show((context as BaseActivity<*>).supportFragmentManager, LibDetailDialogFragment::class.java.name)
           }
