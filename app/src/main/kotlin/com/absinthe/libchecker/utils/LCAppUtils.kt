@@ -121,7 +121,7 @@ object LCAppUtils {
   }
 
   private val checkNativeLibs =
-    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libsecexe.so", "libSecShell.so", "libSecShell-x86.so", "libDexHelper.so", "libDexHelper-x86.so", "libDexHelper-x86_64.so", "libdexjni.so", "libapp.so")
+    listOf("libjiagu.so", "libjiagu_a64.so", "libjiagu_x86.so", "libjiagu_x64.so", "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so", "libapp.so")
   fun checkNativeLibValidation(
     packageName: String,
     nativeLib: String,
@@ -142,7 +142,7 @@ object LCAppUtils {
           ).any { it == "com.qihoo.util.*".toClassDefType() }
         }.getOrDefault(false)
       }
-      "libsecexe.so", "libSecShell.so", "libSecShell-x86.so", "libDexHelper.so", "libDexHelper-x86.so", "libDexHelper-x86_64.so", "libdexjni.so" -> {
+      "libDexHelper.so", "libDexHelper-x86.so", "libdexjni.so" -> {
         runCatching {
           PackageUtils.findDexClasses(
             source,
