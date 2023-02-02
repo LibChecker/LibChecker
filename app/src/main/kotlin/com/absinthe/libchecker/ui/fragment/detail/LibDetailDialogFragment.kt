@@ -42,7 +42,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     root.apply {
       title.text = libName
       lifecycleScope.launch {
-        val iconRes = if (isValidLib){
+        val iconRes = if (isValidLib) {
           LCRules.getRule(libName, type, true)?.iconRes
             ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
         } else {
