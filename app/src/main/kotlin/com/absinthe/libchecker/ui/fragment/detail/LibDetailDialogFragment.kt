@@ -25,12 +25,14 @@ import kotlinx.coroutines.withContext
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
 const val EXTRA_REGEX_NAME = "EXTRA_REGEX_NAME"
+const val EXTRA_IS_VALID_LIB = "EXTRA_IS_VALID_LIB"
 
 class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBottomSheetView>() {
 
   private val libName by lazy { arguments?.getString(EXTRA_LIB_NAME).orEmpty() }
   private val type by lazy { arguments?.getInt(EXTRA_LIB_TYPE) ?: NATIVE }
   private val regexName by lazy { arguments?.getString(EXTRA_REGEX_NAME) }
+  private val isValidLib by lazy { arguments?.getBoolean(EXTRA_IS_VALID_LIB) ?: true }
   private val viewModel: DetailViewModel by activityViewModels()
   private var isStickyEventReceived = false
 
@@ -40,8 +42,12 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     root.apply {
       title.text = libName
       lifecycleScope.launch {
-        val iconRes = LCRules.getRule(libName, type, true)?.iconRes
-          ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        val iconRes = if (isValidLib){
+          LCRules.getRule(libName, type, true)?.iconRes
+            ?: com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        } else {
+          com.absinthe.lc.rulesbundle.R.drawable.ic_sdk_placeholder
+        }
         icon.load(iconRes) {
           crossfade(true)
           placeholder(R.drawable.ic_logo)
@@ -58,6 +64,10 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
 
   override fun onStart() {
     super.onStart()
+    if (!isValidLib) {
+      root.showNotFound()
+      return
+    }
     viewModel.detailBean.observe(viewLifecycleOwner) {
       if (it != null) {
         root.apply {
@@ -133,12 +143,14 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     fun newInstance(
       libName: String,
       @LibType type: Int,
-      regexName: String? = null
+      regexName: String? = null,
+      isValidLib: Boolean = true
     ): LibDetailDialogFragment {
       return LibDetailDialogFragment().putArguments(
         EXTRA_LIB_NAME to libName,
         EXTRA_LIB_TYPE to type,
-        EXTRA_REGEX_NAME to regexName
+        EXTRA_REGEX_NAME to regexName,
+        EXTRA_IS_VALID_LIB to isValidLib
       )
     }
 

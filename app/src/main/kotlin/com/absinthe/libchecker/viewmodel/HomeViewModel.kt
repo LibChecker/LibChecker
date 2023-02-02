@@ -744,7 +744,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       if (referenceMap[it.name] == null) {
         referenceMap[it.name] = mutableSetOf<String>() to NATIVE
       }
-      referenceMap[it.name]!!.first.add(packageName)
+      if (LCAppUtils.checkNativeLibValidation(packageName, it.name)) {
+        referenceMap[it.name]!!.first.add(packageName)
+      }
     }
   }
 

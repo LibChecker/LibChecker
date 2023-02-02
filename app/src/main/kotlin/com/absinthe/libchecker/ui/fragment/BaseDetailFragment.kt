@@ -233,12 +233,13 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   private fun openLibDetailDialog(position: Int) {
     val name = adapter.getItem(position).item.name
+    val isValidLib = viewModel.nativeLibItems.value?.get(position)?.chip != null
 
     lifecycleScope.launch(Dispatchers.IO) {
       val regexName = LCRules.getRule(name, adapter.type, true)?.regexName
 
       withContext(Dispatchers.Main) {
-        LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+        LibDetailDialogFragment.newInstance(name, adapter.type, regexName, isValidLib)
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }
