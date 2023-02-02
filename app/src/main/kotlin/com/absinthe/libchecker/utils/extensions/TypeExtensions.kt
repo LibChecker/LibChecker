@@ -12,3 +12,15 @@ fun String.isTempApk(): Boolean {
 fun Long.sizeToString(context: Context): String {
   return "${Formatter.formatFileSize(context, this)} ($this Bytes)"
 }
+
+fun ByteArray.toHex(): String {
+  return buildString {
+    this@toHex.forEach {
+      var hex = Integer.toHexString(it.toInt() and 0xFF)
+      if (hex.length == 1) {
+        hex = "0$hex"
+      }
+      append(hex.lowercase())
+    }
+  }
+}
