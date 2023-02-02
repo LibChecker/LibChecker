@@ -319,6 +319,13 @@ class LibReferenceFragment :
       }
     }
     this.setOnMenuItemClickListener {
+      (context as BaseActivity<*>).apply {
+        val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+        if (closeBtn != null) {
+          //noinspection RestrictedApi
+          supportActionBar?.collapseActionView()
+        }
+      }
       doSaveLibRefType(type)
     }
   }
