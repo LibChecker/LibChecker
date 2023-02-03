@@ -120,11 +120,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     }
   }
 
-  override fun onResume() {
-    super.onResume()
-    findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-  }
-
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
     handleIntent(intent)

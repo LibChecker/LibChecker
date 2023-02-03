@@ -9,6 +9,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.view.ContextThemeWrapper
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
@@ -172,6 +173,7 @@ object LCAppUtils {
     refName: String? = null,
     refType: Int = NATIVE
   ) {
+    context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
     if (item.abi.toInt() == OVERLAY) {
       OverlayDetailBottomSheetDialogFragment().apply {
         arguments = bundleOf(
