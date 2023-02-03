@@ -2,6 +2,7 @@ package com.absinthe.libchecker.utils
 
 import android.graphics.Color
 import androidx.annotation.ColorInt
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.utils.UiUtils.isDarkMode
@@ -36,5 +37,9 @@ object UiUtils {
       Constants.DARK_MODE_FOLLOW_SYSTEM -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
       else -> DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
+  }
+
+  fun isSoftInputOpen(): Boolean {
+    return SystemServices.inputMethodManager.isActive
   }
 }

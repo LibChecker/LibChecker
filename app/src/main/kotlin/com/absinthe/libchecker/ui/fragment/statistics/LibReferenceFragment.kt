@@ -152,6 +152,7 @@ class LibReferenceFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
+        context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
 
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         val intent = Intent(context, LibReferenceActivity::class.java)

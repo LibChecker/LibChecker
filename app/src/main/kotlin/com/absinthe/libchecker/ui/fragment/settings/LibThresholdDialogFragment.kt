@@ -15,7 +15,7 @@ class LibThresholdDialogFragment : DialogFragment() {
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val view = LibReferenceThresholdView(requireContext())
-    view.count.text = GlobalValues.libReferenceThreshold.toString()
+    view.count.setText(GlobalValues.libReferenceThreshold.toString())
 
     return BaseAlertDialogBuilder(requireContext())
       .setView(view)

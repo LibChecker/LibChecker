@@ -161,6 +161,7 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一张快照？</string>
   <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
+  <string name="dialog_title_confirm_to_delete">确定要删除此快照吗？</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">丢弃</string>
   <!--  Album  -->
