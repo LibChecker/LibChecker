@@ -12,6 +12,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
@@ -80,17 +81,21 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           val databaseDir = requireContext().getDatabasePath(Constants.RULES_DATABASE_NAME).parent
           FileUtils.copy(saveFile, File(databaseDir, Constants.RULES_DATABASE_NAME))
 
-          lifecycleScope.launch(Dispatchers.Main) {
-            root.cloudRulesContentView.localVersion.version.text =
-              root.cloudRulesContentView.remoteVersion.version.text
-            root.cloudRulesContentView.setUpdateButtonStatus(false)
-            runCatching {
-              GlobalValues.localRulesVersion =
-                root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
-              context?.let {
-                ProcessPhoenix.triggerRebirth(it)
+          if (File(databaseDir, Constants.RULES_DATABASE_NAME).md5() == saveFile.md5()) {
+            lifecycleScope.launch(Dispatchers.Main) {
+              root.cloudRulesContentView.localVersion.version.text =
+                root.cloudRulesContentView.remoteVersion.version.text
+              root.cloudRulesContentView.setUpdateButtonStatus(false)
+              runCatching {
+                GlobalValues.localRulesVersion =
+                  root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
+                context?.let {
+                  ProcessPhoenix.triggerRebirth(it)
+                }
               }
             }
+          } else {
+            context?.showToast(R.string.toast_cloud_rules_update_error)
           }
         }
 

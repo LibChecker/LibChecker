@@ -83,7 +83,7 @@ object Constants {
   const val COMMAND_USER_MODE = "/usermode"
 
   const val RULES_DB_FILE_NAME = "rules.db"
-  const val RULES_DATABASE_NAME = "rule_database"
+  const val RULES_DATABASE_NAME = "rules_database"
 
   const val RENGE_THEME = "rengeTheme"
 

@@ -18,6 +18,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -147,6 +148,14 @@ abstract class BaseAppDetailActivity :
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)
       setDisplayShowHomeEnabled(true)
+    }
+    onBackPressedDispatcher.addCallback(this, true) {
+      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+      if (closeBtn != null) {
+        binding.toolbar.collapseActionView()
+      } else {
+        finish()
+      }
     }
   }
 
