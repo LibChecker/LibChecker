@@ -134,7 +134,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
   override fun removeMenuProvider(provider: MenuProvider) {
     // When current menu provider equals to parameter, we can safely remove provided provider.
     // This fix should only be used when the pop-up Dialog does not define a Menu.
-    if (hasWindowFocus() && currentMenuProvider == provider) {
+    if (appViewModel.appListStatus == STATUS_START_INIT || hasWindowFocus() && currentMenuProvider == provider) {
       super.removeMenuProvider(provider)
     }
   }
