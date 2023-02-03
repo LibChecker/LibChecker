@@ -175,6 +175,7 @@
   <string name="dialog_title_keep_previous_snapshot">Attention</string>
   <string name="dialog_message_keep_previous_snapshot">Do you want to keep the previous snapshot?</string>
   <string name="dialog_title_select_to_delete">Choose a Date to Delete Snapshot</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">Keep</string>
   <string name="btn_drop">Discard</string>
 

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
+import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.ui.album.BackupActivity
@@ -23,6 +24,9 @@ import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,30 +103,37 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                   return@setOnItemClickListener
                 }
                 val item = timeStampList[position]
-                lifecycleScope.launch(Dispatchers.IO) {
-                  val dialog: AlertDialog
-                  withContext(Dispatchers.Main) {
-                    dialog = LCAppUtils.createLoadingDialog(this@AlbumActivity)
-                    dialog.show()
-                  }
-                  viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
-                  if (position < timeStampList.size) {
-                    timeStampList.removeAt(position)
-                  }
-                  GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
-                    0L
-                  } else {
-                    timeStampList[0].timestamp
-                  }
-                  withContext(Dispatchers.Main) {
-                    root.adapter.remove(item)
-                    dialog.dismiss()
+                BaseAlertDialogBuilder(this@AlbumActivity)
+                  .setTitle(R.string.dialog_title_confirm_to_delete)
+                  .setMessage(getFormatDateString(item.timestamp))
+                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                    lifecycleScope.launch(Dispatchers.IO) {
+                      val dialog: AlertDialog
+                      withContext(Dispatchers.Main) {
+                        dialog = LCAppUtils.createLoadingDialog(this@AlbumActivity)
+                        dialog.show()
+                      }
+                      viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
+                      if (position < timeStampList.size) {
+                        timeStampList.removeAt(position)
+                      }
+                      GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
+                        0L
+                      } else {
+                        timeStampList[0].timestamp
+                      }
+                      withContext(Dispatchers.Main) {
+                        root.adapter.remove(item)
+                        dialog.dismiss()
 
-                    if (timeStampList.isEmpty()) {
-                      dismiss()
+                        if (timeStampList.isEmpty()) {
+                          dismiss()
+                        }
+                      }
                     }
                   }
-                }
+                  .setNegativeButton(android.R.string.cancel, null)
+                  .show()
               }
             }
           dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
@@ -165,5 +176,11 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       title.text = getString(titleRes)
       subtitle.text = getString(subtitleRes)
     }
+  }
+
+  private fun getFormatDateString(timestamp: Long): String {
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+    val date = Date(timestamp)
+    return simpleDateFormat.format(date)
   }
 }
