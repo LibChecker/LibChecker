@@ -32,7 +32,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
   val count: EditText = EditText(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-    inputType = InputType.TYPE_CLASS_TEXT
+    inputType = InputType.TYPE_CLASS_NUMBER
     gravity = Gravity.CENTER
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     setTypeface(null, Typeface.BOLD)
@@ -45,7 +45,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
         sliderChanging = true
         count.apply {
           setText(value.toInt().toString())
-          if (UiUtils.isSoftInputOpen(this@LibReferenceThresholdView.context)) {
+          if (UiUtils.isSoftInputOpen()) {
             text?.let { setSelection(it.length) }
           }
         }
@@ -64,7 +64,7 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
         text?.toString().let {
           count.apply {
             if (it.isNullOrEmpty()) {
-              setText(1f.toInt().toString())
+              setText(2f.toInt().toString())
               setSelection(1)
             } else {
               val c = it.toFloat()

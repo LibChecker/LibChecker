@@ -1,9 +1,8 @@
 package com.absinthe.libchecker.utils
 
-import android.content.Context
 import android.graphics.Color
-import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
+import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.utils.UiUtils.isDarkMode
@@ -40,8 +39,7 @@ object UiUtils {
     }
   }
 
-  fun isSoftInputOpen(context: Context): Boolean {
-    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    return imm.isActive
+  fun isSoftInputOpen(): Boolean {
+    return SystemServices.inputMethodManager.isActive
   }
 }
