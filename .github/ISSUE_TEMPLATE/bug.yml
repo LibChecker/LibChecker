@@ -2,7 +2,6 @@ name: Bug Report / Bug 反馈
 description: Report a bug / 反馈一个 Bug
 labels: [ "bug" ]
 title: "[BUG] "
-assignees: [ zhaobozhen ]
 body:
   - type: input
     id: version

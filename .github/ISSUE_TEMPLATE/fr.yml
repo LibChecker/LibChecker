@@ -2,7 +2,6 @@ name: Feature Request / 功能请求
 description: Suggest an idea for this project / 提出一个建议
 labels: [ "enhancement" ]
 title: "[FR] "
-assignees: [ zhaobozhen ]
 body:
   - type: textarea
     id: propose
