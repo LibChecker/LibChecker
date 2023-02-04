@@ -63,6 +63,7 @@ class AppListFragment :
   private val appAdapter = AppAdapter()
   private var isFirstLaunch = !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.FIRST_LAUNCH)
   private var isFirstRequestChange = true
+  //private var isSearchTextClearOnce = false
   private var delayShowNavigationJob: Job? = null
   private var firstScrollFlag = false
   private var keyword: String = ""
@@ -119,7 +120,7 @@ class AppListFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (canListScroll(appAdapter.data.size)) {
+              if (isFragmentVisible() /*&& !isSearchTextClearOnce*/ && canListScroll(appAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -136,7 +137,7 @@ class AppListFragment :
                   0
                 }
               }
-              if (position < appAdapter.itemCount - 1) {
+              if (isFragmentVisible() /*&& !isSearchTextClearOnce*/ && position < appAdapter.itemCount - 1) {
                 delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
                   delay(400)
                   withContext(Dispatchers.Main) {
@@ -146,6 +147,7 @@ class AppListFragment :
                   it.start()
                 }
               }
+              //isSearchTextClearOnce = false
             }
           }
         })
@@ -188,6 +190,7 @@ class AppListFragment :
 
   override fun onQueryTextChange(newText: String): Boolean {
     if (keyword != newText) {
+      //isSearchTextClearOnce = newText.isEmpty()
       keyword = newText
       homeViewModel.dbItems.value?.let { allDatabaseItems ->
         appAdapter.highlightText = newText

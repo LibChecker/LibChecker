@@ -78,6 +78,7 @@ class LibReferenceFragment :
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
+  //private var isSearchTextClearOnce = false
   private var keyword: String = ""
   private var searchUpdateJob: Job? = null
 
@@ -108,7 +109,7 @@ class LibReferenceFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (canListScroll(refAdapter.data.size)) {
+              if (isFragmentVisible() /*&& !isSearchTextClearOnce*/ && canListScroll(refAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -125,7 +126,7 @@ class LibReferenceFragment :
                   0
                 }
               }
-              if (position < refAdapter.itemCount - 1) {
+              if (isFragmentVisible() /*&& !isSearchTextClearOnce*/ && position < refAdapter.itemCount - 1) {
                 delayShowNavigationJob = lifecycleScope.launch(Dispatchers.Default) {
                   delay(400)
                   withContext(Dispatchers.Main) {
@@ -135,6 +136,7 @@ class LibReferenceFragment :
                   it.start()
                 }
               }
+              //isSearchTextClearOnce = false
             }
           }
         })
@@ -364,6 +366,7 @@ class LibReferenceFragment :
 
   override fun onQueryTextChange(newText: String): Boolean {
     if (keyword != newText) {
+      //isSearchTextClearOnce = newText.isEmpty()
       keyword = newText
 
       searchUpdateJob?.cancel()
