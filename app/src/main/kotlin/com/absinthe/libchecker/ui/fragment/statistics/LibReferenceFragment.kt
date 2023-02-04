@@ -381,7 +381,9 @@ class LibReferenceFragment :
           LibReferenceAdapter.highlightText = newText
 
           withContext(Dispatchers.Main) {
-            (activity as? INavViewContainer)?.showProgressBar()
+            if (isFragmentVisible()) {
+              (activity as? INavViewContainer)?.showProgressBar()
+            }
             refAdapter.setDiffNewData(filter.toMutableList()) {
               doOnMainThreadIdle {
                 //noinspection NotifyDataSetChanged
