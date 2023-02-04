@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -559,6 +560,15 @@ abstract class BaseAppDetailActivity :
           }
         }
       }
+
+      registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+          super.onPageSelected(position)
+          if (typeList[position] == PERMISSION) {
+            processBarView?.isVisible = true
+          }
+        }
+      })
     }
     binding.tabLayout.apply {
       removeAllTabs()
