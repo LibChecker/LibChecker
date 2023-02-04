@@ -204,7 +204,12 @@ class LibReferenceFragment :
       }
     }
     GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
-      homeViewModel.refreshRef()
+      if (it < homeViewModel.savedThreshold) {
+        matchRules(true)
+        homeViewModel.savedThreshold = it
+      } else {
+        homeViewModel.refreshRef()
+      }
     }
     GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
       // noinspection NotifyDataSetChanged
@@ -358,6 +363,15 @@ class LibReferenceFragment :
     }
     homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
+  }
+
+  private fun matchRules(needShowLoading: Boolean) {
+    isListReady = false
+    if (needShowLoading) {
+      flip(VF_LOADING)
+    }
+    homeViewModel.cancelMatchingJob()
+    homeViewModel.matchingRules(category)
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {

@@ -68,6 +68,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
   val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
 
+  private var savedRefList: MutableLiveData<List<LibReference>?> = MutableLiveData()
+  private var referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>? = null
+  var savedThreshold = GlobalValues.libReferenceThreshold
+
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
 
@@ -431,13 +435,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   fun computeLibReference(@LibType type: Int) {
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
+      referenceMap = null
       libReference.postValue(null)
       val appMap = AppItemRepository.getApplicationInfoMap()
       val map = HashMap<String, Pair<MutableSet<String>, Int>>()
-      val refList = mutableListOf<LibReference>()
       val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
-      var onlyShowNotMarked = false
       var progressCount = 0
 
       fun updateLibRefProgressImpl() {
@@ -451,9 +454,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       when (type) {
         ALL, NOT_MARKED -> {
-          if (type == NOT_MARKED) {
-            onlyShowNotMarked = true
-          }
           for (item in appMap.values) {
             if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
               progressCount++
@@ -610,45 +610,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
       }
 
-      var chip: LibChip?
-      var rule: Rule?
-      for (entry in map) {
-        if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
-          rule = LCRules.getRule(entry.key, entry.value.second, true)
-          chip = null
-          rule?.let {
-            chip = LibChip(
-              iconRes = it.iconRes,
-              name = it.label,
-              regexName = it.regexName
-            )
-          }
-          if (!onlyShowNotMarked) {
-            refList.add(
-              LibReference(
-                entry.key,
-                chip,
-                entry.value.first,
-                entry.value.second
-              )
-            )
-          } else {
-            if (rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA) {
-              refList.add(
-                LibReference(
-                  entry.key,
-                  null,
-                  entry.value.first,
-                  entry.value.second
-                )
-              )
-            }
-          }
-        }
-      }
-
-      refList.sortByDescending { it.referredList.size }
-      libReference.postValue(refList)
+      referenceMap = map
+      matchingRules(type)
     }
   }
 
@@ -803,8 +766,81 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
+  private var matchingJob: Job? = null
+
+  fun matchingRules(
+    @LibType type: Int
+  ) {
+    matchingJob = viewModelScope.launch(Dispatchers.IO) {
+      referenceMap?.let { map ->
+        var progressCount = 0
+
+        fun updateLibRefProgressImpl() {
+          val size = map.size
+          if (size > 0) {
+            updateLibRefProgress(progressCount * 100 / size)
+          }
+        }
+
+        updateLibRefProgressImpl()
+
+        val refList = mutableListOf<LibReference>()
+
+        var chip: LibChip?
+        var rule: Rule?
+        for (entry in map) {
+          if (entry.value.first.size >= GlobalValues.libReferenceThreshold && entry.key.isNotBlank()) {
+            rule = LCRules.getRule(entry.key, entry.value.second, true)
+            chip = null
+            rule?.let {
+              chip = LibChip(
+                iconRes = it.iconRes,
+                name = it.label,
+                regexName = it.regexName
+              )
+            }
+            if (type != NOT_MARKED) {
+              refList.add(
+                LibReference(
+                  entry.key,
+                  chip,
+                  entry.value.first,
+                  entry.value.second
+                )
+              )
+            } else {
+              if (rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA) {
+                refList.add(
+                  LibReference(
+                    entry.key,
+                    null,
+                    entry.value.first,
+                    entry.value.second
+                  )
+                )
+              }
+            }
+          }
+          progressCount++
+          updateLibRefProgressImpl()
+        }
+
+        refList.sortByDescending { it.referredList.size }
+        libReference.postValue(refList)
+        savedRefList.postValue(refList)
+      }
+    }.also {
+      it.start()
+    }
+  }
+
+  fun cancelMatchingJob() {
+    matchingJob?.cancel()
+    matchingJob = null
+  }
+
   fun refreshRef() {
-    libReference.value?.let { ref ->
+    savedRefList.value?.let { ref ->
       libReference.value =
         ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold }
     }
