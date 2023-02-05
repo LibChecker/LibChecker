@@ -22,8 +22,8 @@ class LibThresholdDialogFragment : DialogFragment() {
       .setTitle(R.string.lib_ref_threshold)
       .setPositiveButton(android.R.string.ok) { _, _ ->
         val threshold = view.slider.value.toInt()
-        GlobalValues.libReferenceThresholdLiveData.value = threshold
         GlobalValues.libReferenceThreshold = threshold
+        GlobalValues.libReferenceThresholdLiveData.value = threshold
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())

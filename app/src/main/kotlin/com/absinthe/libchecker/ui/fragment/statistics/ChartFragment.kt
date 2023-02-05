@@ -80,6 +80,8 @@ class ChartFragment :
   private var queryJob: Job? = null
 
   override fun init() {
+    val isKotlinShowed = !WorkerService.initializingFeatures
+
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
 
@@ -87,11 +89,13 @@ class ChartFragment :
       addOnButtonCheckedListener(this@ChartFragment)
       check(R.id.btn_abi)
     }
-    binding.btnKotlin.isVisible = !WorkerService.initializingFeatures
+    binding.btnKotlin.isVisible = isKotlinShowed
 
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {
-        setData()
+        if (isKotlinShowed) {
+          setData()
+        }
       }
     }
 

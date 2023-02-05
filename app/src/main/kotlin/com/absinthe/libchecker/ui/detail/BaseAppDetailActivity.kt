@@ -657,6 +657,7 @@ abstract class BaseAppDetailActivity :
           )
         }
       )
+      showProcessBarView()
     }
 
     if (!isHarmonyMode) {
@@ -1088,6 +1089,10 @@ abstract class BaseAppDetailActivity :
       }
     }
     binding.detailToolbarContainer.addView(processBarView)
+    showProcessBarView()
+  }
+
+  private fun showProcessBarView() {
     if (viewModel.processToolIconVisibilityLiveData.value == false && detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
       processBarView?.isGone = true
     } else {
