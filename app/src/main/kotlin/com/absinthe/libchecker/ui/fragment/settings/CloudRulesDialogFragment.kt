@@ -7,7 +7,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -17,6 +16,7 @@ import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
@@ -47,11 +47,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
       try {
         request.requestCloudRuleInfo()?.let {
           try {
-            root.cloudRulesContentView.localVersion.version.text =
-              GlobalValues.localRulesVersion.toString()
-            root.cloudRulesContentView.remoteVersion.version.text =
-              it.version.toString()
-            if (GlobalValues.localRulesVersion < it.version) {
+            root.cloudRulesContentView.localVersion.version.text = getLocalRulesVersion().toString()
+            root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
+            if (getLocalRulesVersion() < it.version) {
               root.cloudRulesContentView.setUpdateButtonStatus(true)
             }
             withContext(Dispatchers.Main) {
@@ -87,8 +85,9 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
                 root.cloudRulesContentView.remoteVersion.version.text
               root.cloudRulesContentView.setUpdateButtonStatus(false)
               runCatching {
-                GlobalValues.localRulesVersion =
+                setLocalRulesVersion(
                   root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
+                )
                 context?.let {
                   ProcessPhoenix.triggerRebirth(it)
                 }
@@ -107,5 +106,21 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         }
       }
     )
+  }
+
+  private fun getLocalRulesVersion(): Int {
+    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
+    if (localCloudVersionFile.exists().not()) return LCRules.getVersion()
+    if (localCloudVersionFile.isDirectory.not()) return LCRules.getVersion()
+    localCloudVersionFile.listFiles()?.takeIf { it.isNotEmpty() }?.let {
+      return runCatching { it[0].name.toInt() }.getOrDefault(LCRules.getVersion())
+    } ?: return LCRules.getVersion()
+  }
+
+  private fun setLocalRulesVersion(version: Int) {
+    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
+    if (localCloudVersionFile.isDirectory.not()) localCloudVersionFile.delete()
+    if (localCloudVersionFile.exists().not()) localCloudVersionFile.mkdirs()
+    File(localCloudVersionFile, version.toString()).createNewFile()
   }
 }
