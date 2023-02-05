@@ -234,11 +234,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   private fun openLibDetailDialog(position: Int) {
     val item = adapter.getItem(position)
     val name = item.item.name
-    val isValidLib = if (adapter.type == NATIVE) {
-      item.chip != null
-    } else {
-      true
-    }
+    val isValidLib = item.chip != null
 
     lifecycleScope.launch(Dispatchers.IO) {
       val regexName = LCRules.getRule(name, adapter.type, true)?.regexName
