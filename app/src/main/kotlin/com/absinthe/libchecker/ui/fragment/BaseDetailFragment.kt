@@ -232,9 +232,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   private fun openLibDetailDialog(position: Int) {
-    val name = adapter.getItem(position).item.name
+    val item = adapter.getItem(position)
+    val name = item.item.name
     val isValidLib = if (adapter.type == NATIVE) {
-      viewModel.nativeLibItems.value?.get(position)?.chip != null
+      item.chip != null
     } else {
       true
     }
