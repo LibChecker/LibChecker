@@ -76,7 +76,6 @@ class LibCheckerApp : Application() {
     DayNightDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
-    Repositories.checkRulesDatabase()
     DynamicColors.applyToActivitiesIfAvailable(this)
     initSplitController()
 
