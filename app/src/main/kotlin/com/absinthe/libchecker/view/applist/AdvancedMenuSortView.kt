@@ -2,6 +2,8 @@ package com.absinthe.libchecker.view.applist
 
 import android.content.Context
 import android.graphics.Typeface
+import android.view.ViewGroup
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.AppCompatTextView
@@ -29,9 +31,7 @@ class AdvancedMenuSortView(context: Context) :
     layoutParams = LayoutParams(
       LayoutParams.WRAP_CONTENT,
       LayoutParams.WRAP_CONTENT
-    ).also {
-      it.topMargin = 8.dp
-    }
+    )
     isSelectionRequired = true
     isSingleSelection = true
     addOnButtonCheckedListener(this@AdvancedMenuSortView)
@@ -45,10 +45,21 @@ class AdvancedMenuSortView(context: Context) :
     }
   }
 
+  private val group = HorizontalScrollView(context).apply {
+    isHorizontalScrollBarEnabled = false
+    layoutParams = LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
+    ).also {
+      it.topMargin = 8.dp
+    }
+    addView(toggleGroup)
+  }
+
   init {
     orientation = VERTICAL
     addView(title)
-    addView(toggleGroup)
+    addView(group)
     addButton(context, R.string.adv_sort_by_name, R.id.sort_by_name)
     addButton(context, R.string.adv_sort_by_time, R.id.sort_by_time)
     addButton(context, R.string.adv_sort_by_target_version, R.id.sort_by_target_version)
