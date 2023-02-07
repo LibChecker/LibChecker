@@ -77,7 +77,16 @@
       android:label="@string/title_album" />
     <activity
       android:name=".ui.album.BackupActivity"
-      android:label="@string/album_item_backup_restore_title" />
+      android:label="@string/album_item_backup_restore_title"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="content" />
+        <data android:mimeType="*/*" />
+        <data android:pathPattern=".*\\.lcss" />
+      </intent-filter>
+    </activity>
     <activity
       android:name=".ui.album.ComparisonActivity"
       android:label="@string/album_item_comparison_title"
