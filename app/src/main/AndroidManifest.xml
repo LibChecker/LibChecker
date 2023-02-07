@@ -77,8 +77,8 @@
       android:label="@string/title_album" />
     <activity
       android:name=".ui.album.BackupActivity"
-      android:label="@string/album_item_backup_restore_title"
-      android:exported="true">
+      android:exported="true"
+      android:label="@string/album_item_backup_restore_title">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
