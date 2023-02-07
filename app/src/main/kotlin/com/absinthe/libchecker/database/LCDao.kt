@@ -64,10 +64,10 @@ interface LCDao {
   @Query("SELECT * from snapshot_table WHERE timeStamp LIKE :timestamp ORDER BY packageName ASC")
   fun getSnapshotsFlow(timestamp: Long): Flow<List<SnapshotItem>>
 
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(item: SnapshotItem)
 
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insertSnapshots(items: List<SnapshotItem>)
 
   @Update
@@ -92,7 +92,7 @@ interface LCDao {
   fun deleteSnapshots(list: List<SnapshotItem>)
 
   // TimeStamp Table
-  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   suspend fun insert(item: TimeStampItem)
 
   @Query("SELECT * from timestamp_table ORDER BY timestamp DESC")
