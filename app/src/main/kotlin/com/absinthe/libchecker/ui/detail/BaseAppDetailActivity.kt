@@ -430,16 +430,21 @@ abstract class BaseAppDetailActivity :
       if (this@BaseAppDetailActivity is ApkDetailActivity && PackageUtils.isAppInstalled(packageInfo.packageName)) {
         toolbarAdapter.addData(
           AppDetailToolbarItem(R.drawable.ic_compare, R.string.compare_with_current) {
-            val basePackage = PackageUtils.getPackageInfo(
-              viewModel.packageInfo.packageName,
-              PackageManager.GET_ACTIVITIES
-                or PackageManager.GET_RECEIVERS
-                or PackageManager.GET_SERVICES
-                or PackageManager.GET_PROVIDERS
-                or PackageManager.GET_META_DATA
-                or PackageManager.GET_PERMISSIONS
-            )
-            navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
+            runCatching {
+              val basePackage = PackageUtils.getPackageInfo(
+                viewModel.packageInfo.packageName,
+                PackageManager.GET_ACTIVITIES
+                  or PackageManager.GET_RECEIVERS
+                  or PackageManager.GET_SERVICES
+                  or PackageManager.GET_PROVIDERS
+                  or PackageManager.GET_META_DATA
+                  or PackageManager.GET_PERMISSIONS
+              )
+              navigateToSnapshotDetailPage(basePackage, viewModel.packageInfo)
+            }.onFailure {
+              Toasty.showLong(this@BaseAppDetailActivity, it.toString())
+              Timber.e(it)
+            }
           }
         )
       }
@@ -517,8 +522,9 @@ abstract class BaseAppDetailActivity :
     if (packageInfo.applicationInfo.sharedLibraryFiles?.isNotEmpty() == true) {
       lifecycleScope.launch(Dispatchers.IO) {
         try {
-          val libs =
+          val libs = runCatching {
             PackageUtils.getStaticLibs(PackageUtils.getPackageInfo(packageInfo.packageName))
+          }.getOrDefault(emptyList())
           if (libs.isNotEmpty()) {
             withContext(Dispatchers.Main) {
               typeList.add(1, STATIC)

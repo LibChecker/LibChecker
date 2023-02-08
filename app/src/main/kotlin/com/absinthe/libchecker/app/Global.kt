@@ -36,7 +36,8 @@ object Global {
       stack.contains("MultiSelectPopupWindow.showMultiSelectPopupWindow") ||
       stack.contains("android.view.inputmethod.InputMethodManager.startInputInner") ||
       stack.contains("com.android.server.wm.ConfigurationContainer.setActivityType") ||
-      stack.contains("handleTopResumedActivityChanged")
+      stack.contains("handleTopResumedActivityChanged") ||
+      stack.contains("lspatch")
     ) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {

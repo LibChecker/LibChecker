@@ -245,12 +245,12 @@ object PackageUtils {
             .filter { it.isFile }
             .distinctBy { it.name }
             .map {
-              elfParser = ELFParser(it.inputStream())
+              elfParser = runCatching { ELFParser(it.inputStream()) }.getOrNull()
               LibStringItem(
                 name = it.name,
                 size = FileUtils.getFileSize(it),
-                elfType = elfParser!!.getEType(),
-                elfClass = elfParser!!.getEClass()
+                elfType = elfParser?.getEType() ?: ET_NOT_ELF,
+                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
               )
             }
             .toMutableList()
@@ -741,21 +741,25 @@ object PackageUtils {
                 abiSet.add(ARMV8)
               }
             }
+
             elementName.startsWith("$ARMV7_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(ARMV7_STRING) || ignoreArch) {
                 abiSet.add(ARMV7)
               }
             }
+
             elementName.startsWith("$ARMV5_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(ARMV5_STRING) || ignoreArch) {
                 abiSet.add(ARMV5)
               }
             }
+
             elementName.startsWith("$X86_64_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(X86_64_STRING) || ignoreArch) {
                 abiSet.add(X86_64)
               }
             }
+
             elementName.startsWith("$X86_STRING/") -> {
               if (Build.SUPPORTED_ABIS.contains(X86_STRING) || ignoreArch) {
                 abiSet.add(X86)
@@ -867,6 +871,7 @@ object PackageUtils {
           else -> ERROR
         }
       }
+
       else -> ERROR
     }
 
@@ -1734,12 +1739,14 @@ object PackageUtils {
           append(":")
           appendLine(key.modulus.toByteArray().toHexString(":"))
         }
+
         is DSAPublicKey -> {
           // Public Key Y
           append(context.getString(R.string.signature_public_key_y))
           append(":")
           appendLine(key.y)
         }
+
         else -> {
           // Public Key Type
           append(context.getString(R.string.signature_public_key_type))
