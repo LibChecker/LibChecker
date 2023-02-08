@@ -126,6 +126,11 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.update(item)
   }
 
+  suspend fun deleteDuplicateSnapshotItems() {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteDuplicateSnapshotItems()
+  }
+
   fun deleteAllSnapshots() {
     if (checkDatabaseStatus().not()) return
     lcDao.deleteAllSnapshots()

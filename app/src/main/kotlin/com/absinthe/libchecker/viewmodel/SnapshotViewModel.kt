@@ -1301,6 +1301,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       }
 
       repository.insertSnapshots(finalList)
+      repository.deleteDuplicateSnapshotItems()
       finalList.clear()
       count = 0
       timeStampSet.forEach { insertTimeStamp(it) }
