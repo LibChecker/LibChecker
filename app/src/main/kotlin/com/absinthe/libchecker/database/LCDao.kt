@@ -80,6 +80,10 @@ interface LCDao {
   suspend fun delete(item: SnapshotItem)
 
   @Transaction
+  @Query("DELETE FROM snapshot_table WHERE id NOT IN (SELECT id FROM snapshot_table GROUP BY packageName, timeStamp, versionCode, lastUpdatedTime, packageSize)")
+  suspend fun deleteDuplicateSnapshotItems()
+
+  @Transaction
   @Query("DELETE FROM snapshot_table")
   fun deleteAllSnapshots()
 
