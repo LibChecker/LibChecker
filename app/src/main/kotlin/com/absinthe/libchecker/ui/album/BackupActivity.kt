@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.ui.album
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -24,6 +26,7 @@ import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.StorageUtils
@@ -61,6 +64,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         .commit()
     }
     onBackPressedDispatcher.addCallback(this, true) {
+      if (intent?.data != null) {
+        startActivity(Intent(this@BackupActivity, MainActivity::class.java))
+      }
       finish()
     }
   }
@@ -109,55 +115,9 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }
       restoreResultLauncher =
-        registerForActivityResult(ActivityResultContracts.GetContent()) {
-          it?.let {
-            activity?.let { activity ->
-              runCatching {
-                activity.contentResolver.openInputStream(it)
-                  ?.let { inputStream ->
-                    val dialog = LCAppUtils.createLoadingDialog(activity)
-                    dialog.show()
-                    if (it.toString().endsWith(".sqlite3")) {
-                      lifecycleScope.launch(Dispatchers.IO) {
-                        val restoreFile = File(activity.externalCacheDir, "restore.sqlite3")
-                        inputStream.source().buffer().use { source ->
-                          restoreFile.outputStream().sink().buffer().use { sink ->
-                            source.readAll(sink)
-                          }
-                        }
-                        roomBackup
-                          .database(LCDatabase.getDatabase(requireContext()))
-                          .enableLogDebug(true)
-                          .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
-                          .backupLocationCustomFile(restoreFile)
-                          .apply {
-                            onCompleteListener { success, message, exitCode ->
-                              Timber.d("success: $success, message: $message, exitCode: $exitCode")
-                              if (success) {
-                                restoreFile.delete()
-                                Once.clearDone(OnceTag.FIRST_LAUNCH)
-                                ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
-                              }
-                              lifecycleScope.launch(Dispatchers.Main) {
-                                dialog.dismiss()
-                              }
-                            }
-                          }
-                          .restore()
-                      }
-                    } else {
-                      viewModel.restore(inputStream) { success ->
-                        if (!success) {
-                          context.showToast("Backup file error")
-                        }
-                        dialog.dismiss()
-                      }
-                    }
-                  }
-              }.onFailure { t ->
-                Timber.e(t)
-              }
-            }
+        registerForActivityResult(ActivityResultContracts.GetContent()) { result ->
+          result?.let {
+            restoreDatabase(it)
           }
         }
       roomBackup = RoomBackup(context)
@@ -217,6 +177,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           true
         }
       }
+
+      activity?.intent?.data?.let { uri ->
+        if (uri.scheme == "content" && uri.path?.endsWith(".lcss") == true) {
+          restoreDatabase(uri)
+        }
+      }
     }
 
     override fun onCreateRecyclerView(
@@ -247,6 +213,56 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           }
         }
       return recyclerView
+    }
+
+    private fun restoreDatabase(uri: Uri) {
+      activity?.let { activity ->
+        runCatching {
+          activity.contentResolver.openInputStream(uri)
+            ?.let { inputStream ->
+              val dialog = LCAppUtils.createLoadingDialog(activity)
+              dialog.show()
+              if (uri.toString().endsWith(".sqlite3")) {
+                lifecycleScope.launch(Dispatchers.IO) {
+                  val restoreFile = File(activity.externalCacheDir, "restore.sqlite3")
+                  inputStream.source().buffer().use { source ->
+                    restoreFile.outputStream().sink().buffer().use { sink ->
+                      source.readAll(sink)
+                    }
+                  }
+                  roomBackup
+                    .database(LCDatabase.getDatabase(requireContext()))
+                    .enableLogDebug(true)
+                    .backupLocation(RoomBackup.BACKUP_FILE_LOCATION_CUSTOM_FILE)
+                    .backupLocationCustomFile(restoreFile)
+                    .apply {
+                      onCompleteListener { success, message, exitCode ->
+                        Timber.d("success: $success, message: $message, exitCode: $exitCode")
+                        if (success) {
+                          restoreFile.delete()
+                          Once.clearDone(OnceTag.FIRST_LAUNCH)
+                          ProcessPhoenix.triggerRebirth(LibCheckerApp.app)
+                        }
+                        lifecycleScope.launch(Dispatchers.Main) {
+                          dialog.dismiss()
+                        }
+                      }
+                    }
+                    .restore()
+                }
+              } else {
+                viewModel.restore(requireContext(), inputStream) { success ->
+                  if (!success) {
+                    context?.showToast("Backup file error")
+                  }
+                  dialog.dismiss()
+                }
+              }
+            }
+        }.onFailure { t ->
+          Timber.e(t)
+        }
+      }
     }
   }
 }
