@@ -83,8 +83,7 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <data android:scheme="content" />
-        <data android:mimeType="*/*" />
-        <data android:pathPattern=".*\\.lcss" />
+        <data android:pathPattern=".*\\.lcss"/>
       </intent-filter>
     </activity>
     <activity
