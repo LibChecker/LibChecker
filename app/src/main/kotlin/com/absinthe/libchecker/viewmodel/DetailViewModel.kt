@@ -22,6 +22,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
+import com.absinthe.libchecker.bean.DISABLED
 import com.absinthe.libchecker.bean.LibChip
 import com.absinthe.libchecker.bean.LibStringItem
 import com.absinthe.libchecker.bean.LibStringItemChip
@@ -267,7 +268,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   private fun getPermissionChipList(): List<LibStringItemChip> {
     Timber.d("getPermissionChipList")
     val list = packageInfo.getStatefulPermissionsList().asSequence()
-      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0) }
+      .map { perm -> LibStringItem(perm.first, if (perm.second) 1 else 0, if (perm.first.contains("maxSdkVersion")) DISABLED else null) }
       .toList()
     val chipList = mutableListOf<LibStringItemChip>()
 

@@ -63,6 +63,7 @@ import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.extensions.toHexString
+import com.absinthe.libchecker.utils.manifest.HiddenPermissionsReader
 import com.absinthe.libchecker.utils.manifest.ManifestReader
 import com.absinthe.libchecker.utils.manifest.StaticLibraryReader
 import dev.rikka.tools.refine.Refine
@@ -1163,13 +1164,22 @@ object PackageUtils {
 
   fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
     val flags = requestedPermissionsFlags
+    val hidden = HiddenPermissionsReader.getHiddenPermissions(File(applicationInfo.sourceDir))
 
     if (flags?.size != requestedPermissions?.size) {
       return requestedPermissions?.map { it to true } ?: emptyList()
     }
-    return requestedPermissions?.mapIndexed { index, s ->
+
+    val ret = requestedPermissions?.mapIndexed { index, s ->
       s to (flags[index] and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
-    } ?: emptyList()
+    }?.toMutableList()
+
+    if (hidden.isNotEmpty()) {
+      hidden.forEach { (p, v) ->
+        ret?.add("$p (maxSdkVersion: $v)" to false)
+      }
+    }
+    return ret ?: emptyList()
   }
 
   /**

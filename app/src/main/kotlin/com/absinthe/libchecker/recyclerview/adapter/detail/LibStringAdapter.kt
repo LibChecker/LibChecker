@@ -100,7 +100,7 @@ class LibStringAdapter(
   override fun convert(holder: BaseViewHolder, item: LibStringItemChip) {
     val itemName = when (item.item.source) {
       DISABLED -> {
-        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_DISABLED) > 0) {
+        if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.MARK_DISABLED) > 0 || type == PERMISSION) {
           buildSpannedString {
             strikeThrough {
               inSpans(StyleSpan(Typeface.BOLD_ITALIC)) {
