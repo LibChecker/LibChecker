@@ -29,8 +29,8 @@ gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ve
 kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
 
 androidX-activity = "androidx.activity:activity-ktx:1.6.1"
-androidX-appCompat = "androidx.appcompat:appcompat:1.6.0"
-androidX-browser = "androidx.browser:browser:1.4.0"
+androidX-appCompat = "androidx.appcompat:appcompat:1.6.1"
+androidX-browser = "androidx.browser:browser:1.5.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
 androidX-core = "androidx.core:core-ktx:1.9.0"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.5.5"
