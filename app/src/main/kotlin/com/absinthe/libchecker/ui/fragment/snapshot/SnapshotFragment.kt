@@ -276,9 +276,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
             .toMutableList()
-        )
-        flip(VF_LIST)
-        adapter.setSpaceFooterView(context)
+        ) {
+          flip(VF_LIST)
+          adapter.setSpaceFooterView(context)
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
