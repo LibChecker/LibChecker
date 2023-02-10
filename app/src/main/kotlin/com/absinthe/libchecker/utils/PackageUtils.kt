@@ -1167,19 +1167,24 @@ object PackageUtils {
     val hidden = HiddenPermissionsReader.getHiddenPermissions(File(applicationInfo.sourceDir))
 
     if (flags?.size != requestedPermissions?.size) {
-      return requestedPermissions?.map { it to true } ?: emptyList()
+      return requestedPermissions?.map { it to true }?.toMutableList()?.apply {
+        if (hidden.isNotEmpty()) {
+          hidden.forEach { (p, v) ->
+            add("$p (maxSdkVersion: $v)" to false)
+          }
+        }
+      } ?: emptyList()
     }
 
-    val ret = requestedPermissions?.mapIndexed { index, s ->
+    return requestedPermissions?.mapIndexed { index, s ->
       s to (flags[index] and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0)
-    }?.toMutableList()
-
-    if (hidden.isNotEmpty()) {
-      hidden.forEach { (p, v) ->
-        ret?.add("$p (maxSdkVersion: $v)" to false)
+    }?.toMutableList()?.apply {
+      if (hidden.isNotEmpty()) {
+        hidden.forEach { (p, v) ->
+          add("$p (maxSdkVersion: $v)" to false)
+        }
       }
-    }
-    return ret ?: emptyList()
+    } ?: emptyList()
   }
 
   /**
