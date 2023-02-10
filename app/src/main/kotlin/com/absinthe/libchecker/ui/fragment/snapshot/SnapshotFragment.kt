@@ -17,6 +17,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Space
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -196,6 +197,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           clipToPadding = false
           clipChildren = false
         }
+        setFooterView(
+          Space(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+              ViewGroup.LayoutParams.MATCH_PARENT,
+              96.dp
+            )
+          }
+        )
       }
       setEmptyView(emptyView)
       setDiffCallback(SnapshotDiffUtil())
