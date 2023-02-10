@@ -54,8 +54,8 @@
       android:name=".ui.detail.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
-      android:launchMode="singleTask"
-      android:label="@string/detail_label">
+      android:label="@string/detail_label"
+      android:launchMode="singleTask">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -83,13 +83,13 @@
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
         <data android:scheme="content" />
-        <data android:pathPattern=".*\\.lcss"/>
+        <data android:pathPattern=".*\\.lcss" />
       </intent-filter>
     </activity>
     <activity
       android:name=".ui.album.ComparisonActivity"
-      android:label="@string/album_item_comparison_title"
-      android:exported="true">
+      android:exported="true"
+      android:label="@string/album_item_comparison_title">
       <intent-filter>
         <action android:name="android.intent.action.SEND_MULTIPLE" />
         <category android:name="android.intent.category.DEFAULT" />
