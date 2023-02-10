@@ -1,10 +1,12 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
+import android.content.Context
 import android.content.pm.PackageInfo
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import android.widget.Space
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
@@ -17,6 +19,7 @@ import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
@@ -27,6 +30,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
 class AppAdapter : HighlightAdapter<LCItem>() {
 
+  private var footer: Space? = null
   var cardMode = CardMode.NORMAL
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -126,6 +130,27 @@ class AppAdapter : HighlightAdapter<LCItem>() {
       return super.getItemId(position)
     }
     return data[position].hashCode().toLong()
+  }
+
+  fun setSpaceFooterView(ctx:Context) {
+    recyclerViewOrNull?.let { rv ->
+      if (!rv.canScrollVertically(1)) {
+        if (footer != null) return
+        Space(ctx).apply {
+          layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            96.dp
+          )
+        }.also {
+          setFooterView(it)
+          footer = it
+        }
+      } else {
+        if (footer == null) return
+        removeFooterView(footer!!)
+        footer = null
+      }
+    }
   }
 
   private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
