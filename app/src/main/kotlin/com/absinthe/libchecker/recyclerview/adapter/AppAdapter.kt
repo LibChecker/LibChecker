@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter
 
-import android.content.Context
 import android.content.pm.PackageInfo
 import android.os.Build
 import android.text.SpannableString
@@ -132,11 +131,11 @@ class AppAdapter : HighlightAdapter<LCItem>() {
     return data[position].hashCode().toLong()
   }
 
-  fun setSpaceFooterView(ctx:Context) {
+  fun setSpaceFooterView() {
     recyclerViewOrNull?.let { rv ->
       if (!rv.canScrollVertically(1)) {
         if (footer != null) return
-        Space(ctx).apply {
+        Space(rv.context).apply {
           layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             96.dp

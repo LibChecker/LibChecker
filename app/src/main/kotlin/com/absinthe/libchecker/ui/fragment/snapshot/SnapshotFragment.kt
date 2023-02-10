@@ -278,7 +278,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             .toMutableList()
         ) {
           flip(VF_LIST)
-          adapter.setSpaceFooterView(context)
+          adapter.setSpaceFooterView()
         }
 
         lifecycleScope.launch(Dispatchers.IO) {

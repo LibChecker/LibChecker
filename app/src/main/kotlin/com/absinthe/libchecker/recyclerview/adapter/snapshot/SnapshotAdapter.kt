@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.snapshot
 
-import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -11,7 +10,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.SnapshotDiffItem
@@ -191,11 +189,11 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
     }
   }
 
-  fun setSpaceFooterView(ctx: Context) {
+  fun setSpaceFooterView() {
     recyclerViewOrNull?.let { rv ->
       if (!rv.canScrollVertically(1)) {
         if (footer != null) return
-        Space(ctx).apply {
+        Space(rv.context).apply {
           layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             96.dp

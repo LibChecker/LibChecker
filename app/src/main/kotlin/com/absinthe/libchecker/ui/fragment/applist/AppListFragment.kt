@@ -410,7 +410,7 @@ class AppListFragment :
         appAdapter.notifyDataSetChanged()
       }
 
-      appAdapter.setSpaceFooterView(requireContext())
+      appAdapter.setSpaceFooterView()
     }
   }
 

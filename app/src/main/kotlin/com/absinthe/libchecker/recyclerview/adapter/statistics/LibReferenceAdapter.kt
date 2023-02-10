@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.recyclerview.adapter.statistics
 
-import android.content.Context
 import android.view.ViewGroup
 import android.widget.Space
 import com.absinthe.libchecker.annotation.PACKAGE
@@ -31,11 +30,11 @@ class LibReferenceAdapter : BaseNodeAdapter() {
     }
   }
 
-  fun setSpaceFooterView(ctx: Context) {
+  fun setSpaceFooterView() {
     recyclerViewOrNull?.let { rv ->
       if (!rv.canScrollVertically(1)) {
         if (footer != null) return
-        Space(ctx).apply {
+        Space(rv.context).apply {
           layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             96.dp

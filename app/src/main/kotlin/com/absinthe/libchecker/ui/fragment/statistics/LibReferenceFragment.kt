@@ -194,7 +194,7 @@ class LibReferenceFragment :
         refAdapter.setList(it)
 
         flip(VF_LIST)
-        refAdapter.setSpaceFooterView(context)
+        refAdapter.setSpaceFooterView()
         isListReady = true
       }
     }
