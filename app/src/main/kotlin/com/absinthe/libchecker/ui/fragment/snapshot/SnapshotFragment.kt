@@ -56,6 +56,7 @@ import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -241,6 +242,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          adapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -276,8 +280,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
             .toMutableList()
-        )
-        flip(VF_LIST)
+        ) {
+          flip(VF_LIST)
+          adapter.setSpaceFooterView()
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -492,6 +498,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
     return true
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      adapter.setSpaceFooterView()
+    }
   }
 
   private fun flip(child: Int) {

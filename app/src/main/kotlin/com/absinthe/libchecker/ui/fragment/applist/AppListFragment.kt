@@ -34,6 +34,7 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
@@ -155,6 +156,9 @@ class AppListFragment :
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          appAdapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -265,6 +269,13 @@ class AppListFragment :
       }
     }
     return true
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      appAdapter.setSpaceFooterView()
+    }
   }
 
   private fun initObserver() {
@@ -409,6 +420,8 @@ class AppListFragment :
         //noinspection NotifyDataSetChanged
         appAdapter.notifyDataSetChanged()
       }
+
+      appAdapter.setSpaceFooterView()
     }
   }
 

@@ -6,7 +6,7 @@
   xmlns:tools="http://schemas.android.com/tools"
   tools:context=".ui.fragment.snapshot.SnapshotFragment">
 
-  <ViewFlipper
+  <com.absinthe.libchecker.view.app.CustomViewFlipper
     android:id="@+id/vf_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -40,13 +40,12 @@
       android:layout_height="match_parent"
       android:clipToPadding="false"
       android:paddingTop="?actionBarSize"
-      android:paddingBottom="96dp"
       android:scrollbars="none"
       app:borderBottomVisibility="never"
       app:borderTopDrawable="@null"
       app:borderTopVisibility="whenTop"
       app:fitsSystemWindowsInsets="bottom|top" />
 
-  </ViewFlipper>
+  </com.absinthe.libchecker.view.app.CustomViewFlipper>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
