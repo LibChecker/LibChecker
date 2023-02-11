@@ -38,6 +38,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.services.IShootService

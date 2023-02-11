@@ -26,6 +26,7 @@ import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer

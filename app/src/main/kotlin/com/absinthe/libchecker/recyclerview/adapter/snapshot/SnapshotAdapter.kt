@@ -5,7 +5,6 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.view.ViewGroup
-import android.widget.Space
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
 import androidx.core.view.isGone
@@ -18,7 +17,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.AppItemRepository
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
@@ -31,8 +29,6 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 const val ARROW = "→"
 
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
-
-  private var footer: Space? = null
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -186,36 +182,6 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         builder.append(" $ARROW ").append(newAbiSpanString)
       }
       abiInfo.text = builder
-    }
-  }
-
-  fun setSpaceFooterView() {
-    recyclerViewOrNull?.let { rv ->
-      fun should(): Boolean {
-        val a = rv.childCount
-        val b = itemCount
-        return if (footer == null) {
-          a >= b
-        } else {
-          a >= b - 1
-        }
-      }
-      if (should()) {
-        if (footer != null) return
-        Space(rv.context).apply {
-          layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            96.dp
-          )
-        }.also {
-          setFooterView(it)
-          footer = it
-        }
-      } else {
-        if (footer == null) return
-        removeFooterView(footer!!)
-        footer = null
-      }
     }
   }
 
