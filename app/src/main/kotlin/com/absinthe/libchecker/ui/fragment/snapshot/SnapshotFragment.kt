@@ -241,6 +241,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          adapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -494,6 +497,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
     return true
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      adapter.setSpaceFooterView()
+    }
   }
 
   private fun flip(child: Int) {

@@ -144,6 +144,9 @@ class LibReferenceFragment :
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          refAdapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -421,6 +424,13 @@ class LibReferenceFragment :
       }
     }
     return false
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      refAdapter.setSpaceFooterView()
+    }
   }
 
   override fun onReturnTop() {

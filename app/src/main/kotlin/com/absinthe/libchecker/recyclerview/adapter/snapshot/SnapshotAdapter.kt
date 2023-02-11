@@ -191,7 +191,16 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
   fun setSpaceFooterView() {
     recyclerViewOrNull?.let { rv ->
-      if (!rv.canScrollVertically(1)) {
+      fun should(): Boolean {
+        val a = rv.childCount
+        val b = itemCount
+        return if (footer == null) {
+          a >= b
+        } else {
+          a >= b - 1
+        }
+      }
+      if (should()) {
         if (footer != null) return
         Space(rv.context).apply {
           layoutParams = ViewGroup.LayoutParams(

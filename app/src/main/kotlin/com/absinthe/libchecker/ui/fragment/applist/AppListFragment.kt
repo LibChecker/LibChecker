@@ -155,6 +155,9 @@ class AppListFragment :
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          appAdapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -265,6 +268,13 @@ class AppListFragment :
       }
     }
     return true
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      appAdapter.setSpaceFooterView()
+    }
   }
 
   private fun initObserver() {
