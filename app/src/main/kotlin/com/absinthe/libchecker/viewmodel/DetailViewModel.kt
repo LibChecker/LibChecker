@@ -177,7 +177,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         PROVIDER -> "providers-libs"
         DEX -> "dex-libs"
         STATIC -> "static-libs"
-        else -> throw IllegalArgumentException("Illegal LibType.")
+        else -> throw IllegalArgumentException("Illegal LibType: $type.")
       }
       if (isRegex) {
         categoryDir += "/regex"
