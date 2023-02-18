@@ -22,7 +22,9 @@ class AdvancedMenuAdapter : BaseQuickAdapter<View, BaseViewHolder>(0) {
 
   override fun convert(holder: BaseViewHolder, item: View) {
     (holder.itemView as LinearLayout).apply {
-      addView(item)
+      if (item.parent == null) {
+        addView(item)
+      }
     }
   }
 }
