@@ -13,6 +13,7 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.utils.extensions.putArguments
+import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.LibDetailBottomSheetView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
@@ -21,6 +22,7 @@ import com.absinthe.rulesbundle.LCRules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 const val EXTRA_LIB_NAME = "EXTRA_LIB_NAME"
 const val EXTRA_LIB_TYPE = "EXTRA_LIB_TYPE"
@@ -115,10 +117,15 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
         }
       }
     }
-    if (regexName.isNullOrEmpty()) {
-      viewModel.requestLibDetail(libName, type)
-    } else {
-      viewModel.requestLibDetail(regexName!!, type, true)
+    runCatching {
+      if (regexName.isNullOrEmpty()) {
+        viewModel.requestLibDetail(libName, type)
+      } else {
+        viewModel.requestLibDetail(regexName!!, type, true)
+      }
+    }.onFailure {
+      Timber.e(it)
+      context?.showToast(it.message.toString())
     }
   }
 
