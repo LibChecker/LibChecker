@@ -30,7 +30,9 @@ import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.extensions.getBoolean
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -355,6 +357,10 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     recyclerView.addPaddingTop(UiUtils.getStatusBarHeight())
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false
+
+    doOnMainThreadIdle {
+      recyclerView.setBottomPaddingSpace()
+    }
 
     val lp = recyclerView.layoutParams
     if (lp is FrameLayout.LayoutParams) {
