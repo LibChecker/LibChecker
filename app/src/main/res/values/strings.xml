@@ -196,7 +196,7 @@
   <string name="album_backup_summary">Backup all snapshots</string>
   <string name="album_restore">Restore</string>
   <string name="album_restore_summary">Restore snapshots from backup file</string>
-  <string name="album_restore_detail">%s : %s items in total\n</string>
+  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">Click to Choose</string>
   <string name="album_dialog_delete_snapshot_message">Processing…</string>
 
