@@ -1,5 +1,5 @@
 [versions]
-agp = "7.4.1"
+agp = "7.4.2"
 androidX-lifecycle = "2.5.1"
 androidX-room = "2.5.0"
 appCenter = "5.0.0"
