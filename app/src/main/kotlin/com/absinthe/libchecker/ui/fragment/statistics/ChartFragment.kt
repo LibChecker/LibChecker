@@ -53,6 +53,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -78,6 +79,7 @@ class ChartFragment :
   private var chartType = TYPE_ABI
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var queryJob: Job? = null
+  private var setDataJob: Job? = null
 
   override fun init() {
     val isKotlinShowed = !WorkerService.initializingFeatures
@@ -94,7 +96,13 @@ class ChartFragment :
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {
         if (isKotlinShowed) {
-          setData()
+          setDataJob?.cancel()
+          setDataJob = lifecycleScope.launch(Dispatchers.IO) {
+            delay(2000)
+            withContext(Dispatchers.Main) {
+              setData()
+            }
+          }
         }
       }
     }

@@ -80,7 +80,9 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
 
   override fun onCancel(dialog: DialogInterface) {
     super.onCancel(dialog)
-    dismiss()
+    runCatching {
+      dismiss()
+    }
   }
 
   fun setOnDismissListener(action: () -> Unit) {

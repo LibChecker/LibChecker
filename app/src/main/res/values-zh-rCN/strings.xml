@@ -25,8 +25,8 @@
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
   <!-- Statistics   -->
-  <string name="title_statistics_dialog">%s架构的 Apps</string>
-  <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
+  <string name="title_statistics_dialog">%s架构的应用</string>
+  <string name="title_statistics_dialog_no_native_libs">无原生库的应用</string>
   <string name="tab_chart">图表</string>
   <string name="tab_lib_reference_statistics">库引用统计</string>
   <string name="not_marked_lib">未标记的库</string>

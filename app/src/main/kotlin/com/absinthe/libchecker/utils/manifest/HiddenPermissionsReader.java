@@ -74,7 +74,7 @@ public class HiddenPermissionsReader {
 
     @Override
     public void attr(String ns, String name, int resourceId, int type, Object obj) {
-      if (type == 3 && "name".equals(name)) {
+      if (type == 3 && "name".equals(name) && obj instanceof String) {
         this.name = (String) obj;
       }
       if ("maxSdkVersion".equals(name)) {
