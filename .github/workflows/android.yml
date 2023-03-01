@@ -23,6 +23,7 @@ on:
       - '**.md'
       - 'LICENSE'
       - 'NOTICE'
+  workflow_dispatch:
 
 env:
   APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
