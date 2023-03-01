@@ -23,7 +23,8 @@ class ReleaseTree : Timber.DebugTree() {
     t?.let {
       if (priority == Log.ERROR) {
         val stack = Log.getStackTraceString(it)
-        if (stack.contains("was cancelled")) {
+        if (stack.contains("was cancelled") ||
+          stack.contains("NameNotFoundException") ) {
           return
         }
         Crashes.trackError(it)
