@@ -38,7 +38,7 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
     pkgName?.let { packageName ->
       Timber.d("packageName: $packageName")
       runCatching {
-        @Suppress("DEPRECATION")
+        @Suppress("DEPRECATION, InlinedApi")
         val flag = (
           PackageManager.GET_SERVICES
             or PackageManager.GET_ACTIVITIES
