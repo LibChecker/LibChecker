@@ -8,7 +8,7 @@ hiddenApiRefine = "4.2.1"
 kotlin = "1.8.10"
 protoc = "3.22.0"
 square-retrofit = "2.9.0"
-zhaobozhen = "1.1.3"
+zhaobozhen = "1.1.4"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
