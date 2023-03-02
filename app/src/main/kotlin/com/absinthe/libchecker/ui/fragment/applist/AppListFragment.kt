@@ -228,7 +228,8 @@ class AppListFragment :
     menuInflater.inflate(R.menu.app_list_menu, menu)
     this.menu = menu
 
-    val searchView = SearchView(requireContext()).apply {
+    val context = context ?: return
+    val searchView = SearchView(context).apply {
       setIconifiedByDefault(false)
       setOnQueryTextListener(this@AppListFragment)
       queryHint = getText(R.string.search_hint)
