@@ -412,16 +412,17 @@ class AppListFragment :
       filterList.sortByDescending { it.targetApi }
     }
 
-    appAdapter.setDiffNewData(filterList) {
-      flip(VF_LIST)
-      isListReady = true
+    appAdapter.apply {
+      setDiffNewData(filterList) {
+        flip(VF_LIST)
+        isListReady = true
 
-      if (highlightRefresh) {
-        //noinspection NotifyDataSetChanged
-        appAdapter.notifyDataSetChanged()
+        if (highlightRefresh) {
+          notifyItemRangeChanged(0, data.size)
+        }
+
+        setSpaceFooterView()
       }
-
-      appAdapter.setSpaceFooterView()
     }
   }
 
