@@ -232,6 +232,9 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   private fun openLibDetailDialog(position: Int) {
+    if (position < 0 || position >= adapter.itemCount) {
+      return
+    }
     val item = adapter.getItem(position)
     val name = item.item.name
     val isValidLib = item.chip != null
