@@ -3,12 +3,24 @@ description: Report a bug / 反馈一个 Bug
 labels: [ "bug" ]
 title: "[BUG] "
 body:
-  - type: input
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist / 检查清单
+      description: Ensure that our bug report form is appropriate for you. / 确保我们的错误报告表单适合您。
+      options:
+        - label: No one has submitted a similar or identical bug report before. / 之前没有人提交过类似或相同的 bug report。
+          required: true
+        - label: I'm using the latest version of LibChecker. / 我正在使用 LibChecker 的最新版本。
+          required: true
+  - type: dropdown
     id: version
     attributes:
       label: LibChecker version / LibChecker 版本
-      description: Please enter the full version number / 请输入完整版本号
-      placeholder: e.g. 2.3.0.90c36232(1344)
+      description: Please select the version you are using / 请选择正在使用的版本
+      options:
+        - Latest release / 最新稳定版
+        - Latest CI / 最新 CI 版
     validations:
       required: true
   - type: textarea

@@ -3,6 +3,16 @@ description: Suggest an idea for this project / 提出一个建议
 labels: [ "enhancement" ]
 title: "[FR] "
 body:
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist / 检查清单
+      description: Ensure that our bug report form is appropriate for you. / 确保我们的错误报告表单适合您。
+      options:
+        - label: No one has submitted a similar or identical feature request before. / 之前没有人提交过类似或相同的功能请求。
+          required: true
+        - label: This suggestion does not depart from the original intention of LibChecker. / 这个建议不会背离 LibChecker 的初衷。
+          required: true
   - type: textarea
     id: propose
     attributes:
