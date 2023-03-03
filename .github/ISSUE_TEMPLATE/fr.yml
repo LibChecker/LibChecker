@@ -6,7 +6,7 @@ body:
   - type: checkboxes
     id: checklist
     attributes:
-      label: Checklist
+      label: Checklist / 检查清单
       description: Ensure that our bug report form is appropriate for you. / 确保我们的错误报告表单适合您。
       options:
         - label: No one has submitted a similar or identical feature request before. / 之前没有人提交过类似或相同的功能请求。
