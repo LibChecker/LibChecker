@@ -34,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.app.DayNightDelegate
+import rikka.widget.borderview.BorderView
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
@@ -87,6 +88,10 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     binding.llContainer.apply {
       overScrollMode = RecyclerView.OVER_SCROLL_NEVER
       adapter = this@AlbumActivity.adapter
+      borderVisibilityChangedListener =
+        BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+          binding.appbar.isLifted = !top
+        }
       layoutManager = LinearLayoutManager(context)
       isVerticalScrollBarEnabled = false
       clipToPadding = false
