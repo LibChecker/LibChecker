@@ -26,7 +26,7 @@
 
   </com.google.android.material.appbar.AppBarLayout>
 
-  <LinearLayout
+  <rikka.widget.borderview.BorderRecyclerView
     android:id="@+id/ll_container"
     android:layout_width="match_parent"
     android:layout_height="0dp"

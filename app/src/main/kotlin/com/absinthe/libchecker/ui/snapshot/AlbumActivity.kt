@@ -9,11 +9,14 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.AlbumAdapter
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
@@ -31,10 +34,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import rikka.material.app.DayNightDelegate
+import rikka.widget.borderview.BorderView
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
   private val viewModel: SnapshotViewModel by viewModels()
+  private val adapter = AlbumAdapter()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -80,10 +85,26 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       R.string.album_item_track_title,
       R.string.album_item_track_subtitle
     )
-    binding.llContainer.addView(itemComparison)
-    binding.llContainer.addView(itemManagement)
-    binding.llContainer.addView(itemBackupRestore)
-    binding.llContainer.addView(itemTrack)
+    binding.llContainer.apply {
+      overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+      adapter = this@AlbumActivity.adapter
+      borderVisibilityChangedListener =
+        BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+          binding.appbar.isLifted = !top
+        }
+      layoutManager = LinearLayoutManager(context)
+      isVerticalScrollBarEnabled = false
+      clipToPadding = false
+      clipChildren = false
+      setHasFixedSize(true)
+
+      this@AlbumActivity.adapter.apply {
+        addData(itemComparison)
+        addData(itemManagement)
+        addData(itemBackupRestore)
+        addData(itemTrack)
+      }
+    }
 
     itemComparison.setOnClickListener {
       startActivity(Intent(this, ComparisonActivity::class.java))
