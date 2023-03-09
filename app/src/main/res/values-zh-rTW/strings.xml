@@ -66,14 +66,14 @@
   <string name="lib_ref_threshold">庫參考閾值</string>
   <string name="languages">語言</string>
   <string name="reload_apps">重載應用程式清單</string>
-  <string name="help_docs">説明文件</string>
+  <string name="help_docs">說明文件</string>
   <string name="join_telegram_group">聯絡</string>
   <string name="anonymous_statistics">匿名統計資料</string>
   <string name="cloud_rules">雲端規則</string>
   <string name="dark_mode">深色模式</string>
   <string name="snapshot_keep">快照預設保留規則</string>
   <string name="apk_analytics_summary">按下 APK 檔案時開啟詳細資料頁面</string>
-  <string name="colorful_icon_summary">部分標示庫會呈現為彩色 Logo</string>
+  <string name="colorful_icon_summary">部分標示庫會呈現為彩色標誌</string>
   <string name="lib_ref_threshold_summary">只有庫參考數量達到閾值的庫才顯示在清單中</string>
   <string name="reload_apps_summary">應用程式清單顯示不正常時嘗試此選項</string>
   <string name="help_docs_summary">學習如何使用 LibChecker</string>
@@ -110,13 +110,13 @@
   <string name="extract_native_libs_tip">此應用宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
   <string name="format_last_updated">最近更新：%s</string>
-  <string name="menu_process">處理序</string>
+  <string name="menu_process">處理程序</string>
   <string name="alternative_launch_method">替代的啟動方法</string>
   <string name="compare_with_current">與目前套件比較</string>
   <string name="rx_detail">RxJava 是 Reactive Extensions 的 Java VM 實現：一個使用可觀察序列組成異步和基於事件的程序的庫。</string>
   <string name="rx_android_detail">適用於 Android 的 Reactive Extensions</string>
   <string name="rx_kotlin_detail">RxJava 的 Kotlin 擴展</string>
-  <string name="permission_not_granted">未授權</string>
+  <string name="permission_not_granted">未授予</string>
   <string name="signature_detail">簽章詳細資料</string>
   <string name="signature_version">版本</string>
   <string name="signature_serial_number">序號</string>
@@ -182,6 +182,7 @@
   <string name="album_backup_summary">備份所有快照</string>
   <string name="album_restore">還原</string>
   <string name="album_restore_summary">從備份檔案還原快照</string>
+  <string name="album_restore_detail">%1$s：總計 %2$s 個項目\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
   <!--  Integration  -->
