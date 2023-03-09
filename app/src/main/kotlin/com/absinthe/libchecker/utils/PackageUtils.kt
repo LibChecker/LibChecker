@@ -1164,7 +1164,9 @@ object PackageUtils {
 
   fun PackageInfo.getStatefulPermissionsList(): List<Pair<String, Boolean>> {
     val flags = requestedPermissionsFlags
-    val hidden = HiddenPermissionsReader.getHiddenPermissions(File(applicationInfo.sourceDir))
+    val hidden = HiddenPermissionsReader.getHiddenPermissions(File(applicationInfo.sourceDir)).filter { (p, v) ->
+      OsUtils.higherThan(v as Int)
+    }
 
     if (flags?.size != requestedPermissions?.size) {
       return requestedPermissions?.map { it to true }?.toMutableList()?.apply {

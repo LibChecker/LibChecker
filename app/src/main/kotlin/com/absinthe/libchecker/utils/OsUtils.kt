@@ -33,4 +33,8 @@ object OsUtils {
   fun atLeastO(): Boolean {
     return Build.VERSION.SDK_INT >= 26
   }
+
+  fun higherThan(api: Int): Boolean {
+    return Build.VERSION.SDK_INT > api
+  }
 }
