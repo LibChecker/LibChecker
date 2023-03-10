@@ -6,7 +6,7 @@ appCenter = "5.0.0"
 grpc = "1.53.0"
 hiddenApiRefine = "4.2.1"
 kotlin = "1.8.10"
-protoc = "3.22.1"
+protoc = "3.22.2"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.4"
 
