@@ -368,6 +368,29 @@ object PackageUtils {
       }
     }
 
+    splitList.find {
+      val fileName = it.split(File.separator).last()
+      !fileName.startsWith("split_config") && (fileName.contains("arm") || fileName.contains("x86"))
+    }?.let {
+      ZipFile(File(it)).use { zipFile ->
+        var elfParser: ELFParser?
+        zipFile.entries().asSequence().forEach { entry ->
+          if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
+            elfParser = getElfParser(zipFile.getInputStream(entry))
+            libList.add(
+              LibStringItem(
+                name = entry.name.split("/").last(),
+                size = entry.size,
+                source = it.split(File.separator).last(),
+                elfType = elfParser!!.getEType(),
+                elfClass = elfParser!!.getEClass()
+              )
+            )
+          }
+        }
+      }
+    }
+
     return libList
   }
 
