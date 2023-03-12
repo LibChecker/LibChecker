@@ -346,19 +346,21 @@ object PackageUtils {
       return listOf()
     }
 
-    splitList.find {
+    splitList.filter {
       val fileName = it.split(File.separator).last()
-      fileName.startsWith("split_config.arm") || fileName.startsWith("split_config.x86")
-    }?.let {
+      fileName.contains("arm") || fileName.contains("x86")
+    }.forEach {
       ZipFile(File(it)).use { zipFile ->
         var elfParser: ELFParser?
         zipFile.entries().asSequence().forEach { entry ->
           if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
             elfParser = getElfParser(zipFile.getInputStream(entry))
+            val fileName = it.split(File.separator).last()
             libList.add(
               LibStringItem(
                 name = entry.name.split("/").last(),
                 size = entry.size,
+                source = if (fileName.startsWith("split_config")) null else fileName,
                 elfType = elfParser!!.getEType(),
                 elfClass = elfParser!!.getEClass()
               )
