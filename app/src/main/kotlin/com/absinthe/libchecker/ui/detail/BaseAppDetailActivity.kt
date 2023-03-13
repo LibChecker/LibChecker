@@ -167,9 +167,8 @@ abstract class BaseAppDetailActivity :
         supportActionBar?.title = null
         collapsingToolbar.also {
           it.setOnApplyWindowInsetsListener(null)
-          it.title = runCatching {
-            packageInfo.applicationInfo.loadLabel(packageManager).toString()
-          }.getOrDefault(getString(R.string.detail_label))
+          it.title = packageInfo.applicationInfo?.loadLabel(packageManager)?.toString()
+            ?: getString(R.string.detail_label)
         }
         headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
           override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {

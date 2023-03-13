@@ -408,6 +408,8 @@ class LibReferenceFragment :
                 //noinspection NotifyDataSetChanged
                 refAdapter.notifyDataSetChanged()
               }
+            }
+            binding.list.post {
               (activity as? INavViewContainer)?.hideProgressBar()
             }
           }
