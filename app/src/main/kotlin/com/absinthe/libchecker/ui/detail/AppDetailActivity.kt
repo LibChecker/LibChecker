@@ -35,29 +35,29 @@ class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     isPackageReady = true
-    pkgName?.let { packageName ->
-      Timber.d("packageName: $packageName")
-      runCatching {
-        @Suppress("DEPRECATION", "InlinedApi")
-        val flag = (
-          PackageManager.GET_SERVICES
-            or PackageManager.GET_ACTIVITIES
-            or PackageManager.GET_RECEIVERS
-            or PackageManager.GET_PROVIDERS
-            or PackageManager.GET_PERMISSIONS
-            or PackageManager.GET_META_DATA
-            or PackageManager.MATCH_DISABLED_COMPONENTS
-            or PackageManager.MATCH_UNINSTALLED_PACKAGES
-            or PackageManager.GET_SIGNATURES
-            or PackageManager.GET_SIGNING_CERTIFICATES
-          )
-        PackageUtils.getPackageInfo(packageName, flag)
-      }.getOrNull()?.let { packageInfo ->
-        onPackageInfoAvailable(packageInfo, extraBean)
-      } ?: run {
-        finish()
-      }
-    } ?: finish()
+    Timber.d("packageName: $pkgName")
+    val packageName = pkgName ?: return
+    runCatching {
+      @Suppress("DEPRECATION", "InlinedApi")
+      val flag = (
+        PackageManager.GET_SERVICES
+          or PackageManager.GET_ACTIVITIES
+          or PackageManager.GET_RECEIVERS
+          or PackageManager.GET_PROVIDERS
+          or PackageManager.GET_PERMISSIONS
+          or PackageManager.GET_META_DATA
+          or PackageManager.MATCH_DISABLED_COMPONENTS
+          or PackageManager.MATCH_UNINSTALLED_PACKAGES
+          or PackageManager.GET_SIGNATURES
+          or PackageManager.GET_SIGNING_CERTIFICATES
+        )
+      PackageUtils.getPackageInfo(packageName, flag)
+    }.onFailure {
+      Timber.d("getPackageInfo: $packageName failed" + it.message)
+      finish()
+    }.onSuccess { packageInfo ->
+      onPackageInfoAvailable(packageInfo, extraBean)
+    }
   }
 
   override fun onPostPackageInfoAvailable() {

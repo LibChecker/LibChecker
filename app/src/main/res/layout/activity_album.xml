@@ -30,7 +30,12 @@
     android:id="@+id/ll_container"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    android:orientation="vertical"
+    android:clipToPadding="false"
+    android:scrollbars="none"
+    app:borderBottomVisibility="never"
+    app:borderTopDrawable="@null"
+    app:borderTopVisibility="whenTop"
+    app:fitsSystemWindowsInsets="bottom|top"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintTop_toBottomOf="@id/appbar" />
 

@@ -44,9 +44,7 @@ import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 
 object LCAppUtils {
@@ -63,17 +61,16 @@ object LCAppUtils {
 
   fun setTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
-    val date = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
 
     when {
-      date.endsWith("1225") -> {
+      DateUtils.isChristmas() -> {
         sb.append("\uD83C\uDF84")
       }
-      date == "20220131" -> {
+      DateUtils.isChineseNewYearEve() -> {
         sb.append("\uD83C\uDFEE")
       }
-      date == "20220201" -> {
-        sb.append("\uD83D\uDC2F")
+      DateUtils.isChineseNewYear() -> {
+        sb.append(DateUtils.getChineseZodiac())
       }
     }
 
@@ -86,6 +83,8 @@ object LCAppUtils {
       )
       spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       sb.append(spanString)
+    } else {
+      sb.append(" ")
     }
     return sb.toSpannable()
   }
