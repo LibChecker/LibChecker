@@ -25,7 +25,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -302,29 +304,32 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
     homeViewModel.apply {
-      lifecycleScope.launchWhenStarted {
-        effect.collect {
-          when (it) {
-            is HomeViewModel.Effect.PackageChanged -> {
-              if (allowRefreshing) {
-                packageQueue.offer(it.packageName to it.action)
-                dequeuePackages()
+      lifecycleScope.launch {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          effect.collect {
+            when (it) {
+              is HomeViewModel.Effect.PackageChanged -> {
+                if (allowRefreshing) {
+                  packageQueue.offer(it.packageName to it.action)
+                  dequeuePackages()
 
-                lifecycleScope.launch(Dispatchers.Default) {
-                  val appCount = AppItemRepository.getApplicationInfoMap().size
-                  viewModel.snapshotAppsCount.value ?: runBlocking {
-                    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-                  }
-                  val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
+                  lifecycleScope.launch(Dispatchers.Default) {
+                    val appCount = AppItemRepository.getApplicationInfoMap().size
+                    viewModel.snapshotAppsCount.value ?: runBlocking {
+                      viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
+                    }
+                    val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
 
-                  withContext(Dispatchers.Main) {
-                    dashboard.container.tvSnapshotAppsCountText.text =
-                      String.format("%d / %d", snapshotCount, appCount)
+                    withContext(Dispatchers.Main) {
+                      dashboard.container.tvSnapshotAppsCountText.text =
+                        String.format("%d / %d", snapshotCount, appCount)
+                    }
                   }
                 }
               }
+
+              else -> {}
             }
-            else -> {}
           }
         }
       }

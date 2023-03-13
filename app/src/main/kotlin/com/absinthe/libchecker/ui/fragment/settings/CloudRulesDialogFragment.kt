@@ -2,7 +2,9 @@ package com.absinthe.libchecker.ui.fragment.settings
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
@@ -43,25 +45,28 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    lifecycleScope.launchWhenResumed {
-      try {
-        request.requestCloudRuleInfo()?.let {
-          try {
-            root.cloudRulesContentView.localVersion.version.text = getLocalRulesVersion().toString()
-            root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
-            if (getLocalRulesVersion() < it.version) {
-              root.cloudRulesContentView.setUpdateButtonStatus(true)
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        try {
+          request.requestCloudRuleInfo()?.let {
+            try {
+              root.cloudRulesContentView.localVersion.version.text =
+                getLocalRulesVersion().toString()
+              root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
+              if (getLocalRulesVersion() < it.version) {
+                root.cloudRulesContentView.setUpdateButtonStatus(true)
+              }
+              withContext(Dispatchers.Main) {
+                root.showContent()
+              }
+            } catch (e: Exception) {
+              Timber.e(e)
+              context?.showToast(R.string.toast_cloud_rules_update_error)
             }
-            withContext(Dispatchers.Main) {
-              root.showContent()
-            }
-          } catch (e: Exception) {
-            Timber.e(e)
-            context?.showToast(R.string.toast_cloud_rules_update_error)
           }
+        } catch (t: Throwable) {
+          Timber.e(t)
         }
-      } catch (t: Throwable) {
-        Timber.e(t)
       }
     }
   }

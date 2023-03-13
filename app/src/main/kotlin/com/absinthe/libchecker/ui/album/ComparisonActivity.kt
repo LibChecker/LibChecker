@@ -18,7 +18,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -263,12 +265,14 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         adapter.setList(list.sortedByDescending { it.updateTime })
         flip(VF_LIST)
       }
-      lifecycleScope.launchWhenStarted {
-        effect.collect {
-          when (it) {
-            is SnapshotViewModel.Effect.ChooseComparedApk -> {
-              isLeftPartChoosing = it.isLeftPart
-              chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+      lifecycleScope.launch {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+          effect.collect {
+            when (it) {
+              is SnapshotViewModel.Effect.ChooseComparedApk -> {
+                isLeftPartChoosing = it.isLeftPart
+                chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+              }
             }
           }
         }
