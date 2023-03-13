@@ -1,5 +1,8 @@
 package com.absinthe.libchecker.utils
 
+import android.icu.util.Calendar
+import android.icu.util.ChineseCalendar
+import android.icu.util.GregorianCalendar
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -85,5 +88,34 @@ object DateUtils {
       formatted = formatted.substring(0, 22) + ":" + formatted.substring(22)
     }
     return formatted
+  }
+
+  fun isChristmas(): Boolean {
+    val today = Calendar.getInstance()
+    val month = today.get(Calendar.MONTH)
+    val date = today.get(Calendar.DATE)
+    return month == Calendar.DECEMBER && date == 25
+  }
+
+  fun isChineseNewYearEve(): Boolean {
+    val calendar = ChineseCalendar()
+    val date = calendar.get(Calendar.DATE)
+    val month = calendar.get(Calendar.MONTH)
+    val lastDay = calendar.getActualMaximum(Calendar.DATE)
+    return month == Calendar.DECEMBER && date == lastDay
+  }
+
+  fun isChineseNewYear(): Boolean {
+    val calendar = ChineseCalendar()
+    val date = calendar.get(Calendar.DATE)
+    val month = calendar.get(Calendar.MONTH)
+    return month == Calendar.JANUARY && date == 1
+  }
+
+  fun getChineseZodiac(): String {
+    val cc = Calendar.getInstance(Locale.CHINA) as GregorianCalendar
+    val animalIndex = cc.get(Calendar.YEAR) % 12
+    val zodiacList = listOf("🐒", "🐔", "🐶", "🐷", "🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐒", "🐔", "🐶", "🐷")
+    return zodiacList[animalIndex]
   }
 }
