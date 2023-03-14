@@ -142,10 +142,34 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val processesSet = hashSetOf<String>()
     try {
       packageInfo.let {
-        val services = PackageUtils.getComponentList(it.packageName, it.services, true)
-        val activities = PackageUtils.getComponentList(it.packageName, it.activities, true)
-        val receivers = PackageUtils.getComponentList(it.packageName, it.receivers, true)
-        val providers = PackageUtils.getComponentList(it.packageName, it.providers, true)
+        val services = if (it.services?.isNotEmpty() == true) {
+          it.services
+        } else {
+          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_SERVICES).services
+        }.let { list ->
+          PackageUtils.getComponentList(it.packageName, list, true)
+        }
+        val activities = if (it.activities?.isNotEmpty() == true) {
+          it.activities
+        } else {
+          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_ACTIVITIES).activities
+        }.let { list ->
+          PackageUtils.getComponentList(it.packageName, list, true)
+        }
+        val receivers = if (it.receivers?.isNotEmpty() == true) {
+          it.receivers
+        } else {
+          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_RECEIVERS).receivers
+        }.let { list ->
+          PackageUtils.getComponentList(it.packageName, list, true)
+        }
+        val providers = if (it.providers?.isNotEmpty() == true) {
+          it.providers
+        } else {
+          PackageUtils.getPackageInfo(it.packageName, PackageManager.GET_PROVIDERS).providers
+        }.let { list ->
+          PackageUtils.getComponentList(it.packageName, list, true)
+        }
 
         services.forEach { sc -> processesSet.add(sc.processName) }
         activities.forEach { sc -> processesSet.add(sc.processName) }
