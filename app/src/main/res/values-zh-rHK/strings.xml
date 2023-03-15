@@ -200,7 +200,7 @@
   <string name="adv_show_system_apps">顯示系統應用程式</string>
   <string name="adv_show_overlays">顯示 Overlay</string>
   <string name="adv_show_64_bit">顯示 64 位元應用程式</string>
-  <string name="adv_show_32_bit">顯示 32 位元應用程式</string>
+  <string name="adv_show_32_bit">顯示 32 位應用程式</string>
   <string name="adv_sort_mode">排序模式</string>
   <string name="adv_sort_by_time">升級時間</string>
   <string name="adv_sort_by_target_version">Target 版本</string>
