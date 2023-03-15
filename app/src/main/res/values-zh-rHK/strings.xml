@@ -103,6 +103,7 @@
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 插件新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
+  <string name="play_app_signing">Play 應用程式簽署</string>
   <string name="play_app_signing_details">借助 Play 應用程式簽署，Google 可以為您管理並保護您應用程式的簽署金鑰，並使用它對從您的 App bundle 生成的最佳化分配 APK 進行簽署。Play App Signing 將您的應用程式簽署金鑰儲存在 Google 的安全基礎結構中，並提供升級選項以提高安全性。</string>
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
@@ -161,6 +162,7 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一張快照？</string>
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">捨棄</string>
   <!--  Album  -->
@@ -180,6 +182,7 @@
   <string name="album_backup_summary">備份所有快照</string>
   <string name="album_restore">還原</string>
   <string name="album_restore_summary">從備份檔案還原快照</string>
+  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
   <!--  Integration  -->
@@ -206,4 +209,7 @@
   <string name="adv_show_target_version">顯示 Target 版本</string>
   <string name="adv_show_min_version">顯示 Min 版本</string>
   <string name="adv_tint_abi_label">ABI 標籤染色</string>
+  <string name="adv_mark_exported">Mark Exported Component</string>
+  <string name="adv_mark_disabled">Mark Disabled Component</string>
+  <string name="adv_show_marked_lib">Show Marked Libraries</string>
 </resources>
