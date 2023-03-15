@@ -26,7 +26,7 @@ class LibThresholdDialogFragment : DialogFragment() {
         GlobalValues.libReferenceThresholdLiveData.value = threshold
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong()),
+          EventProperties().set("PREF_LIB_REF_THRESHOLD", threshold.toLong())
         )
       }
       .setNegativeButton(android.R.string.cancel, null)

@@ -12,5 +12,5 @@ data class LibReference(
   val chip: LibChip?,
   val referredList: Set<String>,
   @LibType val type: Int,
-  override val childNode: @RawValue MutableList<BaseNode>? = null,
+  override val childNode: @RawValue MutableList<BaseNode>? = null
 ) : Parcelable, BaseNode()

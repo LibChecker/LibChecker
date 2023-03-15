@@ -34,9 +34,9 @@ class SnapshotNativeProvider : BaseNodeProvider() {
       SnapshotDetailNativeView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).also {
         it.layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
         )
-      },
+      }
     )
   }
 
@@ -60,7 +60,7 @@ class SnapshotNativeProvider : BaseNodeProvider() {
           REMOVED -> R.drawable.ic_remove
           CHANGED -> R.drawable.ic_changed
           else -> throw IllegalArgumentException("wrong diff type")
-        },
+        }
       )
 
       helper.itemView.backgroundTintList = colorRes.toColorStateList(context)

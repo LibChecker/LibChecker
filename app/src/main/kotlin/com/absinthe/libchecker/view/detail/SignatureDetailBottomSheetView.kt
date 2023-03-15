@@ -39,7 +39,7 @@ class SignatureDetailBottomSheetView(context: Context) : LinearLayout(context), 
   val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 12.dp
     }

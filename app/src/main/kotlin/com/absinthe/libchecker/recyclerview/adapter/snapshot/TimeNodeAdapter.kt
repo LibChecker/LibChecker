@@ -28,7 +28,7 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
         item.topApps?.let {
           val list = it.fromJson<List<String>>(
             List::class.java,
-            String::class.java,
+            String::class.java
           )
           adapter.setList(list)
           if ((list?.size ?: 0) <= 5) {
@@ -38,13 +38,13 @@ class TimeNodeAdapter : BaseQuickAdapter<TimeStampItem, BaseViewHolder>(0) {
               AppCompatTextView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                   ViewGroup.LayoutParams.WRAP_CONTENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT,
+                  ViewGroup.LayoutParams.WRAP_CONTENT
                 ).also {
                   gravity = Gravity.CENTER_VERTICAL
                 }
                 text = "…"
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-              },
+              }
             )
           }
         }

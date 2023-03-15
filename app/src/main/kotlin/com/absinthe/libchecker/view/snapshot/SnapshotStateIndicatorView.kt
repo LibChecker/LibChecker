@@ -73,7 +73,7 @@ class SnapshotStateIndicatorView(context: Context) : View(context) {
       drawOverPosition,
       measuredWidth.toFloat(),
       drawOverPosition + eachItemHeight,
-      p,
+      p
     )
     drawOverPosition += eachItemHeight
   }

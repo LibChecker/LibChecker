@@ -18,5 +18,5 @@ data class LCItem(
   val abi: Short,
   val features: Int,
   val targetApi: Short,
-  val variant: Short,
+  val variant: Short
 ) : Parcelable

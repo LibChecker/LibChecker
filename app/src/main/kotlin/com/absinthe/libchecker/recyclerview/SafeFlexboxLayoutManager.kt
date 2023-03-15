@@ -15,14 +15,14 @@ class SafeFlexboxLayoutManager : FlexboxLayoutManager {
   constructor(context: Context, flexDirection: Int, flexWrap: Int) : super(
     context,
     flexDirection,
-    flexWrap,
+    flexWrap
   )
 
   constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
     context,
     attrs,
     defStyleAttr,
-    defStyleRes,
+    defStyleRes
   )
 
   override fun generateLayoutParams(lp: ViewGroup.LayoutParams): RecyclerView.LayoutParams {

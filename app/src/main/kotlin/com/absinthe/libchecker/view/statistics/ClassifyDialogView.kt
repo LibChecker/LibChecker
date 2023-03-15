@@ -33,7 +33,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.MATCH_PARENT,
-      1.0f,
+      1.0f
     ).also {
       it.topMargin = 4.dp
     }
@@ -58,7 +58,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
       setEmptyView(
         LibReferenceLoadingView(context).apply {
           layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 500.dp)
-        },
+        }
       )
     }
     addView(header)
@@ -68,7 +68,7 @@ class ClassifyDialogView(context: Context, val lifecycleScope: LifecycleCoroutin
   private val androidVersionView = AndroidVersionLabelView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setPadding(0, 4.dp, 0, 4.dp)
   }

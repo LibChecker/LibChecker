@@ -42,7 +42,7 @@ class SignatureDetailBSDFragment :
           val values = it.split(":", limit = 2)
           SignatureDetailItem(
             values.getOrNull(0).orEmpty(),
-            values.getOrNull(1).orEmpty(),
+            values.getOrNull(1).orEmpty()
           )
         }.toMutableList()
       }
@@ -65,7 +65,7 @@ class SignatureDetailBSDFragment :
   companion object {
     fun newInstance(detail: String): SignatureDetailBSDFragment {
       return SignatureDetailBSDFragment().putArguments(
-        EXTRA_SIGNATURE_DETAIL to detail,
+        EXTRA_SIGNATURE_DETAIL to detail
       )
     }
 

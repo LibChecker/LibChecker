@@ -21,7 +21,7 @@ class EmptyListView(context: Context) : AViewGroup(context) {
   val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -36,11 +36,11 @@ class EmptyListView(context: Context) : AViewGroup(context) {
     text.autoMeasure()
     setMeasuredDimension(
       measuredWidth.coerceAtLeast(
-        paddingStart + icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd,
+        paddingStart + icon.measuredWidth.coerceAtLeast(text.measuredWidth) + paddingEnd
       ),
       measuredHeight.coerceAtLeast(
-        paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom,
-      ),
+        paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+      )
     )
   }
 

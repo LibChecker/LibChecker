@@ -60,7 +60,7 @@ import kotlin.reflect.KProperty
 class CheckableChipView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
-  defStyleAttr: Int = 0,
+  defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), Checkable {
 
   companion object {
@@ -151,7 +151,7 @@ class CheckableChipView @JvmOverloads constructor(
       set = attrs,
       attrs = R.styleable.CheckableChipView,
       defStyleAttr = R.attr.checkableChipViewStyle,
-      defStyleRes = R.style.Widget_CheckableChipView,
+      defStyleRes = R.style.Widget_CheckableChipView
     ) {
       outlineColor = getColorOrThrow(R.styleable.CheckableChipView_ccv_outlineColor)
       outlineWidth = getDimensionOrThrow(R.styleable.CheckableChipView_ccv_outlineWidth)
@@ -174,7 +174,7 @@ class CheckableChipView @JvmOverloads constructor(
           -intrinsicWidth / 2,
           -intrinsicHeight / 2,
           intrinsicWidth / 2,
-          intrinsicHeight / 2,
+          intrinsicHeight / 2
         )
       }
       touchFeedbackDrawable =
@@ -250,7 +250,7 @@ class CheckableChipView @JvmOverloads constructor(
         height - halfStroke,
         rounding,
         rounding,
-        outlinePaint,
+        outlinePaint
       )
     }
 
@@ -262,7 +262,7 @@ class CheckableChipView @JvmOverloads constructor(
     val indicatorSize = lerp(
       initialIndicatorSize,
       ((width - indicatorCenterX) * 2f).coerceAtLeast((height - indicatorCenterY) * 2f),
-      progress,
+      progress
     )
 
     val indicatorSizeHalf = indicatorSize / 2f
@@ -277,14 +277,14 @@ class CheckableChipView @JvmOverloads constructor(
       indicatorCenterY + indicatorSizeHalf,
       indicatorRounding,
       indicatorRounding,
-      indicatorPaint,
+      indicatorPaint
     )
 
     // Text
     val textX = lerp(
       indicatorCenterX + initialIndicatorSize / 2f + padding,
       outlineWidth + padding + padding / 2f,
-      progress,
+      progress
     )
 
     textPaint.apply {
@@ -297,7 +297,7 @@ class CheckableChipView @JvmOverloads constructor(
 
     canvas.withTranslation(
       x = textX,
-      y = (height - textLayout.height) / 2f,
+      y = (height - textLayout.height) / 2f
     ) {
       textLayout.draw(this)
     }
@@ -306,7 +306,7 @@ class CheckableChipView @JvmOverloads constructor(
     if (progress > 0f) {
       canvas.withTranslation(
         x = width - outlineWidth - padding - iconRadius,
-        y = height / 2f,
+        y = height / 2f
       ) {
         canvas.withScale(progress, progress) {
           clearDrawable.draw(canvas)
@@ -449,7 +449,7 @@ class CheckableChipView @JvmOverloads constructor(
   private fun <T> viewProperty(
     default: T,
     requestLayout: Boolean = false,
-    afterChangeActions: ((newValue: T) -> Unit)? = null,
+    afterChangeActions: ((newValue: T) -> Unit)? = null
   ) = object : ObservableProperty<T>(default) {
 
     override fun beforeChange(property: KProperty<*>, oldValue: T, newValue: T): Boolean =

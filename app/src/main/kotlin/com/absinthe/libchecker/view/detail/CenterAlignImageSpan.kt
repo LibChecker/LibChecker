@@ -16,7 +16,7 @@ class CenterAlignImageSpan(drawable: Drawable) : ImageSpan(drawable) {
     top: Int,
     y: Int,
     bottom: Int,
-    paint: Paint,
+    paint: Paint
   ) {
     val b = drawable
     val fm: Paint.FontMetricsInt = paint.fontMetricsInt

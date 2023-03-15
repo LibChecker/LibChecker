@@ -110,12 +110,12 @@ object PackageUtils {
   fun getPackageInfo(packageName: String, flag: Int = 0): PackageInfo {
     val packageInfo = PackageManagerCompat.getPackageInfo(
       packageName,
-      PackageManager.MATCH_DISABLED_COMPONENTS or flag,
+      PackageManager.MATCH_DISABLED_COMPONENTS or flag
     )
     if (FreezeUtils.isAppFrozen(packageInfo.applicationInfo)) {
       return PackageManagerCompat.getPackageArchiveInfo(
         packageInfo.applicationInfo.sourceDir,
-        PackageManager.MATCH_DISABLED_COMPONENTS or flag,
+        PackageManager.MATCH_DISABLED_COMPONENTS or flag
       )?.apply {
         applicationInfo.sourceDir = packageInfo.applicationInfo.sourceDir
         applicationInfo.nativeLibraryDir = packageInfo.applicationInfo.nativeLibraryDir
@@ -133,7 +133,7 @@ object PackageUtils {
   fun getInstallApplications(): List<PackageInfo> {
     return PackageManagerCompat.getInstalledPackages(
       PackageManager.GET_META_DATA
-        or PackageManager.GET_PERMISSIONS,
+        or PackageManager.GET_PERMISSIONS
     )
   }
 
@@ -210,7 +210,7 @@ object PackageUtils {
       } else {
         val demands = ManifestReader.getManifestProperties(
           File(packageInfo.applicationInfo.sourceDir),
-          arrayOf(compileSdkVersion),
+          arrayOf(compileSdkVersion)
         )
         demands[compileSdkVersion]?.toString()?.toInt() ?: 0
       }
@@ -233,7 +233,7 @@ object PackageUtils {
   fun getNativeDirLibs(
     packageInfo: PackageInfo,
     needStaticLibrary: Boolean = false,
-    specifiedAbi: Int? = null,
+    specifiedAbi: Int? = null
   ): List<LibStringItem> {
     val nativePath = packageInfo.applicationInfo.nativeLibraryDir
     val list = mutableListOf<LibStringItem>()
@@ -251,10 +251,10 @@ object PackageUtils {
                 name = it.name,
                 size = FileUtils.getFileSize(it),
                 elfType = elfParser?.getEType() ?: ET_NOT_ELF,
-                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE,
+                elfClass = elfParser?.getEClass() ?: ELFParser.EIdent.ELFCLASSNONE
               )
             }
-            .toMutableList(),
+            .toMutableList()
         )
       }
     }
@@ -277,16 +277,16 @@ object PackageUtils {
       list.addAll(
         getSourceLibs(
           packageInfo = packageInfo,
-          childDir = "lib/$abiString",
-        ),
+          childDir = "lib/$abiString"
+        )
       )
     }
     list.addAll(
       getSourceLibs(
         packageInfo = packageInfo,
         childDir = "assets/",
-        source = "/assets",
-      ),
+        source = "/assets"
+      )
     )
 
     if (needStaticLibrary) {
@@ -304,7 +304,7 @@ object PackageUtils {
   private fun getSourceLibs(
     packageInfo: PackageInfo,
     childDir: String,
-    source: String? = null,
+    source: String? = null
   ): List<LibStringItem> {
     if (packageInfo.applicationInfo.sourceDir == null) {
       return emptyList()
@@ -323,7 +323,7 @@ object PackageUtils {
               size = it.size,
               source = source,
               elfType = elfParser!!.getEType(),
-              elfClass = elfParser!!.getEClass(),
+              elfClass = elfParser!!.getEClass()
             )
           }
           .toList()
@@ -362,8 +362,8 @@ object PackageUtils {
                 size = entry.size,
                 source = if (fileName.startsWith("split_config")) null else fileName,
                 elfType = elfParser!!.getEType(),
-                elfClass = elfParser!!.getEClass(),
-              ),
+                elfClass = elfParser!!.getEClass()
+              )
             )
           }
         }
@@ -447,8 +447,8 @@ object PackageUtils {
             LibStringItem(
               name = it.key,
               size = 0L,
-              source = "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}",
-            ),
+              source = "$STATIC_LIBRARY_SOURCE_PREFIX$source\n$VERSION_CODE_PREFIX${it.value}"
+            )
           )
         }
       }
@@ -500,7 +500,7 @@ object PackageUtils {
   private fun isKotlinUsedInClassDex(file: File): Boolean {
     return findDexClasses(
       file,
-      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType()),
+      listOf("kotlin.*".toClassDefType(), "kotlinx.*".toClassDefType())
     ).isNotEmpty()
   }
 
@@ -514,7 +514,7 @@ object PackageUtils {
   fun getComponentList(
     packageName: String,
     @LibType type: Int,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<StatefulComponent> {
     val flag = when (type) {
       SERVICE -> PackageManager.GET_SERVICES
@@ -539,7 +539,7 @@ object PackageUtils {
   fun getComponentStringList(
     packageName: String,
     @LibType type: Int,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<String> {
     val flag = when (type) {
       SERVICE -> PackageManager.GET_SERVICES
@@ -564,7 +564,7 @@ object PackageUtils {
   private fun getComponentList(
     packageInfo: PackageInfo,
     @LibType type: Int,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<StatefulComponent> {
     val list: Array<out ComponentInfo>? = when (type) {
       SERVICE -> packageInfo.services
@@ -587,7 +587,7 @@ object PackageUtils {
   fun getComponentStringList(
     packageInfo: PackageInfo,
     @LibType type: Int,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<String> {
     val list: Array<out ComponentInfo>? = when (type) {
       SERVICE -> packageInfo.services
@@ -608,7 +608,7 @@ object PackageUtils {
   fun isComponentEnabled(info: ComponentInfo): Boolean {
     val state = runCatching {
       SystemServices.packageManager.getComponentEnabledSetting(
-        ComponentName(info.packageName, info.name),
+        ComponentName(info.packageName, info.name)
       )
     }.getOrDefault(PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
     return when (state) {
@@ -643,7 +643,7 @@ object PackageUtils {
   fun getComponentList(
     packageName: String,
     list: Array<out ComponentInfo>?,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<StatefulComponent> {
     if (list.isNullOrEmpty()) {
       return emptyList()
@@ -659,7 +659,7 @@ object PackageUtils {
           name,
           isComponentEnabled(it),
           isComponentExported(it),
-          it.processName.orEmpty().removePrefix(it.packageName),
+          it.processName.orEmpty().removePrefix(it.packageName)
         )
       }
       .toList()
@@ -675,7 +675,7 @@ object PackageUtils {
   private fun getComponentStringList(
     packageName: String,
     list: Array<out ComponentInfo>?,
-    isSimpleName: Boolean,
+    isSimpleName: Boolean
   ): List<String> {
     if (list.isNullOrEmpty()) {
       return emptyList()
@@ -705,7 +705,7 @@ object PackageUtils {
     applicationInfo: ApplicationInfo,
     isApk: Boolean = false,
     overlay: Boolean,
-    ignoreArch: Boolean = false,
+    ignoreArch: Boolean = false
   ): Set<Int> {
     var elementName: String
 
@@ -826,7 +826,7 @@ object PackageUtils {
   fun getAbi(
     packageInfo: PackageInfo,
     isApk: Boolean = false,
-    abiSet: Set<Int>? = null,
+    abiSet: Set<Int>? = null
   ): Int {
     val applicationInfo: ApplicationInfo = packageInfo.applicationInfo
     val use32bitAbi = applicationInfo.isUse32BitAbi()
@@ -896,7 +896,7 @@ object PackageUtils {
     ARMV7 + MULTI_ARCH to listOf(R.string.armeabi_v7a, R.string.multiArch),
     ARMV5 + MULTI_ARCH to listOf(R.string.armeabi, R.string.multiArch),
     X86_64 + MULTI_ARCH to listOf(R.string.x86_64, R.string.multiArch),
-    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch),
+    X86 + MULTI_ARCH to listOf(R.string.x86, R.string.multiArch)
   )
 
   private val ABI_BADGE_MAP = arrayMapOf(
@@ -916,7 +916,7 @@ object PackageUtils {
     X86_64 + MULTI_ARCH to R.drawable.ic_abi_label_64bit,
     ARMV7 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
     ARMV5 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
-    X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit,
+    X86 + MULTI_ARCH to R.drawable.ic_abi_label_32bit
   )
 
   /**
@@ -957,7 +957,7 @@ object PackageUtils {
     context: Context,
     item: LibStringItem,
     showElfInfo: Boolean = true,
-    is64Bit: Boolean = false,
+    is64Bit: Boolean = false
   ): String {
     val source = item.source?.let { "[${item.source}]" }.orEmpty()
     if (showElfInfo.not()) {
@@ -1020,7 +1020,7 @@ object PackageUtils {
   fun findDexClasses(
     sourceFile: File,
     classes: List<String>,
-    hasAny: Boolean = false,
+    hasAny: Boolean = false
   ): List<String> {
     val findList = mutableListOf<String>()
     return runCatching {
@@ -1091,15 +1091,15 @@ object PackageUtils {
                       0,
                       className.indexOf(
                         ".",
-                        9,
-                      ),
-                    ),
+                        9
+                      )
+                    )
                   )
                   // Filter classes which paths deep level greater than 4
                   else -> LibStringItem(
                     className.split(".").run {
                       this.subList(0, this.size.coerceAtMost(4)).joinToString(separator = ".")
-                    },
+                    }
                   )
                 }
               }
@@ -1234,7 +1234,7 @@ object PackageUtils {
         arrayOf(
           "META-INF/androidx.databinding_viewbinding.version",
           "META-INF/androidx.databinding_databindingKtx.version",
-          "META-INF/androidx.databinding_library.version",
+          "META-INF/androidx.databinding_library.version"
         ).forEach { entry ->
           zipFile.getEntry(entry)?.let { ze ->
             zipFile.getInputStream(ze).source().buffer().use { bs ->
@@ -1290,7 +1290,7 @@ object PackageUtils {
           items.asSequence()
             .filter { it.applicationInfo.sourceDir != null }
             .map { it.packageName to it }
-            .toMap(),
+            .toMap()
         )
       }
     } while (retry)
@@ -1302,7 +1302,7 @@ object PackageUtils {
           .map {
             getPackageInfo(
               it,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS,
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
             )
           }
           .filter { it.applicationInfo.sourceDir != null }
@@ -1344,8 +1344,8 @@ object PackageUtils {
         "rx.lang.kotlin".toClassDefType(),
         "io.reactivex.rxjava3.android.*".toClassDefType(),
         "io.reactivex.android.*".toClassDefType(),
-        "rx.android.*".toClassDefType(),
-      ),
+        "rx.android.*".toClassDefType()
+      )
     )
     if (isSplitsApk()) {
       features = features or Features.SPLIT_APKS
@@ -1446,7 +1446,7 @@ object PackageUtils {
     }
     return findDexClasses(
       File(applicationInfo.sourceDir),
-      listOf("androidx.compose.*".toClassDefType()),
+      listOf("androidx.compose.*".toClassDefType())
     ).isNotEmpty()
   }
 
@@ -1456,7 +1456,7 @@ object PackageUtils {
         arrayOf(
           "META-INF/androidx.compose.runtime_runtime.version",
           "META-INF/androidx.compose.ui_ui.version",
-          "META-INF/androidx.compose.ui_ui-tooling-preview.version",
+          "META-INF/androidx.compose.ui_ui-tooling-preview.version"
         ).forEach { entry ->
           zipFile.getEntry(entry)?.let { ze ->
             zipFile.getInputStream(ze).source().buffer().use { bs ->
@@ -1511,9 +1511,9 @@ object PackageUtils {
       listOf(
         "rx.*".toClassDefType(),
         "io.reactivex.*".toClassDefType(),
-        "io.reactivex.rxjava3.*".toClassDefType(),
+        "io.reactivex.rxjava3.*".toClassDefType()
       ),
-      hasAny = true,
+      hasAny = true
     ).isNotEmpty()
   }
 
@@ -1537,9 +1537,9 @@ object PackageUtils {
           listOf(
             "rx.*".toClassDefType(),
             "io.reactivex.*".toClassDefType(),
-            "io.reactivex.rxjava3.*".toClassDefType(),
+            "io.reactivex.rxjava3.*".toClassDefType()
           ),
-          hasAny = true,
+          hasAny = true
         )
         if (resultList.contains("io.reactivex.rxjava3.*".toClassDefType())) {
           return@withContext RX_MAJOR_THREE
@@ -1580,9 +1580,9 @@ object PackageUtils {
       listOf(
         "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
         "io.reactivex.rxkotlin".toClassDefType(),
-        "rx.lang.kotlin".toClassDefType(),
+        "rx.lang.kotlin".toClassDefType()
       ),
-      hasAny = true,
+      hasAny = true
     ).isNotEmpty()
   }
 
@@ -1604,9 +1604,9 @@ object PackageUtils {
           listOf(
             "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
             "io.reactivex.rxkotlin".toClassDefType(),
-            "rx.lang.kotlin".toClassDefType(),
+            "rx.lang.kotlin".toClassDefType()
           ),
-          hasAny = true,
+          hasAny = true
         )
         if (resultList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType())) {
           return@withContext RX_MAJOR_THREE
@@ -1637,9 +1637,9 @@ object PackageUtils {
       listOf(
         "io.reactivex.rxjava3.android.*".toClassDefType(),
         "io.reactivex.android.*".toClassDefType(),
-        "rx.android.*".toClassDefType(),
+        "rx.android.*".toClassDefType()
       ),
-      hasAny = true,
+      hasAny = true
     ).isNotEmpty()
   }
 
@@ -1650,9 +1650,9 @@ object PackageUtils {
         listOf(
           "io.reactivex.rxjava3.android.*".toClassDefType(),
           "io.reactivex.android.*".toClassDefType(),
-          "rx.android.*".toClassDefType(),
+          "rx.android.*".toClassDefType()
         ),
-        hasAny = true,
+        hasAny = true
       )
       if (resultList.contains("io.reactivex.rxjava3.android.*".toClassDefType())) {
         return@withContext RX_MAJOR_THREE
@@ -1676,12 +1676,12 @@ object PackageUtils {
     val localedContext = context.createConfigurationContext(
       Configuration(context.resources.configuration).apply {
         setLocale(LocaleDelegate.defaultLocale)
-      },
+      }
     )
     val dateFormat = DateFormat.getDateTimeInstance(
       DateFormat.LONG,
       DateFormat.LONG,
-      LocaleDelegate.defaultLocale,
+      LocaleDelegate.defaultLocale
     )
     return if (OsUtils.atLeastP() && packageInfo.signingInfo != null) {
       if (packageInfo.signingInfo.hasMultipleSigners()) {
@@ -1700,7 +1700,7 @@ object PackageUtils {
   private fun describeSignature(
     context: Context,
     dateFormat: DateFormat,
-    signature: Signature,
+    signature: Signature
   ): LibStringItem {
     val bytes = signature.toByteArray()
     val certificate = X509Certificate.getInstance(bytes)

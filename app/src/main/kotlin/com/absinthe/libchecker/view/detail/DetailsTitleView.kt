@@ -27,12 +27,12 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val appNameView = AlwaysMarqueeTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifMedium,
-    ),
+      R.style.TextView_SansSerifMedium
+    )
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
     }
@@ -45,7 +45,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -55,12 +55,12 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val versionInfoView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensed,
-    ),
+      R.style.TextView_SansSerifCondensed
+    )
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -70,12 +70,12 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val extraInfoView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium,
-    ),
+      R.style.TextView_SansSerifCondensedMedium
+    )
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -89,19 +89,19 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
       measuredWidth - paddingStart - paddingEnd - iconView.measuredWidth - appNameView.marginStart
     appNameView.measure(
       textWidth.toExactlyMeasureSpec(),
-      appNameView.defaultHeightMeasureSpec(this),
+      appNameView.defaultHeightMeasureSpec(this)
     )
     packageNameView.measure(
       textWidth.toExactlyMeasureSpec(),
-      packageNameView.defaultHeightMeasureSpec(this),
+      packageNameView.defaultHeightMeasureSpec(this)
     )
     versionInfoView.measure(
       textWidth.toExactlyMeasureSpec(),
-      versionInfoView.defaultHeightMeasureSpec(this),
+      versionInfoView.defaultHeightMeasureSpec(this)
     )
     extraInfoView.measure(
       textWidth.toExactlyMeasureSpec(),
-      extraInfoView.defaultHeightMeasureSpec(this),
+      extraInfoView.defaultHeightMeasureSpec(this)
     )
     setMeasuredDimension(
       measuredWidth,
@@ -110,7 +110,7 @@ class DetailsTitleView(context: Context, attributeSet: AttributeSet? = null) :
         packageNameView.measuredHeight +
         versionInfoView.measuredHeight +
         extraInfoView.measuredHeight +
-        paddingBottom,
+        paddingBottom
     )
   }
 

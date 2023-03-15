@@ -14,6 +14,6 @@ object DexLibMap {
     "com.alibaba.android",
     "cn.com.chinatelecom",
     "com.github.chrisbanes",
-    "com.google.thirdparty",
+    "com.google.thirdparty"
   )
 }

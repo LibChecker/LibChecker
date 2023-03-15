@@ -30,7 +30,7 @@ object FreezeUtils {
     runCatching {
       val packageInfo = PackageManagerCompat.getPackageInfo(
         packageName,
-        PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS,
+        PackageManager.MATCH_UNINSTALLED_PACKAGES or PackageManager.MATCH_DISABLED_COMPONENTS
       )
       return isAppFrozen(packageInfo.applicationInfo)
     }.onFailure {

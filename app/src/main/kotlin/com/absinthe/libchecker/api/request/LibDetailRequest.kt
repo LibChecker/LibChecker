@@ -11,6 +11,6 @@ interface LibDetailRequest {
   suspend fun requestLibDetail(
     @Path("categoryDir") categoryDir: String,
     @Path("libName") libName: String,
-    @Header("Referer") referer: String = BuildConfig.APPLICATION_ID,
+    @Header("Referer") referer: String = BuildConfig.APPLICATION_ID
   ): LibDetailBean
 }

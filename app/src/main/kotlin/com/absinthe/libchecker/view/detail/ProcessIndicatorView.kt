@@ -23,7 +23,7 @@ class ProcessIndicatorView(context: Context, attributeSet: AttributeSet? = null)
   private val indicators = RecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
     layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
     this.adapter = libStringAdapter

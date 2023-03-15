@@ -36,7 +36,7 @@ class ToastView(context: Context) : AViewGroup(context) {
     icon.autoMeasure()
     setMeasuredDimension(
       message.measuredWidth,
-      message.measuredHeight + icon.measuredHeight / 2,
+      message.measuredHeight + icon.measuredHeight / 2
     )
   }
 

@@ -27,7 +27,7 @@ class BridgeActivity : Activity() {
               Intent(this, ShootService::class.java).also {
                 it.action = ACTION_SHOOT_AND_STOP_AUTO
                 it.putExtra(EXTRA_DROP_PREVIOUS, dropPrevious)
-              },
+              }
             )
           } else {
             Timber.w("Authority mismatch: $authority")

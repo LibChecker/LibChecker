@@ -44,7 +44,7 @@ class AlternativeLaunchBSDFragment :
         .map {
           AlternativeLaunchItem(
             it.loadLabel(SystemServices.packageManager).toString(),
-            it.name,
+            it.name
           )
         }
         .toList()
@@ -57,7 +57,7 @@ class AlternativeLaunchBSDFragment :
               Intent().also {
                 it.setPackage(packageName)
                 it.component = ComponentName(packageName, className)
-              },
+              }
             )
           }.onFailure {
             activity?.showToast(R.string.toast_cant_open_app)

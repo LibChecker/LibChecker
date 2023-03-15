@@ -15,7 +15,7 @@ object PackageManagerCompat {
     return if (OsUtils.atLeastT()) {
       SystemServices.packageManager.getPackageInfo(
         packageName,
-        PackageManager.PackageInfoFlags.of(flags.toLong()),
+        PackageManager.PackageInfoFlags.of(flags.toLong())
       )
     } else {
       SystemServices.packageManager.getPackageInfo(packageName, flags)
@@ -27,7 +27,7 @@ object PackageManagerCompat {
       if (OsUtils.atLeastT()) {
         SystemServices.packageManager.getPackageArchiveInfo(
           archiveFilePath,
-          PackageManager.PackageInfoFlags.of(flags.toLong()),
+          PackageManager.PackageInfoFlags.of(flags.toLong())
         )
       } else {
         SystemServices.packageManager.getPackageArchiveInfo(archiveFilePath, flags)
@@ -39,7 +39,7 @@ object PackageManagerCompat {
     return if (OsUtils.atLeastT()) {
       SystemServices.packageManager.getApplicationInfo(
         packageName,
-        PackageManager.ApplicationInfoFlags.of(flags.toLong()),
+        PackageManager.ApplicationInfoFlags.of(flags.toLong())
       )
     } else {
       SystemServices.packageManager.getApplicationInfo(packageName, flags)
@@ -58,7 +58,7 @@ object PackageManagerCompat {
     return if (OsUtils.atLeastT()) {
       SystemServices.packageManager.queryIntentActivities(
         intent,
-        PackageManager.ResolveInfoFlags.of(flags.toLong()),
+        PackageManager.ResolveInfoFlags.of(flags.toLong())
       )
     } else {
       SystemServices.packageManager.queryIntentActivities(intent, flags)

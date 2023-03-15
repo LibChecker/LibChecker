@@ -42,11 +42,11 @@ class TimeNodeBottomSheetDialogFragment :
           EmptyListView(context).apply {
             layoutParams = ViewGroup.MarginLayoutParams(
               ViewGroup.LayoutParams.MATCH_PARENT,
-              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
             ).also {
               it.bottomMargin = 16.dp
             }
-          },
+          }
         )
         if (isCompareMode) {
           root.adapter.removeAllHeaderView()
@@ -56,7 +56,7 @@ class TimeNodeBottomSheetDialogFragment :
                 viewModel.chooseComparedApk(isLeftMode)
                 dismiss()
               }
-            },
+            }
           )
         } else {
           root.adapter.removeAllHeaderView()
@@ -90,7 +90,7 @@ class TimeNodeBottomSheetDialogFragment :
   companion object {
     fun newInstance(topApps: ArrayList<TimeStampItem>): TimeNodeBottomSheetDialogFragment {
       return TimeNodeBottomSheetDialogFragment().putArguments(
-        EXTRA_TOP_APPS to topApps,
+        EXTRA_TOP_APPS to topApps
       )
     }
   }

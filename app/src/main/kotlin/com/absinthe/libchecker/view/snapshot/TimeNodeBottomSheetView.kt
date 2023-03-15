@@ -27,7 +27,7 @@ class TimeNodeBottomSheetView(context: Context) : LinearLayout(context), IHeader
   private val list = BorderRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       val padding = 16.dp
       it.topMargin = padding

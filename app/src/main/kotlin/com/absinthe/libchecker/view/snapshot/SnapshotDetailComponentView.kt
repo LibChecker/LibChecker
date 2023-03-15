@@ -49,12 +49,12 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
     val name = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifMedium,
-      ),
+        R.style.TextView_SansSerifMedium
+      )
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
       }
@@ -80,7 +80,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
           chip = Chip(context).apply {
             layoutParams = LayoutParams(
               ViewGroup.LayoutParams.WRAP_CONTENT,
-              ViewGroup.LayoutParams.WRAP_CONTENT,
+              ViewGroup.LayoutParams.WRAP_CONTENT
             ).also {
               it.topMargin = 4.dp
             }
@@ -118,7 +118,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
       typeIcon.autoMeasure()
       name.measure(
         (measuredWidth - paddingStart - typeIcon.measuredWidth - name.marginStart - paddingEnd).toExactlyMeasureSpec(),
-        name.defaultHeightMeasureSpec(this),
+        name.defaultHeightMeasureSpec(this)
       )
       val chipHeight = chip?.let {
         it.autoMeasure()
@@ -126,7 +126,7 @@ class SnapshotDetailComponentView(context: Context) : MaterialCardView(context) 
       } ?: 0
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom,
+        paddingTop + name.measuredHeight.coerceAtLeast(typeIcon.measuredHeight) + chipHeight + paddingBottom
       )
     }
 

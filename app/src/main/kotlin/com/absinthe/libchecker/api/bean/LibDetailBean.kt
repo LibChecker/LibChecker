@@ -9,5 +9,5 @@ data class LibDetailBean(
   val iconUrl: String,
   val contributors: List<String>,
   val description: String,
-  val relativeUrl: String,
+  val relativeUrl: String
 )

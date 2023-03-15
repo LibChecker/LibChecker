@@ -22,7 +22,7 @@ class AppListLoadingView(context: Context, attributeSet: AttributeSet? = null) :
   private val text = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -37,7 +37,7 @@ class AppListLoadingView(context: Context, attributeSet: AttributeSet? = null) :
     text.autoMeasure()
     setMeasuredDimension(
       icon.measuredWidth.coerceAtLeast(text.measuredWidth),
-      icon.measuredHeight + text.marginTop + text.measuredHeight,
+      icon.measuredHeight + text.marginTop + text.measuredHeight
     )
   }
 

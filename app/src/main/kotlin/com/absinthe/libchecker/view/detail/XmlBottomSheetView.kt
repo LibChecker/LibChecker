@@ -56,11 +56,11 @@ class XmlBottomSheetView(context: Context) : LinearLayout(context), IHeaderView 
         AppCompatTextView(context).apply {
           layoutParams = MarginLayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
           )
           textSize = 10f
           setTextIsSelectable(true)
-        },
+        }
       )
     }
 

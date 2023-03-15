@@ -85,7 +85,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   fun compareDiff(
     preTimeStamp: Long,
     currTimeStamp: Long = CURRENT_SNAPSHOT,
-    shouldClearDiff: Boolean = false,
+    shouldClearDiff: Boolean = false
   ) {
     if (compareDiffJob?.isActive == true) {
       compareDiffJob?.cancel()
@@ -158,8 +158,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(dbItem.metadata),
           SnapshotDiffItem.DiffNode(dbItem.packageSize),
           deleted = true,
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName },
-        ),
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == dbItem.packageName }
+        )
       )
     }
 
@@ -179,48 +179,48 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
             SnapshotDiffItem.DiffNode(ai.targetSdkVersion.toShort()),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getNativeDirLibs(pi).toJson().orEmpty(),
+              PackageUtils.getNativeDirLibs(pi).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
                 pi.packageName,
                 SERVICE,
-                false,
-              ).toJson().orEmpty(),
+                false
+              ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
                 pi.packageName,
                 ACTIVITY,
-                false,
-              ).toJson().orEmpty(),
+                false
+              ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
                 pi.packageName,
                 RECEIVER,
-                false,
-              ).toJson().orEmpty(),
+                false
+              ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
               PackageUtils.getComponentStringList(
                 pi.packageName,
                 PROVIDER,
-                false,
-              ).toJson().orEmpty(),
+                false
+              ).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              pi.getPermissionsList().toJson().orEmpty(),
+              pi.getPermissionsList().toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getMetaDataItems(pi).toJson().orEmpty(),
+              PackageUtils.getMetaDataItems(pi).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPackageSize(pi, true),
+              PackageUtils.getPackageSize(pi, true)
             ),
             newInstalled = true,
-            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == pi.packageName },
-          ),
+            isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == pi.packageName }
+          )
         )
       } catch (e: Exception) {
         Timber.e(e)
@@ -248,8 +248,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               SnapshotDiffStoringItem(
                 packageName = pi.packageName,
                 lastUpdatedTime = pi.lastUpdateTime,
-                diffContent = snapshotDiffContent,
-              ),
+                diffContent = snapshotDiffContent
+              )
             )
           }
         } else {
@@ -270,8 +270,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
                 SnapshotDiffStoringItem(
                   packageName = pi.packageName,
                   lastUpdatedTime = pi.lastUpdateTime,
-                  diffContent = snapshotDiffContent,
-                ),
+                  diffContent = snapshotDiffContent
+                )
               )
             }
           }
@@ -294,7 +294,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     dbItem: SnapshotItem,
     packageInfo: PackageInfo,
     versionCode: Long,
-    inTrackedList: Boolean,
+    inTrackedList: Boolean
   ): SnapshotDiffItem? {
     if (versionCode == dbItem.versionCode &&
       packageInfo.lastUpdateTime == dbItem.lastUpdatedTime &&
@@ -308,74 +308,74 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       updateTime = packageInfo.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
         dbItem.label,
-        packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
+        packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         dbItem.versionName,
-        packageInfo.versionName,
+        packageInfo.versionName
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
         dbItem.versionCode,
-        versionCode,
+        versionCode
       ),
       abiDiff = SnapshotDiffItem.DiffNode(
         dbItem.abi,
         PackageUtils.getAbi(packageInfo)
-          .toShort(),
+          .toShort()
       ),
       targetApiDiff = SnapshotDiffItem.DiffNode(
         dbItem.targetApi,
-        packageInfo.applicationInfo.targetSdkVersion.toShort(),
+        packageInfo.applicationInfo.targetSdkVersion.toShort()
       ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
         dbItem.nativeLibs,
-        PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
+        PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
       ),
       servicesDiff = SnapshotDiffItem.DiffNode(
         dbItem.services,
         PackageUtils.getComponentStringList(
           packageInfo.packageName,
           SERVICE,
-          false,
-        ).toJson().orEmpty(),
+          false
+        ).toJson().orEmpty()
       ),
       activitiesDiff = SnapshotDiffItem.DiffNode(
         dbItem.activities,
         PackageUtils.getComponentStringList(
           packageInfo.packageName,
           ACTIVITY,
-          false,
-        ).toJson().orEmpty(),
+          false
+        ).toJson().orEmpty()
       ),
       receiversDiff = SnapshotDiffItem.DiffNode(
         dbItem.receivers,
         PackageUtils.getComponentStringList(
           packageInfo.packageName,
           RECEIVER,
-          false,
-        ).toJson().orEmpty(),
+          false
+        ).toJson().orEmpty()
       ),
       providersDiff = SnapshotDiffItem.DiffNode(
         dbItem.providers,
         PackageUtils.getComponentStringList(
           packageInfo.packageName,
           PROVIDER,
-          false,
-        ).toJson().orEmpty(),
+          false
+        ).toJson().orEmpty()
       ),
       permissionsDiff = SnapshotDiffItem.DiffNode(
         dbItem.permissions,
-        packageInfo.getPermissionsList().toJson().orEmpty(),
+        packageInfo.getPermissionsList().toJson().orEmpty()
       ),
       metadataDiff = SnapshotDiffItem.DiffNode(
         dbItem.metadata,
-        PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty(),
+        PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         dbItem.packageSize,
-        PackageUtils.getPackageSize(packageInfo, true),
+        PackageUtils.getPackageSize(packageInfo, true)
       ),
-      isTrackItem = inTrackedList,
+      isTrackItem = inTrackedList
     )
     val diffIndicator = compareDiffIndicator(sdi)
     sdi.apply {
@@ -405,7 +405,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   suspend fun compareDiffWithSnapshotList(
     preTimeStamp: Long = -1L,
     preList: List<SnapshotItem>,
-    currList: List<SnapshotItem>,
+    currList: List<SnapshotItem>
   ) {
     val preMap = preList.associateBy { it.packageName }
     if (preMap.isEmpty()) {
@@ -423,7 +423,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   private suspend fun compareDiffWithSnapshotList(
     preTimeStamp: Long = -1L,
     preMap: Map<String, SnapshotItem>,
-    currMap: Map<String, SnapshotItem>,
+    currMap: Map<String, SnapshotItem>
   ) {
     if (preMap.isEmpty()) {
       return
@@ -467,8 +467,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(preItem.metadata),
           SnapshotDiffItem.DiffNode(preItem.packageSize),
           deleted = true,
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName },
-        ),
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == preItem.packageName }
+        )
       )
     }
 
@@ -492,8 +492,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(currItem.metadata),
           SnapshotDiffItem.DiffNode(currItem.packageSize),
           newInstalled = true,
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == currItem.packageName },
-        ),
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == currItem.packageName }
+        )
       )
     }
 
@@ -507,38 +507,38 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           labelDiff = SnapshotDiffItem.DiffNode(preItem.label, currItem.label),
           versionNameDiff = SnapshotDiffItem.DiffNode(
             preItem.versionName,
-            currItem.versionName,
+            currItem.versionName
           ),
           versionCodeDiff = SnapshotDiffItem.DiffNode(
             preItem.versionCode,
-            currItem.versionCode,
+            currItem.versionCode
           ),
           abiDiff = SnapshotDiffItem.DiffNode(preItem.abi, currItem.abi),
           targetApiDiff = SnapshotDiffItem.DiffNode(preItem.targetApi, currItem.targetApi),
           nativeLibsDiff = SnapshotDiffItem.DiffNode(
             preItem.nativeLibs,
-            currItem.nativeLibs,
+            currItem.nativeLibs
           ),
           servicesDiff = SnapshotDiffItem.DiffNode(preItem.services, currItem.services),
           activitiesDiff = SnapshotDiffItem.DiffNode(
             preItem.activities,
-            currItem.activities,
+            currItem.activities
           ),
           receiversDiff = SnapshotDiffItem.DiffNode(preItem.receivers, currItem.receivers),
           providersDiff = SnapshotDiffItem.DiffNode(preItem.providers, currItem.providers),
           permissionsDiff = SnapshotDiffItem.DiffNode(
             preItem.permissions,
-            currItem.permissions,
+            currItem.permissions
           ),
           metadataDiff = SnapshotDiffItem.DiffNode(
             preItem.metadata,
-            currItem.metadata,
+            currItem.metadata
           ),
           packageSizeDiff = SnapshotDiffItem.DiffNode(
             preItem.packageSize,
-            currItem.packageSize,
+            currItem.packageSize
           ),
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == currItem.packageName },
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == currItem.packageName }
         )
         compareDiffNode = compareDiffIndicator(snapshotDiffItem)
         snapshotDiffItem.added = compareDiffNode.added
@@ -558,12 +558,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   suspend fun compareItemDiff(
     timeStamp: Long = GlobalValues.snapshotTimestamp,
-    packageName: String,
+    packageName: String
   ) {
     val info = runCatching {
       PackageUtils.getPackageInfo(
         packageName,
-        PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS,
+        PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
       )
     }.getOrNull()
     val allTrackItems = repository.getTrackItems()
@@ -576,67 +576,67 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           packageInfo.lastUpdateTime,
           SnapshotDiffItem.DiffNode(
             it.label,
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
+            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
           ),
           SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
           SnapshotDiffItem.DiffNode(it.versionCode, PackageUtils.getVersionCode(packageInfo)),
           SnapshotDiffItem.DiffNode(
             it.abi,
-            PackageUtils.getAbi(packageInfo).toShort(),
+            PackageUtils.getAbi(packageInfo).toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.targetApi,
-            packageInfo.applicationInfo.targetSdkVersion.toShort(),
+            packageInfo.applicationInfo.targetSdkVersion.toShort()
           ),
           SnapshotDiffItem.DiffNode(
             it.nativeLibs,
-            PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
+            PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.services,
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               SERVICE,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.activities,
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               ACTIVITY,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.receivers,
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               RECEIVER,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.providers,
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               PROVIDER,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.permissions,
-            packageInfo.getPermissionsList().toJson().orEmpty(),
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.metadata,
-            PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty(),
+            PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             it.packageSize,
-            PackageUtils.getPackageSize(packageInfo, true),
+            PackageUtils.getPackageSize(packageInfo, true)
           ),
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName },
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
         ).also { diffItem ->
           val compareDiffNode = compareDiffIndicator(diffItem)
           diffItem.added = compareDiffNode.added
@@ -662,7 +662,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem.DiffNode(it.metadata),
           SnapshotDiffItem.DiffNode(it.packageSize),
           deleted = true,
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName },
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
         )
       }
     } ?: run {
@@ -671,54 +671,54 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
           SnapshotDiffItem.DiffNode(
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
+            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
           ),
           SnapshotDiffItem.DiffNode(packageInfo.versionName),
           SnapshotDiffItem.DiffNode(PackageUtils.getVersionCode(packageInfo)),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
+            PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               SERVICE,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               ACTIVITY,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               RECEIVER,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
             PackageUtils.getComponentStringList(
               packageInfo.packageName,
               PROVIDER,
-              false,
-            ).toJson().orEmpty(),
+              false
+            ).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            packageInfo.getPermissionsList().toJson().orEmpty(),
+            packageInfo.getPermissionsList().toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty(),
+            PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getPackageSize(packageInfo, true),
+            PackageUtils.getPackageSize(packageInfo, true)
           ),
           newInstalled = true,
-          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName },
+          isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
         )
       }
     }
@@ -748,13 +748,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           context,
           entity.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
             List::class.java,
-            LibStringItem::class.java,
+            LibStringItem::class.java
           ) ?: emptyList(),
           entity.nativeLibsDiff.new?.fromJson<List<LibStringItem>>(
             List::class.java,
-            LibStringItem::class.java,
-          ),
-        ),
+            LibStringItem::class.java
+          )
+        )
       )
       addComponentDiffInfoFromJson(list, entity.servicesDiff, SERVICE)
       addComponentDiffInfoFromJson(list, entity.activitiesDiff, ACTIVITY)
@@ -765,26 +765,26 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         getPermissionsDiffList(
           entity.permissionsDiff.old.fromJson<List<String>>(
             List::class.java,
-            String::class.java,
+            String::class.java
           ).orEmpty().toSet(),
           entity.permissionsDiff.new?.fromJson<List<String>>(
             List::class.java,
-            String::class.java,
-          )?.toSet(),
-        ),
+            String::class.java
+          )?.toSet()
+        )
       )
 
       list.addAll(
         getMetadataDiffList(
           entity.metadataDiff.old.fromJson<List<LibStringItem>>(
             List::class.java,
-            LibStringItem::class.java,
+            LibStringItem::class.java
           ) ?: emptyList(),
           entity.metadataDiff.new?.fromJson<List<LibStringItem>>(
             List::class.java,
-            LibStringItem::class.java,
-          ),
-        ),
+            LibStringItem::class.java
+          )
+        )
       )
 
       snapshotDetailItems.postValue(list)
@@ -793,7 +793,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   private fun addComponentDiffInfoFromJson(
     list: MutableList<SnapshotDetailItem>,
     diffNode: SnapshotDiffItem.DiffNode<String>,
-    @LibType libType: Int,
+    @LibType libType: Int
   ) {
     val old =
       diffNode.old.fromJson<List<String>>(List::class.java, String::class.java).orEmpty().toSet()
@@ -812,7 +812,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   private fun getNativeDiffList(
     context: Context,
     oldList: List<LibStringItem>,
-    newList: List<LibStringItem>?,
+    newList: List<LibStringItem>?
   ): List<SnapshotDetailItem> {
     val list = mutableListOf<SnapshotDetailItem>()
     if (newList == null) {
@@ -834,8 +834,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               it.name,
               extra,
               CHANGED,
-              NATIVE,
-            ),
+              NATIVE
+            )
           )
         }
         intersectList.add(item)
@@ -854,8 +854,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           item.name,
           PackageUtils.sizeToString(context, item, false),
           REMOVED,
-          NATIVE,
-        ),
+          NATIVE
+        )
       )
     }
     for (item in tempNewList) {
@@ -865,8 +865,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           item.name,
           PackageUtils.sizeToString(context, item, false),
           ADDED,
-          NATIVE,
-        ),
+          NATIVE
+        )
       )
     }
 
@@ -876,7 +876,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   private fun getComponentsDiffList(
     oldSet: Set<String>,
     newSet: Set<String>?,
-    @LibType type: Int,
+    @LibType type: Int
   ): List<SnapshotDetailItem> {
     val list = mutableListOf<SnapshotDetailItem>()
 
@@ -893,7 +893,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     for (item in addList) {
       removeList.find { it.substringAfterLast(".") == item.substringAfterLast(".") }?.let {
         list.add(
-          SnapshotDetailItem(item, String.format("%s\n$ARROW\n%s", it, item), "", MOVED, type),
+          SnapshotDetailItem(item, String.format("%s\n$ARROW\n%s", it, item), "", MOVED, type)
         )
         pendingRemovedOldSet.add(it)
         pendingRemovedNewSet.add(item)
@@ -904,12 +904,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     removeList.forEach {
       list.add(
-        SnapshotDetailItem(it, it, "", REMOVED, type),
+        SnapshotDetailItem(it, it, "", REMOVED, type)
       )
     }
     addList.forEach {
       list.add(
-        SnapshotDetailItem(it, it, "", ADDED, type),
+        SnapshotDetailItem(it, it, "", ADDED, type)
       )
     }
 
@@ -918,7 +918,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun getPermissionsDiffList(
     oldSet: Set<String>,
-    newSet: Set<String>?,
+    newSet: Set<String>?
   ): List<SnapshotDetailItem> {
     val list = mutableListOf<SnapshotDetailItem>()
 
@@ -931,12 +931,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     removeList.forEach {
       list.add(
-        SnapshotDetailItem(it, it, "", REMOVED, PERMISSION),
+        SnapshotDetailItem(it, it, "", REMOVED, PERMISSION)
       )
     }
     addList.forEach {
       list.add(
-        SnapshotDetailItem(it, it, "", ADDED, PERMISSION),
+        SnapshotDetailItem(it, it, "", ADDED, PERMISSION)
       )
     }
 
@@ -945,7 +945,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun getMetadataDiffList(
     oldList: List<LibStringItem>,
-    newList: List<LibStringItem>?,
+    newList: List<LibStringItem>?
   ): List<SnapshotDetailItem> {
     val list = mutableListOf<SnapshotDetailItem>()
 
@@ -968,8 +968,8 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               it.name,
               extra,
               CHANGED,
-              METADATA,
-            ),
+              METADATA
+            )
           )
         }
         intersectList.add(item)
@@ -983,12 +983,12 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     for (item in tempOldList) {
       list.add(
-        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), REMOVED, METADATA),
+        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), REMOVED, METADATA)
       )
     }
     for (item in tempNewList) {
       list.add(
-        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), ADDED, METADATA),
+        SnapshotDetailItem(item.name, item.name, item.source.orEmpty(), ADDED, METADATA)
       )
     }
 
@@ -999,19 +999,19 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     var added: Boolean = false,
     var removed: Boolean = false,
     var changed: Boolean = false,
-    var moved: Boolean = false,
+    var moved: Boolean = false
   )
 
   private fun compareDiffIndicator(item: SnapshotDiffItem): CompareDiffNode {
     val native = compareNativeDiff(
       item.nativeLibsDiff.old.fromJson<List<LibStringItem>>(
         List::class.java,
-        LibStringItem::class.java,
+        LibStringItem::class.java
       ) ?: emptyList(),
       item.nativeLibsDiff.new?.fromJson<List<LibStringItem>>(
         List::class.java,
-        LibStringItem::class.java,
-      ),
+        LibStringItem::class.java
+      )
     )
     val services = compareComponentsDiff(item.servicesDiff)
     val activities = compareComponentsDiff(item.activitiesDiff)
@@ -1020,22 +1020,22 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     val permissions = comparePermissionsDiff(
       item.permissionsDiff.old.fromJson<List<String>>(
         List::class.java,
-        String::class.java,
+        String::class.java
       ).orEmpty().toSet(),
       item.permissionsDiff.new?.fromJson<List<String>>(
         List::class.java,
-        String::class.java,
-      )?.toSet(),
+        String::class.java
+      )?.toSet()
     )
     val metadata = compareMetadataDiff(
       item.metadataDiff.old.fromJson<List<LibStringItem>>(
         List::class.java,
-        LibStringItem::class.java,
+        LibStringItem::class.java
       ) ?: emptyList(),
       item.metadataDiff.new?.fromJson<List<LibStringItem>>(
         List::class.java,
-        LibStringItem::class.java,
-      ),
+        LibStringItem::class.java
+      )
     )
 
     val totalNode = CompareDiffNode().apply {
@@ -1054,7 +1054,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun compareNativeDiff(
     oldList: List<LibStringItem>,
-    newList: List<LibStringItem>?,
+    newList: List<LibStringItem>?
   ): CompareDiffNode {
     if (newList == null) {
       return CompareDiffNode(removed = true)
@@ -1094,11 +1094,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     val oldSet = diffNode.old.fromJson<List<String>>(
       List::class.java,
-      String::class.java,
+      String::class.java
     ).orEmpty().toSet()
     val newSet = diffNode.new.fromJson<List<String>>(
       List::class.java,
-      String::class.java,
+      String::class.java
     ).orEmpty().toSet()
 
     val removeList = (oldSet - newSet).toMutableSet()
@@ -1128,7 +1128,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun comparePermissionsDiff(
     oldSet: Set<String>,
-    newSet: Set<String>?,
+    newSet: Set<String>?
   ): CompareDiffNode {
     if (newSet == null) {
       return CompareDiffNode(removed = true)
@@ -1149,7 +1149,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   private fun compareMetadataDiff(
     oldList: List<LibStringItem>,
-    newList: List<LibStringItem>?,
+    newList: List<LibStringItem>?
   ): CompareDiffNode {
     if (newList == null) {
       return CompareDiffNode(removed = true)
@@ -1239,7 +1239,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         val message = buildString {
           total.forEach {
             append(
-              String.format(context.getString(R.string.album_restore_detail), getFormatDateString(it.key), it.value),
+              String.format(context.getString(R.string.album_restore_detail), getFormatDateString(it.key), it.value)
             )
           }
         }
@@ -1288,7 +1288,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             it.providers,
             it.permissions,
             it.metadata,
-            it.packageSize,
+            it.packageSize
           )
           count++
         }

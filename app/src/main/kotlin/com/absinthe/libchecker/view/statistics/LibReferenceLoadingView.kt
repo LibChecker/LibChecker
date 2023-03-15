@@ -52,7 +52,7 @@ class LibReferenceLoadingView(context: Context, attributeSet: AttributeSet? = nu
     progressIndicator.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
-      measuredHeight,
+      measuredHeight
     )
   }
 

@@ -69,7 +69,7 @@ class StaticAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
     fun newInstance(packageName: String): StaticAnalysisFragment {
       return StaticAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to STATIC,
+        EXTRA_TYPE to STATIC
       )
     }
   }

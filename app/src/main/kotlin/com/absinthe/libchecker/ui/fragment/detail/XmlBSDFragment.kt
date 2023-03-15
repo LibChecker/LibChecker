@@ -20,7 +20,7 @@ class XmlBSDFragment : BaseBottomSheetViewDialogFragment<XmlBottomSheetView>() {
     root.apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
       post {

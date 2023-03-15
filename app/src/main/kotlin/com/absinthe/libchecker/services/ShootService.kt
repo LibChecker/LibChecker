@@ -194,7 +194,7 @@ class ShootService : LifecycleService() {
               dbSnapshotItem.copy().also {
                 it.id = null
                 it.timeStamp = ts
-              },
+              }
             )
           } else {
             dbList.add(
@@ -221,8 +221,8 @@ class ShootService : LifecycleService() {
                   .toJson().orEmpty(),
                 permissions = info.getPermissionsList().toJson().orEmpty(),
                 metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
-                packageSize = PackageUtils.getPackageSize(info, true),
-              ),
+                packageSize = PackageUtils.getPackageSize(info, true)
+              )
             )
           }
 
@@ -279,8 +279,8 @@ class ShootService : LifecycleService() {
                   .toJson().orEmpty(),
                 permissions = it.getPermissionsList().toJson().orEmpty(),
                 metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-                packageSize = PackageUtils.getPackageSize(it, true),
-              ),
+                packageSize = PackageUtils.getPackageSize(it, true)
+              )
             )
           }
           exceptionInfoList.removeAt(0)
@@ -344,7 +344,7 @@ class ShootService : LifecycleService() {
         it.action = Constants.ACTION_SNAPSHOT
         it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       },
-      PendingIntent.FLAG_IMMUTABLE,
+      PendingIntent.FLAG_IMMUTABLE
     )
     builder.setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)

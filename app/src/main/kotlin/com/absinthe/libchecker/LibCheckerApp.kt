@@ -52,7 +52,7 @@ class LibCheckerApp : Application() {
         this,
         BuildConfig.APP_CENTER_SECRET,
         Analytics::class.java,
-        Crashes::class.java,
+        Crashes::class.java
       )
     }
 
@@ -68,7 +68,7 @@ class LibCheckerApp : Application() {
         LCRemoteRepo.Github
       } else {
         LCRemoteRepo.Gitlab
-      },
+      }
     )
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
@@ -112,7 +112,7 @@ class LibCheckerApp : Application() {
         GlobalValues.uuid = UUID.randomUUID().toString()
       }
       return (GlobalValues.uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(
-        90000,
+        90000
       ) + 10000
     }
   }

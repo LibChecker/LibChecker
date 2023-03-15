@@ -12,5 +12,5 @@ data class SnapshotDetailItem(
   val title: String,
   val extra: String,
   val diffType: Int,
-  @LibType val itemType: Int,
+  @LibType val itemType: Int
 )

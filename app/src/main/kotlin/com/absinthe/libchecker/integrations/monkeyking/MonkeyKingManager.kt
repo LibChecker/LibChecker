@@ -42,7 +42,7 @@ class MonkeyKingManager {
     packageName: String,
     componentName: String,
     @LibType type: Int,
-    shouldBlock: Boolean,
+    shouldBlock: Boolean
   ) {
     val fullComponentName = if (componentName.startsWith(".")) {
       packageName + componentName
@@ -55,12 +55,12 @@ class MonkeyKingManager {
         ShareCmpInfo.Component(
           type = getType(type),
           name = fullComponentName,
-          block = shouldBlock,
-        ),
-      ),
+          block = shouldBlock
+        )
+      )
     )
     val bundle = bundleOf(
-      "cmp_list" to shareCmpInfo.toJson(),
+      "cmp_list" to shareCmpInfo.toJson()
     )
     try {
       context.contentResolver.call(URI_AUTHORIZATION.toUri(), "blocks", packageName, bundle)

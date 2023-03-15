@@ -17,8 +17,8 @@ class TimeNodeAddApkView(context: Context) : AViewGroup(context) {
   val name = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium,
-    ),
+      R.style.TextView_SansSerifCondensedMedium
+    )
   ).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -40,7 +40,7 @@ class TimeNodeAddApkView(context: Context) : AViewGroup(context) {
   override fun generateDefaultLayoutParams(): ViewGroup.LayoutParams {
     return ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
   }
 
@@ -49,7 +49,7 @@ class TimeNodeAddApkView(context: Context) : AViewGroup(context) {
     name.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + paddingBottom + name.measuredHeight,
+      paddingTop + paddingBottom + name.measuredHeight
     )
   }
 

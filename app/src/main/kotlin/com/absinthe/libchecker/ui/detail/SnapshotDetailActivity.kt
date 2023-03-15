@@ -74,7 +74,7 @@ class SnapshotDetailActivity :
   private val _entity by unsafeLazy {
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,
-      EXTRA_ENTITY,
+      EXTRA_ENTITY
     )
   }
 
@@ -137,14 +137,14 @@ class SnapshotDetailActivity :
         val appIconLoader = AppIconLoader(
           resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
           false,
-          this@SnapshotDetailActivity,
+          this@SnapshotDetailActivity
         )
         runCatching {
           val icon = appIconLoader.loadIcon(
             PackageUtils.getPackageInfo(
               entity.packageName,
-              PackageManager.GET_META_DATA,
-            ).applicationInfo,
+              PackageManager.GET_META_DATA
+            ).applicationInfo
           )
           load(icon)
         }
@@ -161,7 +161,7 @@ class SnapshotDetailActivity :
         entity.versionNameDiff,
         entity.versionCodeDiff,
         isNewOrDeleted,
-        "%s (%s)",
+        "%s (%s)"
       )
       snapshotTitle.targetApiView.text =
         String.format("API %s", getDiffString(entity.targetApiDiff, isNewOrDeleted))
@@ -170,7 +170,7 @@ class SnapshotDetailActivity :
         snapshotTitle.packageSizeView.isVisible = true
         val sizeDiff = SnapshotDiffItem.DiffNode(
           entity.packageSizeDiff.old.sizeToString(this@SnapshotDetailActivity),
-          entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity),
+          entity.packageSizeDiff.new?.sizeToString(this@SnapshotDetailActivity)
         )
         snapshotTitle.packageSizeView.text = getDiffString(sizeDiff, isNewOrDeleted)
       } else {
@@ -186,7 +186,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, NATIVE))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Native", this.size.toLong()),
+            EventProperties().set("Native", this.size.toLong())
           )
         }
       }
@@ -195,7 +195,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, SERVICE))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Service", this.size.toLong()),
+            EventProperties().set("Service", this.size.toLong())
           )
         }
       }
@@ -204,7 +204,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, ACTIVITY))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Activity", this.size.toLong()),
+            EventProperties().set("Activity", this.size.toLong())
           )
         }
       }
@@ -213,7 +213,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, RECEIVER))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Receiver", this.size.toLong()),
+            EventProperties().set("Receiver", this.size.toLong())
           )
         }
       }
@@ -222,7 +222,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, PROVIDER))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Provider", this.size.toLong()),
+            EventProperties().set("Provider", this.size.toLong())
           )
         }
       }
@@ -231,7 +231,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, PERMISSION))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Permission", this.size.toLong()),
+            EventProperties().set("Permission", this.size.toLong())
           )
         }
       }
@@ -240,7 +240,7 @@ class SnapshotDetailActivity :
           titleList.add(SnapshotTitleNode(this, METADATA))
           Analytics.trackEvent(
             Constants.Event.SNAPSHOT_DETAIL_COMPONENT_COUNT,
-            EventProperties().set("Metadata", this.size.toLong()),
+            EventProperties().set("Metadata", this.size.toLong())
           )
         }
       }
@@ -257,13 +257,13 @@ class SnapshotDetailActivity :
         else -> SnapshotEmptyView(this).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT
           ).also {
             it.gravity = Gravity.CENTER_HORIZONTAL
           }
           addPaddingTop(96.dp)
         }
-      },
+      }
     )
     adapter.setOnItemClickListener { _, view, position ->
       if (adapter.data[position] is SnapshotTitleNode) {
@@ -285,7 +285,7 @@ class SnapshotDetailActivity :
           this@SnapshotDetailActivity,
           item = lcItem,
           refName = item.name,
-          refType = item.itemType,
+          refType = item.itemType
         )
       }
     }
@@ -307,7 +307,7 @@ class SnapshotDetailActivity :
   private fun <T> getDiffString(
     diff: SnapshotDiffItem.DiffNode<T>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s",
+    format: String = "%s"
   ): String {
     return if (diff.old != diff.new && !isNewOrDeleted) {
       "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
@@ -320,7 +320,7 @@ class SnapshotDetailActivity :
     diff1: SnapshotDiffItem.DiffNode<*>,
     diff2: SnapshotDiffItem.DiffNode<*>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s",
+    format: String = "%s"
   ): String {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
       "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"

@@ -51,7 +51,7 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
       setOnItemLongClickListener { _, _, position ->
         ClipboardUtils.put(
           requireContext(),
-          getItem(position).item.name + ": " + getItem(position).item.source,
+          getItem(position).item.name + ": " + getItem(position).item.source
         )
         VersionCompat.showCopiedOnClipboardToast(context)
         true
@@ -75,7 +75,7 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
     fun newInstance(packageName: String): MetaDataAnalysisFragment {
       return MetaDataAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to METADATA,
+        EXTRA_TYPE to METADATA
       )
     }
   }

@@ -44,7 +44,7 @@ abstract class AViewGroup(context: Context, attributeSet: AttributeSet? = null) 
   protected fun View.autoMeasure() {
     measure(
       this.defaultWidthMeasureSpec(parentView = this@AViewGroup),
-      this.defaultHeightMeasureSpec(parentView = this@AViewGroup),
+      this.defaultHeightMeasureSpec(parentView = this@AViewGroup)
     )
   }
 

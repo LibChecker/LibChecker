@@ -60,7 +60,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     EmptyListView(requireContext()).apply {
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.WRAP_CONTENT,
+        FrameLayout.LayoutParams.WRAP_CONTENT
       ).also {
         it.gravity = Gravity.CENTER_HORIZONTAL
       }
@@ -71,7 +71,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   protected val dividerItemDecoration by lazy {
     DividerItemDecoration(
       requireContext(),
-      DividerItemDecoration.VERTICAL,
+      DividerItemDecoration.VERTICAL
     )
   }
   protected var isListReady = false

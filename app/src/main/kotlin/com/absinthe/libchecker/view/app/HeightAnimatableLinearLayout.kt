@@ -19,7 +19,7 @@ class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
   constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
     context,
     attrs,
-    defStyle,
+    defStyle
   )
 
   override fun onAttachedToWindow() {
@@ -42,7 +42,7 @@ class HeightAnimatableLinearLayout : LinearLayout, View.OnLayoutChangeListener {
     oldLeft: Int,
     oldTop: Int,
     oldRight: Int,
-    oldBottom: Int,
+    oldBottom: Int
   ) {
     if ((bottom - top) != (oldBottom - oldTop)) {
       enqueueAnimation {

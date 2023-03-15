@@ -14,7 +14,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
       }
@@ -24,8 +24,8 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
   val className = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium,
-    ),
+      R.style.TextView_SansSerifCondensedMedium
+    )
   ).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -47,7 +47,7 @@ class AlternativeLaunchItemView(context: Context) : AViewGroup(context) {
     className.measure(textWidth.toExactlyMeasureSpec(), className.defaultHeightMeasureSpec(this))
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + paddingBottom + label.measuredHeight + className.measuredHeight,
+      paddingTop + paddingBottom + label.measuredHeight + className.measuredHeight
     )
   }
 

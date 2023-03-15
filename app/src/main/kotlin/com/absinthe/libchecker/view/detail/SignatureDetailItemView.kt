@@ -14,7 +14,7 @@ class SignatureDetailItemView(context: Context) : LinearLayout(context) {
   val type = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.gravity = Gravity.START
     }
@@ -25,7 +25,7 @@ class SignatureDetailItemView(context: Context) : LinearLayout(context) {
   val content = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 4.dp
       it.gravity = Gravity.START
@@ -35,7 +35,7 @@ class SignatureDetailItemView(context: Context) : LinearLayout(context) {
   init {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     )
     orientation = VERTICAL
     setPadding(8.dp, 2.dp, 8.dp, 2.dp)

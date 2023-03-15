@@ -31,7 +31,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -42,7 +42,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       addView(this)
@@ -86,7 +86,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
     libName.measure(libNameWidth.toExactlyMeasureSpec(), libName.defaultHeightMeasureSpec(this))
     libDetail.measure(
       libNameWidth.toExactlyMeasureSpec(),
-      libDetail.defaultHeightMeasureSpec(this),
+      libDetail.defaultHeightMeasureSpec(this)
     )
     chip?.autoMeasure()
     setMeasuredDimension(
@@ -96,7 +96,7 @@ class StaticLibItemView(context: Context) : AViewGroup(context) {
           chip?.measuredHeight
             ?: 0
           ) + paddingTop + paddingBottom
-        ).coerceAtLeast(40.dp),
+        ).coerceAtLeast(40.dp)
     )
   }
 

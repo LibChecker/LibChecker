@@ -33,7 +33,7 @@ class WorkerService : LifecycleService() {
         initAllApplicationInfoItems()
         notifyPackagesChanged(
           intent?.data?.encodedSchemeSpecificPart.orEmpty(),
-          intent?.action.orEmpty(),
+          intent?.action.orEmpty()
         )
       }
     }
@@ -82,7 +82,7 @@ class WorkerService : LifecycleService() {
       AppItemRepository.allPackageInfoMap.putAll(
         PackageUtils.getAppsList().asSequence()
           .map { it.packageName to it }
-          .toMap(),
+          .toMap()
       )
       Global.applicationListJob = null
     }.also {

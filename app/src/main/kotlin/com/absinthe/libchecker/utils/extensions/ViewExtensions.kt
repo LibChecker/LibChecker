@@ -91,7 +91,7 @@ fun TextView.tintHighlightText(highlightText: String, rawText: CharSequence) {
       ForegroundColorSpan(color),
       start,
       start + highlightText.length,
-      Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
+      Spannable.SPAN_INCLUSIVE_EXCLUSIVE
     )
     builder.append(spannableString)
     text = builder
@@ -106,7 +106,7 @@ fun TextView.tintTextToPrimary() {
     ForegroundColorSpan(color),
     0,
     text.length,
-    Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
+    Spannable.SPAN_INCLUSIVE_EXCLUSIVE
   )
   builder.append(spannableString)
   text = builder
@@ -116,7 +116,7 @@ fun ViewPager2.setCurrentItem(
   item: Int,
   duration: Long,
   interpolator: TimeInterpolator = AccelerateDecelerateInterpolator(),
-  pagePxWidth: Int = width,
+  pagePxWidth: Int = width
 ) {
   val pxToDrag: Int = pagePxWidth * (item - currentItem)
   val animator = ValueAnimator.ofInt(0, pxToDrag)

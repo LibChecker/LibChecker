@@ -45,7 +45,7 @@ class AppInfoBottomSheetDialogFragment :
     root.apply {
       layoutParams = ViewGroup.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       )
       setPadding(24.dp, 16.dp, 24.dp, 0)
     }
@@ -60,7 +60,7 @@ class AppInfoBottomSheetDialogFragment :
         activity?.let {
           AlternativeLaunchBSDFragment().apply {
             arguments = bundleOf(
-              EXTRA_PACKAGE_NAME to packageName,
+              EXTRA_PACKAGE_NAME to packageName
             )
             show(it.supportFragmentManager, AlternativeLaunchBSDFragment::class.java.name)
           }
@@ -107,14 +107,14 @@ class AppInfoBottomSheetDialogFragment :
   private fun getResolveInfoList(): List<AppInfoAdapter.AppInfoItem> {
     return PackageManagerCompat.queryIntentActivities(
       Intent(Intent.ACTION_SHOW_APP_INFO),
-      PackageManager.MATCH_DEFAULT_ONLY,
+      PackageManager.MATCH_DEFAULT_ONLY
     ).filter { it.activityInfo.packageName != BuildConfig.APPLICATION_ID }
       .map {
         AppInfoAdapter.AppInfoItem(
           it.activityInfo,
           Intent(Intent.ACTION_SHOW_APP_INFO)
             .setComponent(ComponentName(it.activityInfo.packageName, it.activityInfo.name))
-            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName),
+            .putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
         )
       }
   }
@@ -138,12 +138,12 @@ class AppInfoBottomSheetDialogFragment :
           .setComponent(
             ComponentName(
               Constants.PackageNames.MATERIAL_FILES,
-              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity",
-            ),
+              "${Constants.PackageNames.MATERIAL_FILES}.filelist.FileListActivity"
+            )
           )
           .putExtra("org.openintents.extra.ABSOLUTE_PATH", sourceDir)
-          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
-      ),
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+      )
     )
   }
 

@@ -83,7 +83,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
               movementMethod = LinkMovementMethod.getInstance()
               text = HtmlCompat.fromHtml(
                 "<a href='${it.relativeUrl}'> ${it.relativeUrl} </a>",
-                HtmlCompat.FROM_HTML_MODE_LEGACY,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
               )
             }
           }
@@ -100,8 +100,8 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
                     root.libDetailContentView.setUpdatedTime(
                       String.format(
                         getString(R.string.format_last_updated),
-                        date,
-                      ),
+                        date
+                      )
                     )
                   }
                 }
@@ -151,13 +151,13 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
       libName: String,
       @LibType type: Int,
       regexName: String? = null,
-      isValidLib: Boolean = true,
+      isValidLib: Boolean = true
     ): LibDetailDialogFragment {
       return LibDetailDialogFragment().putArguments(
         EXTRA_LIB_NAME to libName,
         EXTRA_LIB_TYPE to type,
         EXTRA_REGEX_NAME to regexName,
-        EXTRA_IS_VALID_LIB to isValidLib,
+        EXTRA_IS_VALID_LIB to isValidLib
       )
     }
 

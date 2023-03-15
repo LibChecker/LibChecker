@@ -7,5 +7,5 @@ import androidx.room.PrimaryKey
 data class SnapshotDiffStoringItem(
   @PrimaryKey val packageName: String,
   val lastUpdatedTime: Long,
-  val diffContent: String,
+  val diffContent: String
 )

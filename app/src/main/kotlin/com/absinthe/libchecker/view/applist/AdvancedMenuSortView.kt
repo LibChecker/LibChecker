@@ -21,7 +21,7 @@ class AdvancedMenuSortView(context: Context) :
   private val title = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.WRAP_CONTENT,
-      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     )
     setTypeface(null, Typeface.BOLD)
     text = context.getString(R.string.adv_sort_mode)
@@ -30,7 +30,7 @@ class AdvancedMenuSortView(context: Context) :
   private val toggleGroup = MaterialButtonToggleGroup(context).apply {
     layoutParams = LayoutParams(
       LayoutParams.WRAP_CONTENT,
-      LayoutParams.WRAP_CONTENT,
+      LayoutParams.WRAP_CONTENT
     )
     isSelectionRequired = true
     isSingleSelection = true
@@ -49,7 +49,7 @@ class AdvancedMenuSortView(context: Context) :
     isHorizontalScrollBarEnabled = false
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT
     ).also {
       it.topMargin = 8.dp
     }
@@ -67,12 +67,12 @@ class AdvancedMenuSortView(context: Context) :
 
   private fun addButton(context: Context, titleRes: Int, viewId: Int) {
     val chip = MaterialButton(
-      ContextThemeWrapper(context, R.style.App_Widget_AdvancedMenuToggle),
+      ContextThemeWrapper(context, R.style.App_Widget_AdvancedMenuToggle)
     ).apply {
       id = viewId
       layoutParams = LayoutParams(
         LayoutParams.WRAP_CONTENT,
-        LayoutParams.WRAP_CONTENT,
+        LayoutParams.WRAP_CONTENT
       )
       text = context.getString(titleRes)
     }
@@ -82,7 +82,7 @@ class AdvancedMenuSortView(context: Context) :
   override fun onButtonChecked(
     group: MaterialButtonToggleGroup?,
     checkedId: Int,
-    isChecked: Boolean,
+    isChecked: Boolean
   ) {
     var options = GlobalValues.advancedOptions
     when (checkedId) {

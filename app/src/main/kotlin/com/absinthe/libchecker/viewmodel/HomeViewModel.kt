@@ -159,7 +159,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
             variant = if (isHarmony && bundleManager?.getBundleInfo(
                 info.packageName,
-                IBundleManager.GET_BUNDLE_DEFAULT,
+                IBundleManager.GET_BUNDLE_DEFAULT
               ) != null
             ) {
               Constants.VARIANT_HAP
@@ -178,7 +178,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               abi = abiType.toShort(),
               features = -1 /* delay init */,
               targetApi = ai.targetSdkVersion.toShort(),
-              variant = variant,
+              variant = variant
             )
 
             lcItems.add(lcItem)
@@ -222,7 +222,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   private suspend fun requestChangeImpl(
     packageManager: PackageManager,
-    needRefresh: Boolean = false,
+    needRefresh: Boolean = false
   ) {
     Timber.d("Request change: START")
     val timeRecorder = TimeRecorder()
@@ -255,7 +255,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             if (versionCode != dbItem.versionCode || it.lastUpdateTime != dbItem.lastUpdatedTime || dbItem.lastUpdatedTime == 0L) {
               variant = if (isHarmony && bundleManager?.getBundleInfo(
                   it.packageName,
-                  IBundleManager.GET_BUNDLE_DEFAULT,
+                  IBundleManager.GET_BUNDLE_DEFAULT
                 ) != null
               ) {
                 Constants.VARIANT_HAP
@@ -274,7 +274,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 PackageUtils.getAbi(it).toShort(),
                 it.getFeatures(),
                 ai.targetSdkVersion.toShort(),
-                variant,
+                variant
               )
               update(lcItem)
             }
@@ -295,7 +295,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
           variant = if (isHarmony && bundleManager?.getBundleInfo(
               info.packageName,
-              IBundleManager.GET_BUNDLE_DEFAULT,
+              IBundleManager.GET_BUNDLE_DEFAULT
             ) != null
           ) {
             Constants.VARIANT_HAP
@@ -314,7 +314,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             PackageUtils.getAbi(info).toShort(),
             info.getFeatures(),
             ai.targetSdkVersion.toShort(),
-            variant,
+            variant
           )
 
           insert(lcItem)
@@ -373,22 +373,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       collectComponentPopularLibraries(
         appList,
         SERVICE,
-        "Service",
+        "Service"
       )
       collectComponentPopularLibraries(
         appList,
         ACTIVITY,
-        "Activity",
+        "Activity"
       )
       collectComponentPopularLibraries(
         appList,
         RECEIVER,
-        "Receiver",
+        "Receiver"
       )
       collectComponentPopularLibraries(
         appList,
         PROVIDER,
-        "Provider",
+        "Provider"
       )
     } catch (ignore: Exception) {
       Timber.e(ignore, "collectPopularLibraries failed")
@@ -398,7 +398,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private suspend fun collectComponentPopularLibraries(
     appList: Collection<PackageInfo>,
     @LibType type: Int,
-    label: String,
+    label: String
   ) {
     val map = HashMap<String, Int>()
     var compLibList: List<StatefulComponent>
@@ -623,7 +623,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computeComponentReference(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    @LibType type: Int,
+    @LibType type: Int
   ) {
     try {
       when (type) {
@@ -632,34 +632,34 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           computeNativeReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getNativeDirLibs(packageInfo),
+            PackageUtils.getNativeDirLibs(packageInfo)
           )
         }
         SERVICE -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_SERVICES,
+            PackageManager.GET_SERVICES
           )
           computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.services)
         }
         ACTIVITY -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_ACTIVITIES,
+            PackageManager.GET_ACTIVITIES
           )
           computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.activities)
         }
         RECEIVER -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_RECEIVERS,
+            PackageManager.GET_RECEIVERS
           )
           computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.receivers)
         }
         PROVIDER -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_PROVIDERS,
+            PackageManager.GET_PROVIDERS
           )
           computeComponentReferenceInternal(referenceMap, packageName, type, packageInfo.providers)
         }
@@ -667,29 +667,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           computeDexReferenceInternal(
             referenceMap,
             packageName,
-            PackageUtils.getDexList(packageName),
+            PackageUtils.getDexList(packageName)
           )
         }
         PERMISSION -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_PERMISSIONS,
+            PackageManager.GET_PERMISSIONS
           )
           computePermissionReferenceInternal(
             referenceMap,
             packageName,
-            packageInfo.requestedPermissions,
+            packageInfo.requestedPermissions
           )
         }
         METADATA -> {
           val packageInfo = PackageUtils.getPackageInfo(
             packageName,
-            PackageManager.GET_META_DATA,
+            PackageManager.GET_META_DATA
           )
           computeMetadataReferenceInternal(
             referenceMap,
             packageName,
-            packageInfo.applicationInfo.metaData,
+            packageInfo.applicationInfo.metaData
           )
         }
       }
@@ -701,7 +701,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computeNativeReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    list: List<LibStringItem>,
+    list: List<LibStringItem>
   ) {
     list.forEach {
       if (referenceMap[it.name] == null) {
@@ -717,7 +717,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
     @LibType type: Int,
-    components: Array<out ComponentInfo>?,
+    components: Array<out ComponentInfo>?
   ) {
     components?.forEach {
       if (referenceMap[it.name] == null) {
@@ -730,7 +730,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computeDexReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    list: List<LibStringItem>,
+    list: List<LibStringItem>
   ) {
     list.forEach {
       if (referenceMap[it.name] == null) {
@@ -743,7 +743,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computePermissionReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    list: Array<out String>?,
+    list: Array<out String>?
   ) {
     list?.forEach {
       if (referenceMap[it] == null) {
@@ -756,7 +756,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun computeMetadataReferenceInternal(
     referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>,
     packageName: String,
-    bundle: Bundle?,
+    bundle: Bundle?
   ) {
     bundle?.keySet()?.forEach {
       if (referenceMap[it] == null) {
@@ -769,7 +769,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private var matchingJob: Job? = null
 
   fun matchingRules(
-    @LibType type: Int,
+    @LibType type: Int
   ) {
     matchingJob = viewModelScope.launch(Dispatchers.IO) {
       referenceMap?.let { map ->
@@ -796,7 +796,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               chip = LibChip(
                 iconRes = it.iconRes,
                 name = it.label,
-                regexName = it.regexName,
+                regexName = it.regexName
               )
             }
             if (type != NOT_MARKED) {
@@ -805,8 +805,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                   entry.key,
                   chip,
                   entry.value.first,
-                  entry.value.second,
-                ),
+                  entry.value.second
+                )
               )
             } else {
               if (rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA) {
@@ -815,8 +815,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     entry.key,
                     null,
                     entry.value.first,
-                    entry.value.second,
-                  ),
+                    entry.value.second
+                  )
                 )
               }
             }

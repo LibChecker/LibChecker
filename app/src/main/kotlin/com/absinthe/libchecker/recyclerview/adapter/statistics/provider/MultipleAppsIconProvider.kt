@@ -28,12 +28,12 @@ class MultipleAppsIconProvider : BaseNodeProvider() {
       MultipleAppsIconItemView(ContextThemeWrapper(context, R.style.AppListMaterialCard)).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
         ).also {
           val margin = context.getDimensionPixelSize(R.dimen.main_card_margin)
           it.setMargins(0, margin, 0, margin)
         }
-      },
+      }
     )
   }
 

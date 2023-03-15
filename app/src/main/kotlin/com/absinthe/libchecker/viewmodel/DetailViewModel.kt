@@ -100,7 +100,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
 
         list.addAll(
-          getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk)),
+          getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk))
         )
       }
     } catch (e: PackageManager.NameNotFoundException) {
@@ -213,13 +213,13 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
         } catch (t: Throwable) {
           Timber.e(t, "DetailViewModel")
           null
-        },
+        }
       )
     }
 
   private suspend fun getNativeChipList(
     info: ApplicationInfo,
-    specifiedAbi: Int? = null,
+    specifiedAbi: Int? = null
   ): List<LibStringItemChip> {
     val list =
       PackageUtils.getNativeDirLibs(packageInfo, specifiedAbi = specifiedAbi).toMutableList()
@@ -234,7 +234,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           LibChip(
             iconRes = rule.iconRes,
             name = rule.label,
-            regexName = rule.regexName,
+            regexName = rule.regexName
           )
         }
         chipList.add(LibStringItemChip(it, chip))
@@ -263,7 +263,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           chip = LibChip(
             iconRes = rule.iconRes,
             name = rule.label,
-            regexName = rule.regexName,
+            regexName = rule.regexName
           )
         }
         chipList.add(LibStringItemChip(it, chip))
@@ -323,7 +323,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
           chip = LibChip(
             iconRes = rule.iconRes,
             name = rule.label,
-            regexName = rule.regexName,
+            regexName = rule.regexName
           )
         }
         chipList.add(LibStringItemChip(it, chip))
@@ -355,7 +355,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(
         packageName,
-        IBundleManager.GET_BUNDLE_WITH_ABILITIES,
+        IBundleManager.GET_BUNDLE_WITH_ABILITIES
       )?.abilityInfos?.let { abilities ->
         val pages = abilities.asSequence()
           .filter { it.type == AbilityInfo.AbilityType.PAGE }
@@ -364,7 +364,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
               it.className,
               it.enabled,
               false,
-              it.process.removePrefix((it.bundleName)),
+              it.process.removePrefix((it.bundleName))
             )
           }
           .toList()
@@ -375,7 +375,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
               it.className,
               it.enabled,
               false,
-              it.process.removePrefix((it.bundleName)),
+              it.process.removePrefix((it.bundleName))
             )
           }
           .toList()
@@ -386,7 +386,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
               it.className,
               it.enabled,
               false,
-              it.process.removePrefix((it.bundleName)),
+              it.process.removePrefix((it.bundleName))
             )
           }
           .toList()
@@ -397,7 +397,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
               it.className,
               it.enabled,
               false,
-              it.process.removePrefix((it.bundleName)),
+              it.process.removePrefix((it.bundleName))
             )
           }
           .toList()

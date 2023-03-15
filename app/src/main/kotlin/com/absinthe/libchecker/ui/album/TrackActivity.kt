@@ -107,7 +107,7 @@ class TrackActivity :
           TrackListItem(
             label = it.applicationInfo.loadLabel(packageManager).toString(),
             packageName = it.packageName,
-            switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName },
+            switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )
         }
         .sortedByDescending { it.switchState }
@@ -121,11 +121,11 @@ class TrackActivity :
           EmptyListView(this@TrackActivity).apply {
             layoutParams = FrameLayout.LayoutParams(
               FrameLayout.LayoutParams.MATCH_PARENT,
-              FrameLayout.LayoutParams.MATCH_PARENT,
+              FrameLayout.LayoutParams.MATCH_PARENT
             ).also {
               it.gravity = Gravity.CENTER
             }
-          },
+          }
         )
       }
     }
@@ -172,7 +172,7 @@ class TrackActivity :
       list.asSequence()
         .filter { it.label.contains(newText, true) || it.packageName.contains(newText) }
         .sortedByDescending { it.switchState }
-        .toMutableList(),
+        .toMutableList()
     )
     return false
   }

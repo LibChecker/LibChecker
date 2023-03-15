@@ -9,5 +9,5 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "timestamp_table")
 data class TimeStampItem(
   @PrimaryKey val timestamp: Long,
-  val topApps: String?,
+  val topApps: String?
 ) : Parcelable

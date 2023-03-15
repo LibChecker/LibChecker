@@ -39,7 +39,7 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
       id = android.R.id.title
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
       }
@@ -156,14 +156,14 @@ class ComponentLibItemView(context: Context) : AViewGroup(context) {
           topCornerControl.x,
           topCornerControl.y,
           topCornerEnd.x,
-          topCornerEnd.y,
+          topCornerEnd.y
         )
         lineTo(bottomCornerEnd.x, bottomCornerEnd.y)
         quadTo(
           bottomCornerControl.x,
           bottomCornerControl.y,
           bottomCornerStart.x,
-          bottomCornerStart.y,
+          bottomCornerStart.y
         )
         close()
       }

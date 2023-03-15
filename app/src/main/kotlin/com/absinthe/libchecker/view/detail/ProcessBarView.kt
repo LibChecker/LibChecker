@@ -41,7 +41,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       (view as? ProcessBarItemView)?.setTarget(view.isSelected)
       action(
         view.isSelected,
-        processBarAdapter.data[position].process,
+        processBarAdapter.data[position].process
       )
 
       (0 until processBarAdapter.itemCount).forEach {
@@ -74,12 +74,12 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
     val text = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifCondensedMedium,
-      ),
+        R.style.TextView_SansSerifCondensedMedium
+      )
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 2.dp
       }
@@ -96,7 +96,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
         ScaleAnimation.RELATIVE_TO_SELF,
         0.5f,
         ScaleAnimation.RELATIVE_TO_SELF,
-        0.5f,
+        0.5f
       ).apply {
         duration = 1000
         repeatCount = Animation.INFINITE
@@ -129,7 +129,7 @@ class ProcessBarView(context: Context) : RecyclerView(context) {
       text.autoMeasure()
       setMeasuredDimension(
         paddingStart + colorIndicator.measuredWidth + text.marginStart + text.measuredWidth + paddingEnd,
-        paddingTop + paddingBottom + colorIndicator.measuredHeight.coerceAtLeast(text.measuredHeight),
+        paddingTop + paddingBottom + colorIndicator.measuredHeight.coerceAtLeast(text.measuredHeight)
       )
     }
 

@@ -11,7 +11,7 @@ class LibStringDiffUtil : DiffUtil.ItemCallback<LibStringItemChip>() {
 
   override fun areContentsTheSame(
     oldItem: LibStringItemChip,
-    newItem: LibStringItemChip,
+    newItem: LibStringItemChip
   ): Boolean {
     return oldItem.item == newItem.item && oldItem.chip == newItem.chip
   }
