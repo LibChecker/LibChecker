@@ -259,7 +259,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "roomDatabase is missing",
-        OnCompleteListener.EXIT_CODE_ERROR_ROOM_DATABASE_MISSING
+        OnCompleteListener.EXIT_CODE_ERROR_ROOM_DATABASE_MISSING,
       )
       //        throw IllegalArgumentException("roomDatabase is not initialized")
       return false
@@ -274,14 +274,14 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         BACKUP_FILE_LOCATION_INTERNAL,
         BACKUP_FILE_LOCATION_EXTERNAL,
         BACKUP_FILE_LOCATION_CUSTOM_DIALOG,
-        BACKUP_FILE_LOCATION_CUSTOM_FILE
+        BACKUP_FILE_LOCATION_CUSTOM_FILE,
       )
     ) {
       if (enableLogDebug) Log.d(TAG, "backupLocation is missing")
       onCompleteListener?.onComplete(
         false,
         "backupLocation is missing",
-        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_MISSING
+        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_MISSING,
       )
       return false
     }
@@ -293,7 +293,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "backupLocation is set to custom backup file, but no file is defined",
-        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_FILE_MISSING
+        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_LOCATION_FILE_MISSING,
       )
       return false
     }
@@ -305,7 +305,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       SHARED_PREFS,
       masterKeyAlias,
       EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-      EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+      EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
     )
 
     dbName = roomDatabase!!.openHelper.databaseName!!
@@ -475,7 +475,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "error during encryption",
-        OnCompleteListener.EXIT_CODE_ERROR_ENCRYPTION_ERROR
+        OnCompleteListener.EXIT_CODE_ERROR_ENCRYPTION_ERROR,
       )
       return null
     }
@@ -528,7 +528,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "No backups available",
-        OnCompleteListener.EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE
+        OnCompleteListener.EXIT_CODE_ERROR_RESTORE_NO_BACKUPS_AVAILABLE,
       )
       Toast.makeText(context, "No backups available to restore", Toast.LENGTH_SHORT).show()
       return
@@ -561,7 +561,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         onCompleteListener?.onComplete(
           false,
           "Restore dialog canceled",
-          OnCompleteListener.EXIT_CODE_ERROR_BY_USER_CANCELED
+          OnCompleteListener.EXIT_CODE_ERROR_BY_USER_CANCELED,
         )
       }
       .show()
@@ -591,7 +591,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
         onCompleteListener?.onComplete(
           false,
           "cannot restore database, see Log for more details (if enabled)",
-          OnCompleteListener.EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED
+          OnCompleteListener.EXIT_CODE_ERROR_RESTORE_BACKUP_IS_ENCRYPTED,
         )
         return
       }
@@ -690,7 +690,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "error during decryption (wrong password) see Log for more details (if enabled)",
-        OnCompleteListener.EXIT_CODE_ERROR_WRONG_DECRYPTION_PASSWORD
+        OnCompleteListener.EXIT_CODE_ERROR_WRONG_DECRYPTION_PASSWORD,
       )
       return null
     } catch (e: Exception) {
@@ -698,7 +698,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "error during decryption see Log for more details (if enabled)",
-        OnCompleteListener.EXIT_CODE_ERROR_DECRYPTION_ERROR
+        OnCompleteListener.EXIT_CODE_ERROR_DECRYPTION_ERROR,
       )
       return null
     }
@@ -716,7 +716,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
           onCompleteListener?.onComplete(
             false,
             "storage permissions are required, please allow!",
-            OnCompleteListener.EXIT_CODE_ERROR_STORAGE_PERMISSONS_NOT_GRANTED
+            OnCompleteListener.EXIT_CODE_ERROR_STORAGE_PERMISSONS_NOT_GRANTED,
           )
           return@registerForActivityResult
         }
@@ -744,7 +744,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "failure",
-        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CHOOSER
+        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CHOOSER,
       )
     }
 
@@ -761,7 +761,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "failure",
-        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR
+        OnCompleteListener.EXIT_CODE_ERROR_BACKUP_FILE_CREATOR,
       )
     }
 
@@ -811,7 +811,7 @@ class RoomBackup(var context: Context) : FragmentActivity() {
       onCompleteListener?.onComplete(
         false,
         "maxFileCount: Failed to get list of backups",
-        OnCompleteListener.EXIT_CODE_ERROR
+        OnCompleteListener.EXIT_CODE_ERROR,
       )
       return false
     } else if (arrayOfFiles.size > maxFileCount!!) {

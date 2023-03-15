@@ -18,10 +18,10 @@ import com.absinthe.rulesbundle.LCRules
   entities = [
     LCItem::class,
     SnapshotItem::class, TimeStampItem::class,
-    TrackItem::class, SnapshotDiffStoringItem::class
+    TrackItem::class, SnapshotDiffStoringItem::class,
   ],
   version = 20,
-  exportSchema = true
+  exportSchema = true,
 )
 abstract class LCDatabase : RoomDatabase() {
 
@@ -42,7 +42,7 @@ abstract class LCDatabase : RoomDatabase() {
         val instance = Room.databaseBuilder(
           context.applicationContext,
           LCDatabase::class.java,
-          "lc_database"
+          "lc_database",
         )
           .addMigrations(
             MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4,
@@ -51,7 +51,7 @@ abstract class LCDatabase : RoomDatabase() {
             MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
             MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16,
             MIGRATION_16_17, MIGRATION_17_18, MIGRATION_18_19,
-            MIGRATION_19_20
+            MIGRATION_19_20,
           )
           .createFromAsset(LCRules.getRulesAssetPath())
           .build()
@@ -81,7 +81,7 @@ abstract class LCDatabase : RoomDatabase() {
             "activities TEXT NOT NULL, " +
             "receivers TEXT NOT NULL, " +
             "providers TEXT NOT NULL, " +
-            "PRIMARY KEY(packageName))"
+            "PRIMARY KEY(packageName))",
         )
       }
     }
@@ -89,10 +89,10 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN isSplitApk INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE item_table ADD COLUMN isSplitApk INTEGER NOT NULL DEFAULT 0",
         )
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN isKotlinUsed INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE item_table ADD COLUMN isKotlinUsed INTEGER NOT NULL DEFAULT 0",
         )
       }
     }
@@ -100,10 +100,10 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE snapshot_table ADD COLUMN timeStamp INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE snapshot_table ADD COLUMN timeStamp INTEGER NOT NULL DEFAULT 0",
         )
         database.execSQL(
-          "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL DEFAULT '[]'"
+          "ALTER TABLE snapshot_table ADD COLUMN permissions TEXT NOT NULL DEFAULT '[]'",
         )
       }
     }
@@ -111,7 +111,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_4_5: Migration = object : Migration(4, 5) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "CREATE TABLE timestamp_table (timestamp INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(timestamp))"
+          "CREATE TABLE timestamp_table (timestamp INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(timestamp))",
         )
       }
     }
@@ -135,7 +135,7 @@ abstract class LCDatabase : RoomDatabase() {
             "targetApi INTEGER NOT NULL, nativeLibs TEXT NOT NULL, " +
             "services TEXT NOT NULL, activities TEXT NOT NULL, " +
             "receivers TEXT NOT NULL, providers TEXT NOT NULL, " +
-            "permissions TEXT NOT NULL, PRIMARY KEY(id))"
+            "permissions TEXT NOT NULL, PRIMARY KEY(id))",
         )
         // Copy the data
         database.execSQL(
@@ -157,7 +157,7 @@ abstract class LCDatabase : RoomDatabase() {
             "nativeLibs, services, " +
             "activities, receivers, " +
             "providers, permissions " +
-            "FROM snapshot_table"
+            "FROM snapshot_table",
         )
         // Remove the old table
         database.execSQL("DROP TABLE snapshot_table")
@@ -169,7 +169,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_7_8: Migration = object : Migration(7, 8) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "CREATE TABLE track_table (packageName TEXT NOT NULL, PRIMARY KEY(packageName))"
+          "CREATE TABLE track_table (packageName TEXT NOT NULL, PRIMARY KEY(packageName))",
         )
       }
     }
@@ -177,7 +177,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_8_9: Migration = object : Migration(8, 9) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "CREATE TABLE rules_table (name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL, iconIndex INTEGER NOT NULL, isRegexRule INTEGER NOT NULL, PRIMARY KEY(name))"
+          "CREATE TABLE rules_table (name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL, iconIndex INTEGER NOT NULL, isRegexRule INTEGER NOT NULL, PRIMARY KEY(name))",
         )
       }
     }
@@ -185,7 +185,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_9_10: Migration = object : Migration(9, 10) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE rules_table ADD COLUMN regexName TEXT"
+          "ALTER TABLE rules_table ADD COLUMN regexName TEXT",
         )
       }
     }
@@ -193,7 +193,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_10_11: Migration = object : Migration(10, 11) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN targetApi INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE item_table ADD COLUMN targetApi INTEGER NOT NULL DEFAULT 0",
         )
       }
     }
@@ -201,7 +201,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_11_12: Migration = object : Migration(11, 12) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "CREATE TABLE diff_table (packageName TEXT NOT NULL, lastUpdatedTime INTEGER NOT NULL, diffContent TEXT NOT NULL, PRIMARY KEY(packageName))"
+          "CREATE TABLE diff_table (packageName TEXT NOT NULL, lastUpdatedTime INTEGER NOT NULL, diffContent TEXT NOT NULL, PRIMARY KEY(packageName))",
         )
       }
     }
@@ -210,7 +210,7 @@ abstract class LCDatabase : RoomDatabase() {
       override fun migrate(database: SupportSQLiteDatabase) {
         // Create the new table
         database.execSQL(
-          "CREATE TABLE rules_new (_id INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))"
+          "CREATE TABLE rules_new (_id INTEGER NOT NULL DEFAULT 0, name TEXT NOT NULL, label TEXT NOT NULL, type INTEGER NOT NULL DEFAULT 0, iconIndex INTEGER NOT NULL DEFAULT 0, isRegexRule INTEGER NOT NULL DEFAULT 0, regexName TEXT, PRIMARY KEY(_id))",
         )
         // Remove the old table
         database.execSQL("DROP TABLE rules_table")
@@ -235,7 +235,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_15_16: Migration = object : Migration(15, 16) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE item_table ADD COLUMN variant INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE item_table ADD COLUMN variant INTEGER NOT NULL DEFAULT 0",
         )
       }
     }
@@ -243,7 +243,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_16_17: Migration = object : Migration(16, 17) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'"
+          "ALTER TABLE snapshot_table ADD COLUMN metadata TEXT NOT NULL DEFAULT '[]'",
         )
       }
     }
@@ -259,7 +259,7 @@ abstract class LCDatabase : RoomDatabase() {
             "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
             "isSplitApk INTEGER NOT NULL, isKotlinUsed INTEGER, " +
             "targetApi INTEGER NOT NULL, variant INTEGER NOT NULL, " +
-            "PRIMARY KEY(packageName))"
+            "PRIMARY KEY(packageName))",
         )
         // Copy the data
         database.execSQL(
@@ -278,7 +278,7 @@ abstract class LCDatabase : RoomDatabase() {
             "lastUpdatedTime, isSystem, " +
             "abi, isSplitApk, " +
             "isKotlinUsed, targetApi, variant " +
-            "FROM item_table"
+            "FROM item_table",
         )
         // Remove the old table
         database.execSQL("DROP TABLE item_table")
@@ -290,7 +290,7 @@ abstract class LCDatabase : RoomDatabase() {
     private val MIGRATION_18_19: Migration = object : Migration(18, 19) {
       override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
-          "ALTER TABLE snapshot_table ADD COLUMN packageSize INTEGER NOT NULL DEFAULT 0"
+          "ALTER TABLE snapshot_table ADD COLUMN packageSize INTEGER NOT NULL DEFAULT 0",
         )
         Repositories.lcRepository.deleteAllSnapshotDiffItems()
       }
@@ -307,7 +307,7 @@ abstract class LCDatabase : RoomDatabase() {
             "isSystem INTEGER NOT NULL, abi INTEGER NOT NULL, " +
             "features INTEGER NOT NULL, " +
             "targetApi INTEGER NOT NULL, variant INTEGER NOT NULL, " +
-            "PRIMARY KEY(packageName))"
+            "PRIMARY KEY(packageName))",
         )
         // Copy the data
         database.execSQL(
@@ -324,7 +324,7 @@ abstract class LCDatabase : RoomDatabase() {
             "versionCode, installedTime, " +
             "lastUpdatedTime, isSystem, " +
             "abi, -1, targetApi, variant " +
-            "FROM item_table"
+            "FROM item_table",
         )
         // Remove the old table
         database.execSQL("DROP TABLE item_table")

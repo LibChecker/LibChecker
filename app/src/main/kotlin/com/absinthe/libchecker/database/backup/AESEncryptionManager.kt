@@ -35,12 +35,12 @@ class AESEncryptionManager {
     InvalidKeyException::class,
     BadPaddingException::class,
     IllegalBlockSizeException::class,
-    InvalidKeySpecException::class
+    InvalidKeySpecException::class,
   )
   fun encryptData(
     sharedPref: SharedPreferences,
     encryptPassword: String?,
-    data: ByteArray
+    data: ByteArray,
   ): ByteArray {
     // Prepare the nonce
     val secureRandom = SecureRandom()
@@ -86,12 +86,12 @@ class AESEncryptionManager {
     InvalidKeyException::class,
     BadPaddingException::class,
     IllegalBlockSizeException::class,
-    InvalidKeySpecException::class
+    InvalidKeySpecException::class,
   )
   fun decryptData(
     sharedPref: SharedPreferences,
     encryptPassword: String?,
-    encryptedData: ByteArray
+    encryptedData: ByteArray,
   ): ByteArray {
     // Wrap the data into a byte buffer to ease the reading process
     val byteBuffer = ByteBuffer.wrap(encryptedData)

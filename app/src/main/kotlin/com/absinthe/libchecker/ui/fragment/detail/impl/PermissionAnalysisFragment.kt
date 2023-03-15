@@ -71,7 +71,7 @@ class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
       val label = requireContext().getString(R.string.permission_not_granted)
       val color = R.color.material_red_400.getColor(requireContext())
       viewModel.processMapLiveData.postValue(
-        mapOf(label to color)
+        mapOf(label to color),
       )
     } else {
       viewModel.processMapLiveData.postValue(viewModel.processesMap)
@@ -94,7 +94,7 @@ class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
     fun newInstance(packageName: String): PermissionAnalysisFragment {
       return PermissionAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to PERMISSION
+        EXTRA_TYPE to PERMISSION,
       )
     }
   }

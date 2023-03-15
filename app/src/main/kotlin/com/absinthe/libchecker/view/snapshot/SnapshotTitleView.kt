@@ -29,12 +29,12 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val appNameView = AlwaysMarqueeTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifMedium
-    )
+      R.style.TextView_SansSerifMedium,
+    ),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.marginStart = context.getDimensionPixelSize(R.dimen.normal_padding)
       it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
@@ -48,7 +48,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -58,12 +58,12 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val versionInfoView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensed
-    )
+      R.style.TextView_SansSerifCondensed,
+    ),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -73,12 +73,12 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val packageSizeView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensed
-    )
+      R.style.TextView_SansSerifCondensed,
+    ),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -88,12 +88,12 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
   val targetApiView = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
+      R.style.TextView_SansSerifCondensedMedium,
+    ),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     setTextColor(android.R.color.darker_gray.getColor(context))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
@@ -108,19 +108,19 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
     targetApiView.autoMeasure()
     appNameView.measure(
       (textWidth - targetApiView.measuredWidth - appNameView.marginEnd).toExactlyMeasureSpec(),
-      appNameView.defaultHeightMeasureSpec(this)
+      appNameView.defaultHeightMeasureSpec(this),
     )
     packageNameView.measure(
       textWidth.toExactlyMeasureSpec(),
-      packageNameView.defaultHeightMeasureSpec(this)
+      packageNameView.defaultHeightMeasureSpec(this),
     )
     versionInfoView.measure(
       textWidth.toExactlyMeasureSpec(),
-      versionInfoView.defaultHeightMeasureSpec(this)
+      versionInfoView.defaultHeightMeasureSpec(this),
     )
     packageSizeView.measure(
       textWidth.toExactlyMeasureSpec(),
-      packageSizeView.defaultHeightMeasureSpec(this)
+      packageSizeView.defaultHeightMeasureSpec(this),
     )
     setMeasuredDimension(
       measuredWidth,
@@ -129,7 +129,7 @@ class SnapshotTitleView(context: Context, attributeSet: AttributeSet? = null) :
         packageNameView.measuredHeight +
         versionInfoView.measuredHeight +
         packageSizeView.measuredHeight +
-        paddingBottom
+        paddingBottom,
     )
   }
 

@@ -104,11 +104,11 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       vfContainer.apply {
         setInAnimation(
           this@LibReferenceActivity,
-          R.anim.anim_fade_in
+          R.anim.anim_fade_in,
         )
         setOutAnimation(
           this@LibReferenceActivity,
-          R.anim.anim_fade_out
+          R.anim.anim_fade_out,
         )
         displayedChild = 0
         (root as ViewGroup).bringChildToFront(appbar)
@@ -141,7 +141,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
         this,
         item = adapter.getItem(position),
         refName = refName,
-        refType = refType
+        refType = refType,
       )
     }
   }

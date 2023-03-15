@@ -23,6 +23,6 @@ interface CloudRuleBundleRequest {
   @GET(ApiManager.GITHUB_API_REPO_INFO)
   suspend fun requestRepoInfo(
     @Header(OWNER) owner: String,
-    @Header(REPO) repo: String
+    @Header(REPO) repo: String,
   ): RepoInfoResp?
 }

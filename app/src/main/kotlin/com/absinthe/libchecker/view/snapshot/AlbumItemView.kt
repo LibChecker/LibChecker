@@ -48,7 +48,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     val title = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = context.getDimensionPixelSize(R.dimen.album_card_inset_horizontal)
       }
@@ -58,7 +58,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
     val subtitle = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
       setTextColor(R.color.textSecondary.getColor(context))
@@ -87,11 +87,11 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       title.measure(textWidth.toExactlyMeasureSpec(), title.defaultHeightMeasureSpec(this))
       subtitle.measure(
         textWidth.toExactlyMeasureSpec(),
-        subtitle.defaultHeightMeasureSpec(this)
+        subtitle.defaultHeightMeasureSpec(this),
       )
       setMeasuredDimension(
         measuredWidth,
-        (title.measuredHeight + subtitle.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+        (title.measuredHeight + subtitle.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom,
       )
     }
 
@@ -99,7 +99,7 @@ class AlbumItemView(context: Context) : MaterialCardView(context) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
       title.layout(
         icon.right + title.marginStart,
-        (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2
+        (measuredHeight - title.measuredHeight - subtitle.measuredHeight) / 2,
       )
       subtitle.layout(title.left, title.bottom)
     }

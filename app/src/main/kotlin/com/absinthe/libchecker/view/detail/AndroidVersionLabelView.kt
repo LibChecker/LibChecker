@@ -20,7 +20,7 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
   val text = AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.marginStart = 8.dp
     }
@@ -47,7 +47,7 @@ class AndroidVersionLabelView(context: Context) : AViewGroup(context) {
     text.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + icon.measuredHeight.coerceAtLeast(text.measuredHeight) + paddingBottom
+      paddingTop + icon.measuredHeight.coerceAtLeast(text.measuredHeight) + paddingBottom,
     )
   }
 

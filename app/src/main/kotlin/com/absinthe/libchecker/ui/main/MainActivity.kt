@@ -70,7 +70,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
           runCatching {
             PackageUtils.getPackageInfo(
               packageName,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS,
             )
           }.onSuccess {
             AppItemRepository.allPackageInfoMap[packageName] = it
@@ -107,7 +107,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         setPackage(packageName)
       },
       workerServiceConnection,
-      Context.BIND_AUTO_CREATE
+      Context.BIND_AUTO_CREATE,
     )
     handleIntent(intent)
     initObserver()
@@ -284,7 +284,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     }
     Analytics.trackEvent(
       Constants.Event.LAUNCH_ACTION,
-      EventProperties().set("Action", intent.action)
+      EventProperties().set("Action", intent.action),
     )
   }
 

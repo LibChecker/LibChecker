@@ -17,7 +17,7 @@ object AppItemRepository {
       allPackageInfoMap.putAll(
         PackageUtils.getAppsList().asSequence()
           .map { it.packageName to it }
-          .toMap()
+          .toMap(),
       )
     }
     return allPackageInfoMap

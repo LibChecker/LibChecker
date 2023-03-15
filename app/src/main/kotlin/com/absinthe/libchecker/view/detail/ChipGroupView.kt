@@ -27,7 +27,7 @@ class ChipGroupView(context: Context) : ChipGroup(context) {
           }
           clickAction()
         }
-      }
+      },
     )
   }
 }

@@ -17,7 +17,7 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
       AppCompatImageView(context).apply {
         layoutParams = ViewGroup.LayoutParams(24.dp, 24.dp)
         setPadding(0, 0, 4.dp, 0)
-      }
+      },
     )
   }
 

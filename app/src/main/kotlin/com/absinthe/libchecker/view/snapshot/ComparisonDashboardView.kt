@@ -16,7 +16,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
   val container = SnapshotDashboardContainerView(context).apply {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
     setPadding(padding, padding, padding, padding)
@@ -26,7 +26,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
   init {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     radius = 8.dp.toFloat()
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
@@ -38,7 +38,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     val leftPart = ComparisonDashboardHalfView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       horizontalGravity = Gravity.START
     }
@@ -46,7 +46,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     val rightPart = ComparisonDashboardHalfView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       horizontalGravity = Gravity.END
     }
@@ -54,7 +54,7 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
     private val divider = MaterialDivider(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.MATCH_PARENT
+        ViewGroup.LayoutParams.MATCH_PARENT,
       )
     }
 
@@ -72,19 +72,19 @@ class ComparisonDashboardView(context: Context) : MaterialCardView(context, null
 
       leftPart.measure(
         width.toExactlyMeasureSpec(),
-        leftPart.defaultHeightMeasureSpec(this)
+        leftPart.defaultHeightMeasureSpec(this),
       )
       rightPart.measure(
         width.toExactlyMeasureSpec(),
-        rightPart.defaultHeightMeasureSpec(this)
+        rightPart.defaultHeightMeasureSpec(this),
       )
       divider.measure(
         dividerWidth.toExactlyMeasureSpec(),
-        divider.defaultHeightMeasureSpec(this)
+        divider.defaultHeightMeasureSpec(this),
       )
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + leftPart.measuredHeight.coerceAtLeast(rightPart.measuredHeight) + paddingBottom
+        paddingTop + leftPart.measuredHeight.coerceAtLeast(rightPart.measuredHeight) + paddingBottom,
       )
     }
 

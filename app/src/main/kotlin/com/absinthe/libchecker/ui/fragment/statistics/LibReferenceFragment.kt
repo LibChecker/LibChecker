@@ -173,9 +173,9 @@ class LibReferenceFragment :
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.MATCH_PARENT,
           )
-        }
+        },
       )
     }
 
@@ -191,7 +191,7 @@ class LibReferenceFragment :
               is HomeViewModel.Effect.UpdateLibRefProgress -> {
                 binding.loadingView.progressIndicator.setProgressCompat(
                   it.progress,
-                  it.progress > 0
+                  it.progress > 0,
                 )
               }
 
@@ -285,13 +285,13 @@ class LibReferenceFragment :
       val styler = CascadePopupMenu.Styler(
         background = {
           RoundedRectDrawable(color, radius = 6.dp.toFloat())
-        }
+        },
       )
       popup = CascadePopupMenu(
         contextRef.get()!!,
         context.findViewById(R.id.filter),
         defStyleAttr = R.style.Widget_LC_PopupMenu,
-        styler = styler
+        styler = styler,
       ).apply {
         menu.also {
           it.add(R.string.ref_category_all).initMenu(ALL)
@@ -335,7 +335,7 @@ class LibReferenceFragment :
           StyleSpan(Typeface.BOLD),
           0,
           it.length,
-          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+          Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
         )
         this.title = title
       }
@@ -364,8 +364,8 @@ class LibReferenceFragment :
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       EventProperties().set(
         "Type",
-        category.toLong()
-      )
+        category.toLong(),
+      ),
     )
     return true
   }
@@ -403,7 +403,7 @@ class LibReferenceFragment :
           val filter = list.filter {
             it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
               newText,
-              ignoreCase = true
+              ignoreCase = true,
             ) ?: false
           }
           LibReferenceAdapter.highlightText = newText
@@ -427,7 +427,7 @@ class LibReferenceFragment :
             context?.showToast("🥚")
             Analytics.trackEvent(
               Constants.Event.EASTER_EGG,
-              EventProperties().set("EASTER_EGG", "Lib Reference Search")
+              EventProperties().set("EASTER_EGG", "Lib Reference Search"),
             )
           }
         }

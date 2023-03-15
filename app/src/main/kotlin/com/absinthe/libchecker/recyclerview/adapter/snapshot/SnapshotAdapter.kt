@@ -35,9 +35,9 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
       SnapshotItemView(context).also {
         it.layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-      }
+      },
     )
   }
 
@@ -91,7 +91,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         val span = CenterAlignImageSpan(
           labelDrawable.also {
             it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-          }
+          },
         )
         spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         sb.append(spanString)
@@ -106,7 +106,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         packageSizeInfo.isVisible = true
         val sizeDiff = SnapshotDiffItem.DiffNode(
           item.packageSizeDiff.old.sizeToString(context),
-          item.packageSizeDiff.new?.sizeToString(context)
+          item.packageSizeDiff.new?.sizeToString(context),
         )
         packageSizeInfo.text = getDiffString(sizeDiff, isNewOrDeleted)
       } else {
@@ -188,7 +188,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
   private fun <T> getDiffString(
     diff: SnapshotDiffItem.DiffNode<T>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s"
+    format: String = "%s",
   ): String {
     return if (diff.old != diff.new && !isNewOrDeleted) {
       "${format.format(diff.old)} $ARROW ${format.format(diff.new)}"
@@ -201,7 +201,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
     diff1: SnapshotDiffItem.DiffNode<*>,
     diff2: SnapshotDiffItem.DiffNode<*>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s"
+    format: String = "%s",
   ): String {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
       "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"

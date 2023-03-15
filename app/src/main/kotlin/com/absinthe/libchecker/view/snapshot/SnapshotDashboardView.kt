@@ -29,7 +29,7 @@ class SnapshotDashboardView(context: Context) :
   init {
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     radius = 8.dp.toFloat()
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
@@ -42,7 +42,7 @@ class SnapshotDashboardView(context: Context) :
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         text = context.getString(R.string.snapshot_current_timestamp)
       }
@@ -51,7 +51,7 @@ class SnapshotDashboardView(context: Context) :
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
@@ -60,7 +60,7 @@ class SnapshotDashboardView(context: Context) :
     val arrow = AppCompatImageView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setImageResource(R.drawable.ic_arrow_drop_down)
       setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackgroundBorderless))
@@ -70,7 +70,7 @@ class SnapshotDashboardView(context: Context) :
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         ).also {
           it.topMargin = 5.dp
         }
@@ -81,7 +81,7 @@ class SnapshotDashboardView(context: Context) :
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
@@ -90,7 +90,7 @@ class SnapshotDashboardView(context: Context) :
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_added),
         R.drawable.ic_add.getDrawable(context),
-        R.color.material_green_300.getColor(context)
+        R.color.material_green_300.getColor(context),
       )
     }
 
@@ -98,7 +98,7 @@ class SnapshotDashboardView(context: Context) :
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_removed),
         R.drawable.ic_remove.getDrawable(context),
-        R.color.material_red_300.getColor(context)
+        R.color.material_red_300.getColor(context),
       )
     }
 
@@ -106,7 +106,7 @@ class SnapshotDashboardView(context: Context) :
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_changed),
         R.drawable.ic_changed.getDrawable(context),
-        R.color.material_yellow_300.getColor(context)
+        R.color.material_yellow_300.getColor(context),
       )
     }
 
@@ -114,7 +114,7 @@ class SnapshotDashboardView(context: Context) :
       setIndicatorInfo(
         context.getString(R.string.snapshot_indicator_moved),
         R.drawable.ic_move.getDrawable(context),
-        R.color.material_blue_300.getColor(context)
+        R.color.material_blue_300.getColor(context),
       )
     }
 
@@ -143,32 +143,32 @@ class SnapshotDashboardView(context: Context) :
         addedIndicator.measuredWidth,
         removedIndicator.measuredWidth,
         changedIndicator.measuredWidth,
-        movedIndicator.measuredWidth
+        movedIndicator.measuredWidth,
       ).maxOrNull()!!
 
       val textWidth = measuredWidth - paddingStart - paddingEnd - indicatorsWidth
       tvSnapshotTimestampTitle.let {
         it.measure(
           textWidth.toExactlyMeasureSpec(),
-          it.defaultHeightMeasureSpec(this)
+          it.defaultHeightMeasureSpec(this),
         )
       }
       tvSnapshotTimestampText.let {
         it.measure(
           it.defaultWidthMeasureSpec(this),
-          it.defaultHeightMeasureSpec(this)
+          it.defaultHeightMeasureSpec(this),
         )
       }
       tvSnapshotAppsCountTitle.let {
         it.measure(
           textWidth.toExactlyMeasureSpec(),
-          it.defaultHeightMeasureSpec(this)
+          it.defaultHeightMeasureSpec(this),
         )
       }
       tvSnapshotAppsCountText.let {
         it.measure(
           it.defaultWidthMeasureSpec(this),
-          it.defaultHeightMeasureSpec(this)
+          it.defaultHeightMeasureSpec(this),
         )
       }
 
@@ -178,7 +178,7 @@ class SnapshotDashboardView(context: Context) :
           tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
             tvSnapshotAppsCountTitle.marginTop + tvSnapshotAppsCountTitle.measuredHeight +
             tvSnapshotAppsCountText.measuredHeight
-          ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom
+          ).coerceAtLeast(indicatorsHeight) + paddingTop + paddingBottom,
       )
     }
 
@@ -186,19 +186,19 @@ class SnapshotDashboardView(context: Context) :
       tvSnapshotTimestampTitle.layout(paddingStart, paddingTop)
       tvSnapshotTimestampText.layout(
         tvSnapshotTimestampTitle.left,
-        tvSnapshotTimestampTitle.bottom
+        tvSnapshotTimestampTitle.bottom,
       )
       arrow.layout(
         tvSnapshotTimestampText.right,
-        arrow.toViewVerticalCenter(tvSnapshotTimestampText)
+        arrow.toViewVerticalCenter(tvSnapshotTimestampText),
       )
       tvSnapshotAppsCountTitle.layout(
         tvSnapshotTimestampTitle.left,
-        tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop
+        tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop,
       )
       tvSnapshotAppsCountText.layout(
         tvSnapshotTimestampTitle.left,
-        tvSnapshotAppsCountTitle.bottom
+        tvSnapshotAppsCountTitle.bottom,
       )
       addedIndicator.layout(paddingEnd, paddingTop, fromRight = true)
       removedIndicator.layout(paddingEnd, addedIndicator.bottom, fromRight = true)

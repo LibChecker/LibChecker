@@ -49,12 +49,12 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
     val name = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifMedium
-      )
+        R.style.TextView_SansSerifMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = 8.dp
       }
@@ -66,12 +66,12 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
     val libSize = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifCondensed
-      )
+        R.style.TextView_SansSerifCondensed,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       setTextColor(Color.BLACK)
@@ -95,7 +95,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
           chip = Chip(context).apply {
             layoutParams = LayoutParams(
               ViewGroup.LayoutParams.WRAP_CONTENT,
-              ViewGroup.LayoutParams.WRAP_CONTENT
+              ViewGroup.LayoutParams.WRAP_CONTENT,
             ).also {
               it.topMargin = 4.dp
             }
@@ -136,7 +136,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       name.measure(textWidth.toExactlyMeasureSpec(), name.defaultHeightMeasureSpec(this))
       libSize.measure(
         textWidth.toExactlyMeasureSpec(),
-        libSize.defaultHeightMeasureSpec(this)
+        libSize.defaultHeightMeasureSpec(this),
       )
       val chipHeight = chip?.let {
         it.autoMeasure()
@@ -144,7 +144,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
       } ?: 0
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom
+        paddingTop + name.measuredHeight + libSize.measuredHeight + chipHeight + paddingBottom,
       )
     }
 
@@ -157,7 +157,7 @@ class SnapshotDetailNativeView(context: Context) : MaterialCardView(context) {
             chip?.measuredHeight
               ?: 0
             )
-          ) / 2
+          ) / 2,
       )
       libSize.layout(name.left, name.bottom)
       chip?.layout(name.left, libSize.bottom + chip!!.marginTop)

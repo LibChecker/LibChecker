@@ -75,7 +75,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     super.onApplyUserThemeResource(theme, isDecorView)
     theme.applyStyle(
       rikka.material.preference.R.style.ThemeOverlay_Rikka_Material3_Preference,
-      true
+      true,
     )
   }
 
@@ -188,12 +188,12 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
     override fun onCreateRecyclerView(
       inflater: LayoutInflater,
       parent: ViewGroup,
-      savedInstanceState: Bundle?
+      savedInstanceState: Bundle?,
     ): RecyclerView {
       val recyclerView = super.onCreateRecyclerView(
         inflater,
         parent,
-        savedInstanceState
+        savedInstanceState,
       ) as BorderRecyclerView
       recyclerView.fixEdgeEffect()
       recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER

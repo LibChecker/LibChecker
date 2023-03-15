@@ -91,9 +91,9 @@ class AppListFragment :
         EmptyListView(context).apply {
           layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
+            FrameLayout.LayoutParams.MATCH_PARENT,
           )
-        }
+        },
       )
     }
 
@@ -207,7 +207,7 @@ class AppListFragment :
             context?.showToast("🥚")
             Analytics.trackEvent(
               Constants.Event.EASTER_EGG,
-              EventProperties().set("EASTER_EGG", "AppList Search")
+              EventProperties().set("EASTER_EGG", "AppList Search"),
             )
           }
           newText == Constants.COMMAND_DEBUG_MODE -> {
@@ -380,7 +380,7 @@ class AppListFragment :
 
   private fun updateItems(
     newItems: List<LCItem>,
-    highlightRefresh: Boolean = false
+    highlightRefresh: Boolean = false,
   ) {
     Timber.d("updateItems")
     var filterList: MutableList<LCItem> = newItems.toMutableList()

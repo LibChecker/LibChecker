@@ -47,7 +47,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
   val cloudRulesContentView = CloudRulesContentView(context).apply {
     layoutParams = FrameLayout.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
   }
 
@@ -80,7 +80,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     val localVersion = CloudRulesVersionView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       desc.text = context.getString(R.string.rules_local_repo_version)
     }
@@ -93,7 +93,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     val remoteVersion = CloudRulesVersionView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       desc.text = context.getString(R.string.rules_remote_repo_version)
     }
@@ -137,7 +137,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
       updateButton.autoMeasure()
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + localVersion.measuredHeight + updateButton.marginTop + updateButton.measuredHeight + paddingBottom
+        paddingTop + localVersion.measuredHeight + updateButton.marginTop + updateButton.measuredHeight + paddingBottom,
       )
     }
 
@@ -145,12 +145,12 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
       arrow.layout(arrow.toHorizontalCenter(this), paddingTop)
       localVersion.layout(
         arrow.left - 24.dp - localVersion.measuredWidth,
-        localVersion.toViewVerticalCenter(arrow)
+        localVersion.toViewVerticalCenter(arrow),
       )
       remoteVersion.layout(arrow.right + 24.dp, remoteVersion.toViewVerticalCenter(arrow))
       updateButton.layout(
         updateButton.toHorizontalCenter(this),
-        localVersion.bottom + updateButton.marginTop
+        localVersion.bottom + updateButton.marginTop,
       )
     }
   }
@@ -160,7 +160,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     val version = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline3))
     }
@@ -168,8 +168,8 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
     val desc = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifCondensedMedium
-      )
+        R.style.TextView_SansSerifCondensedMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(120.dp, ViewGroup.LayoutParams.WRAP_CONTENT)
       gravity = Gravity.CENTER
@@ -186,7 +186,7 @@ class CloudRulesDialogView(context: Context) : AViewGroup(context), IHeaderView 
       desc.autoMeasure()
       setMeasuredDimension(
         version.measuredWidth.coerceAtLeast(desc.measuredWidth),
-        version.measuredHeight + desc.measuredHeight
+        version.measuredHeight + desc.measuredHeight,
       )
     }
 

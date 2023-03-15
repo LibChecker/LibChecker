@@ -52,7 +52,7 @@ private const val HIGHLIGHT_TRANSITION_DURATION = 250
 class LibStringAdapter(
   val packageName: String,
   @LibType val type: Int,
-  private val fragmentManager: FragmentManager? = null
+  private val fragmentManager: FragmentManager? = null,
 ) :
   HighlightAdapter<LibStringItemChip>() {
 
@@ -120,7 +120,7 @@ class LibStringAdapter(
               ForegroundColorSpan(context.getColorByAttr(com.google.android.material.R.attr.colorPrimary)),
               0,
               item.item.name.length,
-              Spannable.SPAN_INCLUSIVE_EXCLUSIVE
+              Spannable.SPAN_INCLUSIVE_EXCLUSIVE,
             )
           }
         } else {
@@ -157,7 +157,7 @@ class LibStringAdapter(
     if (highlightPosition == -1 || holder.absoluteAdapterPosition != highlightPosition) {
       if (holder.itemView.background is TransitionDrawable) {
         (holder.itemView.background as TransitionDrawable).reverseTransition(
-          HIGHLIGHT_TRANSITION_DURATION
+          HIGHLIGHT_TRANSITION_DURATION,
         )
       }
       holder.itemView.background = null
@@ -165,13 +165,13 @@ class LibStringAdapter(
       val drawable = TransitionDrawable(
         listOf(
           ColorDrawable(Color.TRANSPARENT),
-          ColorDrawable(R.color.highlight_component.getColor(context))
-        ).toTypedArray()
+          ColorDrawable(R.color.highlight_component.getColor(context)),
+        ).toTypedArray(),
       )
       holder.itemView.background = drawable
       if (holder.itemView.background is TransitionDrawable) {
         (holder.itemView.background as TransitionDrawable).startTransition(
-          HIGHLIGHT_TRANSITION_DURATION
+          HIGHLIGHT_TRANSITION_DURATION,
         )
       }
     }
@@ -187,7 +187,7 @@ class LibStringAdapter(
   private fun setNativeContent(
     itemView: NativeLibItemView,
     item: LibStringItemChip,
-    itemName: CharSequence
+    itemName: CharSequence,
   ) {
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item, showElfInfo = true, is64Bit = is64Bit)
@@ -206,7 +206,7 @@ class LibStringAdapter(
   private fun setStaticContent(
     itemView: StaticLibItemView,
     item: LibStringItemChip,
-    itemName: CharSequence
+    itemName: CharSequence,
   ) {
     setOrHighlightText(itemView.libName, itemName)
     itemView.libDetail.let {
@@ -237,7 +237,7 @@ class LibStringAdapter(
   private fun setPermissionContent(
     itemView: ComponentLibItemView,
     item: LibStringItemChip,
-    itemName: CharSequence
+    itemName: CharSequence,
   ) {
     itemView.processLabelColor = if (item.item.size == 0L) {
       R.color.material_red_500.getColor(context)
@@ -250,7 +250,7 @@ class LibStringAdapter(
   private fun setMetadataContent(
     itemView: MetadataLibItemView,
     item: LibStringItemChip,
-    itemName: CharSequence
+    itemName: CharSequence,
   ) {
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = item.item.source
@@ -294,7 +294,7 @@ class LibStringAdapter(
                         val text = ResourceParser(it).setMarkColor(true).parse()
                         XmlBSDFragment().apply {
                           arguments = bundleOf(
-                            EXTRA_TEXT to text
+                            EXTRA_TEXT to text,
                           )
                           show(fm, XmlBSDFragment::class.java.name)
                         }
@@ -308,8 +308,8 @@ class LibStringAdapter(
                     itemView.linkToIcon.setImageDrawable(
                       res.getDrawable(
                         item.item.size.toInt(),
-                        null
-                      )
+                        null,
+                      ),
                     )
                   }
                   clickedTag = true
@@ -320,9 +320,9 @@ class LibStringAdapter(
                       ColorDrawable(
                         res.getColor(
                           item.item.size.toInt(),
-                          null
-                        )
-                      )
+                          null,
+                        ),
+                      ),
                     )
                   }
                   clickedTag = true

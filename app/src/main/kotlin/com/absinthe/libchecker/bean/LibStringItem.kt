@@ -18,5 +18,5 @@ data class LibStringItem(
   val source: String? = null,
   val process: String? = null,
   @ElfType val elfType: Int = ET_NOT_ELF,
-  val elfClass: Int = ELFParser.EIdent.ELFCLASSNONE
+  val elfClass: Int = ELFParser.EIdent.ELFCLASSNONE,
 ) : Parcelable

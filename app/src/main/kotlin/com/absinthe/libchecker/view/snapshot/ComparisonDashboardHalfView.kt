@@ -21,7 +21,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       text = context.getString(R.string.snapshot_current_timestamp)
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -31,7 +31,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -44,7 +44,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.topMargin = 5.dp
       }
@@ -56,7 +56,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifBlack)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -87,25 +87,25 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     tvSnapshotTimestampTitle.let {
       it.measure(
         textWidth.toExactlyMeasureSpec(),
-        it.defaultHeightMeasureSpec(this)
+        it.defaultHeightMeasureSpec(this),
       )
     }
     tvSnapshotTimestampText.let {
       it.measure(
         textWidth.toExactlyMeasureSpec(),
-        it.defaultHeightMeasureSpec(this)
+        it.defaultHeightMeasureSpec(this),
       )
     }
     tvSnapshotAppsCountTitle.let {
       it.measure(
         textWidth.toExactlyMeasureSpec(),
-        it.defaultHeightMeasureSpec(this)
+        it.defaultHeightMeasureSpec(this),
       )
     }
     tvSnapshotAppsCountText.let {
       it.measure(
         textWidth.toExactlyMeasureSpec(),
-        it.defaultHeightMeasureSpec(this)
+        it.defaultHeightMeasureSpec(this),
       )
     }
 
@@ -114,7 +114,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
       tvSnapshotTimestampTitle.measuredHeight + tvSnapshotTimestampText.measuredHeight +
         tvSnapshotAppsCountTitle.marginTop +
         tvSnapshotAppsCountTitle.measuredHeight + tvSnapshotAppsCountText.measuredHeight +
-        paddingTop + paddingBottom
+        paddingTop + paddingBottom,
     )
   }
 
@@ -122,22 +122,22 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
     tvSnapshotTimestampTitle.layout(
       paddingStart,
       paddingTop,
-      fromRight = horizontalGravity == Gravity.END
+      fromRight = horizontalGravity == Gravity.END,
     )
     tvSnapshotTimestampText.layout(
       tvSnapshotTimestampTitle.left,
       tvSnapshotTimestampTitle.bottom,
-      fromRight = horizontalGravity == Gravity.END
+      fromRight = horizontalGravity == Gravity.END,
     )
     tvSnapshotAppsCountTitle.layout(
       tvSnapshotTimestampTitle.left,
       tvSnapshotTimestampText.bottom + tvSnapshotAppsCountTitle.marginTop,
-      fromRight = horizontalGravity == Gravity.END
+      fromRight = horizontalGravity == Gravity.END,
     )
     tvSnapshotAppsCountText.layout(
       tvSnapshotTimestampTitle.left,
       tvSnapshotAppsCountTitle.bottom,
-      fromRight = horizontalGravity == Gravity.END
+      fromRight = horizontalGravity == Gravity.END,
     )
   }
 }

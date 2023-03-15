@@ -43,7 +43,7 @@ class SnapshotDetailTitleView(context: Context) : RoundCornerView(context) {
     background = context.getDrawableByAttr(android.R.attr.selectableItemBackground)
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      context.getDimensionByAttr(android.R.attr.listPreferredItemHeightSmall).toInt()
+      context.getDimensionByAttr(android.R.attr.listPreferredItemHeightSmall).toInt(),
     )
     isClickable = true
     isFocusable = true

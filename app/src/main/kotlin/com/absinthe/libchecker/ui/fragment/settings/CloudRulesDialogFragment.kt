@@ -91,7 +91,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
               root.cloudRulesContentView.setUpdateButtonStatus(false)
               runCatching {
                 setLocalRulesVersion(
-                  root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
+                  root.cloudRulesContentView.remoteVersion.version.text.toString().toInt(),
                 )
                 context?.let {
                   ProcessPhoenix.triggerRebirth(it)
@@ -109,7 +109,7 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         override fun onDownloadFailed() {
           context?.showToast(R.string.toast_cloud_rules_update_error)
         }
-      }
+      },
     )
   }
 

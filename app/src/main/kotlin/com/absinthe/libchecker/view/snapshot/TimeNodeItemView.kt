@@ -18,8 +18,8 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
   val name = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
+      R.style.TextView_SansSerifCondensedMedium,
+    ),
   ).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -31,14 +31,14 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
       AppCompatTextView(
         ContextThemeWrapper(
           context,
-          R.style.TextView_SansSerifCondensedMedium
-        )
+          R.style.TextView_SansSerifCondensedMedium,
+        ),
       ).apply {
         layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 24.dp)
         gravity = Gravity.CENTER
         text = context.getString(R.string.empty_list)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-      }
+      },
     )
   }
 
@@ -62,11 +62,11 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     rvList.autoMeasure()
     name.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      name.defaultHeightMeasureSpec(this)
+      name.defaultHeightMeasureSpec(this),
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + paddingBottom + name.measuredHeight + rvList.measuredHeight
+      paddingTop + paddingBottom + name.measuredHeight + rvList.measuredHeight,
     )
   }
 

@@ -60,7 +60,7 @@ class OverlayDetailBottomSheetDialogFragment :
           val appIconLoader = AppIconLoader(
             resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
             false,
-            requireContext()
+            requireContext(),
           )
           load(appIconLoader.loadIcon(packageInfo.applicationInfo))
         }

@@ -134,7 +134,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       SnapshotDashboardView(ContextThemeWrapper(context, R.style.AlbumMaterialCard)).apply {
         layoutParams = ViewGroup.MarginLayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
       }
 
@@ -181,7 +181,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     val emptyView = SnapshotEmptyView(context).apply {
       layoutParams = FrameLayout.LayoutParams(
         FrameLayout.LayoutParams.MATCH_PARENT,
-        FrameLayout.LayoutParams.WRAP_CONTENT
+        FrameLayout.LayoutParams.WRAP_CONTENT,
       ).also {
         it.gravity = Gravity.CENTER_HORIZONTAL
       }
@@ -235,8 +235,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         if (itemDecorationCount == 0) {
           addItemDecoration(
             HorizontalSpacesItemDecoration(
-              resources.getDimension(R.dimen.normal_padding).toInt() / 2
-            )
+              resources.getDimension(R.dimen.normal_padding).toInt() / 2,
+            ),
           )
         }
         scrollToPosition(0)
@@ -281,7 +281,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
-            .toMutableList()
+            .toMutableList(),
         ) {
           flip(VF_LIST)
           adapter.setSpaceFooterView()
@@ -360,7 +360,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         it.bindService(
           intent,
           shootServiceConnection,
-          Service.BIND_AUTO_CREATE
+          Service.BIND_AUTO_CREATE,
         )
         shootServiceStarted = true
       }
@@ -401,8 +401,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
             ctx.stopService(
               Intent(
                 ctx,
-                ShootService::class.java
-              )
+                ShootService::class.java,
+              ),
             )
           }
         }
@@ -432,7 +432,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
           context,
-          Intent(context, ShootService::class.java)
+          Intent(context, ShootService::class.java),
         )
         shootBinder?.computeSnapshot(dropPrevious) ?: run {
           Timber.w("shoot binder is null")
@@ -443,7 +443,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         if (OsUtils.atLeastT()) {
           if (ContextCompat.checkSelfPermission(
               context,
-              Manifest.permission.POST_NOTIFICATIONS
+              Manifest.permission.POST_NOTIFICATIONS,
             ) != PackageManager.PERMISSION_GRANTED
           ) {
             if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
@@ -454,7 +454,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
         Analytics.trackEvent(
           Constants.Event.SNAPSHOT_CLICK,
-          EventProperties().set("Action", "Click to Save")
+          EventProperties().set("Action", "Click to Save"),
         )
       }
 
@@ -471,7 +471,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         val tipView = TextView(context).also {
           it.layoutParams = ViewGroup.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.WRAP_CONTENT,
           )
           val paddingHorizontal =
             context.getDimensionByAttr(com.google.android.material.R.attr.dialogPreferredPadding)
@@ -553,7 +553,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(context)
       Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
         2,
-        StaggeredGridLayoutManager.VERTICAL
+        StaggeredGridLayoutManager.VERTICAL,
       )
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }

@@ -36,12 +36,12 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
     val labelName = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifMedium
-      )
+        R.style.TextView_SansSerifMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = 8.dp
         it.marginEnd = 8.dp
@@ -54,7 +54,7 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         ).also {
           it.marginStart = 8.dp
           it.marginEnd = 8.dp
@@ -67,7 +67,7 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.WRAP_CONTENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceHeadline4))
       }
@@ -90,16 +90,16 @@ class MultipleAppsIconItemView(context: Context) : FrameLayout(context) {
         )
       labelName.measure(
         labelWidth.toExactlyMeasureSpec(),
-        labelName.defaultHeightMeasureSpec(this)
+        labelName.defaultHeightMeasureSpec(this),
       )
       libName.measure(
         labelWidth.toExactlyMeasureSpec(),
-        libName.defaultHeightMeasureSpec(this)
+        libName.defaultHeightMeasureSpec(this),
       )
       setMeasuredDimension(
         measuredWidth,
         (paddingTop + labelName.measuredHeight + libName.measuredHeight + paddingBottom)
-          .coerceAtLeast(icon.measuredHeight + paddingTop + paddingBottom)
+          .coerceAtLeast(icon.measuredHeight + paddingTop + paddingBottom),
       )
     }
 

@@ -22,7 +22,7 @@ class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.topMargin = 16.dp
       }
@@ -38,7 +38,7 @@ class SnapshotDetailNewInstallView(context: Context) : AViewGroup(context) {
     text.autoMeasure()
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom
+      paddingTop + image.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom,
     )
   }
 

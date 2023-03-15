@@ -77,7 +77,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
     fun newInstance(packageName: String): SignaturesAnalysisFragment {
       return SignaturesAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to SIGNATURES
+        EXTRA_TYPE to SIGNATURES,
       )
     }
   }

@@ -13,7 +13,7 @@ class AdvancedMenuItemView(context: Context) : FrameLayout(context) {
   val chip = CheckableChipView(context).also {
     it.layoutParams = MarginLayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also { lp ->
       lp.setMargins(4.dp, 4.dp, 4.dp, 4.dp)
     }

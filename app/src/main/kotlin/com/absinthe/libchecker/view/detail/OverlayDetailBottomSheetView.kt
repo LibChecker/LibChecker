@@ -26,18 +26,18 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
   val detailsTitleView = DetailsTitleView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 24.dp
     }
   }
 
   private val targetTitleView = AppCompatTextView(
-    ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)
+    ContextThemeWrapper(context, R.style.TextView_SansSerifMedium),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 8.dp
     }
@@ -49,7 +49,7 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
   val targetPackageView = AppItemView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 8.dp
     }
@@ -71,12 +71,12 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
     header.autoMeasure()
     detailsTitleView.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      detailsTitleView.defaultHeightMeasureSpec(this)
+      detailsTitleView.defaultHeightMeasureSpec(this),
     )
     targetTitleView.autoMeasure()
     targetPackageView.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      targetPackageView.defaultHeightMeasureSpec(this)
+      targetPackageView.defaultHeightMeasureSpec(this),
     )
     setMeasuredDimension(
       measuredWidth,
@@ -88,7 +88,7 @@ class OverlayDetailBottomSheetView(context: Context) : AViewGroup(context), IHea
         targetTitleView.measuredHeight +
         targetPackageView.marginTop +
         targetPackageView.measuredHeight +
-        paddingBottom
+        paddingBottom,
     )
   }
 

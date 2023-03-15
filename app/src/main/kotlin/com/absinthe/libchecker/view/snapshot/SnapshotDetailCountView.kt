@@ -14,7 +14,7 @@ class SnapshotDetailCountView(context: Context) : AppCompatTextView(context) {
   init {
     layoutParams = ViewGroup.MarginLayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.marginStart = 4.dp
       it.marginEnd = 4.dp

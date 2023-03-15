@@ -23,7 +23,7 @@ fun BaseQuickAdapter<*, BaseViewHolder>.setSpaceFooterView() {
       Space(rv.context).apply {
         layoutParams = ViewGroup.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          96.dp
+          96.dp,
         )
       }.also {
         setFooterView(it)

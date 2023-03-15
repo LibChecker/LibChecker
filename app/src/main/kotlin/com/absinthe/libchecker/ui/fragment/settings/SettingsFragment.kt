@@ -65,7 +65,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         GlobalValues.isShowSystemApps.value = newValue as Boolean
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue)
+          EventProperties().set("PREF_SHOW_SYSTEM_APPS", newValue),
         )
         true
       }
@@ -81,11 +81,11 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         SystemServices.packageManager.setComponentEnabledSetting(
           ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
           flag,
-          PackageManager.DONT_KILL_APP
+          PackageManager.DONT_KILL_APP,
         )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_APK_ANALYTICS", newValue)
+          EventProperties().set("PREF_APK_ANALYTICS", newValue),
         )
         true
       }
@@ -95,7 +95,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         GlobalValues.isColorfulIcon.value = newValue as Boolean
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_COLORFUL_ICON", newValue)
+          EventProperties().set("PREF_COLORFUL_ICON", newValue),
         )
         true
       }
@@ -108,11 +108,11 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
             LCRemoteRepo.Github
           } else {
             LCRemoteRepo.Gitlab
-          }
+          },
         )
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
-          EventProperties().set("PREF_RULES_REPO", newValue)
+          EventProperties().set("PREF_RULES_REPO", newValue),
         )
         true
       }
@@ -154,7 +154,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         } else {
           CloudRulesDialogFragment().show(
             childFragmentManager,
-            CloudRulesDialogFragment::class.java.name
+            CloudRulesDialogFragment::class.java.name,
           )
           true
         }
@@ -167,7 +167,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         } else {
           LibThresholdDialogFragment().show(
             requireActivity().supportFragmentManager,
-            LibThresholdDialogFragment::class.java.name
+            LibThresholdDialogFragment::class.java.name,
           )
           true
         }
@@ -185,7 +185,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
               viewModel.reloadApps()
               Analytics.trackEvent(
                 Constants.Event.SETTINGS,
-                EventProperties().set("PREF_RELOAD_APPS", "Ok")
+                EventProperties().set("PREF_RELOAD_APPS", "Ok"),
               )
             }
             .setNegativeButton(android.R.string.cancel, null)
@@ -256,7 +256,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           startActivity(Intent.parseUri(marketUrl, 0))
           Analytics.trackEvent(
             Constants.Event.SETTINGS,
-            EventProperties().set("PREF_RATE", "Clicked")
+            EventProperties().set("PREF_RATE", "Clicked"),
           )
         } catch (e: ActivityNotFoundException) {
           Timber.e(e)
@@ -269,7 +269,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
         try {
           startActivity(
             Intent(Intent.ACTION_VIEW, URLManager.TELEGRAM_GROUP.toUri())
-              .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+              .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
           )
         } catch (e: ActivityNotFoundException) {
           Timber.e(e)
@@ -297,14 +297,14 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           locale.getDisplayScript(locale)
         } else {
           locale.getDisplayName(locale)
-        }
+        },
       )
       localeNameUser.add(
         if (!TextUtils.isEmpty(locale.script)) {
           locale.getDisplayScript(userLocale)
         } else {
           locale.getDisplayName(userLocale)
-        }
+        },
       )
     }
 
@@ -314,9 +314,9 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           String.format(
             "%s - %s",
             localeName[i - 1],
-            localeNameUser[i - 1]
+            localeNameUser[i - 1],
           ),
-          HtmlCompat.FROM_HTML_MODE_LEGACY
+          HtmlCompat.FROM_HTML_MODE_LEGACY,
         )
       } else {
         languagePreference.entries[i] = localeNameUser[i - 1]
@@ -348,7 +348,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
   override fun onCreateRecyclerView(
     inflater: LayoutInflater,
     parent: ViewGroup,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): RecyclerView {
     val recyclerView =
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView

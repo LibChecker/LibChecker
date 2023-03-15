@@ -15,7 +15,7 @@ class ComponentRecyclerView : BorderRecyclerView {
   constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
     context,
     attrs,
-    defStyle
+    defStyle,
   )
 
   private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop

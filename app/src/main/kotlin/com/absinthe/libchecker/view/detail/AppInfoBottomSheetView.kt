@@ -21,7 +21,7 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   val launch = AppInfoItemView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 24.dp
     }
@@ -62,11 +62,11 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
     setting.measure(itemWidth.toExactlyMeasureSpec(), setting.defaultHeightMeasureSpec(this))
     list.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      list.defaultHeightMeasureSpec(this)
+      list.defaultHeightMeasureSpec(this),
     )
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + header.measuredHeight + launch.marginTop + launch.measuredHeight + list.measuredHeight + paddingBottom
+      paddingTop + header.measuredHeight + launch.marginTop + launch.measuredHeight + list.measuredHeight + paddingBottom,
     )
   }
 

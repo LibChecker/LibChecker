@@ -37,7 +37,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
             val appIconLoader = AppIconLoader(
               resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size),
               false,
-              requireContext()
+              requireContext(),
             )
             val icon = runCatching {
               appIconLoader.loadIcon(pi.applicationInfo)
@@ -61,7 +61,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
           item.versionNameDiff,
           item.versionCodeDiff,
           item.deleted || item.newInstalled,
-          "%s (%s)"
+          "%s (%s)",
         )
         targetApiView.text = String.format("API %s", item.targetApiDiff.old)
       }
@@ -89,7 +89,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
     diff1: SnapshotDiffItem.DiffNode<*>,
     diff2: SnapshotDiffItem.DiffNode<*>,
     isNewOrDeleted: Boolean = false,
-    format: String = "%s"
+    format: String = "%s",
   ): String {
     return if ((diff1.old != diff1.new || diff2.old != diff2.new) && !isNewOrDeleted) {
       "${format.format(diff1.old, diff2.old)} $ARROW ${format.format(diff1.new, diff2.new)}"
@@ -101,7 +101,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
   companion object {
     fun newInstance(snapshotDiffItem: SnapshotDiffItem): SnapshotNoDiffBSDFragment {
       return SnapshotNoDiffBSDFragment().putArguments(
-        EXTRA_DIFF_ITEM to snapshotDiffItem
+        EXTRA_DIFF_ITEM to snapshotDiffItem,
       )
     }
   }

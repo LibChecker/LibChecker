@@ -49,7 +49,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val demoView = RecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 24.dp
     }
@@ -69,15 +69,15 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
         abi = Constants.ARMV8.toShort(),
         features = 0,
         targetApi = Build.VERSION.SDK_INT.toShort(),
-        variant = 0
-      )
+        variant = 0,
+      ),
     )
   }
 
   private val sortView = AdvancedMenuSortView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 24.dp
     }
@@ -86,7 +86,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val flexLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 8.dp
     }
@@ -98,7 +98,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val itemView = MaterialCardView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 24.dp
     }
@@ -116,36 +116,36 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
           LibStringItemChip(
             LibStringItem(
               name = Constants.EXAMPLE_EXPORTED,
-              source = EXPORTED
+              source = EXPORTED,
             ),
             LibChip(
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
-            )
-          )
+              Constants.EXAMPLE_RULE,
+            ),
+          ),
         )
         addData(
           LibStringItemChip(
             LibStringItem(
-              name = Constants.EXAMPLE_NORMAL
+              name = Constants.EXAMPLE_NORMAL,
             ),
             LibChip(
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
-            )
-          )
+              Constants.EXAMPLE_RULE,
+            ),
+          ),
         )
         addData(
           LibStringItemChip(
             LibStringItem(
               name = Constants.EXAMPLE_DISABLED,
-              source = DISABLED
+              source = DISABLED,
             ),
             LibChip(
               R.drawable.ic_logo,
-              Constants.EXAMPLE_RULE
-            )
-          )
+              Constants.EXAMPLE_RULE,
+            ),
+          ),
         )
       }
     }
@@ -156,7 +156,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val itemFlexLayout = FlexboxLayout(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 8.dp
     }
@@ -168,7 +168,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
   private val list = BottomSheetRecyclerView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     )
     overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     adapter = this@AdvancedMenuBSDView.adapter

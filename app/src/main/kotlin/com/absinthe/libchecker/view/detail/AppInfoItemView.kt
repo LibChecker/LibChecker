@@ -50,12 +50,12 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
   private val text = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
+      R.style.TextView_SansSerifCondensedMedium,
+    ),
   ).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
-      ViewGroup.LayoutParams.WRAP_CONTENT
+      ViewGroup.LayoutParams.WRAP_CONTENT,
     ).also {
       it.topMargin = 12.dp
     }
@@ -108,12 +108,12 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     icon.autoMeasure()
     text.measure(
       (measuredWidth - paddingStart - paddingEnd).toExactlyMeasureSpec(),
-      text.defaultHeightMeasureSpec(this)
+      text.defaultHeightMeasureSpec(this),
     )
     setMeasuredDimension(
       measuredWidth,
       // Ignore errors within 10 pixels, as the different heights of Chinese and English in some fonts can cause the Adapter to fail to align
-      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom) / 10 * 10
+      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom) / 10 * 10,
     )
   }
 

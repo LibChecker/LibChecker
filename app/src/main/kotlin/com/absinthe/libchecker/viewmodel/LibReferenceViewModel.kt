@@ -111,8 +111,8 @@ class LibReferenceViewModel(application: Application) : AndroidViewModel(applica
                 PackageUtils.getMetaDataItems(
                   PackageUtils.getPackageInfo(
                     item.packageName,
-                    PackageManager.GET_META_DATA
-                  )
+                    PackageManager.GET_META_DATA,
+                  ),
                 )
               if (metadataList.any { it.name == name }) {
                 list.add(item)

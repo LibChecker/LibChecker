@@ -54,7 +54,7 @@ class AESEncryptionHelper {
   fun readFile(file: File): ByteArray {
     val fileContents = file.readBytes()
     val inputBuffer = BufferedInputStream(
-      FileInputStream(file)
+      FileInputStream(file),
     )
     inputBuffer.read(fileContents)
     inputBuffer.close()

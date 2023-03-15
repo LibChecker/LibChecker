@@ -72,7 +72,7 @@ class DexAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>() {
     fun newInstance(packageName: String): DexAnalysisFragment {
       return DexAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to DEX
+        EXTRA_TYPE to DEX,
       )
     }
   }

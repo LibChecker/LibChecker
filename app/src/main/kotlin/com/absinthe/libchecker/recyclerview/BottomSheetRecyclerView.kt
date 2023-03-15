@@ -12,7 +12,7 @@ class BottomSheetRecyclerView : BorderRecyclerView {
   constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
     context,
     attrs,
-    defStyle
+    defStyle,
   )
 
   private var lastY = 0f

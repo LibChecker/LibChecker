@@ -35,7 +35,7 @@ class TextSwitcherView : TextSwitcher, ViewSwitcher.ViewFactory {
     return TextView(context).apply {
       layoutParams = LayoutParams(
         LayoutParams.MATCH_PARENT,
-        LayoutParams.MATCH_PARENT
+        LayoutParams.MATCH_PARENT,
       )
       gravity = Gravity.START or Gravity.CENTER
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)

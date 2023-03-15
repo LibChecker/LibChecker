@@ -79,7 +79,7 @@ object LCAppUtils {
       val span = CenterAlignImageSpan(
         R.drawable.ic_ci_label.getDrawable(context)!!.also {
           it.setBounds(0, 0, it.intrinsicWidth, it.intrinsicHeight)
-        }
+        },
       )
       spanString.setSpan(span, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
       sb.append(spanString)
@@ -93,7 +93,7 @@ object LCAppUtils {
     name: String,
     @LibType type: Int,
     packageName: String? = null,
-    nativeLibs: List<LibStringItem>? = null
+    nativeLibs: List<LibStringItem>? = null,
   ): Rule? {
     val ruleEntity = LCRules.getRule(name, type, true) ?: return null
     if (type == NATIVE) {
@@ -125,7 +125,7 @@ object LCAppUtils {
   fun checkNativeLibValidation(
     packageName: String,
     nativeLib: String,
-    otherNativeLibs: List<LibStringItem>? = null
+    otherNativeLibs: List<LibStringItem>? = null,
   ): Boolean {
     if (!checkNativeLibs.contains(nativeLib)) {
       return true
@@ -137,8 +137,8 @@ object LCAppUtils {
           PackageUtils.findDexClasses(
             source,
             listOf(
-              "com.qihoo.util.*".toClassDefType()
-            )
+              "com.qihoo.util.*".toClassDefType(),
+            ),
           ).any { it == "com.qihoo.util.*".toClassDefType() }
         }.getOrDefault(false)
       }
@@ -147,8 +147,8 @@ object LCAppUtils {
           PackageUtils.findDexClasses(
             source,
             listOf(
-              "com.secneo.apkwrapper.*".toClassDefType()
-            )
+              "com.secneo.apkwrapper.*".toClassDefType(),
+            ),
           ).any { it == "com.secneo.apkwrapper.*".toClassDefType() }
         }.getOrDefault(false)
       }
@@ -157,8 +157,8 @@ object LCAppUtils {
           otherNativeLibs?.any { it.name == "libflutter.so" } == true || PackageUtils.findDexClasses(
             source,
             listOf(
-              "io.flutter.FlutterInjector".toClassDefType()
-            )
+              "io.flutter.FlutterInjector".toClassDefType(),
+            ),
           ).any { it == "io.flutter.FlutterInjector".toClassDefType() }
         }.getOrDefault(false)
       }
@@ -170,17 +170,17 @@ object LCAppUtils {
     context: FragmentActivity,
     item: LCItem,
     refName: String? = null,
-    refType: Int = NATIVE
+    refType: Int = NATIVE,
   ) {
     context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
     if (item.abi.toInt() == OVERLAY) {
       OverlayDetailBottomSheetDialogFragment().apply {
         arguments = bundleOf(
-          EXTRA_LC_ITEM to item
+          EXTRA_LC_ITEM to item,
         )
         show(
           context.supportFragmentManager,
-          OverlayDetailBottomSheetDialogFragment::class.java.name
+          OverlayDetailBottomSheetDialogFragment::class.java.name,
         )
       }
     } else {
@@ -192,9 +192,9 @@ object LCAppUtils {
             EXTRA_REF_TYPE to refType,
             EXTRA_DETAIL_BEAN to DetailExtraBean(
               item.features,
-              item.variant
-            )
-          )
+              item.variant,
+            ),
+          ),
         )
       context.startActivity(intent)
     }
@@ -209,7 +209,7 @@ object LCAppUtils {
           }
           trackCornerRadius = 3.dp
           isIndeterminate = true
-        }
+        },
       )
       .setCancelable(false)
       .create()

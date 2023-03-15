@@ -6,5 +6,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class DetailExtraBean(
   val features: Int,
-  val variant: Short
+  val variant: Short,
 ) : Parcelable

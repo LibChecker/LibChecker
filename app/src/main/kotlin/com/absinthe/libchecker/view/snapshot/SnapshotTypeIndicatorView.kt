@@ -21,7 +21,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       addView(this)
@@ -58,7 +58,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
           icon.marginStart + icon.measuredWidth +
           colorLabel.marginStart + colorLabel.measuredWidth
         ),
-      text.measuredHeight.coerceAtLeast(icon.measuredHeight)
+      text.measuredHeight.coerceAtLeast(icon.measuredHeight),
     )
     if (enableRoundCorner) {
       colorLabel.apply {
@@ -69,7 +69,7 @@ class SnapshotTypeIndicatorView(context: Context) : AViewGroup(context) {
               0,
               measuredWidth,
               measuredHeight,
-              (measuredWidth / 2).toFloat()
+              (measuredWidth / 2).toFloat(),
             )
           }
         }

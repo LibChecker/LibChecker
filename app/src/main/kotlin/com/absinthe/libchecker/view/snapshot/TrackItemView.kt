@@ -38,12 +38,12 @@ class TrackItemView(context: Context) : FrameLayout(context) {
     val appName = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifMedium
-      )
+        R.style.TextView_SansSerifMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = 8.dp
       }
@@ -56,7 +56,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -67,7 +67,7 @@ class TrackItemView(context: Context) : FrameLayout(context) {
       id = android.R.id.toggle
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       background = null
     }
@@ -84,16 +84,16 @@ class TrackItemView(context: Context) : FrameLayout(context) {
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart - switch.measuredWidth
       appName.measure(
         textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
+        appName.defaultHeightMeasureSpec(this),
       )
       packageName.measure(
         textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
+        appName.defaultHeightMeasureSpec(this),
       )
       setMeasuredDimension(
         measuredWidth,
         (paddingTop + appName.measuredHeight + packageName.measuredHeight + paddingBottom)
-          .coerceAtLeast(icon.measuredHeight + paddingTop + paddingBottom)
+          .coerceAtLeast(icon.measuredHeight + paddingTop + paddingBottom),
       )
     }
 

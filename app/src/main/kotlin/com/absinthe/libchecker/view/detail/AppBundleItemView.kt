@@ -20,7 +20,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = 8.dp
       }
@@ -30,8 +30,8 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
   private val size = AppCompatTextView(
     ContextThemeWrapper(
       context,
-      R.style.TextView_SansSerifCondensedMedium
-    )
+      R.style.TextView_SansSerifCondensedMedium,
+    ),
   ).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -73,7 +73,7 @@ class AppBundleItemView(context: Context) : AViewGroup(context) {
     size.measure(textWidth.toExactlyMeasureSpec(), size.defaultHeightMeasureSpec(this))
     setMeasuredDimension(
       measuredWidth,
-      paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight
+      paddingTop + paddingBottom + name.measuredHeight + size.measuredHeight,
     )
   }
 

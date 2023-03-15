@@ -48,9 +48,9 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
               list += LibStringItemChip(
                 LibStringItem(
                   name = item.componentName,
-                  source = source
+                  source = source,
                 ),
-                null
+                null,
               )
             }
 
@@ -106,7 +106,7 @@ class AbilityAnalysisFragment : BaseDetailFragment<FragmentLibComponentBinding>(
   companion object {
     fun newInstance(@LibType type: Int): AbilityAnalysisFragment {
       return AbilityAnalysisFragment().putArguments(
-        EXTRA_TYPE to type
+        EXTRA_TYPE to type,
       )
     }
   }

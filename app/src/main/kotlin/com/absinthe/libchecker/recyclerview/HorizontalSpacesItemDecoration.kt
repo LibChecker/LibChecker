@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
  */
 class HorizontalSpacesItemDecoration(
   private val space: Int,
-  private val influenceParent: Boolean = false
+  private val influenceParent: Boolean = false,
 ) : RecyclerView.ItemDecoration() {
 
   override fun getItemOffsets(
     outRect: Rect,
     view: View,
     parent: RecyclerView,
-    state: RecyclerView.State
+    state: RecyclerView.State,
   ) {
     if (influenceParent && parent.paddingLeft != space) {
       parent.setPadding(space, parent.paddingTop, space, parent.paddingBottom)

@@ -78,7 +78,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
 
   private val dashboardView by lazy {
     ComparisonDashboardView(
-      ContextThemeWrapper(this, R.style.AlbumMaterialCard)
+      ContextThemeWrapper(this, R.style.AlbumMaterialCard),
     )
   }
 
@@ -130,7 +130,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     dashboardView.apply {
       layoutParams = ViewGroup.MarginLayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       container.leftPart.apply {
         setOnClickListener {
@@ -197,7 +197,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
             }
             viewModel.compareDiff(
               leftTimeStamp.coerceAtMost(rightTimeStamp),
-              leftTimeStamp.coerceAtLeast(rightTimeStamp)
+              leftTimeStamp.coerceAtLeast(rightTimeStamp),
             )
           } else {
             compareDiffContainsApk()
@@ -223,8 +223,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         if (itemDecorationCount == 0) {
           addItemDecoration(
             HorizontalSpacesItemDecoration(
-              resources.getDimension(R.dimen.normal_padding).toInt() / 2
-            )
+              resources.getDimension(R.dimen.normal_padding).toInt() / 2,
+            ),
           )
         }
       }
@@ -240,7 +240,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       val emptyView = SnapshotEmptyView(this@ComparisonActivity).apply {
         layoutParams = FrameLayout.LayoutParams(
           FrameLayout.LayoutParams.MATCH_PARENT,
-          FrameLayout.LayoutParams.WRAP_CONTENT
+          FrameLayout.LayoutParams.WRAP_CONTENT,
         ).also {
           it.gravity = Gravity.CENTER_HORIZONTAL
         }
@@ -461,7 +461,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         .toJson().orEmpty(),
       permissions = pi!!.getPermissionsList().toJson().orEmpty(),
       metadata = PackageUtils.getMetaDataItems(pi!!).toJson().orEmpty(),
-      packageSize = PackageUtils.getPackageSize(pi!!, true)
+      packageSize = PackageUtils.getPackageSize(pi!!, true),
     )
   }
 
@@ -470,7 +470,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(this)
       Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
         2,
-        StaggeredGridLayoutManager.VERTICAL
+        StaggeredGridLayoutManager.VERTICAL,
       )
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }

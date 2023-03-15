@@ -136,7 +136,7 @@ class ChartFragment :
       val parties = listOf(
         resources.getString(R.string.string_64_bit),
         resources.getString(R.string.string_32_bit),
-        resources.getString(R.string.no_libs)
+        resources.getString(R.string.no_libs),
       )
       val entries: ArrayList<PieEntry> = ArrayList()
 
@@ -228,7 +228,7 @@ class ChartFragment :
       val context = context ?: return@launch
       val parties = listOf(
         resources.getString(R.string.string_kotlin_used),
-        resources.getString(R.string.string_kotlin_unused)
+        resources.getString(R.string.string_kotlin_unused),
       )
       val entries: ArrayList<PieEntry> = ArrayList()
 
@@ -270,7 +270,7 @@ class ChartFragment :
         // add a lot of colors
         val colors = arrayListOf(
           Color.parseColor("#7E52FF"),
-          Color.parseColor("#D9318E")
+          Color.parseColor("#D9318E"),
         )
 
         dataSet.colors = colors
@@ -476,7 +476,7 @@ class ChartFragment :
             getString(R.string.string_64_bit) -> {
               dialogTitle = String.format(
                 getString(R.string.title_statistics_dialog),
-                getString(R.string.string_64_bit)
+                getString(R.string.string_64_bit),
               )
               filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_64_BIT }
                 ?.let { filter ->
@@ -486,7 +486,7 @@ class ChartFragment :
             getString(R.string.string_32_bit) -> {
               dialogTitle = String.format(
                 getString(R.string.title_statistics_dialog),
-                getString(R.string.string_32_bit)
+                getString(R.string.string_32_bit),
               )
               filteredList?.filter { (it.abi % MULTI_ARCH) in ABI_32_BIT }
                 ?.let { filter ->
@@ -559,7 +559,7 @@ class ChartFragment :
             }
             it.show(
               activity.supportFragmentManager,
-              ClassifyBottomSheetDialogFragment::class.java.name
+              ClassifyBottomSheetDialogFragment::class.java.name,
             )
           }
         }
@@ -570,7 +570,7 @@ class ChartFragment :
   override fun onButtonChecked(
     group: MaterialButtonToggleGroup?,
     checkedId: Int,
-    isChecked: Boolean
+    isChecked: Boolean,
   ) {
     when (checkedId) {
       R.id.btn_abi -> if (isChecked) {
@@ -595,7 +595,7 @@ class ChartFragment :
     return PieChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+        LinearLayout.LayoutParams.MATCH_PARENT,
       )
       dragDecelerationFrictionCoef = 0.95f
       description.isEnabled = false
@@ -626,7 +626,7 @@ class ChartFragment :
     return HorizontalBarChart(requireContext()).apply {
       layoutParams = LinearLayout.LayoutParams(
         LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.MATCH_PARENT
+        LinearLayout.LayoutParams.MATCH_PARENT,
       )
       description.isEnabled = false
       legend.isEnabled = false

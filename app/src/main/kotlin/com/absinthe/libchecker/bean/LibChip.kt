@@ -7,5 +7,5 @@ import kotlinx.parcelize.Parcelize
 data class LibChip(
   val iconRes: Int,
   val name: String,
-  val regexName: String? = null
+  val regexName: String? = null,
 ) : Parcelable

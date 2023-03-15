@@ -20,7 +20,7 @@ object JsonUtil {
   inline fun <reified T> fromJson(
     @Language("JSON") string: String,
     rawType: Class<*>,
-    vararg typeArguments: Class<*>
+    vararg typeArguments: Class<*>,
   ): T? = try {
     moshi.adapter<T>(Types.newParameterizedType(rawType, *typeArguments)).fromJson(string)
   } catch (e: Exception) {

@@ -31,7 +31,7 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifMedium)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginEnd = context.getDimensionPixelSize(R.dimen.normal_padding)
       }
@@ -44,7 +44,7 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
     AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerifCondensed)).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       addView(this)
@@ -72,8 +72,8 @@ class MetadataLibItemView(context: Context) : AViewGroup(context) {
     setMeasuredDimension(
       measuredWidth,
       (libName.measuredHeight + libSize.measuredHeight + paddingTop + paddingBottom).coerceAtLeast(
-        40.dp
-      )
+        40.dp,
+      ),
     )
   }
 

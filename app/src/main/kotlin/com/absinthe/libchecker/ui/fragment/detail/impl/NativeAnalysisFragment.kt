@@ -37,9 +37,9 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
               NativeLibExtractTipView(ctx).apply {
                 layoutParams = ViewGroup.LayoutParams(
                   ViewGroup.LayoutParams.MATCH_PARENT,
-                  ViewGroup.LayoutParams.WRAP_CONTENT
+                  ViewGroup.LayoutParams.WRAP_CONTENT,
                 )
-              }
+              },
             )
           }
         }
@@ -91,7 +91,7 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
     fun newInstance(packageName: String): NativeAnalysisFragment {
       return NativeAnalysisFragment().putArguments(
         EXTRA_PACKAGE_NAME to packageName,
-        EXTRA_TYPE to NATIVE
+        EXTRA_TYPE to NATIVE,
       )
     }
   }

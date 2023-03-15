@@ -38,7 +38,7 @@ class AppListInitialiseView(context: Context, attributeSet: AttributeSet? = null
     progressIndicator.autoMeasure()
     setMeasuredDimension(
       loadingView.measuredWidth.coerceAtLeast(progressIndicator.measuredWidth),
-      loadingView.measuredHeight + progressIndicator.measuredHeight
+      loadingView.measuredHeight + progressIndicator.measuredHeight,
     )
   }
 

@@ -77,7 +77,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
                 LibChip(
                   iconRes = rule.iconRes,
                   name = rule.label,
-                  regexName = rule.regexName
+                  regexName = rule.regexName,
                 )
               } else {
                 null
@@ -88,9 +88,9 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
                 LibStringItem(
                   name = item.componentName,
                   source = source,
-                  process = item.processName.takeIf { it.isNotEmpty() }
+                  process = item.processName.takeIf { it.isNotEmpty() },
                 ),
-                chip
+                chip,
               )
             }
 
@@ -187,7 +187,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
                 viewModel.packageInfo.packageName,
                 componentName,
                 type,
-                blockerShouldBlock
+                blockerShouldBlock,
               )
               integrationBlockerList =
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
@@ -220,7 +220,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
                 viewModel.packageInfo.packageName,
                 componentName,
                 type,
-                monkeyKingShouldBlock
+                monkeyKingShouldBlock,
               )
               integrationMonkeyKingBlockList =
                 queryBlockedComponent(context, viewModel.packageInfo.packageName)
@@ -239,7 +239,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
           AnywhereManager().launchActivityEditor(
             context,
             viewModel.packageInfo.packageName,
-            componentName
+            componentName,
           )
         }
       }

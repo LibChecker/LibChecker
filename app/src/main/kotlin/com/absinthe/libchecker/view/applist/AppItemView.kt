@@ -29,11 +29,11 @@ class AppItemView(context: Context) : MaterialCardView(context) {
 
   private val floatView by lazy {
     AppCompatTextView(
-      ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium)
+      ContextThemeWrapper(context, R.style.TextView_SansSerifCondensedMedium),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.gravity = Gravity.CENTER
         it.topMargin = 24.dp
@@ -70,12 +70,12 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     val appName = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifMedium
-      )
+        R.style.TextView_SansSerifMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       ).also {
         it.marginStart = 8.dp
       }
@@ -90,7 +90,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       AppCompatTextView(ContextThemeWrapper(context, R.style.TextView_SansSerif)).apply {
         layoutParams = LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -102,12 +102,12 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     val versionInfo = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifCondensed
-      )
+        R.style.TextView_SansSerifCondensed,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -119,12 +119,12 @@ class AppItemView(context: Context) : MaterialCardView(context) {
     val abiInfo = AppCompatTextView(
       ContextThemeWrapper(
         context,
-        R.style.TextView_SansSerifCondensedMedium
-      )
+        R.style.TextView_SansSerifCondensedMedium,
+      ),
     ).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
+        ViewGroup.LayoutParams.WRAP_CONTENT,
       )
       setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -163,24 +163,24 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart
       appName.measure(
         textWidth.toExactlyMeasureSpec(),
-        appName.defaultHeightMeasureSpec(this)
+        appName.defaultHeightMeasureSpec(this),
       )
       packageName.measure(
         textWidth.toExactlyMeasureSpec(),
-        packageName.defaultHeightMeasureSpec(this)
+        packageName.defaultHeightMeasureSpec(this),
       )
       versionInfo.measure(
         textWidth.toExactlyMeasureSpec(),
-        versionInfo.defaultHeightMeasureSpec(this)
+        versionInfo.defaultHeightMeasureSpec(this),
       )
       abiInfo.measure(
         textWidth.toExactlyMeasureSpec(),
-        abiInfo.defaultHeightMeasureSpec(this)
+        abiInfo.defaultHeightMeasureSpec(this),
       )
       badge?.autoMeasure()
       setMeasuredDimension(
         measuredWidth,
-        paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom
+        paddingTop + appName.measuredHeight + packageName.measuredHeight + versionInfo.measuredHeight + abiInfo.measuredHeight + paddingBottom,
       )
     }
 

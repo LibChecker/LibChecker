@@ -13,10 +13,10 @@ class AdvancedMenuAdapter : BaseQuickAdapter<View, BaseViewHolder>(0) {
       LinearLayout(context).apply {
         layoutParams = LinearLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
+          ViewGroup.LayoutParams.WRAP_CONTENT,
         )
         orientation = LinearLayout.VERTICAL
-      }
+      },
     )
   }
 

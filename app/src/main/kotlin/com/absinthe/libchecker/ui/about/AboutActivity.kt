@@ -49,7 +49,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
   private val configuration by lazy {
     Configuration(resources.configuration).apply {
       setLocale(
-        GlobalValues.locale
+        GlobalValues.locale,
       )
     }
   }
@@ -60,7 +60,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
     initView()
     Analytics.trackEvent(
       Constants.Event.SETTINGS,
-      EventProperties().set("PREF_ABOUT", "Entered")
+      EventProperties().set("PREF_ABOUT", "Entered"),
     )
   }
 
@@ -98,7 +98,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           shouldShowEasterEggCount++
           Analytics.trackEvent(
             Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "Renge 10 hits")
+            EventProperties().set("EASTER_EGG", "Renge 10 hits"),
           )
         }
 
@@ -121,8 +121,8 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           val drawable = TransitionDrawable(
             arrayOf(
               headerContentLayout.background,
-              ColorDrawable(R.color.renge.getColor(this))
-            )
+              ColorDrawable(R.color.renge.getColor(this)),
+            ),
           )
           setHeaderBackground(drawable)
           setHeaderContentScrim(ColorDrawable(R.color.renge.getColor(this)))
@@ -133,7 +133,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           GlobalValues.rengeTheme = !GlobalValues.rengeTheme
           Analytics.trackEvent(
             Constants.Event.EASTER_EGG,
-            EventProperties().set("EASTER_EGG", "Renge 20 hits!")
+            EventProperties().set("EASTER_EGG", "Renge 20 hits!"),
           )
         }
       }
@@ -158,40 +158,40 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           R.drawable.pic_rabbit,
           Absinthe.ME,
           "Developer & Designer",
-          developerUrl
-        )
+          developerUrl,
+        ),
       )
       add(
         Contributor(
           R.drawable.pic_kali,
           "Goooler",
           "Code Tidy & Optimize",
-          "https://github.com/Goooler"
-        )
+          "https://github.com/Goooler",
+        ),
       )
       add(
         Contributor(
           R.drawable.pic_qhy040404,
           "qhy040404",
           "Developer",
-          "https://github.com/qhy040404"
-        )
+          "https://github.com/qhy040404",
+        ),
       )
       add(
         Contributor(
           R.drawable.ic_github,
           "Source Code",
           URLManager.GITHUB_REPO_PAGE,
-          URLManager.GITHUB_REPO_PAGE
-        )
+          URLManager.GITHUB_REPO_PAGE,
+        ),
       )
 
       add(Category("Other Works"))
       addAll(
         Absinthe.getAboutPageRecommendedApps(
           this@AboutActivity,
-          BuildConfig.APPLICATION_ID
-        )
+          BuildConfig.APPLICATION_ID,
+        ),
       )
 
       add(Category("Contribution"))
@@ -231,9 +231,9 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
         Card(
           HtmlCompat.fromHtml(
             contributors.toString(),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-          )
-        )
+            HtmlCompat.FROM_HTML_MODE_LEGACY,
+          ),
+        ),
       )
 
       val list = listOf(
@@ -244,16 +244,16 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
         "https://lottiefiles.com/21836-blast-off",
         "https://lottiefiles.com/1309-smiley-stack",
         "https://lottiefiles.com/44836-gray-down-arrow",
-        "https://lottiefiles.com/66818-holographic-radar"
+        "https://lottiefiles.com/66818-holographic-radar",
       )
       add(Category("Acknowledgement"))
       add(
         Card(
           HtmlCompat.fromHtml(
             getAcknowledgementHtmlString(list),
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-          )
-        )
+            HtmlCompat.FROM_HTML_MODE_LEGACY,
+          ),
+        ),
       )
 
       add(Category("Declaration"))
@@ -268,200 +268,200 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
           "LibChecker-Rules-Bundle",
           "LibChecker",
           License.APACHE_2,
-          "https://github.com/LibChecker/LibChecker-Rules-Bundle"
-        )
+          "https://github.com/LibChecker/LibChecker-Rules-Bundle",
+        ),
       )
       add(
         License(
           "kotlin",
           "JetBrains",
           License.APACHE_2,
-          "https://github.com/JetBrains/kotlin"
-        )
+          "https://github.com/JetBrains/kotlin",
+        ),
       )
       add(
         License(
           "MultiType",
           "drakeet",
           License.APACHE_2,
-          "https://github.com/drakeet/MultiType"
-        )
+          "https://github.com/drakeet/MultiType",
+        ),
       )
       add(
         License(
           "about-page",
           "drakeet",
           License.APACHE_2,
-          "https://github.com/drakeet/about-page"
-        )
+          "https://github.com/drakeet/about-page",
+        ),
       )
       add(
         License(
           "AndroidX",
           "Google",
           License.APACHE_2,
-          "https://source.google.com"
-        )
+          "https://source.google.com",
+        ),
       )
       add(
         License(
           "Android Jetpack",
           "Google",
           License.APACHE_2,
-          "https://source.google.com"
-        )
+          "https://source.google.com",
+        ),
       )
       add(
         License(
           "protobuf",
           "Google",
           License.APACHE_2,
-          "https://github.com/protocolbuffers/protobuf"
-        )
+          "https://github.com/protocolbuffers/protobuf",
+        ),
       )
       add(
         License(
           "material-components-android",
           "Google",
           License.APACHE_2,
-          "https://github.com/material-components/material-components-android"
-        )
+          "https://github.com/material-components/material-components-android",
+        ),
       )
       add(
         License(
           "RikkaX",
           "RikkaApps",
           License.MIT,
-          "https://github.com/RikkaApps/RikkaX"
-        )
+          "https://github.com/RikkaApps/RikkaX",
+        ),
       )
       add(
         License(
           "HiddenApiRefinePlugin",
           "RikkaApps",
           License.MIT,
-          "https://github.com/RikkaApps/HiddenApiRefinePlugin"
-        )
+          "https://github.com/RikkaApps/HiddenApiRefinePlugin",
+        ),
       )
       add(
         License(
           "lottie-android",
           "Airbnb",
           License.APACHE_2,
-          "https://github.com/airbnb/lottie-android"
-        )
+          "https://github.com/airbnb/lottie-android",
+        ),
       )
       add(
         License(
           "MPAndroidChart",
           "PhilJay",
           License.APACHE_2,
-          "https://github.com/PhilJay/MPAndroidChart"
-        )
+          "https://github.com/PhilJay/MPAndroidChart",
+        ),
       )
       add(
         License(
           "Once",
           "jonfinerty",
           License.APACHE_2,
-          "https://github.com/jonfinerty/Once"
-        )
+          "https://github.com/jonfinerty/Once",
+        ),
       )
       add(
         License(
           "BaseRecyclerViewAdapterHelper",
           "CymChad",
           License.MIT,
-          "https://github.com/CymChad/BaseRecyclerViewAdapterHelper"
-        )
+          "https://github.com/CymChad/BaseRecyclerViewAdapterHelper",
+        ),
       )
       add(
         License(
           "OkHttp",
           "Square",
           License.APACHE_2,
-          "https://github.com/square/okhttp"
-        )
+          "https://github.com/square/okhttp",
+        ),
       )
       add(
         License(
           "Retrofit",
           "Square",
           License.APACHE_2,
-          "https://github.com/square/retrofit"
-        )
+          "https://github.com/square/retrofit",
+        ),
       )
       add(
         License(
           "Moshi",
           "Square",
           License.APACHE_2,
-          "https://github.com/square/moshi"
-        )
+          "https://github.com/square/moshi",
+        ),
       )
       add(
         License(
           "dexlib2",
           "JesusFreke",
           License.APACHE_2,
-          "https://github.com/JesusFreke/smali"
-        )
+          "https://github.com/JesusFreke/smali",
+        ),
       )
       add(
         License(
           "coil",
           "coil-kt",
           License.APACHE_2,
-          "https://github.com/coil-kt/coil"
-        )
+          "https://github.com/coil-kt/coil",
+        ),
       )
       add(
         License(
           "AndroidFastScroll",
           "zhanghai",
           License.APACHE_2,
-          "https://github.com/zhanghai/AndroidFastScroll"
-        )
+          "https://github.com/zhanghai/AndroidFastScroll",
+        ),
       )
       add(
         License(
           "AppIconLoader",
           "zhanghai",
           License.APACHE_2,
-          "https://github.com/zhanghai/AppIconLoader"
-        )
+          "https://github.com/zhanghai/AppIconLoader",
+        ),
       )
       add(
         License(
           "LSPosed",
           "LSPosed",
           License.GPL_V3,
-          "https://github.com/LSPosed/LSPosed"
-        )
+          "https://github.com/LSPosed/LSPosed",
+        ),
       )
       add(
         License(
           "AndroidHiddenApiBypass",
           "LSPosed",
           License.APACHE_2,
-          "https://github.com/LSPosed/AndroidHiddenApiBypass"
-        )
+          "https://github.com/LSPosed/AndroidHiddenApiBypass",
+        ),
       )
       add(
         License(
           "cascade",
           "saket",
           License.APACHE_2,
-          "https://github.com/saket/cascade"
-        )
+          "https://github.com/saket/cascade",
+        ),
       )
       add(
         License(
           "Android-Room-Database-Backup",
           "rafi0101",
           License.MIT,
-          "https://github.com/rafi0101/Android-Room-Database-Backup"
-        )
+          "https://github.com/rafi0101/Android-Room-Database-Backup",
+        ),
       )
     }
   }
@@ -476,7 +476,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
         startActivity(
           Intent(Intent.ACTION_VIEW)
             .setData(URLManager.MARKET_PAGE.toUri())
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
         )
       } catch (e: ActivityNotFoundException) {
         Timber.e(e)
