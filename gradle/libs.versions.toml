@@ -18,7 +18,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.14.0" }
 ksp = { id = "com.google.devtools.ksp", version = "1.8.10-1.0.9" }
-protobuf = { id = "com.google.protobuf", version = "0.9.1" }
+protobuf = { id = "com.google.protobuf", version = "0.9.2" }
 moshiX = "dev.zacsweers.moshix:0.21.0"
 
 [libraries]
