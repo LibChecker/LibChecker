@@ -162,7 +162,6 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一張快照？</string>
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
-  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">捨棄</string>
   <!--  Album  -->
@@ -182,7 +181,6 @@
   <string name="album_backup_summary">備份所有快照</string>
   <string name="album_restore">還原</string>
   <string name="album_restore_summary">從備份檔案還原快照</string>
-  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
   <!--  Integration  -->
@@ -209,7 +207,4 @@
   <string name="adv_show_target_version">顯示 Target 版本</string>
   <string name="adv_show_min_version">顯示 Min 版本</string>
   <string name="adv_tint_abi_label">ABI 標籤染色</string>
-  <string name="adv_mark_exported">Mark Exported Component</string>
-  <string name="adv_mark_disabled">Mark Disabled Component</string>
-  <string name="adv_show_marked_lib">Show Marked Libraries</string>
 </resources>
