@@ -7,8 +7,8 @@ import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.view.snapshot.SnapshotNoDiffBSView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
@@ -46,9 +46,7 @@ class SnapshotNoDiffBSDFragment : BaseBottomSheetViewDialogFragment<SnapshotNoDi
             setOnClickListener {
               lifecycleScope.launch {
                 val lcItem = Repositories.lcRepository.getItem(item.packageName) ?: return@launch
-                activity?.let { activity ->
-                  LCAppUtils.launchDetailPage(activity, lcItem)
-                }
+                activity?.launchDetailPage(lcItem)
               }
             }
           } ?: run {

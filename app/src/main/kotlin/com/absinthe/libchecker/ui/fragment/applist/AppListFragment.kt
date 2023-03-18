@@ -33,9 +33,10 @@ import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.main.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
-import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
+
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libchecker.utils.showToast
@@ -81,9 +82,7 @@ class AppListFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
-        activity?.let { a ->
-          LCAppUtils.launchDetailPage(a, it.getItem(position))
-        }
+        activity?.launchDetailPage(it.getItem(position))
       }
       it.setDiffCallback(AppListDiffUtil())
       it.setHasStableIds(true)
