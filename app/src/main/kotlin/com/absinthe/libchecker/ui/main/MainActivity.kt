@@ -304,6 +304,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
               is HomeViewModel.Effect.ReloadApps -> {
                 binding.viewpager.setCurrentItem(0, true)
               }
+
               is HomeViewModel.Effect.UpdateAppListStatus -> {
                 if (it.status == STATUS_START_INIT) {
                   doOnMainThreadIdle {
@@ -313,6 +314,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
                   initFeatures()
                 }
               }
+
               else -> {}
             }
           }
