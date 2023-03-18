@@ -79,6 +79,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getFeatures
 import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
@@ -221,6 +222,7 @@ abstract class BaseAppDetailActivity :
               true
             }
           }
+          setAppSize(FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir))
           appNameView.apply {
             text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
             setLongClickCopiedToClipboard(text)
