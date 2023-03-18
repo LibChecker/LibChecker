@@ -111,9 +111,7 @@ class LibCheckerApp : Application() {
       if (GlobalValues.uuid.isEmpty()) {
         GlobalValues.uuid = UUID.randomUUID().toString()
       }
-      return (GlobalValues.uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(
-        90000
-      ) + 10000
+      return (GlobalValues.uuid.hashCode() + PackageUtils.getPackageInfo(app.packageName).firstInstallTime).mod(90000) + 10000
     }
   }
 }

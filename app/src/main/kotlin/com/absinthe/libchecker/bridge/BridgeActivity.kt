@@ -14,24 +14,25 @@ class BridgeActivity : Activity() {
     super.onCreate(savedInstanceState)
 
     intent.data?.let { uri ->
-      if (uri.scheme == "lc" && uri.host == "bridge") {
-        val action = uri.getQueryParameter("action")
+      if (uri.scheme != "lc" || uri.host != "bridge") {
+        return@let
+      }
+      val action = uri.getQueryParameter("action")
 
-        if (action == "shoot") {
-          val authority = uri.getQueryParameter("authority")?.toInt() ?: 0
+      if (action == "shoot") {
+        val authority = uri.getQueryParameter("authority")?.toInt() ?: 0
 
-          if (authority == LibCheckerApp.generateAuthKey()) {
-            val dropPrevious = uri.getQueryParameter("drop_previous")?.toBoolean() ?: false
+        if (authority == LibCheckerApp.generateAuthKey()) {
+          val dropPrevious = uri.getQueryParameter("drop_previous")?.toBoolean() ?: false
 
-            startService(
-              Intent(this, ShootService::class.java).also {
-                it.action = ACTION_SHOOT_AND_STOP_AUTO
-                it.putExtra(EXTRA_DROP_PREVIOUS, dropPrevious)
-              }
-            )
-          } else {
-            Timber.w("Authority mismatch: $authority")
-          }
+          startService(
+            Intent(this, ShootService::class.java).also {
+              it.action = ACTION_SHOOT_AND_STOP_AUTO
+              it.putExtra(EXTRA_DROP_PREVIOUS, dropPrevious)
+            }
+          )
+        } else {
+          Timber.w("Authority mismatch: $authority")
         }
       }
     }

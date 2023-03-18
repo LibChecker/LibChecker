@@ -28,10 +28,4 @@ object AdvancedOptions {
   const val ITEM_DEFAULT_OPTIONS =
     MARK_DISABLED or
       SHOW_MARKED_LIB
-
-  fun isSortModeNothingChoose(): Boolean {
-    return (GlobalValues.advancedOptions and SORT_BY_NAME) == 0 &&
-      (GlobalValues.advancedOptions and SORT_BY_UPDATE_TIME) == 0 &&
-      (GlobalValues.advancedOptions and SORT_BY_TARGET_API) == 0
-  }
 }

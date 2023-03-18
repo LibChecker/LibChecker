@@ -54,8 +54,6 @@ object Constants {
   const val PREF_LOCAL_BACKUP = "localBackup"
   const val PREF_LOCAL_RESTORE = "localRestore"
 
-  const val PREF_LOCAL_RULES_VERSION = "localRulesVersion"
-  const val PREF_LOCAL_RULES_COUNT = "localRulesCount"
   const val PREF_LOCALE = "locale"
 
   const val PREF_DEBUG_MODE = "debugMode"
