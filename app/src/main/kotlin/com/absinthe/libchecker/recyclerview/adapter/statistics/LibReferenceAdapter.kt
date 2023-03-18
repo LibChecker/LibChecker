@@ -26,6 +26,6 @@ class LibReferenceAdapter : BaseNodeAdapter() {
   }
 
   companion object {
-    var highlightText: String = ""
+    var highlightText: String = String()
   }
 }

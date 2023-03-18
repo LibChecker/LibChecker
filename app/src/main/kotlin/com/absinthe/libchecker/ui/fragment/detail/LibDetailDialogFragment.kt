@@ -93,18 +93,12 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
           if (it.relativeUrl.startsWith(URLManager.GITHUB) && GlobalValues.isGitHubUnreachable) {
             lifecycleScope.launch(Dispatchers.IO) {
               val splits = it.relativeUrl.removePrefix(URLManager.GITHUB).split("/")
-              if (splits.size >= 2) {
-                val date = viewModel.getRepoUpdatedTime(splits[0], splits[1])
-                withContext(Dispatchers.Main) {
-                  if (date != null) {
-                    root.libDetailContentView.setUpdatedTime(
-                      String.format(
-                        getString(R.string.format_last_updated),
-                        date
-                      )
-                    )
-                  }
-                }
+              if (splits.size < 2) {
+                return@launch
+              }
+              val date = viewModel.getRepoUpdatedTime(splits[0], splits[1]) ?: return@launch
+              withContext(Dispatchers.Main) {
+                root.libDetailContentView.setUpdatedTime(date)
               }
             }
           }

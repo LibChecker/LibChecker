@@ -21,6 +21,7 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.absinthe.libraries.utils.view.HeightAnimatableViewFlipper
 import com.airbnb.lottie.LottieAnimationView
@@ -93,7 +94,12 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
 
   init {
     val padding = 16.dp
-    setPadding(padding, padding, padding, 0)
+    setPadding(
+      padding,
+      padding,
+      padding,
+      (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
+    )
     addView(header)
     addView(icon)
     addView(title)
@@ -146,12 +152,24 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       layoutParams = LayoutParams(24.dp, 24.dp)
     }
 
+    val tip = AppCompatTextView(context).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.WRAP_CONTENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also {
+        it.marginStart = 8.dp
+      }
+      alpha = 0.65f
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+    }
+
     val text = AppCompatTextView(context).apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.WRAP_CONTENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       ).also {
         it.marginStart = 8.dp
+        it.topMargin = 0
       }
     }
 
@@ -159,25 +177,31 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
       setPadding(8.dp, 8.dp, 8.dp, 8.dp)
       setBackgroundResource(R.drawable.bg_lib_detail_item)
       addView(icon)
+      addView(tip)
       addView(text)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       super.onMeasure(widthMeasureSpec, heightMeasureSpec)
       icon.autoMeasure()
+      tip.measure(
+        (measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - tip.marginStart).toExactlyMeasureSpec(),
+        tip.defaultHeightMeasureSpec(this)
+      )
       text.measure(
         (measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - text.marginStart).toExactlyMeasureSpec(),
         text.defaultHeightMeasureSpec(this)
       )
       setMeasuredDimension(
         measuredWidth,
-        text.measuredHeight.coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
+        (tip.measuredHeight + text.marginTop + text.measuredHeight).coerceAtLeast(icon.measuredHeight) + paddingTop + paddingBottom
       )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
       icon.layout(paddingStart, icon.toVerticalCenter(this))
-      text.layout(icon.right + text.marginStart, text.toVerticalCenter(this))
+      tip.layout(icon.right + tip.marginStart, paddingTop)
+      text.layout(tip.left, tip.bottom + text.marginTop)
     }
   }
 
@@ -256,6 +280,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       icon.setImageResource(R.drawable.ic_label)
+      tip.text = context.getString(R.string.lib_detail_label_tip)
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
     }
 
@@ -265,6 +290,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       icon.setImageResource(R.drawable.ic_team)
+      tip.text = context.getString(R.string.lib_detail_develop_team_tip)
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
     }
 
@@ -274,6 +300,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       icon.setImageResource(R.drawable.ic_github)
+      tip.text = context.getString(R.string.lib_detail_rule_contributors_tip)
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceSubtitle2))
     }
 
@@ -283,6 +310,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       icon.setImageResource(R.drawable.ic_content)
+      tip.text = context.getString(R.string.lib_detail_description_tip)
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
     }
 
@@ -292,10 +320,11 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
       icon.setImageResource(R.drawable.ic_url)
+      tip.text = context.getString(R.string.lib_detail_relative_link_tip)
       text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
     }
 
-    var updatedTime: LibDetailItemView? = null
+    private var updatedTime: LibDetailItemView? = null
 
     init {
       addView(label)
@@ -313,6 +342,7 @@ class LibDetailBottomSheetView(context: Context) : AViewGroup(context), IHeaderV
             ViewGroup.LayoutParams.WRAP_CONTENT
           )
           icon.setImageResource(R.drawable.ic_time)
+          tip.text = context.getString(R.string.lib_detail_last_update_tip)
           text.setTextAppearance(context.getResourceIdByAttr(com.google.android.material.R.attr.textAppearanceBody2))
         }
         addView(updatedTime)
