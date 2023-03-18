@@ -83,6 +83,7 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -680,7 +681,9 @@ abstract class BaseAppDetailActivity :
       it.layoutParams = ViewGroup.MarginLayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
-      )
+      ).also { lp ->
+        lp.topMargin = 4.dp
+      }
       it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = featureAdapter
       it.clipChildren = false
