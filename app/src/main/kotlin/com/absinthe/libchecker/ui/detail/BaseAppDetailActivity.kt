@@ -86,7 +86,6 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard

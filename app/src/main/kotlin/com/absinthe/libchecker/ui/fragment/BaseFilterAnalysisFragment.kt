@@ -6,7 +6,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

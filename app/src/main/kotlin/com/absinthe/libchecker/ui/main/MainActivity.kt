@@ -43,7 +43,6 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
