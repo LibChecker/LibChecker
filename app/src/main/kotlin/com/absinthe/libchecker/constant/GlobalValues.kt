@@ -9,6 +9,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -58,7 +59,7 @@ object GlobalValues {
 
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
-  val season = LCAppUtils.getCurrentSeason()
+  val season by unsafeLazy { LCAppUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
     get() {
@@ -73,7 +74,7 @@ object GlobalValues {
       getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
     }
 
-  var uuid: String by SPDelegates(Constants.PREF_UUID, "")
+  var uuid: String by SPDelegates(Constants.PREF_UUID, String())
 
   var isGitHubUnreachable = true
 }
