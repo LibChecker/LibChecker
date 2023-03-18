@@ -42,7 +42,7 @@ import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
@@ -303,6 +303,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
               is HomeViewModel.Effect.ReloadApps -> {
                 binding.viewpager.setCurrentItem(0, true)
               }
+
               is HomeViewModel.Effect.UpdateAppListStatus -> {
                 if (it.status == STATUS_START_INIT) {
                   doOnMainThreadIdle {
@@ -312,6 +313,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
                   initFeatures()
                 }
               }
+
               else -> {}
             }
           }

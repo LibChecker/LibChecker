@@ -18,10 +18,10 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.OverlayDetailBottomSheetView
@@ -135,7 +135,7 @@ class OverlayDetailBottomSheetDialogFragment :
           }
 
           targetPackageView.setOnClickListener {
-            LCAppUtils.launchDetailPage(requireActivity(), targetLCItem)
+            activity?.launchDetailPage(targetLCItem)
           }
         }
       }

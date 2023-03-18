@@ -30,8 +30,8 @@ import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setBottomPaddingSpace
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.extensions.getBoolean

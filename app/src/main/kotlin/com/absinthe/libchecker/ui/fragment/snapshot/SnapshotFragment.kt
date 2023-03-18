@@ -53,8 +53,8 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard

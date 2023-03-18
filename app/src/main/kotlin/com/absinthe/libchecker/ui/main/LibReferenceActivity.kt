@@ -18,6 +18,7 @@ import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libchecker.viewmodel.LibReferenceViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -137,8 +138,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
       if (AntiShakeUtils.isInvalidClick(view)) {
         return@setOnItemClickListener
       }
-      LCAppUtils.launchDetailPage(
-        this,
+      launchDetailPage(
         item = adapter.getItem(position),
         refName = refName,
         refType = refType

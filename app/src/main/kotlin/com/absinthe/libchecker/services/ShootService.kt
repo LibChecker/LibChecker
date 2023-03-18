@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.services
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -16,6 +17,7 @@ import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -147,7 +149,12 @@ class ShootService : LifecycleService() {
       Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
       _isShooting = true
 
-      areNotificationsEnabled = notificationManager.areNotificationsEnabled()
+      val notificationPermissionGranted = OsUtils.atLeastT() && ContextCompat.checkSelfPermission(
+        this@ShootService,
+        Manifest.permission.POST_NOTIFICATIONS
+      ) == PackageManager.PERMISSION_GRANTED
+      areNotificationsEnabled =
+        notificationManager.areNotificationsEnabled() && notificationPermissionGranted
 
       notificationManager.cancel(notificationIdShootSuccess)
       showNotification()

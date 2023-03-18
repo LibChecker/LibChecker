@@ -1,20 +1,13 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
-import android.content.Intent
-import android.os.Handler
-import android.os.Looper
-import android.os.MessageQueue
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.view.ContextThemeWrapper
-import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.core.os.bundleOf
 import androidx.core.text.toSpannable
-import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.AUTUMN
@@ -24,17 +17,7 @@ import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
 import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.ui.detail.AppDetailActivity
-import com.absinthe.libchecker.ui.detail.EXTRA_DETAIL_BEAN
-import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
-import com.absinthe.libchecker.ui.fragment.detail.EXTRA_LC_ITEM
-import com.absinthe.libchecker.ui.fragment.detail.OverlayDetailBottomSheetDialogFragment
-import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
-import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
@@ -96,28 +79,22 @@ object LCAppUtils {
     nativeLibs: List<LibStringItem>? = null
   ): Rule? {
     val ruleEntity = LCRules.getRule(name, type, true) ?: return null
-    if (type == NATIVE) {
-      if (packageName == null) {
-        return ruleEntity
-      }
-      val isApk = packageName.isTempApk()
-      val source = if (isApk) {
-        File(packageName)
-      } else {
-        runCatching {
-          File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
-        }.getOrNull()
-      }
-      if (source == null) {
-        return ruleEntity
-      }
-      if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
-        return null
-      }
-      return ruleEntity
-    } else {
+    if (type != NATIVE || packageName == null) {
       return ruleEntity
     }
+
+    if (packageName.isTempApk()) {
+      File(packageName)
+    } else {
+      runCatching {
+        File(PackageUtils.getPackageInfo(packageName).applicationInfo.sourceDir)
+      }.getOrNull()
+    } ?: return ruleEntity
+
+    if (!checkNativeLibValidation(packageName, name, nativeLibs)) {
+      return null
+    }
+    return ruleEntity
   }
 
   private val checkNativeLibs =
@@ -166,40 +143,6 @@ object LCAppUtils {
     }
   }
 
-  fun launchDetailPage(
-    context: FragmentActivity,
-    item: LCItem,
-    refName: String? = null,
-    refType: Int = NATIVE
-  ) {
-    context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
-    if (item.abi.toInt() == OVERLAY) {
-      OverlayDetailBottomSheetDialogFragment().apply {
-        arguments = bundleOf(
-          EXTRA_LC_ITEM to item
-        )
-        show(
-          context.supportFragmentManager,
-          OverlayDetailBottomSheetDialogFragment::class.java.name
-        )
-      }
-    } else {
-      val intent = Intent(context, AppDetailActivity::class.java)
-        .putExtras(
-          bundleOf(
-            EXTRA_PACKAGE_NAME to item.packageName,
-            EXTRA_REF_NAME to refName,
-            EXTRA_REF_TYPE to refType,
-            EXTRA_DETAIL_BEAN to DetailExtraBean(
-              item.features,
-              item.variant
-            )
-          )
-        )
-      context.startActivity(intent)
-    }
-  }
-
   fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
     return BaseAlertDialogBuilder(context)
       .setView(
@@ -213,28 +156,5 @@ object LCAppUtils {
       )
       .setCancelable(false)
       .create()
-  }
-}
-
-/**
- * From drakeet
- */
-fun doOnMainThreadIdle(action: () -> Unit) {
-  val handler = Handler(Looper.getMainLooper())
-
-  val idleHandler = MessageQueue.IdleHandler {
-    handler.removeCallbacksAndMessages(null)
-    action()
-    return@IdleHandler false
-  }
-
-  fun setupIdleHandler(queue: MessageQueue) {
-    queue.addIdleHandler(idleHandler)
-  }
-
-  if (Looper.getMainLooper() == Looper.myLooper()) {
-    setupIdleHandler(Looper.myQueue())
-  } else {
-    setupIdleHandler(Looper.getMainLooper().queue)
   }
 }

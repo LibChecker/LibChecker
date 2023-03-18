@@ -79,8 +79,8 @@ lint/tmp/
 # lint/reports/
 app/.classpath
 app/.project
-app/*/release/*
-app/*/debug/*
+app/foss/*
+app/market/*
 
 .project
 .settings/org.eclipse.buildship.core.prefs

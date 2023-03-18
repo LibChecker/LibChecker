@@ -41,10 +41,10 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotCompon
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
@@ -151,7 +151,7 @@ class SnapshotDetailActivity :
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-            LCAppUtils.launchDetailPage(this@SnapshotDetailActivity, lcItem)
+            launchDetailPage(lcItem)
           }
         }
       }
@@ -281,8 +281,7 @@ class SnapshotDetailActivity :
 
       lifecycleScope.launch {
         val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-        LCAppUtils.launchDetailPage(
-          this@SnapshotDetailActivity,
+        launchDetailPage(
           item = lcItem,
           refName = item.name,
           refType = item.itemType
