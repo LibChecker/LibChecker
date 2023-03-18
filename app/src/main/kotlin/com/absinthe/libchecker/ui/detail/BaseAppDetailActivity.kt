@@ -8,11 +8,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.text.style.ImageSpan
-import android.text.style.StrikethroughSpan
+import android.text.format.Formatter
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -56,7 +53,6 @@ import com.absinthe.libchecker.bean.FeatureItem
 import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
-import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -65,6 +61,7 @@ import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.ProcessBarAdapter
+import com.absinthe.libchecker.recyclerview.adapter.detail.node.AbiLabelNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
@@ -86,14 +83,12 @@ import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
-import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.ProcessBarView
 import com.absinthe.libchecker.viewmodel.DetailViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -222,7 +217,6 @@ abstract class BaseAppDetailActivity :
               true
             }
           }
-          setAppSize(FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir))
           appNameView.apply {
             text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
             setLongClickCopiedToClipboard(text)
@@ -267,6 +261,11 @@ abstract class BaseAppDetailActivity :
               append(" Compile: ")
             }
             append(PackageUtils.getCompileSdkVersion(packageInfo))
+            scale(0.8f) {
+              append(" Size: ")
+            }
+            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            append(Formatter.formatFileSize(this@BaseAppDetailActivity, apkSize))
 
             packageInfo.sharedUserId?.let {
               appendLine().append("sharedUserId = $it")
@@ -293,76 +292,27 @@ abstract class BaseAppDetailActivity :
               }
             }
           }
-          appendLine()
         }
         extraInfo.append(versionInfo)
 
         if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
-          val spanStringBuilder = SpannableStringBuilder()
-          var spanString: SpannableString
-          var itemCount = 0
+          val abiLabelsList = mutableListOf<AbiLabelNode>()
 
           if (abi >= Constants.MULTI_ARCH) {
-            spanString = SpannableString("  ")
-            R.drawable.ic_multi_arch_full.getDrawable(this@BaseAppDetailActivity)?.let { drawable ->
-              drawable.setBounds(
-                0,
-                0,
-                drawable.intrinsicWidth,
-                (drawable.intrinsicHeight * 0.92f).toInt()
-              )
-              val span = CenterAlignImageSpan(drawable)
-              spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-            }
-            spanStringBuilder.append(spanString)
+            abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true))
           }
 
           abiSet.forEach {
-            itemCount++
-            PackageUtils.getAbiString(
-              this@BaseAppDetailActivity,
-              it,
-              false
-            ).let { str ->
-              spanString = SpannableString("\uFFFC $str")
-            }
-            val abiRes = PackageUtils.getAbiBadgeResource(it)
-            abiRes.getDrawable(this@BaseAppDetailActivity)?.mutate()?.let { drawable ->
-              if ((GlobalValues.advancedOptions and AdvancedOptions.TINT_ABI_LABEL) > 0) {
-                if (abiRes == R.drawable.ic_abi_label_64bit) {
-                  drawable.setTint(this@BaseAppDetailActivity.getColorByAttr(com.google.android.material.R.attr.colorPrimary))
-                } else {
-                  drawable.setTint(this@BaseAppDetailActivity.getColorByAttr(com.google.android.material.R.attr.colorTertiary))
-                }
-              }
-              drawable.setBounds(
-                0,
-                0,
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight
+            if (it != Constants.NO_LIBS) {
+              abiLabelsList.add(
+                AbiLabelNode(
+                  it,
+                  apkAnalyticsMode || abi >= Constants.MULTI_ARCH || it == abi % Constants.MULTI_ARCH
+                )
               )
-              if (it != abi % Constants.MULTI_ARCH) {
-                drawable.alpha = 128
-              } else {
-                drawable.alpha = 255
-              }
-              val span = CenterAlignImageSpan(drawable)
-              spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
-            }
-            if (!apkAnalyticsMode && it != abi % Constants.MULTI_ARCH) {
-              spanString.setSpan(
-                StrikethroughSpan(),
-                2,
-                spanString.length,
-                Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-              )
-            }
-            spanStringBuilder.append(spanString)
-            if (itemCount < abiSet.size) {
-              spanStringBuilder.append(", ")
             }
           }
-          extraInfo.append(spanStringBuilder).appendLine()
+          detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
         }
 
         val advanced = when (abi) {
@@ -731,7 +681,9 @@ abstract class BaseAppDetailActivity :
       it.layoutParams = ViewGroup.MarginLayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
-      )
+      ).also { lp ->
+        lp.topMargin = 4.dp
+      }
       it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
       it.adapter = featureAdapter
       it.clipChildren = false
