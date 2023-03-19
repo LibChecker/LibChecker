@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -69,14 +68,19 @@ import timber.log.Timber
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
-  val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
-
-  private var savedRefList: MutableLiveData<List<LibReference>?> = MutableLiveData()
-  private var referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>? = null
-  var savedThreshold = GlobalValues.libReferenceThreshold
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
+
+  private val _libReference: MutableSharedFlow<List<LibReference>?> = MutableSharedFlow()
+  val libReference = _libReference.asSharedFlow()
+
+  private var _savedRefList: List<LibReference>? = null
+  val savedRefList: List<LibReference>?
+    get() = _savedRefList
+
+  private var referenceMap: HashMap<String, Pair<MutableSet<String>, Int>>? = null
+  var savedThreshold = GlobalValues.libReferenceThreshold
 
   var controller: IListController? = null
   var libRefSystemApps: Boolean? = null
@@ -149,48 +153,49 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private suspend fun initItemsImpl(appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
-    Timber.d("initItems: START")
+  private suspend fun initItemsImpl(appList: List<PackageInfo>) =
+    viewModelScope.launch(Dispatchers.IO) {
+      Timber.d("initItems: START")
 
-    val context: Context = getApplication<LibCheckerApp>()
-    val timeRecorder = TimeRecorder()
-    timeRecorder.start()
+      val context: Context = getApplication<LibCheckerApp>()
+      val timeRecorder = TimeRecorder()
+      timeRecorder.start()
 
-    updateAppListStatus(STATUS_START_INIT)
-    Repositories.lcRepository.deleteAllItems()
-    updateInitProgress(0)
+      updateAppListStatus(STATUS_START_INIT)
+      Repositories.lcRepository.deleteAllItems()
+      updateInitProgress(0)
 
-    val lcItems = mutableListOf<LCItem>()
-    val isHarmony = HarmonyOsUtil.isHarmonyOs()
-    val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
-    var progressCount = 0
+      val lcItems = mutableListOf<LCItem>()
+      val isHarmony = HarmonyOsUtil.isHarmonyOs()
+      val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
+      var progressCount = 0
 
-    for (info in appList) {
-      try {
-        lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, bundleManager, true))
-        progressCount++
-        updateInitProgress(progressCount * 100 / appList.size)
-      } catch (e: Throwable) {
-        Timber.e(e, "initItems: ${info.packageName}")
-        continue
+      for (info in appList) {
+        try {
+          lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, bundleManager, true))
+          progressCount++
+          updateInitProgress(progressCount * 100 / appList.size)
+        } catch (e: Throwable) {
+          Timber.e(e, "initItems: ${info.packageName}")
+          continue
+        }
+
+        if (lcItems.size == 50) {
+          insert(lcItems)
+          lcItems.clear()
+        }
       }
 
-      if (lcItems.size == 50) {
+      if (lcItems.isNotEmpty()) {
         insert(lcItems)
-        lcItems.clear()
       }
-    }
+      updateAppListStatus(STATUS_INIT_END)
 
-    if (lcItems.isNotEmpty()) {
-      insert(lcItems)
+      timeRecorder.end()
+      Timber.d("initItems: END, $timeRecorder")
+      updateAppListStatus(STATUS_NOT_START)
+      initJob = null
     }
-    updateAppListStatus(STATUS_INIT_END)
-
-    timeRecorder.end()
-    Timber.d("initItems: END, $timeRecorder")
-    updateAppListStatus(STATUS_NOT_START)
-    initJob = null
-  }
 
   private var requestChangeJob: Job? = null
 
@@ -216,63 +221,64 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
 
-  private suspend fun requestChangeImpl(appMap: Map<String, PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
-    val dbItems = Repositories.lcRepository.getLCItems()
-    if (dbItems.isEmpty()) {
-      return@launch
-    }
-    Timber.d("Request change: START")
-    val timeRecorder = TimeRecorder()
-
-    timeRecorder.start()
-    updateAppListStatus(STATUS_START_REQUEST_CHANGE)
-
-    val isHarmony = HarmonyOsUtil.isHarmonyOs()
-    val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
-
-    val localApps = appMap.map { it.key }.toSet()
-    val dbApps = dbItems.map { it.packageName }.toSet()
-    val newApps = localApps - dbApps
-    val removedApps = dbApps - localApps
-
-    newApps.forEach {
-      runCatching {
-        val info = appMap[it] ?: return@runCatching
-        insert(generateLCItemFromPackageInfo(info, isHarmony, bundleManager))
-      }.onFailure { e ->
-        Timber.e(e, "requestChange: $it")
+  private suspend fun requestChangeImpl(appMap: Map<String, PackageInfo>) =
+    viewModelScope.launch(Dispatchers.IO) {
+      val dbItems = Repositories.lcRepository.getLCItems()
+      if (dbItems.isEmpty()) {
+        return@launch
       }
-    }
+      Timber.d("Request change: START")
+      val timeRecorder = TimeRecorder()
 
-    removedApps.forEach {
-      Repositories.lcRepository.deleteLCItemByPackageName(it)
-    }
+      timeRecorder.start()
+      updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
-    localApps.intersect(dbApps).asSequence()
-      .mapNotNull { appMap[it] }
-      .filter { pi ->
-        dbItems.find { it.packageName == pi.packageName }?.let {
-          it.versionCode != PackageUtils.getVersionCode(pi) ||
-            pi.lastUpdateTime != it.lastUpdatedTime ||
-            it.lastUpdatedTime == 0L
-        } ?: false
-      }.forEach {
-        update(generateLCItemFromPackageInfo(it, isHarmony, bundleManager))
+      val isHarmony = HarmonyOsUtil.isHarmonyOs()
+      val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
+
+      val localApps = appMap.map { it.key }.toSet()
+      val dbApps = dbItems.map { it.packageName }.toSet()
+      val newApps = localApps - dbApps
+      val removedApps = dbApps - localApps
+
+      newApps.forEach {
+        runCatching {
+          val info = appMap[it] ?: return@runCatching
+          insert(generateLCItemFromPackageInfo(info, isHarmony, bundleManager))
+        }.onFailure { e ->
+          Timber.e(e, "requestChange: $it")
+        }
       }
 
-    refreshList()
+      removedApps.forEach {
+        Repositories.lcRepository.deleteLCItemByPackageName(it)
+      }
 
-    updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
-    timeRecorder.end()
-    Timber.d("Request change: END, $timeRecorder")
-    updateAppListStatus(STATUS_NOT_START)
+      localApps.intersect(dbApps).asSequence()
+        .mapNotNull { appMap[it] }
+        .filter { pi ->
+          dbItems.find { it.packageName == pi.packageName }?.let {
+            it.versionCode != PackageUtils.getVersionCode(pi) ||
+              pi.lastUpdateTime != it.lastUpdatedTime ||
+              it.lastUpdatedTime == 0L
+          } ?: false
+        }.forEach {
+          update(generateLCItemFromPackageInfo(it, isHarmony, bundleManager))
+        }
 
-    if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
-      delay(10000)
-      collectPopularLibraries(appMap)
-      Once.markDone(OnceTag.HAS_COLLECT_LIB)
+      refreshList()
+
+      updateAppListStatus(STATUS_START_REQUEST_CHANGE_END)
+      timeRecorder.end()
+      Timber.d("Request change: END, $timeRecorder")
+      updateAppListStatus(STATUS_NOT_START)
+
+      if (!Once.beenDone(Once.THIS_APP_VERSION, OnceTag.HAS_COLLECT_LIB)) {
+        delay(10000)
+        collectPopularLibraries(appMap)
+        Once.markDone(OnceTag.HAS_COLLECT_LIB)
+      }
     }
-  }
 
   private fun generateLCItemFromPackageInfo(
     pi: PackageInfo,
@@ -415,9 +421,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private fun computeLibReferenceImpl(appMap: Map<String, PackageInfo>, @LibType type: Int) {
+  private suspend fun computeLibReferenceImpl(
+    appMap: Map<String, PackageInfo>,
+    @LibType type: Int
+  ) {
     referenceMap = null
-    libReference.postValue(null)
+    _libReference.emit(null)
     val map = HashMap<String, Pair<MutableSet<String>, Int>>()
     val showSystem = GlobalValues.isShowSystemApps.value ?: false
 
@@ -817,8 +826,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         refList.sortByDescending { it.referredList.size }
-        libReference.postValue(refList)
-        savedRefList.postValue(refList)
+        _libReference.emit(refList)
+        _savedRefList = refList
       }
     }
   }
@@ -828,10 +837,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     matchingJob = null
   }
 
-  fun refreshRef() {
-    savedRefList.value?.let { ref ->
-      libReference.value =
-        ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold }
+  fun refreshRef() = viewModelScope.launch(Dispatchers.IO) {
+    _savedRefList?.let { ref ->
+      _libReference.emit(ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold })
     }
   }
 
