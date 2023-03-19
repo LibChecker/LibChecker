@@ -18,9 +18,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.os.bundleOf
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -29,7 +27,6 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
@@ -37,6 +34,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
@@ -53,8 +51,9 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
@@ -265,18 +264,22 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         adapter.setList(list.sortedByDescending { it.updateTime })
         flip(VF_LIST)
       }
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-          effect.collect {
-            when (it) {
-              is SnapshotViewModel.Effect.ChooseComparedApk -> {
-                isLeftPartChoosing = it.isLeftPart
-                chooseApkResultLauncher.launch("application/vnd.android.package-archive")
-              }
+      effect.onEach {
+        when (it) {
+          is SnapshotViewModel.Effect.ChooseComparedApk -> {
+            isLeftPartChoosing = it.isLeftPart
+            chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+          }
+
+          is SnapshotViewModel.Effect.DashboardCountChange -> {
+            if (it.isLeft) {
+              dashboardView.container.leftPart.tvSnapshotAppsCountText.text = it.snapshotCount.toString()
+            } else {
+              dashboardView.container.rightPart.tvSnapshotAppsCountText.text = it.snapshotCount.toString()
             }
           }
         }
-      }
+      }.launchIn(lifecycleScope)
     }
   }
 
@@ -317,12 +320,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           it.leftPart.tvSnapshotAppsCountText.text = 1.toString()
         } else if (leftTimeStamp > 0) {
           it.leftPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
-          lifecycleScope.launch(Dispatchers.IO) {
-            val count = viewModel.repository.getSnapshots(leftTimeStamp).size
-            withContext(Dispatchers.Main) {
-              it.leftPart.tvSnapshotAppsCountText.text = count.toString()
-            }
-          }
+          viewModel.getDashboardCount(leftTimeStamp, true)
         }
 
         if (rightTimeStamp == -1L) {
@@ -332,12 +330,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           it.rightPart.tvSnapshotAppsCountText.text = 1.toString()
         } else if (rightTimeStamp > 0) {
           it.rightPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
-          lifecycleScope.launch(Dispatchers.IO) {
-            val count = viewModel.repository.getSnapshots(rightTimeStamp).size
-            withContext(Dispatchers.Main) {
-              it.rightPart.tvSnapshotAppsCountText.text = count.toString()
-            }
-          }
+          viewModel.getDashboardCount(rightTimeStamp, false)
         }
       }
     }

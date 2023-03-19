@@ -16,9 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
@@ -49,6 +47,8 @@ import com.microsoft.appcenter.analytics.EventProperties
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -295,32 +295,28 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         initFeatures()
       }
 
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.ReloadApps -> {
-                binding.viewpager.setCurrentItem(0, true)
-              }
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.ReloadApps -> {
+            binding.viewpager.setCurrentItem(0, true)
+          }
 
-              is HomeViewModel.Effect.UpdateAppListStatus -> {
-                if (it.status == STATUS_START_INIT) {
-                  doOnMainThreadIdle {
-                    hideNavigationView()
-                  }
-                } else if (it.status == STATUS_INIT_END) {
-                  doOnMainThreadIdle {
-                    showNavigationView()
-                  }
-                  initFeatures()
-                }
+          is HomeViewModel.Effect.UpdateAppListStatus -> {
+            if (it.status == STATUS_START_INIT) {
+              doOnMainThreadIdle {
+                hideNavigationView()
               }
-
-              else -> {}
+            } else if (it.status == STATUS_INIT_END) {
+              doOnMainThreadIdle {
+                showNavigationView()
+              }
+              initFeatures()
             }
           }
+
+          else -> {}
         }
-      }
+      }.launchIn(lifecycleScope)
     }
   }
 

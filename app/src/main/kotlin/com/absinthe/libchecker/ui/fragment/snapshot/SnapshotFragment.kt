@@ -25,9 +25,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -35,7 +33,6 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -73,8 +70,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -266,18 +261,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           compareDiff()
         }
       }.launchIn(lifecycleScope)
-      snapshotAppsCount.observe(viewLifecycleOwner) {
-        if (it != null) {
-          lifecycleScope.launch(Dispatchers.Default) {
-            val appCount = LocalAppDataSource.getCachedApplicationMap().size
-
-            withContext(Dispatchers.Main) {
-              dashboard.container.tvSnapshotAppsCountText.text =
-                String.format("%d / %d", it, appCount)
-            }
-          }
-        }
-      }
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
@@ -303,37 +286,29 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         binding.progressIndicator.setProgressCompat(it, it != 1)
       }
     }
-    homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.PackageChanged -> {
-                if (allowRefreshing) {
-                  packageQueue.offer(it.packageName to it.action)
-                  dequeuePackages()
-
-                  lifecycleScope.launch(Dispatchers.Default) {
-                    val appCount = LocalAppDataSource.getCachedApplicationMap().size
-                    viewModel.snapshotAppsCount.value ?: runBlocking {
-                      viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-                    }
-                    val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
-
-                    withContext(Dispatchers.Main) {
-                      dashboard.container.tvSnapshotAppsCountText.text =
-                        String.format("%d / %d", snapshotCount, appCount)
-                    }
-                  }
-                }
-              }
-
-              else -> {}
-            }
+    homeViewModel.effect.onEach {
+      when (it) {
+        is HomeViewModel.Effect.PackageChanged -> {
+          if (allowRefreshing) {
+            packageQueue.offer(it.packageName to it.action)
+            dequeuePackages()
+            viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
         }
+
+        else -> {}
       }
-    }
+    }.launchIn(lifecycleScope)
+    viewModel.effect.onEach {
+      when (it) {
+        is SnapshotViewModel.Effect.DashboardCountChange -> {
+          dashboard.container.tvSnapshotAppsCountText.text =
+            String.format("%d / %d", it.snapshotCount, it.appCount)
+        }
+
+        else -> {}
+      }
+    }.launchIn(lifecycleScope)
   }
 
   override fun onAttach(context: Context) {
@@ -537,8 +512,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     viewModel.timestamp.value = GlobalValues.snapshotTimestamp
     isSnapshotDatabaseItemsReady = true
 
-    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-
+    viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
     viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
   }

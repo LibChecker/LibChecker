@@ -12,9 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -180,26 +178,22 @@ class LibReferenceFragment :
     }
 
     homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.PackageChanged -> {
-                computeRef(false)
-              }
-
-              is HomeViewModel.Effect.UpdateLibRefProgress -> {
-                binding.loadingView.progressIndicator.setProgressCompat(
-                  it.progress,
-                  it.progress > 0
-                )
-              }
-
-              else -> {}
-            }
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.PackageChanged -> {
+            computeRef(false)
           }
+
+          is HomeViewModel.Effect.UpdateLibRefProgress -> {
+            binding.loadingView.progressIndicator.setProgressCompat(
+              it.progress,
+              it.progress > 0
+            )
+          }
+
+          else -> {}
         }
-      }
+      }.launchIn(lifecycleScope)
       libReference.onEach {
         if (it == null) {
           return@onEach

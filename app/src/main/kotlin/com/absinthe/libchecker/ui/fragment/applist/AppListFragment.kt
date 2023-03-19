@@ -8,9 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -279,65 +277,61 @@ class AppListFragment :
 
   private fun initObserver() {
     homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.ReloadApps -> {
-                Once.clearDone(OnceTag.FIRST_LAUNCH)
-                isFirstLaunch = true
-                doOnMainThreadIdle {
-                  initApps()
-                }
-              }
-
-              is HomeViewModel.Effect.UpdateInitProgress -> {
-                binding.initView.progressIndicator.setProgressCompat(it.progress, true)
-              }
-
-              is HomeViewModel.Effect.PackageChanged -> {
-                requestChange(true)
-              }
-
-              is HomeViewModel.Effect.UpdateAppListStatus -> {
-                Timber.d("AppList status updates to ${it.status}")
-                when (it.status) {
-                  STATUS_START_INIT -> {
-                    isListReady = false
-                    flip(VF_INIT)
-                  }
-
-                  STATUS_INIT_END -> {
-                    if (isFirstLaunch) {
-                      Once.markDone(OnceTag.FIRST_LAUNCH)
-                      Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-                    }
-                    activity?.addMenuProvider(this@AppListFragment)
-                  }
-
-                  STATUS_NOT_START -> {
-                    val first = HarmonyOsUtil.isHarmonyOs() &&
-                      !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
-                    val second = !isFirstLaunch &&
-                      !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
-                    if (first || second) {
-                      initApps()
-                      Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-                      Once.markDone(OnceTag.HARMONY_FIRST_INIT)
-                    }
-                  }
-                }
-              }
-
-              is HomeViewModel.Effect.RefreshList -> {
-                updateItems()
-              }
-
-              else -> {}
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.ReloadApps -> {
+            Once.clearDone(OnceTag.FIRST_LAUNCH)
+            isFirstLaunch = true
+            doOnMainThreadIdle {
+              initApps()
             }
           }
+
+          is HomeViewModel.Effect.UpdateInitProgress -> {
+            binding.initView.progressIndicator.setProgressCompat(it.progress, true)
+          }
+
+          is HomeViewModel.Effect.PackageChanged -> {
+            requestChange(true)
+          }
+
+          is HomeViewModel.Effect.UpdateAppListStatus -> {
+            Timber.d("AppList status updates to ${it.status}")
+            when (it.status) {
+              STATUS_START_INIT -> {
+                isListReady = false
+                flip(VF_INIT)
+              }
+
+              STATUS_INIT_END -> {
+                if (isFirstLaunch) {
+                  Once.markDone(OnceTag.FIRST_LAUNCH)
+                  Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                }
+                activity?.addMenuProvider(this@AppListFragment)
+              }
+
+              STATUS_NOT_START -> {
+                val first = HarmonyOsUtil.isHarmonyOs() &&
+                  !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
+                val second = !isFirstLaunch &&
+                  !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
+                if (first || second) {
+                  initApps()
+                  Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                  Once.markDone(OnceTag.HARMONY_FIRST_INIT)
+                }
+              }
+            }
+          }
+
+          is HomeViewModel.Effect.RefreshList -> {
+            updateItems()
+          }
+
+          else -> {}
         }
-      }
+      }.launchIn(lifecycleScope)
       dbItemsFlow.onEach {
         if (it.isEmpty()) {
           initApps()

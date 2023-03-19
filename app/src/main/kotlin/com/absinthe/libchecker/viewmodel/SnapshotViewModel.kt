@@ -67,15 +67,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
   val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
   val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-  val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
   val comparingProgressLiveData = MutableLiveData(0)
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
-
-  fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-    snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
-  }
 
   private var compareDiffJob: Job? = null
 
@@ -1322,6 +1317,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
   }
 
+  fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    Timber.d("getDashboardCount: $timestamp, $isLeft")
+      val snapshotCount = repository.getSnapshots(timestamp).size
+      val appCount = LocalAppDataSource.getCachedApplicationMap().size
+      setEffect {
+        Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
+      }
+  }
+
   private fun setEffect(builder: () -> Effect) {
     val newEffect = builder()
     viewModelScope.launch {
@@ -1331,5 +1335,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   sealed class Effect {
     data class ChooseComparedApk(val isLeftPart: Boolean) : Effect()
+    data class DashboardCountChange(val snapshotCount: Int, val appCount: Int, val isLeft: Boolean) : Effect()
   }
 }
