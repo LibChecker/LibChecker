@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
@@ -44,6 +43,7 @@ import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.model.StatefulComponent
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getFeatures
@@ -53,10 +53,12 @@ import com.absinthe.libraries.utils.manager.TimeRecorder
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
 import com.microsoft.appcenter.analytics.Analytics
+import java.io.File
 import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.retryWhen
@@ -66,7 +68,7 @@ import timber.log.Timber
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-  val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
+  val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
   val libReference: MutableLiveData<List<LibReference>?> = MutableLiveData()
 
   private var savedRefList: MutableLiveData<List<LibReference>?> = MutableLiveData()
@@ -83,6 +85,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   var workerBinder: IWorkerService? = null
 
   fun reloadApps() {
+    if (appListStatus != STATUS_NOT_START) {
+      Timber.d("reloadApps: ignore, appListStatus: $appListStatus")
+      return
+    }
     setEffect {
       Effect.ReloadApps()
     }
@@ -132,7 +138,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     if (initJob?.isActive == true) {
       return
     }
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch {
       LocalAppDataSource.getApplicationList(Dispatchers.IO).retryWhen { cause, attempt ->
         Timber.d("initItems: RETRY cause: $cause, attempt: $attempt")
         delay(1000)
@@ -143,7 +149,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private fun initItemsImpl(appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+  private suspend fun initItemsImpl(appList: List<PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("initItems: START")
 
     val context: Context = getApplication<LibCheckerApp>()
@@ -189,7 +195,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private var requestChangeJob: Job? = null
 
   fun requestChange(needRefresh: Boolean = false) =
-    viewModelScope.launch(Dispatchers.IO) {
+    viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
         return@launch
@@ -210,9 +216,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
 
-  private suspend fun requestChangeImpl(appMap: Map<String, PackageInfo>) = viewModelScope.launch {
+  private suspend fun requestChangeImpl(appMap: Map<String, PackageInfo>) = viewModelScope.launch(Dispatchers.IO) {
+    val dbItems = Repositories.lcRepository.getLCItems()
+    if (dbItems.isEmpty()) {
+      return@launch
+    }
     Timber.d("Request change: START")
-    val dbItems = dbItems.value ?: return@launch
     val timeRecorder = TimeRecorder()
 
     timeRecorder.start()
@@ -296,7 +305,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     )
   }
 
-  private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
+  private suspend fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
       if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
         return@launch
@@ -824,6 +833,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       libReference.value =
         ref.filter { it.referredList.size >= GlobalValues.libReferenceThreshold }
     }
+  }
+
+  fun clearApkCache() {
+    FileUtils.delete(File(LibCheckerApp.app.externalCacheDir, Constants.TEMP_PACKAGE))
   }
 
   private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)

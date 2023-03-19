@@ -20,7 +20,13 @@ interface LCDao {
 
   // Item Table
   @Query("SELECT * from item_table ORDER BY label ASC")
-  fun getItems(): LiveData<List<LCItem>>
+  fun getItemsFlow(): Flow<List<LCItem>>
+
+  @Query("SELECT * from item_table ORDER BY label ASC")
+  fun getItemsLiveData(): LiveData<List<LCItem>>
+
+  @Query("SELECT * from item_table ORDER BY label ASC")
+  suspend fun getItems(): List<LCItem>
 
   @Query("SELECT * from item_table WHERE packageName LIKE :packageName")
   suspend fun getItem(packageName: String): LCItem?

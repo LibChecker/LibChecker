@@ -266,7 +266,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         flip(VF_LIST)
       }
       lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
           effect.collect {
             when (it) {
               is SnapshotViewModel.Effect.ChooseComparedApk -> {

@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -15,32 +14,33 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
 
   val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
-  val dbItems: LiveData<List<LCItem>> = Repositories.lcRepository.allDatabaseItems
+  val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
 
   fun setData(name: String, @LibType type: Int) = viewModelScope.launch(Dispatchers.IO) {
-    dbItems.value?.let {
+    dbItemsFlow.collect {
       setDataInternal(it, name, type)
     }
   }
 
   fun setData(packagesList: List<String>) = viewModelScope.launch(Dispatchers.IO) {
-    dbItems.value?.let { dbList ->
+    dbItemsFlow.collect {
       val list = mutableListOf<LCItem>()
       packagesList.forEach { pkgName ->
-        dbList.find { it.packageName == pkgName }?.let { lcItem ->
+        it.find { it.packageName == pkgName }?.let { lcItem ->
           list.add(lcItem)
         }
       }

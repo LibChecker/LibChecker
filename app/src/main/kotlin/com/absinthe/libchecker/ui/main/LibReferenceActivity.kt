@@ -12,10 +12,10 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
-import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityLibReferenceBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.isOrientationLandscape
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
@@ -45,22 +45,24 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
     refName?.let { name ->
       initView()
-      viewModel.dbItems.observe(this) {
-        refList?.let {
-          viewModel.setData(it.toList())
-        } ?: run {
-          viewModel.setData(name, refType)
-        }
-      }
-
-      lifecycleScope.launch(Dispatchers.IO) {
-        LCAppUtils.getRuleWithRegex(name, refType)?.let {
-          withContext(Dispatchers.Main) {
-            binding.toolbar.title = it.label
+      lifecycleScope.launch {
+        viewModel.dbItemsFlow.collect {
+          refList?.let {
+            viewModel.setData(it.toList())
+          } ?: run {
+            viewModel.setData(name, refType)
           }
-        } ?: run {
-          withContext(Dispatchers.Main) {
-            binding.toolbar.title = getString(R.string.tab_lib_reference_statistics)
+        }
+
+        withContext(Dispatchers.IO) {
+          LCAppUtils.getRuleWithRegex(name, refType)?.let {
+            withContext(Dispatchers.Main) {
+              binding.toolbar.title = it.label
+            }
+          } ?: run {
+            withContext(Dispatchers.Main) {
+              binding.toolbar.title = getString(R.string.tab_lib_reference_statistics)
+            }
           }
         }
       }

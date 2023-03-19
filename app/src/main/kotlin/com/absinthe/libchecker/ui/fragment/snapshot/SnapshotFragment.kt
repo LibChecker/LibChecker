@@ -305,7 +305,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
     homeViewModel.apply {
       lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.CREATED) {
           effect.collect {
             when (it) {
               is HomeViewModel.Effect.PackageChanged -> {
