@@ -33,11 +33,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -45,6 +43,8 @@ import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -269,7 +269,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       snapshotAppsCount.observe(viewLifecycleOwner) {
         if (it != null) {
           lifecycleScope.launch(Dispatchers.Default) {
-            val appCount = AppItemRepository.getApplicationInfoMap().size
+            val appCount = LocalAppDataSource.getCachedApplicationMap().size
 
             withContext(Dispatchers.Main) {
               dashboard.container.tvSnapshotAppsCountText.text =
@@ -314,7 +314,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
                   dequeuePackages()
 
                   lifecycleScope.launch(Dispatchers.Default) {
-                    val appCount = AppItemRepository.getApplicationInfoMap().size
+                    val appCount = LocalAppDataSource.getCachedApplicationMap().size
                     viewModel.snapshotAppsCount.value ?: runBlocking {
                       viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
                     }
@@ -365,8 +365,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
 
-    if (AppItemRepository.trackItemsChanged) {
-      AppItemRepository.trackItemsChanged = false
+    if (GlobalValues.trackItemsChanged) {
+      GlobalValues.trackItemsChanged = false
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.bean.DetailExtraBean
+import com.absinthe.libchecker.model.DetailExtraBean
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.ui.detail.AppDetailActivity

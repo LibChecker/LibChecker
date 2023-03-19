@@ -1,6 +1,6 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
-import com.absinthe.libchecker.bean.AppBundleItem
+import com.absinthe.libchecker.model.AppBundleItem
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils

@@ -11,11 +11,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
@@ -44,7 +44,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
       val packageInfo = runCatching {
-        AppItemRepository.allPackageInfoMap[item.packageName]
+        LocalAppDataSource.getCachedApplicationMap()[item.packageName]
           ?: PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull()
 

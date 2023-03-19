@@ -33,8 +33,8 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SHARED_UID
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
@@ -375,7 +375,6 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
   }
 

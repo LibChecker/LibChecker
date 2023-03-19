@@ -7,7 +7,7 @@ import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
-import com.absinthe.libchecker.app.Global
+import com.absinthe.libchecker.app.MainLooperFilter
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -90,7 +90,7 @@ class LibCheckerApp : Application() {
 
   override fun attachBaseContext(base: Context?) {
     super.attachBaseContext(base)
-    Global.start()
+    MainLooperFilter.start()
   }
 
   @OptIn(ExperimentalWindowApi::class)

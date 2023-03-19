@@ -16,8 +16,8 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment

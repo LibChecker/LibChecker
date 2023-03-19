@@ -94,6 +94,11 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.delete(item)
   }
 
+  suspend fun deleteLCItemByPackageName(packageName: String) {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteLCItemByPackageName(packageName)
+  }
+
   suspend fun delete(item: TrackItem) {
     if (checkDatabaseStatus().not()) return
     lcDao.delete(item)

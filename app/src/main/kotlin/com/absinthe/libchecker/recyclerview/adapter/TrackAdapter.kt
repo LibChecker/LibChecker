@@ -4,8 +4,8 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.TrackListItem
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
+import com.absinthe.libchecker.model.TrackListItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.TrackItemView
@@ -35,7 +35,7 @@ class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: TrackListItem) {
     (holder.itemView as TrackItemView).container.apply {
       val packageInfo = runCatching {
-        AppItemRepository.allPackageInfoMap[item.packageName]
+        LocalAppDataSource.getCachedApplicationMap()[item.packageName]
           ?: PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull() ?: return
 

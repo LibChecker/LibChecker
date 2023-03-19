@@ -26,14 +26,14 @@ import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
 import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
@@ -65,7 +65,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
       if (packageName != null && action != null) {
         if (action == Intent.ACTION_PACKAGE_REMOVED) {
-          AppItemRepository.allPackageInfoMap.remove(packageName)
+          LocalAppDataSource.removePackage(packageName)
         } else {
           runCatching {
             PackageUtils.getPackageInfo(
@@ -73,7 +73,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
               PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
             )
           }.onSuccess {
-            AppItemRepository.allPackageInfoMap[packageName] = it
+            LocalAppDataSource.addPackage(it)
           }
         }
       }

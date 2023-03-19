@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.bean
+package com.absinthe.libchecker.model
 
 data class AlternativeLaunchItem(
   val label: String,

@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.bean
+package com.absinthe.libchecker.model
 
 import androidx.annotation.DrawableRes
 

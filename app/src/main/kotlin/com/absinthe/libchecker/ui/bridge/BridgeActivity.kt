@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.bridge
+package com.absinthe.libchecker.ui.bridge
 
 import android.app.Activity
 import android.content.Intent

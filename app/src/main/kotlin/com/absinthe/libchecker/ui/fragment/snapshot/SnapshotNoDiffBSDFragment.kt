@@ -3,7 +3,7 @@ package com.absinthe.libchecker.ui.fragment.snapshot
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW

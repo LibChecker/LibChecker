@@ -22,11 +22,11 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
-import com.absinthe.libchecker.bean.DISABLED
-import com.absinthe.libchecker.bean.LibChip
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.model.DISABLED
+import com.absinthe.libchecker.model.LibChip
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.LibStringItemChip
+import com.absinthe.libchecker.model.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount

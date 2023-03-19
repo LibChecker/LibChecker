@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.base
+package com.absinthe.libchecker.ui.base
 
 import android.content.Context
 import android.view.WindowManager

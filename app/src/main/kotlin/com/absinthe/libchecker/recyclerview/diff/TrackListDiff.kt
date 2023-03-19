@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.bean.TrackListItem
+import com.absinthe.libchecker.model.TrackListItem
 
 class TrackListDiff : DiffUtil.ItemCallback<TrackListItem>() {
 

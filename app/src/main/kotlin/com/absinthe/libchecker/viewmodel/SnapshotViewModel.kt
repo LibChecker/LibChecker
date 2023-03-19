@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -18,24 +17,24 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.ADDED
-import com.absinthe.libchecker.bean.CHANGED
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.MOVED
-import com.absinthe.libchecker.bean.REMOVED
-import com.absinthe.libchecker.bean.SnapshotDetailItem
-import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.model.ADDED
+import com.absinthe.libchecker.model.CHANGED
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.MOVED
+import com.absinthe.libchecker.model.REMOVED
+import com.absinthe.libchecker.model.SnapshotDetailItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -91,7 +90,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       compareDiffJob?.cancel()
     }
     compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
-      Global.applicationListJob?.join()
       val timer = TimeRecorder().apply { start() }
 
       if (shouldClearDiff) {
@@ -118,7 +116,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return
     }
 
-    val currMap = AppItemRepository.getApplicationInfoMap().toMutableMap()
+    val currMap = LocalAppDataSource.getCachedApplicationMap().toMutableMap()
     val prePackageSet = preMap.map { it.key }.toSet()
     val currPackageSet = currMap.map { it.key }.toSet()
     val removedPackageSet = prePackageSet - currPackageSet

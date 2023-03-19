@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.base
+package com.absinthe.libchecker.ui.base
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.base.BaseActivity.Companion.inflateBinding
+import com.absinthe.libchecker.ui.base.BaseActivity.Companion.inflateBinding
 import timber.log.Timber
 
 abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {

@@ -10,7 +10,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions

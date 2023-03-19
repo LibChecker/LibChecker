@@ -5,12 +5,9 @@ import android.os.Looper
 import android.util.Log
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.utils.showToast
-import kotlinx.coroutines.Job
 import timber.log.Timber
 
-object Global {
-
-  var applicationListJob: Job? = null
+object MainLooperFilter {
 
   private val handler = Handler(Looper.getMainLooper())
 

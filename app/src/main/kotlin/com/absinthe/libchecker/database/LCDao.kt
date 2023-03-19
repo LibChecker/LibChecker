@@ -37,6 +37,9 @@ interface LCDao {
   @Delete
   suspend fun delete(item: LCItem)
 
+  @Query("DELETE FROM item_table WHERE packageName = :packageName")
+  fun deleteLCItemByPackageName(packageName: String)
+
   @Query("DELETE FROM item_table")
   fun deleteAllItems()
 

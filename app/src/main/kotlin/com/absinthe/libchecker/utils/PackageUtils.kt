@@ -19,7 +19,6 @@ import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.ET_CORE
 import com.absinthe.libchecker.annotation.ET_DYN
@@ -34,9 +33,7 @@ import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.bean.KotlinToolingMetadata
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.StatefulComponent
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
@@ -53,9 +50,11 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
-import com.absinthe.libchecker.constant.librarymap.DexLibMap
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.constant.DexLibMap
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.model.KotlinToolingMetadata
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.StatefulComponent
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.extensions.md5
@@ -77,7 +76,6 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.source
@@ -122,19 +120,6 @@ object PackageUtils {
       } ?: throw PackageManager.NameNotFoundException()
     }
     return packageInfo
-  }
-
-  /**
-   * Get all installed apps in device
-   * @return list of apps
-   * @throws Exception
-   */
-  @Throws(Exception::class)
-  fun getInstallApplications(): List<PackageInfo> {
-    return PackageManagerCompat.getInstalledPackages(
-      PackageManager.GET_META_DATA
-        or PackageManager.GET_PERMISSIONS
-    )
   }
 
   /**
@@ -1246,73 +1231,6 @@ object PackageUtils {
     }
 
     return null
-  }
-
-  private val runtime by lazy { Runtime.getRuntime() }
-
-  private fun getAppListByShell(): List<String> {
-    try {
-      val pmList = mutableListOf<String>()
-      val process = runtime.exec("pm list packages")
-      process.inputStream.source().buffer().use { bs ->
-        while (true) {
-          bs.readUtf8Line()?.trim()?.let { line ->
-            if (line.startsWith("package:")) {
-              line.removePrefix("package:").takeIf { removedPrefix -> removedPrefix.isNotBlank() }
-                ?.let { pmList.add(it) }
-            }
-          } ?: break
-        }
-      }
-      return pmList
-    } catch (t: Throwable) {
-      Timber.w(t)
-      return emptyList()
-    }
-  }
-
-  suspend fun getAppsList(): List<PackageInfo> {
-    var appList: List<PackageInfo>
-    var retry: Boolean
-
-    do {
-      retry = false
-      appList = try {
-        getInstallApplications()
-      } catch (e: Exception) {
-        Timber.w(e)
-        delay(200)
-        retry = true
-        emptyList()
-      }.also { items ->
-        AppItemRepository.allPackageInfoMap.clear()
-        AppItemRepository.allPackageInfoMap.putAll(
-          items.asSequence()
-            .filter { it.applicationInfo.sourceDir != null }
-            .map { it.packageName to it }
-            .toMap()
-        )
-      }
-    } while (retry)
-
-    val pmList = getAppListByShell()
-    try {
-      if (pmList.size > appList.size) {
-        appList = pmList.asSequence()
-          .map {
-            getPackageInfo(
-              it,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-            )
-          }
-          .filter { it.applicationInfo.sourceDir != null }
-          .toList()
-      }
-    } catch (t: Throwable) {
-      Timber.w(t)
-      appList = emptyList()
-    }
-    return appList
   }
 
   fun getPackageSize(packageInfo: PackageInfo, includeSplits: Boolean): Long {

@@ -77,4 +77,6 @@ object GlobalValues {
   var uuid: String by SPDelegates(Constants.PREF_UUID, String())
 
   var isGitHubUnreachable = true
+
+  var trackItemsChanged = false
 }

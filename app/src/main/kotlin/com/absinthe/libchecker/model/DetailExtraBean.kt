@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.bean
+package com.absinthe.libchecker.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

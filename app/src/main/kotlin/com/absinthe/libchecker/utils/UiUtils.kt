@@ -3,7 +3,7 @@ package com.absinthe.libchecker.utils
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatDelegate
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libraries.utils.utils.UiUtils

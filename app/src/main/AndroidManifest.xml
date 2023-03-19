@@ -112,7 +112,7 @@
       android:label="@string/settings_about"
       android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
-      android:name=".bridge.BridgeActivity"
+      android:name=".ui.bridge.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
 

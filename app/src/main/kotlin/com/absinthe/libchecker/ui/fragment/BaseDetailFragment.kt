@@ -17,8 +17,8 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseFragment
-import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.ui.base.BaseFragment
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer

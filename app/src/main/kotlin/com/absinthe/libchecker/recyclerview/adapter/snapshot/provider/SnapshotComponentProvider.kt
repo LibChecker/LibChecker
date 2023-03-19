@@ -5,11 +5,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.ADDED
-import com.absinthe.libchecker.bean.CHANGED
-import com.absinthe.libchecker.bean.MOVED
-import com.absinthe.libchecker.bean.REMOVED
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.model.ADDED
+import com.absinthe.libchecker.model.CHANGED
+import com.absinthe.libchecker.model.MOVED
+import com.absinthe.libchecker.model.REMOVED
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotComponentNode
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.utils.extensions.toColorStateList

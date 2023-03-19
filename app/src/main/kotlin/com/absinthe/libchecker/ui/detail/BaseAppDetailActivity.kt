@@ -35,7 +35,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.METADATA
@@ -46,11 +46,11 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.AppDetailToolbarItem
-import com.absinthe.libchecker.bean.DetailExtraBean
-import com.absinthe.libchecker.bean.FeatureItem
-import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.model.AppDetailToolbarItem
+import com.absinthe.libchecker.model.DetailExtraBean
+import com.absinthe.libchecker.model.FeatureItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants

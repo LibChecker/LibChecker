@@ -3,7 +3,7 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil

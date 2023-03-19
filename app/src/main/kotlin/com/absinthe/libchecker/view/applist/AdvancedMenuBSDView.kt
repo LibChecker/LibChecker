@@ -8,11 +8,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.bean.DISABLED
-import com.absinthe.libchecker.bean.EXPORTED
-import com.absinthe.libchecker.bean.LibChip
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.model.DISABLED
+import com.absinthe.libchecker.model.EXPORTED
+import com.absinthe.libchecker.model.LibChip
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.recyclerview.BottomSheetRecyclerView
