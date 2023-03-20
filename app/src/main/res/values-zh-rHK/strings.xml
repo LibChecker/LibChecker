@@ -133,6 +133,12 @@
   <string name="signature_public_key_type">公鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
+  <string name="lib_detail_label_tip">Label</string>
+  <string name="lib_detail_develop_team_tip">Dev Team</string>
+  <string name="lib_detail_rule_contributors_tip">Rule Contributor(s)</string>
+  <string name="lib_detail_description_tip">Description</string>
+  <string name="lib_detail_relative_link_tip">Relative Link</string>
+  <string name="lib_detail_last_update_tip">Updated at</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
@@ -144,7 +150,7 @@
   <string name="snapshot_btn_save_current">儲存目前快照</string>
   <string name="snapshot_current_timestamp">目前快照時間戳記</string>
   <string name="snapshot_apps_count">快照應用程式數量 / 應用程式數量</string>
-  <string name="comparison_snapshot_apps_count">快照應用程式數量</string>
+  <string name="comparison_snapshot_apps_count">Count of Applications in Snapshot</string>
   <string name="snapshot_indicator_added">新增</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">變更</string>
@@ -163,6 +169,7 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一張快照？</string>
   <string name="dialog_title_select_to_delete">選擇日期以刪除快照</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">捨棄</string>
   <!--  Album  -->
@@ -182,6 +189,7 @@
   <string name="album_backup_summary">備份所有快照</string>
   <string name="album_restore">還原</string>
   <string name="album_restore_summary">從備份檔案還原快照</string>
+  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">按下以選擇</string>
   <string name="album_dialog_delete_snapshot_message">處理中…</string>
   <!--  Integration  -->
@@ -208,4 +216,7 @@
   <string name="adv_show_target_version">顯示 Target 版本</string>
   <string name="adv_show_min_version">顯示 Min 版本</string>
   <string name="adv_tint_abi_label">ABI 標籤染色</string>
+  <string name="adv_mark_exported">Mark Exported Component</string>
+  <string name="adv_mark_disabled">Mark Disabled Component</string>
+  <string name="adv_show_marked_lib">Show Marked Libraries</string>
 </resources>
