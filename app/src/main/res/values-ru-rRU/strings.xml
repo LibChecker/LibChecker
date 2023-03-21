@@ -150,7 +150,7 @@
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
   <string name="snapshot_apps_count">Количество приложений в снимке / Количество заявок</string>
-  <string name="comparison_snapshot_apps_count">Count of Applications in Snapshot</string>
+  <string name="comparison_snapshot_apps_count">Количество приложений в снимке</string>
   <string name="snapshot_indicator_added">Добавлено</string>
   <string name="snapshot_indicator_removed">Удалено</string>
   <string name="snapshot_indicator_changed">Изменено</string>
