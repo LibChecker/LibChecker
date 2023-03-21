@@ -29,6 +29,7 @@ jobs:
           upload_translations: true
           download_translations: true
           skip_untranslated_strings: true
+          skip_untranslated_files: true
 
           # Pull request settings
           create_pull_request: true
@@ -38,6 +39,7 @@ jobs:
           # Global settings
           config: 'crowdin.yml'
           crowdin_branch_name: master
+          source: '/app/src/main/res/values/strings.xml'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
