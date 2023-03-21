@@ -39,8 +39,6 @@ jobs:
           # Global settings
           config: 'crowdin.yml'
           crowdin_branch_name: master
-          source: '/app/src/main/res/values/strings.xml'
-          translation: '/app/src/main/res/values-%android_code%/%original_file_name%'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
