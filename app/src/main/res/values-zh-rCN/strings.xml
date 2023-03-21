@@ -137,8 +137,8 @@
   <string name="lib_detail_develop_team_tip">开发团队</string>
   <string name="lib_detail_rule_contributors_tip">规则贡献者</string>
   <string name="lib_detail_description_tip">描述</string>
-  <string name="lib_detail_relative_link_tip">相关链接</string>
-  <string name="lib_detail_last_update_tip">最近更新于</string>
+  <string name="lib_detail_relative_link_tip">相对链接</string>
+  <string name="lib_detail_last_update_tip">更新于</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
@@ -150,7 +150,7 @@
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>
   <string name="snapshot_apps_count">快照应用程序数量 / 应用程序数量</string>
-  <string name="comparison_snapshot_apps_count">快照应用程序数量</string>
+  <string name="comparison_snapshot_apps_count">快照应用数量</string>
   <string name="snapshot_indicator_added">增加</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
