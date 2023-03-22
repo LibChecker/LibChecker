@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <!--  General  -->
+  <string name="title_app_list">Apps</string>
   <string name="title_statistics">Statistiken</string>
   <string name="title_snapshot">Schnappschuss</string>
   <string name="title_settings">Einstellungen</string>
+  <string name="title_album">Album</string>
   <string name="loading">Lädt…</string>
   <string name="channel_shoot">Schnappschuss speichern</string>
   <string name="noti_shoot_title">Aktuellen Speichere Schnappschuss</string>
@@ -11,8 +13,10 @@
   <!--  App list  -->
   <string name="menu_search">Suchen</string>
   <string name="menu_sort">Sortierung</string>
+  <string name="menu_filter">Filter</string>
   <string name="search_hint">Suchen…</string>
   <string name="string_64_bit">64Bit</string>
+  <string name="string_32_bit">32bit</string>
   <string name="no_libs">Keine nativen Bibliotheken</string>
   <string name="cannot_read">Lesen nicht möglich</string>
   <string name="unknown">Unbekannt</string>
@@ -27,8 +31,13 @@
   <string name="tab_lib_reference_statistics">Bibliotheken Referenz</string>
   <string name="not_marked_lib">Nicht markierte Bibliothek</string>
   <string name="submenu_title_component">Komponente</string>
+  <string name="submenu_title_manifest">Manifest</string>
   <string name="ref_category_all">Alle</string>
   <string name="ref_category_native">Native Bibliotheken</string>
+  <string name="ref_category_service">Services</string>
+  <string name="ref_category_activity">Activities</string>
+  <string name="ref_category_br">Broadcast Receivers</string>
+  <string name="ref_category_cp">Content Providers</string>
   <string name="ref_category_perm">Berechtigungen</string>
   <string name="ref_category_static">Statische Bibliotheken</string>
   <string name="ref_category_metadata">Metadaten</string>
