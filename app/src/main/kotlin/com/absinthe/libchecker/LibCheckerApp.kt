@@ -2,6 +2,7 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.window.core.ExperimentalWindowApi
 import androidx.window.embedding.SplitController
 import coil.Coil
@@ -29,7 +30,6 @@ import jonathanfinerty.once.Once
 import me.zhanghai.android.appiconloader.coil.AppIconFetcher
 import me.zhanghai.android.appiconloader.coil.AppIconKeyer
 import org.lsposed.hiddenapibypass.HiddenApiBypass
-import rikka.material.app.DayNightDelegate
 import rikka.material.app.LocaleDelegate
 import timber.log.Timber
 
@@ -72,8 +72,7 @@ class LibCheckerApp : Application() {
     )
     Utility.init(this)
     LocaleDelegate.defaultLocale = GlobalValues.locale
-    DayNightDelegate.setApplicationContext(this)
-    DayNightDelegate.setDefaultNightMode(UiUtils.getNightMode())
+    AppCompatDelegate.setDefaultNightMode(UiUtils.getNightMode())
     Once.initialise(this)
     Repositories.init(this)
     DynamicColors.applyToActivitiesIfAvailable(this)

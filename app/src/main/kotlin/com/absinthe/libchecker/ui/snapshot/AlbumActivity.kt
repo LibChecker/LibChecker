@@ -33,7 +33,6 @@ import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import rikka.material.app.DayNightDelegate
 import rikka.widget.borderview.BorderView
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
@@ -55,12 +54,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.title_album)
 
-    val isDarkMode = when (DayNightDelegate.getDefaultNightMode()) {
-      DayNightDelegate.MODE_NIGHT_YES -> true
-      DayNightDelegate.MODE_NIGHT_NO -> false
-      DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM, DayNightDelegate.MODE_NIGHT_UNSPECIFIED, DayNightDelegate.MODE_NIGHT_AUTO_BATTERY -> UiUtils.isDarkModeOnSystem()
-      else -> false
-    }
+    val isDarkMode = UiUtils.isDarkMode()
     val itemComparison = generateAlbumItemView(
       R.drawable.ic_compare,
       if (isDarkMode) R.color.material_red_900 else R.color.material_red_300,
