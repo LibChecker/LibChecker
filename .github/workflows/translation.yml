@@ -22,14 +22,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: crowdin action
-        uses: crowdin/github-action@v1
+        uses: crowdin/github-action@master
         with:
           # Upload and download translation settings
           upload_sources: true
           upload_translations: true
           download_translations: true
-          skip_untranslated_strings: true
-          skip_untranslated_files: true
 
           # Pull request settings
           create_pull_request: true
