@@ -126,6 +126,7 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
       )
+      setPadding(0, 0, 0, 2.dp)
       setTextColor(android.R.color.darker_gray.getColor(context))
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
       maxLines = 1

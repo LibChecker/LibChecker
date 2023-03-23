@@ -106,7 +106,8 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
     strokeColor = context.getColorByAttr(com.google.android.material.R.attr.colorOutline)
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSecondaryContainer))
 
-    val view = RecyclerView(context).apply {
+    val componentStyleDemoView = RecyclerView(context).apply {
+      setPadding(0, 8.dp, 0, 8.dp)
       overScrollMode = RecyclerView.OVER_SCROLL_NEVER
       layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
       adapter = itemAdapter
@@ -150,7 +151,7 @@ class AdvancedMenuBSDView(context: Context) : LinearLayout(context), IHeaderView
       }
     }
 
-    addView(view)
+    addView(componentStyleDemoView)
   }
 
   private val itemFlexLayout = FlexboxLayout(context).apply {
