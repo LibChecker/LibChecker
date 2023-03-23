@@ -33,6 +33,7 @@ import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -440,11 +441,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
-        val scheme = Uri.Builder().scheme("lc")
-          .authority("bridge")
-          .appendQueryParameter("action", "shoot")
-          .appendQueryParameter("authority", LibCheckerApp.generateAuthKey().toString())
-          .appendQueryParameter("drop_previous", "false")
+        val scheme = Uri.Builder().scheme(LCUris.SCHEME)
+          .authority(LCUris.Bridge.AUTHORITY)
+          .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
+          .appendQueryParameter(LCUris.Bridge.PARAM_AUTHORITY, LibCheckerApp.generateAuthKey().toString())
+          .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
           .build()
           .toString()
         val tipView = TextView(context).also {

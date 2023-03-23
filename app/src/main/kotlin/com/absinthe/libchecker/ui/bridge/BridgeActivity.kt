@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.services.ACTION_SHOOT_AND_STOP_AUTO
 import com.absinthe.libchecker.services.EXTRA_DROP_PREVIOUS
 import com.absinthe.libchecker.services.ShootService
@@ -14,16 +15,16 @@ class BridgeActivity : Activity() {
     super.onCreate(savedInstanceState)
 
     intent.data?.let { uri ->
-      if (uri.scheme != "lc" || uri.host != "bridge") {
+      if (uri.scheme != LCUris.SCHEME || uri.host != LCUris.Bridge.AUTHORITY) {
         return@let
       }
-      val action = uri.getQueryParameter("action")
+      val action = uri.getQueryParameter(LCUris.Bridge.PARAM_ACTION)
 
-      if (action == "shoot") {
-        val authority = uri.getQueryParameter("authority")?.toInt() ?: 0
+      if (action == LCUris.Bridge.ACTION_SHOOT) {
+        val authority = uri.getQueryParameter(LCUris.Bridge.PARAM_AUTHORITY)?.toInt() ?: 0
 
         if (authority == LibCheckerApp.generateAuthKey()) {
-          val dropPrevious = uri.getQueryParameter("drop_previous")?.toBoolean() ?: false
+          val dropPrevious = uri.getQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS)?.toBoolean() ?: false
 
           startService(
             Intent(this, ShootService::class.java).also {
