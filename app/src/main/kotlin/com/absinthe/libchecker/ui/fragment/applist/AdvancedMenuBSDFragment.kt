@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.ui.fragment.main
+package com.absinthe.libchecker.ui.fragment.applist
 
 import android.content.DialogInterface
 import com.absinthe.libchecker.R

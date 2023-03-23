@@ -50,7 +50,7 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
-import com.absinthe.libchecker.constant.DexLibMap
+import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.model.KotlinToolingMetadata
 import com.absinthe.libchecker.model.LibStringItem

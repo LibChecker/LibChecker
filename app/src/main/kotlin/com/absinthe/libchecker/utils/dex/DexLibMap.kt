@@ -1,4 +1,4 @@
-package com.absinthe.libchecker.constant
+package com.absinthe.libchecker.utils.dex
 
 /**
  * <pre>

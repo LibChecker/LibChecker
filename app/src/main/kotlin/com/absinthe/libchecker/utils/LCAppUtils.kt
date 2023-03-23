@@ -4,9 +4,6 @@ import android.content.Context
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
-import android.view.ContextThemeWrapper
-import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.core.text.toSpannable
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
@@ -16,16 +13,13 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
-import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.model.LibStringItem
-import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.Rule
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import java.io.File
 import java.util.Calendar
 import java.util.Locale
@@ -141,20 +135,5 @@ object LCAppUtils {
       }
       else -> true
     }
-  }
-
-  fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
-    return BaseAlertDialogBuilder(context)
-      .setView(
-        LinearProgressIndicator(context).apply {
-          layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-            setPadding(24.dp, 24.dp, 24.dp, 24.dp)
-          }
-          trackCornerRadius = 3.dp
-          isIndeterminate = true
-        }
-      )
-      .setCancelable(false)
-      .create()
   }
 }
