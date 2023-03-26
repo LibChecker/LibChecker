@@ -36,7 +36,9 @@ import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
@@ -160,7 +162,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       try {
         pi = currMap[it]!!
         ai = pi.applicationInfo
-        versionCode = PackageUtils.getVersionCode(pi)
+        versionCode = pi.getVersionCode()
 
         diffList.add(
           SnapshotDiffItem(
@@ -209,7 +211,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               PackageUtils.getMetaDataItems(pi).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPackageSize(pi, true)
+              pi.getPackageSize(true)
             ),
             newInstalled = true,
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == pi.packageName }
@@ -227,7 +229,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       try {
         dbItem = preMap[it]!!
         pi = currMap[it]!!
-        versionCode = PackageUtils.getVersionCode(pi)
+        versionCode = pi.getVersionCode()
         snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
 
         if (snapshotDiffStoringItem?.lastUpdatedTime != pi.lastUpdateTime) {
@@ -291,7 +293,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   ): SnapshotDiffItem? {
     if (versionCode == dbItem.versionCode &&
       packageInfo.lastUpdateTime == dbItem.lastUpdatedTime &&
-      PackageUtils.getPackageSize(packageInfo, true) == dbItem.packageSize &&
+      packageInfo.getPackageSize(true) == dbItem.packageSize &&
       inTrackedList.not()
     ) {
       return null
@@ -366,7 +368,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         dbItem.packageSize,
-        PackageUtils.getPackageSize(packageInfo, true)
+        packageInfo.getPackageSize(true)
       ),
       isTrackItem = inTrackedList
     )
@@ -572,7 +574,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
           ),
           SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
-          SnapshotDiffItem.DiffNode(it.versionCode, PackageUtils.getVersionCode(packageInfo)),
+          SnapshotDiffItem.DiffNode(it.versionCode, packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(
             it.abi,
             PackageUtils.getAbi(packageInfo).toShort()
@@ -627,7 +629,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           SnapshotDiffItem.DiffNode(
             it.packageSize,
-            PackageUtils.getPackageSize(packageInfo, true)
+            packageInfo.getPackageSize(true)
           ),
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
         ).also { diffItem ->
@@ -667,7 +669,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
           ),
           SnapshotDiffItem.DiffNode(packageInfo.versionName),
-          SnapshotDiffItem.DiffNode(PackageUtils.getVersionCode(packageInfo)),
+          SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
@@ -708,7 +710,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getPackageSize(packageInfo, true)
+            packageInfo.getPackageSize(true)
           ),
           newInstalled = true,
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }

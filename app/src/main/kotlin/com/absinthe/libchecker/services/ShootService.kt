@@ -34,8 +34,10 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.lang.ref.WeakReference
@@ -204,9 +206,9 @@ class ShootService : LifecycleService() {
         ai = info.applicationInfo
         dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
 
-        if (dbSnapshotItem?.versionCode == PackageUtils.getVersionCode(info) &&
+        if (dbSnapshotItem?.versionCode == info.getVersionCode() &&
           dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
-          dbSnapshotItem.packageSize == PackageUtils.getPackageSize(info, true)
+          dbSnapshotItem.packageSize == info.getPackageSize(true)
         ) {
           Timber.d("computeSnapshots: ${info.packageName} is up to date")
           dbList.add(
@@ -223,7 +225,7 @@ class ShootService : LifecycleService() {
               timeStamp = ts,
               label = ai.loadLabel(packageManager).toString(),
               versionName = info.versionName ?: "null",
-              versionCode = PackageUtils.getVersionCode(info),
+              versionCode = info.getVersionCode(),
               installedTime = info.firstInstallTime,
               lastUpdatedTime = info.lastUpdateTime,
               isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
@@ -240,7 +242,7 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               permissions = info.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
-              packageSize = PackageUtils.getPackageSize(info, true)
+              packageSize = info.getPackageSize(true)
             )
           )
         }
@@ -281,7 +283,7 @@ class ShootService : LifecycleService() {
               timeStamp = ts,
               label = info.loadLabel(packageManager).toString(),
               versionName = it.versionName ?: "null",
-              versionCode = PackageUtils.getVersionCode(it),
+              versionCode = it.getVersionCode(),
               installedTime = it.firstInstallTime,
               lastUpdatedTime = it.lastUpdateTime,
               isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
@@ -298,7 +300,7 @@ class ShootService : LifecycleService() {
                 .toJson().orEmpty(),
               permissions = it.getPermissionsList().toJson().orEmpty(),
               metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-              packageSize = PackageUtils.getPackageSize(it, true)
+              packageSize = it.getPackageSize(true)
             )
           )
         }

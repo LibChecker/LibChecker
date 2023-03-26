@@ -78,12 +78,23 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragmen
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getFeatures
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
-import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getAGPVersion
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
+import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
+import com.absinthe.libchecker.utils.extensions.getKotlinPluginVersion
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
+import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
+import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
+import com.absinthe.libchecker.utils.extensions.getTargetApiString
+import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.getVersionString
+import com.absinthe.libchecker.utils.extensions.isOverlay
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -226,7 +237,7 @@ abstract class BaseAppDetailActivity :
             setLongClickCopiedToClipboard(text)
           }
           versionInfoView.apply {
-            text = PackageUtils.getVersionString(packageInfo)
+            text = packageInfo.getVersionString()
             setLongClickCopiedToClipboard(text)
           }
         }
@@ -252,15 +263,15 @@ abstract class BaseAppDetailActivity :
             scale(0.8f) {
               append("Target: ")
             }
-            append(PackageUtils.getTargetApiString(packageInfo))
+            append(packageInfo.getTargetApiString())
             scale(0.8f) {
               append(" Min: ")
             }
-            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+            append(packageInfo.applicationInfo.minSdkVersion.toString())
             scale(0.8f) {
               append(" Compile: ")
             }
-            append(PackageUtils.getCompileSdkVersion(packageInfo))
+            append(packageInfo.getCompileSdkVersion())
             scale(0.8f) {
               append(" Size: ")
             }
@@ -720,7 +731,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getKotlinPluginVersion(packageInfo)?.let { version ->
+        packageInfo.getKotlinPluginVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -744,7 +755,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getRxJavaVersion(packageInfo)?.let { version ->
+        packageInfo.getRxJavaVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -768,7 +779,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getRxKotlinVersion(packageInfo)?.let { version ->
+        packageInfo.getRxKotlinVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -792,7 +803,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getRxAndroidVersion(packageInfo)?.let { version ->
+        packageInfo.getRxAndroidVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -816,7 +827,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getAGPVersion(packageInfo)?.let { version ->
+        packageInfo.getAGPVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -880,7 +891,7 @@ abstract class BaseAppDetailActivity :
         }
       )
       withContext(Dispatchers.IO) {
-        PackageUtils.getJetpackComposeVersion(packageInfo)?.let { version ->
+        packageInfo.getJetpackComposeVersion()?.let { version ->
           withContext(Dispatchers.Main) {
             dialog.setTitle(
               HtmlCompat.fromHtml(
@@ -950,8 +961,8 @@ abstract class BaseAppDetailActivity :
         analysisPackage.versionName
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getVersionCode(basePackage),
-        PackageUtils.getVersionCode(analysisPackage)
+        basePackage.getVersionCode(),
+        analysisPackage.getVersionCode()
       ),
       abiDiff = SnapshotDiffItem.DiffNode(
         PackageUtils.getAbi(basePackage).toShort(),
@@ -1022,8 +1033,8 @@ abstract class BaseAppDetailActivity :
         PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getPackageSize(basePackage, true),
-        PackageUtils.getPackageSize(analysisPackage, true)
+        basePackage.getPackageSize(true),
+        analysisPackage.getPackageSize(true)
       )
     )
 

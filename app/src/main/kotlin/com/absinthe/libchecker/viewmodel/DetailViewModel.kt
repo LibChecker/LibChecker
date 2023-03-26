@@ -36,6 +36,8 @@ import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.PackageUtils.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.getSignatures
+import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
@@ -339,7 +341,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getSignatureChipList(): List<LibStringItemChip> =
     withContext(Dispatchers.IO) {
-      PackageUtils.getSignatures(getApplication(), packageInfo).map {
+      packageInfo.getSignatures(getApplication()).map {
         LibStringItemChip(it, null)
       }.toList()
     }

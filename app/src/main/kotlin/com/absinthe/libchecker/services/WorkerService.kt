@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getFeatures
+import com.absinthe.libchecker.utils.extensions.getFeatures
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

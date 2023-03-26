@@ -45,7 +45,8 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getFeatures
+import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
 import com.absinthe.libraries.utils.manager.TimeRecorder
@@ -98,7 +99,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  fun refreshList() {
+  private fun refreshList() {
     setEffect {
       Effect.RefreshList()
     }
@@ -258,7 +259,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         .mapNotNull { appMap[it] }
         .filter { pi ->
           dbItems.find { it.packageName == pi.packageName }?.let {
-            it.versionCode != PackageUtils.getVersionCode(pi) ||
+            it.versionCode != pi.getVersionCode() ||
               pi.lastUpdateTime != it.lastUpdatedTime ||
               it.lastUpdatedTime == 0L
           } ?: false
@@ -300,7 +301,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       pi.packageName,
       pi.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
       pi.versionName ?: "null",
-      PackageUtils.getVersionCode(pi),
+      pi.getVersionCode(),
       pi.firstInstallTime,
       pi.lastUpdateTime,
       (pi.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
@@ -607,6 +608,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           updateLibRefProgressImpl()
         }
       }
+
+      else -> {}
     }
 
     referenceMap = map
@@ -692,6 +695,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             packageInfo.applicationInfo.metaData
           )
         }
+
+        else -> {}
       }
     } catch (e: Exception) {
       Timber.e(e)

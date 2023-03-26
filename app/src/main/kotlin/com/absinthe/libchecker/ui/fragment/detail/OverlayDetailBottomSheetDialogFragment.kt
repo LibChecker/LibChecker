@@ -21,6 +21,8 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.getTargetApiString
+import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
@@ -73,7 +75,7 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         versionInfoView.apply {
-          text = PackageUtils.getVersionString(packageInfo)
+          text = packageInfo.getVersionString()
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
@@ -82,11 +84,11 @@ class OverlayDetailBottomSheetDialogFragment :
             scale(0.8f) {
               append("Target: ")
             }
-            append(PackageUtils.getTargetApiString(packageInfo))
+            append(packageInfo.getTargetApiString())
             scale(0.8f) {
               append(" Min: ")
             }
-            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+            append(packageInfo.applicationInfo.minSdkVersion.toString())
           }
         }
       }

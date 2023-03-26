@@ -392,7 +392,7 @@ class ChartFragment :
         for (item in it) {
           try {
             packageInfo = PackageUtils.getPackageInfo(item.packageName)
-            minSdk = PackageUtils.getMinSdkVersion(packageInfo)
+            minSdk = packageInfo.applicationInfo.minSdkVersion
             apiMap[minSdk] = apiMap[minSdk]?.plus(1) ?: 1
           } catch (e: Exception) {
             Timber.e(e)
@@ -542,7 +542,7 @@ class ChartFragment :
           viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == minSdk })
           filteredList?.filter {
             runCatching { PackageUtils.getPackageInfo(it.packageName) }.getOrNull()
-              ?.let { PackageUtils.getMinSdkVersion(it) == minSdk } ?: false
+              ?.let { it.applicationInfo.minSdkVersion == minSdk } ?: false
           }?.let { filter -> item = ArrayList(filter) }
         }
       }
