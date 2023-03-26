@@ -349,7 +349,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onResume() {
     super.onResume()
-    menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
 
     if (!shootServiceStarted && isFragmentVisible()) {
       context?.applicationContext?.also {
@@ -378,10 +377,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
 
-    if (!viewModel.isComparingActive()) {
-      flip(VF_LIST)
-    } else {
-      flip(VF_LOADING)
+    if (shouldCompare) {
+      if (!viewModel.isComparingActive()) {
+        flip(VF_LIST)
+      } else {
+        flip(VF_LOADING)
+      }
     }
 
     if (hasPackageChanged()) {
@@ -418,7 +419,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.snapshot_menu, menu)
-    this.menu = menu
+    this.menu = menu.apply {
+      findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
+    }
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -429,6 +432,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
+        (context as INavViewContainer).showNavigationView()
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
           context,
