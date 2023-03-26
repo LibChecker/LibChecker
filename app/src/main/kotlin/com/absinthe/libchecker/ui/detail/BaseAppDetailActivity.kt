@@ -307,7 +307,7 @@ abstract class BaseAppDetailActivity :
               abiLabelsList.add(
                 AbiLabelNode(
                   it,
-                  apkAnalyticsMode || abi >= Constants.MULTI_ARCH || it == abi % Constants.MULTI_ARCH
+                  apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
                 )
               )
             }
