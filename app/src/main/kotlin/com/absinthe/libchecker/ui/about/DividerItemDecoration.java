@@ -2,13 +2,15 @@ package com.absinthe.libchecker.ui.about;
 
 import android.graphics.Rect;
 import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
 
 import com.drakeet.about.License;
 import com.drakeet.about.Recommendation;
 import com.drakeet.multitype.MultiTypeAdapter;
+
+import java.util.List;
 
 /**
  * @author drakeet

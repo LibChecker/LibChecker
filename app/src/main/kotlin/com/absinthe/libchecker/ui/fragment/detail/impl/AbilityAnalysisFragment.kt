@@ -3,12 +3,12 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.model.DISABLED
 import com.absinthe.libchecker.model.EXPORTED
 import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.model.LibStringItemChip
-import com.absinthe.libchecker.compat.VersionCompat
-import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE

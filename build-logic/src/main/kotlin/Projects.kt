@@ -1,11 +1,11 @@
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import org.gradle.api.JavaVersion
-import org.gradle.api.Project
 import java.io.File
 import java.nio.charset.Charset
 import java.time.Instant
+import org.gradle.api.JavaVersion
+import org.gradle.api.Project
 
 const val baseVersionName = "2.3.9"
 val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
@@ -81,5 +81,12 @@ private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinli
   }
 }
 
-fun String.exec(): String = Runtime.getRuntime().exec(this).inputStream.readBytes()
-  .toString(Charset.defaultCharset()).trim()
+fun String.exec(): String {
+  val process = ProcessBuilder(*this.split("\\s".toRegex()).toTypedArray())
+    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    .start()
+  val result = process.inputStream.readAllBytes().toString(Charset.defaultCharset()).trim()
+  process.waitFor()
+  return result
+}
+

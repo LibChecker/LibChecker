@@ -284,7 +284,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     pi: PackageInfo,
     isHarmony: Boolean,
     bundleManager: IBundleManager?,
-    delayInitFeatures: Boolean = false,
+    delayInitFeatures: Boolean = false
   ): LCItem {
     val variant = if (isHarmony && bundleManager?.getBundleInfo(
         pi.packageName,

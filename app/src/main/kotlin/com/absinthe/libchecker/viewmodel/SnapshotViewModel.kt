@@ -1217,7 +1217,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
   }
 
-  fun restore(context: Context, inputStream: InputStream, resultAction: (success: Boolean) -> Unit) {
+  fun restore(
+    context: Context,
+    inputStream: InputStream,
+    resultAction: (success: Boolean) -> Unit
+  ) {
     viewModelScope.launch(Dispatchers.IO) {
       inputStream.use { stream ->
         val list: SnapshotList = try {
@@ -1319,11 +1323,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
-      val snapshotCount = repository.getSnapshots(timestamp).size
-      val appCount = LocalAppDataSource.getCachedApplicationMap().size
-      setEffect {
-        Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
-      }
+    val snapshotCount = repository.getSnapshots(timestamp).size
+    val appCount = LocalAppDataSource.getCachedApplicationMap().size
+    setEffect {
+      Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
+    }
   }
 
   private fun setEffect(builder: () -> Effect) {

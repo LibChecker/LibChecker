@@ -26,14 +26,16 @@ object LocalAppDataSource : AppDataSource {
 
       if (listByShell.size > list.size) {
         Timber.d("listByShell.size > list.size")
-        emit(listByShell.mapNotNull { packageName ->
-          runCatching {
-            PackageManagerCompat.getPackageInfo(
-              packageName,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-            )
-          }.getOrNull()
-        })
+        emit(
+          listByShell.mapNotNull { packageName ->
+            runCatching {
+              PackageManagerCompat.getPackageInfo(
+                packageName,
+                PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
+              )
+            }.getOrNull()
+          }
+        )
       } else {
         emit(list)
       }

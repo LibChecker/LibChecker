@@ -50,11 +50,11 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
-import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.model.KotlinToolingMetadata
 import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.model.StatefulComponent
+import com.absinthe.libchecker.utils.dex.DexLibMap
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
 import com.absinthe.libchecker.utils.elf.ELFParser
 import com.absinthe.libchecker.utils.extensions.md5

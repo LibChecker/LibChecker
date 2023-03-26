@@ -25,11 +25,11 @@ import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.STATIC
+import com.absinthe.libchecker.constant.AdvancedOptions
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.model.DISABLED
 import com.absinthe.libchecker.model.EXPORTED
 import com.absinthe.libchecker.model.LibStringItemChip
-import com.absinthe.libchecker.constant.AdvancedOptions
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.recyclerview.adapter.HighlightAdapter
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_TEXT
 import com.absinthe.libchecker.ui.fragment.detail.XmlBSDFragment
