@@ -29,7 +29,6 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
@@ -45,6 +44,7 @@ import com.absinthe.libchecker.ui.fragment.IListController
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -299,7 +299,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     return LCItem(
       pi.packageName,
-      pi.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
+      pi.getAppName() ?: "null",
       pi.versionName ?: "null",
       pi.getVersionCode(),
       pi.firstInstallTime,

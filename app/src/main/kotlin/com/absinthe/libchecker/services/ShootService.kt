@@ -34,6 +34,7 @@ import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
@@ -223,7 +224,7 @@ class ShootService : LifecycleService() {
               id = null,
               packageName = info.packageName,
               timeStamp = ts,
-              label = ai.loadLabel(packageManager).toString(),
+              label = info.getAppName() ?: "null",
               versionName = info.versionName ?: "null",
               versionCode = info.getVersionCode(),
               installedTime = info.firstInstallTime,
@@ -281,7 +282,7 @@ class ShootService : LifecycleService() {
               id = null,
               packageName = it.packageName,
               timeStamp = ts,
-              label = info.loadLabel(packageManager).toString(),
+              label = it.getAppName() ?: "null",
               versionName = it.versionName ?: "null",
               versionCode = it.getVersionCode(),
               installedTime = it.firstInstallTime,

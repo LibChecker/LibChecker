@@ -25,6 +25,7 @@ import com.absinthe.libchecker.model.TrackListItem
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView
@@ -106,7 +107,7 @@ class TrackActivity :
         .asSequence()
         .map {
           TrackListItem(
-            label = it.applicationInfo.loadLabel(packageManager).toString(),
+            label = it.getAppName() ?: "null",
             packageName = it.packageName,
             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )

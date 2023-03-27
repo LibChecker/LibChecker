@@ -7,6 +7,7 @@ import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.core.content.pm.PackageInfoCompat
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.model.KotlinToolingMetadata
 import com.absinthe.libchecker.model.LibStringItem
@@ -599,3 +600,5 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
     PackageUtils.describeSignature(localedContext, dateFormat, it)
   }
 }
+
+fun PackageInfo.getAppName(): String? = applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()

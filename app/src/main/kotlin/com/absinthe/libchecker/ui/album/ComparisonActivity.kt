@@ -42,6 +42,7 @@ import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -437,7 +438,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         id = null,
         packageName = it.packageName,
         timeStamp = -1L,
-        label = ai.loadLabel(packageManager).toString(),
+        label = it.getAppName() ?: "null",
         versionName = it.versionName ?: "null",
         versionCode = it.getVersionCode(),
         installedTime = it.firstInstallTime,

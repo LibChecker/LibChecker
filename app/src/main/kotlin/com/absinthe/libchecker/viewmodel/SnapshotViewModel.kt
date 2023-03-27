@@ -17,7 +17,6 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
@@ -36,6 +35,7 @@ import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -122,7 +122,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     val diffList = mutableListOf<SnapshotDiffItem>()
     val allTrackItems = repository.getTrackItems()
-    val packageManager = SystemServices.packageManager
     val size = currMap.size
 
     var count = 0
@@ -168,7 +167,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           SnapshotDiffItem(
             pi.packageName,
             pi.lastUpdateTime,
-            SnapshotDiffItem.DiffNode(ai.loadLabel(packageManager).toString()),
+            SnapshotDiffItem.DiffNode(pi.getAppName() ?: "null"),
             SnapshotDiffItem.DiffNode(pi.versionName),
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
@@ -303,7 +302,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       updateTime = packageInfo.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
         dbItem.label,
-        packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+        packageInfo.getAppName() ?: "null"
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         dbItem.versionName,
@@ -569,10 +568,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(
-            it.label,
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
-          ),
+          SnapshotDiffItem.DiffNode(it.label, packageInfo.getAppName() ?: "null"),
           SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
           SnapshotDiffItem.DiffNode(it.versionCode, packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(
@@ -665,9 +661,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
-          ),
+          SnapshotDiffItem.DiffNode(packageInfo.getAppName() ?: "null"),
           SnapshotDiffItem.DiffNode(packageInfo.versionName),
           SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),

@@ -10,7 +10,6 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
@@ -20,6 +19,7 @@ import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionString
@@ -67,7 +67,7 @@ class OverlayDetailBottomSheetDialogFragment :
           load(appIconLoader.loadIcon(packageInfo.applicationInfo))
         }
         appNameView.apply {
-          text = packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+          text = packageInfo.getAppName()
           setLongClickCopiedToClipboard(text)
         }
         packageNameView.apply {

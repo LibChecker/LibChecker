@@ -578,17 +578,15 @@ object PackageUtils {
   /**
    * Get ABIs set of an app
    * @param file Application file
-   * @param applicationInfo ApplicationInfo
+   * @param packageInfo PackageInfo
    * @param isApk Whether is an APK file
-   * @param overlay Is this app an overlay app
    * @param ignoreArch Ignore arch so you can get all ABIs
    * @return ABI type
    */
   fun getAbiSet(
     file: File,
-    applicationInfo: ApplicationInfo,
+    packageInfo: PackageInfo,
     isApk: Boolean = false,
-    overlay: Boolean,
     ignoreArch: Boolean = false
   ): Set<Int> {
     var elementName: String
@@ -600,7 +598,7 @@ object PackageUtils {
       zipFile = ZipFile(file)
       val entries = zipFile.entries()
 
-      if (overlay) {
+      if (packageInfo.isOverlay()) {
         abiSet.add(OVERLAY)
         return abiSet
       }
@@ -657,8 +655,8 @@ object PackageUtils {
       }
 
       if (abiSet.isEmpty()) {
-        if (!isApk && applicationInfo.nativeLibraryDir != null) {
-          abiSet.addAll(getAbiListByNativeDir(applicationInfo.nativeLibraryDir))
+        if (!isApk && packageInfo.applicationInfo.nativeLibraryDir != null) {
+          abiSet.addAll(getAbiListByNativeDir(packageInfo.applicationInfo.nativeLibraryDir))
         }
 
         if (abiSet.isEmpty()) {
@@ -726,8 +724,8 @@ object PackageUtils {
     }
 
     val file = File(applicationInfo.sourceDir)
-    val realAbiSet =
-      abiSet ?: getAbiSet(file, applicationInfo, isApk, overlay = false, ignoreArch = true)
+    val realAbiSet = abiSet ?: getAbiSet(file, packageInfo, isApk, ignoreArch = true)
+
     if (realAbiSet.contains(NO_LIBS)) {
       return NO_LIBS
     }
