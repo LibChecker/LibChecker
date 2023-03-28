@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -505,7 +506,8 @@ abstract class BaseAppDetailActivity :
         showProcessBarView()
       }
       it.featuresFlow.onEach { feat ->
-        Timber.d("feat: $feat")
+        initFeatureListView()
+
         when (feat.featureType) {
           Features.SPLIT_APKS -> {
             featureAdapter.addData(
@@ -596,7 +598,6 @@ abstract class BaseAppDetailActivity :
     }
 
     if (featureListView == null) {
-      initFeatureListView()
       viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
     }
 
@@ -656,19 +657,34 @@ abstract class BaseAppDetailActivity :
       return false
     }
 
-    featureListView = RecyclerView(this).also {
-      it.layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also { lp ->
-        lp.topMargin = 4.dp
+    doOnMainThreadIdle {
+      val oldContainerHeight = binding.headerContentLayout.height
+      featureListView = RecyclerView(this).also {
+        it.layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also { lp ->
+          lp.topMargin = 4.dp
+        }
+        it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        it.adapter = featureAdapter
+        it.clipChildren = false
+        it.overScrollMode = View.OVER_SCROLL_NEVER
       }
-      it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-      it.adapter = featureAdapter
-      it.clipChildren = false
-      it.overScrollMode = View.OVER_SCROLL_NEVER
+      binding.headerContentLayout.addView(featureListView)
+      val newContainerHeight = oldContainerHeight + 40.dp
+      val params = binding.headerContentLayout.layoutParams
+      ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also {
+        it.addUpdateListener { valueAnimator ->
+          val height = valueAnimator.animatedValue as Int
+          params.height = height
+          binding.headerContentLayout.layoutParams = params
+        }
+        it.duration = 250
+        it.start()
+      }
     }
-    binding.headerContentLayout.addView(featureListView)
+
     return true
   }
 
