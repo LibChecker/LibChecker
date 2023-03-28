@@ -1,9 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.content.Context
-import android.graphics.Color
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -46,14 +43,9 @@ object FeaturesDialog {
   }
 
   fun showRxKotlinDialog(context: Context, version: String?) {
-    val icon = context.getDrawable(R.drawable.ic_reactivex)!!.mutate()
-    val color = Color.parseColor("#7F52FF")
-    val filter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-    icon.colorFilter = filter
-
     commonShowDialogImpl(
       context,
-      icon,
+      R.drawable.ic_rxkotlin,
       R.string.rxkotlin,
       R.string.rx_kotlin_detail,
       version
@@ -61,14 +53,9 @@ object FeaturesDialog {
   }
 
   fun showRxAndroidDialog(context: Context, version: String?) {
-    val icon = context.getDrawable(R.drawable.ic_reactivex)!!.mutate()
-    val color = Color.parseColor("#3DDC84")
-    val filter = PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN)
-    icon.colorFilter = filter
-
     commonShowDialogImpl(
       context,
-      icon,
+      R.drawable.ic_rxandroid,
       R.string.rxandroid,
       R.string.rx_android_detail,
       version

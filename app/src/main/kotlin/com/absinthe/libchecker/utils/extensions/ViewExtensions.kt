@@ -3,7 +3,10 @@ package com.absinthe.libchecker.utils.extensions
 import android.animation.Animator
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
+import android.content.ClipData
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -13,15 +16,20 @@ import android.text.style.StrikethroughSpan
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.FileProvider
 import androidx.core.view.children
 import androidx.viewpager2.widget.ViewPager2
+import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libraries.utils.extensions.addPaddingBottom
 import com.absinthe.libraries.utils.extensions.addPaddingEnd
 import com.absinthe.libraries.utils.extensions.addPaddingStart
 import com.absinthe.libraries.utils.extensions.addPaddingTop
 import com.absinthe.libraries.utils.utils.UiUtils
+import java.io.File
 import rikka.core.util.ClipboardUtils
 
 fun View.setLongClickCopiedToClipboard(text: CharSequence) {
@@ -176,4 +184,27 @@ fun TextView.reverseStrikeThroughAnimation(): ValueAnimator {
   animator.duration = 1000
   animator.start()
   return animator
+}
+
+fun ImageView.copyToClipboard() {
+  val drawable = (drawable as? BitmapDrawable)?.bitmap ?: return
+  val iconFile = File(context.externalCacheDir, Constants.TEMP_ICON)
+  if (!iconFile.exists()) {
+    iconFile.createNewFile()
+  }
+  iconFile.outputStream().use {
+    drawable.compress(Bitmap.CompressFormat.PNG, 100, it)
+  }
+  val uri = FileProvider.getUriForFile(
+    context,
+    BuildConfig.APPLICATION_ID + ".fileprovider",
+    iconFile
+  )
+  if (ClipboardUtils.put(
+      context,
+      ClipData.newUri(context.contentResolver, Constants.TEMP_ICON, uri)
+    )
+  ) {
+    VersionCompat.showCopiedOnClipboardToast(context)
+  }
 }

@@ -5,6 +5,7 @@ import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.SpannableString
+import android.text.format.Formatter
 import android.text.style.ImageSpan
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
@@ -17,9 +18,12 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.getTargetApiString
 import com.absinthe.libchecker.utils.extensions.getVersionString
@@ -65,6 +69,10 @@ class OverlayDetailBottomSheetDialogFragment :
             requireContext()
           )
           load(appIconLoader.loadIcon(packageInfo.applicationInfo))
+          setOnLongClickListener {
+            copyToClipboard()
+            true
+          }
         }
         appNameView.apply {
           text = packageInfo.getAppName()
@@ -89,6 +97,15 @@ class OverlayDetailBottomSheetDialogFragment :
               append(" Min: ")
             }
             append(packageInfo.applicationInfo.minSdkVersion.toString())
+            scale(0.8f) {
+              append(" Compile: ")
+            }
+            append(packageInfo.getCompileSdkVersion())
+            scale(0.8f) {
+              append(" Size: ")
+            }
+            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            append(Formatter.formatFileSize(context, apkSize))
           }
         }
       }

@@ -1,12 +1,9 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.content.ClipData
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.format.Formatter
@@ -19,7 +16,6 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
@@ -32,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
@@ -44,7 +39,6 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -74,6 +68,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
@@ -94,7 +89,6 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import java.io.File
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -103,7 +97,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
-import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
 abstract class BaseAppDetailActivity :
@@ -188,27 +181,7 @@ abstract class BaseAppDetailActivity :
               }
             }
             setOnLongClickListener {
-              val drawable =
-                (drawable as? BitmapDrawable)?.bitmap ?: return@setOnLongClickListener false
-              val iconFile = File(externalCacheDir, Constants.TEMP_ICON)
-              if (!iconFile.exists()) {
-                iconFile.createNewFile()
-              }
-              iconFile.outputStream().use {
-                drawable.compress(Bitmap.CompressFormat.PNG, 100, it)
-              }
-              val uri = FileProvider.getUriForFile(
-                this@BaseAppDetailActivity,
-                BuildConfig.APPLICATION_ID + ".fileprovider",
-                iconFile
-              )
-              if (ClipboardUtils.put(
-                  this@BaseAppDetailActivity,
-                  ClipData.newUri(contentResolver, Constants.TEMP_ICON, uri)
-                )
-              ) {
-                VersionCompat.showCopiedOnClipboardToast(this@BaseAppDetailActivity)
-              }
+              copyToClipboard()
               true
             }
           }
@@ -877,8 +850,7 @@ abstract class BaseAppDetailActivity :
 
       abiSet.forEach {
         if (it != Constants.NO_LIBS) {
-          val isActive =
-            apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
+          val isActive = apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
           abiLabelsList.add(AbiLabelNode(it, isActive))
         }
       }
