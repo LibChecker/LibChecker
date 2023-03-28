@@ -83,10 +83,6 @@ class ShootService : LifecycleService() {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     Timber.d("onStartCommand: ${intent?.action}")
-    if (intent?.`package` != packageName) {
-      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-      stopSelf()
-    }
     when (intent?.action) {
       ACTION_SHOOT_AND_STOP_AUTO -> {
         val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
