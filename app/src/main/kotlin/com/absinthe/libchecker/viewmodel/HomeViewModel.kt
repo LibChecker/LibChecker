@@ -160,7 +160,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     viewModelScope.launch(Dispatchers.IO) {
       Timber.d("initItems: START")
 
-      val context: Context = getApplication<LibCheckerApp>()
       val timeRecorder = TimeRecorder()
       timeRecorder.start()
 
