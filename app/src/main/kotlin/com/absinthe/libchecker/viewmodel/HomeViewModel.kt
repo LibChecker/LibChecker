@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
@@ -154,11 +153,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
+  private val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
+
   private fun initItemsImpl(appList: List<PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
       Timber.d("initItems: START")
 
-      val context: Context = getApplication<LibCheckerApp>()
       val timeRecorder = TimeRecorder()
       timeRecorder.start()
 
@@ -168,12 +168,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       val lcItems = mutableListOf<LCItem>()
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
-      val bundleManager by lazy { ApplicationDelegate(context).iBundleManager }
       var progressCount = 0
 
       for (info in appList) {
         try {
-          lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, bundleManager, true))
+          lcItems.add(generateLCItemFromPackageInfo(info, isHarmony, true))
           progressCount++
           updateInitProgress(progressCount * 100 / appList.size)
         } catch (e: Throwable) {
@@ -235,7 +234,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
-      val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
 
       val localApps = appMap.map { it.key }.toSet()
       val dbApps = dbItems.map { it.packageName }.toSet()
@@ -245,7 +243,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       newApps.forEach {
         runCatching {
           val info = appMap[it] ?: return@runCatching
-          insert(generateLCItemFromPackageInfo(info, isHarmony, bundleManager))
+          insert(generateLCItemFromPackageInfo(info, isHarmony))
         }.onFailure { e ->
           Timber.e(e, "requestChange: $it")
         }
@@ -264,7 +262,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
               it.lastUpdatedTime == 0L
           } ?: false
         }.forEach {
-          update(generateLCItemFromPackageInfo(it, isHarmony, bundleManager))
+          update(generateLCItemFromPackageInfo(it, isHarmony))
         }
 
       refreshList()
@@ -284,7 +282,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun generateLCItemFromPackageInfo(
     pi: PackageInfo,
     isHarmony: Boolean,
-    bundleManager: IBundleManager?,
     delayInitFeatures: Boolean = false
   ): LCItem {
     val variant = if (isHarmony && bundleManager?.getBundleInfo(
