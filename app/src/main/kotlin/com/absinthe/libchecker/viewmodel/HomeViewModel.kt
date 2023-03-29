@@ -154,7 +154,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
   }
 
-  private suspend fun initItemsImpl(appList: List<PackageInfo>) =
+  private fun initItemsImpl(appList: List<PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
       Timber.d("initItems: START")
 
@@ -222,7 +222,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
 
-  private suspend fun requestChangeImpl(appMap: Map<String, PackageInfo>) =
+  private fun requestChangeImpl(appMap: Map<String, PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
       val dbItems = Repositories.lcRepository.getLCItems()
       if (dbItems.isEmpty()) {
@@ -312,7 +312,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     )
   }
 
-  private suspend fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
+  private fun collectPopularLibraries(appMap: Map<String, PackageInfo>) =
     viewModelScope.launch(Dispatchers.IO) {
       if (GlobalValues.isAnonymousAnalyticsEnabled.value == false) {
         return@launch
