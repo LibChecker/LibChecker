@@ -236,10 +236,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
       val bundleManager by lazy {
-        runCatching {
-          @Suppress("USELESS_CAST")
-          ApplicationDelegate(LibCheckerApp.app).iBundleManager as Any?
-        }.getOrNull()
+        @Suppress("USELESS_CAST")
+        ApplicationDelegate(LibCheckerApp.app).iBundleManager as Any?
       }
 
       val localApps = appMap.map { it.key }.toSet()
