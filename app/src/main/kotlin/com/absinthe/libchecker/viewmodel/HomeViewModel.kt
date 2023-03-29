@@ -235,7 +235,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       updateAppListStatus(STATUS_START_REQUEST_CHANGE)
 
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
-      val bundleManager by lazy { ApplicationDelegate(LibCheckerApp.app).iBundleManager }
+      val bundleManager by lazy {
+        runCatching { ApplicationDelegate(LibCheckerApp.app).iBundleManager }.getOrNull()
+      }
 
       val localApps = appMap.map { it.key }.toSet()
       val dbApps = dbItems.map { it.packageName }.toSet()
