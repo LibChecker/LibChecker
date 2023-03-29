@@ -236,7 +236,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
       val isHarmony = HarmonyOsUtil.isHarmonyOs()
       val bundleManager by lazy {
-        runCatching { ApplicationDelegate(LibCheckerApp.app).iBundleManager }.getOrNull()
+        runCatching {
+          @Suppress("USELESS_CAST")
+          ApplicationDelegate(LibCheckerApp.app).iBundleManager as Any?
+        }.getOrNull()
       }
 
       val localApps = appMap.map { it.key }.toSet()
@@ -286,10 +289,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   private fun generateLCItemFromPackageInfo(
     pi: PackageInfo,
     isHarmony: Boolean,
-    bundleManager: IBundleManager?,
+    bundleManager: Any?,
     delayInitFeatures: Boolean = false
   ): LCItem {
-    val variant = if (isHarmony && bundleManager?.getBundleInfo(
+    val variant = if (isHarmony && (bundleManager as? IBundleManager)?.getBundleInfo(
         pi.packageName,
         IBundleManager.GET_BUNDLE_DEFAULT
       ) != null
