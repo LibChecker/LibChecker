@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.viewmodel
 
 import android.app.Application
-import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
