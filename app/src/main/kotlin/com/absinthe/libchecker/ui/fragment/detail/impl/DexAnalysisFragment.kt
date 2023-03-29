@@ -2,9 +2,9 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment

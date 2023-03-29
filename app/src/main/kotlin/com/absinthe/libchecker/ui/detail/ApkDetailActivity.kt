@@ -10,7 +10,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -69,7 +69,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
   }
 
   private fun initPackage(uri: Uri) {
-    val dialog = LCAppUtils.createLoadingDialog(this)
+    val dialog = UiUtils.createLoadingDialog(this)
     dialog.show()
 
     lifecycleScope.launch(Dispatchers.IO) {

@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.widget.ViewFlipper
 import androidx.fragment.app.findFragment
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.base.BaseFragment
+import com.absinthe.libchecker.ui.base.BaseFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

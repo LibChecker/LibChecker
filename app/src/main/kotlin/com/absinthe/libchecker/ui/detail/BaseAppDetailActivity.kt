@@ -1,12 +1,10 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.content.ClipData
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.format.Formatter
@@ -19,9 +17,7 @@ import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
-import androidx.core.text.HtmlCompat
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.MenuProvider
@@ -33,9 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import coil.load
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.METADATA
@@ -46,24 +40,20 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SIGNATURES
 import com.absinthe.libchecker.annotation.STATIC
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.AppDetailToolbarItem
-import com.absinthe.libchecker.bean.DetailExtraBean
-import com.absinthe.libchecker.bean.FeatureItem
-import com.absinthe.libchecker.bean.SnapshotDiffItem
-import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.databinding.ActivityAppDetailBinding
+import com.absinthe.libchecker.model.AppDetailToolbarItem
+import com.absinthe.libchecker.model.DetailExtraBean
+import com.absinthe.libchecker.model.FeatureItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.adapter.detail.AppDetailToolbarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.FeatureAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.ProcessBarAdapter
 import com.absinthe.libchecker.recyclerview.adapter.detail.node.AbiLabelNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
@@ -78,12 +68,17 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragmen
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getFeatures
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
-import com.absinthe.libchecker.utils.PackageUtils.isOverlay
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getTargetApiString
+import com.absinthe.libchecker.utils.extensions.getVersionCode
+import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -95,16 +90,14 @@ import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import com.microsoft.appcenter.analytics.Analytics
-import com.microsoft.appcenter.analytics.EventProperties
-import java.io.File
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.appiconloader.AppIconLoader
 import ohos.bundle.IBundleManager
-import rikka.core.util.ClipboardUtils
 import timber.log.Timber
 
 abstract class BaseAppDetailActivity :
@@ -132,9 +125,6 @@ abstract class BaseAppDetailActivity :
   private var hasReloadVariant = false
   private var featureListView: RecyclerView? = null
   private var processBarView: ProcessBarView? = null
-  private var easterEggTabA = -1
-  private var easterEggTabB = -1
-  private var easterEggCount = 0
 
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
@@ -163,8 +153,7 @@ abstract class BaseAppDetailActivity :
         supportActionBar?.title = null
         collapsingToolbar.also {
           it.setOnApplyWindowInsetsListener(null)
-          it.title = packageInfo.applicationInfo?.loadLabel(packageManager)?.toString()
-            ?: getString(R.string.detail_label)
+          it.title = packageInfo.getAppName() ?: getString(R.string.detail_label)
         }
         headerLayout.addOnOffsetChangedListener(object : AppBarStateChangeListener() {
           override fun onStateChanged(appBarLayout: AppBarLayout, state: State) {
@@ -193,32 +182,12 @@ abstract class BaseAppDetailActivity :
               }
             }
             setOnLongClickListener {
-              (drawable as? BitmapDrawable)?.bitmap?.let { bitmap ->
-                val iconFile = File(externalCacheDir, Constants.TEMP_ICON)
-                if (!iconFile.exists()) {
-                  iconFile.createNewFile()
-                }
-                iconFile.outputStream().use {
-                  bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
-                }
-                val uri = FileProvider.getUriForFile(
-                  this@BaseAppDetailActivity,
-                  BuildConfig.APPLICATION_ID + ".fileprovider",
-                  iconFile
-                )
-                if (ClipboardUtils.put(
-                    this@BaseAppDetailActivity,
-                    ClipData.newUri(contentResolver, Constants.TEMP_ICON, uri)
-                  )
-                ) {
-                  VersionCompat.showCopiedOnClipboardToast(this@BaseAppDetailActivity)
-                }
-              }
+              copyToClipboard()
               true
             }
           }
           appNameView.apply {
-            text = packageInfo.applicationInfo.loadLabel(packageManager).toString()
+            text = packageInfo.getAppName()
             setLongClickCopiedToClipboard(text)
           }
           packageNameView.apply {
@@ -226,41 +195,26 @@ abstract class BaseAppDetailActivity :
             setLongClickCopiedToClipboard(text)
           }
           versionInfoView.apply {
-            text = PackageUtils.getVersionString(packageInfo)
+            text = packageInfo.getVersionString()
             setLongClickCopiedToClipboard(text)
           }
         }
 
         val extraInfo = SpannableStringBuilder()
-        val file = File(packageInfo.applicationInfo.sourceDir)
-        val overlay = packageInfo.isOverlay()
-        var abiSet = PackageUtils.getAbiSet(
-          file,
-          packageInfo.applicationInfo,
-          isApk = apkAnalyticsMode,
-          overlay = overlay,
-          ignoreArch = true
-        ).toSet()
-        val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
-        abiSet = abiSet.sortedByDescending { it == abi }.toSet()
-
-        val trueAbi = abi.mod(Constants.MULTI_ARCH)
-        viewModel.is64Bit.postValue(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
-
         val versionInfo = buildSpannedString {
           if (!isHarmonyMode) {
             scale(0.8f) {
               append("Target: ")
             }
-            append(PackageUtils.getTargetApiString(packageInfo))
+            append(packageInfo.getTargetApiString())
             scale(0.8f) {
               append(" Min: ")
             }
-            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+            append(packageInfo.applicationInfo.minSdkVersion.toString())
             scale(0.8f) {
               append(" Compile: ")
             }
-            append(PackageUtils.getCompileSdkVersion(packageInfo))
+            append(packageInfo.getCompileSdkVersion())
             scale(0.8f) {
               append(" Size: ")
             }
@@ -295,54 +249,16 @@ abstract class BaseAppDetailActivity :
         }
         extraInfo.append(versionInfo)
 
-        if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
-          val abiLabelsList = mutableListOf<AbiLabelNode>()
-
-          if (abi >= Constants.MULTI_ARCH) {
-            abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true))
-          }
-
-          abiSet.forEach {
-            if (it != Constants.NO_LIBS) {
-              abiLabelsList.add(
-                AbiLabelNode(
-                  it,
-                  apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
-                )
-              )
-            }
-          }
-          detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
-        }
-
-        val advanced = when (abi) {
-          Constants.ERROR -> getString(R.string.cannot_read)
-          Constants.OVERLAY -> Constants.OVERLAY_STRING
-          else -> ""
-        }
-        extraInfo.append(advanced)
         detailsTitle.extraInfoView.apply {
           text = extraInfo
           setLongClickCopiedToClipboard(text)
         }
-
-        if (featureListView == null) {
-          lifecycleScope.launch(Dispatchers.IO) {
-            var features = extraBean?.features ?: -1
-            if (features == -1) {
-              features = packageInfo.getFeatures()
-              Repositories.lcRepository.updateFeatures(packageInfo.packageName, features)
-            }
-
-            withContext(Dispatchers.Main) {
-              initFeatures(packageInfo, features)
-            }
-          }
-        }
+        viewModel.initAbiInfo(packageInfo, apkAnalyticsMode)
       } catch (e: Exception) {
         Timber.e(e)
         Toasty.showLong(this@BaseAppDetailActivity, e.toString())
         finish()
+        return
       }
 
       if (hasReloadVariant) {
@@ -530,34 +446,6 @@ abstract class BaseAppDetailActivity :
             detailFragmentManager.currentItemsCount = count
           }
           detailFragmentManager.selectedPosition = typeList[tab.position]
-
-          if ((easterEggCount % 2) == 0) {
-            if (tab.position == easterEggTabA || easterEggTabA == -1) {
-              easterEggCount++
-              easterEggTabA = tab.position
-            } else {
-              easterEggCount = 0
-              easterEggTabA = -1
-              easterEggTabB = -1
-            }
-          } else {
-            if (tab.position == easterEggTabB || easterEggTabB == -1) {
-              easterEggCount++
-              easterEggTabB = tab.position
-            } else {
-              easterEggCount = 0
-              easterEggTabA = -1
-              easterEggTabB = -1
-            }
-          }
-          if (easterEggCount >= 10) {
-            easterEggCount = 0
-            Toasty.showLong(this@BaseAppDetailActivity, "What are you doing?\uD83E\uDD14")
-            Analytics.trackEvent(
-              Constants.Event.EASTER_EGG,
-              EventProperties().set("EASTER_EGG", "Detail page Repeated sliding")
-            )
-          }
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -572,49 +460,145 @@ abstract class BaseAppDetailActivity :
       }
     mediator.attach()
 
-    viewModel.itemsCountLiveData.observe(this) {
-      if (detailFragmentManager.currentItemsCount != it.count && typeList[binding.tabLayout.selectedTabPosition] == it.locate) {
-        binding.tsComponentCount.setText(it.count.toString())
-        detailFragmentManager.currentItemsCount = it.count
-      }
-    }
-    viewModel.processToolIconVisibilityLiveData.observe(this) { visible ->
-      if (visible) {
-        if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
-          if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
-            toolbarAdapter.addData(toolbarProcessItem)
-          }
+    viewModel.also {
+      it.itemsCountLiveData.observe(this) { live ->
+        if (detailFragmentManager.currentItemsCount != live.count && typeList[binding.tabLayout.selectedTabPosition] == live.locate) {
+          binding.tsComponentCount.setText(live.count.toString())
+          detailFragmentManager.currentItemsCount = live.count
         }
-        if (GlobalValues.processMode || detailFragmentManager.currentFragment is PermissionAnalysisFragment) {
-          if (processBarView == null) {
-            initProcessBarView()
+      }
+      it.processToolIconVisibilityLiveData.observe(this) { visible ->
+        if (visible) {
+          if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
+            if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+              toolbarAdapter.addData(toolbarProcessItem)
+            }
           }
-          processBarView?.isVisible = true
+          if (GlobalValues.processMode || detailFragmentManager.currentFragment is PermissionAnalysisFragment) {
+            if (processBarView == null) {
+              initProcessBarView()
+            }
+            processBarView?.isVisible = true
+          } else {
+            processBarView?.isGone = true
+          }
         } else {
-          processBarView?.isGone = true
+          if (toolbarAdapter.data.contains(toolbarProcessItem)) {
+            toolbarAdapter.remove(toolbarProcessItem)
+          }
+          if (detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
+            processBarView?.isGone = true
+          }
         }
-      } else {
-        if (toolbarAdapter.data.contains(toolbarProcessItem)) {
-          toolbarAdapter.remove(toolbarProcessItem)
+      }
+      it.processMapLiveData.observe(this) { map ->
+        if (processBarView == null) {
+          initProcessBarView()
         }
-        if (detailFragmentManager.currentFragment !is PermissionAnalysisFragment) {
-          processBarView?.isGone = true
+        processBarView?.setData(
+          map.map { mapItem ->
+            ProcessBarAdapter.ProcessBarItem(
+              mapItem.key,
+              mapItem.value
+            )
+          }
+        )
+        showProcessBarView()
+      }
+      it.featuresFlow.onEach { feat ->
+        initFeatureListView()
+
+        when (feat.featureType) {
+          Features.SPLIT_APKS -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_aab) {
+                FeaturesDialog.showSplitApksDialog(this, packageInfo.packageName)
+              }
+            )
+          }
+
+          Features.KOTLIN_USED -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_kotlin_logo) {
+                FeaturesDialog.showKotlinDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.RX_JAVA -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_reactivex) {
+                FeaturesDialog.showRxJavaDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.RX_KOTLIN -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_rxkotlin) {
+                FeaturesDialog.showRxKotlinDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.RX_ANDROID -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_rxandroid) {
+                FeaturesDialog.showRxAndroidDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.AGP -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_gradle) {
+                FeaturesDialog.showAGPDialog(this, feat.version)
+              }
+            )
+          }
+
+          Features.XPOSED_MODULE -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_xposed) {
+                FeaturesDialog.showXPosedDialog(this)
+              }
+            )
+          }
+
+          Features.PLAY_SIGNING -> {
+            featureAdapter.addData(
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
+                FeaturesDialog.showPlayAppSigningDialog(this)
+              }
+            )
+          }
+
+          Features.PWA -> {
+            featureAdapter.addData(
+              FeatureItem(R.drawable.ic_pwa) {
+                FeaturesDialog.showPWADialog(this)
+              }
+            )
+          }
+
+          Features.JETPACK_COMPOSE -> {
+            featureAdapter.addData(
+              FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
+                FeaturesDialog.showJetpackComposeDialog(this, feat.version)
+              }
+            )
+          }
+        }
+      }.launchIn(lifecycleScope)
+      it.abiBundle.observe(this) { bundle ->
+        if (bundle != null) {
+          initAbiView(bundle.abi, bundle.abiSet)
         }
       }
     }
-    viewModel.processMapLiveData.observe(this) {
-      if (processBarView == null) {
-        initProcessBarView()
-      }
-      processBarView?.setData(
-        it.map { mapItem ->
-          ProcessBarAdapter.ProcessBarItem(
-            mapItem.key,
-            mapItem.value
-          )
-        }
-      )
-      showProcessBarView()
+
+    if (featureListView == null) {
+      viewModel.initFeatures(packageInfo, extraBean?.features ?: -1)
     }
 
     if (!isHarmonyMode) {
@@ -655,10 +639,6 @@ abstract class BaseAppDetailActivity :
     menu.findItem(R.id.search).apply {
       setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW or MenuItem.SHOW_AS_ACTION_IF_ROOM)
       actionView = searchView
-
-      // if (!isListReady) {
-      //   isVisible = false
-      // }
     }
   }
 
@@ -677,221 +657,35 @@ abstract class BaseAppDetailActivity :
       return false
     }
 
-    featureListView = RecyclerView(this).also {
-      it.layoutParams = ViewGroup.MarginLayoutParams(
-        ViewGroup.LayoutParams.MATCH_PARENT,
-        ViewGroup.LayoutParams.WRAP_CONTENT
-      ).also { lp ->
-        lp.topMargin = 4.dp
+    doOnMainThreadIdle {
+      val oldContainerHeight = binding.headerContentLayout.height
+      featureListView = RecyclerView(this).also {
+        it.layoutParams = ViewGroup.MarginLayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT,
+          ViewGroup.LayoutParams.WRAP_CONTENT
+        ).also { lp ->
+          lp.topMargin = 4.dp
+        }
+        it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        it.adapter = featureAdapter
+        it.clipChildren = false
+        it.overScrollMode = View.OVER_SCROLL_NEVER
       }
-      it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-      it.adapter = featureAdapter
-      it.clipChildren = false
-      it.overScrollMode = View.OVER_SCROLL_NEVER
+      binding.headerContentLayout.addView(featureListView)
+      val newContainerHeight = oldContainerHeight + 40.dp
+      val params = binding.headerContentLayout.layoutParams
+      ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also {
+        it.addUpdateListener { valueAnimator ->
+          val height = valueAnimator.animatedValue as Int
+          params.height = height
+          binding.headerContentLayout.layoutParams = params
+        }
+        it.duration = 250
+        it.start()
+      }
     }
-    binding.headerContentLayout.addView(featureListView)
+
     return true
-  }
-
-  private suspend fun initFeatures(packageInfo: PackageInfo, features: Int) {
-    initFeatureListView()
-
-    if ((features and Features.SPLIT_APKS) > 0) {
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_aab) {
-          AppBundleBottomSheetDialogFragment().apply {
-            arguments = bundleOf(
-              EXTRA_PACKAGE_NAME to packageInfo.packageName
-            )
-            show(supportFragmentManager, AppBundleBottomSheetDialogFragment::class.java.name)
-          }
-        }
-      )
-    }
-    if ((features and Features.KOTLIN_USED) > 0) {
-      val dialog = BaseAlertDialogBuilder(this)
-        .setIcon(R.drawable.ic_kotlin_logo)
-        .setTitle(R.string.kotlin_string)
-        .setMessage(R.string.kotlin_details)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_kotlin_logo) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getKotlinPluginVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.kotlin_string)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
-    if ((features and Features.RX_JAVA) > 0) {
-      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-        .setIcon(R.drawable.ic_reactivex)
-        .setTitle(R.string.rxjava)
-        .setMessage(R.string.rx_detail)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_reactivex) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getRxJavaVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.rxjava)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
-    if ((features and Features.RX_KOTLIN) > 0) {
-      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-        .setIcon(R.drawable.ic_rxkotlin)
-        .setTitle(R.string.rxkotlin)
-        .setMessage(R.string.rx_kotlin_detail)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_rxkotlin) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getRxKotlinVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.rxkotlin)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
-    if ((features and Features.RX_ANDROID) > 0) {
-      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-        .setIcon(R.drawable.ic_rxandroid)
-        .setTitle(R.string.rxandroid)
-        .setMessage(R.string.rx_android_detail)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_rxandroid) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getRxAndroidVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.rxandroid)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
-    if ((features and Features.AGP) > 0) {
-      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-        .setIcon(R.drawable.ic_gradle)
-        .setTitle(R.string.agp)
-        .setMessage(R.string.agp_details)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_gradle) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getAGPVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.agp)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
-
-    if ((features and Features.XPOSED_MODULE) > 0) {
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_xposed) {
-          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-            .setIcon(R.drawable.ic_xposed)
-            .setTitle(R.string.xposed_module)
-            .setMessage(R.string.xposed_module_details)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
-        }
-      )
-    }
-
-    if ((features and Features.PLAY_SIGNING) > 0) {
-      featureAdapter.addData(
-        FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store) {
-          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-            .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_play_store)
-            .setTitle(R.string.play_app_signing)
-            .setMessage(R.string.play_app_signing_details)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
-        }
-      )
-    }
-
-    if ((features and Features.PWA) > 0) {
-      featureAdapter.addData(
-        FeatureItem(R.drawable.ic_pwa) {
-          BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-            .setIcon(R.drawable.ic_pwa)
-            .setTitle(R.string.pwa)
-            .setMessage(R.string.pwa_details)
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
-        }
-      )
-    }
-
-    if ((features and Features.JETPACK_COMPOSE) > 0) {
-      val dialog = BaseAlertDialogBuilder(this@BaseAppDetailActivity)
-        .setIcon(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose)
-        .setTitle(R.string.jetpack_compose)
-        .setMessage(R.string.jetpack_compose_details)
-        .setPositiveButton(android.R.string.ok, null)
-      featureAdapter.addData(
-        FeatureItem(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_jetpack_compose) {
-          dialog.show()
-        }
-      )
-      withContext(Dispatchers.IO) {
-        PackageUtils.getJetpackComposeVersion(packageInfo)?.let { version ->
-          withContext(Dispatchers.Main) {
-            dialog.setTitle(
-              HtmlCompat.fromHtml(
-                "${getString(R.string.jetpack_compose)} <b>$version</b>",
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-              )
-            )
-          }
-        }
-      }
-    }
   }
 
   private val toolbarQuicklyLaunchItem by unsafeLazy {
@@ -942,16 +736,16 @@ abstract class BaseAppDetailActivity :
       packageName = basePackage.packageName,
       updateTime = basePackage.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
-        basePackage.applicationInfo.loadLabel(SystemServices.packageManager).toString(),
-        analysisPackage.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+        basePackage.getAppName() ?: "null",
+        analysisPackage.getAppName() ?: "null"
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         basePackage.versionName,
         analysisPackage.versionName
       ),
       versionCodeDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getVersionCode(basePackage),
-        PackageUtils.getVersionCode(analysisPackage)
+        basePackage.getVersionCode(),
+        analysisPackage.getVersionCode()
       ),
       abiDiff = SnapshotDiffItem.DiffNode(
         PackageUtils.getAbi(basePackage).toShort(),
@@ -1022,8 +816,8 @@ abstract class BaseAppDetailActivity :
         PackageUtils.getMetaDataItems(analysisPackage).toJson().orEmpty()
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getPackageSize(basePackage, true),
-        PackageUtils.getPackageSize(analysisPackage, true)
+        basePackage.getPackageSize(true),
+        analysisPackage.getPackageSize(true)
       )
     )
 
@@ -1056,6 +850,27 @@ abstract class BaseAppDetailActivity :
       processBarView?.isGone = true
     } else {
       processBarView?.isVisible = true
+    }
+  }
+
+  private fun initAbiView(abi: Int, abiSet: Set<Int>) {
+    val trueAbi = abi.mod(Constants.MULTI_ARCH)
+    viewModel.is64Bit.postValue(trueAbi == Constants.ARMV8 || trueAbi == Constants.X86_64)
+
+    if (abiSet.isNotEmpty() && !abiSet.contains(Constants.OVERLAY) && !abiSet.contains(Constants.ERROR)) {
+      val abiLabelsList = mutableListOf<AbiLabelNode>()
+
+      if (abi >= Constants.MULTI_ARCH) {
+        abiLabelsList.add(AbiLabelNode(Constants.MULTI_ARCH, true))
+      }
+
+      abiSet.forEach {
+        if (it != Constants.NO_LIBS) {
+          val isActive = apkAnalyticsMode || it == abi % Constants.MULTI_ARCH
+          abiLabelsList.add(AbiLabelNode(it, isActive))
+        }
+      }
+      binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
     }
   }
 }

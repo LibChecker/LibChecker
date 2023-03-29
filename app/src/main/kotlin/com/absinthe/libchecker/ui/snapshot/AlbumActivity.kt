@@ -12,16 +12,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.AlbumAdapter
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
@@ -125,7 +124,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                     lifecycleScope.launch(Dispatchers.IO) {
                       val dialog: AlertDialog
                       withContext(Dispatchers.Main) {
-                        dialog = LCAppUtils.createLoadingDialog(this@AlbumActivity)
+                        dialog = com.absinthe.libchecker.utils.UiUtils.createLoadingDialog(this@AlbumActivity)
                         dialog.show()
                       }
                       viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)

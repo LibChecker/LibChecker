@@ -112,13 +112,14 @@
       android:label="@string/settings_about"
       android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
-      android:name=".bridge.BridgeActivity"
+      android:name=".ui.bridge.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
 
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
         <data
           android:host="bridge"
           android:scheme="lc" />

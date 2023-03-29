@@ -10,14 +10,14 @@ import android.os.RemoteException
 import android.os.SystemClock
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getFeatures
+import com.absinthe.libchecker.utils.extensions.getFeatures
 import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -75,18 +75,12 @@ class WorkerService : LifecycleService() {
     super.onDestroy()
   }
 
-  private fun initAllApplicationInfoItems() {
-    Global.applicationListJob?.cancel()
-    Global.applicationListJob = lifecycleScope.launch(Dispatchers.IO) {
-      AppItemRepository.allPackageInfoMap.clear()
-      AppItemRepository.allPackageInfoMap.putAll(
-        PackageUtils.getAppsList().asSequence()
-          .map { it.packageName to it }
-          .toMap()
-      )
-      Global.applicationListJob = null
-    }.also {
-      it.start()
+  private fun initAllApplicationInfoItems() = lifecycleScope.launch(Dispatchers.IO) {
+    LocalAppDataSource.getCachedApplicationMap(Dispatchers.IO).retryWhen { cause, attempt ->
+      Timber.w(cause)
+      attempt < 5
+    }.collect { map ->
+      Timber.i("initAllApplicationInfoItems: ${map.size}")
     }
   }
 

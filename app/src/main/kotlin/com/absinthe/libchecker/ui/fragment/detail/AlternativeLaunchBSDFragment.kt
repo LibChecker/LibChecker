@@ -5,8 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.view.View
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
-import com.absinthe.libchecker.bean.AlternativeLaunchItem
+import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.model.AlternativeLaunchItem
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.showToast

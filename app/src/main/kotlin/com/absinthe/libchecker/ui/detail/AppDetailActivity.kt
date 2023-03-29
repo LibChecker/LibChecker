@@ -9,8 +9,8 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.bean.DetailExtraBean
 import com.absinthe.libchecker.compat.IntentCompat
+import com.absinthe.libchecker.model.DetailExtraBean
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.utils.PackageUtils

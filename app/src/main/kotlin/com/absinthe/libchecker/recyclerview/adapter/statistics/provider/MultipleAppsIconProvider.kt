@@ -7,7 +7,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.italic
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PACKAGE
-import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText

@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
@@ -38,7 +38,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
       val icon = AppCompatImageView(context).also {
         val packageName = packages[icons.size]
         val packageInfo = runCatching {
-          AppItemRepository.allPackageInfoMap[packageName]
+          LocalAppDataSource.getCachedApplicationMap()[packageName]
             ?: PackageUtils.getPackageInfo(packageName)
         }.getOrNull() ?: return
 

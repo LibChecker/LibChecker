@@ -6,7 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.view.detail.AppInfoItemView
 import com.chad.library.adapter.base.BaseQuickAdapter

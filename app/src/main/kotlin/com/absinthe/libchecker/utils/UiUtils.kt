@@ -1,12 +1,18 @@
 package com.absinthe.libchecker.utils
 
 import android.graphics.Color
+import android.view.ContextThemeWrapper
+import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libraries.utils.utils.UiUtils
+import com.google.android.material.progressindicator.LinearProgressIndicator
 
 object UiUtils {
   fun getRandomColor(): Int {
@@ -41,5 +47,20 @@ object UiUtils {
 
   fun isSoftInputOpen(): Boolean {
     return SystemServices.inputMethodManager.isActive
+  }
+
+  fun createLoadingDialog(context: ContextThemeWrapper): AlertDialog {
+    return BaseAlertDialogBuilder(context)
+      .setView(
+        LinearProgressIndicator(context).apply {
+          layoutParams = ViewGroup.LayoutParams(200.dp, ViewGroup.LayoutParams.WRAP_CONTENT).also {
+            setPadding(24.dp, 24.dp, 24.dp, 24.dp)
+          }
+          trackCornerRadius = 3.dp
+          isIndeterminate = true
+        }
+      )
+      .setCancelable(false)
+      .create()
   }
 }

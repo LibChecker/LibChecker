@@ -8,9 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -19,19 +17,18 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
-import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentAppListBinding
 import com.absinthe.libchecker.recyclerview.adapter.AppAdapter
 import com.absinthe.libchecker.recyclerview.diff.AppListDiffUtil
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
-import com.absinthe.libchecker.ui.fragment.main.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -49,6 +46,8 @@ import jonathanfinerty.once.Once
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -144,8 +143,6 @@ class AppListFragment :
                   withContext(Dispatchers.Main) {
                     (activity as? INavViewContainer)?.showNavigationView()
                   }
-                }.also {
-                  it.start()
                 }
               }
               isSearchTextClearOnce = false
@@ -196,28 +193,26 @@ class AppListFragment :
     if (keyword != newText) {
       isSearchTextClearOnce = newText.isEmpty()
       keyword = newText
-      homeViewModel.dbItems.value?.let { allDatabaseItems ->
-        appAdapter.highlightText = newText
-        updateItems(allDatabaseItems, highlightRefresh = true)
+      appAdapter.highlightText = newText
+      updateItems(highlightRefresh = true)
 
-        when {
-          newText.equals("Easter Egg", true) -> {
-            context?.showToast("🥚")
-            Analytics.trackEvent(
-              Constants.Event.EASTER_EGG,
-              EventProperties().set("EASTER_EGG", "AppList Search")
-            )
-          }
-          newText == Constants.COMMAND_DEBUG_MODE -> {
-            GlobalValues.debugMode = true
-            context?.showToast("DEBUG MODE")
-          }
-          newText == Constants.COMMAND_USER_MODE -> {
-            GlobalValues.debugMode = false
-            context?.showToast("USER MODE")
-          }
-          else -> {
-          }
+      when {
+        newText.equals("Easter Egg", true) -> {
+          context?.showToast("🥚")
+          Analytics.trackEvent(
+            Constants.Event.EASTER_EGG,
+            EventProperties().set("EASTER_EGG", "AppList Search")
+          )
+        }
+        newText == Constants.COMMAND_DEBUG_MODE -> {
+          GlobalValues.debugMode = true
+          context?.showToast("DEBUG MODE")
+        }
+        newText == Constants.COMMAND_USER_MODE -> {
+          GlobalValues.debugMode = false
+          context?.showToast("USER MODE")
+        }
+        else -> {
         }
       }
     }
@@ -281,107 +276,89 @@ class AppListFragment :
 
   private fun initObserver() {
     homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.ReloadApps -> {
-                if (appListStatus == STATUS_NOT_START) {
-                  Once.clearDone(OnceTag.FIRST_LAUNCH)
-                  isFirstLaunch = true
-                  doOnMainThreadIdle {
-                    initApps()
-                  }
-                }
-              }
-
-              is HomeViewModel.Effect.UpdateInitProgress -> {
-                binding.initView.progressIndicator.setProgressCompat(it.progress, true)
-              }
-
-              is HomeViewModel.Effect.PackageChanged -> {
-                requestChange(true)
-              }
-
-              is HomeViewModel.Effect.UpdateAppListStatus -> {
-                Timber.d("AppList status updates to ${it.status}")
-                when (it.status) {
-                  STATUS_START_INIT -> {
-                    isListReady = false
-                    flip(VF_INIT)
-                    (activity as? INavViewContainer)?.hideNavigationView()
-                  }
-
-                  STATUS_INIT_END -> {
-                    if (isFirstLaunch) {
-                      Once.markDone(OnceTag.FIRST_LAUNCH)
-                      Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-                    }
-                    (activity as? INavViewContainer)?.showNavigationView()
-                    activity?.addMenuProvider(this@AppListFragment)
-                  }
-
-                  STATUS_START_REQUEST_CHANGE_END -> {
-                    dbItems.value?.let { dbItems -> updateItems(dbItems) }
-                  }
-
-                  STATUS_NOT_START -> {
-                    val first = HarmonyOsUtil.isHarmonyOs() &&
-                      !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
-                    val second = !isFirstLaunch &&
-                      !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
-                    if (first || second) {
-                      initApps()
-                      Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
-                      Once.markDone(OnceTag.HARMONY_FIRST_INIT)
-                    }
-                  }
-                }
-              }
-
-              is HomeViewModel.Effect.RefreshList -> {
-                homeViewModel.dbItems.value?.let { dbItems ->
-                  updateItems(dbItems)
-                }
-              }
-
-              else -> {}
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.ReloadApps -> {
+            Once.clearDone(OnceTag.FIRST_LAUNCH)
+            isFirstLaunch = true
+            doOnMainThreadIdle {
+              initApps()
             }
           }
-        }
-      }
 
-      dbItems.observe(viewLifecycleOwner) {
-        if (it.isNullOrEmpty()) {
+          is HomeViewModel.Effect.UpdateInitProgress -> {
+            binding.initView.progressIndicator.setProgressCompat(it.progress, true)
+          }
+
+          is HomeViewModel.Effect.PackageChanged -> {
+            requestChange(true)
+          }
+
+          is HomeViewModel.Effect.UpdateAppListStatus -> {
+            Timber.d("AppList status updates to ${it.status}")
+            when (it.status) {
+              STATUS_START_INIT -> {
+                isListReady = false
+                flip(VF_INIT)
+              }
+
+              STATUS_INIT_END -> {
+                if (isFirstLaunch) {
+                  Once.markDone(OnceTag.FIRST_LAUNCH)
+                  Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                }
+                activity?.addMenuProvider(this@AppListFragment)
+              }
+
+              STATUS_NOT_START -> {
+                val first = HarmonyOsUtil.isHarmonyOs() &&
+                  !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.HARMONY_FIRST_INIT)
+                val second = !isFirstLaunch &&
+                  !Once.beenDone(Once.THIS_APP_INSTALL, OnceTag.SHOULD_RELOAD_APP_LIST)
+                if (first || second) {
+                  initApps()
+                  Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
+                  Once.markDone(OnceTag.HARMONY_FIRST_INIT)
+                }
+              }
+            }
+          }
+
+          is HomeViewModel.Effect.RefreshList -> {
+            updateItems()
+          }
+
+          else -> {}
+        }
+      }.launchIn(lifecycleScope)
+      dbItemsFlow.onEach {
+        if (it.isEmpty()) {
           initApps()
         } else if (
           appListStatus != STATUS_START_INIT &&
           appListStatus != STATUS_START_REQUEST_CHANGE
         ) {
-          updateItems(it)
+          updateItems()
           if (hasPackageChanged() || isFirstRequestChange) {
             isFirstRequestChange = false
             homeViewModel.requestChange()
           }
         }
-      }
+      }.launchIn(lifecycleScope)
     }
 
     GlobalValues.apply {
       isShowSystemApps.observe(viewLifecycleOwner) {
         if (isListReady) {
-          updateItems(homeViewModel.dbItems.value!!)
+          updateItems()
         }
       }
     }
   }
 
-  private fun updateItems(
-    newItems: List<LCItem>,
-    highlightRefresh: Boolean = false
-  ) {
+  private fun updateItems(highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
     Timber.d("updateItems")
-    var filterList: MutableList<LCItem> = newItems.toMutableList()
+    var filterList: MutableList<LCItem> = Repositories.lcRepository.getLCItems().toMutableList()
 
     val isNonNativeLibApp64Bit = android.os.Process.is64Bit()
     val options = GlobalValues.advancedOptions
@@ -411,7 +388,7 @@ class AppListFragment :
       }.toMutableList()
 
       if (HarmonyOsUtil.isHarmonyOs() && keyword.contains("Harmony", true)) {
-        filterList.addAll(newItems.filter { it.variant == Constants.VARIANT_HAP })
+        filterList = filterList.filter { it.variant == Constants.VARIANT_HAP }.toMutableList()
       }
     }
 
@@ -423,16 +400,18 @@ class AppListFragment :
       filterList.sortByDescending { it.targetApi }
     }
 
-    appAdapter.apply {
-      setDiffNewData(filterList) {
-        flip(VF_LIST)
-        isListReady = true
+    withContext(Dispatchers.Main) {
+      appAdapter.apply {
+        setDiffNewData(filterList) {
+          flip(VF_LIST)
+          isListReady = true
 
-        if (highlightRefresh) {
-          notifyItemRangeChanged(0, data.size)
+          if (highlightRefresh) {
+            notifyItemRangeChanged(0, data.size)
+          }
+
+          setSpaceFooterView()
         }
-
-        setSpaceFooterView()
       }
     }
   }

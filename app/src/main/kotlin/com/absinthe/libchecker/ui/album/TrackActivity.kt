@@ -16,14 +16,16 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.TrackListItem
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.TrackItem
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
+import com.absinthe.libchecker.model.TrackListItem
 import com.absinthe.libchecker.recyclerview.adapter.TrackAdapter
 import com.absinthe.libchecker.recyclerview.diff.TrackListDiff
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.snapshot.TrackItemView
 import com.absinthe.libchecker.view.snapshot.TrackLoadingView
@@ -82,7 +84,7 @@ class TrackActivity :
           }
           list.find { it.packageName == data[pos].packageName }?.switchState = state
         }
-        AppItemRepository.trackItemsChanged = true
+        GlobalValues.trackItemsChanged = true
       }
 
       setOnItemClickListener { _, view, position ->
@@ -101,11 +103,11 @@ class TrackActivity :
 
     lifecycleScope.launch(Dispatchers.IO) {
       val trackedList = repository.getTrackItems()
-      list += AppItemRepository.getApplicationInfoMap().values
+      list += LocalAppDataSource.getCachedApplicationMap().values
         .asSequence()
         .map {
           TrackListItem(
-            label = it.applicationInfo.loadLabel(packageManager).toString(),
+            label = it.getAppName() ?: "null",
             packageName = it.packageName,
             switchState = trackedList.any { trackItem -> trackItem.packageName == it.packageName }
           )

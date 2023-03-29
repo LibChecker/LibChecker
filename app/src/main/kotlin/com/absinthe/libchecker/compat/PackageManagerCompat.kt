@@ -7,7 +7,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
-import com.absinthe.libchecker.SystemServices
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.utils.OsUtils
 
 object PackageManagerCompat {

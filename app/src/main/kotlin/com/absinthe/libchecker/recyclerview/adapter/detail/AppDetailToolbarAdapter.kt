@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.adapter.detail
 
 import android.view.ViewGroup
-import com.absinthe.libchecker.bean.AppDetailToolbarItem
+import com.absinthe.libchecker.model.AppDetailToolbarItem
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.view.detail.AppDetailToolbarView
 import com.chad.library.adapter.base.BaseQuickAdapter

@@ -19,17 +19,17 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.database.LCDatabase
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityBackupBinding
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.StorageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.jakewharton.processphoenix.ProcessPhoenix
@@ -101,7 +101,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
           it?.let {
             activity?.let { activity ->
               runCatching {
-                val dialog = LCAppUtils.createLoadingDialog(activity)
+                val dialog = UiUtils.createLoadingDialog(activity)
                 dialog.show()
                 activity.contentResolver.openOutputStream(it)?.let { os ->
                   viewModel.backup(os) {
@@ -135,7 +135,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
 
           if (StorageUtils.isExternalStorageWritable) {
             if (FileUtils.getFileSize(Repositories.getLCDatabaseFile()) > 100 * 1024 * 1024) {
-              val dialog = LCAppUtils.createLoadingDialog(requireActivity())
+              val dialog = UiUtils.createLoadingDialog(requireActivity())
               dialog.show()
               roomBackup
                 .database(LCDatabase.getDatabase(requireContext()))
@@ -220,7 +220,7 @@ class BackupActivity : BaseActivity<ActivityBackupBinding>() {
         runCatching {
           activity.contentResolver.openInputStream(uri)
             ?.let { inputStream ->
-              val dialog = LCAppUtils.createLoadingDialog(activity)
+              val dialog = UiUtils.createLoadingDialog(activity)
               dialog.show()
               if (uri.toString().endsWith(".sqlite3")) {
                 lifecycleScope.launch(Dispatchers.IO) {

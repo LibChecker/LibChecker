@@ -5,8 +5,8 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.databinding.ActivityChartBinding
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.statistics.ChartFragment
 
 class ChartActivity : BaseActivity<ActivityChartBinding>() {

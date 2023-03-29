@@ -12,9 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -33,13 +31,13 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SHARED_UID
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.ChartActivity
@@ -63,6 +61,8 @@ import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
@@ -130,13 +130,11 @@ class LibReferenceFragment :
                 }
               }
               if (isFragmentVisible() && !isSearchTextClearOnce && position < refAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.Default) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
                   delay(400)
                   withContext(Dispatchers.Main) {
                     (activity as? INavViewContainer)?.showNavigationView()
                   }
-                }.also {
-                  it.start()
                 }
               }
               isSearchTextClearOnce = false
@@ -180,36 +178,32 @@ class LibReferenceFragment :
     }
 
     homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.PackageChanged -> {
-                computeRef(false)
-              }
-
-              is HomeViewModel.Effect.UpdateLibRefProgress -> {
-                binding.loadingView.progressIndicator.setProgressCompat(
-                  it.progress,
-                  it.progress > 0
-                )
-              }
-
-              else -> {}
-            }
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.PackageChanged -> {
+            computeRef(false)
           }
+
+          is HomeViewModel.Effect.UpdateLibRefProgress -> {
+            binding.loadingView.progressIndicator.setProgressCompat(
+              it.progress,
+              it.progress > 0
+            )
+          }
+
+          else -> {}
         }
-      }
-      libReference.observe(viewLifecycleOwner) {
+      }.launchIn(lifecycleScope)
+      libReference.onEach {
         if (it == null) {
-          return@observe
+          return@onEach
         }
         refAdapter.setList(it)
 
         flip(VF_LIST)
         refAdapter.setSpaceFooterView()
         isListReady = true
-      }
+      }.launchIn(lifecycleScope)
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
       if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
@@ -375,7 +369,6 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
   }
 
@@ -399,7 +392,7 @@ class LibReferenceFragment :
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
-        homeViewModel.libReference.value?.let { list ->
+        homeViewModel.savedRefList?.let { list ->
           val filter = list.filter {
             it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
               newText,
@@ -431,8 +424,6 @@ class LibReferenceFragment :
             )
           }
         }
-      }.also {
-        it.start()
       }
     }
     return false

@@ -9,7 +9,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
@@ -18,26 +17,28 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.app.Global
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.ADDED
-import com.absinthe.libchecker.bean.CHANGED
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.MOVED
-import com.absinthe.libchecker.bean.REMOVED
-import com.absinthe.libchecker.bean.SnapshotDetailItem
-import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
+import com.absinthe.libchecker.model.ADDED
+import com.absinthe.libchecker.model.CHANGED
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.MOVED
+import com.absinthe.libchecker.model.REMOVED
+import com.absinthe.libchecker.model.SnapshotDetailItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.protocol.Snapshot
 import com.absinthe.libchecker.protocol.SnapshotList
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.fromJson
 import com.absinthe.libchecker.utils.toJson
@@ -68,15 +69,10 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   val timestamp: MutableLiveData<Long> = MutableLiveData(GlobalValues.snapshotTimestamp)
   val snapshotDiffItems: MutableLiveData<List<SnapshotDiffItem>> = MutableLiveData()
   val snapshotDetailItems: MutableLiveData<List<SnapshotDetailItem>> = MutableLiveData()
-  val snapshotAppsCount: MutableLiveData<Int> = MutableLiveData()
   val comparingProgressLiveData = MutableLiveData(0)
 
   private val _effect: MutableSharedFlow<Effect> = MutableSharedFlow()
   val effect = _effect.asSharedFlow()
-
-  fun computeSnapshotAppCount(timeStamp: Long) = viewModelScope.launch(Dispatchers.IO) {
-    snapshotAppsCount.postValue(repository.getSnapshots(timeStamp).size)
-  }
 
   private var compareDiffJob: Job? = null
 
@@ -91,7 +87,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       compareDiffJob?.cancel()
     }
     compareDiffJob = viewModelScope.launch(Dispatchers.IO) {
-      Global.applicationListJob?.join()
       val timer = TimeRecorder().apply { start() }
 
       if (shouldClearDiff) {
@@ -118,7 +113,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return
     }
 
-    val currMap = AppItemRepository.getApplicationInfoMap().toMutableMap()
+    val currMap = LocalAppDataSource.getCachedApplicationMap().toMutableMap()
     val prePackageSet = preMap.map { it.key }.toSet()
     val currPackageSet = currMap.map { it.key }.toSet()
     val removedPackageSet = prePackageSet - currPackageSet
@@ -127,7 +122,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
     val diffList = mutableListOf<SnapshotDiffItem>()
     val allTrackItems = repository.getTrackItems()
-    val packageManager = SystemServices.packageManager
     val size = currMap.size
 
     var count = 0
@@ -167,13 +161,13 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       try {
         pi = currMap[it]!!
         ai = pi.applicationInfo
-        versionCode = PackageUtils.getVersionCode(pi)
+        versionCode = pi.getVersionCode()
 
         diffList.add(
           SnapshotDiffItem(
             pi.packageName,
             pi.lastUpdateTime,
-            SnapshotDiffItem.DiffNode(ai.loadLabel(packageManager).toString()),
+            SnapshotDiffItem.DiffNode(pi.getAppName() ?: "null"),
             SnapshotDiffItem.DiffNode(pi.versionName),
             SnapshotDiffItem.DiffNode(versionCode),
             SnapshotDiffItem.DiffNode(PackageUtils.getAbi(pi).toShort()),
@@ -216,7 +210,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
               PackageUtils.getMetaDataItems(pi).toJson().orEmpty()
             ),
             SnapshotDiffItem.DiffNode(
-              PackageUtils.getPackageSize(pi, true)
+              pi.getPackageSize(true)
             ),
             newInstalled = true,
             isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == pi.packageName }
@@ -234,7 +228,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       try {
         dbItem = preMap[it]!!
         pi = currMap[it]!!
-        versionCode = PackageUtils.getVersionCode(pi)
+        versionCode = pi.getVersionCode()
         snapshotDiffStoringItem = repository.getSnapshotDiff(dbItem.packageName)
 
         if (snapshotDiffStoringItem?.lastUpdatedTime != pi.lastUpdateTime) {
@@ -298,7 +292,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   ): SnapshotDiffItem? {
     if (versionCode == dbItem.versionCode &&
       packageInfo.lastUpdateTime == dbItem.lastUpdatedTime &&
-      PackageUtils.getPackageSize(packageInfo, true) == dbItem.packageSize &&
+      packageInfo.getPackageSize(true) == dbItem.packageSize &&
       inTrackedList.not()
     ) {
       return null
@@ -308,7 +302,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       updateTime = packageInfo.lastUpdateTime,
       labelDiff = SnapshotDiffItem.DiffNode(
         dbItem.label,
-        packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+        packageInfo.getAppName() ?: "null"
       ),
       versionNameDiff = SnapshotDiffItem.DiffNode(
         dbItem.versionName,
@@ -373,7 +367,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       ),
       packageSizeDiff = SnapshotDiffItem.DiffNode(
         dbItem.packageSize,
-        PackageUtils.getPackageSize(packageInfo, true)
+        packageInfo.getPackageSize(true)
       ),
       isTrackItem = inTrackedList
     )
@@ -574,12 +568,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(
-            it.label,
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
-          ),
+          SnapshotDiffItem.DiffNode(it.label, packageInfo.getAppName() ?: "null"),
           SnapshotDiffItem.DiffNode(it.versionName, packageInfo.versionName),
-          SnapshotDiffItem.DiffNode(it.versionCode, PackageUtils.getVersionCode(packageInfo)),
+          SnapshotDiffItem.DiffNode(it.versionCode, packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(
             it.abi,
             PackageUtils.getAbi(packageInfo).toShort()
@@ -634,7 +625,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
           ),
           SnapshotDiffItem.DiffNode(
             it.packageSize,
-            PackageUtils.getPackageSize(packageInfo, true)
+            packageInfo.getPackageSize(true)
           ),
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == it.packageName }
         ).also { diffItem ->
@@ -670,11 +661,9 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
         diffItem = SnapshotDiffItem(
           packageInfo.packageName,
           packageInfo.lastUpdateTime,
-          SnapshotDiffItem.DiffNode(
-            packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
-          ),
+          SnapshotDiffItem.DiffNode(packageInfo.getAppName() ?: "null"),
           SnapshotDiffItem.DiffNode(packageInfo.versionName),
-          SnapshotDiffItem.DiffNode(PackageUtils.getVersionCode(packageInfo)),
+          SnapshotDiffItem.DiffNode(packageInfo.getVersionCode()),
           SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
           SnapshotDiffItem.DiffNode(packageInfo.applicationInfo.targetSdkVersion.toShort()),
           SnapshotDiffItem.DiffNode(
@@ -715,7 +704,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
             PackageUtils.getMetaDataItems(packageInfo).toJson().orEmpty()
           ),
           SnapshotDiffItem.DiffNode(
-            PackageUtils.getPackageSize(packageInfo, true)
+            packageInfo.getPackageSize(true)
           ),
           newInstalled = true,
           isTrackItem = allTrackItems.any { trackItem -> trackItem.packageName == info.packageName }
@@ -1224,7 +1213,11 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
   }
 
-  fun restore(context: Context, inputStream: InputStream, resultAction: (success: Boolean) -> Unit) {
+  fun restore(
+    context: Context,
+    inputStream: InputStream,
+    resultAction: (success: Boolean) -> Unit
+  ) {
     viewModelScope.launch(Dispatchers.IO) {
       inputStream.use { stream ->
         val list: SnapshotList = try {
@@ -1324,6 +1317,15 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
     }
   }
 
+  fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    Timber.d("getDashboardCount: $timestamp, $isLeft")
+    val snapshotCount = repository.getSnapshots(timestamp).size
+    val appCount = LocalAppDataSource.getCachedApplicationMap().size
+    setEffect {
+      Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
+    }
+  }
+
   private fun setEffect(builder: () -> Effect) {
     val newEffect = builder()
     viewModelScope.launch {
@@ -1333,5 +1335,6 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
 
   sealed class Effect {
     data class ChooseComparedApk(val isLeftPart: Boolean) : Effect()
+    data class DashboardCountChange(val snapshotCount: Int, val appCount: Int, val isLeft: Boolean) : Effect()
   }
 }

@@ -6,9 +6,7 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.view.View
 import androidx.activity.addCallback
 import androidx.activity.viewModels
@@ -18,28 +16,25 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
 import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.applist.AppListFragment
 import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
-import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
@@ -49,10 +44,13 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import java.io.File
 import jonathanfinerty.once.Once
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 const val PAGE_TRANSFORM_DURATION = 300L
@@ -65,7 +63,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
       if (packageName != null && action != null) {
         if (action == Intent.ACTION_PACKAGE_REMOVED) {
-          AppItemRepository.allPackageInfoMap.remove(packageName)
+          LocalAppDataSource.removePackage(packageName)
         } else {
           runCatching {
             PackageUtils.getPackageInfo(
@@ -73,7 +71,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
               PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
             )
           }.onSuccess {
-            AppItemRepository.allPackageInfoMap[packageName] = it
+            LocalAppDataSource.addPackage(it)
           }
         }
       }
@@ -102,6 +100,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     super.onCreate(savedInstanceState)
 
     initView()
+    initObserver()
     bindService(
       Intent(this, WorkerService::class.java).apply {
         setPackage(packageName)
@@ -109,17 +108,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
       workerServiceConnection,
       Context.BIND_AUTO_CREATE
     )
+    appViewModel.clearApkCache()
     handleIntent(intent)
-    initObserver()
-    clearApkCache()
-    onBackPressedDispatcher.addCallback(this, true) {
-      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-      if (closeBtn != null) {
-        binding.toolbar.collapseActionView()
-      } else {
-        finish()
-      }
-    }
   }
 
   override fun onNewIntent(intent: Intent) {
@@ -251,6 +241,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         fixBottomNavigationViewInsets(this)
       }
     }
+
+    onBackPressedDispatcher.addCallback(this, true) {
+      val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+      if (closeBtn != null) {
+        binding.toolbar.collapseActionView()
+      } else {
+        finish()
+      }
+    }
   }
 
   /**
@@ -296,48 +295,41 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
         initFeatures()
       }
 
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.ReloadApps -> {
-                binding.viewpager.setCurrentItem(0, true)
-              }
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.ReloadApps -> {
+            binding.viewpager.setCurrentItem(0, true)
+          }
 
-              is HomeViewModel.Effect.UpdateAppListStatus -> {
-                if (it.status == STATUS_START_INIT) {
-                  doOnMainThreadIdle {
-                    hideNavigationView()
-                  }
-                } else if (it.status == STATUS_INIT_END) {
-                  initFeatures()
-                }
+          is HomeViewModel.Effect.UpdateAppListStatus -> {
+            if (it.status == STATUS_START_INIT) {
+              doOnMainThreadIdle {
+                hideNavigationView()
               }
-
-              else -> {}
+            } else if (it.status == STATUS_INIT_END) {
+              doOnMainThreadIdle {
+                showNavigationView()
+              }
+              initFeatures()
             }
           }
+
+          else -> {}
         }
-      }
+      }.launchIn(lifecycleScope)
     }
   }
 
-  private fun clearApkCache() {
-    FileUtils.delete(File(externalCacheDir, Constants.TEMP_PACKAGE))
-  }
-
   private fun initFeatures() {
-    Handler(Looper.getMainLooper()).also {
-      it.post(object : Runnable {
-        override fun run() {
-          if (appViewModel.workerBinder == null) {
-            it.postDelayed(this, 300)
-          } else {
-            Timber.d("initFeatures")
-            appViewModel.workerBinder?.initFeatures()
-          }
-        }
-      })
+    lifecycleScope.launch {
+      while (appViewModel.workerBinder == null) {
+        delay(300)
+      }
+
+      withContext(Dispatchers.Main) {
+        Timber.d("initFeatures")
+        appViewModel.workerBinder?.initFeatures()
+      }
     }
   }
 }

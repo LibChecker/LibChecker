@@ -22,27 +22,41 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
-import com.absinthe.libchecker.bean.DISABLED
-import com.absinthe.libchecker.bean.LibChip
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.LibStringItemChip
-import com.absinthe.libchecker.bean.StatefulComponent
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.database.Repositories
+import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.model.DISABLED
+import com.absinthe.libchecker.model.LibChip
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.LibStringItemChip
+import com.absinthe.libchecker.model.StatefulComponent
+import com.absinthe.libchecker.ui.detail.VersionedFeature
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.getAGPVersion
+import com.absinthe.libchecker.utils.extensions.getFeatures
+import com.absinthe.libchecker.utils.extensions.getJetpackComposeVersion
+import com.absinthe.libchecker.utils.extensions.getKotlinPluginVersion
+import com.absinthe.libchecker.utils.extensions.getRxAndroidVersion
+import com.absinthe.libchecker.utils.extensions.getRxJavaVersion
+import com.absinthe.libchecker.utils.extensions.getRxKotlinVersion
+import com.absinthe.libchecker.utils.extensions.getSignatures
+import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.rulesbundle.LCRules
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ohos.bundle.AbilityInfo
@@ -78,6 +92,11 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   lateinit var packageInfo: PackageInfo
   val packageInfoLiveData = MutableLiveData<PackageInfo>(null)
+
+  private val _featuresFlow = MutableSharedFlow<VersionedFeature>()
+  val featuresFlow = _featuresFlow.asSharedFlow()
+
+  val abiBundle = MutableLiveData<AbiBundle>(null)
 
   init {
     componentsMap.put(SERVICE, MutableLiveData())
@@ -339,7 +358,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   private suspend fun getSignatureChipList(): List<LibStringItemChip> =
     withContext(Dispatchers.IO) {
-      PackageUtils.getSignatures(getApplication(), packageInfo).map {
+      packageInfo.getSignatures(getApplication()).map {
         LibStringItemChip(it, null)
       }.toList()
     }
@@ -425,4 +444,63 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return formatter.format(pushedAt)
   }
+
+  fun initFeatures(packageInfo: PackageInfo, features: Int) = viewModelScope.launch(Dispatchers.IO) {
+    Timber.d("initFeatures: features = $features")
+    var feat = features
+    if (feat == -1) {
+      feat = packageInfo.getFeatures()
+      Repositories.lcRepository.updateFeatures(packageInfo.packageName, feat)
+    }
+
+    if ((feat and Features.SPLIT_APKS) > 0) {
+      _featuresFlow.emit(VersionedFeature(Features.SPLIT_APKS, null))
+    }
+    if ((feat and Features.KOTLIN_USED) > 0) {
+      val version = packageInfo.getKotlinPluginVersion()
+      _featuresFlow.emit(VersionedFeature(Features.KOTLIN_USED, version))
+    }
+    if ((feat and Features.RX_JAVA) > 0) {
+      val version = packageInfo.getRxJavaVersion()
+      _featuresFlow.emit(VersionedFeature(Features.RX_JAVA, version))
+    }
+    if ((feat and Features.RX_KOTLIN) > 0) {
+      val version = packageInfo.getRxKotlinVersion()
+      _featuresFlow.emit(VersionedFeature(Features.RX_KOTLIN, version))
+    }
+    if ((feat and Features.RX_ANDROID) > 0) {
+      val version = packageInfo.getRxAndroidVersion()
+      _featuresFlow.emit(VersionedFeature(Features.RX_ANDROID, version))
+    }
+    if ((feat and Features.AGP) > 0) {
+      val version = packageInfo.getAGPVersion()
+      _featuresFlow.emit(VersionedFeature(Features.AGP, version))
+    }
+    if ((feat and Features.XPOSED_MODULE) > 0) {
+      _featuresFlow.emit(VersionedFeature(Features.XPOSED_MODULE, null))
+    }
+    if ((feat and Features.PLAY_SIGNING) > 0) {
+      _featuresFlow.emit(VersionedFeature(Features.PLAY_SIGNING, null))
+    }
+    if ((feat and Features.PWA) > 0) {
+      _featuresFlow.emit(VersionedFeature(Features.PWA, null))
+    }
+    if ((feat and Features.JETPACK_COMPOSE) > 0) {
+      val version = packageInfo.getJetpackComposeVersion()
+      _featuresFlow.emit(VersionedFeature(Features.JETPACK_COMPOSE, version))
+    }
+  }
+
+  fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    val abiSet = PackageUtils.getAbiSet(
+      file = File(packageInfo.applicationInfo.sourceDir),
+      packageInfo = packageInfo,
+      isApk = apkAnalyticsMode,
+      ignoreArch = true
+    ).toSet()
+    val abi = PackageUtils.getAbi(packageInfo, isApk = apkAnalyticsMode, abiSet = abiSet)
+    abiBundle.postValue(AbiBundle(abi, abiSet.sortedByDescending { it == abi }.toSet()))
+  }
+
+  data class AbiBundle(val abi: Int, val abiSet: Set<Int>)
 }

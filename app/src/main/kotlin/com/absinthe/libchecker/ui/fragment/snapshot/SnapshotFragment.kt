@@ -25,19 +25,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -45,6 +41,8 @@ import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -73,8 +71,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -266,18 +262,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           compareDiff()
         }
       }.launchIn(lifecycleScope)
-      snapshotAppsCount.observe(viewLifecycleOwner) {
-        if (it != null) {
-          lifecycleScope.launch(Dispatchers.Default) {
-            val appCount = AppItemRepository.getApplicationInfoMap().size
-
-            withContext(Dispatchers.Main) {
-              dashboard.container.tvSnapshotAppsCountText.text =
-                String.format("%d / %d", it, appCount)
-            }
-          }
-        }
-      }
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
@@ -303,37 +287,29 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         binding.progressIndicator.setProgressCompat(it, it != 1)
       }
     }
-    homeViewModel.apply {
-      lifecycleScope.launch {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-          effect.collect {
-            when (it) {
-              is HomeViewModel.Effect.PackageChanged -> {
-                if (allowRefreshing) {
-                  packageQueue.offer(it.packageName to it.action)
-                  dequeuePackages()
-
-                  lifecycleScope.launch(Dispatchers.Default) {
-                    val appCount = AppItemRepository.getApplicationInfoMap().size
-                    viewModel.snapshotAppsCount.value ?: runBlocking {
-                      viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-                    }
-                    val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
-
-                    withContext(Dispatchers.Main) {
-                      dashboard.container.tvSnapshotAppsCountText.text =
-                        String.format("%d / %d", snapshotCount, appCount)
-                    }
-                  }
-                }
-              }
-
-              else -> {}
-            }
+    homeViewModel.effect.onEach {
+      when (it) {
+        is HomeViewModel.Effect.PackageChanged -> {
+          if (allowRefreshing) {
+            packageQueue.offer(it.packageName to it.action)
+            dequeuePackages()
+            viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
         }
+
+        else -> {}
       }
-    }
+    }.launchIn(lifecycleScope)
+    viewModel.effect.onEach {
+      when (it) {
+        is SnapshotViewModel.Effect.DashboardCountChange -> {
+          dashboard.container.tvSnapshotAppsCountText.text =
+            String.format("%d / %d", it.snapshotCount, it.appCount)
+        }
+
+        else -> {}
+      }
+    }.launchIn(lifecycleScope)
   }
 
   override fun onAttach(context: Context) {
@@ -365,8 +341,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
 
-    if (AppItemRepository.trackItemsChanged) {
-      AppItemRepository.trackItemsChanged = false
+    if (GlobalValues.trackItemsChanged) {
+      GlobalValues.trackItemsChanged = false
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
@@ -465,11 +441,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
-        val scheme = Uri.Builder().scheme("lc")
-          .authority("bridge")
-          .appendQueryParameter("action", "shoot")
-          .appendQueryParameter("authority", LibCheckerApp.generateAuthKey().toString())
-          .appendQueryParameter("drop_previous", "false")
+        val scheme = Uri.Builder().scheme(LCUris.SCHEME)
+          .authority(LCUris.Bridge.AUTHORITY)
+          .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
+          .appendQueryParameter(LCUris.Bridge.PARAM_AUTHORITY, LibCheckerApp.generateAuthKey().toString())
+          .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
           .build()
           .toString()
         val tipView = TextView(context).also {
@@ -537,8 +513,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     viewModel.timestamp.value = GlobalValues.snapshotTimestamp
     isSnapshotDatabaseItemsReady = true
 
-    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-
+    viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
     viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
   }
