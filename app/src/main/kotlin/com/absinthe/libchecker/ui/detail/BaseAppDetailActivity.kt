@@ -657,23 +657,25 @@ abstract class BaseAppDetailActivity :
       return false
     }
 
+    featureListView = RecyclerView(this).also {
+      it.layoutParams = ViewGroup.MarginLayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      ).also { lp ->
+        lp.topMargin = 4.dp
+      }
+      it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+      it.adapter = featureAdapter
+      it.clipChildren = false
+      it.overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
     doOnMainThreadIdle {
       val oldContainerHeight = binding.headerContentLayout.height
-      featureListView = RecyclerView(this).also {
-        it.layoutParams = ViewGroup.MarginLayoutParams(
-          ViewGroup.LayoutParams.MATCH_PARENT,
-          ViewGroup.LayoutParams.WRAP_CONTENT
-        ).also { lp ->
-          lp.topMargin = 4.dp
-        }
-        it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        it.adapter = featureAdapter
-        it.clipChildren = false
-        it.overScrollMode = View.OVER_SCROLL_NEVER
-      }
-      binding.headerContentLayout.addView(featureListView)
       val newContainerHeight = oldContainerHeight + 40.dp
       val params = binding.headerContentLayout.layoutParams
+
+      binding.headerContentLayout.addView(featureListView)
       ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also {
         it.addUpdateListener { valueAnimator ->
           val height = valueAnimator.animatedValue as Int
@@ -870,7 +872,10 @@ abstract class BaseAppDetailActivity :
           abiLabelsList.add(AbiLabelNode(it, isActive))
         }
       }
-      binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
+      doOnMainThreadIdle {
+        binding.headerContentLayout.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
+      }
     }
   }
 }
