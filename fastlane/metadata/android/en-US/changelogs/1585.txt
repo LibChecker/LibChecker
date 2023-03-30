@@ -1,0 +1,8 @@
+- Update Traditional Chinese translation
+- Fix a problem with the display of uninstalled permissions
+- Now the native library page will show all native libraries in split apks
+- Fix the problem that some apps can't enter the details page
+- The details page now shows the apk size of the app
+- New ABI logo is used on the details page
+- Optimized the speed of going to the details page
+- Added Android 14 logo, although the API of Android 14 is likely to be 34 eventually, it has not yet reached platform stability at this stage, so please judge the compatibility of the app by yourself
