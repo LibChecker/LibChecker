@@ -3,8 +3,6 @@ import com.google.protobuf.gradle.id
 import java.nio.file.Paths
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
-@Suppress("DSL_SCOPE_VIOLATION")
-
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
