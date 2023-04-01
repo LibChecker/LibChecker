@@ -97,9 +97,9 @@ jobs:
         id: apk-path
         run: |
           foss_path=$(find **/build/outputs/apk/foss -name '*.apk' -type f | head -1)
-          echo "::set-output name=foss_path::$foss_path"
+          echo "foss_path=$foss_path" >> $GITHUB_OUTPUT
           market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
-          echo "::set-output name=market_path::$market_path"
+          echo "market_path=$market_path" >> $GITHUB_OUTPUT
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
