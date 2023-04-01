@@ -34,6 +34,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
           container.currentMenuProvider?.let { current ->
             activity?.removeMenuProvider(current)
           }
+          activity?.removeMenuProvider(this)
           activity?.addMenuProvider(this)
           container.currentMenuProvider = this
         }

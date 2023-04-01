@@ -307,6 +307,7 @@ class AppListFragment :
                   Once.markDone(OnceTag.FIRST_LAUNCH)
                   Once.markDone(OnceTag.SHOULD_RELOAD_APP_LIST)
                 }
+                activity?.removeMenuProvider(this@AppListFragment)
                 activity?.addMenuProvider(this@AppListFragment)
               }
 
