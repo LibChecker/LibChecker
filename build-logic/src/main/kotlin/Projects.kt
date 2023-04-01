@@ -7,7 +7,7 @@ import java.time.Instant
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 
-const val baseVersionName = "2.3.9"
+const val baseVersionName = "2.4.0"
 val verName: String by lazy { "${baseVersionName}${versionNameSuffix}.${"git rev-parse --short HEAD".exec()}" }
 val verCode: Int by lazy { "git rev-list --count HEAD".exec().toInt() }
 val isDevVersion: Boolean by lazy { "git tag -l $baseVersionName".exec().isEmpty() }
