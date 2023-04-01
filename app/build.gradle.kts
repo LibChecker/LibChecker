@@ -3,12 +3,7 @@ import com.google.protobuf.gradle.id
 import java.nio.file.Paths
 import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 
-@Suppress(
-  "DSL_SCOPE_VIOLATION",
-  "MISSING_DEPENDENCY_CLASS",
-  "UNRESOLVED_REFERENCE_WRONG_RECEIVER",
-  "FUNCTION_CALL_EXPECTED"
-)
+@Suppress("DSL_SCOPE_VIOLATION")
 
 plugins {
   alias(libs.plugins.android.application)
@@ -34,6 +29,8 @@ setupAppModule {
   }
 
   buildFeatures {
+    aidl = true
+    buildConfig = true
     viewBinding = true
   }
 
