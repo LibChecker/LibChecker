@@ -82,7 +82,7 @@ class ELFParser(inputStream: InputStream) {
         e_shnum = ByteArray(ELF64_HALF)
         e_shstrndx = ByteArray(ELF64_HALF)
       } else {
-        Timber.e("Not a valid ELF file")
+        Timber.w("Not a valid ELF file")
         return@use
       }
       it.read(e_type)
