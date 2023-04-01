@@ -679,7 +679,12 @@ abstract class BaseAppDetailActivity :
       ValueAnimator.ofInt(oldContainerHeight, newContainerHeight).also {
         it.addUpdateListener { valueAnimator ->
           val height = valueAnimator.animatedValue as Int
-          params.height = height
+
+          if (valueAnimator.animatedFraction == 1f) {
+            params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+          } else {
+            params.height = height
+          }
           binding.headerContentLayout.layoutParams = params
         }
         it.duration = 250
@@ -873,7 +878,6 @@ abstract class BaseAppDetailActivity :
         }
       }
       doOnMainThreadIdle {
-        binding.headerContentLayout.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         binding.detailsTitle.abiLabelsAdapter.setList(abiLabelsList)
       }
     }
