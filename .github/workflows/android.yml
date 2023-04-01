@@ -103,7 +103,7 @@ jobs:
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
-        uses: zhaobozhen/apk-info-action@v1
+        uses: zhaobozhen/apk-info-action@1.1.1
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
