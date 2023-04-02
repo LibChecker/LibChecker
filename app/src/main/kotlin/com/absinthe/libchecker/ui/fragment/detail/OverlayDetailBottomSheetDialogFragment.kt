@@ -5,12 +5,12 @@ import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.os.Build
 import android.text.SpannableString
+import android.text.format.Formatter
 import android.text.style.ImageSpan
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.SystemServices
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
@@ -18,10 +18,16 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
+import com.absinthe.libchecker.utils.extensions.copyToClipboard
+import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.getTargetApiString
+import com.absinthe.libchecker.utils.extensions.getVersionString
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.detail.OverlayDetailBottomSheetView
@@ -63,9 +69,13 @@ class OverlayDetailBottomSheetDialogFragment :
             requireContext()
           )
           load(appIconLoader.loadIcon(packageInfo.applicationInfo))
+          setOnLongClickListener {
+            copyToClipboard()
+            true
+          }
         }
         appNameView.apply {
-          text = packageInfo.applicationInfo.loadLabel(SystemServices.packageManager).toString()
+          text = packageInfo.getAppName()
           setLongClickCopiedToClipboard(text)
         }
         packageNameView.apply {
@@ -73,7 +83,7 @@ class OverlayDetailBottomSheetDialogFragment :
           setLongClickCopiedToClipboard(text)
         }
         versionInfoView.apply {
-          text = PackageUtils.getVersionString(packageInfo)
+          text = packageInfo.getVersionString()
           setLongClickCopiedToClipboard(text)
         }
         extraInfoView.apply {
@@ -82,11 +92,20 @@ class OverlayDetailBottomSheetDialogFragment :
             scale(0.8f) {
               append("Target: ")
             }
-            append(PackageUtils.getTargetApiString(packageInfo))
+            append(packageInfo.getTargetApiString())
             scale(0.8f) {
               append(" Min: ")
             }
-            append(PackageUtils.getMinSdkVersion(packageInfo).toString())
+            append(packageInfo.applicationInfo.minSdkVersion.toString())
+            scale(0.8f) {
+              append(" Compile: ")
+            }
+            append(packageInfo.getCompileSdkVersion())
+            scale(0.8f) {
+              append(" Size: ")
+            }
+            val apkSize = FileUtils.getFileSize(packageInfo.applicationInfo.sourceDir)
+            append(Formatter.formatFileSize(context, apkSize))
           }
         }
       }
@@ -135,7 +154,7 @@ class OverlayDetailBottomSheetDialogFragment :
           }
 
           targetPackageView.setOnClickListener {
-            LCAppUtils.launchDetailPage(requireActivity(), targetLCItem)
+            activity?.launchDetailPage(targetLCItem)
           }
         }
       }

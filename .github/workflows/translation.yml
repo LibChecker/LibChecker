@@ -28,7 +28,6 @@ jobs:
           upload_sources: true
           upload_translations: true
           download_translations: true
-          skip_untranslated_strings: true
 
           # Pull request settings
           create_pull_request: true

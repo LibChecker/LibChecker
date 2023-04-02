@@ -2,15 +2,23 @@ package com.absinthe.libchecker.view.settings
 
 import android.content.Context
 import android.graphics.Typeface
+import android.text.InputType
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.EditText
+import androidx.core.widget.doOnTextChanged
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.slider.Slider
 
 class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
+
+  private var initialized = false
+  private var sliderChanging = false
+  private var countChanging = false
 
   val slider: Slider = Slider(context).apply {
     layoutParams =
@@ -21,9 +29,11 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
     value = GlobalValues.libReferenceThreshold.toFloat()
     addView(this)
   }
-  val count: TextView = TextView(context).apply {
+  val count: EditText = EditText(context).apply {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    inputType = InputType.TYPE_CLASS_NUMBER
+    gravity = Gravity.CENTER
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
     setTypeface(null, Typeface.BOLD)
     addView(this)
@@ -31,8 +41,48 @@ class LibReferenceThresholdView(context: Context) : AViewGroup(context) {
 
   init {
     slider.addOnChangeListener { _, value, _ ->
-      count.text = value.toInt().toString()
-      slider.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+      if (!countChanging) {
+        sliderChanging = true
+        count.apply {
+          setText(value.toInt().toString())
+          if (UiUtils.isSoftInputOpen()) {
+            text?.let { setSelection(it.length) }
+          }
+        }
+        slider.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+      } else {
+        countChanging = false
+      }
+    }
+    count.doOnTextChanged { text, _, _, _ ->
+      if (!initialized) {
+        initialized = true
+        return@doOnTextChanged
+      }
+      if (!sliderChanging) {
+        countChanging = true
+        text?.toString().let {
+          count.apply {
+            if (it.isNullOrEmpty()) {
+              setText(2f.toInt().toString())
+              setSelection(1)
+            } else {
+              val c = it.toFloat()
+              if (c < 1f) {
+                setText(1f.toInt().toString())
+                setSelection(1)
+              } else if (c > 50f) {
+                setText(50f.toInt().toString())
+                setSelection(2)
+              } else {
+                slider.value = c
+              }
+            }
+          }
+        }
+      } else {
+        sliderChanging = false
+      }
     }
   }
 

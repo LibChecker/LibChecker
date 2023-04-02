@@ -10,7 +10,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseFragment
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV7
@@ -24,11 +23,11 @@ import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.databinding.FragmentPieChartBinding
 import com.absinthe.libchecker.services.WorkerService
+import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.isShowing
 import com.absinthe.libchecker.view.statistics.IntegerFormatter
 import com.absinthe.libchecker.view.statistics.OsVersionAxisFormatter
 import com.absinthe.libchecker.viewmodel.ChartViewModel
@@ -54,6 +53,7 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import java.util.TreeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -79,8 +79,11 @@ class ChartFragment :
   private var chartType = TYPE_ABI
   private var dialog: ClassifyBottomSheetDialogFragment? = null
   private var queryJob: Job? = null
+  private var setDataJob: Job? = null
 
   override fun init() {
+    val isKotlinShowed = !WorkerService.initializingFeatures
+
     chartView = generatePieChartView()
     binding.root.addView(chartView, -1)
 
@@ -88,11 +91,19 @@ class ChartFragment :
       addOnButtonCheckedListener(this@ChartFragment)
       check(R.id.btn_abi)
     }
-    binding.btnKotlin.isVisible = !WorkerService.initializingFeatures
+    binding.btnKotlin.isVisible = isKotlinShowed
 
     viewModel.apply {
       dbItems.observe(viewLifecycleOwner) {
-        setData()
+        if (isKotlinShowed) {
+          setDataJob?.cancel()
+          setDataJob = lifecycleScope.launch(Dispatchers.IO) {
+            delay(2000)
+            withContext(Dispatchers.Main) {
+              setData()
+            }
+          }
+        }
       }
     }
 
@@ -381,7 +392,7 @@ class ChartFragment :
         for (item in it) {
           try {
             packageInfo = PackageUtils.getPackageInfo(item.packageName)
-            minSdk = PackageUtils.getMinSdkVersion(packageInfo)
+            minSdk = packageInfo.applicationInfo.minSdkVersion
             apiMap[minSdk] = apiMap[minSdk]?.plus(1) ?: 1
           } catch (e: Exception) {
             Timber.e(e)
@@ -440,16 +451,17 @@ class ChartFragment :
   override fun onValueSelected(e: Entry?, h: Highlight?) {
     if (e == null) return
     if (h == null) return
-    if (dialog?.isShowing() == true) return
+    if (dialog != null) return
 
     if (OsUtils.atLeastR()) {
       chartView.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
     }
 
-    var dialogTitle = ""
+    dialog = ClassifyBottomSheetDialogFragment()
     viewModel.filteredList.postValue(emptyList())
 
     lifecycleScope.launch(Dispatchers.IO) {
+      var dialogTitle = ""
       var item: List<LCItem> = emptyList()
 
       val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
@@ -489,6 +501,7 @@ class ChartFragment :
                 }
             }
           }
+          viewModel.androidVersion.postValue(null)
         }
         TYPE_KOTLIN -> {
           when (legendList.getOrNull(h.x.toInt())) {
@@ -507,6 +520,7 @@ class ChartFragment :
                 }
             }
           }
+          viewModel.androidVersion.postValue(null)
         }
         TYPE_TARGET_API -> {
           val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
@@ -528,28 +542,27 @@ class ChartFragment :
           viewModel.androidVersion.postValue(AndroidVersions.versions.find { it.first == minSdk })
           filteredList?.filter {
             runCatching { PackageUtils.getPackageInfo(it.packageName) }.getOrNull()
-              ?.let { PackageUtils.getMinSdkVersion(it) == minSdk } ?: false
+              ?.let { it.applicationInfo.minSdkVersion == minSdk } ?: false
           }?.let { filter -> item = ArrayList(filter) }
         }
       }
 
       viewModel.dialogTitle.postValue(dialogTitle)
       viewModel.filteredList.postValue(item)
-    }
 
-    dialog = ClassifyBottomSheetDialogFragment().apply {
-      setOnDismissListener(object : ClassifyBottomSheetDialogFragment.OnDismissListener {
-        override fun onDismiss() {
-          this@ChartFragment.dialog = null
-          (chartView as? Chart<*>)?.highlightValue(null)
-          viewModel.dialogTitle.postValue("")
-          viewModel.filteredList.postValue(emptyList())
-          viewModel.androidVersion.postValue(null)
+      withContext(Dispatchers.Main) {
+        activity?.let { activity ->
+          dialog?.also {
+            it.setOnDismiss {
+              this@ChartFragment.dialog = null
+              (chartView as? Chart<*>)?.highlightValue(null)
+            }
+            it.show(
+              activity.supportFragmentManager,
+              ClassifyBottomSheetDialogFragment::class.java.name
+            )
+          }
         }
-      })
-    }.also {
-      activity?.let { activity ->
-        it.show(activity.supportFragmentManager, ClassifyBottomSheetDialogFragment::class.java.name)
       }
     }
   }

@@ -23,6 +23,7 @@ on:
       - '**.md'
       - 'LICENSE'
       - 'NOTICE'
+  workflow_dispatch:
 
 env:
   APP_CENTER_SECRET: ${{secrets.APP_CENTER_SECRET}}
@@ -96,13 +97,13 @@ jobs:
         id: apk-path
         run: |
           foss_path=$(find **/build/outputs/apk/foss -name '*.apk' -type f | head -1)
-          echo "::set-output name=foss_path::$foss_path"
+          echo "foss_path=$foss_path" >> $GITHUB_OUTPUT
           market_path=$(find **/build/outputs/apk/market -name '*.apk' -type f | head -1)
-          echo "::set-output name=market_path::$market_path"
+          echo "market_path=$market_path" >> $GITHUB_OUTPUT
       - name: Get apk info
         if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         id: apk-info
-        uses: hkusu/apk-info-action@v1
+        uses: zhaobozhen/apk-info-action@1.1.1
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
@@ -145,3 +146,20 @@ jobs:
             *${{ github.event.head_commit.message }}* by ${{ github.event.head_commit.author.name }}
             See commit detail [here](${{ github.event.head_commit.url }})
             This push skipped building
+
+  cancelled:
+    runs-on: ubuntu-latest
+    if: ${{ cancelled() && github.repository == 'LibChecker/LibChecker' && github.event_name != 'pull_request' && github.ref == 'refs/heads/master' }}
+    needs: [check, build]
+    steps:
+      - name: Send commit to telegram if cancelled
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |+
+            New push to github!
+            *${{ github.event.head_commit.message }}* by ${{ github.event.head_commit.author.name }}
+            See commit detail [here](${{ github.event.head_commit.url }})
+            This push cancelled building

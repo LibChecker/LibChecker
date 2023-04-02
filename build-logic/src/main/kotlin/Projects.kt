@@ -1,12 +1,12 @@
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import org.gradle.api.JavaVersion
-import org.gradle.api.Project
 import java.io.File
 import java.time.Instant
+import org.gradle.api.JavaVersion
+import org.gradle.api.Project
 
-const val baseVersionName = "2.3.5"
+const val baseVersionName = "2.4.0"
 val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${exec("git rev-parse --short HEAD")}"
 val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
 val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()

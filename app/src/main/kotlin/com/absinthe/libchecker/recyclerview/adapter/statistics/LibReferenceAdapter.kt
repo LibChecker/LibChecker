@@ -2,7 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter.statistics
 
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.SHARED_UID
-import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.provider.LIB_REFERENCE_PROVIDER
 import com.absinthe.libchecker.recyclerview.adapter.statistics.provider.LibReferenceProvider
 import com.absinthe.libchecker.recyclerview.adapter.statistics.provider.MULTIPLE_APPS_ICON_PROVIDER
@@ -26,6 +26,6 @@ class LibReferenceAdapter : BaseNodeAdapter() {
   }
 
   companion object {
-    var highlightText: String = ""
+    var highlightText: String = String()
   }
 }

@@ -16,10 +16,10 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.tintHighlightText
@@ -103,6 +103,7 @@ class LibReferenceProvider : BaseNodeProvider() {
           val regexName = LCRules.getRule(name, ref.type, true)?.regexName
 
           withContext(Dispatchers.Main) {
+            (context as BaseActivity<*>).findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
             LibDetailDialogFragment.newInstance(name, ref.type, regexName)
               .show((context as BaseActivity<*>).supportFragmentManager, LibDetailDialogFragment::class.java.name)
           }

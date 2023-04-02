@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.bean.LibReference
+import com.absinthe.libchecker.model.LibReference
 import com.chad.library.adapter.base.entity.node.BaseNode
 
 class RefListDiffUtil : DiffUtil.ItemCallback<BaseNode>() {

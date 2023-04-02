@@ -25,8 +25,8 @@
   <string name="get_app_list_denied_tip">请授予 LibChecker\n“读取应用列表”\n权限</string>
   <string name="advanced_menu">高级菜单</string>
   <!-- Statistics   -->
-  <string name="title_statistics_dialog">%s架构的 Apps</string>
-  <string name="title_statistics_dialog_no_native_libs">无原生库的 Apps</string>
+  <string name="title_statistics_dialog">%s架构的应用</string>
+  <string name="title_statistics_dialog_no_native_libs">无原生库的应用</string>
   <string name="tab_chart">图表</string>
   <string name="tab_lib_reference_statistics">库引用统计</string>
   <string name="not_marked_lib">未标记的库</string>
@@ -103,6 +103,7 @@
   <string name="agp_details">Android Studio 构建系统以 Gradle 为基础，并且 Android Gradle 插件添加了几项专用于构建 Android 应用的功能。虽然 Android 插件通常会与 Android Studio 的更新步调保持一致，但插件（以及 Gradle 系统的其余部分）可独立于 Android Studio 运行并单独更新。</string>
   <string name="xposed_module">Xposed 模块</string>
   <string name="xposed_module_details">Xposed 是一个模块框架，可以在不接触任何 APK 的情况下更改系统和应用程序的行为。这很棒，因为这意味着模块可以在不同版本甚至 ROM 上工作而无需任何更改。</string>
+  <string name="play_app_signing">Play 应用签名</string>
   <string name="play_app_signing_details">借助 Play 应用签名，Google 可以为您管理和保护您应用的签名密钥，并使用它对从您的 app bundle 生成的优化分发 APK 进行签名。Play App Signing 将您的应用签名密钥存储在 Google 的安全基础架构中，并提供升级选项以提高安全性。</string>
   <string name="pwa_details">渐进式 Web 应用程序 (PWA) 使用现代 API 构建和增强，以提供增强的功能、可靠性和可安装性，同时使用单个代码库在任何设备上访问任何人、任何地方。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
@@ -132,6 +133,12 @@
   <string name="signature_public_key_type">公钥类型</string>
   <string name="signature_algorithm_name">签名算法</string>
   <string name="signature_algorithm_oid">签名算法 OID</string>
+  <string name="lib_detail_label_tip">标签</string>
+  <string name="lib_detail_develop_team_tip">开发团队</string>
+  <string name="lib_detail_rule_contributors_tip">规则贡献者</string>
+  <string name="lib_detail_description_tip">描述</string>
+  <string name="lib_detail_relative_link_tip">相关链接</string>
+  <string name="lib_detail_last_update_tip">最近更新于</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
@@ -143,6 +150,7 @@
   <string name="snapshot_btn_save_current">保存当前快照</string>
   <string name="snapshot_current_timestamp">当前快照时间戳</string>
   <string name="snapshot_apps_count">快照应用程序数量 / 应用程序数量</string>
+  <string name="comparison_snapshot_apps_count">快照应用数量</string>
   <string name="snapshot_indicator_added">增加</string>
   <string name="snapshot_indicator_removed">移除</string>
   <string name="snapshot_indicator_changed">变更</string>
@@ -161,6 +169,7 @@
   <string name="dialog_title_keep_previous_snapshot">注意</string>
   <string name="dialog_message_keep_previous_snapshot">是否保留上一张快照？</string>
   <string name="dialog_title_select_to_delete">选择日期以删除快照</string>
+  <string name="dialog_title_confirm_to_delete">确定要删除此快照吗？</string>
   <string name="btn_keep">保留</string>
   <string name="btn_drop">丢弃</string>
   <!--  Album  -->
@@ -180,6 +189,7 @@
   <string name="album_backup_summary">将所有快照备份</string>
   <string name="album_restore">恢复</string>
   <string name="album_restore_summary">从备份文件恢复快照</string>
+  <string name="album_restore_detail">%1$s : 共 %2$s 项\n</string>
   <string name="album_click_to_choose">点击选择</string>
   <string name="album_dialog_delete_snapshot_message">处理中…</string>
   <!--  Integration  -->
@@ -206,4 +216,7 @@
   <string name="adv_show_target_version">显示 Target 版本</string>
   <string name="adv_show_min_version">显示 Min 版本</string>
   <string name="adv_tint_abi_label">ABI 徽标染色</string>
+  <string name="adv_mark_exported">标记已导出的组件</string>
+  <string name="adv_mark_disabled">标记已禁用的组件</string>
+  <string name="adv_show_marked_lib">显示已标记的库</string>
 </resources>

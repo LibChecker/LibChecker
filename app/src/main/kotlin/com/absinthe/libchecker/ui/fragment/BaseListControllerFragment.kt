@@ -6,7 +6,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.absinthe.libchecker.base.BaseFragment
+import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import rikka.widget.borderview.BorderViewDelegate
 
@@ -34,6 +34,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
           container.currentMenuProvider?.let { current ->
             activity?.removeMenuProvider(current)
           }
+          activity?.removeMenuProvider(this)
           activity?.addMenuProvider(this)
           container.currentMenuProvider = this
         }

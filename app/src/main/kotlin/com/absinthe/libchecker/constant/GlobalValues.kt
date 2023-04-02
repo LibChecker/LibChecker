@@ -9,7 +9,7 @@ import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
-import com.absinthe.rulesbundle.LCRules
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
@@ -23,13 +23,12 @@ object GlobalValues {
   var advancedOptions: Int by SPDelegates(Constants.PREF_ADVANCED_OPTIONS, AdvancedOptions.DEFAULT_OPTIONS)
   val advancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(advancedOptions)
 
+  var itemAdvancedOptions: Int by SPDelegates(Constants.PREF_ITEM_ADVANCED_OPTIONS, AdvancedOptions.ITEM_DEFAULT_OPTIONS)
+  val itemAdvancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(itemAdvancedOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
-
-  var localRulesVersion: Int by SPDelegates(Constants.PREF_LOCAL_RULES_VERSION, LCRules.getVersion())
-
-  var localRulesCount: Int by SPDelegates(Constants.PREF_LOCAL_RULES_COUNT, 0)
 
   var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 
@@ -60,7 +59,7 @@ object GlobalValues {
 
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)
 
-  val season = LCAppUtils.getCurrentSeason()
+  val season by unsafeLazy { LCAppUtils.getCurrentSeason() }
 
   var locale: Locale = Locale.getDefault()
     get() {
@@ -75,7 +74,9 @@ object GlobalValues {
       getPreferences().edit { putString(Constants.PREF_LOCALE, value.toLanguageTag()) }
     }
 
-  var uuid: String by SPDelegates(Constants.PREF_UUID, "")
+  var uuid: String by SPDelegates(Constants.PREF_UUID, String())
 
   var isGitHubUnreachable = true
+
+  var trackItemsChanged = false
 }

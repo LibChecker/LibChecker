@@ -13,7 +13,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -27,7 +27,6 @@ import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.compat.BundleCompat
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
@@ -35,14 +34,18 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.snapshot.ComparisonDashboardView
@@ -51,8 +54,9 @@ import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import java.io.File
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
@@ -103,14 +107,9 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   }
 
   private fun registerCallbacks() {
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
+    onBackPressedDispatcher.addCallback(this, true) {
+      finish()
+    }
     chooseApkResultLauncher =
       registerForActivityResult(ActivityResultContracts.GetContent()) {
         if (isLeftPartChoosing) {
@@ -268,16 +267,24 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         adapter.setList(list.sortedByDescending { it.updateTime })
         flip(VF_LIST)
       }
-      lifecycleScope.launchWhenStarted {
-        effect.collect {
-          when (it) {
-            is SnapshotViewModel.Effect.ChooseComparedApk -> {
-              isLeftPartChoosing = it.isLeftPart
-              chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+      effect.onEach {
+        when (it) {
+          is SnapshotViewModel.Effect.ChooseComparedApk -> {
+            isLeftPartChoosing = it.isLeftPart
+            chooseApkResultLauncher.launch("application/vnd.android.package-archive")
+          }
+
+          is SnapshotViewModel.Effect.DashboardCountChange -> {
+            if (it.isLeft) {
+              dashboardView.container.leftPart.tvSnapshotAppsCountText.text =
+                it.snapshotCount.toString()
+            } else {
+              dashboardView.container.rightPart.tvSnapshotAppsCountText.text =
+                it.snapshotCount.toString()
             }
           }
         }
-      }
+      }.launchIn(lifecycleScope)
     }
   }
 
@@ -318,12 +325,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           it.leftPart.tvSnapshotAppsCountText.text = 1.toString()
         } else if (leftTimeStamp > 0) {
           it.leftPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(leftTimeStamp)
-          lifecycleScope.launch(Dispatchers.IO) {
-            val count = viewModel.repository.getSnapshots(leftTimeStamp).size
-            withContext(Dispatchers.Main) {
-              it.leftPart.tvSnapshotAppsCountText.text = count.toString()
-            }
-          }
+          viewModel.getDashboardCount(leftTimeStamp, true)
         }
 
         if (rightTimeStamp == -1L) {
@@ -333,12 +335,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           it.rightPart.tvSnapshotAppsCountText.text = 1.toString()
         } else if (rightTimeStamp > 0) {
           it.rightPart.tvSnapshotTimestampText.text = viewModel.getFormatDateString(rightTimeStamp)
-          lifecycleScope.launch(Dispatchers.IO) {
-            val count = viewModel.repository.getSnapshots(rightTimeStamp).size
-            withContext(Dispatchers.Main) {
-              it.rightPart.tvSnapshotAppsCountText.text = count.toString()
-            }
-          }
+          viewModel.getDashboardCount(rightTimeStamp, false)
         }
       }
     }
@@ -435,35 +432,34 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       }
     }
 
-    if (pi == null) {
-      throw IllegalStateException("PackageInfo is null")
-    }
-    val ai = pi!!.applicationInfo
-    return SnapshotItem(
-      id = null,
-      packageName = pi!!.packageName,
-      timeStamp = -1L,
-      label = ai.loadLabel(packageManager).toString(),
-      versionName = pi!!.versionName ?: "null",
-      versionCode = PackageUtils.getVersionCode(pi!!),
-      installedTime = pi!!.firstInstallTime,
-      lastUpdatedTime = pi!!.lastUpdateTime,
-      isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-      abi = PackageUtils.getAbi(pi!!).toShort(),
-      targetApi = ai.targetSdkVersion.toShort(),
-      nativeLibs = PackageUtils.getNativeDirLibs(pi!!).toJson().orEmpty(),
-      services = PackageUtils.getComponentStringList(pi!!.packageName, SERVICE, false)
-        .toJson().orEmpty(),
-      activities = PackageUtils.getComponentStringList(pi!!.packageName, ACTIVITY, false)
-        .toJson().orEmpty(),
-      receivers = PackageUtils.getComponentStringList(pi!!.packageName, RECEIVER, false)
-        .toJson().orEmpty(),
-      providers = PackageUtils.getComponentStringList(pi!!.packageName, PROVIDER, false)
-        .toJson().orEmpty(),
-      permissions = pi!!.getPermissionsList().toJson().orEmpty(),
-      metadata = PackageUtils.getMetaDataItems(pi!!).toJson().orEmpty(),
-      packageSize = PackageUtils.getPackageSize(pi!!, true)
-    )
+    pi?.let {
+      val ai = it.applicationInfo
+      return SnapshotItem(
+        id = null,
+        packageName = it.packageName,
+        timeStamp = -1L,
+        label = it.getAppName() ?: "null",
+        versionName = it.versionName ?: "null",
+        versionCode = it.getVersionCode(),
+        installedTime = it.firstInstallTime,
+        lastUpdatedTime = it.lastUpdateTime,
+        isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+        abi = PackageUtils.getAbi(it).toShort(),
+        targetApi = ai.targetSdkVersion.toShort(),
+        nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
+        services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
+          .toJson().orEmpty(),
+        activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
+          .toJson().orEmpty(),
+        receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
+          .toJson().orEmpty(),
+        providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
+          .toJson().orEmpty(),
+        permissions = it.getPermissionsList().toJson().orEmpty(),
+        metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
+        packageSize = it.getPackageSize(true)
+      )
+    } ?: throw IllegalStateException("PackageInfo is null")
   }
 
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
@@ -473,6 +469,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         2,
         StaggeredGridLayoutManager.VERTICAL
       )
+
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }
   }

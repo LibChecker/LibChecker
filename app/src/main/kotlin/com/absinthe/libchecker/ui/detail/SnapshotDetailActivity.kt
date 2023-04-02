@@ -22,17 +22,17 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.bean.ADDED
-import com.absinthe.libchecker.bean.CHANGED
-import com.absinthe.libchecker.bean.MOVED
-import com.absinthe.libchecker.bean.REMOVED
-import com.absinthe.libchecker.bean.SnapshotDetailItem
-import com.absinthe.libchecker.bean.SnapshotDiffItem
 import com.absinthe.libchecker.compat.IntentCompat
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.databinding.ActivitySnapshotDetailBinding
+import com.absinthe.libchecker.model.ADDED
+import com.absinthe.libchecker.model.CHANGED
+import com.absinthe.libchecker.model.MOVED
+import com.absinthe.libchecker.model.REMOVED
+import com.absinthe.libchecker.model.SnapshotDetailItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.VerticalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.ARROW
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotDetailAdapter
@@ -41,10 +41,10 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotCompon
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotNativeNode
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.node.SnapshotTitleNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
@@ -151,7 +151,7 @@ class SnapshotDetailActivity :
         setOnClickListener {
           lifecycleScope.launch {
             val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-            LCAppUtils.launchDetailPage(this@SnapshotDetailActivity, lcItem)
+            launchDetailPage(lcItem)
           }
         }
       }
@@ -281,8 +281,7 @@ class SnapshotDetailActivity :
 
       lifecycleScope.launch {
         val lcItem = Repositories.lcRepository.getItem(entity.packageName) ?: return@launch
-        LCAppUtils.launchDetailPage(
-          this@SnapshotDetailActivity,
+        launchDetailPage(
           item = lcItem,
           refName = item.name,
           refType = item.itemType

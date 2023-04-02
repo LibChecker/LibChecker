@@ -1,5 +1,6 @@
 package com.absinthe.libchecker.services
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -16,6 +17,7 @@ import android.os.RemoteException
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
@@ -25,14 +27,18 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.ui.main.MainActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.PackageUtils.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getColor
+import com.absinthe.libchecker.utils.extensions.getPackageSize
+import com.absinthe.libchecker.utils.extensions.getPermissionsList
+import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.lang.ref.WeakReference
@@ -40,6 +46,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -75,10 +83,6 @@ class ShootService : LifecycleService() {
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     Timber.d("onStartCommand: ${intent?.action}")
-    if (intent?.`package` != packageName) {
-      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-      stopSelf()
-    }
     when (intent?.action) {
       ACTION_SHOOT_AND_STOP_AUTO -> {
         val dropPrevious = intent.getBooleanExtra(EXTRA_DROP_PREVIOUS, false)
@@ -137,198 +141,212 @@ class ShootService : LifecycleService() {
     listenerList.finishBroadcast()
   }
 
-  private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) =
-    lifecycleScope.launch(Dispatchers.IO) {
-      if (isComputing) {
-        Timber.w("computeSnapshots isComputing, ignored")
-        return@launch
-      }
-      isComputing = true
-      Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
-      _isShooting = true
+  private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
+    LocalAppDataSource.getApplicationList(Dispatchers.IO).retryWhen { cause, attempt ->
+      Timber.e(cause)
+      attempt < 3
+    }.catch {
+      Timber.e(it)
+    }.collect {
+      computeSnapshotsImpl(it, dropPrevious, stopWhenFinish)
+    }
+  }
 
-      areNotificationsEnabled = notificationManager.areNotificationsEnabled()
+  private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {
+    if (isComputing) {
+      Timber.w("computeSnapshots isComputing, ignored")
+      return
+    }
+    isComputing = true
+    Timber.i("computeSnapshots: dropPrevious = $dropPrevious")
+    _isShooting = true
 
-      notificationManager.cancel(notificationIdShootSuccess)
-      showNotification()
+    val notificationPermissionGranted = !OsUtils.atLeastT() || ContextCompat.checkSelfPermission(
+      this@ShootService,
+      Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED
+    areNotificationsEnabled =
+      notificationManager.areNotificationsEnabled() && notificationPermissionGranted
 
-      if (areNotificationsEnabled) {
-        notificationManager.notify(notificationIdShoot, builder.build())
-      }
+    notificationManager.cancel(notificationIdShootSuccess)
+    showNotification()
 
-      val timer = TimeRecorder().also {
-        it.start()
-      }
-      val ts = System.currentTimeMillis()
-      val appList = PackageUtils.getAppsList()
+    if (areNotificationsEnabled) {
+      notificationManager.notify(notificationIdShoot, builder.build())
+    }
 
-      repository.deleteAllSnapshotDiffItems()
+    val timer = TimeRecorder().also {
+      it.start()
+    }
+    val ts = System.currentTimeMillis()
 
-      val size = appList.size
-      val dbList = mutableListOf<SnapshotItem>()
-      val exceptionInfoList = mutableListOf<PackageInfo>()
-      val currentSnapshotTimestamp = GlobalValues.snapshotTimestamp
-      var count = 0
+    repository.deleteAllSnapshotDiffItems()
 
-      if (areNotificationsEnabled) {
-        builder.setProgress(size, count, false)
-        notificationManager.notify(notificationIdShoot, builder.build())
-      }
+    val size = appList.size
+    val dbList = mutableListOf<SnapshotItem>()
+    val exceptionInfoList = mutableListOf<PackageInfo>()
+    val currentSnapshotTimestamp = GlobalValues.snapshotTimestamp
+    var count = 0
 
-      var currentProgress: Int
-      var lastProgress = 0
-      var ai: ApplicationInfo
-      var dbSnapshotItem: SnapshotItem?
+    if (areNotificationsEnabled) {
+      builder.setProgress(size, count, false)
+      notificationManager.notify(notificationIdShoot, builder.build())
+    }
 
-      for (info in appList) {
-        try {
-          ai = info.applicationInfo
-          dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
+    var currentProgress: Int
+    var lastProgress = 0
+    var ai: ApplicationInfo
+    var dbSnapshotItem: SnapshotItem?
 
-          if (dbSnapshotItem?.versionCode == PackageUtils.getVersionCode(info) &&
-            dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
-            dbSnapshotItem.packageSize == PackageUtils.getPackageSize(info, true)
-          ) {
-            Timber.d("computeSnapshots: ${info.packageName} is up to date")
-            dbList.add(
-              dbSnapshotItem.copy().also {
-                it.id = null
-                it.timeStamp = ts
-              }
+    for (info in appList) {
+      try {
+        ai = info.applicationInfo
+        dbSnapshotItem = repository.getSnapshot(currentSnapshotTimestamp, info.packageName)
+
+        if (dbSnapshotItem?.versionCode == info.getVersionCode() &&
+          dbSnapshotItem.lastUpdatedTime == info.lastUpdateTime &&
+          dbSnapshotItem.packageSize == info.getPackageSize(true)
+        ) {
+          Timber.d("computeSnapshots: ${info.packageName} is up to date")
+          dbList.add(
+            dbSnapshotItem.copy().also {
+              it.id = null
+              it.timeStamp = ts
+            }
+          )
+        } else {
+          dbList.add(
+            SnapshotItem(
+              id = null,
+              packageName = info.packageName,
+              timeStamp = ts,
+              label = info.getAppName() ?: "null",
+              versionName = info.versionName ?: "null",
+              versionCode = info.getVersionCode(),
+              installedTime = info.firstInstallTime,
+              lastUpdatedTime = info.lastUpdateTime,
+              isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+              abi = PackageUtils.getAbi(info).toShort(),
+              targetApi = ai.targetSdkVersion.toShort(),
+              nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
+              services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
+                .toJson().orEmpty(),
+              activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
+                .toJson().orEmpty(),
+              receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
+                .toJson().orEmpty(),
+              providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
+                .toJson().orEmpty(),
+              permissions = info.getPermissionsList().toJson().orEmpty(),
+              metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
+              packageSize = info.getPackageSize(true)
             )
-          } else {
-            dbList.add(
-              SnapshotItem(
-                id = null,
-                packageName = info.packageName,
-                timeStamp = ts,
-                label = ai.loadLabel(packageManager).toString(),
-                versionName = info.versionName ?: "null",
-                versionCode = PackageUtils.getVersionCode(info),
-                installedTime = info.firstInstallTime,
-                lastUpdatedTime = info.lastUpdateTime,
-                isSystem = (ai.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                abi = PackageUtils.getAbi(info).toShort(),
-                targetApi = ai.targetSdkVersion.toShort(),
-                nativeLibs = PackageUtils.getNativeDirLibs(info).toJson().orEmpty(),
-                services = PackageUtils.getComponentStringList(info.packageName, SERVICE, false)
-                  .toJson().orEmpty(),
-                activities = PackageUtils.getComponentStringList(info.packageName, ACTIVITY, false)
-                  .toJson().orEmpty(),
-                receivers = PackageUtils.getComponentStringList(info.packageName, RECEIVER, false)
-                  .toJson().orEmpty(),
-                providers = PackageUtils.getComponentStringList(info.packageName, PROVIDER, false)
-                  .toJson().orEmpty(),
-                permissions = info.getPermissionsList().toJson().orEmpty(),
-                metadata = PackageUtils.getMetaDataItems(info).toJson().orEmpty(),
-                packageSize = PackageUtils.getPackageSize(info, true)
-              )
-            )
-          }
-
-          count++
-          currentProgress = count * 100 / size
-          if (currentProgress > lastProgress) {
-            lastProgress = currentProgress
-            notifyProgress(currentProgress)
-          }
-        } catch (e: Exception) {
-          Timber.e(e)
-          exceptionInfoList.add(info)
-          continue
+          )
         }
 
-        if (dbList.size >= 50) {
-          if (areNotificationsEnabled) {
-            builder.setProgress(size, count, false)
-            notificationManager.notify(notificationIdShoot, builder.build())
-          }
-          repository.insertSnapshots(dbList)
-          dbList.clear()
-        }
-      }
-
-      var info: ApplicationInfo
-      var abiValue: Int
-      while (exceptionInfoList.isNotEmpty()) {
-        try {
-          info = exceptionInfoList[0].applicationInfo
-          abiValue = PackageUtils.getAbi(exceptionInfoList[0])
-          PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_PERMISSIONS).let {
-            dbList.add(
-              SnapshotItem(
-                id = null,
-                packageName = it.packageName,
-                timeStamp = ts,
-                label = info.loadLabel(packageManager).toString(),
-                versionName = it.versionName ?: "null",
-                versionCode = PackageUtils.getVersionCode(it),
-                installedTime = it.firstInstallTime,
-                lastUpdatedTime = it.lastUpdateTime,
-                isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
-                abi = abiValue.toShort(),
-                targetApi = info.targetSdkVersion.toShort(),
-                nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
-                services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
-                  .toJson().orEmpty(),
-                activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
-                  .toJson().orEmpty(),
-                receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
-                  .toJson().orEmpty(),
-                providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
-                  .toJson().orEmpty(),
-                permissions = it.getPermissionsList().toJson().orEmpty(),
-                metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
-                packageSize = PackageUtils.getPackageSize(it, true)
-              )
-            )
-          }
-          exceptionInfoList.removeAt(0)
-        } catch (e: Exception) {
-          exceptionInfoList.removeAt(0)
-          continue
-        }
         count++
-        notifyProgress(count * 100 / size)
+        currentProgress = count * 100 / size
+        if (currentProgress > lastProgress) {
+          lastProgress = currentProgress
+          notifyProgress(currentProgress)
+        }
+      } catch (e: Exception) {
+        Timber.e(e)
+        exceptionInfoList.add(info)
+        continue
       }
 
-      if (areNotificationsEnabled) {
-        builder.setProgress(size, count, false)
-        notificationManager.notify(notificationIdShoot, builder.build())
-      }
-      repository.insertSnapshots(dbList)
-      repository.insert(TimeStampItem(ts, null))
-
-      if (dropPrevious) {
-        Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
-        repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
-      }
-
-      if (areNotificationsEnabled) {
-        notificationManager.cancel(notificationIdShoot)
-
-        builder.setProgress(0, 0, false)
-          .setOngoing(false)
-          .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
-          .setContentText(getFormatDateString(ts))
-        notificationManager.notify(notificationIdShootSuccess, builder.build())
-      }
-
-      timer.end()
-      Timber.d("computeSnapshots: $timer")
-
-      GlobalValues.snapshotTimestamp = ts
-      _isShooting = false
-      notifyFinished(ts)
-      ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
-      stopSelf()
-      Timber.i("computeSnapshots end")
-      isComputing = false
-
-      if (stopWhenFinish) {
-        stopSelf()
+      if (dbList.size >= 50) {
+        if (areNotificationsEnabled) {
+          builder.setProgress(size, count, false)
+          notificationManager.notify(notificationIdShoot, builder.build())
+        }
+        repository.insertSnapshots(dbList)
+        dbList.clear()
       }
     }
+
+    var info: ApplicationInfo
+    var abiValue: Int
+    while (exceptionInfoList.isNotEmpty()) {
+      try {
+        info = exceptionInfoList[0].applicationInfo
+        abiValue = PackageUtils.getAbi(exceptionInfoList[0])
+        PackageUtils.getPackageInfo(info.packageName, PackageManager.GET_PERMISSIONS).let {
+          dbList.add(
+            SnapshotItem(
+              id = null,
+              packageName = it.packageName,
+              timeStamp = ts,
+              label = it.getAppName() ?: "null",
+              versionName = it.versionName ?: "null",
+              versionCode = it.getVersionCode(),
+              installedTime = it.firstInstallTime,
+              lastUpdatedTime = it.lastUpdateTime,
+              isSystem = (info.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM,
+              abi = abiValue.toShort(),
+              targetApi = info.targetSdkVersion.toShort(),
+              nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
+              services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
+                .toJson().orEmpty(),
+              activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
+                .toJson().orEmpty(),
+              receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
+                .toJson().orEmpty(),
+              providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
+                .toJson().orEmpty(),
+              permissions = it.getPermissionsList().toJson().orEmpty(),
+              metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
+              packageSize = it.getPackageSize(true)
+            )
+          )
+        }
+        exceptionInfoList.removeAt(0)
+      } catch (e: Exception) {
+        exceptionInfoList.removeAt(0)
+        continue
+      }
+      count++
+      notifyProgress(count * 100 / size)
+    }
+
+    if (areNotificationsEnabled) {
+      builder.setProgress(size, count, false)
+      notificationManager.notify(notificationIdShoot, builder.build())
+    }
+    repository.insertSnapshots(dbList)
+    repository.insert(TimeStampItem(ts, null))
+
+    if (dropPrevious) {
+      Timber.i("deleteSnapshotsAndTimeStamp: ${GlobalValues.snapshotTimestamp}")
+      repository.deleteSnapshotsAndTimeStamp(GlobalValues.snapshotTimestamp)
+    }
+
+    if (areNotificationsEnabled) {
+      notificationManager.cancel(notificationIdShoot)
+
+      builder.setProgress(0, 0, false)
+        .setOngoing(false)
+        .setContentTitle(createConfigurationContext(configuration).resources.getString(R.string.noti_shoot_title_saved))
+        .setContentText(getFormatDateString(ts))
+      notificationManager.notify(notificationIdShootSuccess, builder.build())
+    }
+
+    timer.end()
+    Timber.d("computeSnapshots: $timer")
+
+    GlobalValues.snapshotTimestamp = ts
+    _isShooting = false
+    notifyFinished(ts)
+    ServiceCompat.stopForeground(this@ShootService, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopSelf()
+    Timber.i("computeSnapshots end")
+    isComputing = false
+
+    if (stopWhenFinish) {
+      stopSelf()
+    }
+  }
 
   private fun getFormatDateString(timestamp: Long): String {
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())

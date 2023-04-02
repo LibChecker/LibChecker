@@ -3,9 +3,9 @@ package com.absinthe.libchecker.ui.fragment.detail.impl
 import android.view.ViewGroup
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibNativeBinding
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.fragment.BaseDetailFragment
@@ -69,9 +69,16 @@ class NativeAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() {
       setEmptyView(emptyView)
     }
 
-    viewModel.packageInfoLiveData.observe(viewLifecycleOwner) {
-      if (it != null) {
-        viewModel.initSoAnalysisData()
+    viewModel.apply {
+      packageInfoLiveData.observe(viewLifecycleOwner) {
+        if (it != null) {
+          viewModel.initSoAnalysisData()
+        }
+      }
+      is64Bit.observe(viewLifecycleOwner) {
+        if (it != null) {
+          adapter.set64Bit(it)
+        }
       }
     }
   }

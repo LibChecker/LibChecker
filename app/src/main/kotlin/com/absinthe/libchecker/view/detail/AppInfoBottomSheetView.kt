@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
+import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 
 class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
@@ -47,7 +48,12 @@ class AppInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderVie
   }
 
   init {
-    setPadding(24.dp, 16.dp, 24.dp, 0)
+    setPadding(
+      24.dp,
+      16.dp,
+      24.dp,
+      (16.dp - SystemBarManager.navigationBarSize).coerceAtLeast(0)
+    )
     addView(header)
     addView(launch)
     addView(setting)

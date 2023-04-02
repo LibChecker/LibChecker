@@ -17,9 +17,9 @@ import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.base.BaseFragment
-import com.absinthe.libchecker.bean.LibStringItemChip
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.adapter.detail.LibStringAdapter
+import com.absinthe.libchecker.ui.base.BaseFragment
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.ui.detail.IDetailContainer
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
@@ -28,8 +28,8 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.EmptyListView
@@ -232,13 +232,18 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   }
 
   private fun openLibDetailDialog(position: Int) {
-    val name = adapter.getItem(position).item.name
+    if (position < 0 || position >= adapter.itemCount) {
+      return
+    }
+    val item = adapter.getItem(position)
+    val name = item.item.name
+    val isValidLib = item.chip != null
 
     lifecycleScope.launch(Dispatchers.IO) {
       val regexName = LCRules.getRule(name, adapter.type, true)?.regexName
 
       withContext(Dispatchers.Main) {
-        LibDetailDialogFragment.newInstance(name, adapter.type, regexName)
+        LibDetailDialogFragment.newInstance(name, adapter.type, regexName, isValidLib)
           .show(childFragmentManager, LibDetailDialogFragment::class.java.name)
       }
     }

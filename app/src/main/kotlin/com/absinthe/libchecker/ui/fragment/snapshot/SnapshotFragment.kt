@@ -31,11 +31,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.database.AppItemRepository
+import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
@@ -43,6 +41,8 @@ import com.absinthe.libchecker.recyclerview.diff.SnapshotDiffUtil
 import com.absinthe.libchecker.services.IShootService
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
@@ -51,11 +51,12 @@ import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.snapshot.AlbumActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDimensionByAttr
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.view.snapshot.SnapshotDashboardView
 import com.absinthe.libchecker.view.snapshot.SnapshotEmptyView
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -70,8 +71,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import rikka.widget.borderview.BorderView
 import timber.log.Timber
 
@@ -241,6 +240,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          adapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -260,24 +262,14 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           compareDiff()
         }
       }.launchIn(lifecycleScope)
-      snapshotAppsCount.observe(viewLifecycleOwner) {
-        if (it != null) {
-          lifecycleScope.launch(Dispatchers.Default) {
-            val appCount = AppItemRepository.getApplicationInfoMap().size
-
-            withContext(Dispatchers.Main) {
-              dashboard.container.tvSnapshotAppsCountText.text =
-                String.format("%d / %d", it, appCount)
-            }
-          }
-        }
-      }
       snapshotDiffItems.observe(viewLifecycleOwner) { list ->
         adapter.setDiffNewData(
           list.sortedByDescending { it.updateTime }
             .toMutableList()
-        )
-        flip(VF_LIST)
+        ) {
+          flip(VF_LIST)
+          adapter.setSpaceFooterView()
+        }
 
         lifecycleScope.launch(Dispatchers.IO) {
           delay(250)
@@ -295,34 +287,29 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         binding.progressIndicator.setProgressCompat(it, it != 1)
       }
     }
-    homeViewModel.apply {
-      lifecycleScope.launchWhenStarted {
-        effect.collect {
-          when (it) {
-            is HomeViewModel.Effect.PackageChanged -> {
-              if (allowRefreshing) {
-                packageQueue.offer(it.packageName to it.action)
-                dequeuePackages()
-
-                lifecycleScope.launch(Dispatchers.Default) {
-                  val appCount = AppItemRepository.getApplicationInfoMap().size
-                  viewModel.snapshotAppsCount.value ?: runBlocking {
-                    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-                  }
-                  val snapshotCount = viewModel.snapshotAppsCount.value ?: 0
-
-                  withContext(Dispatchers.Main) {
-                    dashboard.container.tvSnapshotAppsCountText.text =
-                      String.format("%d / %d", snapshotCount, appCount)
-                  }
-                }
-              }
-            }
-            else -> {}
+    homeViewModel.effect.onEach {
+      when (it) {
+        is HomeViewModel.Effect.PackageChanged -> {
+          if (allowRefreshing) {
+            packageQueue.offer(it.packageName to it.action)
+            dequeuePackages()
+            viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
           }
         }
+
+        else -> {}
       }
-    }
+    }.launchIn(lifecycleScope)
+    viewModel.effect.onEach {
+      when (it) {
+        is SnapshotViewModel.Effect.DashboardCountChange -> {
+          dashboard.container.tvSnapshotAppsCountText.text =
+            String.format("%d / %d", it.snapshotCount, it.appCount)
+        }
+
+        else -> {}
+      }
+    }.launchIn(lifecycleScope)
   }
 
   override fun onAttach(context: Context) {
@@ -338,7 +325,6 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onResume() {
     super.onResume()
-    menu?.findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
 
     if (!shootServiceStarted && isFragmentVisible()) {
       context?.applicationContext?.also {
@@ -355,8 +341,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
     }
 
-    if (AppItemRepository.trackItemsChanged) {
-      AppItemRepository.trackItemsChanged = false
+    if (GlobalValues.trackItemsChanged) {
+      GlobalValues.trackItemsChanged = false
       flip(VF_LOADING)
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
@@ -367,10 +353,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp, shouldClearDiff = true)
     }
 
-    if (!viewModel.isComparingActive()) {
-      flip(VF_LIST)
-    } else {
-      flip(VF_LOADING)
+    if (shouldCompare) {
+      if (!viewModel.isComparingActive()) {
+        flip(VF_LIST)
+      } else {
+        flip(VF_LOADING)
+      }
     }
 
     if (hasPackageChanged()) {
@@ -407,7 +395,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
     menuInflater.inflate(R.menu.snapshot_menu, menu)
-    this.menu = menu
+    this.menu = menu.apply {
+      findItem(R.id.save)?.isVisible = binding.vfContainer.displayedChild == VF_LIST
+    }
   }
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -418,6 +408,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       }
       fun computeNewSnapshot(dropPrevious: Boolean = false) {
         flip(VF_LOADING)
+        (context as INavViewContainer).showNavigationView()
         this@SnapshotFragment.dropPrevious = dropPrevious
         ContextCompat.startForegroundService(
           context,
@@ -450,11 +441,11 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       if (GlobalValues.snapshotTimestamp == 0L) {
         computeNewSnapshot()
       } else {
-        val scheme = Uri.Builder().scheme("lc")
-          .authority("bridge")
-          .appendQueryParameter("action", "shoot")
-          .appendQueryParameter("authority", LibCheckerApp.generateAuthKey().toString())
-          .appendQueryParameter("drop_previous", "false")
+        val scheme = Uri.Builder().scheme(LCUris.SCHEME)
+          .authority(LCUris.Bridge.AUTHORITY)
+          .appendQueryParameter(LCUris.Bridge.PARAM_ACTION, LCUris.Bridge.ACTION_SHOOT)
+          .appendQueryParameter(LCUris.Bridge.PARAM_AUTHORITY, LibCheckerApp.generateAuthKey().toString())
+          .appendQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS, false.toString())
           .build()
           .toString()
         val tipView = TextView(context).also {
@@ -494,6 +485,13 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     return true
   }
 
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      adapter.setSpaceFooterView()
+    }
+  }
+
   private fun flip(child: Int) {
     allowRefreshing = child == VF_LIST
     if (binding.vfContainer.displayedChild == child) {
@@ -515,8 +513,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     viewModel.timestamp.value = GlobalValues.snapshotTimestamp
     isSnapshotDatabaseItemsReady = true
 
-    viewModel.computeSnapshotAppCount(GlobalValues.snapshotTimestamp)
-
+    viewModel.getDashboardCount(GlobalValues.snapshotTimestamp, true)
     viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     isSnapshotDatabaseItemsReady = false
   }

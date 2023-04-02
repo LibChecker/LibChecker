@@ -12,7 +12,8 @@ import timber.log.Timber
 
 class LCRepository(private val lcDao: LCDao) {
 
-  val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItems()
+  val allDatabaseItems: LiveData<List<LCItem>> = lcDao.getItemsLiveData()
+  val allLCItemsFlow: Flow<List<LCItem>> = lcDao.getItemsFlow()
   val allSnapshotItemsFlow: Flow<List<SnapshotItem>> =
     lcDao.getSnapshotsFlow(GlobalValues.snapshotTimestamp)
 
@@ -23,6 +24,8 @@ class LCRepository(private val lcDao: LCDao) {
     }
     return true
   }
+
+  suspend fun getLCItems(): List<LCItem> = lcDao.getItems()
 
   suspend fun getItem(packageName: String): LCItem? {
     if (checkDatabaseStatus().not()) return null
@@ -94,6 +97,11 @@ class LCRepository(private val lcDao: LCDao) {
     lcDao.delete(item)
   }
 
+  suspend fun deleteLCItemByPackageName(packageName: String) {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteLCItemByPackageName(packageName)
+  }
+
   suspend fun delete(item: TrackItem) {
     if (checkDatabaseStatus().not()) return
     lcDao.delete(item)
@@ -124,6 +132,11 @@ class LCRepository(private val lcDao: LCDao) {
   suspend fun updateTimeStampItem(item: TimeStampItem) {
     if (checkDatabaseStatus().not()) return
     lcDao.update(item)
+  }
+
+  suspend fun deleteDuplicateSnapshotItems() {
+    if (checkDatabaseStatus().not()) return
+    lcDao.deleteDuplicateSnapshotItems()
   }
 
   fun deleteAllSnapshots() {

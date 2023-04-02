@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.recyclerview.diff
 
 import androidx.recyclerview.widget.DiffUtil
-import com.absinthe.libchecker.bean.SnapshotDiffItem
+import com.absinthe.libchecker.model.SnapshotDiffItem
 
 class SnapshotDiffUtil : DiffUtil.ItemCallback<SnapshotDiffItem>() {
 

@@ -8,18 +8,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.base.BaseAlertDialogBuilder
-import com.absinthe.libchecker.bean.DISABLED
-import com.absinthe.libchecker.bean.LibChip
-import com.absinthe.libchecker.bean.LibStringItem
-import com.absinthe.libchecker.bean.LibStringItemChip
 import com.absinthe.libchecker.compat.VersionCompat
 import com.absinthe.libchecker.databinding.FragmentLibComponentBinding
 import com.absinthe.libchecker.integrations.anywhere.AnywhereManager
 import com.absinthe.libchecker.integrations.blocker.BlockerManager
 import com.absinthe.libchecker.integrations.monkeyking.MonkeyKingManager
 import com.absinthe.libchecker.integrations.monkeyking.ShareCmpInfo
+import com.absinthe.libchecker.model.DISABLED
+import com.absinthe.libchecker.model.EXPORTED
+import com.absinthe.libchecker.model.LibChip
+import com.absinthe.libchecker.model.LibStringItem
+import com.absinthe.libchecker.model.LibStringItemChip
 import com.absinthe.libchecker.recyclerview.diff.LibStringDiffUtil
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.BaseFilterAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.EXTRA_TYPE
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
@@ -81,7 +82,7 @@ class ComponentsAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibCompone
               } else {
                 null
               }
-              source = if (item.enabled) null else DISABLED
+              source = if (!item.enabled) DISABLED else if (item.exported) EXPORTED else null
 
               list += LibStringItemChip(
                 LibStringItem(

@@ -27,6 +27,11 @@ object Constants {
   const val TEMP_ICON = "lc_temp_icon.png"
   const val EXAMPLE_PACKAGE = "this.is.an.example"
 
+  const val EXAMPLE_EXPORTED = "this.is.exported"
+  const val EXAMPLE_NORMAL = "this.is.normal"
+  const val EXAMPLE_DISABLED = "this.is.disabled"
+  const val EXAMPLE_RULE = "Example SDK"
+
   const val PREF_SHOW_SYSTEM_APPS = "showSystemApps"
   const val PREF_APK_ANALYTICS = "apkAnalytics"
   const val PREF_RULES_REPO = "rulesRepository"
@@ -49,8 +54,6 @@ object Constants {
   const val PREF_LOCAL_BACKUP = "localBackup"
   const val PREF_LOCAL_RESTORE = "localRestore"
 
-  const val PREF_LOCAL_RULES_VERSION = "localRulesVersion"
-  const val PREF_LOCAL_RULES_COUNT = "localRulesCount"
   const val PREF_LOCALE = "locale"
 
   const val PREF_DEBUG_MODE = "debugMode"
@@ -78,12 +81,13 @@ object Constants {
   const val COMMAND_USER_MODE = "/usermode"
 
   const val RULES_DB_FILE_NAME = "rules.db"
-  const val RULES_DATABASE_NAME = "rule_database"
+  const val RULES_DATABASE_NAME = "rules_database"
 
   const val RENGE_THEME = "rengeTheme"
 
   const val PREF_UUID = "uuid"
   const val PREF_ADVANCED_OPTIONS = "advancedOptions"
+  const val PREF_ITEM_ADVANCED_OPTIONS = "itemAdvancedOptions"
 
   object Event {
     const val LAUNCH_ACTION = "Launch Action"

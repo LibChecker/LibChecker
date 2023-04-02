@@ -2,20 +2,23 @@ package com.absinthe.libchecker.ui.fragment.settings
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.constant.Constants
-import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.settings.CloudRulesDialogView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
+import com.absinthe.rulesbundle.LCRules
 import com.absinthe.rulesbundle.RuleDatabase
 import com.jakewharton.processphoenix.ProcessPhoenix
 import java.io.File
@@ -42,27 +45,28 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    lifecycleScope.launchWhenResumed {
-      try {
-        request.requestCloudRuleInfo()?.let {
-          try {
-            root.cloudRulesContentView.localVersion.version.text =
-              GlobalValues.localRulesVersion.toString()
-            root.cloudRulesContentView.remoteVersion.version.text =
-              it.version.toString()
-            if (GlobalValues.localRulesVersion < it.version) {
-              root.cloudRulesContentView.setUpdateButtonStatus(true)
+    lifecycleScope.launch {
+      lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+        try {
+          request.requestCloudRuleInfo()?.let {
+            try {
+              root.cloudRulesContentView.localVersion.version.text =
+                getLocalRulesVersion().toString()
+              root.cloudRulesContentView.remoteVersion.version.text = it.version.toString()
+              if (getLocalRulesVersion() < it.version) {
+                root.cloudRulesContentView.setUpdateButtonStatus(true)
+              }
+              withContext(Dispatchers.Main) {
+                root.showContent()
+              }
+            } catch (e: Exception) {
+              Timber.e(e)
+              context?.showToast(R.string.toast_cloud_rules_update_error)
             }
-            withContext(Dispatchers.Main) {
-              root.showContent()
-            }
-          } catch (e: Exception) {
-            Timber.e(e)
-            context?.showToast(R.string.toast_cloud_rules_update_error)
           }
+        } catch (t: Throwable) {
+          Timber.e(t)
         }
-      } catch (t: Throwable) {
-        Timber.e(t)
       }
     }
   }
@@ -80,17 +84,22 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
           val databaseDir = requireContext().getDatabasePath(Constants.RULES_DATABASE_NAME).parent
           FileUtils.copy(saveFile, File(databaseDir, Constants.RULES_DATABASE_NAME))
 
-          lifecycleScope.launch(Dispatchers.Main) {
-            root.cloudRulesContentView.localVersion.version.text =
-              root.cloudRulesContentView.remoteVersion.version.text
-            root.cloudRulesContentView.setUpdateButtonStatus(false)
-            runCatching {
-              GlobalValues.localRulesVersion =
-                root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
-              context?.let {
-                ProcessPhoenix.triggerRebirth(it)
+          if (File(databaseDir, Constants.RULES_DATABASE_NAME).md5() == saveFile.md5()) {
+            lifecycleScope.launch(Dispatchers.Main) {
+              root.cloudRulesContentView.localVersion.version.text =
+                root.cloudRulesContentView.remoteVersion.version.text
+              root.cloudRulesContentView.setUpdateButtonStatus(false)
+              runCatching {
+                setLocalRulesVersion(
+                  root.cloudRulesContentView.remoteVersion.version.text.toString().toInt()
+                )
+                context?.let {
+                  ProcessPhoenix.triggerRebirth(it)
+                }
               }
             }
+          } else {
+            context?.showToast(R.string.toast_cloud_rules_update_error)
           }
         }
 
@@ -102,5 +111,21 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
         }
       }
     )
+  }
+
+  private fun getLocalRulesVersion(): Int {
+    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
+    if (localCloudVersionFile.exists().not()) return LCRules.getVersion()
+    if (localCloudVersionFile.isDirectory.not()) return LCRules.getVersion()
+    localCloudVersionFile.listFiles()?.takeIf { it.isNotEmpty() }?.let {
+      return runCatching { it[0].name.toInt() }.getOrDefault(LCRules.getVersion())
+    } ?: return LCRules.getVersion()
+  }
+
+  private fun setLocalRulesVersion(version: Int) {
+    val localCloudVersionFile = File(requireContext().filesDir, "lcrules/version")
+    if (localCloudVersionFile.isDirectory.not()) localCloudVersionFile.delete()
+    if (localCloudVersionFile.exists().not()) localCloudVersionFile.mkdirs()
+    File(localCloudVersionFile, version.toString()).createNewFile()
   }
 }

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--  General  -->
+  <string name="title_app_list">Apps</string>
+  <string name="title_statistics">Statistiken</string>
+  <string name="title_snapshot">Schnappschuss</string>
+  <string name="title_settings">Einstellungen</string>
+  <string name="title_album">Album</string>
+  <string name="loading">Lädt…</string>
+  <string name="channel_shoot">Schnappschuss speichern</string>
+  <string name="noti_shoot_title">Aktuellen Speichere Schnappschuss</string>
+  <string name="noti_shoot_title_saved">Ein Schnappschuss wurde gespeichert</string>
+  <!--  App list  -->
+  <string name="menu_search">Suchen</string>
+  <string name="menu_sort">Sortierung</string>
+  <string name="menu_filter">Filter</string>
+  <string name="search_hint">Suchen…</string>
+  <string name="string_64_bit">64Bit</string>
+  <string name="string_32_bit">32bit</string>
+  <string name="no_libs">Keine nativen Bibliotheken</string>
+  <string name="cannot_read">Lesen nicht möglich</string>
+  <string name="unknown">Unbekannt</string>
+  <string name="empty_list">Die Liste ist leer</string>
+  <string name="uncharted_territory">Unerforschtes Gebiet</string>
+  <string name="get_app_list_denied_tip">Bitte erteilen Sie\n\"Informationen über installierte Apps\"\nBerechtigung für LibChecker</string>
+  <string name="advanced_menu">Erweitertes Menü</string>
+  <!-- Statistics   -->
+  <string name="title_statistics_dialog">Apps mit %s ABI</string>
+  <string name="title_statistics_dialog_no_native_libs">Apps ohne native Bibliotheken</string>
+  <string name="tab_chart">Diagramm</string>
+  <string name="tab_lib_reference_statistics">Bibliotheken Referenz</string>
+  <string name="not_marked_lib">Nicht markierte Bibliothek</string>
+  <string name="submenu_title_component">Komponente</string>
+  <string name="submenu_title_manifest">Manifest</string>
+  <string name="ref_category_all">Alle</string>
+  <string name="ref_category_native">Native Bibliotheken</string>
+  <string name="ref_category_service">Services</string>
+  <string name="ref_category_activity">Activities</string>
+  <string name="ref_category_br">Broadcast Receivers</string>
+  <string name="ref_category_cp">Content Providers</string>
+  <string name="ref_category_perm">Berechtigungen</string>
+  <string name="ref_category_static">Statische Bibliotheken</string>
+  <string name="ref_category_metadata">Metadaten</string>
+  <string name="ref_category_package">Paket</string>
+  <string name="ref_category_shared_uid">Gemeinsame UID</string>
+  <string name="ref_category_signatures">Signaturen</string>
+  <string name="string_kotlin_used">Nutzt Kotlin</string>
+  <string name="string_kotlin_unused">Nutzt kein Kotlin</string>
+  <!--  About  -->
+  <string name="settings_about">Über</string>
+  <string name="settings_translate">Beteilige dich an der Übersetzung</string>
+  <string name="settings_translate_summary">Hilf uns die App zu übersetzen</string>
+  <string name="settings_rate_us">Bewerte uns</string>
+  <string name="settings_rate_us_summary">Dies hilft uns von mehr Leuten gefunden zu werden</string>
+  <string name="settings_about_summary">Dies ist LibChecker!</string>
+  <!--  Settings  -->
+  <!--  Detail  -->
+  <!--  Toast  -->
+  <!--  Snapshot  -->
+  <!--  Dialog  -->
+  <!--  Album  -->
+  <!--  Integration  -->
+  <!--  Cloud rules  -->
+  <!-- Advanced menu -->
+</resources>

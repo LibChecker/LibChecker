@@ -2,7 +2,7 @@ package com.absinthe.libchecker.recyclerview.adapter.detail
 
 import android.text.format.Formatter
 import android.view.ViewGroup
-import com.absinthe.libchecker.bean.AppBundleItem
+import com.absinthe.libchecker.model.AppBundleItem
 import com.absinthe.libchecker.view.detail.AppBundleItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder

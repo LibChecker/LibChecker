@@ -5,44 +5,46 @@ import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.MenuItem
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.base.BaseActivity
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityAlbumBinding
+import com.absinthe.libchecker.recyclerview.adapter.snapshot.AlbumAdapter
 import com.absinthe.libchecker.ui.album.BackupActivity
 import com.absinthe.libchecker.ui.album.ComparisonActivity
 import com.absinthe.libchecker.ui.album.TrackActivity
+import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
-import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.view.snapshot.AlbumItemView
 import com.absinthe.libchecker.viewmodel.SnapshotViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.absinthe.libraries.utils.utils.UiUtils
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import rikka.material.app.DayNightDelegate
+import rikka.widget.borderview.BorderView
 
 class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
 
   private val viewModel: SnapshotViewModel by viewModels()
+  private val adapter = AlbumAdapter()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     initView()
-    onBackPressedDispatcher.addCallback(
-      this,
-      object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-          finish()
-        }
-      }
-    )
+    onBackPressedDispatcher.addCallback(this, true) {
+      finish()
+    }
   }
 
   private fun initView() {
@@ -51,12 +53,7 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.title_album)
 
-    val isDarkMode = when (DayNightDelegate.getDefaultNightMode()) {
-      DayNightDelegate.MODE_NIGHT_YES -> true
-      DayNightDelegate.MODE_NIGHT_NO -> false
-      DayNightDelegate.MODE_NIGHT_FOLLOW_SYSTEM, DayNightDelegate.MODE_NIGHT_UNSPECIFIED, DayNightDelegate.MODE_NIGHT_AUTO_BATTERY -> UiUtils.isDarkModeOnSystem()
-      else -> false
-    }
+    val isDarkMode = UiUtils.isDarkMode()
     val itemComparison = generateAlbumItemView(
       R.drawable.ic_compare,
       if (isDarkMode) R.color.material_red_900 else R.color.material_red_300,
@@ -81,10 +78,26 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       R.string.album_item_track_title,
       R.string.album_item_track_subtitle
     )
-    binding.llContainer.addView(itemComparison)
-    binding.llContainer.addView(itemManagement)
-    binding.llContainer.addView(itemBackupRestore)
-    binding.llContainer.addView(itemTrack)
+    binding.llContainer.apply {
+      overScrollMode = RecyclerView.OVER_SCROLL_NEVER
+      adapter = this@AlbumActivity.adapter
+      borderVisibilityChangedListener =
+        BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
+          binding.appbar.isLifted = !top
+        }
+      layoutManager = LinearLayoutManager(context)
+      isVerticalScrollBarEnabled = false
+      clipToPadding = false
+      clipChildren = false
+      setHasFixedSize(true)
+
+      this@AlbumActivity.adapter.apply {
+        addData(itemComparison)
+        addData(itemManagement)
+        addData(itemBackupRestore)
+        addData(itemTrack)
+      }
+    }
 
     itemComparison.setOnClickListener {
       startActivity(Intent(this, ComparisonActivity::class.java))
@@ -104,30 +117,37 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
                   return@setOnItemClickListener
                 }
                 val item = timeStampList[position]
-                lifecycleScope.launch(Dispatchers.IO) {
-                  val dialog: AlertDialog
-                  withContext(Dispatchers.Main) {
-                    dialog = LCAppUtils.createLoadingDialog(this@AlbumActivity)
-                    dialog.show()
-                  }
-                  viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
-                  if (position < timeStampList.size) {
-                    timeStampList.removeAt(position)
-                  }
-                  GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
-                    0L
-                  } else {
-                    timeStampList[0].timestamp
-                  }
-                  withContext(Dispatchers.Main) {
-                    root.adapter.remove(item)
-                    dialog.dismiss()
+                BaseAlertDialogBuilder(this@AlbumActivity)
+                  .setTitle(R.string.dialog_title_confirm_to_delete)
+                  .setMessage(getFormatDateString(item.timestamp))
+                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                    lifecycleScope.launch(Dispatchers.IO) {
+                      val dialog: AlertDialog
+                      withContext(Dispatchers.Main) {
+                        dialog = com.absinthe.libchecker.utils.UiUtils.createLoadingDialog(this@AlbumActivity)
+                        dialog.show()
+                      }
+                      viewModel.repository.deleteSnapshotsAndTimeStamp(item.timestamp)
+                      if (position < timeStampList.size) {
+                        timeStampList.removeAt(position)
+                      }
+                      GlobalValues.snapshotTimestamp = if (timeStampList.isEmpty()) {
+                        0L
+                      } else {
+                        timeStampList[0].timestamp
+                      }
+                      withContext(Dispatchers.Main) {
+                        root.adapter.remove(item)
+                        dialog.dismiss()
 
-                    if (timeStampList.isEmpty()) {
-                      dismiss()
+                        if (timeStampList.isEmpty()) {
+                          dismiss()
+                        }
+                      }
                     }
                   }
-                }
+                  .setNegativeButton(android.R.string.cancel, null)
+                  .show()
               }
             }
           dialog.show(supportFragmentManager, TimeNodeBottomSheetDialogFragment::class.java.name)
@@ -170,5 +190,11 @@ class AlbumActivity : BaseActivity<ActivityAlbumBinding>() {
       title.text = getString(titleRes)
       subtitle.text = getString(subtitleRes)
     }
+  }
+
+  private fun getFormatDateString(timestamp: Long): String {
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd, HH:mm:ss", Locale.getDefault())
+    val date = Date(timestamp)
+    return simpleDateFormat.format(date)
   }
 }

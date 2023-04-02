@@ -31,13 +31,13 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.SHARED_UID
-import com.absinthe.libchecker.base.BaseActivity
-import com.absinthe.libchecker.bean.LibReference
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
+import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
 import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
+import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.ChartActivity
@@ -46,9 +46,10 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
 import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
-import com.absinthe.libchecker.utils.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
+import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
 import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
@@ -60,6 +61,8 @@ import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.saket.cascade.CascadePopupMenu
@@ -78,6 +81,7 @@ class LibReferenceFragment :
   private var delayShowNavigationJob: Job? = null
   private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
+  private var isSearchTextClearOnce = false
   private var keyword: String = ""
   private var searchUpdateJob: Job? = null
 
@@ -108,7 +112,7 @@ class LibReferenceFragment :
                 delayShowNavigationJob?.cancel()
                 delayShowNavigationJob = null
               }
-              if (canListScroll(refAdapter.data.size)) {
+              if (isFragmentVisible() && !isSearchTextClearOnce && canListScroll(refAdapter.data.size)) {
                 (activity as? INavViewContainer)?.hideNavigationView()
               }
 
@@ -125,16 +129,15 @@ class LibReferenceFragment :
                   0
                 }
               }
-              if (position < refAdapter.itemCount - 1) {
-                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.Default) {
+              if (isFragmentVisible() && !isSearchTextClearOnce && position < refAdapter.itemCount - 1) {
+                delayShowNavigationJob = lifecycleScope.launch(Dispatchers.IO) {
                   delay(400)
                   withContext(Dispatchers.Main) {
                     (activity as? INavViewContainer)?.showNavigationView()
                   }
-                }.also {
-                  it.start()
                 }
               }
+              isSearchTextClearOnce = false
             }
           }
         })
@@ -142,6 +145,9 @@ class LibReferenceFragment :
       vfContainer.apply {
         setInAnimation(activity, R.anim.anim_fade_in)
         setOutAnimation(activity, R.anim.anim_fade_out)
+        setOnDisplayedChildChangedListener {
+          refAdapter.setSpaceFooterView()
+        }
       }
     }
 
@@ -152,6 +158,7 @@ class LibReferenceFragment :
         if (AntiShakeUtils.isInvalidClick(view)) {
           return@setOnItemClickListener
         }
+        context.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.clearFocus()
 
         val item = refAdapter.data[position] as? LibReference ?: return@setOnItemClickListener
         val intent = Intent(context, LibReferenceActivity::class.java)
@@ -171,28 +178,32 @@ class LibReferenceFragment :
     }
 
     homeViewModel.apply {
-      lifecycleScope.launchWhenStarted {
-        effect.collect {
-          when (it) {
-            is HomeViewModel.Effect.PackageChanged -> {
-              computeRef(false)
-            }
-            is HomeViewModel.Effect.UpdateLibRefProgress -> {
-              binding.loadingView.progressIndicator.setProgressCompat(it.progress, it.progress > 0)
-            }
-            else -> {}
+      effect.onEach {
+        when (it) {
+          is HomeViewModel.Effect.PackageChanged -> {
+            computeRef(false)
           }
+
+          is HomeViewModel.Effect.UpdateLibRefProgress -> {
+            binding.loadingView.progressIndicator.setProgressCompat(
+              it.progress,
+              it.progress > 0
+            )
+          }
+
+          else -> {}
         }
-      }
-      libReference.observe(viewLifecycleOwner) {
+      }.launchIn(lifecycleScope)
+      libReference.onEach {
         if (it == null) {
-          return@observe
+          return@onEach
         }
         refAdapter.setList(it)
 
         flip(VF_LIST)
+        refAdapter.setSpaceFooterView()
         isListReady = true
-      }
+      }.launchIn(lifecycleScope)
     }
     GlobalValues.isShowSystemApps.observe(viewLifecycleOwner) {
       if (homeViewModel.libRefSystemApps == null || homeViewModel.libRefSystemApps != it) {
@@ -201,7 +212,12 @@ class LibReferenceFragment :
       }
     }
     GlobalValues.libReferenceThresholdLiveData.observe(viewLifecycleOwner) {
-      homeViewModel.refreshRef()
+      if (it < homeViewModel.savedThreshold) {
+        matchRules(true)
+        homeViewModel.savedThreshold = it
+      } else {
+        homeViewModel.refreshRef()
+      }
     }
     GlobalValues.isColorfulIcon.observe(viewLifecycleOwner) {
       // noinspection NotifyDataSetChanged
@@ -226,6 +242,7 @@ class LibReferenceFragment :
   override fun onPause() {
     super.onPause()
     popup?.dismiss()
+    (activity as? INavViewContainer)?.hideProgressBar()
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -318,6 +335,13 @@ class LibReferenceFragment :
       }
     }
     this.setOnMenuItemClickListener {
+      (context as BaseActivity<*>).apply {
+        val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
+        if (closeBtn != null) {
+          //noinspection RestrictedApi
+          supportActionBar?.collapseActionView()
+        }
+      }
       doSaveLibRefType(type)
     }
   }
@@ -345,8 +369,16 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.cancelComputingLibReference()
     homeViewModel.computeLibReference(category)
+  }
+
+  private fun matchRules(needShowLoading: Boolean) {
+    isListReady = false
+    if (needShowLoading) {
+      flip(VF_LOADING)
+    }
+    homeViewModel.cancelMatchingJob()
+    homeViewModel.matchingRules(category)
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -355,11 +387,12 @@ class LibReferenceFragment :
 
   override fun onQueryTextChange(newText: String): Boolean {
     if (keyword != newText) {
+      isSearchTextClearOnce = newText.isEmpty()
       keyword = newText
 
       searchUpdateJob?.cancel()
       searchUpdateJob = lifecycleScope.launch(Dispatchers.IO) {
-        homeViewModel.libReference.value?.let { list ->
+        homeViewModel.savedRefList?.let { list ->
           val filter = list.filter {
             it.libName.contains(newText, ignoreCase = true) || it.chip?.name?.contains(
               newText,
@@ -369,12 +402,16 @@ class LibReferenceFragment :
           LibReferenceAdapter.highlightText = newText
 
           withContext(Dispatchers.Main) {
-            (activity as? INavViewContainer)?.showProgressBar()
+            if (isFragmentVisible()) {
+              (activity as? INavViewContainer)?.showProgressBar()
+            }
             refAdapter.setDiffNewData(filter.toMutableList()) {
               doOnMainThreadIdle {
                 //noinspection NotifyDataSetChanged
                 refAdapter.notifyDataSetChanged()
               }
+            }
+            binding.list.post {
               (activity as? INavViewContainer)?.hideProgressBar()
             }
           }
@@ -387,11 +424,16 @@ class LibReferenceFragment :
             )
           }
         }
-      }.also {
-        it.start()
       }
     }
     return false
+  }
+
+  override fun onVisibilityChanged(visible: Boolean) {
+    super.onVisibilityChanged(visible)
+    if (visible) {
+      refAdapter.setSpaceFooterView()
+    }
   }
 
   override fun onReturnTop() {

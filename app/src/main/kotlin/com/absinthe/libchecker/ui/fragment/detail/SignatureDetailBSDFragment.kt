@@ -3,8 +3,8 @@ package com.absinthe.libchecker.ui.fragment.detail
 import android.content.DialogInterface
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.bean.SignatureDetailItem
 import com.absinthe.libchecker.compat.VersionCompat
+import com.absinthe.libchecker.model.SignatureDetailItem
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.SignatureDetailBottomSheetView

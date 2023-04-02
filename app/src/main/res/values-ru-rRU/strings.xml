@@ -15,18 +15,23 @@
   <string name="menu_sort">Сортировка</string>
   <string name="menu_filter">Фильтр</string>
   <string name="search_hint">Поиск…</string>
+  <string name="string_64_bit">64 бит</string>
+  <string name="string_32_bit">32 бит</string>
   <string name="no_libs">Нет нативных библиотек</string>
   <string name="cannot_read">«Невозможно прочитать»</string>
   <string name="unknown">Неизвестно</string>
   <string name="empty_list">Список пуст</string>
   <string name="uncharted_territory">Неизученная территория</string>
   <string name="get_app_list_denied_tip">Пожалуйста, предоставьте\nLibChecker разрешение получить\nинформацию об установленных приложениях</string>
+  <string name="advanced_menu">Расширенное меню</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">Приложения с %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">Приложения без нативных библиотек</string>
   <string name="tab_chart">Диаграмма</string>
   <string name="tab_lib_reference_statistics">Ссылка на библиотеку</string>
   <string name="not_marked_lib">Не отмеченная библиотека</string>
+  <string name="submenu_title_component">Компонент</string>
+  <string name="submenu_title_manifest">Манифест</string>
   <string name="ref_category_all">Все</string>
   <string name="ref_category_native">Нативные библиотеки</string>
   <string name="ref_category_service">Службы</string>
@@ -34,11 +39,17 @@
   <string name="ref_category_br">Широковещательные приемники</string>
   <string name="ref_category_cp">Поставщики контента</string>
   <string name="ref_category_perm">Разрешения</string>
+  <string name="ref_category_static">Нативные библиотеки</string>
+  <string name="ref_category_metadata">Метаданные</string>
+  <string name="ref_category_package">Пакет</string>
+  <string name="ref_category_shared_uid">Общий UID</string>
   <string name="ref_category_signatures">подпись</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
+  <string name="settings_translate">Участвуйте в переводе</string>
+  <string name="settings_translate_summary">Помогите нам перевести это приложение</string>
   <string name="settings_rate_us">Оценить приложение</string>
   <string name="settings_rate_us_summary">Это может сделать нас доступнее для большего числа людей</string>
   <string name="settings_about_summary">Это LibChecker!</string>
@@ -96,10 +107,18 @@
   <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы.</string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
+  <string name="format_last_updated">Обновлено: %s</string>
   <string name="menu_process">Приложение</string>
+  <string name="alternative_launch_method">Альтернативный метод запуска</string>
+  <string name="compare_with_current">Сравнить с текущим пакетом</string>
   <string name="rx_detail">RxJava — это реализация Reactive Extensions на виртуальной машине Java: библиотека для составления асинхронных и событийных программ с использованием наблюдаемых последовательностей.</string>
   <string name="rx_android_detail">Reactive Extensions для Android</string>
   <string name="rx_kotlin_detail">Расширения Kotlin для RxJava</string>
+  <string name="permission_not_granted">Не предоставлено</string>
+  <string name="signature_detail">Детали подписи</string>
+  <string name="signature_version">Версия</string>
+  <string name="signature_serial_number">Серийный номер</string>
+  <string name="signature_subject">Тема</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
   <string name="toast_not_existing_market">Нет магазина приложений</string>
@@ -110,6 +129,7 @@
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
   <string name="snapshot_apps_count">Количество приложений в снимке / Количество заявок</string>
+  <string name="comparison_snapshot_apps_count">Количество приложений в снимке</string>
   <string name="snapshot_indicator_added">Добавлено</string>
   <string name="snapshot_indicator_removed">Удалено</string>
   <string name="snapshot_indicator_changed">Изменено</string>
@@ -159,4 +179,9 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">Обновить</string>
   <!-- Advanced menu -->
+  <string name="adv_show_system_apps">Показать системные приложения</string>
+  <string name="adv_show_overlays">Показать оверлеи</string>
+  <string name="adv_show_64_bit">Показывать 64-битные приложения</string>
+  <string name="adv_show_32_bit">Показывать 32-битные приложения</string>
+  <string name="adv_sort_mode">Тип сортировки</string>
 </resources>

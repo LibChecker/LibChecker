@@ -54,8 +54,8 @@
       android:name=".ui.detail.ApkDetailActivity"
       android:configChanges="orientation"
       android:exported="true"
-      android:launchMode="singleTask"
-      android:label="@string/detail_label">
+      android:label="@string/detail_label"
+      android:launchMode="singleTask">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -77,11 +77,19 @@
       android:label="@string/title_album" />
     <activity
       android:name=".ui.album.BackupActivity"
-      android:label="@string/album_item_backup_restore_title" />
+      android:exported="true"
+      android:label="@string/album_item_backup_restore_title">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="content" />
+        <data android:pathPattern=".*\\.lcss" />
+      </intent-filter>
+    </activity>
     <activity
       android:name=".ui.album.ComparisonActivity"
-      android:label="@string/album_item_comparison_title"
-      android:exported="true">
+      android:exported="true"
+      android:label="@string/album_item_comparison_title">
       <intent-filter>
         <action android:name="android.intent.action.SEND_MULTIPLE" />
         <category android:name="android.intent.category.DEFAULT" />
@@ -104,13 +112,14 @@
       android:label="@string/settings_about"
       android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
     <activity
-      android:name=".bridge.BridgeActivity"
+      android:name=".ui.bridge.BridgeActivity"
       android:exported="true"
       android:theme="@style/Transparent">
 
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
         <data
           android:host="bridge"
           android:scheme="lc" />

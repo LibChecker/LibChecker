@@ -48,7 +48,7 @@ class ComparisonDashboardHalfView(context: Context, attributeSet: AttributeSet? 
       ).also {
         it.topMargin = 5.dp
       }
-      text = context.getString(R.string.snapshot_apps_count)
+      text = context.getString(R.string.comparison_snapshot_apps_count)
       setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     }
 

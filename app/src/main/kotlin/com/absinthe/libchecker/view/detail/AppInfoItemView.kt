@@ -112,7 +112,8 @@ class AppInfoItemView(context: Context) : AViewGroup(context) {
     )
     setMeasuredDimension(
       measuredWidth,
-      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom)
+      // Ignore errors within 10 pixels, as the different heights of Chinese and English in some fonts can cause the Adapter to fail to align
+      (paddingTop + icon.measuredHeight + text.marginTop + text.measuredHeight + paddingBottom) / 10 * 10
     )
   }
 

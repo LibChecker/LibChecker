@@ -14,6 +14,10 @@ object AdvancedOptions {
   const val SHOW_MIN_API = 1 shl 10
   const val TINT_ABI_LABEL = 1 shl 11
 
+  const val MARK_EXPORTED = 1 shl 0
+  const val MARK_DISABLED = 1 shl 1
+  const val SHOW_MARKED_LIB = 1 shl 2
+
   const val DEFAULT_OPTIONS =
     SHOW_OVERLAYS or
       SHOW_64_BIT_APPS or
@@ -21,9 +25,7 @@ object AdvancedOptions {
       SORT_BY_NAME or
       SHOW_TARGET_API
 
-  fun isSortModeNothingChoose(): Boolean {
-    return (GlobalValues.advancedOptions and SORT_BY_NAME) == 0 &&
-      (GlobalValues.advancedOptions and SORT_BY_UPDATE_TIME) == 0 &&
-      (GlobalValues.advancedOptions and SORT_BY_TARGET_API) == 0
-  }
+  const val ITEM_DEFAULT_OPTIONS =
+    MARK_DISABLED or
+      SHOW_MARKED_LIB
 }

@@ -16,45 +16,52 @@
     android:visibility="gone"
     app:hideAnimationBehavior="outward" />
 
-  <com.google.android.material.button.MaterialButtonToggleGroup
-    android:id="@+id/buttons_group"
-    android:layout_width="match_parent"
+  <HorizontalScrollView
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal"
     android:layout_marginTop="@dimen/normal_padding"
-    android:gravity="center_horizontal"
-    android:paddingHorizontal="@dimen/normal_padding"
-    app:selectionRequired="true"
-    app:singleSelection="true"
-    tools:ignore="HardcodedText">
+    android:scrollbars="none">
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btn_abi"
-      style="?attr/materialButtonOutlinedStyle"
+    <com.google.android.material.button.MaterialButtonToggleGroup
+      android:id="@+id/buttons_group"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="ABI" />
+      android:gravity="center_horizontal"
+      android:paddingHorizontal="@dimen/normal_padding"
+      app:selectionRequired="true"
+      app:singleSelection="true"
+      tools:ignore="HardcodedText">
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btn_kotlin"
-      style="?attr/materialButtonOutlinedStyle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Kotlin" />
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_abi"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ABI" />
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btn_target_api"
-      style="?attr/materialButtonOutlinedStyle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Target" />
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_kotlin"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kotlin" />
 
-    <com.google.android.material.button.MaterialButton
-      android:id="@+id/btn_min_sdk"
-      style="?attr/materialButtonOutlinedStyle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="Min" />
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_target_api"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Target" />
 
-  </com.google.android.material.button.MaterialButtonToggleGroup>
+      <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_min_sdk"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Min" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+  </HorizontalScrollView>
 
 </LinearLayout>
