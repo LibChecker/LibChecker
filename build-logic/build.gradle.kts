@@ -13,6 +13,10 @@ gradlePlugin {
       id = "build-logic"
       implementationClass = "BuildLogic"
     }
+    create("res-opt") {
+      id = "res-opt"
+      implementationClass = "ResoptPlugin"
+    }
   }
 }
 
