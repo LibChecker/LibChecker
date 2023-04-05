@@ -11,4 +11,8 @@ object Features {
   const val RX_JAVA = 1 shl 7
   const val RX_KOTLIN = 1 shl 8
   const val RX_ANDROID = 1 shl 9
+
+  object Ext {
+    const val APPLICATION_PROP = 1 shr 1
+  }
 }

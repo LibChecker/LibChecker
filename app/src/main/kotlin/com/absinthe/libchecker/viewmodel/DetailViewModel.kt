@@ -84,7 +84,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   var sortMode = GlobalValues.libSortMode
   var isApk = false
-  var extractNativeLibs: Boolean? = null
   var queriedText: String? = null
   var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
@@ -113,11 +112,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     val list = ArrayList<LibStringItemChip>()
 
     try {
-      val info = packageInfo.applicationInfo
-
-      info?.let {
-        extractNativeLibs = it.flags and ApplicationInfo.FLAG_EXTRACT_NATIVE_LIBS != 0
-
+      packageInfo.applicationInfo?.let { info ->
         list.addAll(
           getNativeChipList(info, PackageUtils.getAbi(packageInfo, isApk))
         )
@@ -489,6 +484,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       val version = packageInfo.getJetpackComposeVersion()
       _featuresFlow.emit(VersionedFeature(Features.JETPACK_COMPOSE, version))
     }
+
+    _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP, null))
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {
