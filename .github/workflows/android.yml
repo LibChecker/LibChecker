@@ -107,7 +107,7 @@ jobs:
         with:
           apk-path: ${{ steps.apk-path.outputs.foss_path }}
       - name: Upload mappings with App Center CLI
-        if: success() && github.repository == 'LibChecker/LibChecker'
+        if: success() && github.event_name != 'pull_request' && github.repository == 'LibChecker/LibChecker'
         uses: zhaobozhen/AppCenter-Github-Action@1.0.0
         with:
           command: appcenter crashes upload-mappings --mapping app/build/outputs/mapping/marketRelease/mapping.txt --version-name ${{ steps.apk-info.outputs.version-name }} --version-code ${{ steps.apk-info.outputs.version-code }} --app zhaobozhen2025-gmail.com/LibChecker
