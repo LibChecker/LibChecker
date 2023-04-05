@@ -139,6 +139,8 @@
   <string name="lib_detail_description_tip">描述</string>
   <string name="lib_detail_relative_link_tip">相关链接</string>
   <string name="lib_detail_last_update_tip">最近更新于</string>
+  <string name="lib_detail_app_props_title">应用属性</string>
+  <string name="lib_detail_app_props_tip">更多资料</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>

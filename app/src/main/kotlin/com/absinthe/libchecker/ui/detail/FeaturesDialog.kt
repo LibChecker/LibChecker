@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.AppPropBottomSheetDialogFragment
 
 object FeaturesDialog {
 
@@ -104,6 +105,15 @@ object FeaturesDialog {
       R.string.jetpack_compose_details,
       version
     )
+  }
+
+  fun showAppPropDialog(activity: FragmentActivity, packageName: String) {
+    AppPropBottomSheetDialogFragment().apply {
+      arguments = bundleOf(
+        EXTRA_PACKAGE_NAME to packageName
+      )
+      show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
+    }
   }
 
   private fun commonShowDialogImpl(

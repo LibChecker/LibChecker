@@ -17,4 +17,6 @@ object URLManager {
   const val CROWDIN_PAGE = "https://crowdin.com/project/libchecker"
 
   const val TELEGRAM_GROUP = "https://t.me/libcheckerr"
+
+  const val ANDROID_DEV_MANIFEST_APPLICATION = "https://developer.android.com/guide/topics/manifest/application-element"
 }
