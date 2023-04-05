@@ -51,10 +51,4 @@ class AppPropsAdapter(packageInfo: PackageInfo) : BaseQuickAdapter<AppPropItem, 
     val id = idText.toInt()
     return runCatching { appResources.getResourceName(id) }.getOrDefault(idText)
   }
-
-  companion object {
-    val tipsMap = mapOf<String, String>(
-
-    )
-  }
 }

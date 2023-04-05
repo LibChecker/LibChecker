@@ -5,7 +5,6 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.view.AViewGroup
 

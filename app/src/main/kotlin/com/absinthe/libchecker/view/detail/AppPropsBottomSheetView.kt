@@ -28,7 +28,8 @@ import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber
 
-class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) : LinearLayout(context),
+class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
+  LinearLayout(context),
   IHeaderView {
 
   val adapter by unsafeLazy { AppPropsAdapter(packageInfo) }
