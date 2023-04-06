@@ -25,7 +25,7 @@
   <string name="get_app_list_denied_tip">請授予 LibChecker\n「讀取應用程式清單」\n權限</string>
   <string name="advanced_menu">進階選單</string>
   <!-- Statistics   -->
-  <string name="title_statistics_dialog">%s 架構的應用程式</string>
+  <string name="title_statistics_dialog">%s架構的應用程式</string>
   <string name="title_statistics_dialog_no_native_libs">無原生庫的應用程式</string>
   <string name="tab_chart">圖表</string>
   <string name="tab_lib_reference_statistics">庫參考資料</string>
@@ -129,7 +129,7 @@
   <string name="signature_public_key_exponent">公開金鑰指數</string>
   <string name="signature_public_key_modulus_size">公開金鑰模數大小</string>
   <string name="signature_public_key_modulus">公開金鑰模數</string>
-  <string name="signature_public_key_y">公開金鑰值Y</string>
+  <string name="signature_public_key_y">公開金鑰值 Y</string>
   <string name="signature_public_key_type">公開金鑰類型</string>
   <string name="signature_algorithm_name">簽章演算法名稱</string>
   <string name="signature_algorithm_oid">簽章演算法 OID</string>
@@ -139,6 +139,8 @@
   <string name="lib_detail_description_tip">描述</string>
   <string name="lib_detail_relative_link_tip">相對連結</string>
   <string name="lib_detail_last_update_tip">更新於</string>
+  <string name="lib_detail_app_props_title">應用程式屬性</string>
+  <string name="lib_detail_app_props_tip">更多資訊</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
