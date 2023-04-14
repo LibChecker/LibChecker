@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.ui.base
 
 import android.view.LayoutInflater
-import androidx.annotation.MainThread
 import androidx.viewbinding.ViewBinding
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
