@@ -11,7 +11,7 @@ val Project.verName: String get() = "${baseVersionName}${versionNameSuffix}.${ex
 val Project.verCode: Int get() = exec("git rev-list --count HEAD").toInt()
 val Project.isDevVersion: Boolean get() = exec("git tag -l $baseVersionName").isEmpty()
 val Project.versionNameSuffix: String get() = if (isDevVersion) ".dev" else ""
-val javaLevel = JavaVersion.VERSION_11
+val javaLevel = JavaVersion.VERSION_17
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)
