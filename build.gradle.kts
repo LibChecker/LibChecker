@@ -28,12 +28,6 @@ allprojects {
       jvmTarget = JavaVersion.VERSION_11.toString()
     }
   }
-
-  tasks.matching {
-    it.name.contains("transformClassesWithHiddenApiRefine")
-  }.configureEach {
-    notCompatibleWithConfigurationCache("https://github.com/RikkaApps/HiddenApiRefinePlugin/issues/9")
-  }
 }
 
 tasks.register<Delete>("clean") {
