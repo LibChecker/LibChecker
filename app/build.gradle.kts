@@ -1,14 +1,5 @@
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import com.google.protobuf.gradle.id
-import java.nio.file.Paths
-import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
-
-@Suppress(
-  "DSL_SCOPE_VIOLATION",
-  "MISSING_DEPENDENCY_CLASS",
-  "UNRESOLVED_REFERENCE_WRONG_RECEIVER",
-  "FUNCTION_CALL_EXPECTED"
-)
 
 plugins {
   alias(libs.plugins.android.application)
@@ -18,6 +9,7 @@ plugins {
   alias(libs.plugins.hiddenApiRefine)
   alias(libs.plugins.ksp)
   alias(libs.plugins.moshiX)
+  id("res-opt") apply false
 }
 
 ksp {
@@ -34,6 +26,8 @@ setupAppModule {
   }
 
   buildFeatures {
+    aidl = true
+    buildConfig = true
     viewBinding = true
   }
 
@@ -72,41 +66,6 @@ setupAppModule {
     outputs.configureEach {
       (this as? ApkVariantOutputImpl)?.outputFileName =
         "LibChecker-${verName}-${verCode}-${name}.apk"
-    }
-  }
-}
-
-tasks.matching {
-  it.name.contains("optimize(.*)ReleaseRes".toRegex())
-}.configureEach {
-  notCompatibleWithConfigurationCache("optimizeReleaseRes tasks haven't support CC.")
-  val flavor = name.removeSurrounding("optimize", "ReleaseResources").toLowerCaseAsciiOnly()
-  doLast {
-    val aapt2 = File(
-      androidComponents.sdkComponents.sdkDirectory.get().asFile,
-      "build-tools/${project.android.buildToolsVersion}/aapt2"
-    )
-    val zip = Paths.get(
-      buildDir.path,
-      "intermediates",
-      "optimized_processed_res",
-      "${flavor}Release",
-      "resources-${flavor}-release-optimize.ap_"
-    )
-    val optimized = File("${zip}.opt")
-    val cmd = exec {
-      commandLine(
-        aapt2, "optimize",
-        "--collapse-resource-names",
-        "--resources-config-path", "aapt2-resources.cfg",
-        "-o", optimized,
-        zip
-      )
-      isIgnoreExitValue = false
-    }
-    if (cmd.exitValue == 0) {
-      delete(zip)
-      optimized.renameTo(zip.toFile())
     }
   }
 }
