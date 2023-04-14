@@ -16,7 +16,6 @@ abstract class BaseActivity<VB : ViewBinding> : MaterialActivity(), IBinding<VB>
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = (inflateBinding(layoutInflater) as VB).also {
-      it.lifecycleOwner = this
       setContentView(it.root)
     }
   }
