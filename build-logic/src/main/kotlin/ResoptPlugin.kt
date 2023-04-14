@@ -32,7 +32,7 @@ class ResoptPlugin : Plugin<Project> {
             project.buildDir.path, "intermediates", "optimized_processed_res", name
           ).toFile()
           val zip =
-            if (variant.flavorName != null) "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_" else "resources-${variant.buildType}-optimize.ap_"
+            if (variant.flavorName.isNullOrEmpty()) "resources-${variant.buildType}-optimize.ap_" else "resources-${variant.flavorName}-${variant.buildType}-optimize.ap_"
           val optimized = "$zip.opt"
           project.afterEvaluate {
             val injected = objects.newInstance<Injected>()
