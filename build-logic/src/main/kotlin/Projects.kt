@@ -39,7 +39,6 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
         applicationIdSuffix = ".debug"
       }
       release {
-        isCrunchPngs = false
         isMinifyEnabled = true
         isShrinkResources = true
         proguardFiles(
