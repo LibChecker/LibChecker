@@ -34,6 +34,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     Timber.d("${javaClass.simpleName} ==> onViewCreated")
+    binding.lifecycleOwner = viewLifecycleOwner
     init()
   }
 
@@ -50,6 +51,7 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
 
   override fun onDestroyView() {
     Timber.d("${javaClass.simpleName} ==> onDestroyView")
+    _binding = null
     super.onDestroyView()
   }
 
