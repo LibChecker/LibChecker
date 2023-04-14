@@ -89,7 +89,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   var workerBinder: IWorkerService? = null
 
   fun reloadApps() {
-    if (appListStatus != STATUS_NOT_START) {
+    if (appListStatus != STATUS_NOT_START || (initJob?.isActive == false && requestChangeJob?.isActive == false)) {
       Timber.d("reloadApps: ignore, appListStatus: $appListStatus")
       return
     }
