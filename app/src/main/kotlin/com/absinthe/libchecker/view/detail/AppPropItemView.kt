@@ -42,12 +42,10 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
     layoutParams =
       LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f)
-    alpha = 0.85f
+    alpha = 0.65f
   }
 
   init {
-    setPadding(8.dp, 8.dp, 8.dp, 8.dp)
-    setBackgroundResource(R.drawable.bg_lib_detail_item)
     addView(tip)
     addView(key)
     addView(value)
