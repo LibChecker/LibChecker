@@ -615,7 +615,12 @@ abstract class BaseAppDetailActivity :
       viewModel.initAbilities(packageInfo.packageName)
     }
 
-    onPostPackageInfoAvailable()
+    // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
+    lifecycleScope.launch(Dispatchers.IO) {
+      withContext(Dispatchers.Main) {
+        onPostPackageInfoAvailable()
+      }
+    }
   }
 
   protected open fun onPostPackageInfoAvailable() {}
