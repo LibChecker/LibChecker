@@ -92,6 +92,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlin.math.abs
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -618,6 +619,7 @@ abstract class BaseAppDetailActivity :
     // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread
     lifecycleScope.launch(Dispatchers.IO) {
       withContext(Dispatchers.Main) {
+        delay(1L)
         onPostPackageInfoAvailable()
       }
     }
