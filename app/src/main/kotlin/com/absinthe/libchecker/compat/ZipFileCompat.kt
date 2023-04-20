@@ -1,10 +1,10 @@
 package com.absinthe.libchecker.compat
 
-import java.util.zip.ZipFile as JavaZipFile
 import java.io.File
 import java.io.InputStream
 import java.util.Enumeration
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile as JavaZipFile
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 
