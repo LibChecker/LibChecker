@@ -2,12 +2,14 @@ package com.absinthe.libchecker.utils.manifest;
 
 import androidx.collection.ArrayMap;
 
+import com.absinthe.libchecker.compat.IZipFile;
+import com.absinthe.libchecker.compat.ZipFileCompat;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import java.util.jar.JarFile;
 
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
@@ -19,7 +21,7 @@ public class ApplicationReader {
   private final ArrayMap<String, Object> properties = new ArrayMap<>();
 
   private ApplicationReader(File apk) throws IOException {
-    try (JarFile zip = new JarFile(apk)) {
+    try (IZipFile zip = new ZipFileCompat(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
       AxmlReader reader = new AxmlReader(bytes != null ? bytes : new byte[0]);

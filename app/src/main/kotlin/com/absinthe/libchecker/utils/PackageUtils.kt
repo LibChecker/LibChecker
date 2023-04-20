@@ -31,7 +31,9 @@ import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.PackageManagerCompat
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.Constants.ARMV5
 import com.absinthe.libchecker.constant.Constants.ARMV5_STRING
@@ -70,7 +72,6 @@ import java.security.interfaces.DSAPublicKey
 import java.security.interfaces.RSAPublicKey
 import java.text.DateFormat
 import java.util.zip.ZipEntry
-import java.util.zip.ZipFile
 import javax.security.cert.X509Certificate
 import org.jf.dexlib2.Opcodes
 import timber.log.Timber
@@ -220,9 +221,9 @@ object PackageUtils {
       return emptyList()
     }
     return runCatching {
-      ZipFile(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
+      ZipFileCompat(File(packageInfo.applicationInfo.sourceDir)).use { zipFile ->
         var elfParser: ELFParser?
-        return zipFile.entries()
+        return zipFile.getZipEntries()
           .asSequence()
           .filter { (it.isDirectory.not() && it.name.startsWith(childDir)) && it.name.endsWith(".so") }
           .distinctBy { it.name.split("/").last() }
@@ -260,9 +261,9 @@ object PackageUtils {
       val fileName = it.split(File.separator).last()
       fileName.contains("arm") || fileName.contains("x86")
     }.forEach {
-      ZipFile(File(it)).use { zipFile ->
+      ZipFileCompat(File(it)).use { zipFile ->
         var elfParser: ELFParser?
-        zipFile.entries().asSequence().forEach { entry ->
+        zipFile.getZipEntries().asSequence().forEach { entry ->
           if (entry.name.startsWith("lib/") && entry.isDirectory.not()) {
             elfParser = getElfParser(zipFile.getInputStream(entry))
             val fileName = it.split(File.separator).last()
@@ -592,11 +593,11 @@ object PackageUtils {
     var elementName: String
 
     val abiSet = mutableSetOf<Int>()
-    var zipFile: ZipFile? = null
+    var zipFile: IZipFile? = null
 
     try {
-      zipFile = ZipFile(file)
-      val entries = zipFile.entries()
+      zipFile = ZipFileCompat(file)
+      val entries = zipFile.getZipEntries()
 
       if (packageInfo.isOverlay()) {
         abiSet.add(OVERLAY)
