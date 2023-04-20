@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.model.KotlinToolingMetadata
 import com.absinthe.libchecker.model.LibStringItem
@@ -21,7 +22,6 @@ import dev.rikka.tools.refine.Refine
 import java.io.File
 import java.text.DateFormat
 import java.util.Properties
-import java.util.zip.ZipFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okio.buffer
@@ -140,7 +140,7 @@ fun PackageInfo.isKotlinUsed(): Boolean {
   return runCatching {
     val file = File(applicationInfo.sourceDir)
 
-    ZipFile(file).use {
+    ZipFileCompat(file).use {
       it.getEntry("kotlin-tooling-metadata.json") != null ||
         it.getEntry("kotlin/kotlin.kotlin_builtins") != null ||
         it.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
@@ -159,7 +159,7 @@ private const val AGP_KEYWORD2 = "Created-By: Android Gradle "
  */
 fun PackageInfo.getAGPVersion(): String? {
   runCatching {
-    ZipFile(File(applicationInfo.sourceDir)).use { zipFile ->
+    ZipFileCompat(File(applicationInfo.sourceDir)).use { zipFile ->
       zipFile.getEntry("META-INF/com/android/build/gradle/app-metadata.properties")?.let { ze ->
         Properties().apply {
           load(zipFile.getInputStream(ze))
@@ -330,7 +330,7 @@ fun ApplicationInfo.isUse32BitAbi(): Boolean {
  */
 fun PackageInfo.getKotlinPluginVersion(): String? {
   return runCatching {
-    ZipFile(applicationInfo.sourceDir).use { zip ->
+    ZipFileCompat(applicationInfo.sourceDir).use { zip ->
       val entry = zip.getEntry("kotlin-tooling-metadata.json") ?: return@runCatching null
       zip.getInputStream(entry).source().buffer().use {
         val json = it.readUtf8().fromJson<KotlinToolingMetadata>()
@@ -348,8 +348,8 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   val usedInMetaInf = runCatching {
     val file = File(applicationInfo.sourceDir)
 
-    ZipFile(file).use {
-      it.entries().asSequence().any { entry ->
+    ZipFileCompat(file).use {
+      it.getZipEntries().asSequence().any { entry ->
         entry.isDirectory.not() &&
           entry.name.startsWith("androidx.compose") &&
           entry.name.endsWith(".version")
@@ -374,7 +374,7 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
  */
 fun PackageInfo.getJetpackComposeVersion(): String? {
   runCatching {
-    ZipFile(File(applicationInfo.sourceDir)).use { zipFile ->
+    ZipFileCompat(File(applicationInfo.sourceDir)).use { zipFile ->
       arrayOf(
         "META-INF/androidx.compose.runtime_runtime.version",
         "META-INF/androidx.compose.ui_ui.version",
@@ -404,7 +404,7 @@ fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
   val usedInMetaInf = runCatching {
     val file = File(applicationInfo.sourceDir)
 
-    ZipFile(file).use {
+    ZipFileCompat(file).use {
       it.getEntry("META-INF/rxjava.properties") != null
     }
   }.getOrDefault(false)
@@ -431,7 +431,7 @@ private const val REACTIVEX_KEYWORD = "Implementation-Version"
 
 suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO) {
   runCatching {
-    ZipFile(File(applicationInfo.sourceDir)).use { zipFile ->
+    ZipFileCompat(File(applicationInfo.sourceDir)).use { zipFile ->
       zipFile.getEntry("META-INF/rxjava.properties")?.let { ze ->
         Properties().apply {
           load(zipFile.getInputStream(ze))
@@ -471,7 +471,7 @@ fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
   val usedInMetaInf = runCatching {
     val file = File(applicationInfo.sourceDir)
 
-    ZipFile(file).use {
+    ZipFileCompat(file).use {
       it.getEntry("META-INF/rxkotlin.properties") != null
     }
   }.getOrDefault(false)
@@ -496,7 +496,7 @@ fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
 
 suspend fun PackageInfo.getRxKotlinVersion(): String? = withContext(Dispatchers.IO) {
   runCatching {
-    ZipFile(File(applicationInfo.sourceDir)).use { zipFile ->
+    ZipFileCompat(File(applicationInfo.sourceDir)).use { zipFile ->
       zipFile.getEntry("META-INF/rxkotlin.properties")?.let { ze ->
         Properties().apply {
           load(zipFile.getInputStream(ze))

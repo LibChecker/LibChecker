@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.utils.dex;
 
+import com.absinthe.libchecker.compat.IZipFile;
+import com.absinthe.libchecker.compat.ZipFileCompat;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 
@@ -14,7 +16,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,8 +49,8 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Override
   public List<String> getDexEntryNames() throws IOException {
     List<String> entryNames = Lists.newArrayList();
-    try (ZipFile zipFile = getZipFile()) {
-      Enumeration<? extends ZipEntry> entriesEnumeration = zipFile.entries();
+    try (IZipFile zipFile = getZipFile()) {
+      Enumeration<? extends ZipEntry> entriesEnumeration = zipFile.getZipEntries();
 
       while (entriesEnumeration.hasMoreElements()) {
         ZipEntry entry = entriesEnumeration.nextElement();
@@ -76,7 +77,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
   @Nullable
   @Override
   public DexEntry<DexBackedDexFile> getEntry(@Nonnull String entryName) throws IOException {
-    try (ZipFile zipFile = getZipFile()) {
+    try (IZipFile zipFile = getZipFile()) {
       ZipEntry entry = zipFile.getEntry(entryName);
       if (entry == null) {
         return null;
@@ -86,16 +87,16 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
     }
   }
 
-  protected ZipFile getZipFile() {
+  protected IZipFile getZipFile() {
     try {
-      return new ZipFile(zipFilePath);
-    } catch (IOException ex) {
+      return new ZipFileCompat(zipFilePath);
+    } catch (Exception ex) {
       throw new org.jf.dexlib2.dexbacked.ZipDexContainer.NotAZipFileException();
     }
   }
 
   @Nonnull
-  protected DexEntry<DexBackedDexFile> loadEntry(@Nonnull ZipFile zipFile, @Nonnull ZipEntry zipEntry) throws IOException {
+  protected DexEntry<DexBackedDexFile> loadEntry(@Nonnull IZipFile zipFile, @Nonnull ZipEntry zipEntry) throws IOException {
     try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
       byte[] buf = ByteStreams.toByteArray(inputStream);
 
