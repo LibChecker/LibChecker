@@ -1,13 +1,13 @@
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.api.AndroidBasePlugin
+import java.nio.file.Paths
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.kotlin.dsl.newInstance
 import org.gradle.process.ExecOperations
-import java.nio.file.Paths
-import javax.inject.Inject
 
 interface Injected {
   @get:Inject

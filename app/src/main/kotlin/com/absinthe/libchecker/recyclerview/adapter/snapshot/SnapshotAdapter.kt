@@ -14,7 +14,6 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr

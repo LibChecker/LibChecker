@@ -3,8 +3,6 @@ package com.absinthe.libchecker.data.app
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import com.absinthe.libchecker.compat.PackageManagerCompat
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

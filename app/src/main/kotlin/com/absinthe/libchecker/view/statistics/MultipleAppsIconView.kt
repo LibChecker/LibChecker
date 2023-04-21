@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
