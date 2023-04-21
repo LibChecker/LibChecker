@@ -32,7 +32,6 @@ class WorkerService : LifecycleService() {
       override fun onReceive(context: Context, intent: Intent?) {
         Timber.d("package receiver received: ${intent?.action}")
         lastPackageChangedTime = SystemClock.elapsedRealtime()
-        initAllApplicationInfoItems()
         notifyPackagesChanged(
           intent?.data?.encodedSchemeSpecificPart.orEmpty(),
           intent?.action.orEmpty()
@@ -53,7 +52,6 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     initializingFeatures = false
-    initAllApplicationInfoItems()
 
     val intentFilter = IntentFilter().apply {
       addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -75,15 +73,6 @@ class WorkerService : LifecycleService() {
     Timber.d("onDestroy")
     unregisterReceiver(packageReceiver)
     super.onDestroy()
-  }
-
-  private fun initAllApplicationInfoItems() = lifecycleScope.launch(Dispatchers.IO) {
-    LocalAppDataSource.getCachedApplicationMap(Dispatchers.IO).retryWhen { cause, attempt ->
-      Timber.w(cause)
-      attempt < 5
-    }.collect { map ->
-      Timber.i("initAllApplicationInfoItems: ${map.size}")
-    }
   }
 
   @Synchronized

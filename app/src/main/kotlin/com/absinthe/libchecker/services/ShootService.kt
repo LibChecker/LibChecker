@@ -142,14 +142,7 @@ class ShootService : LifecycleService() {
   }
 
   private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    LocalAppDataSource.getApplicationList(Dispatchers.IO).retryWhen { cause, attempt ->
-      Timber.e(cause)
-      attempt < 3
-    }.catch {
-      Timber.e(it)
-    }.collect {
-      computeSnapshotsImpl(it, dropPrevious, stopWhenFinish)
-    }
+    computeSnapshotsImpl(LocalAppDataSource.getApplicationList(), dropPrevious, stopWhenFinish)
   }
 
   private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {

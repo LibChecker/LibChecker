@@ -13,7 +13,6 @@ import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.utils.FreezeUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -53,10 +52,8 @@ class AppAdapter : HighlightAdapter<LCItem>() {
     (holder.itemView as AppItemView).container.apply {
       val packageInfo = if (item.packageName != Constants.EXAMPLE_PACKAGE) {
         val packageInfo = runCatching {
-          LocalAppDataSource.getCachedApplicationMap()[item.packageName]
-            ?: PackageUtils.getPackageInfo(item.packageName)
+          PackageUtils.getPackageInfo(item.packageName)
         }.getOrNull() ?: return
-
         icon.load(packageInfo)
         packageInfo
       } else {

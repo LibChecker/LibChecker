@@ -35,8 +35,7 @@ class TrackAdapter : BaseQuickAdapter<TrackListItem, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: TrackListItem) {
     (holder.itemView as TrackItemView).container.apply {
       val packageInfo = runCatching {
-        LocalAppDataSource.getCachedApplicationMap()[item.packageName]
-          ?: PackageUtils.getPackageInfo(item.packageName)
+        PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull() ?: return
 
       icon.load(packageInfo)

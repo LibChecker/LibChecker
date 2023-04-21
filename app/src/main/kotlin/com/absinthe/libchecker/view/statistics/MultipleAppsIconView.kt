@@ -38,8 +38,7 @@ class MultipleAppsIconView(context: Context) : AViewGroup(context) {
       val icon = AppCompatImageView(context).also {
         val packageName = packages[icons.size]
         val packageInfo = runCatching {
-          LocalAppDataSource.getCachedApplicationMap()[packageName]
-            ?: PackageUtils.getPackageInfo(packageName)
+          PackageUtils.getPackageInfo(packageName)
         }.getOrNull() ?: return
 
         it.load(packageInfo)

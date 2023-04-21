@@ -13,8 +13,6 @@ import timber.log.Timber
 
 object LocalAppDataSource : AppDataSource {
 
-  private var applicationsMap: ConcurrentMap<String, PackageInfo> = ConcurrentHashMap(100)
-
   override fun getApplicationList(ioDispatcher: CoroutineDispatcher): Flow<List<PackageInfo>> =
     flow {
       Timber.d("getApplicationList start")
@@ -41,35 +39,30 @@ object LocalAppDataSource : AppDataSource {
       }
     }.flowOn(ioDispatcher)
 
-  override fun getCachedApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>> =
+  override fun getApplicationList(): List<PackageInfo> {
+    Timber.d("getApplicationList start")
+    val list =
+      PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS)
+    Timber.d("getApplicationList end, apps count: ${list.size}")
+    return list
+  }
+
+  override fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>> =
     flow {
-      if (applicationsMap.isEmpty()) {
-        getApplicationList(ioDispatcher).collect { list ->
-          applicationsMap.putAll(
-            list.asSequence()
-              .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
-              .map { it.packageName to it }
-              .toMap()
-          )
-        }
+      getApplicationList(ioDispatcher).collect { list ->
+        val map = list.asSequence()
+          .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
+          .map { it.packageName to it }
+          .toMap()
+        emit(map)
       }
-      emit(applicationsMap)
     }.flowOn(ioDispatcher)
 
-  override fun getCachedApplicationMap(): Map<String, PackageInfo> {
-    return applicationsMap
-  }
-
-  override fun clearCache() {
-    applicationsMap.clear()
-  }
-
-  fun removePackage(packageName: String) {
-    applicationsMap.remove(packageName)
-  }
-
-  fun addPackage(packageInfo: PackageInfo) {
-    applicationsMap[packageInfo.packageName] = packageInfo
+  override fun getApplicationMap(): Map<String, PackageInfo> {
+    return getApplicationList().asSequence()
+      .filter { it.applicationInfo.sourceDir != null || it.applicationInfo.publicSourceDir != null }
+      .map { it.packageName to it }
+      .toMap()
   }
 
   private val runtime by lazy { Runtime.getRuntime() }

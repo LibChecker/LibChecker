@@ -44,8 +44,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
       val packageInfo = runCatching {
-        LocalAppDataSource.getCachedApplicationMap()[item.packageName]
-          ?: PackageUtils.getPackageInfo(item.packageName)
+        PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull()
 
       if (packageInfo == null) {

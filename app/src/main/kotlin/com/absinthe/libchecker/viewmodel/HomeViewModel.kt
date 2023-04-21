@@ -143,13 +143,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       return
     }
     viewModelScope.launch {
-      LocalAppDataSource.getApplicationList(Dispatchers.IO).retryWhen { cause, attempt ->
-        Timber.d("initItems: RETRY cause: $cause, attempt: $attempt")
-        delay(1000)
-        attempt < 3
-      }.collect { appList ->
-        initJob = initItemsImpl(appList)
-      }
+      initJob = initItemsImpl(LocalAppDataSource.getApplicationList())
     }
   }
 
@@ -209,16 +203,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         requestChangeJob?.cancel()
       }
 
-      if (needRefresh) {
-        LocalAppDataSource.clearCache()
-      }
-      LocalAppDataSource.getCachedApplicationMap(Dispatchers.IO).retryWhen { cause, attempt ->
-        Timber.d("requestChange: RETRY cause: $cause, attempt: $attempt")
-        delay(1000)
-        attempt < 3
-      }.collect { appMap ->
-        requestChangeJob = requestChangeImpl(appMap)
-      }
+      requestChangeJob = requestChangeImpl(LocalAppDataSource.getApplicationMap())
     }
 
   private fun requestChangeImpl(appMap: Map<String, PackageInfo>) =
@@ -409,13 +394,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
   fun computeLibReference(@LibType type: Int) {
     computeLibReferenceJob?.cancel()
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
-      LocalAppDataSource.getCachedApplicationMap(Dispatchers.IO).retryWhen { cause, attempt ->
-        Timber.e(cause, "computeLibReference failed, attempt: $attempt")
-        delay(1000)
-        true
-      }.collect { appMap ->
-        computeLibReferenceImpl(appMap, type)
-      }
+      computeLibReferenceImpl(LocalAppDataSource.getApplicationMap(), type)
     }
   }
 

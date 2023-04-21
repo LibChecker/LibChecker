@@ -63,16 +63,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
       if (packageName != null && action != null) {
         if (action == Intent.ACTION_PACKAGE_REMOVED) {
-          LocalAppDataSource.removePackage(packageName)
+          Timber.d("Package $packageName removed")
         } else {
-          runCatching {
-            PackageUtils.getPackageInfo(
-              packageName,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-            )
-          }.onSuccess {
-            LocalAppDataSource.addPackage(it)
-          }
+          Timber.d("Package $packageName changed")
         }
       }
       appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
