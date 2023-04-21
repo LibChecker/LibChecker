@@ -58,6 +58,7 @@ import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragme
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.ui.fragment.detail.XposedInfoDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.AbilityAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.DexAnalysisFragment
@@ -561,7 +562,8 @@ abstract class BaseAppDetailActivity :
           Features.XPOSED_MODULE -> {
             featureAdapter.addData(
               FeatureItem(R.drawable.ic_xposed) {
-                FeaturesDialog.showXPosedDialog(this)
+                XposedInfoDialogFragment.newInstance(packageInfo.packageName)
+                  .show(supportFragmentManager, XposedInfoDialogFragment::class.java.name)
               }
             )
           }

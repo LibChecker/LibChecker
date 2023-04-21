@@ -151,6 +151,9 @@
   <string name="lib_detail_last_update_tip">Updated at</string>
   <string name="lib_detail_app_props_title">Application Properties</string>
   <string name="lib_detail_app_props_tip">More information</string>
+  <string name="lib_detail_xposed_min_version">Min Version</string>
+  <string name="lib_detail_xposed_default_scope">Default Scope</string>
+  <string name="lib_detail_xposed_init_class">Init Class</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>
