@@ -103,7 +103,7 @@ class TrackActivity :
 
     lifecycleScope.launch(Dispatchers.IO) {
       val trackedList = repository.getTrackItems()
-      list += LocalAppDataSource.getCachedApplicationMap().values
+      list += LocalAppDataSource.getApplicationList()
         .asSequence()
         .map {
           TrackListItem(

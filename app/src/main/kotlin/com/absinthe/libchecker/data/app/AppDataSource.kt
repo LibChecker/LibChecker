@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 interface AppDataSource {
   fun getApplicationList(ioDispatcher: CoroutineDispatcher): Flow<List<PackageInfo>>
 
-  fun getCachedApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>>
+  fun getApplicationList(): List<PackageInfo>
 
-  fun getCachedApplicationMap(): Map<String, PackageInfo>
+  fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>>
 
-  fun clearCache()
+  fun getApplicationMap(): Map<String, PackageInfo>
 }

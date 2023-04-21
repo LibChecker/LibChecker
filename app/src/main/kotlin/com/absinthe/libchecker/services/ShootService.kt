@@ -46,8 +46,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -142,14 +140,7 @@ class ShootService : LifecycleService() {
   }
 
   private fun computeSnapshots(dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) = lifecycleScope.launch(Dispatchers.IO) {
-    LocalAppDataSource.getApplicationList(Dispatchers.IO).retryWhen { cause, attempt ->
-      Timber.e(cause)
-      attempt < 3
-    }.catch {
-      Timber.e(it)
-    }.collect {
-      computeSnapshotsImpl(it, dropPrevious, stopWhenFinish)
-    }
+    computeSnapshotsImpl(LocalAppDataSource.getApplicationList(), dropPrevious, stopWhenFinish)
   }
 
   private suspend fun computeSnapshotsImpl(appList: List<PackageInfo>, dropPrevious: Boolean = false, stopWhenFinish: Boolean = false) {

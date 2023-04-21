@@ -10,7 +10,6 @@ import android.os.RemoteException
 import android.os.SystemClock
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getFeatures
@@ -19,8 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.retryWhen
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class WorkerService : LifecycleService() {
@@ -32,7 +29,6 @@ class WorkerService : LifecycleService() {
       override fun onReceive(context: Context, intent: Intent?) {
         Timber.d("package receiver received: ${intent?.action}")
         lastPackageChangedTime = SystemClock.elapsedRealtime()
-        initAllApplicationInfoItems()
         notifyPackagesChanged(
           intent?.data?.encodedSchemeSpecificPart.orEmpty(),
           intent?.action.orEmpty()
@@ -53,7 +49,6 @@ class WorkerService : LifecycleService() {
     super.onCreate()
     Timber.d("onCreate")
     initializingFeatures = false
-    initAllApplicationInfoItems()
 
     val intentFilter = IntentFilter().apply {
       addAction(Intent.ACTION_PACKAGE_ADDED)
@@ -75,15 +70,6 @@ class WorkerService : LifecycleService() {
     Timber.d("onDestroy")
     unregisterReceiver(packageReceiver)
     super.onDestroy()
-  }
-
-  private fun initAllApplicationInfoItems() = lifecycleScope.launch(Dispatchers.IO) {
-    LocalAppDataSource.getCachedApplicationMap(Dispatchers.IO).retryWhen { cause, attempt ->
-      Timber.w(cause)
-      attempt < 5
-    }.collect { map ->
-      Timber.i("initAllApplicationInfoItems: ${map.size}")
-    }
   }
 
   @Synchronized

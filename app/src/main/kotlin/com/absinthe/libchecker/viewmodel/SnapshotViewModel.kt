@@ -113,7 +113,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
       return
     }
 
-    val currMap = LocalAppDataSource.getCachedApplicationMap().toMutableMap()
+    val currMap = LocalAppDataSource.getApplicationMap().toMutableMap()
     val prePackageSet = preMap.map { it.key }.toSet()
     val currPackageSet = currMap.map { it.key }.toSet()
     val removedPackageSet = prePackageSet - currPackageSet
@@ -1320,7 +1320,7 @@ class SnapshotViewModel(application: Application) : AndroidViewModel(application
   fun getDashboardCount(timestamp: Long, isLeft: Boolean) = viewModelScope.launch(Dispatchers.IO) {
     Timber.d("getDashboardCount: $timestamp, $isLeft")
     val snapshotCount = repository.getSnapshots(timestamp).size
-    val appCount = LocalAppDataSource.getCachedApplicationMap().size
+    val appCount = LocalAppDataSource.getApplicationMap().size
     setEffect {
       Effect.DashboardCountChange(snapshotCount, appCount, isLeft)
     }

@@ -4,7 +4,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -24,9 +23,7 @@ class TimeNodeItemAdapter : BaseQuickAdapter<String, BaseViewHolder>(0) {
   override fun convert(holder: BaseViewHolder, item: String) {
     (holder.itemView as AppCompatImageView).also { imageView ->
       runCatching {
-        val packageInfo = LocalAppDataSource.getCachedApplicationMap()[item]
-          ?: PackageUtils.getPackageInfo(item)
-        imageView.load(packageInfo)
+        imageView.load(PackageUtils.getPackageInfo(item))
       }.onFailure {
         imageView.load(R.drawable.ic_icon_blueprint)
       }

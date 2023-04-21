@@ -4,7 +4,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
@@ -24,7 +23,6 @@ import com.absinthe.libchecker.annotation.STATUS_INIT_END
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.OnceTag
-import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.OnWorkerListener
@@ -36,7 +34,6 @@ import com.absinthe.libchecker.ui.fragment.settings.SettingsFragment
 import com.absinthe.libchecker.ui.fragment.snapshot.SnapshotFragment
 import com.absinthe.libchecker.ui.fragment.statistics.LibReferenceFragment
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.setCurrentItem
 import com.absinthe.libchecker.viewmodel.HomeViewModel
@@ -63,16 +60,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), INavViewContainer, IAp
     override fun onReceivePackagesChanged(packageName: String?, action: String?) {
       if (packageName != null && action != null) {
         if (action == Intent.ACTION_PACKAGE_REMOVED) {
-          LocalAppDataSource.removePackage(packageName)
+          Timber.d("Package $packageName removed")
         } else {
-          runCatching {
-            PackageUtils.getPackageInfo(
-              packageName,
-              PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS
-            )
-          }.onSuccess {
-            LocalAppDataSource.addPackage(it)
-          }
+          Timber.d("Package $packageName changed")
         }
       }
       appViewModel.packageChanged(packageName.orEmpty(), action.orEmpty())
