@@ -141,6 +141,9 @@
   <string name="lib_detail_last_update_tip">最近更新于</string>
   <string name="lib_detail_app_props_title">应用属性</string>
   <string name="lib_detail_app_props_tip">更多资料</string>
+  <string name="lib_detail_xposed_min_version">最低版本</string>
+  <string name="lib_detail_xposed_default_scope">默认 Scope</string>
+  <string name="lib_detail_xposed_init_class">初始化类</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
