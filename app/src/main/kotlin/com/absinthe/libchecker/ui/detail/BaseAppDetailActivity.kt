@@ -56,7 +56,6 @@ import com.absinthe.libchecker.recyclerview.adapter.detail.node.AbiLabelNode
 import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.ui.fragment.detail.AppInfoBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
-import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.ui.fragment.detail.XposedInfoDialogFragment

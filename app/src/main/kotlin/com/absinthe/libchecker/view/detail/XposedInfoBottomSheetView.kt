@@ -12,13 +12,11 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.app.IHeaderView
 import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
-import timber.log.Timber
 
 class XposedInfoBottomSheetView(context: Context) : AViewGroup(context), IHeaderView {
 
