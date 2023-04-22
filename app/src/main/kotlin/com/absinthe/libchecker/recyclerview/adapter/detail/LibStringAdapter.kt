@@ -247,14 +247,20 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
   }
 
+  private val metadataLinkable = setOf("string", "array", "xml", "drawable", "color", "dimen")
+
   private fun setMetadataContent(
     itemView: MetadataLibItemView,
     item: LibStringItemChip,
     itemName: CharSequence
   ) {
     setOrHighlightText(itemView.libName, itemName)
+    val type = runCatching {
+      appResources?.getResourceTypeName(item.item.size.toInt())
+    }.getOrDefault("null")
+
     itemView.libSize.text = item.item.source
-    itemView.linkToIcon.isVisible = item.item.size > 0
+    itemView.linkToIcon.isVisible = metadataLinkable.contains(type)
 
     if (itemView.linkToIcon.isVisible) {
       itemView.linkToIcon.setOnClickListener {
@@ -267,9 +273,6 @@ class LibStringAdapter(
         } else {
           var clickedTag = false
           item.item.source?.let {
-            val type = runCatching {
-              it.substring(it.indexOf(":") + 1, it.indexOf("/"))
-            }.getOrNull()
             Timber.d("type: $type")
 
             runCatching {

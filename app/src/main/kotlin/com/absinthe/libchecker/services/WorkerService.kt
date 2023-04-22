@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.os.IBinder
 import android.os.RemoteCallbackList
 import android.os.RemoteException
@@ -93,7 +94,7 @@ class WorkerService : LifecycleService() {
       it.forEach { item ->
         if (item.features == -1) {
           runCatching {
-            val feature = PackageUtils.getPackageInfo(item.packageName).getFeatures()
+            val feature = PackageUtils.getPackageInfo(item.packageName, PackageManager.GET_META_DATA).getFeatures()
             Repositories.lcRepository.updateFeatures(item.packageName, feature)
           }.onFailure { e ->
             Timber.w(e)
