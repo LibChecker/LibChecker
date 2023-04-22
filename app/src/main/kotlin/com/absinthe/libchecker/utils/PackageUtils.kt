@@ -367,8 +367,6 @@ object PackageUtils {
               runCatching {
                 value = appResources.getResourceName(id.toInt())
               }
-            } else {
-              id = 0L
             }
           }
           LibStringItem(key, id, value)
