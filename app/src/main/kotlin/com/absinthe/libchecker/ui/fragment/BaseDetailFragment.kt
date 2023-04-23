@@ -28,6 +28,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
+import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.dp
@@ -140,7 +141,11 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
       if (this is ComponentsAnalysisFragment && viewModel.processesMap.isNotEmpty()) {
         viewModel.processToolIconVisibilityLiveData.postValue(isComponentFragment())
       } else {
-        viewModel.processToolIconVisibilityLiveData.postValue(false)
+        if (this is NativeAnalysisFragment && viewModel.nativeSourceMap.isNotEmpty()) {
+          viewModel.processToolIconVisibilityLiveData.postValue(true)
+        } else {
+          viewModel.processToolIconVisibilityLiveData.postValue(false)
+        }
       }
     }
   }
@@ -201,7 +206,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
   fun getItemsCount() = adapter.itemCount
 
   fun switchProcessMode() {
-    if (isComponentFragment()) {
+    if (isComponentFragment() || isNativeSourceAvailable()) {
       adapter.switchProcessMode()
     }
   }
@@ -251,6 +256,10 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
   fun isComponentFragment(): Boolean {
     return type == ACTIVITY || type == SERVICE || type == RECEIVER || type == PROVIDER
+  }
+
+  fun isNativeSourceAvailable(): Boolean {
+    return type == NATIVE && viewModel.nativeSourceMap.isNotEmpty()
   }
 
   protected fun hasNonGrantedPermissions(): Boolean {

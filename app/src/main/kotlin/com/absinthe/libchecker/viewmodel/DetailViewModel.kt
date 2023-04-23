@@ -88,6 +88,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
   var queriedProcess: String? = null
   var processesMap: Map<String, Int> = mapOf()
   var processMode: Boolean = GlobalValues.processMode
+  var nativeSourceMap: Map<String, Int> = mapOf()
 
   lateinit var packageInfo: PackageInfo
   val packageInfoLiveData = MutableLiveData<PackageInfo>(null)
@@ -110,6 +111,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
   fun initSoAnalysisData() = viewModelScope.launch(Dispatchers.IO) {
     val list = ArrayList<LibStringItemChip>()
+    val sourceSet = hashSetOf<String>()
 
     try {
       packageInfo.applicationInfo?.let { info ->
@@ -119,6 +121,20 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       }
     } catch (e: PackageManager.NameNotFoundException) {
       Timber.e(e)
+    }
+
+    list.forEach { item ->
+      item.item.process?.let { process ->
+          sourceSet.add(process)
+      }
+    }
+    val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
+      .associateWith { UiUtils.getRandomColor() }
+    nativeSourceMap = sourceMap
+
+    if (sourceMap.isNotEmpty()) {
+      processMapLiveData.postValue(sourceMap)
+      processToolIconVisibilityLiveData.postValue(true)
     }
 
     nativeLibItems.postValue(list)
@@ -196,7 +212,6 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
       }
       processesMap =
         processesSet.filter { it.isNotEmpty() }.associateWith { UiUtils.getRandomColor() }
-      processMapLiveData.postValue(processesMap)
     } catch (e: Exception) {
       Timber.e(e)
     }
