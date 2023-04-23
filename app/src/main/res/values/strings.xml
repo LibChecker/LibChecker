@@ -121,6 +121,7 @@
   <string name="xml_detail">XML Detail</string>
   <string name="format_last_updated">Updated at: %s</string>
   <string name="menu_process">Process</string>
+  <string name="menu_split">Split</string>
   <string name="alternative_launch_method">Alternative Launch Method</string>
   <string name="compare_with_current">Compare with current package</string>
   <string name="rx_detail">RxJava is a Java VM implementation of Reactive Extensions: a library for composing asynchronous and event-based programs by using observable sequences.</string>

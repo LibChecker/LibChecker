@@ -28,6 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import coil.load
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -82,6 +83,7 @@ import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
+import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
@@ -434,6 +436,16 @@ abstract class BaseAppDetailActivity :
           }
         }
       }
+      registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+          super.onPageSelected(position)
+          if (typeList[position] == NATIVE) {
+            toolbarProcessItem.tooltipTextRes = R.string.menu_split
+          } else {
+            toolbarProcessItem.tooltipTextRes = R.string.menu_process
+          }
+        }
+      })
     }
     binding.tabLayout.apply {
       removeAllTabs()
@@ -472,6 +484,11 @@ abstract class BaseAppDetailActivity :
       it.processToolIconVisibilityLiveData.observe(this) { visible ->
         if (visible) {
           if (detailFragmentManager.currentFragment?.isComponentFragment() == true) {
+            if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
+              toolbarAdapter.addData(toolbarProcessItem)
+            }
+          }
+          if (detailFragmentManager.currentFragment?.isNativeSourceAvailable() == true) {
             if (!toolbarAdapter.data.contains(toolbarProcessItem)) {
               toolbarAdapter.addData(toolbarProcessItem)
             }
@@ -734,7 +751,7 @@ abstract class BaseAppDetailActivity :
           initProcessBarView()
         }
         processBarView!!.setData(
-          viewModel.processesMap.map { mapItem ->
+          viewModel.processMapLiveData.valueUnsafe.map { mapItem ->
             ProcessBarAdapter.ProcessBarItem(
               mapItem.key,
               mapItem.value

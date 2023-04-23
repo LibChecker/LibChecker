@@ -189,6 +189,11 @@ class LibStringAdapter(
     item: LibStringItemChip,
     itemName: CharSequence
   ) {
+    itemView.processLabelColor = if (item.item.process.isNullOrEmpty() || !processMode) {
+      -1
+    } else {
+      processMap[item.item.process] ?: UiUtils.getRandomColor()
+    }
     setOrHighlightText(itemView.libName, itemName)
     itemView.libSize.text = PackageUtils.sizeToString(context, item.item, showElfInfo = true, is64Bit = is64Bit)
     if ((GlobalValues.itemAdvancedOptions and AdvancedOptions.SHOW_MARKED_LIB) > 0) {

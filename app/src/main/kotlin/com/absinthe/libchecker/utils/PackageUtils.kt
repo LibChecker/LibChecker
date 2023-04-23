@@ -271,7 +271,7 @@ object PackageUtils {
               LibStringItem(
                 name = entry.name.split("/").last(),
                 size = entry.size,
-                source = if (fileName.startsWith("split_config")) null else fileName,
+                process = if (fileName.startsWith("split_config")) null else fileName,
                 elfType = elfParser!!.getEType(),
                 elfClass = elfParser!!.getEClass()
               )
