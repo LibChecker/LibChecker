@@ -26,7 +26,6 @@ class AppPropsAdapter(packageInfo: PackageInfo) : BaseQuickAdapter<AppPropItem, 
       // TODO
       // setTipText("TODO")
       setKeyText(item.key)
-
       setValueText(resIdToPath(item.value))
     }
   }
