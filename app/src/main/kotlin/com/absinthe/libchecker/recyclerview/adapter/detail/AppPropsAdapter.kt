@@ -27,28 +27,11 @@ class AppPropsAdapter(packageInfo: PackageInfo) : BaseQuickAdapter<AppPropItem, 
       // setTipText("TODO")
       setKeyText(item.key)
 
-      if (maybeResourceId(item.value)) {
-        setValueText(resIdToPath(item.value))
-      } else {
-        setValueText(item.value)
-      }
+      setValueText(resIdToPath(item.value))
     }
-  }
-
-  private fun maybeResourceId(idText: String): Boolean {
-    if (idText.isNotBlank() && idText.isDigitsOnly() && idText.toLongOrNull() != null) {
-      val id = idText.toLong()
-      @Suppress("KotlinConstantConditions")
-      if ((id and 0xFF000000) == 0x7F000000.toLong() && (id and 0x00FF0000) >= 0x00010000 && (id and 0x0000FFFF) >= 0x00000000) {
-        // This may be an android resource id
-        return true
-      }
-    }
-    return false
   }
 
   private fun resIdToPath(idText: String): String {
-    val id = idText.toInt()
-    return runCatching { appResources.getResourceName(id) }.getOrDefault(idText)
+    return runCatching { appResources.getResourceName(idText.toInt()) }.getOrDefault(idText)
   }
 }
