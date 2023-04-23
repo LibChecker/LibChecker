@@ -32,6 +32,10 @@ class AppPropsAdapter(packageInfo: PackageInfo) : BaseQuickAdapter<AppPropItem, 
   }
 
   private fun resIdToPath(idText: String): String {
-    return runCatching { appResources.getResourceName(idText.toInt()) }.getOrDefault(idText)
+    return if (idText.isNotBlank() && idText.isDigitsOnly() && idText.toLongOrNull() != null) {
+      runCatching { appResources.getResourceName(idText.toInt()) }.getOrDefault(idText)
+    } else {
+      idText
+    }
   }
 }
