@@ -125,7 +125,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     list.forEach { item ->
       item.item.process?.let { process ->
-          sourceSet.add(process)
+        sourceSet.add(process)
       }
     }
     val sourceMap = sourceSet.filter { source -> source.isNotEmpty() }
