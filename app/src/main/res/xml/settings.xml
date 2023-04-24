@@ -47,7 +47,7 @@
       app:summary="%s"
       app:title="@string/rules_repo_title" />
 
-    <rikka.preference.SimpleMenuPreference
+    <ListPreference
       app:defaultValue="SYSTEM"
       app:entries="@array/language"
       app:entryValues="@array/language_value"

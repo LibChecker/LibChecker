@@ -18,6 +18,7 @@
     <item>zh-HK</item>
     <item>ru</item>
     <item>uk</item>
+    <item>ja</item>
   </string-array>
 
   <string-array name="language_value" translatable="false">
@@ -28,6 +29,7 @@
     <item>zh-HK</item>
     <item>ru-RU</item>
     <item>ru-UA</item>
+    <item>ja-JP</item>
   </string-array>
 
   <string-array name="list_dark_mode" tools:ignore="InconsistentArrays">
