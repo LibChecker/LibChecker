@@ -14,6 +14,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.activityViewModels
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.TwoStatePreference
@@ -119,7 +120,7 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
       }
     }
     val languagePreference =
-      findPreference<SimpleMenuPreference>(Constants.PREF_LOCALE)?.apply {
+      findPreference<ListPreference>(Constants.PREF_LOCALE)?.apply {
         setOnPreferenceChangeListener { _, newValue ->
           if (newValue is String) {
             val locale: Locale = if ("SYSTEM" == newValue) {
