@@ -192,7 +192,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   private var requestChangeJob: Job? = null
 
-  fun requestChange(needRefresh: Boolean = false) =
+  fun requestChange() =
     viewModelScope.launch {
       if (appListStatus == STATUS_START_INIT) {
         Timber.d("Request change canceled: STATUS_START_INIT")
