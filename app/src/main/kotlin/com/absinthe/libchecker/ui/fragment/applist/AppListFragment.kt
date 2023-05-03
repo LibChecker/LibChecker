@@ -291,7 +291,7 @@ class AppListFragment :
           }
 
           is HomeViewModel.Effect.PackageChanged -> {
-            requestChange(true)
+            requestChange()
           }
 
           is HomeViewModel.Effect.UpdateAppListStatus -> {
@@ -463,7 +463,7 @@ class AppListFragment :
       returnTopOfList()
     } else {
       flip(VF_LOADING)
-      homeViewModel.requestChange(true)
+      homeViewModel.requestChange()
     }
   }
 }
