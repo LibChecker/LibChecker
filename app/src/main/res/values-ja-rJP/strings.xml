@@ -6,7 +6,7 @@
   <string name="title_snapshot">スナップショット</string>
   <string name="title_settings">設定</string>
   <string name="title_album">アルバム</string>
-  <string name="loading">読み込み中...</string>
+  <string name="loading">読み込み中…</string>
   <string name="channel_shoot">スナップショットを保存</string>
   <string name="noti_shoot_title">現在のスナップショットを保存中です</string>
   <string name="noti_shoot_title_saved">スナップショットの保存が完了しました</string>
@@ -14,7 +14,7 @@
   <string name="menu_search">検索</string>
   <string name="menu_sort">ソート</string>
   <string name="menu_filter">フィルタ</string>
-  <string name="search_hint">検索...</string>
+  <string name="search_hint">検索…</string>
   <string name="string_64_bit">64bit</string>
   <string name="string_32_bit">32bit</string>
   <string name="no_libs">ネイティブライブラリはありません</string>
@@ -134,7 +134,7 @@
   <string name="album_restore_summary">バックアップファイルからスナップショットを復元</string>
   <string name="album_restore_detail">%1$s : 合計で%2$s件のアイテム\n</string>
   <string name="album_click_to_choose">クリックで選択</string>
-  <string name="album_dialog_delete_snapshot_message">処理中です...</string>
+  <string name="album_dialog_delete_snapshot_message">処理中です…</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">MonkeyKing Purifyでブロックをする</string>
   <string name="integration_monkey_king_menu_unblock">MonkeyKing Purifyでのブロックを解除</string>

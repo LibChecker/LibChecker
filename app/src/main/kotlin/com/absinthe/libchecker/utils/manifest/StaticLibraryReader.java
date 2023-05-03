@@ -14,11 +14,12 @@ import java.util.Map;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
+import timber.log.Timber;
 
 public class StaticLibraryReader {
   private final ArrayMap<String, Object> staticLibs = new ArrayMap<>();
 
-  private StaticLibraryReader(File apk) throws IOException {
+  private StaticLibraryReader(File apk) {
     try (IZipFile zip = new ZipFileCompat(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
@@ -30,6 +31,8 @@ public class StaticLibraryReader {
           return new ManifestTagVisitor(child);
         }
       });
+    } catch (Exception e) {
+      Timber.e(e);
     }
   }
 

@@ -573,7 +573,7 @@ suspend fun PackageInfo.getRxAndroidVersion(): String? = withContext(Dispatchers
 
 /**
  * Get signatures of an app
- * @param packageInfo PackageInfo
+ * @param context Context
  * @return List of LibStringItem
  */
 fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {

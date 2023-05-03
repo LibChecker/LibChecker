@@ -14,11 +14,12 @@ import java.util.Map;
 import pxb.android.axml.AxmlReader;
 import pxb.android.axml.AxmlVisitor;
 import pxb.android.axml.NodeVisitor;
+import timber.log.Timber;
 
 public class HiddenPermissionsReader {
   private final ArrayMap<String, Object> permissionMap = new ArrayMap<>();
 
-  private HiddenPermissionsReader(File apk) throws IOException {
+  private HiddenPermissionsReader(File apk) {
     try (IZipFile zip = new ZipFileCompat(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
       byte[] bytes = getBytesFromInputStream(is);
@@ -30,6 +31,8 @@ public class HiddenPermissionsReader {
           return new ManifestTagVisitor(child);
         }
       });
+    } catch (Exception e) {
+      Timber.e(e);
     }
   }
 

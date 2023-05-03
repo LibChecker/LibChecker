@@ -66,10 +66,8 @@ public class ApplicationReader {
     @Override
     public NodeVisitor child(String ns, String name) {
       NodeVisitor child = super.child(ns, name);
-      switch (name) {
-        case "application":
-          return new ApplicationTagVisitor(child);
-        default:
+      if ("application".equals(name)) {
+        return new ApplicationTagVisitor(child);
       }
       return child;
     }
