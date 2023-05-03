@@ -1,5 +1,3 @@
-@file:Suppress("unused")
-
 package com.absinthe.libchecker.utils
 
 import com.squareup.moshi.Moshi
