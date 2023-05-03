@@ -21,7 +21,7 @@ public class ManifestReader {
   private final ArrayMap<String, Object> properties = new ArrayMap<>();
   private final String[] demands;
 
-  private ManifestReader(File apk, String[] demands) throws IOException {
+  private ManifestReader(File apk, String[] demands) {
     this.demands = demands;
     try (IZipFile zip = new ZipFileCompat(apk)) {
       InputStream is = zip.getInputStream(zip.getEntry("AndroidManifest.xml"));
