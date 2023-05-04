@@ -50,7 +50,7 @@ class AppPropItemView(context: Context) : AViewGroup(context) {
   }
 
   val linkToIcon = AppCompatImageButton(context).apply {
-    layoutParams  = LayoutParams(24.dp, 24.dp).also {
+    layoutParams = LayoutParams(24.dp, 24.dp).also {
       it.marginStart = 8.dp
     }
     scaleType = ImageView.ScaleType.CENTER_CROP

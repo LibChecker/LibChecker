@@ -102,14 +102,14 @@ class AppPropsAdapter(
               }
               "xml" -> {
                 appResources.getXml(item.value.toInt()).let {
-                    val text = ResourceParser(it).setMarkColor(true).parse()
-                    XmlBSDFragment().apply {
-                      arguments = bundleOf(
-                        EXTRA_TEXT to text
-                      )
-                      show(fragMgr, XmlBSDFragment::class.java.name)
-                    }
+                  val text = ResourceParser(it).setMarkColor(true).parse()
+                  XmlBSDFragment().apply {
+                    arguments = bundleOf(
+                      EXTRA_TEXT to text
+                    )
+                    show(fragMgr, XmlBSDFragment::class.java.name)
                   }
+                }
                 clickedTag = false
               }
               "drawable", "mipmap" -> {
