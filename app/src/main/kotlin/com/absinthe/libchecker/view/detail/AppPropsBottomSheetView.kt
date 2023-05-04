@@ -13,6 +13,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
@@ -32,7 +33,12 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
   LinearLayout(context),
   IHeaderView {
 
-  val adapter by unsafeLazy { AppPropsAdapter(packageInfo) }
+  val adapter by unsafeLazy {
+    AppPropsAdapter(
+      packageInfo,
+      (context as FragmentActivity).supportFragmentManager
+    )
+  }
 
   private val header = BottomSheetHeaderView(context).apply {
     layoutParams =
@@ -89,7 +95,7 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
+    isNestedScrollingEnabled = true
     setHasFixedSize(true)
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
   }

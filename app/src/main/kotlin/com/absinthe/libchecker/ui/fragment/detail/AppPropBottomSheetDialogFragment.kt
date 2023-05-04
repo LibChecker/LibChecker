@@ -32,7 +32,7 @@ class AppPropBottomSheetDialogFragment :
       } else {
         propsMap.map { prop ->
           AppPropItem(key = prop.key, value = prop.value?.toString().orEmpty())
-        }
+        }.sortedBy { item -> item.key }
       }
       root.adapter.setList(bundleList)
     }

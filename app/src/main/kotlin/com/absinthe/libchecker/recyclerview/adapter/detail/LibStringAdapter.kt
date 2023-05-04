@@ -252,7 +252,7 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
   }
 
-  private val metadataLinkable = setOf("string", "array", "xml", "drawable", "color", "dimen")
+  private val metadataLinkable = setOf("string", "array", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun setMetadataContent(
     itemView: MetadataLibItemView,
@@ -311,7 +311,7 @@ class LibStringAdapter(
                   }
                   clickedTag = false
                 }
-                "drawable" -> {
+                "drawable", "mipmap" -> {
                   appResources?.let { res ->
                     itemView.linkToIcon.setImageDrawable(
                       res.getDrawable(

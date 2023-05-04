@@ -13,7 +13,6 @@ import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
 import androidx.collection.arrayMapOf
-import androidx.core.text.isDigitsOnly
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -59,6 +58,7 @@ import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isOverlay
 import com.absinthe.libchecker.utils.extensions.isUse32BitAbi
+import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.extensions.md5
 import com.absinthe.libchecker.utils.extensions.sha1
 import com.absinthe.libchecker.utils.extensions.sha256
@@ -358,7 +358,7 @@ object PackageUtils {
           var value = it.get(key).toString()
           var id = 0L
 
-          if (value.isNotBlank() && value.isDigitsOnly() && value.toLongOrNull() != null) {
+          if (value.maybeResourceId()) {
             id = value.toLong()
             runCatching {
               value = appResources.getResourceName(id.toInt())
