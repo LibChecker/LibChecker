@@ -55,7 +55,7 @@ class AppPropsAdapter(
     8 to "accessibility"
   )
 
-  private val linkable = setOf("string", "array", "xml", "drawable", "color", "dimen", "mipmap")
+  private val linkable = setOf("string", "array", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
     return when {
