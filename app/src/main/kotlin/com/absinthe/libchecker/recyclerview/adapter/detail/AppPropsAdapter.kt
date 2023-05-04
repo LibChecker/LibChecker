@@ -26,15 +26,31 @@ class AppPropsAdapter(packageInfo: PackageInfo) : BaseQuickAdapter<AppPropItem, 
       // TODO
       // setTipText("TODO")
       setKeyText(item.key)
-      setValueText(resIdToPath(item.value))
+      setValueText(parseValue(item))
     }
   }
 
-  private fun resIdToPath(idText: String): String {
-    return if (idText.isNotBlank() && idText.isDigitsOnly() && idText.toLongOrNull() != null) {
-      runCatching { appResources.getResourceName(idText.toInt()) }.getOrDefault(idText)
-    } else {
-      idText
+  private val category = mapOf(
+    0 to "game",
+    1 to "audio",
+    2 to "video",
+    3 to "image",
+    4 to "social",
+    5 to "news",
+    6 to "maps",
+    7 to "productivity",
+    8 to "accessibility"
+  )
+
+  private fun parseValue(item: AppPropItem): String {
+    return when {
+      item.key == "appCategory" -> {
+        category.getValue(item.value.toInt())
+      }
+      item.value.isNotBlank() && item.value.isDigitsOnly() && item.value.toLongOrNull() != null -> {
+        runCatching { appResources.getResourceName(item.value.toInt()) }.getOrDefault(item.value)
+      }
+      else -> item.value
     }
   }
 }
