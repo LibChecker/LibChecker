@@ -89,7 +89,7 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
     isVerticalScrollBarEnabled = false
     clipToPadding = false
     clipChildren = false
-    isNestedScrollingEnabled = false
+    isNestedScrollingEnabled = true
     setHasFixedSize(true)
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
   }
