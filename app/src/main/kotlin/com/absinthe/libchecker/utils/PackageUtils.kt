@@ -900,7 +900,7 @@ object PackageUtils {
   ): List<String> {
     val findList = mutableListOf<String>()
     return runCatching {
-      FastDexFileFactory.loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
+      FastDexFileFactory.Base().loadDexContainer(sourceFile, Opcodes.getDefault()).apply {
         dexEntryNames.forEach { entry ->
           getEntry(entry)?.dexFile?.classes?.forEach { def ->
             classes.forEach {
@@ -945,7 +945,7 @@ object PackageUtils {
 
       val primaryList = mutableListOf<LibStringItem>()
       val pkgType = "L${packageName.replace(".", "/")}"
-      FastDexFileFactory.loadDexContainer(File(path), Opcodes.getDefault()).apply {
+      FastDexFileFactory.Base().loadDexContainer(File(path), Opcodes.getDefault()).apply {
         dexEntryNames.forEachIndexed { index, entry ->
           if (index >= 5) {
             return@forEachIndexed
