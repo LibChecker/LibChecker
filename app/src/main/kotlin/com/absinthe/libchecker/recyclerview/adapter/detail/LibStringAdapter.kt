@@ -252,7 +252,7 @@ class LibStringAdapter(
     setOrHighlightText(itemView.libName, itemName)
   }
 
-  private val metadataLinkable = setOf("string", "array", "xml", "drawable", "mipmap", "color", "dimen")
+  private val metadataLinkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun setMetadataContent(
     itemView: MetadataLibItemView,
@@ -294,6 +294,11 @@ class LibStringAdapter(
                       res.getStringArray(item.item.size.toInt()).contentToString()
                   }
                   clickedTag = true
+                }
+                "bool" -> {
+                  appResources?.let { res ->
+                    itemView.libSize.text = res.getBoolean(item.item.size.toInt()).toString()
+                  }
                 }
                 "xml" -> {
                   fragmentManager?.let { fm ->

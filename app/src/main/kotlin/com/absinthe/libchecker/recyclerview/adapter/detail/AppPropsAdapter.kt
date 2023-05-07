@@ -55,7 +55,7 @@ class AppPropsAdapter(
     8 to "accessibility"
   )
 
-  private val linkable = setOf("string", "array", "xml", "drawable", "mipmap", "color", "dimen")
+  private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
     return when {
@@ -98,6 +98,10 @@ class AppPropsAdapter(
               "array" -> {
                 itemView.value.text =
                   appResources.getStringArray(item.value.toInt()).contentToString()
+                clickedTag = true
+              }
+              "bool" -> {
+                itemView.value.text = appResources.getBoolean(item.value.toInt()).toString()
                 clickedTag = true
               }
               "xml" -> {
