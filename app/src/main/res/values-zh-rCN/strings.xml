@@ -145,6 +145,9 @@
   <string name="lib_detail_xposed_min_version">Min 版本</string>
   <string name="lib_detail_xposed_default_scope">默认 Scope</string>
   <string name="lib_detail_xposed_init_class">初始化类</string>
+  <string name="lib_detail_app_install_source_title">安装来源</string>
+  <string name="lib_detail_app_install_source_initiating_package">安装请求方</string>
+  <string name="lib_detail_app_install_source_installing_package">安装执行方</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>

@@ -155,6 +155,9 @@
   <string name="lib_detail_xposed_min_version">Min Version</string>
   <string name="lib_detail_xposed_default_scope">Default Scope</string>
   <string name="lib_detail_xposed_init_class">Init Class</string>
+  <string name="lib_detail_app_install_source_title">Installation Source</string>
+  <string name="lib_detail_app_install_source_initiating_package">Installation requester</string>
+  <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

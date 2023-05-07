@@ -13,6 +13,7 @@ object Features {
   const val RX_ANDROID = 1 shl 9
 
   object Ext {
-    const val APPLICATION_PROP = 1 shr 1
+    const val APPLICATION_PROP = -1 shl 0
+    const val APPLICATION_INSTALL_SOURCE = -1 shl 1
   }
 }

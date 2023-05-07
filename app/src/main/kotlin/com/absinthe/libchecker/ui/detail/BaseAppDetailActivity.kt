@@ -616,6 +616,16 @@ abstract class BaseAppDetailActivity :
               }
             )
           }
+
+          Features.Ext.APPLICATION_INSTALL_SOURCE -> {
+            if (!apkAnalyticsMode) {
+              featureAdapter.addData(
+                FeatureItem(R.drawable.ic_install_source) {
+                  FeaturesDialog.showAppInstallSourceDialog(this, packageInfo.packageName)
+                }
+              )
+            }
+          }
         }
       }.launchIn(lifecycleScope)
       it.abiBundle.observe(this) { bundle ->
