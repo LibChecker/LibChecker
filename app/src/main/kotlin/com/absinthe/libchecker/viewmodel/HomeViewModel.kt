@@ -11,12 +11,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.ALL
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
 import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.NOT_MARKED
 import com.absinthe.libchecker.annotation.PACKAGE
 import com.absinthe.libchecker.annotation.PERMISSION
 import com.absinthe.libchecker.annotation.PROVIDER
@@ -30,6 +28,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LibReferenceOptions
 import com.absinthe.libchecker.constant.OnceTag
 import com.absinthe.libchecker.data.app.LocalAppDataSource
 import com.absinthe.libchecker.database.Repositories
@@ -83,7 +82,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   var controller: IListController? = null
   var libRefSystemApps: Boolean? = null
-  var libRefType: Int? = null
   var appListStatus: Int = STATUS_NOT_START
   var workerBinder: IWorkerService? = null
 
@@ -390,17 +388,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   private var computeLibReferenceJob: Job? = null
 
-  fun computeLibReference(@LibType type: Int) {
+  fun computeLibReference() {
     computeLibReferenceJob?.cancel()
     computeLibReferenceJob = viewModelScope.launch(Dispatchers.IO) {
-      computeLibReferenceImpl(LocalAppDataSource.getApplicationMap(), type)
+      computeLibReferenceImpl(LocalAppDataSource.getApplicationMap())
     }
   }
 
-  private suspend fun computeLibReferenceImpl(
-    appMap: Map<String, PackageInfo>,
-    @LibType type: Int
-  ) {
+  private suspend fun computeLibReferenceImpl(appMap: Map<String, PackageInfo>) {
     referenceMap = null
     _libReference.emit(null)
     val map = HashMap<String, Pair<MutableSet<String>, Int>>()
@@ -415,180 +410,52 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
       }
     }
 
+    fun computeInternal(@LibType type: Int) {
+      for (item in appMap.values) {
+        if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
+          progressCount++
+          updateLibRefProgressImpl()
+          continue
+        }
+
+        computeComponentReference(map, item.packageName, type)
+        progressCount++
+        updateLibRefProgressImpl()
+      }
+    }
+
     updateLibRefProgress(0)
 
-    when (type) {
-      ALL, NOT_MARKED -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          arrayOf(NATIVE, SERVICE, ACTIVITY, RECEIVER, PROVIDER, PERMISSION, METADATA).forEach {
-            computeComponentReference(map, item.packageName, it)
-          }
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      NATIVE -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, NATIVE)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      SERVICE -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, SERVICE)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      ACTIVITY -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, ACTIVITY)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      RECEIVER -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, RECEIVER)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      PROVIDER -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, PROVIDER)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      DEX -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, DEX)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      PERMISSION -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, PERMISSION)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      METADATA -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          computeComponentReference(map, item.packageName, METADATA)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      PACKAGE -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          val split = item.packageName.split(".")
-          val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
-          if (map[packagePrefix] == null) {
-            map[packagePrefix] = mutableSetOf<String>() to PACKAGE
-          }
-          map[packagePrefix]!!.first.add(item.packageName)
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      SHARED_UID -> {
-        for (item in appMap.values) {
-          if (!showSystem && ((item.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == ApplicationInfo.FLAG_SYSTEM)) {
-            progressCount++
-            updateLibRefProgressImpl()
-            continue
-          }
-
-          if (item.sharedUserId?.isNotBlank() == true) {
-            if (map[item.sharedUserId] == null) {
-              map[item.sharedUserId] = mutableSetOf<String>() to SHARED_UID
-            }
-            map[item.sharedUserId]!!.first.add(item.packageName)
-          }
-          progressCount++
-          updateLibRefProgressImpl()
-        }
-      }
-
-      else -> {}
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.NATIVE_LIBS > 0) {
+      computeInternal(NATIVE)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SERVICES > 0) {
+      computeInternal(SERVICE)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.ACTIVITIES > 0) {
+      computeInternal(ACTIVITY)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.RECEIVERS > 0) {
+      computeInternal(RECEIVER)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PROVIDERS > 0) {
+      computeInternal(PROVIDER)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PERMISSIONS > 0) {
+      computeInternal(PERMISSION)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.METADATA > 0) {
+      computeInternal(METADATA)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.PACKAGES > 0) {
+      computeInternal(PACKAGE)
+    }
+    if (GlobalValues.libReferenceOptions and LibReferenceOptions.SHARED_UID > 0) {
+      computeInternal(SHARED_UID)
     }
 
     referenceMap = map
-    matchingRules(type)
+    matchingRules()
   }
 
   private fun computeComponentReference(
@@ -671,6 +538,25 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
           )
         }
 
+        PACKAGE -> {
+          val split = packageName.split(".")
+          val packagePrefix = split.subList(0, split.size.coerceAtMost(2)).joinToString(".")
+          if (referenceMap[packagePrefix] == null) {
+            referenceMap[packagePrefix] = mutableSetOf<String>() to PACKAGE
+          }
+          referenceMap[packagePrefix]!!.first.add(packageName)
+        }
+
+        SHARED_UID -> {
+          val packageInfo = PackageUtils.getPackageInfo(packageName)
+          if (packageInfo.sharedUserId?.isNotBlank() == true) {
+            if (referenceMap[packageInfo.sharedUserId] == null) {
+              referenceMap[packageInfo.sharedUserId] = mutableSetOf<String>() to SHARED_UID
+            }
+            referenceMap[packageInfo.sharedUserId]!!.first.add(packageName)
+          }
+        }
+
         else -> {}
       }
     } catch (e: Exception) {
@@ -748,9 +634,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
   private var matchingJob: Job? = null
 
-  fun matchingRules(
-    @LibType type: Int
-  ) {
+  fun matchingRules() {
     matchingJob = viewModelScope.launch(Dispatchers.IO) {
       referenceMap?.let { map ->
         var progressCount = 0
@@ -779,7 +663,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 regexName = it.regexName
               )
             }
-            if (type != NOT_MARKED) {
+            val shouldAdd = if (GlobalValues.libReferenceOptions and LibReferenceOptions.ONLY_NOT_MARKED > 0) {
+              rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA
+            } else {
+              true
+            }
+            if (shouldAdd) {
               refList.add(
                 LibReference(
                   entry.key,
@@ -788,17 +677,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                   entry.value.second
                 )
               )
-            } else {
-              if (rule == null && entry.value.second != PERMISSION && entry.value.second != METADATA) {
-                refList.add(
-                  LibReference(
-                    entry.key,
-                    null,
-                    entry.value.first,
-                    entry.value.second
-                  )
-                )
-              }
             }
           }
           progressCount++

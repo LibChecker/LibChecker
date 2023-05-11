@@ -58,10 +58,7 @@ object Constants {
 
   const val PREF_DEBUG_MODE = "debugMode"
 
-  const val CURRENT_LIB_REF_TYPE = "currentLibRefType"
-
   const val PREF_DARK_MODE = "darkMode"
-
   const val DARK_MODE_OFF = "off"
   const val DARK_MODE_ON = "on"
   const val DARK_MODE_FOLLOW_SYSTEM = "system"
@@ -88,6 +85,7 @@ object Constants {
   const val PREF_UUID = "uuid"
   const val PREF_ADVANCED_OPTIONS = "advancedOptions"
   const val PREF_ITEM_ADVANCED_OPTIONS = "itemAdvancedOptions"
+  const val PREF_LIB_REF_OPTIONS = "libRefOptions"
 
   object Event {
     const val LAUNCH_ACTION = "Launch Action"

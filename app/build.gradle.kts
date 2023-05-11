@@ -116,7 +116,6 @@ dependencies {
   implementation(libs.timber)
   implementation(libs.processPhoenix)
   implementation(libs.once)
-  implementation(libs.cascade)
   implementation(libs.fastScroll)
   implementation(libs.appIconLoader)
   implementation(libs.appIconLoader.coil)
