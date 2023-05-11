@@ -44,6 +44,7 @@
   <string name="ref_category_package">パッケージ</string>
   <string name="ref_category_shared_uid">共有UID</string>
   <string name="ref_category_signatures">署名</string>
+  <string name="ref_category_only_not_marked">Only Not Marked</string>
   <string name="string_kotlin_used">Kotlinを使用</string>
   <string name="string_kotlin_unused">Kotlinを未使用</string>
   <!--  About  -->
