@@ -25,7 +25,7 @@ moshiX = "dev.zacsweers.moshix:0.22.1"
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
 
 androidX-activity = "androidx.activity:activity-ktx:1.7.1"
 androidX-appCompat = "androidx.appcompat:appcompat:1.6.1"
