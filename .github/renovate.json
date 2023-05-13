@@ -4,5 +4,16 @@
   ],
   "extends": [
     "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePrefixes": [
+        "org.jetbrains.kotlin",
+        "com.google.devtools.ksp",
+      ],
+      "excludePackagePrefixes": ["org.jetbrains.kotlinx"],
+      "groupName": "kotlin-based dependencies",
+      "automerge": true
+    }
   ]
 }
