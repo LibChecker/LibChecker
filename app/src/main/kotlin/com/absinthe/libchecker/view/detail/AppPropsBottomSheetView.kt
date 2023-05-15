@@ -23,9 +23,9 @@ import com.absinthe.libchecker.recyclerview.adapter.detail.AppPropsAdapter
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getDrawable
+import com.absinthe.libchecker.utils.extensions.paddingBottomCompat
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libraries.utils.manager.SystemBarManager
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import timber.log.Timber
 
@@ -98,17 +98,13 @@ class AppPropsBottomSheetView(context: Context, packageInfo: PackageInfo) :
     isNestedScrollingEnabled = true
     setHasFixedSize(true)
     addItemDecoration(VerticalSpacesItemDecoration(4.dp))
+    paddingBottomCompat = 16.dp
   }
 
   init {
     orientation = VERTICAL
     val padding = 16.dp
-    setPadding(
-      padding,
-      padding,
-      padding,
-      (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
-    )
+    setPadding(padding, padding, padding, 0)
     addView(header)
     addView(tipView)
     addView(list)

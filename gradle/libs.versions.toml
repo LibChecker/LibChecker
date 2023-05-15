@@ -3,10 +3,10 @@ agp = "8.0.1"
 androidX-lifecycle = "2.6.1"
 androidX-room = "2.5.1"
 appCenter = "5.0.1"
-grpc = "1.54.1"
+grpc = "1.55.1"
 hiddenApiRefine = "4.3.0"
 kotlin = "1.8.21"
-protoc = "3.22.4"
+protoc = "3.23.0"
 shizuku = "13.1.1"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.4"
@@ -26,13 +26,13 @@ moshiX = "dev.zacsweers.moshix:0.22.1"
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
-kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.0"
+kotlinX-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
 
 androidX-activity = "androidx.activity:activity-ktx:1.7.1"
 androidX-appCompat = "androidx.appcompat:appcompat:1.6.1"
 androidX-browser = "androidx.browser:browser:1.5.0"
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.1.4"
-androidX-core = "androidx.core:core-ktx:1.10.0"
+androidX-core = "androidx.core:core-ktx:1.10.1"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.5.7"
 androidX-lifecycle-liveData = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidX-lifecycle" }
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
@@ -47,7 +47,7 @@ androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-beta01"
 androidX-window = "androidx.window:window:1.0.0"
 
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.10"
-square-moshi = "com.squareup.moshi:moshi:1.14.0"
+square-moshi = "com.squareup.moshi:moshi:1.15.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.11.0"
 square-okio = "com.squareup.okio:okio:3.3.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
@@ -83,7 +83,6 @@ appCenter-crashes = { module = "com.microsoft.appcenter:appcenter-crashes", vers
 appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
 brvah = "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.11"
-cascade = "me.saket.cascade:cascade:1.3.0"
 coil = "io.coil-kt:coil:2.3.0"
 commons-io = "commons-io:commons-io:2.11.0"
 commons-compress = "org.apache.commons:commons-compress:1.23.0"

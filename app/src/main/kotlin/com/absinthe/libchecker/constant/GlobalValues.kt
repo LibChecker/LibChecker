@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPDelegates
@@ -26,11 +25,12 @@ object GlobalValues {
   var itemAdvancedOptions: Int by SPDelegates(Constants.PREF_ITEM_ADVANCED_OPTIONS, AdvancedOptions.ITEM_DEFAULT_OPTIONS)
   val itemAdvancedOptionsLiveData: MutableLiveData<Int> = MutableLiveData(itemAdvancedOptions)
 
+  var libReferenceOptions: Int by SPDelegates(Constants.PREF_LIB_REF_OPTIONS, LibReferenceOptions.DEFAULT_OPTIONS)
+  val libReferenceOptionsLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)
-
-  var currentLibRefType: Int by SPDelegates(Constants.CURRENT_LIB_REF_TYPE, NATIVE)
 
   var debugMode: Boolean by SPDelegates(Constants.PREF_DEBUG_MODE, false)
 

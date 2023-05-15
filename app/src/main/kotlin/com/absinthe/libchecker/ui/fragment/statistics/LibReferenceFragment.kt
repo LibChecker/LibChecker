@@ -2,10 +2,6 @@ package com.absinthe.libchecker.ui.fragment.statistics
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -16,23 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.annotation.ACTIVITY
-import com.absinthe.libchecker.annotation.ALL
-import com.absinthe.libchecker.annotation.DEX
-import com.absinthe.libchecker.annotation.LibType
-import com.absinthe.libchecker.annotation.METADATA
-import com.absinthe.libchecker.annotation.NATIVE
-import com.absinthe.libchecker.annotation.NOT_MARKED
-import com.absinthe.libchecker.annotation.PACKAGE
-import com.absinthe.libchecker.annotation.PERMISSION
-import com.absinthe.libchecker.annotation.PROVIDER
-import com.absinthe.libchecker.annotation.RECEIVER
-import com.absinthe.libchecker.annotation.SERVICE
-import com.absinthe.libchecker.annotation.SHARED_UID
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.LibReferenceOptions
 import com.absinthe.libchecker.databinding.FragmentLibReferenceBinding
 import com.absinthe.libchecker.model.LibReference
 import com.absinthe.libchecker.recyclerview.adapter.statistics.LibReferenceAdapter
@@ -40,6 +23,7 @@ import com.absinthe.libchecker.recyclerview.diff.RefListDiffUtil
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
+import com.absinthe.libchecker.ui.fragment.applist.AdvancedMenuBSDFragment
 import com.absinthe.libchecker.ui.main.ChartActivity
 import com.absinthe.libchecker.ui.main.EXTRA_REF_LIST
 import com.absinthe.libchecker.ui.main.EXTRA_REF_NAME
@@ -47,17 +31,13 @@ import com.absinthe.libchecker.ui.main.EXTRA_REF_TYPE
 import com.absinthe.libchecker.ui.main.INavViewContainer
 import com.absinthe.libchecker.ui.main.LibReferenceActivity
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
-import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.showToast
 import com.absinthe.libchecker.view.detail.EmptyListView
-import com.absinthe.libchecker.view.drawable.RoundedRectDrawable
 import com.absinthe.libchecker.viewmodel.HomeViewModel
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.analytics.EventProperties
-import java.lang.ref.WeakReference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -65,7 +45,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.saket.cascade.CascadePopupMenu
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import rikka.widget.borderview.BorderView
 
@@ -77,13 +56,12 @@ class LibReferenceFragment :
   SearchView.OnQueryTextListener {
 
   private val refAdapter = LibReferenceAdapter()
-  private var popup: CascadePopupMenu? = null
   private var delayShowNavigationJob: Job? = null
-  private var category = GlobalValues.currentLibRefType
   private var firstScrollFlag = false
   private var isSearchTextClearOnce = false
   private var keyword: String = ""
   private var searchUpdateJob: Job? = null
+  private var advancedMenuBSDFragment: LibReferenceMenuBSDFragment? = null
 
   override fun init() {
     val context = (context as? BaseActivity<*>) ?: return
@@ -226,10 +204,7 @@ class LibReferenceFragment :
 
     lifecycleScope.launch {
       if (refAdapter.data.isEmpty()) {
-        if (homeViewModel.libRefType == null) {
-          computeRef(true)
-          homeViewModel.libRefType = category
-        }
+        computeRef(true)
       }
     }
   }
@@ -241,7 +216,8 @@ class LibReferenceFragment :
 
   override fun onPause() {
     super.onPause()
-    popup?.dismiss()
+    advancedMenuBSDFragment?.dismiss()
+    advancedMenuBSDFragment = null
     (activity as? INavViewContainer)?.hideProgressBar()
   }
 
@@ -273,95 +249,31 @@ class LibReferenceFragment :
 
   override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
     val context = (context as? BaseActivity<*>) ?: return false
-    val contextRef = WeakReference(context)
     if (menuItem.itemId == R.id.filter) {
-      val color = context.getColorByAttr(com.google.android.material.R.attr.colorSurface)
-      val styler = CascadePopupMenu.Styler(
-        background = {
-          RoundedRectDrawable(color, radius = 6.dp.toFloat())
-        }
-      )
-      popup = CascadePopupMenu(
-        contextRef.get()!!,
-        context.findViewById(R.id.filter),
-        defStyleAttr = R.style.Widget_LC_PopupMenu,
-        styler = styler
-      ).apply {
-        menu.also {
-          it.add(R.string.ref_category_all).initMenu(ALL)
-          it.add(R.string.ref_category_native).initMenu(NATIVE)
-          it.addSubMenu(R.string.submenu_title_component).also { componentMenu ->
-            componentMenu.setHeaderTitle(R.string.submenu_title_component)
-            componentMenu.add(R.string.ref_category_service).initMenu(SERVICE)
-            componentMenu.add(R.string.ref_category_activity).initMenu(ACTIVITY)
-            componentMenu.add(R.string.ref_category_br).initMenu(RECEIVER)
-            componentMenu.add(R.string.ref_category_cp).initMenu(PROVIDER)
-          }
-          it.addSubMenu(R.string.submenu_title_manifest).also { manifestMenu ->
-            manifestMenu.setHeaderTitle(R.string.submenu_title_manifest)
-            manifestMenu.add(R.string.ref_category_perm).initMenu(PERMISSION)
-            manifestMenu.add(R.string.ref_category_metadata).initMenu(METADATA)
-          }
-          it.add(R.string.ref_category_package).initMenu(PACKAGE)
-          it.add(R.string.ref_category_shared_uid).initMenu(SHARED_UID)
-          it.add(R.string.ref_category_dex).also { dexMenu ->
-            dexMenu.onlyVisibleInDebugMode()
-            dexMenu.initMenu(DEX)
-          }
-          it.add(R.string.not_marked_lib).also { notMarkedMenu ->
-            notMarkedMenu.onlyVisibleInDebugMode()
-            notMarkedMenu.initMenu(NOT_MARKED)
-          }
+      advancedMenuBSDFragment?.dismiss()
+      advancedMenuBSDFragment = LibReferenceMenuBSDFragment().apply {
+        setOnDismissListener {
+          GlobalValues.libReferenceOptionsLiveData.postValue(GlobalValues.libReferenceOptions)
+          refreshList()
+          advancedMenuBSDFragment = null
         }
       }
-      popup?.show()
+      advancedMenuBSDFragment?.show(context.supportFragmentManager, AdvancedMenuBSDFragment::class.java.name)
     } else if (menuItem.itemId == R.id.chart) {
       startActivity(Intent(context, ChartActivity::class.java))
     }
     return true
   }
 
-  private fun MenuItem.initMenu(@LibType type: Int) {
-    this.title?.let {
-      if (GlobalValues.currentLibRefType == type) {
-        val title = SpannableStringBuilder("$it ✔")
-        title.setSpan(
-          StyleSpan(Typeface.BOLD),
-          0,
-          it.length,
-          Spannable.SPAN_INCLUSIVE_EXCLUSIVE
-        )
-        this.title = title
-      }
-    }
-    this.setOnMenuItemClickListener {
-      (context as BaseActivity<*>).apply {
-        val closeBtn = findViewById<View>(androidx.appcompat.R.id.search_close_btn)
-        if (closeBtn != null) {
-          //noinspection RestrictedApi
-          supportActionBar?.collapseActionView()
-        }
-      }
-      doSaveLibRefType(type)
-    }
-  }
-
-  private fun MenuItem.onlyVisibleInDebugMode() {
-    isVisible = BuildConfig.DEBUG || GlobalValues.debugMode
-  }
-
-  private fun doSaveLibRefType(@LibType type: Int): Boolean {
-    category = type
-    GlobalValues.currentLibRefType = type
+  private fun refreshList() {
     computeRef(true)
     Analytics.trackEvent(
       Constants.Event.LIB_REFERENCE_FILTER_TYPE,
       EventProperties().set(
         "Type",
-        category.toLong()
+        LibReferenceOptions.getOptionsString(GlobalValues.libReferenceOptions)
       )
     )
-    return true
   }
 
   private fun computeRef(needShowLoading: Boolean) {
@@ -369,7 +281,7 @@ class LibReferenceFragment :
     if (needShowLoading) {
       flip(VF_LOADING)
     }
-    homeViewModel.computeLibReference(category)
+    homeViewModel.computeLibReference()
   }
 
   private fun matchRules(needShowLoading: Boolean) {
@@ -378,7 +290,7 @@ class LibReferenceFragment :
       flip(VF_LOADING)
     }
     homeViewModel.cancelMatchingJob()
-    homeViewModel.matchingRules(category)
+    homeViewModel.matchingRules()
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
