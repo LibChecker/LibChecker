@@ -44,6 +44,7 @@
   <string name="ref_category_package">套件</string>
   <string name="ref_category_shared_uid">共用的 UID</string>
   <string name="ref_category_signatures">簽章</string>
+  <string name="ref_category_only_not_marked">僅未標示的項目</string>
   <string name="string_kotlin_used">已使用 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
   <!--  About  -->
