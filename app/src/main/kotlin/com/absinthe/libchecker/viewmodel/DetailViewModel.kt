@@ -507,7 +507,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     if (OsUtils.atLeastR()) {
       runCatching {
         val info = SystemServices.packageManager.getInstallSourceInfo(packageInfo.packageName)
-        if (info.originatingPackageName != null || info.installingPackageName != null) {
+        if (info.installingPackageName != null) {
           _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
         }
       }
