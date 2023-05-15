@@ -11,7 +11,6 @@ import androidx.core.text.scale
 import androidx.core.view.isGone
 import coil.load
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.AndroidVersions
 import com.absinthe.libchecker.constant.Constants
@@ -28,7 +27,6 @@ import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 class AppInstallSourceBSDFragment :
   BaseBottomSheetViewDialogFragment<AppInstallSourceBottomSheetView>() {
@@ -45,14 +43,9 @@ class AppInstallSourceBSDFragment :
       return
     }
     val packageName = packageName ?: return
-    val info = runCatching {
-      SystemServices.packageManager.getInstallSourceInfo(packageName)
-    }.getOrElse { e ->
-      Timber.e(e)
-      return
-    }
+    val info = PackageUtils.getInstallSourceInfo(packageName) ?: return
 
-    initAppItemContainerView(root.initiatingTitleView, root.initiatingPackageView.container, info.initiatingPackageName)
+    initAppItemContainerView(root.initiatingTitleView, root.initiatingPackageView.container, info.originatingPackageName)
     initAppItemContainerView(root.installingTitleView, root.installingPackageView.container, info.installingPackageName)
   }
 

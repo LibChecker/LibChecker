@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
+import android.content.pm.IPackageManager
+import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
@@ -74,6 +76,9 @@ import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import org.jf.dexlib2.Opcodes
+import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuBinderWrapper
+import rikka.shizuku.SystemServiceHelper
 import timber.log.Timber
 
 object PackageUtils {
@@ -1034,6 +1039,30 @@ object PackageUtils {
     return runCatching {
       getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).getStatefulPermissionsList()
     }.getOrElse { emptyList() }
+  }
+
+  fun getInstallSourceInfo(packageName: String): InstallSourceInfo? {
+    if (!OsUtils.atLeastR()) return null
+    val origInstallSourceInfo = runCatching {
+      SystemServices.packageManager.getInstallSourceInfo(packageName)
+    }.getOrElse { e ->
+      Timber.e(e)
+      return null
+    }
+    if (!Shizuku.pingBinder()) {
+      Timber.e("Shizuku not running")
+      return origInstallSourceInfo
+    }
+    if (Shizuku.getVersion() < 10) {
+      Timber.e("Requires Shizuku API 10")
+      return origInstallSourceInfo
+    } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+      Shizuku.requestPermission(0)
+      return getInstallSourceInfo(packageName)
+    }
+    return IPackageManager.Stub.asInterface(
+      ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
+    ).getInstallSourceInfo(packageName)
   }
 
   /**

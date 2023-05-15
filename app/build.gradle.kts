@@ -129,6 +129,8 @@ dependencies {
 
   implementation(libs.bundles.rikkax)
 
+  implementation(libs.bundles.shizuku)
+
   debugImplementation(libs.square.leakCanary)
   "marketCompileOnly"(fileTree("ohos"))
   "marketImplementation"(libs.bundles.appCenter)
