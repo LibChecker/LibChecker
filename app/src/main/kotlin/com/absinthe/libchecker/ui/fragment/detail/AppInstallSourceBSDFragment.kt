@@ -67,6 +67,7 @@ class AppInstallSourceBSDFragment :
       item.isGone = true
       return
     }
+    item.packageView.container.icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_shizuku)
     if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU)) {
       item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
       item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
@@ -111,6 +112,7 @@ class AppInstallSourceBSDFragment :
     }
 
     if (packageName == null) {
+      item.packageView.container.icon.load(R.drawable.ic_icon_blueprint)
       item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_empty)
       item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_empty_detail)
       return
