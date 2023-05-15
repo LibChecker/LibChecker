@@ -77,7 +77,13 @@ class AppInstallSourceBSDFragment :
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
         }
       } else {
-        if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+        if (Shizuku.getVersion() < 10) {
+          item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_low_version)
+          item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
+          item.packageView.setOnClickListener {
+            LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+          }
+        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
           item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
           item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
           item.packageView.setOnClickListener {
