@@ -22,6 +22,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -36,6 +37,7 @@ import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.getAGPVersion
@@ -501,6 +503,15 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_PROP, null))
+
+    if (OsUtils.atLeastR()) {
+      runCatching {
+        val info = SystemServices.packageManager.getInstallSourceInfo(packageInfo.packageName)
+        if (info.installingPackageName != null) {
+          _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
+        }
+      }
+    }
   }
 
   fun initAbiInfo(packageInfo: PackageInfo, apkAnalyticsMode: Boolean) = viewModelScope.launch(Dispatchers.IO) {

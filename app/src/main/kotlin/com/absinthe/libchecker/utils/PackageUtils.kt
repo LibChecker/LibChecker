@@ -2,9 +2,12 @@ package com.absinthe.libchecker.utils
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
+import android.content.pm.IPackageManager
+import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
@@ -12,6 +15,7 @@ import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
@@ -74,6 +78,9 @@ import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import org.jf.dexlib2.Opcodes
+import rikka.shizuku.Shizuku
+import rikka.shizuku.ShizukuBinderWrapper
+import rikka.shizuku.SystemServiceHelper
 import timber.log.Timber
 
 object PackageUtils {
@@ -1036,6 +1043,30 @@ object PackageUtils {
     }.getOrElse { emptyList() }
   }
 
+  @RequiresApi(Build.VERSION_CODES.R)
+  fun getInstallSourceInfo(packageName: String): InstallSourceInfo? {
+    val origInstallSourceInfo = runCatching {
+      SystemServices.packageManager.getInstallSourceInfo(packageName)
+    }.getOrElse { e ->
+      Timber.e(e)
+      return null
+    }
+    if (!Shizuku.pingBinder()) {
+      Timber.e("Shizuku not running")
+      return origInstallSourceInfo
+    }
+    if (Shizuku.getVersion() < 10) {
+      Timber.e("Requires Shizuku API 10")
+      return origInstallSourceInfo
+    } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+      Timber.i("Shizuku not authorized")
+      return origInstallSourceInfo
+    }
+    return IPackageManager.Stub.asInterface(
+      ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
+    ).getInstallSourceInfo(packageName)
+  }
+
   /**
    * Check if an app is installed
    * @return true if it is installed
@@ -1160,5 +1191,22 @@ object PackageUtils {
       append(signature.toCharsString())
     }
     return LibStringItem(serialNumber, 0, source, null)
+  }
+
+  fun startLaunchAppActivity(context: Context, packageName: String?) {
+    if (packageName == null) {
+      return
+    }
+    val launcherActivity: String
+    val intent = Intent(Intent.ACTION_MAIN, null)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setPackage(packageName)
+    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
+    launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
+    val launchIntent = Intent(Intent.ACTION_MAIN)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setClassName(packageName, launcherActivity)
+      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(launchIntent)
   }
 }

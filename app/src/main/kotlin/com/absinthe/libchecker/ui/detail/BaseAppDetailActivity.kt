@@ -69,6 +69,7 @@ import com.absinthe.libchecker.ui.fragment.detail.impl.PermissionAnalysisFragmen
 import com.absinthe.libchecker.ui.fragment.detail.impl.SignaturesAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.StaticAnalysisFragment
 import com.absinthe.libchecker.utils.FileUtils
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
@@ -615,6 +616,16 @@ abstract class BaseAppDetailActivity :
                 FeaturesDialog.showAppPropDialog(this, packageInfo.packageName)
               }
             )
+          }
+
+          Features.Ext.APPLICATION_INSTALL_SOURCE -> {
+            if (OsUtils.atLeastR() && !apkAnalyticsMode) {
+              featureAdapter.addData(
+                FeatureItem(R.drawable.ic_install_source) {
+                  FeaturesDialog.showAppInstallSourceDialog(this, packageInfo.packageName)
+                }
+              )
+            }
           }
         }
       }.launchIn(lifecycleScope)

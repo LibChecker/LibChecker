@@ -2,7 +2,9 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -10,6 +12,7 @@ import androidx.fragment.app.FragmentActivity
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppPropBottomSheetDialogFragment
 
 object FeaturesDialog {
@@ -113,6 +116,16 @@ object FeaturesDialog {
         EXTRA_PACKAGE_NAME to packageName
       )
       show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
+    }
+  }
+
+  @RequiresApi(Build.VERSION_CODES.R)
+  fun showAppInstallSourceDialog(activity: FragmentActivity, packageName: String) {
+    AppInstallSourceBSDFragment().apply {
+      arguments = bundleOf(
+        EXTRA_PACKAGE_NAME to packageName
+      )
+      show(activity.supportFragmentManager, AppInstallSourceBSDFragment::class.java.name)
     }
   }
 

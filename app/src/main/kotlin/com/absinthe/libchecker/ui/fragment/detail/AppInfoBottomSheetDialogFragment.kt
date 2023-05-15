@@ -54,7 +54,7 @@ class AppInfoBottomSheetDialogFragment :
         if (packageName == BuildConfig.APPLICATION_ID) {
           Toasty.showShort(requireContext(), "But why…")
         } else {
-          startLaunchAppActivity(packageName)
+          PackageUtils.startLaunchAppActivity(requireContext(), packageName)
         }
       } catch (e: Exception) {
         activity?.let {
@@ -145,22 +145,5 @@ class AppInfoBottomSheetDialogFragment :
           .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
       )
     )
-  }
-
-  private fun startLaunchAppActivity(packageName: String?) {
-    if (packageName == null) {
-      return
-    }
-    val launcherActivity: String
-    val intent = Intent(Intent.ACTION_MAIN, null)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setPackage(packageName)
-    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
-    launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
-    val launchIntent = Intent(Intent.ACTION_MAIN)
-      .addCategory(Intent.CATEGORY_LAUNCHER)
-      .setClassName(packageName, launcherActivity)
-      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    startActivity(launchIntent)
   }
 }

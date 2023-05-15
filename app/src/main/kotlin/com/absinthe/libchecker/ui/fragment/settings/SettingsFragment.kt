@@ -30,7 +30,7 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.ApkDetailActivity
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.fragment.IListController
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
@@ -247,15 +247,8 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_RATE)?.apply {
       setOnPreferenceClickListener {
-        val hasInstallCoolApk = PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)
-        val marketUrl = if (hasInstallCoolApk) {
-          URLManager.COOLAPK_APP_PAGE
-        } else {
-          URLManager.MARKET_PAGE
-        }
-
         try {
-          startActivity(Intent.parseUri(marketUrl, 0))
+          LCAppUtils.launchMarketPage(requireContext(), BuildConfig.APPLICATION_ID)
           Analytics.trackEvent(
             Constants.Event.SETTINGS,
             EventProperties().set("PREF_RATE", "Clicked")
