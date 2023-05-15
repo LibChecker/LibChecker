@@ -144,11 +144,11 @@ object LCAppUtils {
     context.startActivity(
       Intent.parseUri(
         "${
-          (if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
+          if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
             URLManager.COOLAPK_SCHEME
           } else {
             URLManager.MARKET_SCHEME
-          })
+          }
         }$packageName",
         0
       )
