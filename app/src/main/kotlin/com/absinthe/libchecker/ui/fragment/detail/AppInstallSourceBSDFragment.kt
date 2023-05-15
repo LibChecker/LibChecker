@@ -71,6 +71,8 @@ class AppInstallSourceBSDFragment :
       item.packageView.container.appName.text =
         getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
       item.packageView.container.packageName.text =
+        getString(R.string.lib_detail_app_install_source_shizuku_usage)
+      item.packageView.container.versionInfo.text =
         getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
       item.packageView.setOnClickListener {
         LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
@@ -80,6 +82,8 @@ class AppInstallSourceBSDFragment :
         item.packageView.container.appName.text =
           getString(R.string.lib_detail_app_install_source_shizuku_not_running)
         item.packageView.container.packageName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_usage)
+        item.packageView.container.versionInfo.text =
           getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
         item.packageView.setOnClickListener {
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
@@ -89,6 +93,8 @@ class AppInstallSourceBSDFragment :
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_low_version)
           item.packageView.container.packageName.text =
+            getString(R.string.lib_detail_app_install_source_shizuku_usage)
+          item.packageView.container.versionInfo.text =
             getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
           item.packageView.setOnClickListener {
             LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
@@ -97,6 +103,8 @@ class AppInstallSourceBSDFragment :
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
           item.packageView.container.packageName.text =
+            getString(R.string.lib_detail_app_install_source_shizuku_usage)
+          item.packageView.container.versionInfo.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
           item.packageView.setOnClickListener {
             if (permissionCallback == null) {

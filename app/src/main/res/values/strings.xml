@@ -161,8 +161,9 @@
   <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
   <string name="lib_detail_app_install_source_empty">Unknown</string>
   <string name="lib_detail_app_install_source_empty_detail">adb or uninstalled app</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.</string>
   <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
-  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.\nClick here to install Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
   <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
   <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
