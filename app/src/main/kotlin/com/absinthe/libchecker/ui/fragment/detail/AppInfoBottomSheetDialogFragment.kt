@@ -54,7 +54,7 @@ class AppInfoBottomSheetDialogFragment :
         if (packageName == BuildConfig.APPLICATION_ID) {
           Toasty.showShort(requireContext(), "But why…")
         } else {
-          PackageUtils.startLaunchAppActivity(requireContext(),packageName)
+          PackageUtils.startLaunchAppActivity(requireContext(), packageName)
         }
       } catch (e: Exception) {
         activity?.let {

@@ -247,7 +247,6 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
     }
     findPreference<Preference>(Constants.PREF_RATE)?.apply {
       setOnPreferenceClickListener {
-
         try {
           LCAppUtils.launchMarketPage(requireContext(), BuildConfig.APPLICATION_ID)
           Analytics.trackEvent(

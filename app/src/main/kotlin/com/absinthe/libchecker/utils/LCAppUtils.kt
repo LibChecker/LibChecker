@@ -143,7 +143,8 @@ object LCAppUtils {
   fun launchMarketPage(context: Context, packageName: String) {
     context.startActivity(
       Intent.parseUri(
-        "${(if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
+        "${
+          (if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
             URLManager.COOLAPK_SCHEME
           } else {
             URLManager.MARKET_SCHEME

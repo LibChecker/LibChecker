@@ -34,9 +34,13 @@ class AppInstallSourceBSDFragment :
   BaseBottomSheetViewDialogFragment<AppInstallSourceBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
+
   @SuppressLint("NewApi")
   private val permissionCallback = Shizuku.OnRequestPermissionResultListener { _, _ ->
-    initAppInstallSourceItemView(root.originatingView, PackageUtils.getInstallSourceInfo(packageName!!)!!.originatingPackageName)
+    initAppInstallSourceItemView(
+      root.originatingView,
+      PackageUtils.getInstallSourceInfo(packageName!!)!!.originatingPackageName
+    )
   }
 
   override fun initRootView(): AppInstallSourceBottomSheetView =

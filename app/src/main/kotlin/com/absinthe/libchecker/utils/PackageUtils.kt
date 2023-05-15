@@ -1192,7 +1192,7 @@ object PackageUtils {
     return LibStringItem(serialNumber, 0, source, null)
   }
 
-  fun startLaunchAppActivity(context: Context,packageName: String?) {
+  fun startLaunchAppActivity(context: Context, packageName: String?) {
     if (packageName == null) {
       return
     }
