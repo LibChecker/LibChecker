@@ -27,7 +27,7 @@ class AppInstallSourceItemView(context: Context) : AViewGroup(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
 
-  val packageView = AppItemView(context).apply {
+  val packageView = AppItemView(context, true).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.MATCH_PARENT,
       ViewGroup.LayoutParams.WRAP_CONTENT

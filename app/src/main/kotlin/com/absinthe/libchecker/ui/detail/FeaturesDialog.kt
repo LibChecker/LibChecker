@@ -2,7 +2,9 @@ package com.absinthe.libchecker.ui.detail
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
@@ -117,6 +119,7 @@ object FeaturesDialog {
     }
   }
 
+  @RequiresApi(Build.VERSION_CODES.R)
   fun showAppInstallSourceDialog(activity: FragmentActivity, packageName: String) {
     AppInstallSourceBSDFragment().apply {
       arguments = bundleOf(

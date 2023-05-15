@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+android:drawable="@drawable/bg_app_item_text"
+android:insetBottom="2dp"
+android:insetLeft="0dp"
+android:insetRight="0dp"
+android:insetTop="2dp"/>

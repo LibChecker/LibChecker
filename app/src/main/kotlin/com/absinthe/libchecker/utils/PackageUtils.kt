@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Process
 import android.text.format.Formatter
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.collection.arrayMapOf
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.R
@@ -1042,8 +1043,8 @@ object PackageUtils {
     }.getOrElse { emptyList() }
   }
 
+  @RequiresApi(Build.VERSION_CODES.R)
   fun getInstallSourceInfo(packageName: String): InstallSourceInfo? {
-    if (!OsUtils.atLeastR()) return null
     val origInstallSourceInfo = runCatching {
       SystemServices.packageManager.getInstallSourceInfo(packageName)
     }.getOrElse { e ->

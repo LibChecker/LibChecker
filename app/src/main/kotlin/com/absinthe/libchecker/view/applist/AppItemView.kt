@@ -8,6 +8,7 @@ import android.util.TypedValue
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.marginStart
@@ -21,6 +22,10 @@ import com.absinthe.libchecker.view.AViewGroup
 import com.google.android.material.card.MaterialCardView
 
 class AppItemView(context: Context) : MaterialCardView(context) {
+
+  constructor(context: Context, textAtMostMode: Boolean) : this(context) {
+    container.textAtMostMode = textAtMostMode
+  }
 
   val container = AppItemContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
@@ -59,6 +64,8 @@ class AppItemView(context: Context) : MaterialCardView(context) {
   }
 
   class AppItemContainerView(context: Context) : AViewGroup(context) {
+
+    var textAtMostMode: Boolean = false
 
     val icon = AppCompatImageView(context).apply {
       val iconSize = context.getDimensionPixelSize(R.dimen.app_icon_size)
@@ -135,6 +142,26 @@ class AppItemView(context: Context) : MaterialCardView(context) {
 
     private var badge: AppCompatImageView? = null
 
+    fun setAppName(text: String) {
+      appName.text = text
+      appName.setItemBackground()
+    }
+
+    fun setPackageName(text: String) {
+      packageName.text = text
+      packageName.setItemBackground()
+    }
+
+    fun setVersionInfo(text: String) {
+      versionInfo.text = text
+      versionInfo.setItemBackground()
+    }
+
+    fun setAbiInfo(text: String) {
+      abiInfo.text = text
+      abiInfo.setItemBackground()
+    }
+
     fun setBadge(res: Int) {
       setBadge(res.getDrawable(context))
     }
@@ -161,20 +188,25 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       icon.autoMeasure()
       val textWidth =
         measuredWidth - paddingStart - paddingEnd - icon.measuredWidth - appName.marginStart
+      val fixedTextWidth = if (textAtMostMode) {
+        textWidth.toAtMostMeasureSpec()
+      } else {
+        textWidth.toExactlyMeasureSpec()
+      }
       appName.measure(
-        textWidth.toExactlyMeasureSpec(),
+        fixedTextWidth,
         appName.defaultHeightMeasureSpec(this)
       )
       packageName.measure(
-        textWidth.toExactlyMeasureSpec(),
+        fixedTextWidth,
         packageName.defaultHeightMeasureSpec(this)
       )
       versionInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
+        fixedTextWidth,
         versionInfo.defaultHeightMeasureSpec(this)
       )
       abiInfo.measure(
-        textWidth.toExactlyMeasureSpec(),
+        fixedTextWidth,
         abiInfo.defaultHeightMeasureSpec(this)
       )
       badge?.autoMeasure()
@@ -192,5 +224,15 @@ class AppItemView(context: Context) : MaterialCardView(context) {
       abiInfo.layout(appName.left, versionInfo.bottom)
       badge?.layout(paddingTop, paddingEnd, fromRight = true)
     }
+  }
+}
+
+private fun TextView.setItemBackground() {
+  if (text.trim().isEmpty()) {
+    setBackgroundResource(R.drawable.bg_app_item_text_inset)
+    alpha = 0.65f
+  } else {
+    background = null
+    alpha = 1f
   }
 }
