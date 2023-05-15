@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import android.content.Context
+import android.content.Intent
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -13,6 +14,8 @@ import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.SPRING
 import com.absinthe.libchecker.annotation.SUMMER
 import com.absinthe.libchecker.annotation.WINTER
+import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.constant.URLManager
 import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.isTempApk
@@ -135,5 +138,19 @@ object LCAppUtils {
       }
       else -> true
     }
+  }
+
+  fun launchMarketPage(context: Context, packageName: String) {
+    context.startActivity(
+      Intent.parseUri(
+        "${(if (PackageUtils.isAppInstalled(Constants.PackageNames.COOLAPK)) {
+            URLManager.COOLAPK_SCHEME
+          } else {
+            URLManager.MARKET_SCHEME
+          })
+        }$packageName",
+        0
+      )
+    )
   }
 }

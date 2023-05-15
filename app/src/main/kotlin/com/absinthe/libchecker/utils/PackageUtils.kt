@@ -2,6 +2,7 @@ package com.absinthe.libchecker.utils
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
@@ -1057,8 +1058,8 @@ object PackageUtils {
       Timber.e("Requires Shizuku API 10")
       return origInstallSourceInfo
     } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-      Shizuku.requestPermission(0)
-      return getInstallSourceInfo(packageName)
+      Timber.i("Shizuku not authorized")
+      return origInstallSourceInfo
     }
     return IPackageManager.Stub.asInterface(
       ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
@@ -1189,5 +1190,22 @@ object PackageUtils {
       append(signature.toCharsString())
     }
     return LibStringItem(serialNumber, 0, source, null)
+  }
+
+  fun startLaunchAppActivity(context: Context,packageName: String?) {
+    if (packageName == null) {
+      return
+    }
+    val launcherActivity: String
+    val intent = Intent(Intent.ACTION_MAIN, null)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setPackage(packageName)
+    val info = PackageManagerCompat.queryIntentActivities(intent, 0)
+    launcherActivity = info.getOrNull(0)?.activityInfo?.name.orEmpty()
+    val launchIntent = Intent(Intent.ACTION_MAIN)
+      .addCategory(Intent.CATEGORY_LAUNCHER)
+      .setClassName(packageName, launcherActivity)
+      .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(launchIntent)
   }
 }

@@ -156,8 +156,16 @@
   <string name="lib_detail_xposed_default_scope">Default Scope</string>
   <string name="lib_detail_xposed_init_class">Init Class</string>
   <string name="lib_detail_app_install_source_title">Installation Source</string>
-  <string name="lib_detail_app_install_source_initiating_package">Installation requester</string>
+  <string name="lib_detail_app_install_source_originating_package">Installation requester</string>
   <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
+  <string name="lib_detail_app_install_source_empty">Unknown</string>
+  <string name="lib_detail_app_install_source_empty_detail">adb or uninstalled app</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.\nClick here to install Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
 
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Copied to clipboard</string>

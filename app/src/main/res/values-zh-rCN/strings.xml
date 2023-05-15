@@ -146,8 +146,16 @@
   <string name="lib_detail_xposed_default_scope">默认 Scope</string>
   <string name="lib_detail_xposed_init_class">初始化类</string>
   <string name="lib_detail_app_install_source_title">安装来源</string>
-  <string name="lib_detail_app_install_source_initiating_package">安装请求方</string>
+  <string name="lib_detail_app_install_source_originating_package">安装请求方</string>
   <string name="lib_detail_app_install_source_installing_package">安装执行方</string>
+  <string name="lib_detail_app_install_source_empty">未知</string>
+  <string name="lib_detail_app_install_source_empty_detail">adb 或已被卸载的 App</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 未安装</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">因为安卓限制了获取安装请求者的 API, 我们使用 Shizuku 来获取安装请求者。\n点此安装 Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku 未启动</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">点此跳转到 Shizuku 以启动它</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未授权</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">点此进行 Shizuku 授权以获取安装请求者</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>

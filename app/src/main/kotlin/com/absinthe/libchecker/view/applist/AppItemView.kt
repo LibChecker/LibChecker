@@ -94,7 +94,6 @@ class AppItemView(context: Context) : MaterialCardView(context) {
         )
         setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-        maxLines = 1
         ellipsize = TextUtils.TruncateAt.END
         addView(this)
       }

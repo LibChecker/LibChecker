@@ -22,6 +22,7 @@ import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.AbilityType
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -505,7 +506,7 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
 
     if (OsUtils.atLeastR()) {
       runCatching {
-        val info = PackageUtils.getInstallSourceInfo(packageInfo.packageName) ?: throw NullPointerException()
+        val info = SystemServices.packageManager.getInstallSourceInfo(packageInfo.packageName)
         if (info.originatingPackageName != null || info.installingPackageName != null) {
           _featuresFlow.emit(VersionedFeature(Features.Ext.APPLICATION_INSTALL_SOURCE, info.initiatingPackageName))
         }

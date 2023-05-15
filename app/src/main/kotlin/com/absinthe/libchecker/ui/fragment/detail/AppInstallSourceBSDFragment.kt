@@ -1,11 +1,11 @@
 package com.absinthe.libchecker.ui.fragment.detail
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
-import android.view.View
-import android.widget.TextView
 import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import androidx.core.view.isGone
@@ -17,21 +17,27 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
 import com.absinthe.libchecker.ui.detail.EXTRA_PACKAGE_NAME
+import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
-import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.AppInstallSourceBottomSheetView
+import com.absinthe.libchecker.view.detail.AppInstallSourceItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.runBlocking
+import rikka.shizuku.Shizuku
 
 class AppInstallSourceBSDFragment :
   BaseBottomSheetViewDialogFragment<AppInstallSourceBottomSheetView>() {
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
+  @SuppressLint("NewApi")
+  private val permissionCallback = Shizuku.OnRequestPermissionResultListener { _, _ ->
+    initAppInstallSourceItemView(root.originatingView, PackageUtils.getInstallSourceInfo(packageName!!)!!.originatingPackageName)
+  }
 
   override fun initRootView(): AppInstallSourceBottomSheetView =
     AppInstallSourceBottomSheetView(requireContext())
@@ -45,29 +51,70 @@ class AppInstallSourceBSDFragment :
     val packageName = packageName ?: return
     val info = PackageUtils.getInstallSourceInfo(packageName) ?: return
 
-    initAppItemContainerView(root.initiatingTitleView, root.initiatingPackageView.container, info.originatingPackageName)
-    initAppItemContainerView(root.installingTitleView, root.installingPackageView.container, info.installingPackageName)
+    initOriginatingItemView(root.originatingView, info.originatingPackageName)
+    initAppInstallSourceItemView(root.installingView, info.installingPackageName)
   }
 
-  private fun initAppItemContainerView(
-    title: TextView,
-    view: AppItemView.AppItemContainerView,
-    packageName: String?
+  private fun initOriginatingItemView(
+    item: AppInstallSourceItemView,
+    originatingPackageName: String?
   ) {
-    if (packageName == null || context == null) {
-      title.isGone = true
-      (view.parent as View).isGone = true
+    if (context == null) {
+      item.isGone = true
       return
     }
+    if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU)) {
+      item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
+      item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
+      item.packageView.setOnClickListener {
+        LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+      }
+    } else {
+      if (!Shizuku.pingBinder()) {
+        item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_not_running)
+        item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
+        item.packageView.setOnClickListener {
+          PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
+        }
+      } else {
+        if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+          item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
+          item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
+          item.packageView.setOnClickListener {
+            Shizuku.addRequestPermissionResultListener(permissionCallback)
+            Shizuku.requestPermission(0)
+          }
+        } else {
+          initAppInstallSourceItemView(item, originatingPackageName)
+        }
+      }
+    }
+  }
+
+  private fun initAppInstallSourceItemView(
+    item: AppInstallSourceItemView,
+    packageName: String?
+  ) {
+    if (context == null) {
+      item.isGone = true
+      return
+    }
+
+    if (packageName == null) {
+      item.packageView.container.appName.text = getString(R.string.lib_detail_app_install_source_empty)
+      item.packageView.container.packageName.text = getString(R.string.lib_detail_app_install_source_empty_detail)
+      return
+    }
+
     val targetLCItem = runBlocking { Repositories.lcRepository.getItem(packageName) } ?: return
 
     val pi = runCatching {
       PackageUtils.getPackageInfo(packageName)
     }.getOrNull()
-    view.icon.load(pi)
-    view.appName.text = targetLCItem.label
-    view.packageName.text = packageName
-    view.versionInfo.text =
+    item.packageView.container.icon.load(pi)
+    item.packageView.container.appName.text = targetLCItem.label
+    item.packageView.container.packageName.text = packageName
+    item.packageView.container.versionInfo.text =
       PackageUtils.getVersionString(targetLCItem.versionName, targetLCItem.versionCode)
 
     val str = StringBuilder()
@@ -83,22 +130,24 @@ class AppInstallSourceBSDFragment :
         val span = CenterAlignImageSpan(drawable)
         spanString.setSpan(span, 0, 1, ImageSpan.ALIGN_BOTTOM)
       }
-      view.abiInfo.text = spanString
+      item.packageView.container.abiInfo.text = spanString
     } else {
-      view.abiInfo.text = str
+      item.packageView.container.abiInfo.text = str
     }
 
     if (targetLCItem.variant == Constants.VARIANT_HAP) {
-      view.setBadge(R.drawable.ic_harmony_badge)
+      item.packageView.container.setBadge(R.drawable.ic_harmony_badge)
     } else {
-      view.setBadge(null)
+      item.packageView.container.setBadge(null)
     }
 
-    (view.parent as View).setOnClickListener {
+    item.packageView.setOnClickListener {
       activity?.finish()
       dismiss()
       activity?.launchDetailPage(targetLCItem)
     }
+
+    Shizuku.removeRequestPermissionResultListener(permissionCallback)
   }
 
   private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
