@@ -28,6 +28,7 @@ import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.runBlocking
 import rikka.shizuku.Shizuku
+import rikka.sui.Sui
 
 @RequiresApi(Build.VERSION_CODES.R)
 class AppInstallSourceBSDFragment :
@@ -67,7 +68,7 @@ class AppInstallSourceBSDFragment :
       return
     }
     item.packageView.container.icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_shizuku)
-    if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU)) {
+    if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU) && !Sui.isSui()) {
       item.packageView.container.appName.text =
         getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
       item.packageView.container.packageName.text =
@@ -99,7 +100,7 @@ class AppInstallSourceBSDFragment :
           item.packageView.setOnClickListener {
             LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
           }
-        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED && !Sui.isSui()) {
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
           item.packageView.container.packageName.text =
