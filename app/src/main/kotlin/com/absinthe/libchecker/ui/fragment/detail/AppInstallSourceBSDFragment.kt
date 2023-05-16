@@ -100,7 +100,7 @@ class AppInstallSourceBSDFragment :
           item.packageView.setOnClickListener {
             LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
           }
-        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED && !Sui.isSui()) {
+        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
           item.packageView.container.appName.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
           item.packageView.container.packageName.text =
