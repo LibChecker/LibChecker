@@ -4,14 +4,12 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import androidx.lifecycle.MutableLiveData
 import com.absinthe.libchecker.BuildConfig
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_SIZE
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.SPDelegates
 import com.absinthe.libchecker.utils.SPUtils
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import java.util.Locale
-import rikka.sui.Sui
 
 const val SP_NAME = "${BuildConfig.APPLICATION_ID}_preferences"
 
@@ -81,6 +79,4 @@ object GlobalValues {
   var isGitHubUnreachable = true
 
   var trackItemsChanged = false
-
-  val isSuiAvailable by lazy { Sui.init(LibCheckerApp.app.packageName) }
 }
