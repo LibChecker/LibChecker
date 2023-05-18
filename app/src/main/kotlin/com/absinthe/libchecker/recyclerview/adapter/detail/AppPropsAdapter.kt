@@ -81,11 +81,11 @@ class AppPropsAdapter(
 
     if (itemView.linkToIcon.isVisible) {
       itemView.linkToIcon.setOnClickListener {
-        val transformed = itemView.linkToIcon.getTag(item.value.toInt()) as? Boolean ?: false
+        val transformed = itemView.linkToIcon.tag as? Boolean? ?: false
         if (transformed) {
           itemView.value.text = parseValue(item)
           itemView.linkToIcon.setImageResource(R.drawable.ic_outline_change_circle_24)
-          itemView.linkToIcon.setTag(item.value.toInt(), false)
+          itemView.linkToIcon.tag = false
         } else {
           var clickedTag = false
           Timber.d("type: $type")
@@ -145,7 +145,7 @@ class AppPropsAdapter(
               }
             }
           }
-          itemView.linkToIcon.setTag(item.value.toInt(), clickedTag)
+          itemView.linkToIcon.tag = clickedTag
         }
       }
     }
