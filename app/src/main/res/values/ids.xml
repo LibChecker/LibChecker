@@ -9,4 +9,6 @@
   <item name="sort_by_target_version" type="id" />
 
   <item name="adapter_bottom_padding_id" type="id" />
+
+  <item name="resource_transformed_id" type="id" />
 </resources>
