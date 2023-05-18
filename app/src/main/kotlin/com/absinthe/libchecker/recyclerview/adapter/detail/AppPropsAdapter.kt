@@ -55,12 +55,21 @@ class AppPropsAdapter(
     8 to "accessibility"
   )
 
+  private val installLocation = mapOf(
+    0 to "auto",
+    1 to "internalOnly",
+    2 to "preferExternal"
+  )
+
   private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
     return when {
       item.key == "appCategory" -> {
         category.getValue(item.value.toInt())
+      }
+      item.key == "installLocation" -> {
+        installLocation.getValue(item.value.toInt())
       }
       item.value.maybeResourceId() -> {
         runCatching {
