@@ -643,7 +643,7 @@ abstract class BaseAppDetailActivity :
     if (!isHarmonyMode) {
       viewModel.initComponentsData()
     } else {
-      viewModel.initAbilities(packageInfo.packageName)
+      viewModel.initAbilities(this, packageInfo.packageName)
     }
 
     // To ensure onPostPackageInfoAvailable() is executed at the end of ui thread

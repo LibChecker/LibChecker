@@ -1,12 +1,11 @@
 package com.absinthe.libchecker.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -62,7 +61,7 @@ import timber.log.Timber
 
 const val CURRENT_SNAPSHOT = -1L
 
-class SnapshotViewModel(application: Application) : AndroidViewModel(application) {
+class SnapshotViewModel : ViewModel() {
 
   val repository = Repositories.lcRepository
   val allSnapshots = repository.allSnapshotItemsFlow

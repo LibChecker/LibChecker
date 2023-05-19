@@ -1,15 +1,13 @@
 package com.absinthe.libchecker.viewmodel
 
-import android.app.Application
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.util.SparseArray
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -66,7 +64,7 @@ import ohos.bundle.IBundleManager
 import retrofit2.HttpException
 import timber.log.Timber
 
-class DetailViewModel(application: Application) : AndroidViewModel(application) {
+class DetailViewModel : ViewModel() {
 
   val detailBean: MutableLiveData<LibDetailBean?> = MutableLiveData()
 
@@ -166,8 +164,8 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     }
   }
 
-  fun initSignatures() = viewModelScope.launch {
-    signaturesLibItems.value = getSignatureChipList()
+  fun initSignatures(context: Context) = viewModelScope.launch {
+    signaturesLibItems.value = getSignatureChipList(context)
   }
 
   fun initComponentsData() = viewModelScope.launch(Dispatchers.IO) {
@@ -368,20 +366,18 @@ class DetailViewModel(application: Application) : AndroidViewModel(application) 
     return chipList
   }
 
-  private suspend fun getSignatureChipList(): List<LibStringItemChip> =
+  private suspend fun getSignatureChipList(context: Context): List<LibStringItemChip> =
     withContext(Dispatchers.IO) {
-      packageInfo.getSignatures(getApplication()).map {
+      packageInfo.getSignatures(context).map {
         LibStringItemChip(it, null)
       }.toList()
     }
 
-  fun initAbilities(packageName: String) = viewModelScope.launch(Dispatchers.IO) {
+  fun initAbilities(context: Context, packageName: String) = viewModelScope.launch(Dispatchers.IO) {
     abilitiesMap.put(AbilityType.PAGE, MutableLiveData())
     abilitiesMap.put(AbilityType.SERVICE, MutableLiveData())
     abilitiesMap.put(AbilityType.WEB, MutableLiveData())
     abilitiesMap.put(AbilityType.DATA, MutableLiveData())
-
-    val context: Context = getApplication<LibCheckerApp>()
 
     try {
       ApplicationDelegate(context).iBundleManager?.getBundleInfo(

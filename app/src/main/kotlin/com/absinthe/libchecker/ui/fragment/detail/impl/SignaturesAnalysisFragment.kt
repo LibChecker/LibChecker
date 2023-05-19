@@ -60,7 +60,7 @@ class SignaturesAnalysisFragment : BaseDetailFragment<FragmentLibComponentBindin
       setDiffCallback(LibStringDiffUtil())
       setEmptyView(emptyView)
     }
-    viewModel.initSignatures()
+    viewModel.initSignatures(requireContext())
   }
 
   override fun getFilterListByText(text: String): List<LibStringItemChip>? {

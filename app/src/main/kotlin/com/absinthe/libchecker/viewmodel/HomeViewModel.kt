@@ -1,13 +1,12 @@
 package com.absinthe.libchecker.viewmodel
 
-import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.ComponentInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.annotation.ACTIVITY
@@ -63,7 +62,7 @@ import kotlinx.coroutines.launch
 import ohos.bundle.IBundleManager
 import timber.log.Timber
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel : ViewModel() {
 
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
 

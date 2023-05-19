@@ -1,10 +1,9 @@
 package com.absinthe.libchecker.viewmodel
 
-import android.app.Application
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.LibType
@@ -25,7 +24,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class LibReferenceViewModel(application: Application) : AndroidViewModel(application) {
+class LibReferenceViewModel : ViewModel() {
 
   val libRefList: MutableLiveData<List<LCItem>> = MutableLiveData()
   val dbItemsFlow: Flow<List<LCItem>> = Repositories.lcRepository.allLCItemsFlow
