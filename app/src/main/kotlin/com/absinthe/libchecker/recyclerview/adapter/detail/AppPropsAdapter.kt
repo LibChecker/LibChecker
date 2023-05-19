@@ -47,11 +47,11 @@ class AppPropsAdapter(
   private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
-    try {
-      if (item.value.maybeResourceId()) {
+    if (item.value.maybeResourceId()) {
+      try {
         return appResources.getResourceName(item.value.toInt())
-      }
-    } catch (_: Exception) {}
+      } catch (_: Exception) {}
+    }
     return PropertiesMap.parseProperty(item.key, item.value)
   }
 
