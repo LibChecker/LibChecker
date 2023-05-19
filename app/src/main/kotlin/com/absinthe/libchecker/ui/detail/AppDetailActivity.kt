@@ -23,10 +23,25 @@ const val EXTRA_DETAIL_BEAN = "EXTRA_DETAIL_BEAN"
 
 class AppDetailActivity : BaseAppDetailActivity(), IDetailContainer {
 
-  private val pkgName by unsafeLazy { intent.getStringExtra(EXTRA_PACKAGE_NAME) }
-  private val refName by unsafeLazy { intent.getStringExtra(EXTRA_REF_NAME) }
-  private val refType by unsafeLazy { intent.getIntExtra(EXTRA_REF_TYPE, ALL) }
-  private val extraBean by unsafeLazy { IntentCompat.getParcelableExtra<DetailExtraBean>(intent, EXTRA_DETAIL_BEAN) }
+  private val pkgName by unsafeLazy {
+    intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: let {
+      intent.data?.let { uri ->
+        uri.getQueryParameter("id").takeIf { uri.scheme == "market" && uri.host == "details" }
+      }
+    }
+  }
+  private val refName by unsafeLazy {
+    intent.getStringExtra(EXTRA_REF_NAME)
+  }
+  private val refType by unsafeLazy {
+    intent.getIntExtra(EXTRA_REF_TYPE, ALL)
+  }
+  private val extraBean by unsafeLazy {
+    IntentCompat.getParcelableExtra<DetailExtraBean>(
+      intent,
+      EXTRA_DETAIL_BEAN
+    )
+  }
 
   override val apkAnalyticsMode: Boolean = false
   override fun requirePackageName() = pkgName
