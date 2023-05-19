@@ -47,13 +47,12 @@ class AppPropsAdapter(
   private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
-    return if (item.value.maybeResourceId()) {
-      runCatching {
-        appResources.getResourceName(item.value.toInt())
-      }.getOrDefault(PropertiesMap.parseProperty(item.key, item.value))
-    } else {
-      PropertiesMap.parseProperty(item.key, item.value)
-    }
+    try {
+      if (item.value.maybeResourceId()) {
+        return appResources.getResourceName(item.value.toInt())
+      }
+    } catch (_: Exception) {}
+    return PropertiesMap.parseProperty(item.key, item.value)
   }
 
   private fun initLinkBtn(itemView: AppPropItemView, item: AppPropItem) {
