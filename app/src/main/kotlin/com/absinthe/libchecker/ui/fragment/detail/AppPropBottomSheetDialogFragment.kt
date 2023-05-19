@@ -31,7 +31,13 @@ class AppPropBottomSheetDialogFragment :
         emptyList()
       } else {
         propsMap.map { prop ->
-          AppPropItem(key = prop.key, value = prop.value?.toString().orEmpty())
+          AppPropItem(
+            key = prop.key,
+            value = when (val value = prop.value) {
+              is pxb.android.axml.ValueWrapper -> value.ref.toString()
+              else -> value?.toString().orEmpty()
+            }
+          )
         }.sortedBy { item -> item.key }
       }
       root.adapter.setList(bundleList)
