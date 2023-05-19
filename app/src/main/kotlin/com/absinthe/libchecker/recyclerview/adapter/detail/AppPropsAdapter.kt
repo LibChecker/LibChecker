@@ -12,6 +12,7 @@ import com.absinthe.libchecker.model.AppPropItem
 import com.absinthe.libchecker.ui.fragment.detail.EXTRA_TEXT
 import com.absinthe.libchecker.ui.fragment.detail.XmlBSDFragment
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
+import com.absinthe.libchecker.utils.manifest.PropertiesMap
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 import com.absinthe.libchecker.view.detail.AppPropItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -43,41 +44,15 @@ class AppPropsAdapter(
     }
   }
 
-  private val category = mapOf(
-    0 to "game",
-    1 to "audio",
-    2 to "video",
-    3 to "image",
-    4 to "social",
-    5 to "news",
-    6 to "maps",
-    7 to "productivity",
-    8 to "accessibility"
-  )
-
-  private val installLocation = mapOf(
-    0 to "auto",
-    1 to "internalOnly",
-    2 to "preferExternal"
-  )
-
   private val linkable = setOf("string", "array", "bool", "xml", "drawable", "mipmap", "color", "dimen")
 
   private fun parseValue(item: AppPropItem): String {
-    return when {
-      item.key == "appCategory" -> {
-        category.getValue(item.value.toInt())
-      }
-      item.key == "installLocation" -> {
-        installLocation.getValue(item.value.toInt())
-      }
-      item.value.maybeResourceId() -> {
-        runCatching {
-          appResources.getResourceName(item.value.toInt())
-        }.getOrDefault(item.value)
-      }
-      else -> item.value
+    if (item.value.maybeResourceId()) {
+      try {
+        return appResources.getResourceName(item.value.toInt())
+      } catch (_: Exception) {}
     }
+    return PropertiesMap.parseProperty(item.key, item.value)
   }
 
   private fun initLinkBtn(itemView: AppPropItemView, item: AppPropItem) {
