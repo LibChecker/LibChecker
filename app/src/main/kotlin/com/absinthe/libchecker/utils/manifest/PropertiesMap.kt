@@ -89,6 +89,13 @@ object PropertiesMap {
     4 to "singleInstance"
   )
 
+  private val memtagModes = mapOf(
+    -1 to "default",
+    0 to "off",
+    1 to "async",
+    2 to "sync"
+  )
+
   fun parseProperty(key: String, value: String): String {
     fun String.addOrigValue(): String {
       return "$this ($value)"
@@ -114,7 +121,7 @@ object PropertiesMap {
       }
 
       "screenOrientation" -> {
-        screenOrientations.getValue(value.toInt())
+        screenOrientations.getValue(value.toInt()).addOrigValue()
       }
 
       "windowSoftInputMode" -> {
@@ -142,6 +149,10 @@ object PropertiesMap {
 
       "launchMode" -> {
         launchModes.getValue(value.toInt()).addOrigValue()
+      }
+
+      "memtagMode" -> {
+        memtagModes.getValue(value.toInt()).addOrigValue()
       }
 
       else -> value
