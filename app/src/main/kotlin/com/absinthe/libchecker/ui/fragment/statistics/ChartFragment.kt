@@ -60,9 +60,9 @@ import timber.log.Timber
 
 private const val TYPE_ABI = 0
 private const val TYPE_KOTLIN = 1
-private const val TYPE_COMPOSE = 2
-private const val TYPE_TARGET_API = 3
-private const val TYPE_MIN_SDK = 4
+private const val TYPE_TARGET_API = 2
+private const val TYPE_MIN_SDK = 3
+private const val TYPE_COMPOSE = 4
 
 private val ABI_64_BIT = setOf(ARMV8, X86_64)
 private val ABI_32_BIT = setOf(ARMV5, ARMV7, X86)
@@ -120,9 +120,9 @@ class ChartFragment :
     when (chartType) {
       TYPE_ABI -> setAbiData()
       TYPE_KOTLIN -> setKotlinData()
-      TYPE_COMPOSE -> setComposeData()
       TYPE_TARGET_API -> setTargetApiData()
       TYPE_MIN_SDK -> setMinSdkData()
+      TYPE_COMPOSE -> setComposeData()
     }
   }
 
@@ -297,84 +297,6 @@ class ChartFragment :
     }
   }
 
-  private fun setComposeData() {
-    binding.progressHorizontal.show()
-    if (chartView.parent != null) {
-      binding.root.removeView(chartView)
-    }
-    chartView = generatePieChartView()
-    binding.root.addView(chartView, -1)
-    queryJob?.cancel()
-    queryJob = lifecycleScope.launch(Dispatchers.IO) {
-      val context = context ?: return@launch
-      val parties = listOf(
-        resources.getString(R.string.string_compose_used),
-        resources.getString(R.string.string_compose_unused)
-      )
-      val entries: ArrayList<PieEntry> = ArrayList()
-
-      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
-        viewModel.dbItems.value
-      } else {
-        viewModel.dbItems.value?.filter { !it.isSystem }
-      }
-      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-
-      filteredList?.let {
-        val list = mutableListOf(0, 0)
-
-        for (item in it) {
-          if ((item.features and Features.JETPACK_COMPOSE) > 0) {
-            list[0]++
-          } else {
-            list[1]++
-          }
-        }
-
-        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
-        // the chart.
-        legendList.clear()
-        for (i in parties.indices) {
-          entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
-          legendList.add(parties[i % parties.size])
-        }
-        val dataSet = PieDataSet(entries, "").apply {
-          setDrawIcons(false)
-          sliceSpace = 3f
-          iconsOffset = MPPointF(0f, 40f)
-          selectionShift = 5f
-          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
-          valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-        }
-
-        // add a lot of colors
-        val colors = arrayListOf(
-          Color.parseColor("#37bf6e"),
-          Color.parseColor("#073042")
-        )
-
-        dataSet.colors = colors
-        // dataSet.setSelectionShift(0f);
-        val data = PieData(dataSet).apply {
-          setValueFormatter(PercentFormatter(chartView as PieChart))
-          setValueTextSize(10f)
-          setValueTextColor(colorOnSurface)
-        }
-
-        withContext(Dispatchers.Main) {
-          (chartView as PieChart).apply {
-            this.data = data
-            setEntryLabelColor(colorOnSurface)
-            highlightValues(null)
-            invalidate()
-          }
-          binding.progressHorizontal.hide()
-        }
-      }
-    }
-  }
-
   private fun setTargetApiData() {
     binding.progressHorizontal.show()
     queryJob?.cancel()
@@ -525,6 +447,84 @@ class ChartFragment :
     }
   }
 
+  private fun setComposeData() {
+    binding.progressHorizontal.show()
+    if (chartView.parent != null) {
+      binding.root.removeView(chartView)
+    }
+    chartView = generatePieChartView()
+    binding.root.addView(chartView, -1)
+    queryJob?.cancel()
+    queryJob = lifecycleScope.launch(Dispatchers.IO) {
+      val context = context ?: return@launch
+      val parties = listOf(
+        resources.getString(R.string.string_compose_used),
+        resources.getString(R.string.string_compose_unused)
+      )
+      val entries: ArrayList<PieEntry> = ArrayList()
+
+      val filteredList = if (GlobalValues.isShowSystemApps.value == true) {
+        viewModel.dbItems.value
+      } else {
+        viewModel.dbItems.value?.filter { !it.isSystem }
+      }
+      val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+
+      filteredList?.let {
+        val list = mutableListOf(0, 0)
+
+        for (item in it) {
+          if ((item.features and Features.JETPACK_COMPOSE) > 0) {
+            list[0]++
+          } else {
+            list[1]++
+          }
+        }
+
+        // NOTE: The order of the entries when being added to the entries array determines their position around the center of
+        // the chart.
+        legendList.clear()
+        for (i in parties.indices) {
+          entries.add(PieEntry(list[i].toFloat(), parties[i % parties.size]))
+          legendList.add(parties[i % parties.size])
+        }
+        val dataSet = PieDataSet(entries, "").apply {
+          setDrawIcons(false)
+          sliceSpace = 3f
+          iconsOffset = MPPointF(0f, 40f)
+          selectionShift = 5f
+          xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+          valueLineColor = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+        }
+
+        // add a lot of colors
+        val colors = arrayListOf(
+          Color.parseColor("#37bf6e"),
+          Color.parseColor("#073042")
+        )
+
+        dataSet.colors = colors
+        // dataSet.setSelectionShift(0f);
+        val data = PieData(dataSet).apply {
+          setValueFormatter(PercentFormatter(chartView as PieChart))
+          setValueTextSize(10f)
+          setValueTextColor(colorOnSurface)
+        }
+
+        withContext(Dispatchers.Main) {
+          (chartView as PieChart).apply {
+            this.data = data
+            setEntryLabelColor(colorOnSurface)
+            highlightValues(null)
+            invalidate()
+          }
+          binding.progressHorizontal.hide()
+        }
+      }
+    }
+  }
+
   override fun onNothingSelected() {
     Timber.d("Nothing selected")
   }
@@ -603,24 +603,6 @@ class ChartFragment :
           }
           viewModel.androidVersion.postValue(null)
         }
-        TYPE_COMPOSE -> {
-          when (legendList.getOrNull(h.x.toInt())) {
-            getString(R.string.string_compose_used) -> {
-              dialogTitle = getString(R.string.string_compose_used)
-              filteredList?.filter { (it.features and Features.JETPACK_COMPOSE) > 0 }
-                ?.let { filter ->
-                  item = ArrayList(filter)
-                }
-            }
-            getString(R.string.string_compose_unused) -> {
-              dialogTitle = getString(R.string.string_compose_unused)
-              filteredList?.filter { (it.features and Features.JETPACK_COMPOSE) == 0 }
-                ?.let { filter ->
-                  item = ArrayList(filter)
-                }
-            }
-          }
-        }
         TYPE_TARGET_API -> {
           val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
           var packageInfo: PackageInfo?
@@ -643,6 +625,24 @@ class ChartFragment :
             runCatching { PackageUtils.getPackageInfo(it.packageName) }.getOrNull()
               ?.let { it.applicationInfo.minSdkVersion == minSdk } ?: false
           }?.let { filter -> item = ArrayList(filter) }
+        }
+        TYPE_COMPOSE -> {
+          when (legendList.getOrNull(h.x.toInt())) {
+            getString(R.string.string_compose_used) -> {
+              dialogTitle = getString(R.string.string_compose_used)
+              filteredList?.filter { (it.features and Features.JETPACK_COMPOSE) > 0 }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
+            getString(R.string.string_compose_unused) -> {
+              dialogTitle = getString(R.string.string_compose_unused)
+              filteredList?.filter { (it.features and Features.JETPACK_COMPOSE) == 0 }
+                ?.let { filter ->
+                  item = ArrayList(filter)
+                }
+            }
+          }
         }
       }
 
@@ -678,14 +678,14 @@ class ChartFragment :
       R.id.btn_kotlin -> if (isChecked) {
         chartType = TYPE_KOTLIN
       }
-      R.id.btn_compose -> if (isChecked) {
-        chartType = TYPE_COMPOSE
-      }
       R.id.btn_target_api -> if (isChecked) {
         chartType = TYPE_TARGET_API
       }
       R.id.btn_min_sdk -> if (isChecked) {
         chartType = TYPE_MIN_SDK
+      }
+      R.id.btn_compose -> if (isChecked) {
+        chartType = TYPE_COMPOSE
       }
     }
     setData()
