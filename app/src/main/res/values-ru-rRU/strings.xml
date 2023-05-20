@@ -46,6 +46,8 @@
   <string name="ref_category_signatures">подпись</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
+  <string name="string_compose_used">Используется Jetpack Compose</string>
+  <string name="string_compose_unused">Jetpack Compose не используется</string>
   <!--  About  -->
   <string name="settings_about">О приложении</string>
   <string name="settings_translate">Участвуйте в переводе</string>
