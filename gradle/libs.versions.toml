@@ -83,7 +83,7 @@ appCenter-crashes = { module = "com.microsoft.appcenter:appcenter-crashes", vers
 appIconLoader = "me.zhanghai.android.appiconloader:appiconloader:1.5.0"
 appIconLoader-coil = "me.zhanghai.android.appiconloader:appiconloader-coil:1.5.0"
 brvah = "com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.11"
-coil = "io.coil-kt:coil:2.3.0"
+coil = "io.coil-kt:coil:2.4.0"
 commons-io = "commons-io:commons-io:2.12.0"
 commons-compress = "org.apache.commons:commons-compress:1.23.0"
 dexLib2 = "org.smali:dexlib2:2.5.2"
