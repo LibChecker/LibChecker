@@ -49,7 +49,9 @@ class LibReferenceViewModel : ViewModel() {
         list.filter { !it.isSystem }
       }
 
-      libRefList.postValue(filterList)
+      if (libRefList.value != filterList) {
+        libRefList.postValue(filterList)
+      }
     }
   }
 
@@ -132,6 +134,8 @@ class LibReferenceViewModel : ViewModel() {
       list.filter { !it.isSystem }
     }
 
-    libRefList.postValue(filterList)
+    if (libRefList.value != filterList) {
+      libRefList.postValue(filterList)
+    }
   }
 }
