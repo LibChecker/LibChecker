@@ -146,6 +146,19 @@
   <string name="lib_detail_xposed_min_version">Min 版本</string>
   <string name="lib_detail_xposed_default_scope">預設範圍</string>
   <string name="lib_detail_xposed_init_class">初始類別</string>
+  <string name="lib_detail_app_install_source_title">安裝來源</string>
+  <string name="lib_detail_app_install_source_originating_package">安裝要求者</string>
+  <string name="lib_detail_app_install_source_installing_package">安裝執行程式</string>
+  <string name="lib_detail_app_install_source_empty">未知</string>
+  <string name="lib_detail_app_install_source_empty_detail">ADB 或已解除安裝的應用程式</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">因為 Android 限制了取得安裝要求者的 API，我們使用 Shizuku 以取得安裝要求者。</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku 尚未安裝</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">按一下這裡以安裝 Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">需要 Shizuku API 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">按一下這裡以更新 Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku 未在執行</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">按一下這裡以跳轉到 Shizuku 以將其啟動</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未經授權</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
