@@ -159,6 +159,7 @@
   <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku 未在執行</string>
   <string name="lib_detail_app_install_source_shizuku_not_running_detail">按一下這裡以跳轉到 Shizuku 以將其啟動</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku 未經授權</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">按一下這裡進行 Shizuku 授權以取得安裝要求者</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="toast_not_existing_market">裝置中不存在應用市集</string>
