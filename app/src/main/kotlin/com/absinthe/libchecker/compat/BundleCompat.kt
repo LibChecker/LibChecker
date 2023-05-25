@@ -4,16 +4,13 @@ package com.absinthe.libchecker.compat
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.core.os.BundleCompat as AndroidXBuildCompat
 import com.absinthe.libchecker.utils.OsUtils
 import java.io.Serializable
 
 object BundleCompat {
   inline fun <reified T : Parcelable> getParcelable(bundle: Bundle, key: String?): T? {
-    return if (OsUtils.atLeastT()) {
-      bundle.getParcelable(key, T::class.java)
-    } else {
-      bundle.getParcelable(key)
-    }
+    return AndroidXBuildCompat.getParcelable(bundle, key, T::class.java)
   }
 
   inline fun <reified T : Serializable> getSerializable(bundle: Bundle, key: String?): T? {
@@ -25,10 +22,6 @@ object BundleCompat {
   }
 
   inline fun <reified T : Parcelable> getParcelableArrayList(bundle: Bundle, key: String?): ArrayList<T>? {
-    return if (OsUtils.atLeastT()) {
-      bundle.getParcelableArrayList(key, T::class.java)
-    } else {
-      bundle.getParcelableArrayList(key)
-    }
+    return AndroidXBuildCompat.getParcelableArrayList(bundle, key, T::class.java)
   }
 }
