@@ -119,15 +119,15 @@
     public protected *;
 }
 
-## R8 full mode
-## Once
-#-keep,allowobfuscation,allowshrinking class jonathanfinerty.once.PersistedMap
-#
-## ViewBinding
-#-keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
-#-keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
-#
-## TODO: Waiting for new retrofit release to remove these rules
-#-keep,allowobfuscation,allowshrinking interface retrofit2.Call
-#-keep,allowobfuscation,allowshrinking class retrofit2.Response
-#-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+# R8 full mode
+# Once
+-keep,allowobfuscation,allowshrinking class jonathanfinerty.once.PersistedMap
+
+# ViewBinding
+-keep,allowobfuscation,allowshrinking class com.absinthe.libchecker.ui.base.BaseActivity
+-keep,allowobfuscation,allowshrinking class * extends com.absinthe.libchecker.ui.base.BaseActivity
+
+# TODO: Waiting for new retrofit release to remove these rules
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
