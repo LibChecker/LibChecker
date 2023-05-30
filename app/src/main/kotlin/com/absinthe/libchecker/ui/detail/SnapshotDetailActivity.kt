@@ -1,6 +1,8 @@
 package com.absinthe.libchecker.ui.detail
 
-import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
@@ -44,6 +46,7 @@ import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -78,7 +81,7 @@ class SnapshotDetailActivity :
     )
   }
 
-  override fun requirePackageName() = entity.packageName
+  override fun requirePackageName() = entity.packageName.takeIf { it.contains("/").not() }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -140,12 +143,16 @@ class SnapshotDetailActivity :
           this@SnapshotDetailActivity
         )
         runCatching {
-          val icon = appIconLoader.loadIcon(
-            PackageUtils.getPackageInfo(
-              entity.packageName,
-              PackageManager.GET_META_DATA
-            ).applicationInfo
-          )
+          val icon = if (entity.packageName.contains("/").not()) {
+            appIconLoader.loadIcon(
+              PackageUtils.getPackageInfo(entity.packageName).applicationInfo
+            )
+          } else {
+            getIconsCombo(
+              entity.packageName.substringBeforeLast("/"),
+              entity.packageName.substringAfterLast("/")
+            )
+          }
           load(icon)
         }
         setOnClickListener {
@@ -156,7 +163,12 @@ class SnapshotDetailActivity :
         }
       }
       snapshotTitle.appNameView.text = getDiffString(entity.labelDiff, isNewOrDeleted)
-      snapshotTitle.packageNameView.text = entity.packageName
+      snapshotTitle.packageNameView.text = entity.packageName.takeIf { it.contains("/").not() }
+        ?: "${entity.packageName.substringBeforeLast("/")} $ARROW ${
+          entity.packageName.substringAfterLast(
+            "/"
+          )
+        }"
       snapshotTitle.versionInfoView.text = getDiffString(
         entity.versionNameDiff,
         entity.versionCodeDiff,
@@ -346,12 +358,14 @@ class SnapshotDetailActivity :
         is SnapshotTitleNode -> {
           sb.append("[${getComponentName(it.type)}]").appendLine()
         }
+
         is SnapshotComponentNode -> {
           sb.append(getDiffTypeLabel(it.item.diffType))
             .append(" ")
             .append(it.item.title)
             .appendLine()
         }
+
         is SnapshotNativeNode -> {
           sb.append(getDiffTypeLabel(it.item.diffType))
             .append(" ")
@@ -389,5 +403,38 @@ class SnapshotDetailActivity :
       MOVED -> "🔵<->"
       else -> throw IllegalArgumentException("wrong diff type")
     }
+  }
+
+  private fun getIconsCombo(leftPackage: String, rightPackage: String): Bitmap {
+    val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+    val appIconLoader = AppIconLoader(iconSize, false, this)
+    val leftIcon = appIconLoader.loadIcon(
+      PackageUtils.getPackageInfo(leftPackage).applicationInfo
+    ).let {
+      Bitmap.createBitmap(it, 0, 0, it.width / 2, it.height)
+    }
+    val rightIcon = appIconLoader.loadIcon(
+      PackageUtils.getPackageInfo(rightPackage).applicationInfo
+    ).let {
+      Bitmap.createBitmap(it, it.width / 2, 0, it.width / 2, it.height)
+    }
+    val comboIcon = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+    Canvas(comboIcon).apply {
+      drawBitmap(leftIcon, 0f, 0f, null)
+      drawBitmap(rightIcon, iconSize / 2f, 0f, null)
+      drawLine(
+        iconSize / 2f,
+        0f,
+        iconSize / 2f,
+        iconSize.toFloat(),
+        Paint().apply {
+          color = getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+          strokeWidth = 2.dp.toFloat()
+        }
+      )
+      save()
+      restore()
+    }
+    return comboIcon
   }
 }

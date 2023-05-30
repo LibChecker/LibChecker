@@ -210,7 +210,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           }
         } else {
           val intent = Intent(context, SnapshotDetailActivity::class.java)
-            .putExtras(bundleOf(EXTRA_ENTITY to getItem(position)))
+            .putExtras(bundleOf(EXTRA_ENTITY to item))
           startActivity(intent)
         }
       }
