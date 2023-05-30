@@ -206,6 +206,8 @@
   <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">Keep</string>
   <string name="btn_drop">Discard</string>
+  <string name="dialog_title_compare_diff_apk">Attention</string>
+  <string name="dialog_message_compare_diff_apk">Do you want to compare two different APKs?</string>
 
   <!--  Album  -->
   <string name="album_compare">Compare</string>

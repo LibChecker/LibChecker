@@ -32,9 +32,11 @@ import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
+import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
 import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.base.BaseActivity
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
@@ -57,6 +59,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
@@ -201,11 +204,10 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
               leftTimeStamp.coerceAtMost(rightTimeStamp),
               leftTimeStamp.coerceAtLeast(rightTimeStamp)
             )
+            flip(VF_LOADING)
           } else {
             compareDiffContainsApk()
           }
-
-          flip(VF_LOADING)
         }
         setOnLongClickListener {
           if (adapter.data.isNotEmpty()) {
@@ -365,6 +367,27 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         null
       }
     }.getOrNull()
+
+    if (leftPackage != null && rightPackage != null) {
+      if (leftPackage.packageName != rightPackage.packageName) {
+        withContext(Dispatchers.Main) {
+          BaseAlertDialogBuilder(this@ComparisonActivity)
+            .setTitle(R.string.dialog_title_compare_diff_apk)
+            .setMessage(R.string.dialog_message_compare_diff_apk)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+              navigateToSnapshotDetail(
+                leftPackage,
+                rightPackage
+              )
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+        }
+      } else {
+        navigateToSnapshotDetail(leftPackage, rightPackage)
+      }
+      return@launch
+    }
     val leftSnapshots: List<SnapshotItem> = if (leftPackage != null) {
       listOf(leftPackage)
     } else if (leftTimeStamp > 0) {
@@ -393,7 +416,33 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       return@launch
     }
 
+    flip(VF_LOADING)
     viewModel.compareDiffWithSnapshotList(-1, leftSnapshots, rightSnapshots)
+  }
+
+  private fun navigateToSnapshotDetail(left: SnapshotItem, right: SnapshotItem) {
+    val snapshotDiff = SnapshotDiffItem(
+      packageName = "${left.packageName}/${right.packageName}",
+      updateTime = -1,
+      labelDiff = SnapshotDiffItem.DiffNode(left.label, right.label),
+      versionNameDiff = SnapshotDiffItem.DiffNode(left.versionName, right.versionName),
+      versionCodeDiff = SnapshotDiffItem.DiffNode(left.versionCode, right.versionCode),
+      abiDiff = SnapshotDiffItem.DiffNode(left.abi, right.abi),
+      targetApiDiff = SnapshotDiffItem.DiffNode(left.targetApi, right.targetApi),
+      nativeLibsDiff = SnapshotDiffItem.DiffNode(left.nativeLibs, right.nativeLibs),
+      servicesDiff = SnapshotDiffItem.DiffNode(left.services, right.services),
+      activitiesDiff = SnapshotDiffItem.DiffNode(left.activities, right.activities),
+      receiversDiff = SnapshotDiffItem.DiffNode(left.receivers, right.receivers),
+      providersDiff = SnapshotDiffItem.DiffNode(left.providers, right.providers),
+      permissionsDiff = SnapshotDiffItem.DiffNode(left.permissions, right.permissions),
+      metadataDiff = SnapshotDiffItem.DiffNode(left.metadata, right.metadata),
+      packageSizeDiff = SnapshotDiffItem.DiffNode(left.packageSize, right.packageSize),
+      isTrackItem = false
+    )
+
+    val intent = Intent(this, SnapshotDetailActivity::class.java)
+      .putExtras(bundleOf(EXTRA_ENTITY to snapshotDiff))
+    startActivity(intent)
   }
 
   private fun getSnapshotItemByUri(uri: Uri, fileName: String): SnapshotItem {
