@@ -28,6 +28,9 @@ object GlobalValues {
   var libReferenceOptions: Int by SPDelegates(Constants.PREF_LIB_REF_OPTIONS, LibReferenceOptions.DEFAULT_OPTIONS)
   val libReferenceOptionsLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceOptions)
 
+  var snapshotOptions: Int by SPDelegates(Constants.PREF_SNAPSHOT_OPTIONS, SnapshotOptions.DEFAULT_OPTIONS)
+  val snapshotOptionsLiveData: MutableLiveData<Int> = MutableLiveData(snapshotOptions)
+
   var repo: String by SPDelegates(Constants.PREF_RULES_REPO, Constants.REPO_GITLAB)
 
   var snapshotTimestamp: Long by SPDelegates(Constants.PREF_SNAPSHOT_TIMESTAMP, 0)

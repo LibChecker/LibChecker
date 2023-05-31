@@ -118,4 +118,28 @@ object DateUtils {
     val zodiacList = listOf("🐒", "🐔", "🐶", "🐷", "🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐒", "🐔", "🐶", "🐷")
     return zodiacList[animalIndex]
   }
+
+  fun getToday(): String {
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH) + 1
+    val day = calendar.get(Calendar.DATE)
+    return "$year.$month.$day"
+  }
+
+  fun isTimestampToday(timestamp: Long): Boolean {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = timestamp
+
+    val today = Calendar.getInstance()
+    val todayYear = today.get(Calendar.YEAR)
+    val todayMonth = today.get(Calendar.MONTH)
+    val todayDay = today.get(Calendar.DAY_OF_MONTH)
+
+    val timestampYear = calendar.get(Calendar.YEAR)
+    val timestampMonth = calendar.get(Calendar.MONTH)
+    val timestampDay = calendar.get(Calendar.DAY_OF_MONTH)
+
+    return todayYear == timestampYear && todayMonth == timestampMonth && todayDay == timestampDay
+  }
 }

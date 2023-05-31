@@ -14,20 +14,33 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.AdvancedOptions
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
+import com.absinthe.libchecker.constant.SnapshotOptions
 import com.absinthe.libchecker.model.SnapshotDiffItem
+import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
+import com.absinthe.libchecker.utils.extensions.unsafeLazy
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 const val ARROW = "→"
 
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
+
+  var cardMode = CardMode.NORMAL
+  private val formatter by unsafeLazy {
+    SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+  }
+  private val formatterToday by unsafeLazy {
+    SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+  }
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -42,6 +55,7 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
   override fun convert(holder: BaseViewHolder, item: SnapshotDiffItem) {
     (holder.itemView as SnapshotItemView).container.apply {
+      setDrawStroke(cardMode == CardMode.DEMO)
       val packageInfo = runCatching {
         PackageUtils.getPackageInfo(item.packageName)
       }.getOrNull()
@@ -180,6 +194,16 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         builder.append(" $ARROW ").append(newAbiSpanString)
       }
       abiInfo.text = builder
+
+      updateTime.isVisible = (GlobalValues.snapshotOptions and SnapshotOptions.SHOW_UPDATE_TIME) > 0
+      if (updateTime.isVisible) {
+        val timeText = if (DateUtils.isTimestampToday(item.updateTime)) {
+          formatterToday.format(item.updateTime)
+        } else {
+          formatter.format(item.updateTime)
+        }
+        updateTime.text = String.format(context.getString(R.string.format_last_updated), timeText)
+      }
     }
   }
 
@@ -206,5 +230,9 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
     } else {
       format.format(diff1.old, diff2.old)
     }
+  }
+
+  enum class CardMode {
+    NORMAL, DEMO
   }
 }

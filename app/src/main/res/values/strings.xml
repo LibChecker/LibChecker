@@ -262,4 +262,6 @@
   <string name="adv_mark_disabled">Mark Disabled Component</string>
   <string name="adv_show_marked_lib">Show Marked Libraries</string>
 
+  <!--  Snapshot menu  -->
+  <string name="snapshot_menu_show_update_time">Show Update Time</string>
 </resources>
