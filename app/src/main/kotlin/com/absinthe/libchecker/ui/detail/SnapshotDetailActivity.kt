@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.ui.detail
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.os.Bundle
 import android.view.Gravity
 import android.view.Menu
@@ -46,7 +44,6 @@ import com.absinthe.libchecker.ui.app.CheckPackageOnResumingActivity
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
-import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
@@ -65,6 +62,7 @@ import me.zhanghai.android.appiconloader.AppIconLoader
 import rikka.core.util.ClipboardUtils
 
 const val EXTRA_ENTITY = "EXTRA_ENTITY"
+const val EXTRA_ICON = "EXTRA_ICON"
 
 class SnapshotDetailActivity :
   CheckPackageOnResumingActivity<ActivitySnapshotDetailBinding>(),
@@ -78,6 +76,12 @@ class SnapshotDetailActivity :
     IntentCompat.getSerializableExtra<SnapshotDiffItem>(
       intent,
       EXTRA_ENTITY
+    )
+  }
+  private val _icon by unsafeLazy {
+    IntentCompat.getParcelableExtra<Bitmap>(
+      intent,
+      EXTRA_ICON
     )
   }
 
@@ -143,15 +147,12 @@ class SnapshotDetailActivity :
           this@SnapshotDetailActivity
         )
         runCatching {
-          val icon = if (entity.packageName.contains("/").not()) {
+          val icon = if (entity.packageName.contains("/").not() || _icon == null) {
             appIconLoader.loadIcon(
               PackageUtils.getPackageInfo(entity.packageName).applicationInfo
             )
           } else {
-            getIconsCombo(
-              entity.packageName.substringBeforeLast("/"),
-              entity.packageName.substringAfterLast("/")
-            )
+            _icon
           }
           load(icon)
         }
@@ -403,38 +404,5 @@ class SnapshotDetailActivity :
       MOVED -> "🔵<->"
       else -> throw IllegalArgumentException("wrong diff type")
     }
-  }
-
-  private fun getIconsCombo(leftPackage: String, rightPackage: String): Bitmap {
-    val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
-    val appIconLoader = AppIconLoader(iconSize, false, this)
-    val leftIcon = appIconLoader.loadIcon(
-      PackageUtils.getPackageInfo(leftPackage).applicationInfo
-    ).let {
-      Bitmap.createBitmap(it, 0, 0, it.width / 2, it.height)
-    }
-    val rightIcon = appIconLoader.loadIcon(
-      PackageUtils.getPackageInfo(rightPackage).applicationInfo
-    ).let {
-      Bitmap.createBitmap(it, it.width / 2, 0, it.width / 2, it.height)
-    }
-    val comboIcon = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
-    Canvas(comboIcon).apply {
-      drawBitmap(leftIcon, 0f, 0f, null)
-      drawBitmap(rightIcon, iconSize / 2f, 0f, null)
-      drawLine(
-        iconSize / 2f,
-        0f,
-        iconSize / 2f,
-        iconSize.toFloat(),
-        Paint().apply {
-          color = getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-          strokeWidth = 2.dp.toFloat()
-        }
-      )
-      save()
-      restore()
-    }
-    return comboIcon
   }
 }

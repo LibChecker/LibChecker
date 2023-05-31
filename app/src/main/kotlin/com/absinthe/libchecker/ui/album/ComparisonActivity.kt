@@ -5,6 +5,9 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -17,6 +20,7 @@ import androidx.activity.addCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,13 +42,16 @@ import com.absinthe.libchecker.recyclerview.adapter.snapshot.SnapshotAdapter
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.detail.EXTRA_ENTITY
+import com.absinthe.libchecker.ui.detail.EXTRA_ICON
 import com.absinthe.libchecker.ui.detail.SnapshotDetailActivity
 import com.absinthe.libchecker.ui.fragment.snapshot.TimeNodeBottomSheetDialogFragment
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getAppName
+import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -60,11 +67,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.zhanghai.android.appiconloader.AppIconLoader
 import okio.buffer
 import okio.sink
 import okio.source
 import rikka.widget.borderview.BorderView
-import timber.log.Timber
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
@@ -78,6 +85,8 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   private var isLeftPartChoosing = false
   private var leftUri: Uri? = null
   private var rightUri: Uri? = null
+  private var leftIconOriginal: Bitmap? = null
+  private var rightIconOriginal: Bitmap? = null
 
   private lateinit var chooseApkResultLauncher: ActivityResultLauncher<String>
 
@@ -310,6 +319,7 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           }
 
           invalidateDashboard()
+          compareDiffContainsApk()
         } else {
           showToast(R.string.album_item_comparison_invalid_shared_items)
         }
@@ -353,6 +363,12 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
   }
 
   private fun compareDiffContainsApk() = lifecycleScope.launch(Dispatchers.IO) {
+    var dialog: AlertDialog?
+    withContext(Dispatchers.Main) {
+      dialog = UiUtils.createLoadingDialog(this@ComparisonActivity).also {
+        it.show()
+      }
+    }
     val leftPackage = runCatching {
       if (leftTimeStamp == -1L && leftUri != null) {
         getSnapshotItemByUri(leftUri!!, Constants.TEMP_PACKAGE)
@@ -367,6 +383,10 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         null
       }
     }.getOrNull()
+
+    withContext(Dispatchers.Main) {
+      dialog?.dismiss()
+    }
 
     if (leftPackage != null && rightPackage != null) {
       if (leftPackage.packageName != rightPackage.packageName) {
@@ -441,7 +461,12 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     )
 
     val intent = Intent(this, SnapshotDetailActivity::class.java)
-      .putExtras(bundleOf(EXTRA_ENTITY to snapshotDiff))
+      .putExtras(
+        bundleOf(
+          EXTRA_ENTITY to snapshotDiff,
+          EXTRA_ICON to getIconsCombo(leftIconOriginal!!, rightIconOriginal!!)
+        )
+      )
     startActivity(intent)
   }
 
@@ -451,7 +476,6 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
       contentResolver.openInputStream(uri)?.use { inputStream ->
         val fileSize = inputStream.available()
         val freeSize = Environment.getExternalStorageDirectory().freeSpace
-        Timber.d("fileSize=$fileSize, freeSize=$freeSize")
 
         if (freeSize > fileSize * 1.5) {
           tf.sink().buffer().use { sink ->
@@ -473,6 +497,14 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
           pi = PackageManagerCompat.getPackageArchiveInfo(tf.path, flag)?.also {
             it.applicationInfo.sourceDir = tf.path
             it.applicationInfo.publicSourceDir = tf.path
+          }
+
+          val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+          val appIconLoader = AppIconLoader(iconSize, false, this)
+          if (fileName == Constants.TEMP_PACKAGE) {
+            leftIconOriginal = appIconLoader.loadIcon(pi!!.applicationInfo)
+          } else {
+            rightIconOriginal = appIconLoader.loadIcon(pi!!.applicationInfo)
           }
         } else {
           showToast(R.string.toast_not_enough_storage_space)
@@ -540,5 +572,33 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
     }
 
     binding.vfContainer.displayedChild = child
+  }
+
+  private fun getIconsCombo(leftIconOrigin: Bitmap, rightIconOrigin: Bitmap): Bitmap {
+    val iconSize = resources.getDimensionPixelSize(R.dimen.lib_detail_icon_size)
+    val leftIcon = Bitmap.createBitmap(leftIconOrigin, 0, 0, leftIconOrigin.width / 2, leftIconOrigin.height)
+    val rightIcon = Bitmap.createBitmap(rightIconOrigin, rightIconOrigin.width / 2, 0, rightIconOrigin.width / 2, rightIconOrigin.height)
+    val comboIcon = Bitmap.createBitmap(iconSize, iconSize, Bitmap.Config.ARGB_8888)
+    val isSameIcon = leftIconOrigin.sameAs(rightIconOrigin)
+
+    Canvas(comboIcon).apply {
+      drawBitmap(leftIcon, 0f, 0f, null)
+      drawBitmap(rightIcon, iconSize / 2f, 0f, null)
+      if (!isSameIcon) {
+        drawLine(
+          iconSize / 2f,
+          0f,
+          iconSize / 2f,
+          iconSize.toFloat(),
+          Paint().apply {
+            color = getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
+            strokeWidth = 2.dp.toFloat()
+          }
+        )
+      }
+      save()
+      restore()
+    }
+    return comboIcon
   }
 }
