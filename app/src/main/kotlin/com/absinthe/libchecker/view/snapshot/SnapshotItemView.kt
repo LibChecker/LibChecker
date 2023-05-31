@@ -132,6 +132,21 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
       addView(this)
     }
 
+    val updateTime = AppCompatTextView(
+      ContextThemeWrapper(
+        context,
+        R.style.TextView_SansSerifCondensed
+      )
+    ).apply {
+      layoutParams = LayoutParams(
+        ViewGroup.LayoutParams.MATCH_PARENT,
+        ViewGroup.LayoutParams.WRAP_CONTENT
+      )
+      setTextColor(android.R.color.darker_gray.getColor(context))
+      setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f)
+      addView(this)
+    }
+
     val stateIndicator = SnapshotStateIndicatorView(context).apply {
       layoutParams = LayoutParams(5.dp, ViewGroup.LayoutParams.MATCH_PARENT)
       addView(this)
@@ -162,6 +177,10 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
         textWidth.toExactlyMeasureSpec(),
         targetApiInfo.defaultHeightMeasureSpec(this)
       )
+      updateTime.measure(
+        textWidth.toExactlyMeasureSpec(),
+        updateTime.defaultHeightMeasureSpec(this)
+      )
       abiInfo.measure(
         textWidth.toExactlyMeasureSpec(),
         abiInfo.defaultHeightMeasureSpec(this)
@@ -169,6 +188,11 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
 
       val packageSizeHeight = if (packageSizeInfo.isVisible) {
         packageSizeInfo.measuredHeight
+      } else {
+        0
+      }
+      val updateTimeHeight = if (updateTime.isVisible) {
+        updateTime.measuredHeight
       } else {
         0
       }
@@ -181,6 +205,7 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
             versionInfo.measuredHeight +
             packageSizeHeight +
             targetApiInfo.measuredHeight +
+            updateTimeHeight +
             abiInfo.measuredHeight +
             paddingBottom
           )
@@ -201,12 +226,20 @@ class SnapshotItemView(context: Context) : FrameLayout(context) {
         appName.left,
         if (packageSizeInfo.isVisible) packageSizeInfo.bottom else versionInfo.bottom
       )
-      abiInfo.layout(appName.left, targetApiInfo.bottom)
+      updateTime.layout(appName.left, targetApiInfo.bottom)
+      abiInfo.layout(
+        appName.left,
+        if (updateTime.isVisible) updateTime.bottom else targetApiInfo.bottom
+      )
       stateIndicator.layout(
         paddingEnd,
         stateIndicator.toVerticalCenter(this),
         fromRight = true
       )
+    }
+
+    fun setDrawStroke(shouldDrawStroke: Boolean) {
+      this.shouldDrawStroke = shouldDrawStroke
     }
   }
 }

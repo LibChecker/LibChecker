@@ -110,7 +110,7 @@
   <string name="jetpack_compose_details">Jetpack Compose 是用于构建原生 Android 界面的新工具包。它可简化并加快 Android 上的界面开发，使用更少的代码、强大的工具和直观的 Kotlin API，快速打造生动而精彩的应用。</string>
   <string name="extract_native_libs_tip">该应用声明了 </string>
   <string name="xml_detail">XML 详情</string>
-  <string name="format_last_updated">最近更新: %s</string>
+  <string name="format_last_updated">更新于: %s</string>
   <string name="menu_process">进程</string>
   <string name="menu_split">模块</string>
   <string name="alternative_launch_method">备选的启动方式</string>
@@ -242,4 +242,5 @@
   <string name="adv_mark_exported">标记已导出的组件</string>
   <string name="adv_mark_disabled">标记已禁用的组件</string>
   <string name="adv_show_marked_lib">显示已标记的库</string>
+  <string name="snapshot_menu_show_update_time">显示更新时间</string>
 </resources>

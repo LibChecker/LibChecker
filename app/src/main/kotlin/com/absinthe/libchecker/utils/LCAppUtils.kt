@@ -39,6 +39,20 @@ object LCAppUtils {
     }
   }
 
+  fun getCurrentSeasonString(season: Int = getCurrentSeason()): String {
+    return when (season) {
+      SPRING -> "Spring"
+      SUMMER -> "Summer"
+      AUTUMN -> "Autumn"
+      WINTER -> "Winter"
+      else -> ""
+    }
+  }
+
+  fun getNextSeasonString(): String {
+    return getCurrentSeasonString((getCurrentSeason() + 1) % 4)
+  }
+
   fun setTitle(context: Context): Spannable {
     val sb = SpannableStringBuilder(context.getString(R.string.app_name))
 

@@ -110,7 +110,7 @@
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="extract_native_libs_tip">此應用程式宣告了 </string>
   <string name="xml_detail">XML 詳細資料</string>
-  <string name="format_last_updated">最近更新：%s</string>
+  <string name="format_last_updated">更新於：%s</string>
   <string name="menu_process">處理程序</string>
   <string name="menu_split">分割</string>
   <string name="alternative_launch_method">替代啟動方法</string>

@@ -122,6 +122,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   }
   private val packageQueue: Queue<Pair<String?, String?>> by lazy { LinkedList() }
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+  private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
 
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
@@ -310,6 +311,10 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
         else -> {}
       }
     }.launchIn(lifecycleScope)
+    GlobalValues.snapshotOptionsLiveData.observe(viewLifecycleOwner) {
+      // noinspection NotifyDataSetChanged
+      adapter.notifyDataSetChanged()
+    }
   }
 
   override fun onAttach(context: Context) {
@@ -365,6 +370,12 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       viewModel.compareDiff(GlobalValues.snapshotTimestamp)
     }
     (activity as? IAppBarContainer)?.setLiftOnScrollTargetView(binding.list)
+  }
+
+  override fun onPause() {
+    super.onPause()
+    advancedMenuBSDFragment?.dismiss()
+    advancedMenuBSDFragment = null
   }
 
   override fun onDestroyView() {
@@ -480,6 +491,16 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           Constants.SNAPSHOT_KEEP -> computeNewSnapshot(false)
           Constants.SNAPSHOT_DISCARD -> computeNewSnapshot(true)
         }
+      }
+    } else if (menuItem.itemId == R.id.advanced) {
+      activity?.let {
+        advancedMenuBSDFragment?.dismiss()
+        advancedMenuBSDFragment = SnapshotMenuBSDFragment().apply {
+          setOnDismissListener {
+            GlobalValues.snapshotOptionsLiveData.postValue(GlobalValues.snapshotOptions)
+          }
+        }
+        advancedMenuBSDFragment?.show(it.supportFragmentManager, SnapshotMenuBSDFragment::class.java.name)
       }
     }
     return true
