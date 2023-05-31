@@ -46,6 +46,8 @@
   <string name="ref_category_signatures">署名</string>
   <string name="string_kotlin_used">Kotlinを使用</string>
   <string name="string_kotlin_unused">Kotlinを未使用</string>
+  <string name="string_compose_used">Jetpack Composeを使用</string>
+  <string name="string_compose_unused">Jetpack Composeを未使用</string>
   <!--  About  -->
   <string name="settings_about">アプリについて</string>
   <string name="settings_translate">翻訳に参加する</string>

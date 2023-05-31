@@ -37,6 +37,8 @@
   <string name="ref_category_signatures">підпис</string>
   <string name="string_kotlin_used">Використовується Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не використовується</string>
+  <string name="string_compose_used">Використовується Jetpack Compose</string>
+  <string name="string_compose_unused">Jetpack Compose не використовується</string>
   <!--  About  -->
   <string name="settings_about">Про додаток</string>
   <string name="settings_rate_us">Оцінити додаток</string>

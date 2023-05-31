@@ -47,6 +47,8 @@
   <string name="ref_category_only_not_marked">僅未標示的項目</string>
   <string name="string_kotlin_used">已使用 Kotlin</string>
   <string name="string_kotlin_unused">未使用 Kotlin</string>
+  <string name="string_compose_used">已使用 Jetpack Compose</string>
+  <string name="string_compose_unused">未使用 Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">關於</string>
   <string name="settings_translate">參與翻譯</string>

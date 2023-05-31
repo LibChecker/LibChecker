@@ -46,6 +46,8 @@
   <string name="ref_category_signatures">Signaturen</string>
   <string name="string_kotlin_used">Nutzt Kotlin</string>
   <string name="string_kotlin_unused">Nutzt kein Kotlin</string>
+  <string name="string_compose_used">Nutzt Jetpack Compose</string>
+  <string name="string_compose_unused">Nutzt kein Jetpack Compose</string>
   <!--  About  -->
   <string name="settings_about">Über</string>
   <string name="settings_translate">Beteilige dich an der Übersetzung</string>
