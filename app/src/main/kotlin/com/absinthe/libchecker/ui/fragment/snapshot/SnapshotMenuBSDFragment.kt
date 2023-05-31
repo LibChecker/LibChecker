@@ -4,7 +4,6 @@ import android.content.DialogInterface
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.SnapshotOptions
-import com.absinthe.libchecker.view.applist.AdvancedMenuItemView
 import com.absinthe.libchecker.view.snapshot.SnapshotMenuBSDView
 import com.absinthe.libchecker.view.snapshot.SnapshotMenuItemView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment

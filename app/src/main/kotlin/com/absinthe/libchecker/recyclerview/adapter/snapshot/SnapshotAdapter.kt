@@ -19,12 +19,10 @@ import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
-import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.setAlphaForAll
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.view.applist.AppItemView
 import com.absinthe.libchecker.view.detail.CenterAlignImageSpan
 import com.absinthe.libchecker.view.snapshot.SnapshotItemView
 import com.chad.library.adapter.base.BaseQuickAdapter

@@ -17,7 +17,6 @@ import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.view.app.IHeaderView
-import com.absinthe.libchecker.view.applist.AdvancedMenuItemView
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
