@@ -21,7 +21,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -73,7 +72,6 @@ import okio.buffer
 import okio.sink
 import okio.source
 import rikka.widget.borderview.BorderView
-import timber.log.Timber
 
 const val VF_LOADING = 0
 const val VF_LIST = 1
