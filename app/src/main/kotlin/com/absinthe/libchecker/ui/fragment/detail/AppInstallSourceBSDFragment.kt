@@ -37,10 +37,13 @@ class AppInstallSourceBSDFragment :
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
   private val originatingCallback = { packageName: String ->
-    initAppInstallSourceItemView(
-      root.originatingView,
-      PackageUtils.getInstallSourceInfo(packageName)!!.originatingPackageName
-    )
+    // temporarily fix by catch exception
+    runCatching {
+      initOriginatingItemView(
+        root.originatingView,
+        PackageUtils.getInstallSourceInfo(packageName)!!.originatingPackageName
+      )
+    }
   }
 
   override fun initRootView(): AppInstallSourceBottomSheetView =
