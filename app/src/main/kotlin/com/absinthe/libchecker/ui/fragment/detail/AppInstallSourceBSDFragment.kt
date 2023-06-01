@@ -36,7 +36,12 @@ class AppInstallSourceBSDFragment :
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
-  private var permissionCallback: Shizuku.OnRequestPermissionResultListener? = null
+  private val originatingCallback = { packageName: String ->
+    initAppInstallSourceItemView(
+      root.originatingView,
+      PackageUtils.getInstallSourceInfo(packageName)!!.originatingPackageName
+    )
+  }
 
   override fun initRootView(): AppInstallSourceBottomSheetView =
     AppInstallSourceBottomSheetView(requireContext())
@@ -53,10 +58,9 @@ class AppInstallSourceBSDFragment :
 
   override fun onDestroyView() {
     super.onDestroyView()
-    permissionCallback?.let {
-      Shizuku.removeRequestPermissionResultListener(it)
-      permissionCallback = null
-    }
+    val packageName = packageName ?: return
+    Shizuku.removeRequestPermissionResultListener { _, _ -> originatingCallback(packageName) }
+    Shizuku.removeBinderReceivedListener { originatingCallback(packageName) }
   }
 
   private fun initOriginatingItemView(
@@ -88,6 +92,9 @@ class AppInstallSourceBSDFragment :
           getString(R.string.lib_detail_app_install_source_shizuku_not_running_detail)
         item.packageView.setOnClickListener {
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
+          Shizuku.addBinderReceivedListener {
+            originatingCallback(packageName!!)
+          }
         }
       } else {
         if (Shizuku.getVersion() < 10) {
@@ -108,16 +115,8 @@ class AppInstallSourceBSDFragment :
           item.packageView.container.versionInfo.text =
             getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
           item.packageView.setOnClickListener {
-            if (permissionCallback == null) {
-              permissionCallback = Shizuku.OnRequestPermissionResultListener { _, _ ->
-                initAppInstallSourceItemView(
-                  root.originatingView,
-                  PackageUtils.getInstallSourceInfo(packageName!!)!!.originatingPackageName
-                )
-              }
-              Shizuku.addRequestPermissionResultListener(permissionCallback!!)
-              Shizuku.requestPermission(0)
-            }
+            Shizuku.addRequestPermissionResultListener { _, _ -> originatingCallback(packageName!!) }
+            Shizuku.requestPermission(0)
           }
         } else {
           initAppInstallSourceItemView(item, originatingPackageName)
@@ -145,6 +144,7 @@ class AppInstallSourceBSDFragment :
         it.setVersionInfo("                                                                            ")
         it.setAbiInfo("                                            ")
       }
+      item.packageView.setOnClickListener(null)
       return
     }
 
@@ -191,10 +191,8 @@ class AppInstallSourceBSDFragment :
       activity?.launchDetailPage(targetLCItem)
     }
 
-    permissionCallback?.let {
-      Shizuku.removeRequestPermissionResultListener(it)
-      permissionCallback = null
-    }
+    Shizuku.removeRequestPermissionResultListener { _, _ -> originatingCallback(packageName) }
+    Shizuku.removeBinderReceivedListener { originatingCallback(packageName) }
   }
 
   private fun getBuildVersionsInfo(packageInfo: PackageInfo?, packageName: String): CharSequence {
