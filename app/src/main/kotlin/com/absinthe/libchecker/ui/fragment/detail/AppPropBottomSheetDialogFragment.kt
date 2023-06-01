@@ -8,6 +8,7 @@ import com.absinthe.libchecker.view.detail.AppPropsBottomSheetView
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import java.io.File
+import pxb.android.axml.ValueWrapper
 
 const val EXTRA_PACKAGE_INFO = "EXTRA_PACKAGE_INFO"
 
@@ -36,7 +37,7 @@ class AppPropBottomSheetDialogFragment :
         AppPropItem(
           key = prop.key,
           value = when (val value = prop.value) {
-            is pxb.android.axml.ValueWrapper -> value.ref.toString()
+            is ValueWrapper -> value.ref.toString()
             else -> value?.toString().orEmpty()
           }
         )
