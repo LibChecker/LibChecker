@@ -528,13 +528,13 @@ class ComparisonActivity : BaseActivity<ActivityComparisonBinding>() {
         abi = PackageUtils.getAbi(it).toShort(),
         targetApi = ai.targetSdkVersion.toShort(),
         nativeLibs = PackageUtils.getNativeDirLibs(it).toJson().orEmpty(),
-        services = PackageUtils.getComponentStringList(it.packageName, SERVICE, false)
+        services = PackageUtils.getComponentStringList(it, SERVICE, false)
           .toJson().orEmpty(),
-        activities = PackageUtils.getComponentStringList(it.packageName, ACTIVITY, false)
+        activities = PackageUtils.getComponentStringList(it, ACTIVITY, false)
           .toJson().orEmpty(),
-        receivers = PackageUtils.getComponentStringList(it.packageName, RECEIVER, false)
+        receivers = PackageUtils.getComponentStringList(it, RECEIVER, false)
           .toJson().orEmpty(),
-        providers = PackageUtils.getComponentStringList(it.packageName, PROVIDER, false)
+        providers = PackageUtils.getComponentStringList(it, PROVIDER, false)
           .toJson().orEmpty(),
         permissions = it.getPermissionsList().toJson().orEmpty(),
         metadata = PackageUtils.getMetaDataItems(it).toJson().orEmpty(),
