@@ -36,7 +36,7 @@ class AppInstallSourceBSDFragment :
 
   private val packageName by lazy { arguments?.getString(EXTRA_PACKAGE_NAME) }
 
-  private val originatingCallback = { packageName:String ->
+  private val originatingCallback = { packageName: String ->
     initAppInstallSourceItemView(
       root.originatingView,
       PackageUtils.getInstallSourceInfo(packageName)!!.originatingPackageName
