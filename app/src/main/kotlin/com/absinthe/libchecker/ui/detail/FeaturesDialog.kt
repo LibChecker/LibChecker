@@ -14,6 +14,8 @@ import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.fragment.detail.AppBundleBottomSheetDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppInstallSourceBSDFragment
 import com.absinthe.libchecker.ui.fragment.detail.AppPropBottomSheetDialogFragment
+import com.absinthe.libchecker.ui.fragment.detail.EXTRA_PACKAGE_INFO
+import com.absinthe.libchecker.utils.PackageUtils
 
 object FeaturesDialog {
 
@@ -111,9 +113,13 @@ object FeaturesDialog {
   }
 
   fun showAppPropDialog(activity: FragmentActivity, packageName: String) {
+    val pi = runCatching {
+      PackageUtils.getPackageInfo(packageName)
+    }.getOrNull() ?: return
+
     AppPropBottomSheetDialogFragment().apply {
       arguments = bundleOf(
-        EXTRA_PACKAGE_NAME to packageName
+        EXTRA_PACKAGE_INFO to pi
       )
       show(activity.supportFragmentManager, AppPropBottomSheetDialogFragment::class.java.name)
     }
