@@ -4,6 +4,7 @@ import com.absinthe.libchecker.R
 
 object AndroidVersions {
   val versions = listOf(
+    Triple(10000, "Preview", null),
     Triple(1, "1.0", null),
     Triple(2, "1.1", null),
     Triple(3, "Cupcake, 1.5", null),
@@ -41,6 +42,7 @@ object AndroidVersions {
   )
 
   val simpleVersions = mapOf(
+    10000 to "Preview",
     1 to "1.0",
     2 to "1.1",
     3 to "1.5",
