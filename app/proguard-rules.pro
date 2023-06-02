@@ -133,4 +133,4 @@
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
 
 # org.apache.commons:commons-compress
--keep,allowoptimization,allowshrinking class org.apache.commons.compress.archivers.zip.**
+-keep,allowoptimization class org.apache.commons.compress.archivers.zip.**
