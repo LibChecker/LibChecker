@@ -268,7 +268,7 @@ fun PackageInfo.getFeatures(): Int {
     File(applicationInfo.sourceDir),
     listOf(
       "androidx.compose.*".toClassDefType(),
-      "rx.*".toClassDefType(),
+      "rx.exceptions.*".toClassDefType(),
       "io.reactivex.*".toClassDefType(),
       "io.reactivex.rxjava3.*".toClassDefType(),
       "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
@@ -412,14 +412,14 @@ fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
     return true
   }
   if (foundList != null) {
-    return foundList.contains("rx.*".toClassDefType()) ||
+    return foundList.contains("rx.exceptions.*".toClassDefType()) ||
       foundList.contains("io.reactivex.*".toClassDefType()) ||
       foundList.contains("io.reactivex.rxjava3.*".toClassDefType())
   }
   return PackageUtils.findDexClasses(
     File(applicationInfo.sourceDir),
     listOf(
-      "rx.*".toClassDefType(),
+      "rx.exceptions.*".toClassDefType(),
       "io.reactivex.*".toClassDefType(),
       "io.reactivex.rxjava3.*".toClassDefType()
     ),
@@ -444,7 +444,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
     val resultList = PackageUtils.findDexClasses(
       File(applicationInfo.sourceDir),
       listOf(
-        "rx.*".toClassDefType(),
+        "rx.exceptions.*".toClassDefType(),
         "io.reactivex.*".toClassDefType(),
         "io.reactivex.rxjava3.*".toClassDefType()
       )
@@ -455,7 +455,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
     if (resultList.contains("io.reactivex.*".toClassDefType())) {
       return@withContext RX_MAJOR_TWO
     }
-    if (resultList.contains("rx.*".toClassDefType())) {
+    if (resultList.contains("rx.exceptions.*".toClassDefType())) {
       return@withContext RX_MAJOR_ONE
     }
   }
