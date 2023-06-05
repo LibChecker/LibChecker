@@ -447,8 +447,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
         "rx.*".toClassDefType(),
         "io.reactivex.*".toClassDefType(),
         "io.reactivex.rxjava3.*".toClassDefType()
-      ),
-      hasAny = false
+      )
     )
     if (resultList.contains("io.reactivex.rxjava3.*".toClassDefType())) {
       return@withContext RX_MAJOR_THREE
