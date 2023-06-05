@@ -447,8 +447,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
         "rx.*".toClassDefType(),
         "io.reactivex.*".toClassDefType(),
         "io.reactivex.rxjava3.*".toClassDefType()
-      ),
-      hasAny = true
+      )
     )
     if (resultList.contains("io.reactivex.rxjava3.*".toClassDefType())) {
       return@withContext RX_MAJOR_THREE
@@ -512,8 +511,7 @@ suspend fun PackageInfo.getRxKotlinVersion(): String? = withContext(Dispatchers.
         "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
         "io.reactivex.rxkotlin".toClassDefType(),
         "rx.lang.kotlin".toClassDefType()
-      ),
-      hasAny = true
+      )
     )
     if (resultList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType())) {
       return@withContext RX_MAJOR_THREE
@@ -556,8 +554,7 @@ suspend fun PackageInfo.getRxAndroidVersion(): String? = withContext(Dispatchers
       "io.reactivex.rxjava3.android.*".toClassDefType(),
       "io.reactivex.android.*".toClassDefType(),
       "rx.android.*".toClassDefType()
-    ),
-    hasAny = true
+    )
   )
   if (resultList.contains("io.reactivex.rxjava3.android.*".toClassDefType())) {
     return@withContext RX_MAJOR_THREE
