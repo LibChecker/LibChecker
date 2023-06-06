@@ -268,7 +268,7 @@ fun PackageInfo.getFeatures(): Int {
     File(applicationInfo.sourceDir),
     listOf(
       "androidx.compose.*".toClassDefType(),
-      "rx.*".toClassDefType(),
+      "rx.exceptions.*".toClassDefType(),
       "io.reactivex.*".toClassDefType(),
       "io.reactivex.rxjava3.*".toClassDefType(),
       "io.reactivex.rxjava3.kotlin.*".toClassDefType(),
@@ -359,8 +359,8 @@ fun PackageInfo.isUseJetpackCompose(foundList: List<String>? = null): Boolean {
   if (usedInMetaInf) {
     return true
   }
-  if (foundList.isNullOrEmpty().not()) {
-    return foundList?.contains("androidx.compose.*".toClassDefType()) == true
+  if (foundList != null) {
+    return foundList.contains("androidx.compose.*".toClassDefType())
   }
   return PackageUtils.findDexClasses(
     File(applicationInfo.sourceDir),
@@ -411,15 +411,15 @@ fun PackageInfo.isRxJavaUsed(foundList: List<String>? = null): Boolean {
   if (usedInMetaInf) {
     return true
   }
-  if (foundList.isNullOrEmpty().not()) {
-    return foundList?.contains("rx.*".toClassDefType()) == true ||
-      foundList?.contains("io.reactivex.*".toClassDefType()) == true ||
-      foundList?.contains("io.reactivex.rxjava3.*".toClassDefType()) == true
+  if (foundList != null) {
+    return foundList.contains("rx.exceptions.*".toClassDefType()) ||
+      foundList.contains("io.reactivex.*".toClassDefType()) ||
+      foundList.contains("io.reactivex.rxjava3.*".toClassDefType())
   }
   return PackageUtils.findDexClasses(
     File(applicationInfo.sourceDir),
     listOf(
-      "rx.*".toClassDefType(),
+      "rx.exceptions.*".toClassDefType(),
       "io.reactivex.*".toClassDefType(),
       "io.reactivex.rxjava3.*".toClassDefType()
     ),
@@ -444,7 +444,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
     val resultList = PackageUtils.findDexClasses(
       File(applicationInfo.sourceDir),
       listOf(
-        "rx.*".toClassDefType(),
+        "rx.exceptions.*".toClassDefType(),
         "io.reactivex.*".toClassDefType(),
         "io.reactivex.rxjava3.*".toClassDefType()
       )
@@ -455,7 +455,7 @@ suspend fun PackageInfo.getRxJavaVersion(): String? = withContext(Dispatchers.IO
     if (resultList.contains("io.reactivex.*".toClassDefType())) {
       return@withContext RX_MAJOR_TWO
     }
-    if (resultList.contains("rx.*".toClassDefType())) {
+    if (resultList.contains("rx.exceptions.*".toClassDefType())) {
       return@withContext RX_MAJOR_ONE
     }
   }
@@ -477,10 +477,10 @@ fun PackageInfo.isRxKotlinUsed(foundList: List<String>? = null): Boolean {
   if (usedInMetaInf) {
     return true
   }
-  if (foundList.isNullOrEmpty().not()) {
-    return foundList?.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType()) == true ||
-      foundList?.contains("io.reactivex.rxkotlin".toClassDefType()) == true ||
-      foundList?.contains("rx.lang.kotlin".toClassDefType()) == true
+  if (foundList != null) {
+    return foundList.contains("io.reactivex.rxjava3.kotlin.*".toClassDefType()) ||
+      foundList.contains("io.reactivex.rxkotlin".toClassDefType()) ||
+      foundList.contains("rx.lang.kotlin".toClassDefType())
   }
   return PackageUtils.findDexClasses(
     File(applicationInfo.sourceDir),
@@ -531,10 +531,10 @@ suspend fun PackageInfo.getRxKotlinVersion(): String? = withContext(Dispatchers.
  * @return true if it uses RxAndroid framework
  */
 fun PackageInfo.isRxAndroidUsed(foundList: List<String>? = null): Boolean {
-  if (foundList.isNullOrEmpty().not()) {
-    return foundList?.contains("io.reactivex.rxjava3.android.*".toClassDefType()) == true ||
-      foundList?.contains("io.reactivex.android.*".toClassDefType()) == true ||
-      foundList?.contains("rx.android.*".toClassDefType()) == true
+  if (foundList != null) {
+    return foundList.contains("io.reactivex.rxjava3.android.*".toClassDefType()) ||
+      foundList.contains("io.reactivex.android.*".toClassDefType()) ||
+      foundList.contains("rx.android.*".toClassDefType())
   }
   return PackageUtils.findDexClasses(
     File(applicationInfo.sourceDir),
