@@ -67,7 +67,11 @@ class XposedInfoDialogFragment : BaseBottomSheetViewDialogFragment<XposedInfoBot
         description.text.text = metadataBundle["xposeddescription"]?.source.toString()
         metadataBundle["xposedscope"]?.let { scopeItem ->
           val appRes = SystemServices.packageManager.getResourcesForApplication(packageName)
-          scope.text.text = appRes.getStringArray(scopeItem.size.toInt()).contentToString()
+          runCatching {
+            appRes.getStringArray(scopeItem.size.toInt()).contentToString()
+          }.getOrNull()?.let { content ->
+            scope.text.text = content
+          }
         }
         ZipFileCompat(pi.applicationInfo.sourceDir).use { zipFile ->
           zipFile.getEntry("assets/xposed_init")?.let { entry ->

@@ -404,6 +404,9 @@ class AppListFragment :
     withContext(Dispatchers.Main) {
       appAdapter.apply {
         setDiffNewData(filterList) {
+          if (isDetached) {
+            return@setDiffNewData
+          }
           flip(VF_LIST)
           isListReady = true
 
