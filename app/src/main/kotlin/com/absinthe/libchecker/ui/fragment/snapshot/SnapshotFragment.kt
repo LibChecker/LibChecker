@@ -268,6 +268,9 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
           list.sortedByDescending { it.updateTime }
             .toMutableList()
         ) {
+          if (isDetached) {
+            return@setDiffNewData
+          }
           flip(VF_LIST)
           adapter.setSpaceFooterView()
         }
