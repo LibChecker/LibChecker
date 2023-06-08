@@ -143,7 +143,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
     bottomCornerStart.set(0f, h.toFloat())
   }
 
-  override fun onDraw(canvas: Canvas?) {
+  override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
     if (processLabelColor != -1) {
       path.apply {
