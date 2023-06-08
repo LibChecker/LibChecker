@@ -64,10 +64,10 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    compileSdkVersion(33)
+    compileSdkVersion(34)
     defaultConfig {
       minSdk = 24
-      targetSdk = 33
+      targetSdk = 34
     }
     sourceSets.configureEach {
       java.srcDirs("src/$name/kotlin")

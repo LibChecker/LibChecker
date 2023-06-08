@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.os.IBinder
@@ -107,7 +108,15 @@ class ShootService : LifecycleService() {
         val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
         createNotificationChannel(channel)
       }
-      startForeground(notificationIdShoot, builder.build())
+      if (OsUtils.atLeastU()) {
+        startForeground(
+          notificationIdShoot,
+          builder.build(),
+          ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        )
+      } else {
+        startForeground(notificationIdShoot, builder.build())
+      }
     }
   }
 
