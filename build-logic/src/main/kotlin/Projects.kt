@@ -64,10 +64,10 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
 
 private inline fun <reified T : BaseExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<BaseExtension>("android") {
-    (this as? BaseAppModuleExtension)?.compileSdkPreview = "UpsideDownCake"
+    compileSdkVersion(34)
     defaultConfig {
       minSdk = 24
-      targetSdkPreview = "UpsideDownCake"
+      targetSdk = 34
     }
     sourceSets.configureEach {
       java.srcDirs("src/$name/kotlin")
