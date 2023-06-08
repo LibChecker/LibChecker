@@ -5,9 +5,6 @@
   <!-- Automatically split the following activity pairs. -->
   <SplitPairRule
     window:splitRatio="0.3"
-    window:splitMinWidth="1650px"
-    window:finishPrimaryWithSecondary="true"
-    window:finishSecondaryWithPrimary="true"
     window:clearTop="true">
     <SplitPairFilter
       window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"

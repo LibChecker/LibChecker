@@ -3,7 +3,7 @@ package com.absinthe.libchecker
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.window.core.ExperimentalWindowApi
+import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
@@ -93,11 +93,12 @@ class LibCheckerApp : Application() {
     MainLooperFilter.start()
   }
 
-  @OptIn(ExperimentalWindowApi::class)
   private fun initSplitController() {
     runCatching {
-      if (SplitController.getInstance().isSplitSupported()) {
-        SplitController.initialize(this, R.xml.main_split_config)
+      if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
+        RuleController.getInstance(this).setRules(
+          RuleController.parseRules(this, R.xml.main_split_config)
+        )
       }
     }
   }
