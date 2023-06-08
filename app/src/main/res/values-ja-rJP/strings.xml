@@ -164,4 +164,5 @@
   <string name="adv_mark_exported">エクスポートされたコンポーネントをマークする</string>
   <string name="adv_mark_disabled">無効なコンポーネントをマークする</string>
   <string name="adv_show_marked_lib">マーク済みのライブラリを表示</string>
+  <!--  Snapshot menu  -->
 </resources>

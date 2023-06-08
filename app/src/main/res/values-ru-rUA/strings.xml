@@ -150,4 +150,5 @@
   <string name="rules_btn_restart_to_update">Перезагрузите, чтобы обновить</string>
   <string name="rules_btn_update">поновити</string>
   <!-- Advanced menu -->
+  <!--  Snapshot menu  -->
 </resources>

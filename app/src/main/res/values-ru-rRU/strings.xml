@@ -186,4 +186,5 @@
   <string name="adv_show_64_bit">Показывать 64-битные приложения</string>
   <string name="adv_show_32_bit">Показывать 32-битные приложения</string>
   <string name="adv_sort_mode">Тип сортировки</string>
+  <!--  Snapshot menu  -->
 </resources>
