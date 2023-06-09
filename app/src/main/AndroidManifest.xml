@@ -12,6 +12,7 @@
   <application
     android:name=".LibCheckerApp"
     android:appCategory="productivity"
+    android:configChanges="orientation"
     android:dataExtractionRules="@xml/data_extraction_rules"
     android:enableOnBackInvokedCallback="true"
     android:fullBackupContent="@xml/backup_rules"
@@ -21,7 +22,7 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/AppTheme"
-    tools:targetApi="33">
+    tools:targetApi="34">
 
     <activity
       android:name=".ui.main.MainActivity"

@@ -98,7 +98,7 @@ class AppListFragment :
       list.apply {
         adapter = appAdapter
         borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManagerImpl()
+        layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
@@ -182,7 +182,7 @@ class AppListFragment :
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManagerImpl()
+    binding.list.layoutManager = getSuitableLayoutManagerImpl(newConfig)
   }
 
   override fun onQueryTextSubmit(query: String?): Boolean {
@@ -430,8 +430,8 @@ class AppListFragment :
 
   override fun getSuitableLayoutManager() = binding.list.layoutManager
 
-  private fun getSuitableLayoutManagerImpl(): RecyclerView.LayoutManager {
-    layoutManager = when (resources.configuration.orientation) {
+  private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
+    layoutManager = when (configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
       Configuration.ORIENTATION_LANDSCAPE ->
         StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
