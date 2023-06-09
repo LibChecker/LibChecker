@@ -79,7 +79,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
     binding.root.apply {
-      fitsSystemWindows = isOrientationLandscape
+      fitsSystemWindows = newConfig.isOrientationLandscape
       paddingTopCompat = 0
     }
   }

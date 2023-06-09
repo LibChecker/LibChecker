@@ -124,6 +124,8 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
   private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
   private var advancedMenuBSDFragment: SnapshotMenuBSDFragment? = null
 
+  private lateinit var layoutManager: RecyclerView.LayoutManager
+
   override fun init() {
     val context = (this.context as? BaseActivity<*>) ?: return
 
@@ -221,7 +223,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
       list.apply {
         adapter = this@SnapshotFragment.adapter
         borderDelegate = borderViewDelegate
-        layoutManager = getSuitableLayoutManager()
+        layoutManager = getSuitableLayoutManagerImpl(resources.configuration)
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
             if (isResumed) {
@@ -404,7 +406,7 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
 
   override fun onConfigurationChanged(newConfig: Configuration) {
     super.onConfigurationChanged(newConfig)
-    binding.list.layoutManager = getSuitableLayoutManager()
+    binding.list.layoutManager = getSuitableLayoutManagerImpl(newConfig)
   }
 
   override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -551,15 +553,16 @@ class SnapshotFragment : BaseListControllerFragment<FragmentSnapshotBinding>() {
     }
   }
 
-  override fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
-    return when (resources.configuration.orientation) {
-      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(context)
-      Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
-        2,
-        StaggeredGridLayoutManager.VERTICAL
-      )
-      else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
+  override fun getSuitableLayoutManager() = binding.list.layoutManager
+
+  private fun getSuitableLayoutManagerImpl(configuration: Configuration): RecyclerView.LayoutManager {
+    layoutManager = when (configuration.orientation) {
+      Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
+      Configuration.ORIENTATION_LANDSCAPE ->
+        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+      else -> throw IllegalStateException("Wrong orientation at SnapshotFragment.")
     }
+    return layoutManager
   }
 
   override fun onReturnTop() {
