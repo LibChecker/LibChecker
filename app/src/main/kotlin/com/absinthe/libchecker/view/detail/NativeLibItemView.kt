@@ -164,7 +164,7 @@ class NativeLibItemView(context: Context) : AViewGroup(context) {
         )
         close()
       }
-      canvas?.drawPath(path, paint)
+      canvas.drawPath(path, paint)
     }
   }
 }
