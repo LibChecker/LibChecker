@@ -1064,7 +1064,13 @@ object PackageUtils {
     }
     return IPackageManager.Stub.asInterface(
       ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
-    ).getInstallSourceInfo(packageName)
+    ).let {
+      if (OsUtils.atLeastU()) {
+        it.getInstallSourceInfo(packageName, Shizuku.getUid())
+      } else {
+        it.getInstallSourceInfo(packageName)
+      }
+    }
   }
 
   /**
