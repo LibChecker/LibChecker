@@ -8,6 +8,8 @@ public interface IPackageManager extends IInterface {
 
   InstallSourceInfo getInstallSourceInfo(String packageName);
 
+  InstallSourceInfo getInstallSourceInfo(String packageName, int callingUid);
+
   abstract class Stub extends Binder implements IPackageManager {
 
     public static IPackageManager asInterface(IBinder obj) {
