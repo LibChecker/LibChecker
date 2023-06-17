@@ -785,7 +785,7 @@ class HomeViewModel : ViewModel() {
   fun removeOfflineRules(instant: Boolean = false) {
     offlineRemoveJob = viewModelScope.launch(Dispatchers.IO) {
       if (!instant) {
-        //delay 3 seconds to prevent accidental operation
+        // delay 3 seconds to prevent accidental operation
         delay(3000L)
       }
 
