@@ -93,7 +93,7 @@
   <string name="array_snapshot_discard">丢弃</string>
   <!--  Detail  -->
   <string name="detail">详情</string>
-  <string name="detail_label">查看 App 详情</string>
+  <string name="detail_label">查看应用详情</string>
   <string name="not_found">未找到</string>
   <string name="create_an_issue">协助我们来补充信息</string>
   <string name="app_bundle_details">Android App Bundle 是 Android 新推出的一种官方发布格式，可让您以更高效的方式开发和发布应用。借助 Android App Bundle，您可以更轻松地以更小的应用提供优质的使用体验，从而提升安装成功率并减少卸载量。转换过程轻松便捷。您无需重构代码即可开始获享较小应用的优势。改用这种格式后，您可以体验模块化应用开发和可自定义功能交付，并从中受益。</string>
@@ -166,7 +166,7 @@
   <string name="toast_copied_to_clipboard">已复制到剪贴板</string>
   <string name="toast_not_existing_market">设备中不存在应用市场</string>
   <string name="toast_use_another_file_manager">请使用其它文件管理器打开此 APK</string>
-  <string name="toast_cant_open_app">无法启动此 App</string>
+  <string name="toast_cant_open_app">无法启动此应用</string>
   <string name="toast_cloud_rules_update_error">云端规则更新失败，请重试</string>
   <string name="toast_not_enough_storage_space">存储空间不足</string>
   <!--  Snapshot  -->
@@ -180,10 +180,10 @@
   <string name="snapshot_indicator_moved">移动</string>
   <string name="snapshot_empty_list_title">没有组件变更</string>
   <string name="snapshot_no_snapshot">没有快照</string>
-  <string name="snapshot_detail_new_install_title">这是一个全新的 App</string>
-  <string name="snapshot_detail_deleted_title">此 App 已被移除</string>
+  <string name="snapshot_detail_new_install_title">这是一个全新的应用</string>
+  <string name="snapshot_detail_deleted_title">此应用已被移除</string>
   <string name="snapshot_time_node_uninitialized">（未初始化）</string>
-  <string name="snapshot_preinstalled_app">预装的 App</string>
+  <string name="snapshot_preinstalled_app">预置应用</string>
   <string name="snapshot_generate_text_report">生成文字报告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示: 现在您可以通过<br><b>%s</b><br>在后台生成快照。]]></string>
   <!--  Dialog  -->
