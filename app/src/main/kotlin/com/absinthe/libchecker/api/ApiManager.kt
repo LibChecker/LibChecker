@@ -5,7 +5,6 @@ import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -25,6 +24,9 @@ object ApiManager {
 
   const val GITHUB_API_REPO_INFO = "https://api.github.com/repos/%s/%s"
 
+  private const val GITHUB_ARCHIVE_URL = "https://github.com/LibChecker/LibChecker-Rules/archive/refs/heads/master.zip"
+  private const val GITLAB_ARCHIVE_URL = "https://gitlab.com/zhaobozhen/LibChecker-Rules/-/archive/master/LibChecker-Rules-master.zip"
+
   private val root
     get() = when (GlobalValues.repo) {
       Constants.REPO_GITHUB -> GITHUB_ROOT_URL
@@ -34,12 +36,16 @@ object ApiManager {
 
   val rulesBundleUrl = "${root}cloud/rules/v$VERSION/rules.db"
 
+  val archiveUrl
+    get() = when (GlobalValues.repo) {
+      Constants.REPO_GITHUB -> GITHUB_ARCHIVE_URL
+      Constants.REPO_GITLAB -> GITLAB_ARCHIVE_URL
+      else -> GITHUB_ARCHIVE_URL
+    }
+
   @PublishedApi
   internal val retrofit by unsafeLazy {
     val okHttpClient = OkHttpClient.Builder()
-      .connectTimeout(30, TimeUnit.SECONDS)
-      .readTimeout(30, TimeUnit.SECONDS)
-      .writeTimeout(30, TimeUnit.SECONDS)
       .addInterceptor(BaseUrlInterceptor())
       .build()
     Retrofit.Builder()

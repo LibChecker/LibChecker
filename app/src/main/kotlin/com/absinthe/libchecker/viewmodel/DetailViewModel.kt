@@ -18,6 +18,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.annotation.STATIC
 import com.absinthe.libchecker.api.ApiManager
 import com.absinthe.libchecker.api.bean.LibDetailBean
+import com.absinthe.libchecker.api.offline.OfflineRulesRequests
 import com.absinthe.libchecker.api.request.CloudRuleBundleRequest
 import com.absinthe.libchecker.api.request.LibDetailRequest
 import com.absinthe.libchecker.app.SystemServices
@@ -239,9 +240,14 @@ class DetailViewModel : ViewModel() {
       detailBean.postValue(
         try {
           request.requestLibDetail(categoryDir, libName)
-        } catch (t: Throwable) {
-          Timber.e(t, "DetailViewModel")
-          null
+        } catch (t1: Throwable) {
+          Timber.e(t1, "DetailViewModel")
+          try {
+            OfflineRulesRequests.getLibDetail(categoryDir, libName)
+          } catch (t2: Throwable) {
+            Timber.e(t2, "DetailViewModel")
+            null
+          }
         }
       )
     }

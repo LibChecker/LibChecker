@@ -8,7 +8,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.preference.TwoStatePreference
 import com.absinthe.libchecker.LibCheckerApp
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
@@ -25,6 +27,9 @@ import com.absinthe.libchecker.annotation.STATUS_NOT_START
 import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE
 import com.absinthe.libchecker.annotation.STATUS_START_REQUEST_CHANGE_END
+import com.absinthe.libchecker.api.ApiManager
+import com.absinthe.libchecker.api.offline.OfflineRulesRequests
+import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LibReferenceOptions
@@ -38,9 +43,11 @@ import com.absinthe.libchecker.model.LibStringItem
 import com.absinthe.libchecker.model.StatefulComponent
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.ui.fragment.IListController
+import com.absinthe.libchecker.utils.DownloadUtils
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.LCAppUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -702,6 +709,91 @@ class HomeViewModel : ViewModel() {
 
   fun clearApkCache() {
     FileUtils.delete(File(LibCheckerApp.app.externalCacheDir, Constants.TEMP_PACKAGE))
+  }
+
+  var offlineRulesInitializing = false
+  private var offlineRemoveJob: Job? = null
+
+  fun initOfflineRules(preference: TwoStatePreference) {
+    offlineRemoveJob?.apply {
+      cancel()
+      preference.summary =
+        preference.context.getString(R.string.offline_status_format).format(
+          OfflineRulesRequests.getVersion(),
+          OfflineRulesRequests.getCount()
+        )
+      return
+    }
+
+    viewModelScope.launch(Dispatchers.IO) {
+      val zipFile = File(LibCheckerApp.app.filesDir, "rules.zip")
+
+      DownloadUtils.download(
+        ApiManager.archiveUrl,
+        zipFile,
+        object : DownloadUtils.OnDownloadListener {
+          override fun onDownloadSuccess() {
+            doOnMainThreadIdle {
+              preference.summary =
+                preference.context.getString(R.string.offline_unzipping)
+            }
+            val rulesDir = File(LibCheckerApp.app.filesDir, "rules").apply {
+              if (exists()) FileUtils.delete(this)
+              mkdirs()
+            }
+            ZipFileCompat(zipFile).use { zip ->
+              zip.getZipEntries().asSequence().forEach { entry ->
+                if (entry.isDirectory) {
+                  File(rulesDir, entry.name).mkdirs()
+                } else {
+                  zip.getInputStream(entry).use { input ->
+                    File(rulesDir, entry.name).outputStream().use {
+                      input.copyTo(it)
+                    }
+                  }
+                }
+              }
+            }
+            FileUtils.delete(zipFile)
+
+            doOnMainThreadIdle {
+              preference.summary =
+                preference.context.getString(R.string.offline_status_format).format(
+                  OfflineRulesRequests.getVersion(),
+                  OfflineRulesRequests.getCount()
+                )
+            }
+          }
+
+          override fun onDownloading(progress: Int) {
+          }
+
+          override fun onDownloadFailed() {
+            doOnMainThreadIdle {
+              preference.isChecked = false
+              preference.summary =
+                preference.context.getString(R.string.offline_download_failed)
+            }
+            removeOfflineRules(true)
+            return
+          }
+        }
+      )
+    }
+  }
+
+  fun removeOfflineRules(instant: Boolean = false) {
+    offlineRemoveJob = viewModelScope.launch(Dispatchers.IO) {
+      if (!instant) {
+        //delay 3 seconds to prevent accidental operation
+        delay(3000L)
+      }
+
+      FileUtils.delete(File(LibCheckerApp.app.filesDir, "rules.zip"))
+      FileUtils.delete(File(LibCheckerApp.app.filesDir, "rules"))
+
+      offlineRemoveJob = null
+    }
   }
 
   private suspend fun insert(item: LCItem) = Repositories.lcRepository.insert(item)

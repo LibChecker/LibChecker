@@ -21,6 +21,7 @@ import androidx.preference.TwoStatePreference
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.api.offline.OfflineRulesRequests
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
@@ -160,6 +161,26 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           )
           true
         }
+      }
+    }
+    findPreference<TwoStatePreference>(Constants.PREF_OFFLINE_RULES)?.apply {
+      if (GlobalValues.isOfflineRulesEnabled && !viewModel.offlineRulesInitializing) {
+        summary =
+          getString(R.string.offline_status_format).format(
+            OfflineRulesRequests.getVersion(),
+            OfflineRulesRequests.getCount()
+          )
+      }
+      setOnPreferenceChangeListener { _, newValue ->
+        GlobalValues.isOfflineRulesEnabled = newValue as Boolean
+        if (GlobalValues.isOfflineRulesEnabled) {
+          summary = getString(R.string.offline_downloading)
+          viewModel.initOfflineRules(this)
+        } else {
+          summary = null
+          viewModel.removeOfflineRules()
+        }
+        true
       }
     }
     findPreference<Preference>(Constants.PREF_LIB_REF_THRESHOLD)?.apply {

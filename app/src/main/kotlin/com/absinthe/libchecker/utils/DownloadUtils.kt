@@ -39,9 +39,9 @@ object DownloadUtils {
             body.byteStream().source().buffer().use { input ->
               file.sink().buffer().use { output ->
                 output.writeAll(input)
-                listener.onDownloadSuccess()
               }
             }
+            listener.onDownloadSuccess()
           } ?: run {
             listener.onDownloadFailed()
           }

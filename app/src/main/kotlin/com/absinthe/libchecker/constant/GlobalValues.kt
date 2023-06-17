@@ -58,6 +58,8 @@ object GlobalValues {
   val isAnonymousAnalyticsEnabled: MutableLiveData<Boolean> =
     MutableLiveData(getPreferences().getBoolean(Constants.PREF_ANONYMOUS_ANALYTICS, true))
 
+  var isOfflineRulesEnabled: Boolean by SPDelegates(Constants.PREF_OFFLINE_RULES, false)
+
   val libSortModeLiveData: MutableLiveData<Int> = MutableLiveData(libSortMode)
 
   val libReferenceThresholdLiveData: MutableLiveData<Int> = MutableLiveData(libReferenceThreshold)

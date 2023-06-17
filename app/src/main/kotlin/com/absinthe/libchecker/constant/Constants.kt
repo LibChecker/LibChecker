@@ -46,6 +46,7 @@ object Constants {
   const val PREF_ANONYMOUS_ANALYTICS = "analytics"
   const val PREF_CLOUD_RULES = "cloudRules"
   const val PREF_SNAPSHOT_KEEP = "snapshotKeep"
+  const val PREF_OFFLINE_RULES = "offlineRules"
 
   const val PREF_LIB_SORT_MODE = "libSortMode"
   const val PREF_PROCESS_MODE = "processMode"

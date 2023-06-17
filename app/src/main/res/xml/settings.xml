@@ -38,15 +38,6 @@
       app:summary="%s"
       app:title="@string/dark_mode" />
 
-    <rikka.preference.SimpleMenuPreference
-      app:defaultValue="gitlab"
-      app:entries="@array/list_repo"
-      app:entryValues="@array/list_repo_value"
-      app:icon="@drawable/ic_repository"
-      app:key="rulesRepository"
-      app:summary="%s"
-      app:title="@string/rules_repo_title" />
-
     <ListPreference
       app:defaultValue="SYSTEM"
       app:entries="@array/language"
@@ -55,12 +46,6 @@
       app:key="locale"
       app:summary="%s"
       app:title="@string/languages" />
-
-    <Preference
-      app:icon="@drawable/ic_cloud_rules"
-      app:key="cloudRules"
-      app:summary="@string/cloud_rules_summary"
-      app:title="@string/cloud_rules" />
 
     <Preference
       app:icon="@drawable/ic_threshold"
@@ -73,6 +58,32 @@
       app:key="reloadApps"
       app:summary="@string/reload_apps_summary"
       app:title="@string/reload_apps" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+    android:key="rulesCategory"
+    android:title="@string/pref_group_rules">
+
+    <rikka.material.preference.MaterialSwitchPreference
+      android:defaultValue="false"
+      android:key="offlineRules"
+      android:title="@string/offline_rules" />
+
+    <rikka.preference.SimpleMenuPreference
+      app:defaultValue="gitlab"
+      app:entries="@array/list_repo"
+      app:entryValues="@array/list_repo_value"
+      app:icon="@drawable/ic_repository"
+      app:key="rulesRepository"
+      app:summary="%s"
+      app:title="@string/rules_repo_title" />
+
+    <Preference
+      app:icon="@drawable/ic_cloud_rules"
+      app:key="cloudRules"
+      app:summary="@string/cloud_rules_summary"
+      app:title="@string/cloud_rules" />
 
   </PreferenceCategory>
 

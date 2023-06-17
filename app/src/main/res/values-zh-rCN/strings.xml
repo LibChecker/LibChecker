@@ -62,6 +62,7 @@
   <string name="library_declaration">LibChecker 中的所有标记库信息均来自其所属的 SDK 的开发文档或代码仓库，如果信息有有误，请联系：absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">常规</string>
+  <string name="pref_group_rules">规则</string>
   <string name="pref_group_others">其它</string>
   <string name="apk_analytics">APK 分析</string>
   <string name="colorful_icon">多彩图标</string>
@@ -75,6 +76,7 @@
   <string name="cloud_rules">云端规则</string>
   <string name="dark_mode">深色模式</string>
   <string name="snapshot_keep">快照默认保留规则</string>
+  <string name="offline_rules">离线规则</string>
   <string name="apk_analytics_summary">当点击一个 APK 文件时打开详情页</string>
   <string name="colorful_icon_summary">部分标记库会呈现为彩色 Logo</string>
   <string name="lib_ref_threshold_summary">只有库引用数量达到阈值的库才显示在列表中</string>
@@ -229,6 +231,11 @@
   <string name="rules_remote_repo_version">远端规则库版本</string>
   <string name="rules_btn_restart_to_update">重启以更新</string>
   <string name="rules_btn_update">更新</string>
+  <!--  Offline rules  -->
+  <string name="offline_downloading">下载中…</string>
+  <string name="offline_download_failed">下载离线规则失败</string>
+  <string name="offline_unzipping">解压中…</string>
+  <string name="offline_status_format">当前版本: %d\n规则数量: %d</string>
   <!-- Advanced menu -->
   <string name="adv_show_system_apps">显示系统应用</string>
   <string name="adv_show_overlays">显示 Overlay</string>
