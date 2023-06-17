@@ -44,6 +44,7 @@
   <string name="ref_category_package">Пакет</string>
   <string name="ref_category_shared_uid">Общий UID</string>
   <string name="ref_category_signatures">подпись</string>
+  <string name="ref_category_only_not_marked">Only Not Marked</string>
   <string name="string_kotlin_used">Используется Kotlin</string>
   <string name="string_kotlin_unused">Kotlin не используется</string>
   <string name="string_compose_used">Используется Jetpack Compose</string>
@@ -105,12 +106,15 @@
   <string name="agp_details">Система сборки Android Studio основана на Gradle, а подключаемый модуль Android Gradle добавляет несколько функций, характерных для создания приложений для Android. Хотя подключаемый модуль Android обычно обновляется одновременно с Android Studio, этот подключаемый модуль (и остальная часть системы Gradle) может работать независимо от Android Studio и обновляться отдельно.</string>
   <string name="xposed_module">Xposed модуль</string>
   <string name="xposed_module_details">Xposed — это фреймворк для модулей, которые могут изменить поведение системы и приложений, не затрагивая никаких APK. Это здорово, потому что это означает, что модули могут работать с разными версиями ОС и прошивками без каких-либо изменений.</string>
+  <string name="play_app_signing">Play App Signing</string>
   <string name="play_app_signing_details">С помощью Play App Signing Google управляет ключом подписи вашего приложения и защищает его от вашего имени и использует его для подписи оптимизированных APK-файлов для распространения, которые создаются из ваших пакетов приложений. Play App Signing сохраняет ключ подписи вашего приложения в защищенной инфраструктуре Google и предлагает варианты обновления для повышения безопасности.</string>
   <string name="pwa_details">Прогрессивные веб-приложения (PWA) создаются и улучшаются с помощью современных API-интерфейсов, чтобы обеспечить расширенные возможности, надежность и простоту установки, а также охватывать всех, где угодно и на любом устройстве с помощью единой кодовой базы.</string>
+  <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
   <string name="extract_native_libs_tip">Приложение декларирует </string>
   <string name="xml_detail">XML Деталь</string>
   <string name="format_last_updated">Обновлено: %s</string>
   <string name="menu_process">Приложение</string>
+  <string name="menu_split">Split</string>
   <string name="alternative_launch_method">Альтернативный метод запуска</string>
   <string name="compare_with_current">Сравнить с текущим пакетом</string>
   <string name="rx_detail">RxJava — это реализация Reactive Extensions на виртуальной машине Java: библиотека для составления асинхронных и событийных программ с использованием наблюдаемых последовательностей.</string>
@@ -120,13 +124,51 @@
   <string name="signature_detail">Детали подписи</string>
   <string name="signature_version">Версия</string>
   <string name="signature_serial_number">Серийный номер</string>
+  <string name="signature_issuer">Issuer</string>
   <string name="signature_subject">Тема</string>
+  <string name="signature_validity_not_before">Validity Not Before</string>
+  <string name="signature_validity_not_after">Validity Not After</string>
+  <string name="signature_public_key_format">Public key Format</string>
+  <string name="signature_public_key_algorithm">Public key Algorithm</string>
+  <string name="signature_public_key_exponent">Public key Exponent</string>
+  <string name="signature_public_key_modulus_size">Public key Modulus Size</string>
+  <string name="signature_public_key_modulus">Public key Modulus</string>
+  <string name="signature_public_key_y">Public key Value Y</string>
+  <string name="signature_public_key_type">Public key Type</string>
+  <string name="signature_algorithm_name">Signature Algorithm Name</string>
+  <string name="signature_algorithm_oid">Signature Algorithm OID</string>
+  <string name="lib_detail_label_tip">Label</string>
+  <string name="lib_detail_develop_team_tip">Dev Team</string>
+  <string name="lib_detail_rule_contributors_tip">Rule Contributor(s)</string>
+  <string name="lib_detail_description_tip">Description</string>
+  <string name="lib_detail_relative_link_tip">Relative Link</string>
+  <string name="lib_detail_last_update_tip">Updated at</string>
+  <string name="lib_detail_app_props_title">Application Properties</string>
+  <string name="lib_detail_app_props_tip">More information</string>
+  <string name="lib_detail_xposed_min_version">Min Version</string>
+  <string name="lib_detail_xposed_default_scope">Default Scope</string>
+  <string name="lib_detail_xposed_init_class">Init Class</string>
+  <string name="lib_detail_app_install_source_title">Installation Source</string>
+  <string name="lib_detail_app_install_source_originating_package">Installation requester</string>
+  <string name="lib_detail_app_install_source_installing_package">Installation Executor</string>
+  <string name="lib_detail_app_install_source_empty">Unknown</string>
+  <string name="lib_detail_app_install_source_empty_detail">adb or uninstalled app</string>
+  <string name="lib_detail_app_install_source_shizuku_usage">Because Android restricts the API to get the installation requester, we use Shizuku to get the installation requester.</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled">Shizuku not installed</string>
+  <string name="lib_detail_app_install_source_shizuku_uninstalled_detail">Click here to install Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version">Requires Shizuku API 10</string>
+  <string name="lib_detail_app_install_source_shizuku_low_version_detail">Click here to update Shizuku</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running">Shizuku not running</string>
+  <string name="lib_detail_app_install_source_shizuku_not_running_detail">Click here to jump to Shizuku to start it</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted">Shizuku not authorized</string>
+  <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">Click here for Shizuku authorization for installation requester</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">Скопировано в буфер обмена</string>
   <string name="toast_not_existing_market">Нет магазина приложений</string>
   <string name="toast_use_another_file_manager">Пожалуйста, используйте другой файловый менеджер, чтобы открыть APK</string>
   <string name="toast_cant_open_app">«Невозможно открыть это приложение»</string>
   <string name="toast_cloud_rules_update_error">Не удалось обновить облачные правила. Пожалуйста, попробуйте еще раз.</string>
+  <string name="toast_not_enough_storage_space">Not enough storage space</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">Сохранить текущий снимок</string>
   <string name="snapshot_current_timestamp">Отметка времени текущего снимка</string>
@@ -141,6 +183,7 @@
   <string name="snapshot_detail_new_install_title">Это приложение недавно установлено</string>
   <string name="snapshot_detail_deleted_title">Это приложение было удалено</string>
   <string name="snapshot_time_node_uninitialized">(Неинициализировано)</string>
+  <string name="snapshot_preinstalled_app">Preinstalled app</string>
   <string name="snapshot_generate_text_report">Создать текстовый отчет</string>
   <string name="snapshot_scheme_tip"><![CDATA[Совет: Теперь вы можете генерировать снимки в фоновом режиме через:<br><b>%s</b>]]></string>
   <!--  Dialog  -->
@@ -150,13 +193,18 @@
   <string name="dialog_title_keep_previous_snapshot">Внимание</string>
   <string name="dialog_message_keep_previous_snapshot">Вы хотите сохранить предыдущий снимок?</string>
   <string name="dialog_title_select_to_delete">Выберите дату для удаления снимка</string>
+  <string name="dialog_title_confirm_to_delete">Are you sure to delete this snapshot?</string>
   <string name="btn_keep">Оставить</string>
   <string name="btn_drop">Удалить</string>
+  <string name="dialog_title_compare_diff_apk">Attention</string>
+  <string name="dialog_message_compare_diff_apk">Do you want to compare two different APKs?</string>
   <!--  Album  -->
   <string name="album_compare">Сравнить</string>
   <string name="album_item_comparison_title">Сравнение</string>
   <string name="album_item_comparison_subtitle">Сравнение двух снимков</string>
   <string name="album_item_comparison_invalid_compare">Недопустимое сравнение</string>
+  <string name="album_item_comparison_invalid_shared_items">Please select two APK files for comparison</string>
+  <string name="album_item_comparison_choose_local_apk">Choose Local APK</string>
   <string name="album_item_management_title">Менеджер</string>
   <string name="album_item_management_subtitle">Управление всеми снимками</string>
   <string name="album_item_backup_restore_title">Бекап и восстановление</string>
@@ -167,6 +215,7 @@
   <string name="album_backup_summary">Бекап всех снимков</string>
   <string name="album_restore">Восстановление</string>
   <string name="album_restore_summary">Восстановление снимков из бекапа</string>
+  <string name="album_restore_detail">%1$s : %2$s items in total\n</string>
   <string name="album_click_to_choose">Нажмите, чтобы выбрать</string>
   <string name="album_dialog_delete_snapshot_message">Обработка…</string>
   <!--  Integration  -->
@@ -186,5 +235,16 @@
   <string name="adv_show_64_bit">Показывать 64-битные приложения</string>
   <string name="adv_show_32_bit">Показывать 32-битные приложения</string>
   <string name="adv_sort_mode">Тип сортировки</string>
+  <string name="adv_sort_by_time">Updated Time</string>
+  <string name="adv_sort_by_target_version">Target Version</string>
+  <string name="adv_sort_by_name">Name</string>
+  <string name="adv_show_android_version">Show Android Version</string>
+  <string name="adv_show_target_version">Show Target Version</string>
+  <string name="adv_show_min_version">Show Min Version</string>
+  <string name="adv_tint_abi_label">Tint ABI Label</string>
+  <string name="adv_mark_exported">Mark Exported Component</string>
+  <string name="adv_mark_disabled">Mark Disabled Component</string>
+  <string name="adv_show_marked_lib">Show Marked Libraries</string>
   <!--  Snapshot menu  -->
+  <string name="snapshot_menu_show_update_time">Show Update Time</string>
 </resources>
