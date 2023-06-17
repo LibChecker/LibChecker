@@ -183,7 +183,7 @@
   <string name="snapshot_detail_new_install_title">這是一個全新的應用程式</string>
   <string name="snapshot_detail_deleted_title">此應用程式已被移除</string>
   <string name="snapshot_time_node_uninitialized">(未初始化)</string>
-  <string name="snapshot_preinstalled_app">預裝的 app</string>
+  <string name="snapshot_preinstalled_app">預置應用程式</string>
   <string name="snapshot_generate_text_report">產生文字報告</string>
   <string name="snapshot_scheme_tip"><![CDATA[提示：現在您可以透過<br><b>%s</b><br>在背景產生快照。]]></string>
   <!--  Dialog  -->
