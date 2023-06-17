@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 const val ARROW = "→"
+const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
 
 class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
 
@@ -202,7 +203,11 @@ class SnapshotAdapter : BaseQuickAdapter<SnapshotDiffItem, BaseViewHolder>(0) {
         } else {
           formatter.format(item.updateTime)
         }
-        updateTime.text = String.format(context.getString(R.string.format_last_updated), timeText)
+        updateTime.text = if (item.updateTime <= PREINSTALLED_TIMESTAMP) {
+          context.getString(R.string.snapshot_preinstalled_app)
+        } else {
+          context.getString(R.string.format_last_updated).format(timeText)
+        }
       }
     }
   }
