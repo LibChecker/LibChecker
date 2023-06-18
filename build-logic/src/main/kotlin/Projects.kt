@@ -22,7 +22,16 @@ fun Project.setupAppModule(block: BaseAppModuleExtension.() -> Unit = {}) {
     defaultConfig {
       versionCode = verCode
       versionName = verName
-      resourceConfigurations += arrayOf("en", "zh-rCN", "zh-rTW", "zh-rHK", "ru-rRU", "ru-rUA", "ja-rJP")
+      resourceConfigurations += arrayOf(
+        "en",
+        "zh-rCN",
+        "zh-rTW",
+        "zh-rHK",
+        "ru-rRU",
+        "ru-rUA",
+        "ja-rJP",
+        "vi-rVN",
+      )
     }
     val releaseSigning = if (project.hasProperty("releaseStoreFile")) {
       signingConfigs.create("release") {
