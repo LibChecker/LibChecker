@@ -260,11 +260,11 @@ class LibStringAdapter(
     itemName: CharSequence
   ) {
     setOrHighlightText(itemView.libName, itemName)
+    setOrHighlightText(itemView.libSize, item.item.source.orEmpty())
+
     val type = runCatching {
       appResources?.getResourceTypeName(item.item.size.toInt())
     }.getOrDefault("null")
-
-    itemView.libSize.text = item.item.source
     itemView.linkToIcon.isVisible = metadataLinkable.contains(type)
 
     if (itemView.linkToIcon.isVisible) {
