@@ -68,7 +68,9 @@ class MetaDataAnalysisFragment : BaseDetailFragment<FragmentLibNativeBinding>() 
   }
 
   override fun getFilterListByText(text: String): List<LibStringItemChip>? {
-    return viewModel.metaDataItems.value?.filter { it.item.name.contains(text, true) }
+    return viewModel.metaDataItems.value?.filter {
+      it.item.name.contains(text, true) || it.item.source?.contains(text, true) == true
+    }
   }
 
   companion object {
