@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.ApplicationInfoHidden
 import android.content.pm.ComponentInfo
-import android.content.pm.IPackageManager
 import android.content.pm.InstallSourceInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -85,8 +84,6 @@ import java.text.DateFormat
 import java.util.zip.ZipEntry
 import javax.security.cert.X509Certificate
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuBinderWrapper
-import rikka.shizuku.SystemServiceHelper
 import timber.log.Timber
 
 object PackageUtils {
@@ -1044,24 +1041,29 @@ object PackageUtils {
       Timber.e(e)
       return null
     }
-    if (!Shizuku.pingBinder()) {
-      Timber.e("Shizuku not running")
-      return origInstallSourceInfo
-    }
-    if (Shizuku.getVersion() < 10) {
-      Timber.e("Requires Shizuku API 10")
-      return origInstallSourceInfo
-    } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-      Timber.i("Shizuku not authorized")
-      return origInstallSourceInfo
-    }
-    return IPackageManager.Stub.asInterface(
-      ShizukuBinderWrapper(SystemServiceHelper.getSystemService("package"))
-    ).let {
-      if (OsUtils.atLeastU()) {
-        it.getInstallSourceInfo(packageName, Shizuku.getUid())
-      } else {
-        it.getInstallSourceInfo(packageName)
+    return when (ShizukuUtils.checkShizukuStatus()) {
+      ShizukuUtils.Status.SUCCESS -> SystemServices.iPackageManager.let {
+        if (OsUtils.atLeastU()) {
+          it.getInstallSourceInfo(packageName, Shizuku.getUid())
+        } else {
+          it.getInstallSourceInfo(packageName)
+        }
+      }
+      ShizukuUtils.Status.NOT_AUTHORIZED -> {
+        Timber.i("Shizuku not authorized")
+        return origInstallSourceInfo
+      }
+      ShizukuUtils.Status.LOW_VERSION -> {
+        Timber.e("Requires Shizuku API 10")
+        return origInstallSourceInfo
+      }
+      ShizukuUtils.Status.NOT_RUNNING -> {
+        Timber.e("Shizuku not running")
+        return origInstallSourceInfo
+      }
+      ShizukuUtils.Status.NOT_INSTALLED -> {
+        Timber.e("Shizuku not installed")
+        return origInstallSourceInfo
       }
     }
   }

@@ -644,6 +644,12 @@ abstract class BaseAppDetailActivity :
               )
             }
           }
+
+          Features.Ext.MULTI_USER -> {
+            if (!apkAnalyticsMode) {
+              TODO()
+            }
+          }
         }
       }.launchIn(lifecycleScope)
       it.abiBundle.observe(this) { bundle ->

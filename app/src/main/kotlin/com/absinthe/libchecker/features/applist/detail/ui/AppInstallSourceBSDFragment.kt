@@ -3,6 +3,7 @@ package com.absinthe.libchecker.features.applist.detail.ui
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.content.pm.PackageInfo
 import android.os.Build
 import android.text.SpannableString
 import android.text.style.ImageSpan
@@ -17,13 +18,13 @@ import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceB
 import com.absinthe.libchecker.features.applist.detail.ui.view.AppInstallSourceItemView
 import com.absinthe.libchecker.features.applist.detail.ui.view.CenterAlignImageSpan
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.ShizukuUtils
 import com.absinthe.libchecker.utils.extensions.getDrawable
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libraries.utils.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libraries.utils.view.BottomSheetHeaderView
 import kotlinx.coroutines.runBlocking
 import rikka.shizuku.Shizuku
-import rikka.sui.Sui
 
 @RequiresApi(Build.VERSION_CODES.R)
 class AppInstallSourceBSDFragment :
@@ -61,22 +62,32 @@ class AppInstallSourceBSDFragment :
       return
     }
     item.packageView.container.icon.load(com.absinthe.lc.rulesbundle.R.drawable.ic_lib_shizuku)
-    if (!PackageUtils.isAppInstalled(Constants.PackageNames.SHIZUKU) && !Sui.isSui()) {
-      item.packageView.container.appName.text =
-        getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
-      item.packageView.container.packageName.text =
-        getString(R.string.lib_detail_app_install_source_shizuku_usage)
-      item.packageView.container.versionInfo.text =
-        getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
-      item.packageView.setOnClickListener {
-        startActivity(
-          Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
-          }
-        )
+    when (ShizukuUtils.checkShizukuStatus()) {
+      ShizukuUtils.Status.SUCCESS -> initAppInstallSourceItemView(item, originatingPackageName)
+      ShizukuUtils.Status.NOT_AUTHORIZED -> {
+        item.packageView.container.appName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
+        item.packageView.container.packageName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_usage)
+        item.packageView.container.versionInfo.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
+        item.packageView.setOnClickListener {
+          Shizuku.addRequestPermissionResultListener(this)
+          Shizuku.requestPermission(0)
+        }
       }
-    } else {
-      if (!Shizuku.pingBinder()) {
+      ShizukuUtils.Status.LOW_VERSION -> {
+        item.packageView.container.appName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_low_version)
+        item.packageView.container.packageName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_usage)
+        item.packageView.container.versionInfo.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
+        item.packageView.setOnClickListener {
+          LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
+        }
+      }
+      ShizukuUtils.Status.NOT_RUNNING -> {
         item.packageView.container.appName.text =
           getString(R.string.lib_detail_app_install_source_shizuku_not_running)
         item.packageView.container.packageName.text =
@@ -87,34 +98,16 @@ class AppInstallSourceBSDFragment :
           PackageUtils.startLaunchAppActivity(requireContext(), Constants.PackageNames.SHIZUKU)
           Shizuku.addBinderReceivedListener(this)
         }
-      } else {
-        if (Shizuku.getVersion() < 10) {
-          item.packageView.container.appName.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_low_version)
-          item.packageView.container.packageName.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_usage)
-          item.packageView.container.versionInfo.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_low_version_detail)
-          item.packageView.setOnClickListener {
-            startActivity(
-              Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(URLManager.SHIZUKU_APP_GITHUB_RELEASE_PAGE)
-              }
-            )
-          }
-        } else if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-          item.packageView.container.appName.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted)
-          item.packageView.container.packageName.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_usage)
-          item.packageView.container.versionInfo.text =
-            getString(R.string.lib_detail_app_install_source_shizuku_permission_not_granted_detail)
-          item.packageView.setOnClickListener {
-            Shizuku.addRequestPermissionResultListener(this)
-            Shizuku.requestPermission(0)
-          }
-        } else {
-          initAppInstallSourceItemView(item, originatingPackageName)
+      }
+      ShizukuUtils.Status.NOT_INSTALLED -> {
+        item.packageView.container.appName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_uninstalled)
+        item.packageView.container.packageName.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_usage)
+        item.packageView.container.versionInfo.text =
+          getString(R.string.lib_detail_app_install_source_shizuku_uninstalled_detail)
+        item.packageView.setOnClickListener {
+          LCAppUtils.launchMarketPage(requireContext(), Constants.PackageNames.SHIZUKU)
         }
       }
     }

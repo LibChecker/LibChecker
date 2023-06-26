@@ -45,6 +45,14 @@ object LocalAppDataSource : AppDataSource {
     return list
   }
 
+  override fun getApplicationList(userId: Int): List<PackageInfo> {
+    Timber.d("getApplicationList for $userId start")
+    val list =
+      PackageManagerCompat.getInstalledPackages(PackageManager.GET_META_DATA or PackageManager.GET_PERMISSIONS, userId)
+    Timber.d("getApplicationList for $userId end, apps count: ${list.size}")
+    return list
+  }
+
   override fun getApplicationMap(ioDispatcher: CoroutineDispatcher): Flow<Map<String, PackageInfo>> =
     flow {
       getApplicationList(ioDispatcher).collect { list ->
