@@ -54,7 +54,7 @@ object PackageManagerCompat {
     }
   }
 
-  fun getInstalledPackages(flags: Int, userId:Int): List<PackageInfo> {
+  fun getInstalledPackages(flags: Int, userId: Int): List<PackageInfo> {
     if (ShizukuUtils.checkShizukuStatus() != ShizukuUtils.Status.SUCCESS) {
       Timber.w("Shizuku unavailable")
       return listOf()
