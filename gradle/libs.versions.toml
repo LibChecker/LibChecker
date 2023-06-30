@@ -46,7 +46,7 @@ androidX-security = "androidx.security:security-crypto:1.1.0-alpha06"
 androidX-viewPager2 = "androidx.viewpager2:viewpager2:1.1.0-beta02"
 androidX-window = "androidx.window:window:1.1.0"
 
-square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.11"
+square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.12"
 square-moshi = "com.squareup.moshi:moshi:1.15.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.11.0"
 square-okio = "com.squareup.okio:okio:3.3.0"
