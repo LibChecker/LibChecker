@@ -18,7 +18,7 @@
     android:fitsSystemWindows="true"
     app:liftOnScroll="true">
 
-    <androidx.appcompat.widget.Toolbar
+    <androidx.appcompat.widget.ToolbarCompat
       android:id="@+id/toolbar"
       style="?actionBarStyle"
       android:layout_width="match_parent"
