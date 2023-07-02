@@ -34,7 +34,9 @@ object MainLooperFilter {
       stack.contains("android.view.inputmethod.InputMethodManager.startInputInner") ||
       stack.contains("com.android.server.wm.ConfigurationContainer.setActivityType") ||
       stack.contains("handleTopResumedActivityChanged") ||
-      stack.contains("lspatch")
+      stack.contains("lspatch") ||
+      stack.contains("tryGetViewHolderForPositionByDeadline") ||
+      stack.contains("addChildrenForExpandedActionView")
     ) {
       Timber.w(e)
     } else if (stack.contains("ClipboardService")) {
