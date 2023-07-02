@@ -17,6 +17,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import com.absinthe.libchecker.BuildConfig
@@ -487,7 +488,7 @@ class AboutActivity : AbsAboutActivityProxy(), MenuProvider {
   }
 
   private fun initView() {
-    addMenuProvider(this)
+    addMenuProvider(this, this, Lifecycle.State.STARTED)
     findViewById<Toolbar>(R.id.toolbar)?.let {
       it.title = getString(R.string.settings_about)
     }

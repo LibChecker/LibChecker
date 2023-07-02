@@ -1,8 +1,13 @@
 package com.absinthe.libchecker.ui.fragment
 
+import android.os.Bundle
 import android.view.Menu
+import android.view.View
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
@@ -23,34 +28,28 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
 
   private var lastPackageChangedTime: Long = 0
 
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    activity?.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+      override fun onResume(owner: LifecycleOwner) {
+        scheduleAppbarLiftingStatus(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
+      }
+
+      override fun onStop(owner: LifecycleOwner) {
+        if (this == homeViewModel.controller) {
+          homeViewModel.controller = null
+        }
+      }
+    })
+  }
+
   override fun onVisibilityChanged(visible: Boolean) {
     super.onVisibilityChanged(visible)
     if (visible) {
       if (this != homeViewModel.controller) {
         homeViewModel.controller = this
       }
-      (activity as? IAppBarContainer)?.let { container ->
-        if (container.currentMenuProvider != this) {
-          container.currentMenuProvider?.let { current ->
-            activity?.removeMenuProvider(current)
-          }
-          activity?.removeMenuProvider(this)
-          activity?.addMenuProvider(this)
-          container.currentMenuProvider = this
-        }
-      }
-    }
-  }
-
-  override fun onResume() {
-    super.onResume()
-    scheduleAppbarLiftingStatus(!(getBorderViewDelegate()?.isShowingTopBorder ?: true))
-  }
-
-  override fun onDetach() {
-    super.onDetach()
-    if (this == homeViewModel.controller) {
-      homeViewModel.controller = null
     }
   }
 
