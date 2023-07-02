@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import androidx.activity.viewModels
 import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.SimpleItemAnimator
 import coil.load
@@ -113,7 +114,7 @@ class SnapshotDetailActivity :
   }
 
   private fun initView() {
-    addMenuProvider(this)
+    addMenuProvider(this, this, Lifecycle.State.STARTED)
     setSupportActionBar(binding.toolbar)
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)

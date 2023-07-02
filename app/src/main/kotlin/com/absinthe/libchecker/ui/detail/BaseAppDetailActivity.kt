@@ -24,6 +24,7 @@ import androidx.core.view.MenuProvider
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -134,7 +135,7 @@ abstract class BaseAppDetailActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     binding = ActivityAppDetailBinding.inflate(layoutInflater)
     super.onCreate(savedInstanceState)
-    addMenuProvider(this)
+    addMenuProvider(this, this, Lifecycle.State.STARTED)
     setSupportActionBar(getToolbar())
     supportActionBar?.apply {
       setDisplayHomeAsUpEnabled(true)

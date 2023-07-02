@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.activity.addCallback
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.absinthe.libchecker.R
@@ -55,7 +56,7 @@ class TrackActivity :
   }
 
   private fun initView() {
-    addMenuProvider(this)
+    addMenuProvider(this, this, Lifecycle.State.STARTED)
     setSupportActionBar(binding.toolbar)
     (binding.root as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
