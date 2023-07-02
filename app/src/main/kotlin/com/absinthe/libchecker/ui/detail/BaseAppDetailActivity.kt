@@ -761,15 +761,17 @@ abstract class BaseAppDetailActivity :
         if (processBarView == null) {
           initProcessBarView()
         }
-        processBarView!!.setData(
-          viewModel.processMapLiveData.valueUnsafe.map { mapItem ->
-            ProcessBarAdapter.ProcessBarItem(
-              mapItem.key,
-              mapItem.value
-            )
-          }
-        )
-        processBarView?.isVisible = true
+        viewModel.processMapLiveData.value?.let {
+          processBarView?.setData(
+            it.map { mapItem ->
+              ProcessBarAdapter.ProcessBarItem(
+                mapItem.key,
+                mapItem.value
+              )
+            }
+          )
+          processBarView?.isVisible = true
+        }
       } else {
         binding.detailToolbarContainer.removeView(processBarView)
         processBarView = null
