@@ -56,7 +56,6 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
   override fun onStart() {
     super.onStart()
     Timber.d("${javaClass.simpleName} ==> onStart")
-    onVisibilityChanged(true)
   }
 
   override fun onResume() {
@@ -74,6 +73,5 @@ abstract class BaseFragment<VB : ViewBinding> : Fragment(), IBinding<VB> {
   override fun onStop() {
     super.onStop()
     Timber.d("${javaClass.simpleName} ==> onStop")
-    onVisibilityChanged(true)
   }
 }
