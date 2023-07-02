@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.RemoteException
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -80,11 +81,16 @@ class SettingsFragment : PreferenceFragmentCompat(), IListController {
           PackageManager.COMPONENT_ENABLED_STATE_DISABLED
         }
 
-        SystemServices.packageManager.setComponentEnabledSetting(
-          ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
-          flag,
-          PackageManager.DONT_KILL_APP
-        )
+        try {
+          SystemServices.packageManager.setComponentEnabledSetting(
+            ComponentName(BuildConfig.APPLICATION_ID, ApkDetailActivity::class.java.name),
+            flag,
+            PackageManager.DONT_KILL_APP
+          )
+        } catch (e: RemoteException) {
+          Timber.e(e)
+          Toasty.showShort(requireContext(), e.toString())
+        }
         Analytics.trackEvent(
           Constants.Event.SETTINGS,
           EventProperties().set("PREF_APK_ANALYTICS", newValue)
