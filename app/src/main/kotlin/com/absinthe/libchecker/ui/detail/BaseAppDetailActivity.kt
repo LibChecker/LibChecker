@@ -84,7 +84,6 @@ import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.getVersionString
 import com.absinthe.libchecker.utils.extensions.setLongClickCopiedToClipboard
 import com.absinthe.libchecker.utils.extensions.unsafeLazy
-import com.absinthe.libchecker.utils.extensions.valueUnsafe
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.toJson
 import com.absinthe.libchecker.view.detail.AppBarStateChangeListener
