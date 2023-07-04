@@ -21,12 +21,12 @@ object AdvancedOptions {
 
   const val DEFAULT_OPTIONS =
     SHOW_SYSTEM_APPS or
+      SHOW_SYSTEM_FRAMEWORK_APPS or
       SHOW_OVERLAYS or
       SHOW_64_BIT_APPS or
       SHOW_32_BIT_APPS or
       SORT_BY_NAME or
-      SHOW_TARGET_API or
-      SHOW_SYSTEM_FRAMEWORK_APPS
+      SHOW_TARGET_API
 
   const val ITEM_DEFAULT_OPTIONS =
     MARK_DISABLED or
