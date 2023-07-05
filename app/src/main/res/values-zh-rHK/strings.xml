@@ -245,6 +245,7 @@
   <string name="adv_mark_exported">標示已匯出的元件</string>
   <string name="adv_mark_disabled">標示已停用的元件</string>
   <string name="adv_show_marked_lib">顯示已標示的庫</string>
+  <string name="adv_show_system_framework_apps">Show Framework Apps</string>
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">顯示更新時間</string>
 </resources>
