@@ -367,7 +367,7 @@ class AppListFragment :
       filterList = filterList.filter { !it.isSystem }.toMutableList()
     }
     if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
-      filterList = filterList.filter { !it.packageName.startWith("com.android.") && !it.packageName == "android" }.toMutableList()
+      filterList = filterList.filter { !it.packageName.startWith("com.android.") && it.packageName != "android" }.toMutableList()
     }
     if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
       filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
