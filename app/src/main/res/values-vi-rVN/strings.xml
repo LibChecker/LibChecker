@@ -245,6 +245,7 @@
   <string name="adv_mark_exported">Đánh dấu thành phần đã xuất</string>
   <string name="adv_mark_disabled">Đánh dấu thành phần bị vô hiệu hóa</string>
   <string name="adv_show_marked_lib">Hiển thị thư viện được đánh dấu</string>
+  <string name="adv_show_system_framework_apps">Show Framework Apps</string>
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">Hiển thị thời gian cập nhật</string>
 </resources>
