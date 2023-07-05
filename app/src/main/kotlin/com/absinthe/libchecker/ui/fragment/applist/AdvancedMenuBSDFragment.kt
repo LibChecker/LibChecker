@@ -27,6 +27,7 @@ class AdvancedMenuBSDFragment : BaseBottomSheetViewDialogFragment<AdvancedMenuBS
       maxPeekSize = ((dialog?.window?.decorView?.height ?: 0) * 0.8).toInt()
     }
     optionsViewMap[AdvancedOptions.SHOW_SYSTEM_APPS] = root.addOptionItemView(R.string.adv_show_system_apps, AdvancedOptions.SHOW_SYSTEM_APPS)
+    optionsViewMap[AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS] = root.addOptionItemView(R.string.adv_show_system_framework_apps, AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS)
     optionsViewMap[AdvancedOptions.SHOW_OVERLAYS] = root.addOptionItemView(R.string.adv_show_overlays, AdvancedOptions.SHOW_OVERLAYS)
     optionsViewMap[AdvancedOptions.SHOW_64_BIT_APPS] = root.addOptionItemView(R.string.adv_show_64_bit, AdvancedOptions.SHOW_64_BIT_APPS)
     optionsViewMap[AdvancedOptions.SHOW_32_BIT_APPS] = root.addOptionItemView(R.string.adv_show_32_bit, AdvancedOptions.SHOW_32_BIT_APPS)
