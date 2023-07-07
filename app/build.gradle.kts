@@ -19,6 +19,10 @@ ksp {
   arg("room.expandProjection", "true")
 }
 
+moshi {
+  generateProguardRules.set(false)
+}
+
 setupAppModule {
   namespace = "com.absinthe.libchecker"
   defaultConfig {
