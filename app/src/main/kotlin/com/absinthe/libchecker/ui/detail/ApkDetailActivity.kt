@@ -89,6 +89,7 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
               isPackageReady = true
 
               withContext(Dispatchers.Main) {
+                @Suppress("DEPRECATION", "InlinedApi")
                 val flag = (
                   PackageManager.GET_SERVICES
                     or PackageManager.GET_ACTIVITIES
@@ -96,6 +97,8 @@ class ApkDetailActivity : BaseAppDetailActivity(), IDetailContainer {
                     or PackageManager.GET_PROVIDERS
                     or PackageManager.GET_PERMISSIONS
                     or PackageManager.GET_META_DATA
+                    or PackageManager.GET_SIGNATURES
+                    or PackageManager.GET_SIGNING_CERTIFICATES
                     or PackageManager.MATCH_DISABLED_COMPONENTS
                     or PackageManager.MATCH_UNINSTALLED_PACKAGES
                   )
