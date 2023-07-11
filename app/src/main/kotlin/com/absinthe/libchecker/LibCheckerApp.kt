@@ -94,10 +94,16 @@ class LibCheckerApp : Application() {
   }
 
   private fun initSplitController() {
+    val ratio = UiUtils.getScreenAspectRatio()
+    Timber.d("initSplitController: getScreenAspectRatio: $ratio")
     runCatching {
       if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
         RuleController.getInstance(this).setRules(
-          RuleController.parseRules(this, R.xml.main_split_config)
+          if (ratio in 0.8f..1.2f) {
+            RuleController.parseRules(this, R.xml.main_split_config_foldable)
+          } else {
+            RuleController.parseRules(this, R.xml.main_split_config)
+          }
         )
       }
     }

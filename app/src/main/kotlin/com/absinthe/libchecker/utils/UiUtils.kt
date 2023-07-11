@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import android.graphics.Color
+import android.util.DisplayMetrics
 import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
@@ -62,5 +63,14 @@ object UiUtils {
       )
       .setCancelable(false)
       .create()
+  }
+
+  @Suppress("DEPRECATION")
+  fun getScreenAspectRatio(): Float {
+    val displayMetrics = DisplayMetrics()
+    SystemServices.windowManager.defaultDisplay.getMetrics(displayMetrics)
+    val width = displayMetrics.widthPixels
+    val height = displayMetrics.heightPixels
+    return width.toFloat() / height.toFloat()
   }
 }

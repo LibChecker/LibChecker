@@ -12,9 +12,9 @@ import java.io.File
 object VersionCompat {
 
   private val hasClipboardOverlayView: Boolean by lazy {
-    val source =
-      File(PackageUtils.getPackageInfo(Constants.PackageNames.SYSTEMUI).applicationInfo.sourceDir)
     runCatching {
+      val source =
+        File(PackageUtils.getPackageInfo(Constants.PackageNames.SYSTEMUI).applicationInfo.sourceDir)
       PackageUtils.findDexClasses(
         source,
         listOf("com.android.systemui.clipboardoverlay.ClipboardOverlayView".toClassDefType())

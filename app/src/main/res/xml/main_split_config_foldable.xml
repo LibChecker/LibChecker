@@ -1,0 +1,40 @@
+<!-- The split configuration for activities. -->
+<resources
+  xmlns:window="http://schemas.android.com/apk/res-auto">
+
+  <!-- Automatically split the following activity pairs. -->
+  <SplitPairRule
+    window:splitRatio="0.5"
+    window:clearTop="true">
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.detail.AppDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.main.LibReferenceActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.main.ChartActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.detail.SnapshotDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.MainActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.about.AboutActivity" />
+
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.main.LibReferenceActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.detail.AppDetailActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.detail.SnapshotDetailActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.detail.AppDetailActivity" />
+
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.snapshot.AlbumActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.album.BackupActivity" />
+    <SplitPairFilter
+      window:primaryActivityName="com.absinthe.libchecker.ui.snapshot.AlbumActivity"
+      window:secondaryActivityName="com.absinthe.libchecker.ui.album.TrackActivity" />
+  </SplitPairRule>
+
+</resources>
