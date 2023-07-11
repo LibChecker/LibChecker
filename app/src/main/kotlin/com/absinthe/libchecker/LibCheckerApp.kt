@@ -2,12 +2,14 @@ package com.absinthe.libchecker
 
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitController
 import coil.Coil
 import coil.ImageLoader
 import com.absinthe.libchecker.app.MainLooperFilter
+import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.Repositories
@@ -95,11 +97,16 @@ class LibCheckerApp : Application() {
 
   private fun initSplitController() {
     val ratio = UiUtils.getScreenAspectRatio()
-    Timber.d("initSplitController: getScreenAspectRatio: $ratio")
+    val hasHinge = if (OsUtils.atLeastR()) {
+      SystemServices.packageManager.hasSystemFeature(PackageManager.FEATURE_SENSOR_HINGE_ANGLE)
+    } else {
+      false
+    }
+    Timber.d("initSplitController: getScreenAspectRatio: $ratio, hasHinge=$hasHinge")
     runCatching {
       if (SplitController.getInstance(this).splitSupportStatus == SplitController.SplitSupportStatus.SPLIT_AVAILABLE) {
         RuleController.getInstance(this).setRules(
-          if (ratio in 0.8f..1.2f) {
+          if (hasHinge || ratio in 0.85f..1.15f) {
             RuleController.parseRules(this, R.xml.main_split_config_foldable)
           } else {
             RuleController.parseRules(this, R.xml.main_split_config)
