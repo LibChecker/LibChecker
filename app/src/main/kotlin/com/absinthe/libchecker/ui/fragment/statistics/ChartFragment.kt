@@ -550,6 +550,7 @@ class ChartFragment :
       } else {
         viewModel.dbItems.value?.filter { !it.isSystem }
       }
+      viewModel.androidVersion.postValue(null)
 
       when (chartType) {
         TYPE_ABI -> {
@@ -582,7 +583,6 @@ class ChartFragment :
                 }
             }
           }
-          viewModel.androidVersion.postValue(null)
         }
         TYPE_KOTLIN -> {
           when (legendList.getOrNull(h.x.toInt())) {
@@ -601,7 +601,6 @@ class ChartFragment :
                 }
             }
           }
-          viewModel.androidVersion.postValue(null)
         }
         TYPE_TARGET_API -> {
           val targetApi = legendList.getOrNull(h.x.toInt())?.toInt() ?: 0
