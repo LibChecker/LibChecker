@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Process
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -600,4 +601,11 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
   }
 }
 
-fun PackageInfo.getAppName(): String? = applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
+fun PackageInfo.getAppName(): String? =
+  applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
+
+const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
+
+fun PackageInfo.isPreinstalled(): Boolean {
+  return lastUpdateTime <= PREINSTALLED_TIMESTAMP
+}

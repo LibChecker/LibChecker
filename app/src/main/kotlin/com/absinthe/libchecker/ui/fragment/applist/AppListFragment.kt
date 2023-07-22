@@ -30,8 +30,10 @@ import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.fragment.BaseListControllerFragment
 import com.absinthe.libchecker.ui.fragment.IAppBarContainer
 import com.absinthe.libchecker.ui.main.INavViewContainer
+import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.addPaddingTop
 import com.absinthe.libchecker.utils.extensions.doOnMainThreadIdle
+import com.absinthe.libchecker.utils.extensions.isPreinstalled
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.utils.extensions.setSpaceFooterView
 import com.absinthe.libchecker.utils.harmony.HarmonyOsUtil
@@ -367,7 +369,7 @@ class AppListFragment :
       filterList = filterList.filter { !it.isSystem }.toMutableList()
     }
     if ((options and AdvancedOptions.SHOW_SYSTEM_FRAMEWORK_APPS) == 0) {
-      filterList = filterList.filter { !it.packageName.startsWith("com.android.") && it.packageName != "android" }.toMutableList()
+      filterList = filterList.filter { (!it.packageName.startsWith("com.android.") && it.packageName != "android") || !PackageUtils.getPackageInfo(it.packageName).isPreinstalled() }.toMutableList()
     }
     if ((options and AdvancedOptions.SHOW_OVERLAYS) == 0) {
       filterList = filterList.filter { it.abi.toInt() != Constants.OVERLAY }.toMutableList()
