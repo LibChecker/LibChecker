@@ -378,7 +378,9 @@ fun PackageInfo.getJetpackComposeVersion(): String? {
       arrayOf(
         "META-INF/androidx.compose.runtime_runtime.version",
         "META-INF/androidx.compose.ui_ui.version",
-        "META-INF/androidx.compose.ui_ui-tooling-preview.version"
+        "META-INF/androidx.compose.ui_ui-tooling-preview.version",
+        "META-INF/androidx.compose.foundation_foundation.version",
+        "META-INF/androidx.compose.animation_animation.version",
       ).forEach { entry ->
         zipFile.getEntry(entry)?.let { ze ->
           zipFile.getInputStream(ze).source().buffer().use { bs ->
