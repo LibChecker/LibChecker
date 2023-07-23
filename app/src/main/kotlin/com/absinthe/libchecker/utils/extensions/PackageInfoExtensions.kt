@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.os.Process
 import androidx.core.content.pm.PackageInfoCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -381,7 +380,7 @@ fun PackageInfo.getJetpackComposeVersion(): String? {
         "META-INF/androidx.compose.ui_ui.version",
         "META-INF/androidx.compose.ui_ui-tooling-preview.version",
         "META-INF/androidx.compose.foundation_foundation.version",
-        "META-INF/androidx.compose.animation_animation.version",
+        "META-INF/androidx.compose.animation_animation.version"
       ).forEach { entry ->
         zipFile.getEntry(entry)?.let { ze ->
           zipFile.getInputStream(ze).source().buffer().use { bs ->
