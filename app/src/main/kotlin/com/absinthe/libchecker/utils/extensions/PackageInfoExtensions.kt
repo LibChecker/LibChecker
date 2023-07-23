@@ -378,7 +378,9 @@ fun PackageInfo.getJetpackComposeVersion(): String? {
       arrayOf(
         "META-INF/androidx.compose.runtime_runtime.version",
         "META-INF/androidx.compose.ui_ui.version",
-        "META-INF/androidx.compose.ui_ui-tooling-preview.version"
+        "META-INF/androidx.compose.ui_ui-tooling-preview.version",
+        "META-INF/androidx.compose.foundation_foundation.version",
+        "META-INF/androidx.compose.animation_animation.version"
       ).forEach { entry ->
         zipFile.getEntry(entry)?.let { ze ->
           zipFile.getInputStream(ze).source().buffer().use { bs ->
@@ -598,4 +600,11 @@ fun PackageInfo.getSignatures(context: Context): Sequence<LibStringItem> {
   }
 }
 
-fun PackageInfo.getAppName(): String? = applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
+fun PackageInfo.getAppName(): String? =
+  applicationInfo?.loadLabel(SystemServices.packageManager)?.toString()
+
+const val PREINSTALLED_TIMESTAMP = 1230768000000 // 2009-01-01 08:00:00 GMT+8
+
+fun PackageInfo.isPreinstalled(): Boolean {
+  return lastUpdateTime <= PREINSTALLED_TIMESTAMP
+}

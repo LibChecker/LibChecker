@@ -6,8 +6,8 @@ appCenter = "5.0.2"
 grpc = "1.56.1"
 hiddenApiRefine = "4.3.0"
 kotlin = "1.9.0"
-protoc = "3.23.2"
-shizuku = "13.1.2"
+protoc = "3.23.4"
+shizuku = "13.1.4"
 square-retrofit = "2.9.0"
 zhaobozhen = "1.1.4"
 
@@ -18,8 +18,8 @@ hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "3.15.0" }
-ksp = { id = "com.google.devtools.ksp", version = "1.9.0-1.0.11" }
-protobuf = { id = "com.google.protobuf", version = "0.9.3" }
+ksp = { id = "com.google.devtools.ksp", version = "1.9.0-1.0.12" }
+protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 moshiX = "dev.zacsweers.moshix:0.24.0"
 
 [libraries]
@@ -49,7 +49,7 @@ androidX-window = "androidx.window:window:1.1.0"
 square-leakCanary = "com.squareup.leakcanary:leakcanary-android:2.12"
 square-moshi = "com.squareup.moshi:moshi:1.15.0"
 square-okHttp = "com.squareup.okhttp3:okhttp:4.11.0"
-square-okio = "com.squareup.okio:okio:3.3.0"
+square-okio = "com.squareup.okio:okio:3.4.0"
 square-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "square-retrofit" }
 square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "square-retrofit" }
 
@@ -94,7 +94,7 @@ flexbox = "com.google.android.flexbox:flexbox:3.0.0"
 hiddenApiBypass = "org.lsposed.hiddenapibypass:hiddenapibypass:4.3"
 javax-annotation = "javax.annotation:javax.annotation-api:1.3.2"
 lc-rules = "com.github.LibChecker:LibChecker-Rules-Bundle:32.1"
-lottie = "com.airbnb.android:lottie:6.0.1"
+lottie = "com.airbnb.android:lottie:6.1.0"
 mpAndroidChart = "com.github.PhilJay:MPAndroidChart:3.1.0"
 once = "com.jonathanfinerty.once:once:1.3.1"
 processPhoenix = "com.jakewharton:process-phoenix:2.1.2"
