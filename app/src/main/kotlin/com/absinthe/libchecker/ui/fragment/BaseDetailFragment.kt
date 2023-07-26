@@ -247,7 +247,7 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
 
     if (adapter.type == PERMISSION) {
       PermissionDetailDialogFragment.newInstance(name)
-        .show(childFragmentManager,PermissionDetailDialogFragment::class.java.name)
+        .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
       return
     }
 
