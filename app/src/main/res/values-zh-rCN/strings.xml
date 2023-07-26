@@ -248,4 +248,5 @@
   <string name="adv_show_system_framework_apps">显示系统框架应用</string>
   <!--  Snapshot menu  -->
   <string name="snapshot_menu_show_update_time">显示更新时间</string>
+  <string name="snapshot_menu_hide_no_component_changes">隐藏无组件变更</string>
 </resources>

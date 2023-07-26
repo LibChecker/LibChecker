@@ -37,6 +37,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
+import com.absinthe.libchecker.constant.SnapshotOptions
 import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.model.SnapshotDiffItem
 import com.absinthe.libchecker.recyclerview.HorizontalSpacesItemDecoration
@@ -631,8 +632,12 @@ class SnapshotFragment :
   }
 
   private fun updateItems(list: List<SnapshotDiffItem>, highlightRefresh: Boolean = false) = lifecycleScope.launch(Dispatchers.Main) {
+    val filterList = list.toMutableList()
+    if (GlobalValues.snapshotOptions.and(SnapshotOptions.HIDE_NO_COMPONENT_CHANGES) != 0) {
+      filterList.removeAll { it.isNothingChanged() }
+    }
     adapter.setDiffNewData(
-      list.sortedByDescending { it.updateTime }
+      filterList.sortedByDescending { it.updateTime }
         .toMutableList()
     ) {
       if (isDetached) {
