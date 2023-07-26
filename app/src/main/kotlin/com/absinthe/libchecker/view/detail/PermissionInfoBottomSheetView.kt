@@ -258,7 +258,7 @@ class PermissionInfoBottomSheetView(context: Context) : AViewGroup(context), IHe
       )
       setMeasuredDimension(
         measuredWidth,
-        label.measuredHeight + description.measuredHeight + marginVertical * 4
+        label.measuredHeight + description.measuredHeight + marginVertical
       )
     }
 
