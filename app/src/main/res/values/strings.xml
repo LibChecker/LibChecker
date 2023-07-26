@@ -113,6 +113,7 @@
   <string name="app_info_launch">Launch</string>
   <string name="app_info_settings">Settings</string>
   <string name="lib_detail_dialog_title">Library Details</string>
+  <string name="lib_permission_dialog_title">Permission Detail</string>
   <string name="agp_details">The Android Studio build system is based on Gradle, and the Android Gradle plugin adds several features that are specific to building Android apps. Although the Android plugin is typically updated in lock-step with Android Studio, the plugin (and the rest of the Gradle system) can run independent of Android Studio and be updated separately.</string>
   <string name="xposed_module">Xposed Module</string>
   <string name="xposed_module_details">Xposed is a framework for modules that can change the behavior of the system and apps without touching any APKs. That\'s great because it means that modules can work for different versions and even ROMs without any changes.</string>
