@@ -26,6 +26,7 @@ import com.absinthe.libchecker.ui.fragment.detail.DetailFragmentManager
 import com.absinthe.libchecker.ui.fragment.detail.LibDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.LocatedCount
 import com.absinthe.libchecker.ui.fragment.detail.MODE_SORT_BY_LIB
+import com.absinthe.libchecker.ui.fragment.detail.PermissionDetailDialogFragment
 import com.absinthe.libchecker.ui.fragment.detail.Sortable
 import com.absinthe.libchecker.ui.fragment.detail.impl.ComponentsAnalysisFragment
 import com.absinthe.libchecker.ui.fragment.detail.impl.NativeAnalysisFragment
@@ -243,6 +244,12 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>(), Sortable
     val item = adapter.getItem(position)
     val name = item.item.name
     val isValidLib = item.chip != null
+
+    if (adapter.type == PERMISSION) {
+      PermissionDetailDialogFragment.newInstance(name)
+        .show(childFragmentManager, PermissionDetailDialogFragment::class.java.name)
+      return
+    }
 
     lifecycleScope.launch(Dispatchers.IO) {
       val regexName = LCRules.getRule(name, adapter.type, true)?.regexName

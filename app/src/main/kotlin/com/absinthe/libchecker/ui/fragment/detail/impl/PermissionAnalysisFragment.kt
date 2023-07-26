@@ -17,7 +17,7 @@ import rikka.core.util.ClipboardUtils
 class PermissionAnalysisFragment : BaseFilterAnalysisFragment<FragmentLibComponentBinding>() {
 
   override fun getRecyclerView() = binding.list
-  override val needShowLibDetailDialog = false
+  override val needShowLibDetailDialog = true
 
   override fun init() {
     binding.apply {
