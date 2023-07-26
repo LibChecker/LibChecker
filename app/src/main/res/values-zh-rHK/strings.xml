@@ -103,6 +103,7 @@
   <string name="app_info_launch">啟動</string>
   <string name="app_info_settings">設定</string>
   <string name="lib_detail_dialog_title">庫詳細資料</string>
+  <string name="lib_permission_dialog_title">Permission Detail</string>
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 外掛程式新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
